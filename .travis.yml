@@ -1,5 +1,6 @@
 language: android
 jdk: oraclejdk7
+before_install: git submodule update --init
 
 env:
   matrix:
