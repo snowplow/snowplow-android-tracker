@@ -4,7 +4,13 @@ before_install: git submodule update --init
 
 env:
   matrix:
-    - ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+before_install:
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+before_script:
+  - ./ci/wait_for_emulator
+
 
 android:
   components:
