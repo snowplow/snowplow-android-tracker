@@ -1,1 +1,2 @@
-include ':android-tracker'
+include ':android-tracker', ':java-tracker-core'
+project(':java-tracker-core').projectDir = new File('java-tracker/java-tracker-core')
