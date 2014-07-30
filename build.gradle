@@ -1,27 +1,19 @@
-/*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-// Applying the java plugin to add support for Java
-apply plugin: 'java'
-// As per http://www.gradle.org/docs/current/userguide/publishing_maven.html
-apply plugin: 'maven-publish'
-
-subprojects {
-    apply plugin: 'java'
-    group = 'com.snowplowanalytics'
-    version = '0.1.0'
+buildscript {
     repositories {
-        // Use 'maven central' for resolving our dependencies
-        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
     }
 }
