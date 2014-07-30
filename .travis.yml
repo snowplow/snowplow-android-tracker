@@ -11,8 +11,8 @@ before_install:
   - emulator -avd test -no-skin -no-audio -no-window &
 
 before_script:
-  - chmod +x ./ci/wait_for_emulator.sh
-  - ./ci/wait_for_emulator.sh
+  - chmod +x ./ci/wait_for_emulator
+  - ./ci/wait_for_emulator
 
 android:
   components:
