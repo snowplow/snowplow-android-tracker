@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+//public class Subject {
 public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
 
     public Subject() {
@@ -49,11 +50,11 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
     }
 
     private void setDefaultScreenResolution(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        this.setScreenResolution(size.x, size.y);
+//        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+//        Display display = windowManager.getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//        this.setScreenResolution(size.x, size.y);
     }
 
     private void setDefaultTimezone() {
