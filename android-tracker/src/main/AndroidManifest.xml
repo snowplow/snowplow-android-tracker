@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.snowplowanalytics.snowplow.tracker.android">
 
-    <application android:allowBackup="true">
-        <!--android:label="@string/app_name"-->
+    <application android:allowBackup="true"
+        android:label="snowplow-android-tracker">
         <!--android:icon="@drawable/ic_launcher"-->
         <!--android:theme="@style/AppTheme">-->
 
