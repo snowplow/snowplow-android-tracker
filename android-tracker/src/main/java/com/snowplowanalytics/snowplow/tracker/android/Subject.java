@@ -19,14 +19,22 @@ import android.os.Build;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 //public class Subject {
 public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
+
+    private HashMap<String, String> standardPairs = new HashMap<String, String>();
 
     public Subject() {
         // Default Platform
@@ -69,5 +77,15 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
 
     private void setDefaultLanguage() {
         this.setLanguage(Locale.getDefault().getDisplayLanguage());
+    }
+
+    private void setAdvertisingID() {
+
+    }
+
+    public Map<String, String> getSubject() {
+        HashMap<String, String> retval = new HashMap<String, String>();
+        retval.putAll(super.getSubject);
+        retval.putAll(this.standardPairs);
     }
 }
