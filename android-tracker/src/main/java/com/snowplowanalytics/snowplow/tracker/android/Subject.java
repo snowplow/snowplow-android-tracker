@@ -56,6 +56,9 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
 
         // Default Language
         setDefaultLanguage();
+
+        // Advertising ID from Play Services
+        setAdvertisingID(context);
     }
 
     @SuppressWarnings("deprecation")
@@ -80,13 +83,14 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
         this.setLanguage(Locale.getDefault().getDisplayLanguage());
     }
 
-    private void setAdvertisingID() {
-
+    private void setAdvertisingID(Context context) {
+        this.standardPairs.put(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
     }
 
     public Map<String, String> getSubject() {
-        HashMap<String, String> retval = new HashMap<String, String>();
-        retval.putAll(super.getSubject);
-        retval.putAll(this.standardPairs);
+        HashMap<String, String> allPairs = new HashMap<String, String>();
+        allPairs.putAll(super.getSubject());
+        allPairs.putAll(this.standardPairs);
+        return allPairs;
     }
 }
