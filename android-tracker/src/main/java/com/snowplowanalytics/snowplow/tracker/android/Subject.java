@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-//public class Subject {
 public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
 
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
