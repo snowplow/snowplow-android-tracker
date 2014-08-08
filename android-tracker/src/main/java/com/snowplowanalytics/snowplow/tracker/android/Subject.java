@@ -58,16 +58,17 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
         setDefaultLanguage();
     }
 
+    @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
-//        Point size = new Point();
-//        if(Build.VERSION.SDK_INT >= 13) {
-//            display.getSize(size);
-//            this.setScreenResolution(size.x, size.y);
-//        } else {
+        Point size = new Point();
+        if(Build.VERSION.SDK_INT >= 13) {
+            display.getSize(size);
+            this.setScreenResolution(size.x, size.y);
+        } else {
             this.setScreenResolution(display.getWidth(), display.getHeight());
-//        }
+        }
     }
 
     private void setDefaultTimezone() {
