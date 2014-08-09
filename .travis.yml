@@ -7,10 +7,9 @@ env:
 
 android:
   components:
-    - build-tools-19.0.2
-    - android-19
+    - build-tools-19.1.0
   licenses:
-    - android-sdk-license-5be876d5 # new license needs to be accepted to build with Build Tools 19.1+
+    - android-sdk-license-5be876d5
 
 before_install: 
   - git submodule update --init --recursive
