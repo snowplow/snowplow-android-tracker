@@ -31,6 +31,7 @@ import java.util.TimeZone;
 public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
 
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
+    private HashMap<String, String> geoLocationPairs = new HashMap<String, String>();
 
     public Subject() {
         // Default Platform
@@ -92,12 +93,16 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     private void setLocation(Context context) {
         Location location = Util.getLocation(context);
-        this.standardPairs.put(Parameter.LATITUDE, Double.toString(location.getLatitude()));
-        this.standardPairs.put(Parameter.LONGITUDE, Double.toString(location.getLongitude()));
-        this.standardPairs.put(Parameter.ALTITUDE, Double.toString(location.getAltitude()));
-        this.standardPairs.put(Parameter.LATLONG_ACCURACY, Float.toString(location.getAccuracy()));
-        this.standardPairs.put(Parameter.SPEED, Float.toString(location.getSpeed()));
-        this.standardPairs.put(Parameter.BEARING, Double.toString(location.getBearing()));
+        this.geoLocationPairs.put(Parameter.LATITUDE, Double.toString(location.getLatitude()));
+        this.geoLocationPairs.put(Parameter.LONGITUDE, Double.toString(location.getLongitude()));
+        this.geoLocationPairs.put(Parameter.ALTITUDE, Double.toString(location.getAltitude()));
+        this.geoLocationPairs.put(Parameter.LATLONG_ACCURACY, Float.toString(location.getAccuracy()));
+        this.geoLocationPairs.put(Parameter.SPEED, Float.toString(location.getSpeed()));
+        this.geoLocationPairs.put(Parameter.BEARING, Double.toString(location.getBearing()));
+    }
+
+    public Map<String, String> getSubjectLocation() {
+        return this.geoLocationPairs;
     }
 
     public Map<String, String> getSubject() {
