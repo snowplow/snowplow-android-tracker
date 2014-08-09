@@ -13,18 +13,15 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
-import android.os.Build;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -60,17 +57,22 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
         setAdvertisingID(context);
     }
 
+    @TargetApi(19)
     @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
-        if(Build.VERSION.SDK_INT >= 13) {
-            display.getSize(size);
-            this.setScreenResolution(size.x, size.y);
-        } else {
-            this.setScreenResolution(display.getWidth(), display.getHeight());
-        }
+            try {
+                Class<?> partypes[] = new Class[1];
+                partypes[0] = Point.class;
+                Display.class.getMethod("getSize", partypes);
+                display.getSize(size);
+                this.setScreenResolution(size.x, size.y);
+            } catch (NoSuchMethodException e) {
+                Log.e(Subject.class.toString(), "Display.getSize isn't available on older devices.");
+                this.setScreenResolution(display.getWidth(), display.getHeight());
+            }
     }
 
     private void setDefaultTimezone() {
