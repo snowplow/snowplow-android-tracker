@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.snowplowanalytics.snowplow.tracker.android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application android:allowBackup="true"
         android:label="snowplow-android-tracker">
-        <!--android:icon="@drawable/ic_launcher"-->
-        <!--android:theme="@style/AppTheme">-->
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.android;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.location.Location;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -54,6 +55,9 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
         // Advertising ID from Play Services
         setAdvertisingID(context);
+
+        // Closest Location available
+        setLocation(context);
     }
 
     @SuppressWarnings("deprecation")
@@ -84,6 +88,16 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     private void setAdvertisingID(Context context) {
         this.standardPairs.put(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
+    }
+
+    private void setLocation(Context context) {
+        Location location = Util.getLocation(context);
+        this.standardPairs.put(Parameter.LATITUDE, Double.toString(location.getLatitude()));
+        this.standardPairs.put(Parameter.LONGITUDE, Double.toString(location.getLongitude()));
+        this.standardPairs.put(Parameter.ALTITUDE, Double.toString(location.getAltitude()));
+        this.standardPairs.put(Parameter.LATLONG_ACCURACY, Float.toString(location.getAccuracy()));
+        this.standardPairs.put(Parameter.SPEED, Float.toString(location.getSpeed()));
+        this.standardPairs.put(Parameter.BEARING, Double.toString(location.getBearing()));
     }
 
     public Map<String, String> getSubject() {

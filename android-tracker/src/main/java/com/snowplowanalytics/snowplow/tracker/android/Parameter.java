@@ -15,4 +15,11 @@ package com.snowplowanalytics.snowplow.tracker.android;
 
 public class Parameter extends com.snowplowanalytics.snowplow.tracker.core.Parameter {
     public static final String ANDROID_IDFA = "androidIdfa";
+
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String ALTITUDE = "altitude";
+    public static final String LATLONG_ACCURACY = "latitudeLongitudeAccuracy";
+    public static final String SPEED = "speed";
+    public static final String BEARING = "bearing";
 }

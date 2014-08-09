@@ -14,6 +14,9 @@
 package com.snowplowanalytics.snowplow.tracker.android;
 
 import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -38,4 +41,24 @@ public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
 
         return id;
     }
+
+    public static Location getLocation(Context context) {
+        Location location = null;
+        LocationManager locationManager =
+                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        String provider = locationManager.getBestProvider(criteria, true);
+        if (provider != null) {
+            try {
+                location = locationManager.getLastKnownLocation(provider);
+            } catch (SecurityException ex) {
+                location = null;
+            }
+        }
+        return location;
+    }
+
 }
