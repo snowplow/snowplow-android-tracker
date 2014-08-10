@@ -39,6 +39,9 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
         // Default Timezone
         setDefaultTimezone();
+
+        // Default Language
+        setDefaultLanguage();
     }
 
     public Subject(Context context) {
@@ -48,11 +51,11 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         // Default Timezone
         setDefaultTimezone();
 
-        // Default Screen Resolution
-        setDefaultScreenResolution(context);
-
         // Default Language
         setDefaultLanguage();
+
+        // Default Screen Resolution
+        setDefaultScreenResolution(context);
 
         // Advertising ID from Play Services
         setAdvertisingID(context);
