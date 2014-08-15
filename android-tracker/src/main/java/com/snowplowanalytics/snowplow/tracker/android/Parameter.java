@@ -13,6 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
-public class Parameter extends com.snowplowanalytics.snowplow.tracker.Parameter {
+public class Parameter extends com.snowplowanalytics.snowplow.tracker.core.Parameter {
     public static final String ANDROID_IDFA = "androidIdfa";
 }

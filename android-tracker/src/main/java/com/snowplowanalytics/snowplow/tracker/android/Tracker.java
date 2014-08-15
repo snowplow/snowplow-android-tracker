@@ -13,9 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 
-public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
+public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
 
     public Tracker(Emitter emitter, String namespace, String appId) {
         super(emitter, namespace, appId);

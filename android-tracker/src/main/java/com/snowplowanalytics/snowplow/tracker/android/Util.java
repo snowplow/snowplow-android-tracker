@@ -21,7 +21,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
 
-public class Util extends com.snowplowanalytics.snowplow.tracker.Util {
+public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
 
     public static String getAdvertisingID(Context context) {
         String id = "";

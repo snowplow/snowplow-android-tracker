@@ -20,7 +20,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class Subject extends com.snowplowanalytics.snowplow.tracker.Subject {
+public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
 
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
 
