@@ -1,2 +1,2 @@
-include ':android-tracker', ':java-tracker-core'
-project(':java-tracker-core').projectDir = new File('java-tracker/java-tracker-core')
+include ':android-tracker', ':snowplow-java-tracker-core'
+project('snowplow-java-tracker-core').projectDir = new File('snowplow-java-tracker/snowplow-java-tracker-core')
