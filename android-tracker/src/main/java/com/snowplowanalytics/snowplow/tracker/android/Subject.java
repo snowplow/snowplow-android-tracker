@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.util.Log;
@@ -34,7 +33,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     public Subject() {
         // Default Platform
-        this.setPlatform(DevicePlatform.Mobile);
+        super.setPlatform(DevicePlatform.Mobile);
 
         // Default Timezone
         setDefaultTimezone();
@@ -42,7 +41,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     public Subject(Context context) {
         // Default Platform
-        this.setPlatform(DevicePlatform.Mobile);
+        super.setPlatform(DevicePlatform.Mobile);
 
         // Default Timezone
         setDefaultTimezone();
@@ -57,7 +56,6 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         setAdvertisingID(context);
     }
 
-    @TargetApi(19)
     @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -93,5 +91,10 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         allPairs.putAll(super.getSubject());
         allPairs.putAll(this.standardPairs);
         return allPairs;
+    }
+
+    public void setContext(Context context) {
+        setAdvertisingID(context);
+        setDefaultScreenResolution(context);
     }
 }
