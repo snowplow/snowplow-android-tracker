@@ -96,12 +96,18 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     private void setLocation(Context context) {
         Location location = Util.getLocation(context);
-        this.geoLocationPairs.put(Parameter.LATITUDE, Double.toString(location.getLatitude()));
-        this.geoLocationPairs.put(Parameter.LONGITUDE, Double.toString(location.getLongitude()));
-        this.geoLocationPairs.put(Parameter.ALTITUDE, Double.toString(location.getAltitude()));
-        this.geoLocationPairs.put(Parameter.LATLONG_ACCURACY, Float.toString(location.getAccuracy()));
-        this.geoLocationPairs.put(Parameter.SPEED, Float.toString(location.getSpeed()));
-        this.geoLocationPairs.put(Parameter.BEARING, Double.toString(location.getBearing()));
+        this.geoLocationPairs.put(Parameter.LATITUDE,
+                Double.toString(location.getLatitude()));
+        this.geoLocationPairs.put(Parameter.LONGITUDE,
+                Double.toString(location.getLongitude()));
+        this.geoLocationPairs.put(Parameter.ALTITUDE,
+                Double.toString(location.getAltitude()));
+        this.geoLocationPairs.put(Parameter.LATLONG_ACCURACY,
+                Float.toString(location.getAccuracy()));
+        this.geoLocationPairs.put(Parameter.SPEED,
+                Float.toString(location.getSpeed()));
+        this.geoLocationPairs.put(Parameter.BEARING,
+                Double.toString(location.getBearing()));
     }
 
     public Map<String, String> getSubjectLocation() {
@@ -118,5 +124,6 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     public void setContext(Context context) {
         setAdvertisingID(context);
         setDefaultScreenResolution(context);
+        setLocation(context);
     }
 }
