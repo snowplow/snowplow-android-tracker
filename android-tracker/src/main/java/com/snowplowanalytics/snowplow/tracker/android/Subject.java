@@ -34,6 +34,8 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     private HashMap<String, String> geoLocationPairs = new HashMap<String, String>();
 
     public Subject() {
+        super();
+
         // Default Platform
         super.setPlatform(DevicePlatform.Mobile);
 
@@ -45,6 +47,8 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     }
 
     public Subject(Context context) {
+        super();
+
         // Default Platform
         super.setPlatform(DevicePlatform.Mobile);
 
