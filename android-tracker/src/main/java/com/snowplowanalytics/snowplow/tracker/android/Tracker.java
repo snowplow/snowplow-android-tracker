@@ -14,8 +14,14 @@
 package com.snowplowanalytics.snowplow.tracker.android;
 
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
+
+import java.util.List;
 
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
+
+    private Subject subject;
 
     /**
      * @param emitter Emitter to which events will be sent
@@ -23,8 +29,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
      * @param appId Application ID
      */
     public Tracker(Emitter emitter, String namespace, String appId) {
-        super(emitter, namespace, appId);
-        super.setTrackerVersion(Version.TRACKER);
+        this(emitter, null, namespace, appId, true);
     }
 
     /**
@@ -34,8 +39,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
      * @param appId Application ID
      */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
-        super(emitter, subject, namespace, appId);
-        super.setTrackerVersion(Version.TRACKER);
+        this(emitter, subject, namespace, appId, true);
     }
 
     /**
@@ -45,8 +49,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
      * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
      */
     public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
-        super(emitter, namespace, appId, base64Encoded);
-        super.setTrackerVersion(Version.TRACKER);
+        this(emitter, null, namespace, appId, base64Encoded);
     }
 
     /**
@@ -60,5 +63,17 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
                    boolean base64Encoded) {
         super(emitter, subject, namespace, appId, base64Encoded);
         super.setTrackerVersion(Version.TRACKER);
+        this.subject = subject;
+    }
+
+    @Override
+    protected Payload completePayload(Payload payload, List<SchemaPayload> context,
+                                   double timestamp) {
+        SchemaPayload locationPayload = new SchemaPayload();
+        locationPayload.setSchema(Constants.GEOLOCATION_SCHEMA);
+        locationPayload.setData(this.subject.getSubjectLocation());
+        context.add(locationPayload);
+        super.completePayload(payload, context, timestamp);
+        return payload;
     }
 }
