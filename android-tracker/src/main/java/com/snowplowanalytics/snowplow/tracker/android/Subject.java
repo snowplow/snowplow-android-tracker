@@ -13,6 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
@@ -68,6 +69,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         setLocation(context);
     }
 
+    @TargetApi(19)
     @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
