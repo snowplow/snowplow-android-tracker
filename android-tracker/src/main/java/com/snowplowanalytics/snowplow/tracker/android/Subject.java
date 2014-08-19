@@ -67,12 +67,16 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
         // Closest Location available
         setLocation(context);
+
+        // Carrier Name
+        setCarrier(context);
     }
 
     @TargetApi(19)
     @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
             try {
@@ -116,6 +120,10 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
                 Double.toString(location.getBearing()));
     }
 
+    private void setCarrier(Context context) {
+        this.standardPairs.put(Parameter.CARRIER, Util.getCarrier(context));
+    }
+
     public Map<String, String> getSubjectLocation() {
         return this.geoLocationPairs;
     }
@@ -131,5 +139,6 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         setAdvertisingID(context);
         setDefaultScreenResolution(context);
         setLocation(context);
+        setCarrier(context);
     }
 }

@@ -17,6 +17,7 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.telephony.TelephonyManager;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -40,6 +41,16 @@ public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
         }
 
         return id;
+    }
+
+    public static String getCarrier(Context context) {
+        String carrierName = "";
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager != null) {
+            carrierName = telephonyManager.getNetworkOperatorName();
+        }
+        return carrierName;
     }
 
     public static Location getLocation(Context context) {

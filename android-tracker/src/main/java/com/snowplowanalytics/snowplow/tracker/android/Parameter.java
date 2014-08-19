@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.android;
 
 public class Parameter extends com.snowplowanalytics.snowplow.tracker.core.Parameter {
     public static final String ANDROID_IDFA = "androidIdfa";
+    public static final String CARRIER = "carrier";
 
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
