@@ -17,21 +17,45 @@ import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     */
     public Tracker(Emitter emitter, String namespace, String appId) {
         super(emitter, namespace, appId);
         super.setTrackerVersion(Version.TRACKER);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param subject Subject to be tracked
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId) {
         super(emitter, subject, namespace, appId);
         super.setTrackerVersion(Version.TRACKER);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
+     */
     public Tracker(Emitter emitter, String namespace, String appId, boolean base64Encoded) {
         super(emitter, namespace, appId, base64Encoded);
         super.setTrackerVersion(Version.TRACKER);
     }
 
+    /**
+     * @param emitter Emitter to which events will be sent
+     * @param subject Subject to be tracked
+     * @param namespace Identifier for the Tracker instance
+     * @param appId Application ID
+     * @param base64Encoded Whether JSONs in the payload should be base-64 encoded
+     */
     public Tracker(Emitter emitter, Subject subject, String namespace, String appId,
                    boolean base64Encoded) {
         super(emitter, subject, namespace, appId, base64Encoded);
