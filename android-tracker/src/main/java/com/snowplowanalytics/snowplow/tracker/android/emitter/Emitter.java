@@ -38,8 +38,6 @@ import java.util.Iterator;
 
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
 
-    private String uri;
-    private RequestMethod requestMethod;
     private Uri.Builder uriBuilder = new Uri.Builder();
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
 
@@ -90,7 +88,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                     .authority(URI)
                     .appendPath(Constants.DEFAULT_VENDOR + "/tp2");
         }
-        this.uri = URI;
         super.httpMethod = httpMethod;
         super.requestCallback = callback;
 
