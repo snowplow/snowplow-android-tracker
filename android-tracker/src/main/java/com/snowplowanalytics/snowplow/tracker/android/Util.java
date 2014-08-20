@@ -17,7 +17,9 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -28,7 +30,7 @@ import java.io.IOException;
 public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
 
     public static String getAdvertisingID(Context context) {
-        String id = "";
+        String id = null;
 
         try {
             id = AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
@@ -66,6 +68,7 @@ public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
             try {
                 location = locationManager.getLastKnownLocation(provider);
             } catch (SecurityException ex) {
+                Log.d(Util.class.toString(), "No permission to retrieve location.");
                 location = null;
             }
         }

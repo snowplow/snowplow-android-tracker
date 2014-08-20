@@ -2,6 +2,9 @@
     package="com.snowplowanalytics.snowplow.tracker.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--Enable the permissions below for getting users geographical location.-->
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
 
     <application android:allowBackup="true"
         android:label="snowplow-android-tracker">

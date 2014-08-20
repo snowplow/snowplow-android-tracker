@@ -17,6 +17,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
+import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -33,6 +34,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
     private HashMap<String, String> geoLocationPairs = new HashMap<String, String>();
+    private HashMap<String, String> mobilePairs = new HashMap<String, String>();
 
     public Subject() {
         super();
@@ -45,19 +47,17 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
         // Default Language
         setDefaultLanguage();
+
+        // Other mobile context data
+        setOsType();
+        setOsVersion();
+        setDeviceModel();
+        setDeviceVendor();
     }
 
     public Subject(Context context) {
-        super();
-
-        // Default Platform
-        super.setPlatform(DevicePlatform.Mobile);
-
-        // Default Timezone
-        setDefaultTimezone();
-
-        // Default Language
-        setDefaultLanguage();
+        // Default constructor for Subject data we can get
+        this();
 
         // Default Screen Resolution
         setDefaultScreenResolution(context);
@@ -70,6 +70,18 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
         // Carrier Name
         setCarrier(context);
+    }
+
+    private void putToMobile(String key, String value) {
+        // Avoid putting null or empty values in the map
+        if (key != null && value != null && !key.isEmpty() && !value.isEmpty())
+            this.mobilePairs.put(key, value);
+    }
+
+    private void putToGeoLocation(String key, String value) {
+        // Avoid putting null or empty values in the map
+        if (key != null && value != null && !key.isEmpty() && !value.isEmpty())
+            this.geoLocationPairs.put(key, value);
     }
 
     @TargetApi(19)
@@ -101,32 +113,52 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     }
 
     private void setAdvertisingID(Context context) {
-        this.standardPairs.put(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
+        putToMobile(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
     }
 
     private void setLocation(Context context) {
         Location location = Util.getLocation(context);
-        this.geoLocationPairs.put(Parameter.LATITUDE,
+        if (location == null) // No location available
+            return;
+        putToGeoLocation(Parameter.LATITUDE,
                 Double.toString(location.getLatitude()));
-        this.geoLocationPairs.put(Parameter.LONGITUDE,
+        putToGeoLocation(Parameter.LONGITUDE,
                 Double.toString(location.getLongitude()));
-        this.geoLocationPairs.put(Parameter.ALTITUDE,
+        putToGeoLocation(Parameter.ALTITUDE,
                 Double.toString(location.getAltitude()));
-        this.geoLocationPairs.put(Parameter.LATLONG_ACCURACY,
+        putToGeoLocation(Parameter.LATLONG_ACCURACY,
                 Float.toString(location.getAccuracy()));
-        this.geoLocationPairs.put(Parameter.SPEED,
+        putToGeoLocation(Parameter.SPEED,
                 Float.toString(location.getSpeed()));
-        this.geoLocationPairs.put(Parameter.BEARING,
+        putToGeoLocation(Parameter.BEARING,
                 Double.toString(location.getBearing()));
     }
 
     private void setCarrier(Context context) {
-        this.standardPairs.put(Parameter.CARRIER, Util.getCarrier(context));
+        putToMobile(Parameter.CARRIER, Util.getCarrier(context));
+    }
+
+    private void setDeviceModel() {
+        putToMobile(Parameter.DEVICE_MODEL, android.os.Build.MODEL);
+    }
+
+    private void setDeviceVendor() {
+        putToMobile(Parameter.DEVICE_VENDOR, Build.MANUFACTURER);
+    }
+
+    private void setOsVersion() {
+        putToMobile(Parameter.OS_VERSION, android.os.Build.VERSION.RELEASE);
+    }
+
+    private void setOsType() {
+        putToMobile(Parameter.OS_TYPE, "android");
     }
 
     public Map<String, String> getSubjectLocation() {
         return this.geoLocationPairs;
     }
+
+    public Map<String, String> getSubjectMobile() { return this.mobilePairs; }
 
     public Map<String, String> getSubject() {
         HashMap<String, String> allPairs = new HashMap<String, String>();

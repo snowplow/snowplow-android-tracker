@@ -17,11 +17,16 @@ import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
 import java.util.List;
 
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
 
     private Subject subject;
+    private final Logger logger = LoggerFactory.getLogger(Tracker.class);
 
     /**
      * @param emitter Emitter to which events will be sent
@@ -69,11 +74,31 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
     @Override
     protected Payload completePayload(Payload payload, List<SchemaPayload> context,
                                    double timestamp) {
-        SchemaPayload locationPayload = new SchemaPayload();
-        locationPayload.setSchema(Constants.GEOLOCATION_SCHEMA);
-        locationPayload.setData(this.subject.getSubjectLocation());
-        context.add(locationPayload);
-        super.completePayload(payload, context, timestamp);
-        return payload;
+
+
+        if (this.subject != null) {
+
+            if (context == null) {
+                logger.debug("No list of user context passed in");
+                context = new LinkedList<SchemaPayload>();
+            }
+
+            if (!this.subject.getSubjectLocation().isEmpty()) {
+                SchemaPayload locationPayload = new SchemaPayload();
+                locationPayload.setSchema(Constants.GEOLOCATION_SCHEMA);
+                locationPayload.setData(this.subject.getSubjectLocation());
+                context.add(locationPayload);
+            }
+
+            if (!this.subject.getSubjectMobile().isEmpty()) {
+                SchemaPayload mobilePayload = new SchemaPayload();
+                mobilePayload.setSchema(Constants.MOBILE_SCHEMA);
+                mobilePayload.setData(this.subject.getSubjectMobile());
+                context.add(mobilePayload);
+            }
+
+        }
+
+        return super.completePayload(payload, context, timestamp);
     }
 }
