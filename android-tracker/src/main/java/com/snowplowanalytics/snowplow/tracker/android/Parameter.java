@@ -18,7 +18,7 @@ public class Parameter extends com.snowplowanalytics.snowplow.tracker.core.Param
     public static final String ANDROID_IDFA = "androidIdfa";
     public static final String CARRIER = "carrier";
     public static final String DEVICE_MODEL = "deviceModel";
-    public static final String DEVICE_VENDOR = "deviceVendor";
+    public static final String DEVICE_MANUFACTURER = "deviceManufacturer";
     public static final String OS_VERSION = "osVersion";
     public static final String OS_TYPE = "osType";
 

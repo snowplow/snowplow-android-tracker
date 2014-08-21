@@ -143,7 +143,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     }
 
     private void setDeviceVendor() {
-        putToMobile(Parameter.DEVICE_VENDOR, Build.MANUFACTURER);
+        putToMobile(Parameter.DEVICE_MANUFACTURER, Build.MANUFACTURER);
     }
 
     private void setOsVersion() {
