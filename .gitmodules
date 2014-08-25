@@ -1,3 +1,0 @@
-[submodule "snowplow-java-tracker"]
-	path = snowplow-java-tracker
-	url = https://github.com/snowplow/snowplow-java-tracker.git
