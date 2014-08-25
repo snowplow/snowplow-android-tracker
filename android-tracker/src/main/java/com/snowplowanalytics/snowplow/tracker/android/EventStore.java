@@ -26,7 +26,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EventStore {
@@ -34,7 +37,8 @@ public class EventStore {
     private SQLiteDatabase database;
     private EventStoreHelper dbHelper;
     private String[] allColumns = { EventStoreHelper.COLUMN_ID,
-            EventStoreHelper.COLUMN_EVENT_DATA };
+            EventStoreHelper.COLUMN_EVENT_DATA, EventStoreHelper.COLUMN_DATE_CREATED};
+    private long lastInsertedRowId = -1;
 
     private static final String querySelectAll =
             "SELECT * FROM 'events'";
@@ -57,52 +61,71 @@ public class EventStore {
 
     public EventStore(Context context) {
         dbHelper = new EventStoreHelper(context);
+        open();
+            System.out.println(database.getPath());
     }
 
-    public void open() {
+    public boolean open() {
         database = dbHelper.getWritableDatabase();
+        return database != null;
     }
 
     public void close() {
         dbHelper.close();
     }
 
+    @SuppressWarnings("unchecked")
     public long insertPayload(Payload payload) {
         return insertMap(payload.getMap());
     }
 
     public long insertMap(Map<String, String> map) {
-        byte[] bytes = EventStore.serialize(map);
-        ContentValues values = new ContentValues(2);
-        values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes);
-        values.put(EventStoreHelper.COLUMN_PENDING, 0);
-        return database.insert(EventStoreHelper.TABLE_EVENTS, null, values);
+        if (open()) {
+            byte[] bytes = EventStore.serialize(map);
+            ContentValues values = new ContentValues(2);
+            values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes);
+            values.put(EventStoreHelper.COLUMN_PENDING, 0);
+            lastInsertedRowId = database.insert(EventStoreHelper.TABLE_EVENTS, null, values);
+        }
+        return lastInsertedRowId;
     }
 
-    public boolean removeEventWithId(long id) {
-        int retval = database.delete(EventStoreHelper.TABLE_EVENTS,
-                EventStoreHelper.COLUMN_ID + "=" + id, null);
+    public boolean removeEvent(long id) {
+        int retval = -1;
+        if (open()) {
+            retval = database.delete(EventStoreHelper.TABLE_EVENTS,
+                    EventStoreHelper.COLUMN_ID + "=" + id, null);
+        }
         return retval == 0;
     }
 
     public boolean removeAllEvents() {
-        int retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
+        int retval = -1;
+        if (open()) {
+            retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
+        }
         return retval == 0;
     }
 
     public boolean setPending(long id) {
-        ContentValues value = new ContentValues();
-        value.put(EventStoreHelper.COLUMN_PENDING, 1);
-        int retval = database.update(EventStoreHelper.TABLE_EVENTS,
-                value, EventStoreHelper.COLUMN_ID + "=" + id, null);
+        int retval = -1;
+        if (open()) {
+            ContentValues value = new ContentValues();
+            value.put(EventStoreHelper.COLUMN_PENDING, 1);
+            retval = database.update(EventStoreHelper.TABLE_EVENTS,
+                    value, EventStoreHelper.COLUMN_ID + "=" + id, null);
+        }
         return retval == 1; // Update should only affect one row
     }
 
     public boolean removePending(long id) {
-        ContentValues value = new ContentValues();
-        value.put(EventStoreHelper.COLUMN_PENDING, 0);
-        int retval = database.update(EventStoreHelper.TABLE_EVENTS,
-                value, EventStoreHelper.COLUMN_ID + "=" + id, null);
+        int retval = -1;
+        if (open()) {
+            ContentValues value = new ContentValues();
+            value.put(EventStoreHelper.COLUMN_PENDING, 0);
+            retval = database.update(EventStoreHelper.TABLE_EVENTS,
+                    value, EventStoreHelper.COLUMN_ID + "=" + id, null);
+        }
         return retval == 1; // Update should only affect one row
     }
 
@@ -111,17 +134,60 @@ public class EventStore {
     }
 
     public Map<String, Object> getEvent(long id) {
+        // The Object contains the table row ID, payload (a map<string, string>) as byte[]
+        // and the date created..
         Map<String, Object> eventMetadata = new HashMap<String, Object>();
-        Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns,
-                null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
-            eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA, cursor.getBlob(1));
-            eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED, cursor.getInt(2));
+        if (open()) {
+            Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns,
+                    EventStoreHelper.COLUMN_ID + "=" + id, null, null, null, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
+                eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
+                        EventStore.deserialize(cursor.getBlob(1)));
+//                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
+//                        cursor.getString(3));
+                cursor.moveToNext();
+            }
+            cursor.close();
         }
-        cursor.close();
         return eventMetadata;
+    }
+
+    public List<Map<String, Object>> getQueryEvents(String query) {
+        List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
+        if (open()) {
+            Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
+                    null, null, null, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Map<String, Object> eventMetadata = new HashMap<String, Object>();
+                eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
+                eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
+                        EventStore.deserialize(cursor.getBlob(1)));
+//                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
+//                        Timestamp.valueOf(cursor.getString(3)));
+                cursor.moveToNext();
+                res.add(eventMetadata);
+            }
+        }
+        return res;
+    }
+
+    public List<Map<String, Object>> getAllEvents() {
+        return getQueryEvents(null);
+    }
+
+    public List<Map<String, Object>> getAllNonPendingEvents() {
+        return getQueryEvents(EventStoreHelper.COLUMN_PENDING + "=0");
+    }
+
+    public List<Map<String, Object>> getAllPendingEvents() {
+        return getQueryEvents(EventStoreHelper.COLUMN_ID + "=1");
+    }
+
+    public long getLastInsertedRowId() {
+        return lastInsertedRowId;
     }
 
     public static byte[] serialize(Map<String, String> map) {
