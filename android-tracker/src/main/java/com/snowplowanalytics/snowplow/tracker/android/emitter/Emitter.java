@@ -13,9 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.android.emitter;
 
+import android.content.Context;
 import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.android.Constants;
+import com.snowplowanalytics.snowplow.tracker.android.EventStore;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
@@ -40,24 +42,25 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
     private Uri.Builder uriBuilder = new Uri.Builder();
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
+    private final EventStore eventStore;
 
     /**
      * Create an Emitter instance with a collector URL.
      *
      * @param URI The collector URL. Don't include "http://" - this is done automatically.
      */
-    public Emitter(String URI) {
-        this(URI, HttpMethod.GET, null);
+    public Emitter(String URI, Context context) {
+        this(URI, HttpMethod.GET, null, context);
     }
 
     /**
-     * Create an Emitter instance with a collector URL, and callback function.
+     * Create an Emitter instance with a collector URL, and callback method.
      *
      * @param URI      The collector URL. Don't include "http://" - this is done automatically.
-     * @param callback The callback function to handle success/failure cases when sending events.
+     * @param callback The callback method to handle success/failure cases when sending events.
      */
-    public Emitter(String URI, RequestCallback callback) {
-        this(URI, HttpMethod.GET, callback);
+    public Emitter(String URI, Context context, RequestCallback callback) {
+        this(URI, HttpMethod.GET, callback, context);
     }
 
     /**
@@ -66,8 +69,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
      * @param URI        The collector URL. Don't include "http://" - this is done automatically.
      * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
      */
-    public Emitter(String URI, HttpMethod httpMethod) {
-        this(URI, httpMethod, null);
+    public Emitter(String URI, Context context, HttpMethod httpMethod) {
+        this(URI, httpMethod, null, context);
     }
 
     /**
@@ -75,10 +78,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
      *
      * @param URI        The collector URL. Don't include "http://" - this is done automatically.
      * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
-     * @param callback   The callback function to handle success/failure cases when sending events.
+     * @param callback   The callback method to handle success/failure cases when sending events.
      */
-    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback) {
-//        super(URI, httpMethod, callback);
+    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback, Context context) {
         if(httpMethod == HttpMethod.GET) {
             uriBuilder.scheme("http")
                     .authority(URI)
@@ -90,6 +92,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         }
         super.httpMethod = httpMethod;
         super.requestCallback = callback;
+        this.eventStore = new EventStore(context);
 
         if (httpMethod == HttpMethod.GET) {
             super.setBufferOption(BufferOption.Instant);
@@ -102,7 +105,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         Iterator<String> iterator = hashMap.keySet().iterator();
         HttpResponse httpResponse = null;
         HttpClient httpClient = new DefaultHttpClient();
-
 
         while (iterator.hasNext()) {
             String key = iterator.next();
