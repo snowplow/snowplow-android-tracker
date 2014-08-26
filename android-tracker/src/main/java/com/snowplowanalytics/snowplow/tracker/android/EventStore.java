@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +38,8 @@ public class EventStore {
     private String[] allColumns = { EventStoreHelper.COLUMN_ID,
             EventStoreHelper.COLUMN_EVENT_DATA, EventStoreHelper.COLUMN_DATE_CREATED};
     private long lastInsertedRowId = -1;
+
+    private String TAG = EventStore.class.getName();
 
     private static final String querySelectAll =
             "SELECT * FROM 'events'";
@@ -144,9 +145,9 @@ public class EventStore {
             while (!cursor.isAfterLast()) {
                 eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
                 eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
-                        EventStore.deserialize(cursor.getBlob(1)));
-//                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
-//                        cursor.getString(3));
+                        EventStore.deserializer(cursor.getBlob(1)));
+                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
+                        cursor.getString(2));
                 cursor.moveToNext();
             }
             cursor.close();
@@ -164,9 +165,9 @@ public class EventStore {
                 Map<String, Object> eventMetadata = new HashMap<String, Object>();
                 eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
                 eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
-                        EventStore.deserialize(cursor.getBlob(1)));
-//                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
-//                        Timestamp.valueOf(cursor.getString(3)));
+                        EventStore.deserializer(cursor.getBlob(1)));
+                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED,
+                        cursor.getString(2));
                 cursor.moveToNext();
                 res.add(eventMetadata);
             }
@@ -183,7 +184,7 @@ public class EventStore {
     }
 
     public List<Map<String, Object>> getAllPendingEvents() {
-        return getQueryEvents(EventStoreHelper.COLUMN_ID + "=1");
+        return getQueryEvents(EventStoreHelper.COLUMN_PENDING + "=1");
     }
 
     public long getLastInsertedRowId() {
@@ -208,7 +209,7 @@ public class EventStore {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, String> deserialize(byte[] bytes) {
+    public static Map<String, String> deserializer(byte[] bytes) {
         try {
             ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
             ObjectInputStream in = new ObjectInputStream(mem_in);
