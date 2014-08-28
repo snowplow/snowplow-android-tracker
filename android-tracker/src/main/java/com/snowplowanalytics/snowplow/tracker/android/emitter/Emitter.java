@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.android.emitter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 
 import com.snowplowanalytics.snowplow.tracker.android.Constants;
 import com.snowplowanalytics.snowplow.tracker.android.EventStore;
@@ -37,12 +38,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
 
-    private Uri.Builder uriBuilder = new Uri.Builder();
+    private final Uri.Builder uriBuilder = new Uri.Builder();
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
     private final EventStore eventStore;
+    private BufferOption bufferOption = BufferOption.Default; // Storing option for use in checking
 
     /**
      * Create an Emitter instance with a collector URL.
@@ -99,46 +103,38 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         }
     }
 
-    @SuppressWarnings("unchecked")
+//    @Override
+//    public void flushBuffer() {
+//        if (super.httpMethod == HttpMethod.GET) {
+//            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
+//
+//            }
+//        }
+//    }
+
     protected HttpResponse sendGetData(Payload payload) {
-        HashMap hashMap = (HashMap) payload.getMap();
-        Iterator<String> iterator = hashMap.keySet().iterator();
         HttpResponse httpResponse = null;
-        HttpClient httpClient = new DefaultHttpClient();
-
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            String value = (String) hashMap.get(key);
-            this.uriBuilder.appendQueryParameter(key, value);
-        }
-
+        AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload);
+        asyncHttpGet.execute();
         try {
-            HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
-            httpResponse = httpClient.execute(httpGet);
-            logger.debug(httpResponse.getStatusLine().toString());
-        } catch (IOException e) {
-            logger.error("Error when sending HTTP GET error.");
+            httpResponse = asyncHttpGet.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return httpResponse;
     }
 
     protected HttpResponse sendPostData(Payload payload) {
-        HttpPost httpPost = new HttpPost(uriBuilder.build().toString());
-        httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
         HttpResponse httpResponse = null;
-        HttpClient httpClient = new DefaultHttpClient();
-
+        AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload);
+        asyncHttpPost.execute();
         try {
-            StringEntity params = new StringEntity(payload.toString());
-            httpPost.setEntity(params);
-            httpResponse = httpClient.execute(httpPost);
-            logger.debug(httpResponse.getStatusLine().toString());
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Encoding exception with the payload.");
+            httpResponse = asyncHttpPost.get();
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            logger.error("Error when sending HTTP POST.");
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return httpResponse;
@@ -148,5 +144,85 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     @Override
     public void setRequestMethod(RequestMethod option) {
         logger.error("Cannot change RequestMethod: Asynchronous requests only available.");
+    }
+
+    @Override
+    public void setBufferOption(BufferOption bufferOption) {
+        super.setBufferOption(bufferOption);
+        this.bufferOption = bufferOption;
+    }
+
+    @Override
+    public boolean addToBuffer(Payload payload) {
+        boolean ret = false;
+        eventStore.insertPayload(payload);
+        if (eventStore.size() >= this.bufferOption.getCode()) {
+            ret = super.addToBuffer(payload);
+        }
+        return ret;
+    }
+
+    private class AsyncHttpPost extends AsyncTask<Void, Void, HttpResponse> {
+        private Payload payload = null;
+
+        AsyncHttpPost(Payload payload) {
+            this.payload = payload;
+        }
+
+        @Override
+        protected HttpResponse doInBackground(Void... voids) {
+
+            HttpPost httpPost = new HttpPost(uriBuilder.build().toString());
+            httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
+            HttpResponse httpResponse = null;
+            HttpClient httpClient = new DefaultHttpClient();
+
+            try {
+                StringEntity params = new StringEntity(payload.toString());
+                httpPost.setEntity(params);
+                httpResponse = httpClient.execute(httpPost);
+                logger.debug(httpResponse.getStatusLine().toString());
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Encoding exception with the payload.");
+                e.printStackTrace();
+            } catch (IOException e) {
+                logger.error("Error when sending HTTP POST.");
+                e.printStackTrace();
+            }
+            return httpResponse;
+        }
+    }
+
+    private class AsyncHttpGet extends AsyncTask<Void, Void, HttpResponse> {
+        private Payload payload = null;
+
+        AsyncHttpGet(Payload payload) {
+            this.payload = payload;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected HttpResponse doInBackground(Void... voids) {
+            HashMap hashMap = (HashMap) payload.getMap();
+            Iterator<String> iterator = hashMap.keySet().iterator();
+            HttpResponse httpResponse = null;
+            HttpClient httpClient = new DefaultHttpClient();
+
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                String value = (String) hashMap.get(key);
+                uriBuilder.appendQueryParameter(key, value);
+            }
+
+            try {
+                HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
+                httpResponse = httpClient.execute(httpGet);
+                logger.debug(httpResponse.getStatusLine().toString());
+            } catch (IOException e) {
+                logger.error("Error when sending HTTP GET error.");
+                e.printStackTrace();
+            }
+            return httpResponse;
+        }
     }
 }
