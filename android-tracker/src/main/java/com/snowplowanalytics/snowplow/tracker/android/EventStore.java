@@ -41,25 +41,6 @@ public class EventStore {
 
     private String TAG = EventStore.class.getName();
 
-    private static final String querySelectAll =
-            "SELECT * FROM 'events'";
-    private static final String querySelectCount =
-            "SELECT Count(*) FROM 'events'";
-    private static final String queryInsertEvent =
-            "INSERT INTO 'events' (eventData, pending) VALUES (?, 0)";
-    private static final String querySelectId =
-            "SELECT * FROM 'events' WHERE id=?";
-    private static final String queryDeleteId =
-            "DELETE FROM 'events' WHERE id=?";
-    private static final String querySelectPending =
-            "SELECT * FROM 'events' WHERE pending=1";
-    private static final String querySelectNonPending =
-            "SELECT * FROM 'events' WHERE pending=0";
-    private static final String querySetPending =
-            "UPDATE events SET pending=1 WHERE id=?";
-    private static final String querySetNonPending =
-            "UPDATE events SET pending=0 WHERE id=?";
-
     public EventStore(Context context) {
         dbHelper = new EventStoreHelper(context);
         open();
