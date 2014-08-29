@@ -220,7 +220,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         // but we keep it for future development in case we find a better use for it.
         boolean ret = false;
         eventStore.insertPayload(payload);
-        if (eventStore.size() >= super.bufferOption.getCode()) {
+        if (eventStore.size() >= super.option.getCode()) {
             ret = super.addToBuffer(payload);
         }
         return ret;
