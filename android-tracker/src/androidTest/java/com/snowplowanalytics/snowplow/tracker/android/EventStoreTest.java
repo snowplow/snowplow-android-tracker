@@ -32,7 +32,7 @@ public class EventStoreTest extends AndroidTestCase {
         EventStore eventStore = new EventStore(getContext());
         List<Map<String, Object>> foo = eventStore.getAllNonPendingEvents();
         for (Map<String, Object> event : foo) {
-            Log.e("EventStoreTest", event.toString());
+            Log.d("EventStoreTest", event.toString());
         }
     }
 

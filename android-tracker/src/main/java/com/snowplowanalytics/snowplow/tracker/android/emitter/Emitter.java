@@ -16,14 +16,18 @@ package com.snowplowanalytics.snowplow.tracker.android.emitter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.snowplowanalytics.snowplow.tracker.android.Constants;
 import com.snowplowanalytics.snowplow.tracker.android.EventStore;
+import com.snowplowanalytics.snowplow.tracker.android.EventStoreHelper;
+import com.snowplowanalytics.snowplow.tracker.android.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -36,17 +40,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
 
+    private final String TAG = Emitter.class.getName();
     private final Uri.Builder uriBuilder = new Uri.Builder();
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
     private final EventStore eventStore;
     private BufferOption bufferOption = BufferOption.Default; // Storing option for use in checking
+
+    private LinkedList<Payload> unsentPayloads;
+    private LinkedList<Long> indexArray;
 
     /**
      * Create an Emitter instance with a collector URL.
@@ -103,16 +113,72 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         }
     }
 
-//    @Override
-//    public void flushBuffer() {
-//        if (super.httpMethod == HttpMethod.GET) {
-//            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
-//
-//            }
-//        }
-//    }
+    @SuppressWarnings("unchecked")
+    @Override
+    public void flushBuffer() {
+        indexArray = new LinkedList<Long>();
+
+        if (httpMethod == HttpMethod.GET) {
+
+            // We cycle through each event that is NOT pending.
+            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
+                // Because we get a raw Object from the database, we cast it to Map<String, Object>
+                // Then create a TrackerPayload map and add the contents to that.
+                // We do this because our overridden sendGetData method accepts a Payload parameter.
+                TrackerPayload payload = new TrackerPayload();
+                payload.addMap((Map<String, Object>)
+                        eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA));
+
+                // Each event's database index is added to a global array
+                // to be used later for removal of events from the database.
+                indexArray.add((Long) eventMetadata.get(EventStoreHelper.METADATA_ID));
+
+                // Setting the event to pending so we don't pick it up a second time.
+                eventStore.setPending((Long)eventMetadata.get(EventStoreHelper.METADATA_ID));
+
+                // Sending each event individually.
+                this.sendGetData(payload);
+            }
+
+
+        } else if (httpMethod == HttpMethod.POST) {
+
+            // We can accept multiple events in a POST request so we create a wrapper for them.
+            SchemaPayload postPayload = new SchemaPayload();
+            postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
+            ArrayList<Map> eventMaps = new ArrayList<Map>();
+
+            // We cycle through each event that is NOT pending
+            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
+                // Because we get a raw Object from the database, we cast it to Map<String, Object>
+                // Then create a TrackerPayload map and add the contents to that.
+                // We do this because our overridden sendGetData method accepts a Payload parameter.
+                TrackerPayload payload = new TrackerPayload();
+                payload.addMap((Map<String, Object>)
+                        eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA));
+
+                // Each event's database index is added to a global array
+                // to be used later for removal of events from the database.
+                indexArray.add((Long) eventMetadata.get(EventStoreHelper.METADATA_ID));
+
+                // Setting the event to pending so we don't pick it up a second time.
+                eventStore.setPending((Long)eventMetadata.get(EventStoreHelper.METADATA_ID));
+
+                // Adding the event to the wrapper payload.
+                eventMaps.add(payload.getMap());
+            }
+            // Setting the array of events as the 'data' of the wrapper.
+            Log.d(TAG, "indexArray before deleting: " + indexArray);
+            postPayload.setData(eventMaps);
+
+            // We finally send this completed wrapper with all the events in it.
+            this.sendPostData(postPayload);
+        }
+    }
 
     protected HttpResponse sendGetData(Payload payload) {
+        // This method is used to call the AsyncHttpGet class to actually send the events
+        // The httpResponse is almost always going to be empty, so avoid using it's return value
         HttpResponse httpResponse = null;
         AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload);
         asyncHttpGet.execute();
@@ -127,6 +193,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     }
 
     protected HttpResponse sendPostData(Payload payload) {
+        // This method is used to call the AsyncHttpPost class to actually send the events
+        // The httpResponse is almost always going to be empty, so avoid using it's return value
         HttpResponse httpResponse = null;
         AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload);
         asyncHttpPost.execute();
@@ -154,6 +222,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
     @Override
     public boolean addToBuffer(Payload payload) {
+        // Checking that the eventStore is of appropriate size before calling super.addToBuffer
+        // There doesn't seem to be any need for the in-memory buffer array,
+        // but we keep it for future development in case we find a better use for it.
         boolean ret = false;
         eventStore.insertPayload(payload);
         if (eventStore.size() >= this.bufferOption.getCode()) {
@@ -164,6 +235,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
     private class AsyncHttpPost extends AsyncTask<Void, Void, HttpResponse> {
         private Payload payload = null;
+        private String TAG = "Emitter" + "+AsyncHttpPost";
 
         AsyncHttpPost(Payload payload) {
             this.payload = payload;
@@ -171,6 +243,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
         @Override
         protected HttpResponse doInBackground(Void... voids) {
+            // Here we do the actual sending of the request
 
             HttpPost httpPost = new HttpPost(uriBuilder.build().toString());
             httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
@@ -191,10 +264,54 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
             }
             return httpResponse;
         }
+
+        @Override
+        protected void onPostExecute(HttpResponse result) {
+            // When the task is done, we execute the onPostExecute to see
+            // what kind of a HTTP response code we get.
+
+            // Ths is used for the callback.
+            unsentPayloads = new LinkedList<Payload>();
+
+            int status_code = result.getStatusLine().getStatusCode();
+            Log.d(TAG, "Status code: " + status_code);
+            // If the events were successfully sent...
+            if (status_code == 200) {
+                // We remove the event from the database using the indexes from the indexArray.
+                Log.d(TAG, "We're about to remove from indexArray: " + indexArray);
+                for (int i = 0; i < indexArray.size(); i++) {
+                    eventStore.removeEvent(indexArray.get(i));
+                    Log.d(TAG, "Removing event with index: " + indexArray.get(i));
+                }
+
+                // If there is a RequestCallback set, we send the appropriate information
+                if(requestCallback != null) {
+                    int success_count = (int) eventStore.size();
+                    Log.d(TAG, "onPostExecute POST Success: " + success_count);
+                    requestCallback.onSuccess(success_count);
+                }
+            } else { // If there was any kind of failure..
+
+                // We remove the pending flag from the events so they can be picked up again
+                // when we try to send the events in another attempt.
+                for (int i = 0; i < indexArray.size(); i++) {
+                    Log.d(TAG, "Removing PENDING with index: " + indexArray.get(i));
+                    eventStore.removePending(indexArray.get(i));
+                }
+
+                // If there is a RequestCallback set, we send the appropriate information
+                if (requestCallback != null) {
+                    Log.d(TAG, "onPostExecute POST Failure: 0");
+                    unsentPayloads.add(payload);
+                    requestCallback.onFailure(0, unsentPayloads);
+                }
+            }
+        }
     }
 
     private class AsyncHttpGet extends AsyncTask<Void, Void, HttpResponse> {
         private Payload payload = null;
+        private String TAG = "Emitter" + "+AsyncHttpGet";
 
         AsyncHttpGet(Payload payload) {
             this.payload = payload;
@@ -203,10 +320,13 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         @SuppressWarnings("unchecked")
         @Override
         protected HttpResponse doInBackground(Void... voids) {
+            // Here we do the actual sending of the request
+
             HashMap hashMap = (HashMap) payload.getMap();
             Iterator<String> iterator = hashMap.keySet().iterator();
             HttpResponse httpResponse = null;
             HttpClient httpClient = new DefaultHttpClient();
+            uriBuilder.clearQuery();
 
             while (iterator.hasNext()) {
                 String key = iterator.next();
@@ -223,6 +343,50 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 e.printStackTrace();
             }
             return httpResponse;
+        }
+
+        @Override
+        protected void onPostExecute(HttpResponse response) {
+            // When the task is done, we execute the onPostExecute to see
+            // what kind of a HTTP response code we get.
+
+            // Ths is used for the callback.
+            unsentPayloads = new LinkedList<Payload>();
+
+            // The success count is reset before we start counting again.
+            int success_count = 0;
+            int status_code = response.getStatusLine().getStatusCode();
+            Log.d(TAG, "Status code: " + status_code);
+            // If the events were successfully sent...
+            if (status_code == 200) {
+                // Incrementing our success count
+                success_count++;
+
+                // We remove the event from the database using the indexes from the indexArray.
+                for (int i = 0; i < indexArray.size(); i++) {
+                    eventStore.removeEvent(indexArray.get(i));
+                    Log.d(TAG, "Removing event with index: " + indexArray.get(i));
+                }
+
+            } else { // If there was any kind of failure..
+                // Adding the payload to the array to be returned in the callback.
+                unsentPayloads.add(payload);
+
+                // We remove the pending flag from the events so they can be picked up again
+                // when we try to send the events in another attempt.
+                for (int i = 0; i < indexArray.size(); i++) {
+                    Log.d(TAG, "Removing PENDING with index: " + indexArray.get(i));
+                    eventStore.removePending(indexArray.get(i));
+                }
+
+            }
+
+            // If there is a RequestCallback set, we send the appropriate information
+            if (unsentPayloads.size() == 0) {
+                if (requestCallback != null)
+                    requestCallback.onSuccess(success_count);
+            } else if (requestCallback != null)
+                requestCallback.onFailure(success_count, unsentPayloads);
         }
     }
 }
