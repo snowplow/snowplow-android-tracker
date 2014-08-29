@@ -53,7 +53,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     private final Uri.Builder uriBuilder = new Uri.Builder();
     private final Logger logger = LoggerFactory.getLogger(Emitter.class);
     private final EventStore eventStore;
-    private BufferOption bufferOption = BufferOption.Default; // Storing option for use in checking
 
     private LinkedList<Payload> unsentPayloads;
     private LinkedList<Long> indexArray;
@@ -215,19 +214,13 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     }
 
     @Override
-    public void setBufferOption(BufferOption bufferOption) {
-        super.setBufferOption(bufferOption);
-        this.bufferOption = bufferOption;
-    }
-
-    @Override
     public boolean addToBuffer(Payload payload) {
         // Checking that the eventStore is of appropriate size before calling super.addToBuffer
         // There doesn't seem to be any need for the in-memory buffer array,
         // but we keep it for future development in case we find a better use for it.
         boolean ret = false;
         eventStore.insertPayload(payload);
-        if (eventStore.size() >= this.bufferOption.getCode()) {
+        if (eventStore.size() >= super.bufferOption.getCode()) {
             ret = super.addToBuffer(payload);
         }
         return ret;
