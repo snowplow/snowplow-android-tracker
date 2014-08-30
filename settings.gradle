@@ -1,1 +1,1 @@
-include ':android-tracker'
+include ':snowplow-android-tracker'
