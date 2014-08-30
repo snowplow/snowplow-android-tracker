@@ -1,4 +1,16 @@
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+    }
+}
+
 apply plugin: 'maven-publish'
 
 group = 'com.snowplowanalytics'
@@ -32,9 +44,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.snowplowanalytics:snowplow-java-tracker-core:0.1.2'
+    compile 'com.android.support:support-v13:20.0.0'
     compile 'com.google.android.gms:play-services:+'
 }
 
@@ -49,6 +62,24 @@ publishing {
             artifact androidReleaseJar {
                 classifier "sources"
             }
+
+            //The publication doesn't know about our dependencies, so we have to manually add them to the pom
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.compile.allDependencies.each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
         }
     }
 }
