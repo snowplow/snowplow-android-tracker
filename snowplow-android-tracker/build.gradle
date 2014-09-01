@@ -27,10 +27,19 @@ android {
         versionCode 1
         versionName "0.1.0"
     }
+
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main  {
+            java {
+                srcDir 'src/main/java'
+            }
         }
     }
 
@@ -56,10 +65,14 @@ task androidReleaseJar(type: Jar, dependsOn: assembleRelease) {
     from "$buildDir/intermediates/classes/release/"
 }
 
+task androidSourcesJar(type: Jar, dependsOn: assembleRelease) {
+    from "$projectDir/src/main/java"
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact androidReleaseJar {
+            artifact androidSourcesJar {
                 classifier "sources"
             }
 
