@@ -72,6 +72,9 @@ task androidSourcesJar(type: Jar, dependsOn: assembleRelease) {
 publishing {
     publications {
         maven(MavenPublication) {
+
+            artifact androidReleaseJar
+
             artifact androidSourcesJar {
                 classifier "sources"
             }
