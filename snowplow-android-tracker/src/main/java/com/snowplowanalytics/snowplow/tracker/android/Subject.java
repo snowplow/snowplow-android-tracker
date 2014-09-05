@@ -33,7 +33,7 @@ import java.util.TimeZone;
 public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
 
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
-    private HashMap<String, String> geoLocationPairs = new HashMap<String, String>();
+    private HashMap<String, Object> geoLocationPairs = new HashMap<String, Object>();
     private HashMap<String, String> mobilePairs = new HashMap<String, String>();
 
     public Subject() {
@@ -78,9 +78,11 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
             this.mobilePairs.put(key, value);
     }
 
-    private void putToGeoLocation(String key, String value) {
+    private void putToGeoLocation(String key, Object value) {
         // Avoid putting null or empty values in the map
-        if (key != null && value != null && !key.isEmpty() && !value.isEmpty())
+        // or if they are strings, avoid empty strings
+        if (key != null && value != null && !key.isEmpty()
+                || (value instanceof String) && !((String) value).isEmpty())
             this.geoLocationPairs.put(key, value);
     }
 
@@ -120,18 +122,12 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         Location location = Util.getLocation(context);
         if (location == null) // No location available
             return;
-        putToGeoLocation(Parameter.LATITUDE,
-                Double.toString(location.getLatitude()));
-        putToGeoLocation(Parameter.LONGITUDE,
-                Double.toString(location.getLongitude()));
-        putToGeoLocation(Parameter.ALTITUDE,
-                Double.toString(location.getAltitude()));
-        putToGeoLocation(Parameter.LATLONG_ACCURACY,
-                Float.toString(location.getAccuracy()));
-        putToGeoLocation(Parameter.SPEED,
-                Float.toString(location.getSpeed()));
-        putToGeoLocation(Parameter.BEARING,
-                Double.toString(location.getBearing()));
+        putToGeoLocation(Parameter.LATITUDE, location.getLatitude());
+        putToGeoLocation(Parameter.LONGITUDE, location.getLongitude());
+        putToGeoLocation(Parameter.ALTITUDE, location.getAltitude());
+        putToGeoLocation(Parameter.LATLONG_ACCURACY, location.getAccuracy());
+        putToGeoLocation(Parameter.SPEED, location.getSpeed());
+        putToGeoLocation(Parameter.BEARING, location.getBearing());
     }
 
     private void setCarrier(Context context) {
@@ -154,7 +150,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         putToMobile(Parameter.OS_TYPE, "android");
     }
 
-    public Map<String, String> getSubjectLocation() {
+    public Map<String, Object> getSubjectLocation() {
         return this.geoLocationPairs;
     }
 
