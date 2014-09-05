@@ -29,10 +29,10 @@ import java.io.IOException;
 public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
 
     public static String getAdvertisingID(Context context) {
-        String id = null;
+        AdvertisingIdClient.Info adInfo = null;
 
         try {
-            id = AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
+            adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
@@ -41,7 +41,7 @@ public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
             e.printStackTrace();
         }
 
-        return id;
+        return adInfo.getId();
     }
 
     public static String getCarrier(Context context) {

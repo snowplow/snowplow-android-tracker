@@ -32,6 +32,7 @@ import java.util.TimeZone;
 
 public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
 
+    private String TAG = Subject.class.getName();
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
     private HashMap<String, Object> geoLocationPairs = new HashMap<String, Object>();
     private HashMap<String, String> mobilePairs = new HashMap<String, String>();
@@ -115,7 +116,11 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     }
 
     private void setAdvertisingID(Context context) {
-        putToMobile(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
+        String androidIdfa = Util.getAdvertisingID(context);
+        if (androidIdfa != null)
+            putToMobile(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
+        else
+            Log.d(TAG, "Advertising ID not available from Play Services");
     }
 
     private void setLocation(Context context) {
