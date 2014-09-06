@@ -22,8 +22,12 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -115,12 +119,24 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         this.setLanguage(Locale.getDefault().getDisplayLanguage());
     }
 
-    private void setAdvertisingID(Context context) {
-        String androidIdfa = Util.getAdvertisingID(context);
-        if (androidIdfa != null)
-            putToMobile(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
-        else
-            Log.d(TAG, "Advertising ID not available from Play Services");
+    private void setAdvertisingID(final Context context) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AdvertisingIdClient.Info info = null;
+                try {
+                    info = AdvertisingIdClient.getAdvertisingIdInfo(context);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                }
+                putToMobile(Parameter.ANDROID_IDFA, info.getId());
+            }
+        });
+        thread.start();
     }
 
     private void setLocation(Context context) {
