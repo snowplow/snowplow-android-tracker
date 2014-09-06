@@ -35,8 +35,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -51,7 +49,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
     private final String TAG = Emitter.class.getName();
     private final Uri.Builder uriBuilder = new Uri.Builder();
-    private final Logger logger = LoggerFactory.getLogger(Emitter.class);
     private final EventStore eventStore;
 
     private LinkedList<Payload> unsentPayloads;
@@ -210,7 +207,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     @Deprecated
     @Override
     public void setRequestMethod(RequestMethod option) {
-        logger.error("Cannot change RequestMethod: Asynchronous requests only available.");
+        Log.e(TAG, "Cannot change RequestMethod: Asynchronous requests only available.");
     }
 
     @Override
@@ -247,12 +244,12 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 StringEntity params = new StringEntity(payload.toString());
                 httpPost.setEntity(params);
                 httpResponse = httpClient.execute(httpPost);
-                logger.debug(httpResponse.getStatusLine().toString());
+                Log.d(TAG, httpResponse.getStatusLine().toString());
             } catch (UnsupportedEncodingException e) {
-                logger.error("Encoding exception with the payload.");
+                Log.e(TAG, "Encoding exception with the payload.");
                 e.printStackTrace();
             } catch (IOException e) {
-                logger.error("Error when sending HTTP POST.");
+                Log.e(TAG, "Error when sending HTTP POST.");
                 e.printStackTrace();
             }
             return httpResponse;
@@ -330,9 +327,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
             try {
                 HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
                 httpResponse = httpClient.execute(httpGet);
-                logger.debug(httpResponse.getStatusLine().toString());
+                Log.d(TAG, httpResponse.getStatusLine().toString());
             } catch (IOException e) {
-                logger.error("Error when sending HTTP GET error.");
+                Log.d(TAG, "Error when sending HTTP GET error.");
                 e.printStackTrace();
             }
             return httpResponse;

@@ -13,12 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+import android.util.Log;
+
 import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +25,7 @@ import java.util.List;
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker {
 
     private Subject subject;
-    private final Logger logger = LoggerFactory.getLogger(Tracker.class);
+    private String TAG = Tracker.class.getName();
 
     /**
      * @param emitter Emitter to which events will be sent
@@ -79,7 +78,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
         if (this.subject != null) {
 
             if (context == null) {
-                logger.debug("No list of user context passed in");
+                Log.d(TAG, "No list of user context passed in");
                 context = new LinkedList<SchemaPayload>();
             }
 
