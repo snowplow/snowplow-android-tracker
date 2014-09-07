@@ -215,12 +215,12 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         // Checking that the eventStore is of appropriate size before calling super.addToBuffer
         // There doesn't seem to be any need for the in-memory buffer array,
         // but we keep it for future development in case we find a better use for it.
-        boolean ret = false;
-        eventStore.insertPayload(payload);
+        long eventId = eventStore.insertPayload(payload);
         if (eventStore.size() >= super.option.getCode()) {
-            ret = super.addToBuffer(payload);
+            flushBuffer();
         }
-        return ret;
+        // Android returns -1 if an error occurred during insert.
+        return eventId != -1;
     }
 
     private class AsyncHttpPost extends AsyncTask<Void, Void, HttpResponse> {
