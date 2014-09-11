@@ -20,28 +20,12 @@ import android.location.LocationManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-
-import java.io.IOException;
+import java.lang.reflect.Method;
 
 public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
 
     public static String getAdvertisingID(Context context) {
-        String id = null;
-
-        try {
-            id = AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        }
-
-        return id;
+        return getPlayAdId(context);
     }
 
     public static String getCarrier(Context context) {
@@ -73,5 +57,53 @@ public class Util extends com.snowplowanalytics.snowplow.tracker.core.Util {
         }
         return location;
     }
+
+    public static String getPlayAdId(Context context) {
+        try {
+            Object AdvertisingInfoObject = getAdvertisingInfoObject(context);
+
+            String playAdid = (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
+
+            return playAdid;
+        }
+        catch (Throwable t) {
+            return null;
+        }
+    }
+
+    private static Object getAdvertisingInfoObject(Context context)
+            throws Exception {
+        return invokeStaticMethod("com.google.android.gms.ads.identifier.AdvertisingIdClient",
+                "getAdvertisingIdInfo",
+                new Class[] {Context.class} , context
+        );
+    }
+
+    private static Object invokeStaticMethod(String className, String methodName,
+                                             Class[] cArgs, Object... args)
+            throws Exception {
+        Class classObject = Class.forName(className);
+
+        return invokeMethod(classObject, methodName, null, cArgs, args);
+    }
+
+    private static Object invokeInstanceMethod(Object instance, String methodName,
+                                               Class[] cArgs, Object... args)
+            throws Exception {
+        Class classObject = instance.getClass();
+
+        return invokeMethod(classObject, methodName, instance, cArgs, args);
+    }
+
+    private static Object invokeMethod(Class classObject, String methodName, Object instance,
+                                       Class[] cArgs, Object... args)
+            throws Exception {
+        Method methodObject = classObject.getMethod(methodName, cArgs);
+
+        Object resultObject = methodObject.invoke(instance, args);
+
+        return resultObject;
+    }
+
 
 }

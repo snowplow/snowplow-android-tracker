@@ -1,3 +1,12 @@
+Version 0.1.1 (2014-09-11)
+--------------------------
+Bumped Core version to 0.1.3 (#22)
+Fixed sending a flushBuffer twice stops the database from removing pending flags on events (#24)
+Fixed addToBuffer doesn't always hit flushBuffer (#20)
+Fixed data types for geolocation_context (#17)
+Fixed tracker failing to retrieve Advertising ID if Play Services isn't available (#16)
+Fixed library dependency warnings in Android Studio (#15)
+
 Version 0.1.0 (2014-09-01)
 --------------------------
 Initial release
