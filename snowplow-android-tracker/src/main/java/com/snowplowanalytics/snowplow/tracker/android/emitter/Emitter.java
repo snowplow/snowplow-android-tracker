@@ -109,6 +109,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         }
     }
 
+    /**
+     * Empties the cached events manually. This shouldn't be used unless you're aware of it works.
+     * If you need events send instantly, use set the <code>Emitter</code> buffer to <code>BufferOption.Instant</code>
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void flushBuffer() {
@@ -146,6 +150,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
             // We cycle through each event that is NOT pending
             for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
+
                 // Because we get a raw Object from the database, we cast it to Map<String, Object>
                 // Then create a TrackerPayload map and add the contents to that.
                 // We do this because our overridden sendGetData method accepts a Payload parameter.
@@ -163,6 +168,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 // Adding the event to the wrapper payload.
                 eventMaps.add(payload.getMap());
             }
+
             // Setting the array of events as the 'data' of the wrapper.
             Log.d(TAG, "indexArray before deleting: " + indexArray);
             postPayload.setData(eventMaps);
@@ -175,9 +181,11 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     protected HttpResponse sendGetData(Payload payload) {
         // This method is used to call the AsyncHttpGet class to actually send the events
         // The httpResponse is almost always going to be empty, so avoid using it's return value
+
         HttpResponse httpResponse = null;
-        AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload);
+        AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload, indexArray);
         asyncHttpGet.execute();
+
         try {
             httpResponse = asyncHttpGet.get();
         } catch (InterruptedException e) {
@@ -185,15 +193,18 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
         return httpResponse;
     }
 
     protected HttpResponse sendPostData(Payload payload) {
         // This method is used to call the AsyncHttpPost class to actually send the events
         // The httpResponse is almost always going to be empty, so avoid using it's return value
+
         HttpResponse httpResponse = null;
-        AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload);
+        AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload, indexArray);
         asyncHttpPost.execute();
+
         try {
             httpResponse = asyncHttpPost.get();
         } catch (InterruptedException e) {
@@ -201,6 +212,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
         return httpResponse;
     }
 
@@ -216,9 +228,11 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         // There doesn't seem to be any need for the in-memory buffer array,
         // but we keep it for future development in case we find a better use for it.
         long eventId = eventStore.insertPayload(payload);
+
         if (eventStore.size() >= super.option.getCode()) {
             flushBuffer();
         }
+
         // Android returns -1 if an error occurred during insert.
         return eventId != -1;
     }
@@ -226,9 +240,11 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     private class AsyncHttpPost extends AsyncTask<Void, Void, HttpResponse> {
         private Payload payload = null;
         private String TAG = "Emitter" + "+AsyncHttpPost";
+        private LinkedList<Long> pendingEventIds = null;
 
-        AsyncHttpPost(Payload payload) {
+        AsyncHttpPost(Payload payload, LinkedList<Long> pendingEventIds) {
             this.payload = payload;
+            this.pendingEventIds = pendingEventIds;
         }
 
         @Override
@@ -252,6 +268,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 Log.e(TAG, "Error when sending HTTP POST.");
                 e.printStackTrace();
             }
+
             return httpResponse;
         }
 
@@ -265,13 +282,14 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
             int status_code = result.getStatusLine().getStatusCode();
             Log.d(TAG, "Status code: " + status_code);
+
             // If the events were successfully sent...
             if (status_code == 200) {
-                // We remove the event from the database using the indexes from the indexArray.
-                Log.d(TAG, "We're about to remove from indexArray: " + indexArray);
-                for (int i = 0; i < indexArray.size(); i++) {
-                    eventStore.removeEvent(indexArray.get(i));
-                    Log.d(TAG, "Removing event with index: " + indexArray.get(i));
+                // We remove the event from the database using the indexes from the pendingEventIds.
+                Log.d(TAG, "We're about to remove from pendingEventIds: " + this.pendingEventIds);
+                for (int i = 0; i < this.pendingEventIds.size(); i++) {
+                    eventStore.removeEvent(this.pendingEventIds.get(i));
+                    Log.d(TAG, "Removing event with index: " + this.pendingEventIds.get(i));
                 }
 
                 // If there is a RequestCallback set, we send the appropriate information
@@ -280,13 +298,14 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                     Log.d(TAG, "onPostExecute POST Success: " + success_count);
                     requestCallback.onSuccess(success_count);
                 }
+
             } else { // If there was any kind of failure..
 
                 // We remove the pending flag from the events so they can be picked up again
                 // when we try to send the events in another attempt.
-                for (int i = 0; i < indexArray.size(); i++) {
-                    Log.d(TAG, "Removing PENDING with index: " + indexArray.get(i));
-                    eventStore.removePending(indexArray.get(i));
+                for (int i = 0; i < this.pendingEventIds.size(); i++) {
+                    Log.d(TAG, "Removing PENDING with index: " + this.pendingEventIds.get(i));
+                    eventStore.removePending(this.pendingEventIds.get(i));
                 }
 
                 // If there is a RequestCallback set, we send the appropriate information
@@ -302,9 +321,11 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     private class AsyncHttpGet extends AsyncTask<Void, Void, HttpResponse> {
         private Payload payload = null;
         private String TAG = "Emitter" + "+AsyncHttpGet";
+        private LinkedList<Long> pendingEventIds = null;
 
-        AsyncHttpGet(Payload payload) {
+        AsyncHttpGet(Payload payload, LinkedList<Long> pendingEventIds) {
             this.payload = payload;
+            this.pendingEventIds = pendingEventIds;
         }
 
         @SuppressWarnings("unchecked")
@@ -332,6 +353,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 Log.d(TAG, "Error when sending HTTP GET error.");
                 e.printStackTrace();
             }
+
             return httpResponse;
         }
 
@@ -347,15 +369,16 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
             int success_count = 0;
             int status_code = response.getStatusLine().getStatusCode();
             Log.d(TAG, "Status code: " + status_code);
+
             // If the events were successfully sent...
             if (status_code == 200) {
                 // Incrementing our success count
                 success_count++;
 
-                // We remove the event from the database using the indexes from the indexArray.
-                for (int i = 0; i < indexArray.size(); i++) {
-                    eventStore.removeEvent(indexArray.get(i));
-                    Log.d(TAG, "Removing event with index: " + indexArray.get(i));
+                // We remove the event from the database using the indexes from the pendingEventIds.
+                for (int i = 0; i < this.pendingEventIds.size(); i++) {
+                    eventStore.removeEvent(this.pendingEventIds.get(i));
+                    Log.d(TAG, "Removing event with index: " + this.pendingEventIds.get(i));
                 }
 
             } else { // If there was any kind of failure..
@@ -364,9 +387,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
                 // We remove the pending flag from the events so they can be picked up again
                 // when we try to send the events in another attempt.
-                for (int i = 0; i < indexArray.size(); i++) {
-                    Log.d(TAG, "Removing PENDING with index: " + indexArray.get(i));
-                    eventStore.removePending(indexArray.get(i));
+                for (int i = 0; i < this.pendingEventIds.size(); i++) {
+                    Log.d(TAG, "Removing PENDING with index: " + this.pendingEventIds.get(i));
+                    eventStore.removePending(this.pendingEventIds.get(i));
                 }
 
             }
@@ -375,8 +398,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
             if (unsentPayloads.size() == 0) {
                 if (requestCallback != null)
                     requestCallback.onSuccess(success_count);
-            } else if (requestCallback != null)
+            } else if (requestCallback != null) {
                 requestCallback.onFailure(success_count, unsentPayloads);
+            }
         }
     }
 }
