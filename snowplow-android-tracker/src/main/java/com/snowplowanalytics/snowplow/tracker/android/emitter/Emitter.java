@@ -98,7 +98,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         } else {
             uriBuilder.scheme("http")
                     .authority(URI)
-                    .appendPath(Constants.DEFAULT_VENDOR + "/tp2");
+                    .appendEncodedPath(Constants.DEFAULT_VENDOR + "/tp2");
         }
         super.httpMethod = httpMethod;
         super.requestCallback = callback;
