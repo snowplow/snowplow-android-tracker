@@ -1,4 +1,4 @@
-Version 0.1.2 (2014-09-xx)
+Version 0.1.2 (2014-09-19)
 --------------------------
 Fixed Emitter encoding the slash in /tp2 (#28)
 
