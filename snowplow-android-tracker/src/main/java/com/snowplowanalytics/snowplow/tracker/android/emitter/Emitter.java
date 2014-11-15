@@ -279,8 +279,13 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
             // Ths is used for the callback.
             unsentPayloads = new LinkedList<Payload>();
+            int status_code = -1;
 
-            int status_code = result.getStatusLine().getStatusCode();
+            if (result != null)
+                status_code = result.getStatusLine().getStatusCode();
+            else
+                Log.w(TAG, "HttpResponse was null. There may be a network issue.");
+
             Log.d(TAG, "Status code: " + status_code);
 
             // If the events were successfully sent...
@@ -367,7 +372,13 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
             // The success count is reset before we start counting again.
             int success_count = 0;
-            int status_code = response.getStatusLine().getStatusCode();
+            int status_code = -1;
+
+            if (response != null)
+                status_code = response.getStatusLine().getStatusCode();
+            else
+                Log.w(TAG, "HttpResponse was null. There may be a network issue.");
+
             Log.d(TAG, "Status code: " + status_code);
 
             // If the events were successfully sent...
