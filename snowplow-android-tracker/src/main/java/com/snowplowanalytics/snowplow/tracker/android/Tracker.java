@@ -72,7 +72,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
 
     @Override
     protected Payload completePayload(Payload payload, List<SchemaPayload> context,
-                                   double timestamp) {
+                                      long timestamp) {
 
 
         if (this.subject != null) {
