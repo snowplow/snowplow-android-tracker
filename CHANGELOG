@@ -1,6 +1,7 @@
 Version 0.1.3 (2014-11-xx)
 --------------------------
 Updated Java Tracker Core to 0.1.4 (#33)
+Updated completePayload to take timestamp as a long (#35)
 Fixed Emitter NPE when device is not connected (#32)
 
 Version 0.1.2 (2014-09-19)
