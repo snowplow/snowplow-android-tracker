@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.1'
+        classpath 'com.android.tools.build:gradle:1.0.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
@@ -18,7 +18,6 @@ android {
     buildToolsVersion '19.1.0'
 
     defaultConfig {
-        applicationId "com.snowplowanalytics.snowplow.tracker.android"
         minSdkVersion 11
         targetSdkVersion 19
         versionCode 2
@@ -27,7 +26,7 @@ android {
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
