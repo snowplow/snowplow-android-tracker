@@ -19,6 +19,8 @@ import com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload;
 
+import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +69,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.core.Tracker
                    boolean base64Encoded) {
         super(emitter, subject, namespace, appId, base64Encoded);
         super.setTrackerVersion(Version.TRACKER);
+        super.setPlatform(DevicePlatform.Mobile);
         this.subject = subject;
     }
 
