@@ -2,6 +2,7 @@ Version 0.2.0 (2014-12-XX)
 --------------------------
 Added dedicated Vagrant setup (#40)
 Bumped Core version to 0.2.0 (#42)
+Updated CHANGELOG with missing tickets (#41)
 
 Version 0.1.3 (2014-11-25)
 --------------------------
@@ -12,6 +13,7 @@ Fixed Emitter NPE when device is not connected (#32)
 Version 0.1.2 (2014-09-19)
 --------------------------
 Fixed Emitter encoding the slash in /tp2 (#28)
+Changed SLF4J logging to use Android logger (#19)
 
 Version 0.1.1 (2014-09-11)
 --------------------------
