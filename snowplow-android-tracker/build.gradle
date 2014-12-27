@@ -110,6 +110,7 @@ build {
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+// DO NOT EDIT. AUTO-GENERATED.
 public class Version {
     static final String TRACKER = "andr-$project.version";
     static final String VERSION = "$project.version";
