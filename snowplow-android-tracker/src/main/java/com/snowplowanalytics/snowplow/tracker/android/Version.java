@@ -13,7 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+// DO NOT EDIT. AUTO-GENERATED.
 public class Version {
-    static final String TRACKER = "andr-0.1.3";
-    static final String VERSION = "0.1.3";
+    static final String TRACKER = "andr-0.2.0";
+    static final String VERSION = "0.2.0";
 }

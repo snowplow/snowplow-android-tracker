@@ -98,7 +98,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
         } else {
             uriBuilder.scheme("http")
                     .authority(URI)
-                    .appendEncodedPath(Constants.DEFAULT_VENDOR + "/tp2");
+                    .appendEncodedPath(Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION);
         }
         super.httpMethod = httpMethod;
         super.requestCallback = callback;
@@ -260,6 +260,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 StringEntity params = new StringEntity(payload.toString());
                 httpPost.setEntity(params);
                 httpResponse = httpClient.execute(httpPost);
+                Log.d(TAG, payload.toString());
                 Log.d(TAG, httpResponse.getStatusLine().toString());
             } catch (UnsupportedEncodingException e) {
                 Log.e(TAG, "Encoding exception with the payload.");
@@ -353,6 +354,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
             try {
                 HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
                 httpResponse = httpClient.execute(httpGet);
+                Log.d(TAG, payload.toString());
                 Log.d(TAG, httpResponse.getStatusLine().toString());
             } catch (IOException e) {
                 Log.d(TAG, "Error when sending HTTP GET error.");

@@ -22,8 +22,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.snowplowanalytics.snowplow.tracker.core.DevicePlatform;
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,13 +38,10 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
     public Subject() {
         super();
 
-        // Default Platform
-        super.setPlatform(DevicePlatform.Mobile);
-
-        // Default Timezone
+        // Default timezone
         setDefaultTimezone();
 
-        // Default Language
+        // Default language
         setDefaultLanguage();
 
         // Other mobile context data

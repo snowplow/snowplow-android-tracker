@@ -6,28 +6,27 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.1'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
 
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
-        applicationId "com.snowplowanalytics.snowplow.tracker.android"
         minSdkVersion 11
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 2
         versionName "$project.version"
     }
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -51,10 +50,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.snowplowanalytics:snowplow-java-tracker-core:0.1.4'
-    compile 'com.android.support:appcompat-v7:20.0.0'
-    compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.google.android.gms:play-services:5.0.89'
+    compile 'com.snowplowanalytics:snowplow-java-tracker-core:0.2.0'
+    compile 'com.google.android.gms:play-services:6.5.87'
 }
 
 // build JAR file
@@ -110,6 +107,7 @@ build {
 
 package com.snowplowanalytics.snowplow.tracker.android;
 
+// DO NOT EDIT. AUTO-GENERATED.
 public class Version {
     static final String TRACKER = "andr-$project.version";
     static final String VERSION = "$project.version";
