@@ -1,4 +1,4 @@
 To get started:
 vagrant ssh
 cd /vagrant
-./gradlew test
+./gradlew clean build

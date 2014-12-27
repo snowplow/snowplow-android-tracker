@@ -4,9 +4,21 @@
 
 ## Overview
 
-Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Android] [snowplow]**.
+Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Android] [snowplow]**. See also: **[Snowplow Java Tracker] [snowplow-java-tracker]**.
 
-With this tracker you can collect event data from your Java-based desktop and server apps, servlets and games. Supports JDK6+.
+With this tracker you can collect event data from your Android-based applications, games or frameworks.
+
+## Quickstart
+
+Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
+
+```bash
+ host$ git clone https://github.com/snowplow/snowplow-android-tracker.git
+ host$ cd snowplow-android-tracker
+ host$ vagrant up && vagrant ssh
+guest$ cd /vagrant
+guest$ ./gradlew clean build
+```
 
 ## Find out more
 
@@ -31,6 +43,10 @@ limitations under the License.
 [android]: http://www.android.com/
 
 [snowplow]: http://snowplowanalytics.com
+[snowplow-java-tracker]: https://github.com/snowplow/snowplow-java-tracker
+
+[vagrant-install]: http://docs.vagrantup.com/v2/installation/index.html
+[virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
 
 [techdocs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
 [setup-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png

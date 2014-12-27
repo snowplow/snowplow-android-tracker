@@ -3,6 +3,7 @@ Version 0.2.0 (2014-12-XX)
 Added dedicated Vagrant setup (#40)
 Bumped Core version to 0.2.0 (#42)
 Added warning that Version.java is auto-generated (#45)
+Added Quickstart section to README (#43)
 Updated CHANGELOG with missing tickets (#41)
 
 Version 0.1.3 (2014-11-25)
