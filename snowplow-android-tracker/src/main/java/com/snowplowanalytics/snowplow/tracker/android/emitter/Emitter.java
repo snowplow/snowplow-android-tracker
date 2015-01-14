@@ -179,41 +179,21 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     }
 
     protected HttpResponse sendGetData(Payload payload) {
-        // This method is used to call the AsyncHttpGet class to actually send the events
-        // The httpResponse is almost always going to be empty, so avoid using it's return value
+        // This function is called in UI thread, so it cannot wait for asyncHttpGet to complete.
 
-        HttpResponse httpResponse = null;
         AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload, indexArray);
         asyncHttpGet.execute();
 
-        try {
-            httpResponse = asyncHttpGet.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return httpResponse;
+        return null;
     }
 
     protected HttpResponse sendPostData(Payload payload) {
-        // This method is used to call the AsyncHttpPost class to actually send the events
-        // The httpResponse is almost always going to be empty, so avoid using it's return value
+        // This function is called in UI thread, so it cannot wait for asyncHttpGet to complete.
 
-        HttpResponse httpResponse = null;
         AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload, indexArray);
         asyncHttpPost.execute();
 
-        try {
-            httpResponse = asyncHttpPost.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return httpResponse;
+        return null;
     }
 
     @Deprecated
