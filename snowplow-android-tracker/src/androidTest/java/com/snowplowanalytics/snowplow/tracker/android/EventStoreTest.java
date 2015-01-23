@@ -3,10 +3,11 @@ package com.snowplowanalytics.snowplow.tracker.android;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.android.payload.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.android.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.android.payload_utils.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.android.payload_utils.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.android.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.android.storage.EventStoreHelper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

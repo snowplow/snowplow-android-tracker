@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker.android.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,7 +19,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.android.Payload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

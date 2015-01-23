@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -12,6 +12,9 @@
  */
 
 package com.snowplowanalytics.snowplow.tracker.android;
+
+import com.snowplowanalytics.snowplow.tracker.android.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.android.generic_utils.Util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -28,7 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject {
+public class Subject {
 
     private String TAG = Subject.class.getName();
     private HashMap<String, String> standardPairs = new HashMap<String, String>();
@@ -70,16 +73,17 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
 
     private void putToMobile(String key, String value) {
         // Avoid putting null or empty values in the map
-        if (key != null && value != null && !key.isEmpty() && !value.isEmpty())
+        if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
             this.mobilePairs.put(key, value);
+        }
     }
 
     private void putToGeoLocation(String key, Object value) {
         // Avoid putting null or empty values in the map
         // or if they are strings, avoid empty strings
-        if (key != null && value != null && !key.isEmpty()
-                || (value instanceof String) && !((String) value).isEmpty())
+        if (key != null && value != null && !key.isEmpty() || (value instanceof String) && !((String) value).isEmpty()) {
             this.geoLocationPairs.put(key, value);
+        }
     }
 
     @TargetApi(19)
@@ -89,16 +93,17 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
                 (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
-            try {
-                Class<?> partypes[] = new Class[1];
-                partypes[0] = Point.class;
-                Display.class.getMethod("getSize", partypes);
-                display.getSize(size);
-                this.setScreenResolution(size.x, size.y);
-            } catch (NoSuchMethodException e) {
-                Log.e(Subject.class.toString(), "Display.getSize isn't available on older devices.");
-                this.setScreenResolution(display.getWidth(), display.getHeight());
-            }
+
+        try {
+            Class<?> partypes[] = new Class[1];
+            partypes[0] = Point.class;
+            Display.class.getMethod("getSize", partypes);
+            display.getSize(size);
+            this.setScreenResolution(size.x, size.y);
+        } catch (NoSuchMethodException e) {
+            Log.e(Subject.class.toString(), "Display.getSize isn't available on older devices.");
+            this.setScreenResolution(display.getWidth(), display.getHeight());
+        }
     }
 
     private void setDefaultTimezone() {
@@ -114,7 +119,7 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                putToMobile(Parameter.ANDROID_IDFA, Util.getAdvertisingID(context));
+            putToMobile(Parameters.ANDROID_IDFA, Util.getAdvertisingID(context));
             }
         });
         thread.start();
@@ -124,45 +129,32 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         Location location = Util.getLocation(context);
         if (location == null) // No location available
             return;
-        putToGeoLocation(Parameter.LATITUDE, location.getLatitude());
-        putToGeoLocation(Parameter.LONGITUDE, location.getLongitude());
-        putToGeoLocation(Parameter.ALTITUDE, location.getAltitude());
-        putToGeoLocation(Parameter.LATLONG_ACCURACY, location.getAccuracy());
-        putToGeoLocation(Parameter.SPEED, location.getSpeed());
-        putToGeoLocation(Parameter.BEARING, location.getBearing());
+        putToGeoLocation(Parameters.LATITUDE, location.getLatitude());
+        putToGeoLocation(Parameters.LONGITUDE, location.getLongitude());
+        putToGeoLocation(Parameters.ALTITUDE, location.getAltitude());
+        putToGeoLocation(Parameters.LATLONG_ACCURACY, location.getAccuracy());
+        putToGeoLocation(Parameters.SPEED, location.getSpeed());
+        putToGeoLocation(Parameters.BEARING, location.getBearing());
     }
 
     private void setCarrier(Context context) {
-        putToMobile(Parameter.CARRIER, Util.getCarrier(context));
+        putToMobile(Parameters.CARRIER, Util.getCarrier(context));
     }
 
     private void setDeviceModel() {
-        putToMobile(Parameter.DEVICE_MODEL, android.os.Build.MODEL);
+        putToMobile(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
     }
 
     private void setDeviceVendor() {
-        putToMobile(Parameter.DEVICE_MANUFACTURER, Build.MANUFACTURER);
+        putToMobile(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
     }
 
     private void setOsVersion() {
-        putToMobile(Parameter.OS_VERSION, android.os.Build.VERSION.RELEASE);
+        putToMobile(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
     }
 
     private void setOsType() {
-        putToMobile(Parameter.OS_TYPE, "android");
-    }
-
-    public Map<String, Object> getSubjectLocation() {
-        return this.geoLocationPairs;
-    }
-
-    public Map<String, String> getSubjectMobile() { return this.mobilePairs; }
-
-    public Map<String, String> getSubject() {
-        HashMap<String, String> allPairs = new HashMap<String, String>();
-        allPairs.putAll(super.getSubject());
-        allPairs.putAll(this.standardPairs);
-        return allPairs;
+        putToMobile(Parameters.OS_TYPE, "android");
     }
 
     public void setContext(Context context) {
@@ -170,5 +162,45 @@ public class Subject extends com.snowplowanalytics.snowplow.tracker.core.Subject
         setDefaultScreenResolution(context);
         setLocation(context);
         setCarrier(context);
+    }
+
+    public void setUserId(String userId) {
+        this.standardPairs.put(Parameters.UID, userId);
+    }
+
+    public void setScreenResolution(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameters.RESOLUTION, res);
+    }
+
+    public void setViewPort(int width, int height) {
+        String res = Integer.toString(width) + "x" + Integer.toString(height);
+        this.standardPairs.put(Parameters.VIEWPORT, res);
+    }
+
+    public void setColorDepth(int depth) {
+        this.standardPairs.put(Parameters.COLOR_DEPTH, Integer.toString(depth));
+    }
+
+    public void setTimezone(String timezone) {
+        this.standardPairs.put(Parameters.TIMEZONE, timezone);
+    }
+
+    public void setLanguage(String language) {
+        this.standardPairs.put(Parameters.LANGUAGE, language);
+    }
+
+    public Map<String, Object> getSubjectLocation() {
+        return this.geoLocationPairs;
+    }
+
+    public Map<String, String> getSubjectMobile() {
+        return this.mobilePairs;
+    }
+
+    public Map<String, String> getSubject() {
+        HashMap<String, String> allPairs = new HashMap<String, String>();
+        allPairs.putAll(this.standardPairs);
+        return allPairs;
     }
 }

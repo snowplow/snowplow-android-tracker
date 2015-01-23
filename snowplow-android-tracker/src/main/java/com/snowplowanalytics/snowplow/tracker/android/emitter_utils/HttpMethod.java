@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,7 +11,18 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.payload;
+package com.snowplowanalytics.snowplow.tracker.android.emitter_utils;
 
-public class SchemaPayload extends com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload {
+/**
+ * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
+ */
+public enum HttpMethod {
+    /**
+     * Each event is sent individually in separate GET requests.
+     */
+    GET,
+    /**
+     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     */
+    POST
 }
