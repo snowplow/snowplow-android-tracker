@@ -19,6 +19,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.util.Base64;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -153,12 +154,7 @@ public class Util {
      */
 
     public static String base64Encode(String string) {
-        try {
-            return Base64.encode(string.getBytes());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return Base64.encodeToString(string.getBytes(), Base64.URL_SAFE);
     }
 
     public static String getEventId() {
