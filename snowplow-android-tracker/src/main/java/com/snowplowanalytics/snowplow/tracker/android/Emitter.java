@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,23 +11,22 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.emitter;
+package com.snowplowanalytics.snowplow.tracker.android;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.android.Constants;
-import com.snowplowanalytics.snowplow.tracker.android.EventStore;
-import com.snowplowanalytics.snowplow.tracker.android.EventStoreHelper;
-import com.snowplowanalytics.snowplow.tracker.android.payload.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.core.emitter.RequestMethod;
-import com.snowplowanalytics.snowplow.tracker.core.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.android.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.android.payload_utils.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.android.payload_utils.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.android.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.android.storage.EventStoreHelper;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -45,7 +44,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter.Emitter {
+public class Emitter {
 
     private final String TAG = Emitter.class.getName();
     private final Uri.Builder uriBuilder = new Uri.Builder();
@@ -54,58 +53,75 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     private LinkedList<Payload> unsentPayloads;
     private LinkedList<Long> indexArray;
 
-    /**
-     * Create an Emitter instance with a collector URL.
-     *
-     * @param URI The collector URL. Don't include "http://" - this is done automatically.
-     */
-    public Emitter(String URI, Context context) {
-        this(URI, HttpMethod.GET, null, context);
-    }
+    protected RequestCallback requestCallback;
+    protected HttpMethod httpMethod;
+    protected BufferOption option = BufferOption.Default;
 
     /**
-     * Create an Emitter instance with a collector URL, and callback method.
-     *
-     * @param URI      The collector URL. Don't include "http://" - this is done automatically.
-     * @param callback The callback method to handle success/failure cases when sending events.
+     * Creates an emitter object
+     * @param builder The builder that constructs an emitter
      */
-    public Emitter(String URI, Context context, RequestCallback callback) {
-        this(URI, HttpMethod.GET, callback, context);
-    }
+    private Emitter(EmitterBuilder builder) {
+        this.httpMethod = builder.httpMethod;
+        this.requestCallback = builder.requestCallback;
+        this.eventStore = new EventStore(builder.context);
 
-    /**
-     * Create an Emitter instance with a collector URL,
-     *
-     * @param URI        The collector URL. Don't include "http://" - this is done automatically.
-     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
-     */
-    public Emitter(String URI, Context context, HttpMethod httpMethod) {
-        this(URI, httpMethod, null, context);
-    }
-
-    /**
-     * Create an Emitter instance with a collector URL and HttpMethod to send requests.
-     *
-     * @param URI        The collector URL. Don't include "http://" - this is done automatically.
-     * @param httpMethod The HTTP request method. If GET, <code>BufferOption</code> is set to <code>Instant</code>.
-     * @param callback   The callback method to handle success/failure cases when sending events.
-     */
-    public Emitter(String URI, HttpMethod httpMethod, RequestCallback callback, Context context) {
-        if(httpMethod == HttpMethod.GET) {
-            uriBuilder.scheme("http")
-                    .authority(URI)
-                    .appendPath("i");
-        } else {
-            uriBuilder.scheme("http")
-                    .authority(URI)
-                    .appendEncodedPath(Constants.PROTOCOL_VENDOR + "/" + Constants.PROTOCOL_VERSION);
-        }
-        super.httpMethod = httpMethod;
-        super.requestCallback = callback;
-        this.eventStore = new EventStore(context);
-
+        // Create URI based on request method
         if (httpMethod == HttpMethod.GET) {
-            super.setBufferOption(BufferOption.Instant);
+            uriBuilder.scheme("http")
+                    .authority(builder.uri)
+                    .appendPath("i");
+        }
+        else {
+            uriBuilder.scheme("http")
+                    .authority(builder.uri)
+                    .appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" + TrackerConstants.PROTOCOL_VERSION);
+        }
+
+        // Set buffer option based on request method
+        if (httpMethod == HttpMethod.GET) {
+            setBufferOption(BufferOption.Instant);
+        }
+    }
+
+    public static class EmitterBuilder {
+        private final String uri; // Required
+        private final Context context; // Required
+        protected RequestCallback requestCallback; // Optional
+        protected HttpMethod httpMethod = HttpMethod.POST; // Optional
+
+        /**
+         * @param uri The uri of the collector
+         * @param context The android context object
+         */
+        public EmitterBuilder(String uri, Context context) {
+            this.uri = uri;
+            this.context = context;
+        }
+
+        /**
+         * @param httpMethod The method by which requests are emitted
+         * @return
+         */
+        public EmitterBuilder httpMethod(HttpMethod httpMethod) {
+            this.httpMethod = httpMethod;
+            return this;
+        }
+
+        /**
+         * @param requestCallback Request callback function
+         * @return
+         */
+        public EmitterBuilder requestCallback(RequestCallback requestCallback) {
+            this.requestCallback = requestCallback;
+            return this;
+        }
+
+        /**
+         * @return a new Emitter object
+         */
+        public Emitter build(){
+            return new Emitter(this);
         }
     }
 
@@ -114,7 +130,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
      * If you need events send instantly, use set the <code>Emitter</code> buffer to <code>BufferOption.Instant</code>
      */
     @SuppressWarnings("unchecked")
-    @Override
     public void flushBuffer() {
         indexArray = new LinkedList<Long>();
 
@@ -145,7 +160,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
 
             // We can accept multiple events in a POST request so we create a wrapper for them.
             SchemaPayload postPayload = new SchemaPayload();
-            postPayload.setSchema(Constants.SCHEMA_PAYLOAD_DATA);
+            postPayload.setSchema(TrackerConstants.SCHEMA_PAYLOAD_DATA);
             ArrayList<Map> eventMaps = new ArrayList<Map>();
 
             // We cycle through each event that is NOT pending
@@ -217,19 +232,17 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
     }
 
     @Deprecated
-    @Override
     public void setRequestMethod(RequestMethod option) {
         Log.e(TAG, "Cannot change RequestMethod: Asynchronous requests only available.");
     }
 
-    @Override
     public boolean addToBuffer(Payload payload) {
         // Checking that the eventStore is of appropriate size before calling super.addToBuffer
         // There doesn't seem to be any need for the in-memory buffer array,
         // but we keep it for future development in case we find a better use for it.
         long eventId = eventStore.insertPayload(payload);
 
-        if (eventStore.size() >= super.option.getCode()) {
+        if (eventStore.size() >= option.getCode()) {
             flushBuffer();
         }
 
@@ -415,5 +428,14 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.core.emitter
                 requestCallback.onFailure(success_count, unsentPayloads);
             }
         }
+    }
+
+    /**
+     * Sets whether the buffer should send events instantly or after the buffer has reached
+     * it's limit. By default, this is set to BufferOption Default.
+     * @param option Set the BufferOption enum to Instant send events upon creation.
+     */
+    public void setBufferOption(BufferOption option) {
+        this.option = option;
     }
 }

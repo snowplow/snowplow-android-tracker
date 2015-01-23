@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,7 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.payload;
+package com.snowplowanalytics.snowplow.tracker.android.emitter_utils;
 
-public class TrackerPayload extends com.snowplowanalytics.snowplow.tracker.core.payload.TrackerPayload {
+import com.snowplowanalytics.snowplow.tracker.android.Payload;
+
+import java.util.List;
+
+public interface RequestCallback {
+
+    void onSuccess(int successCount);
+
+    void onFailure(int successCount, List<Payload> failedEvent);
+
 }
