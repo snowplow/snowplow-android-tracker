@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.storage;
+package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,7 +19,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.snowplowanalytics.snowplow.tracker.android.Payload;
+import com.snowplowanalytics.snowplow.tracker.Payload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,8 +35,11 @@ public class EventStore {
 
     private SQLiteDatabase database;
     private EventStoreHelper dbHelper;
-    private String[] allColumns = { EventStoreHelper.COLUMN_ID,
-            EventStoreHelper.COLUMN_EVENT_DATA, EventStoreHelper.COLUMN_DATE_CREATED};
+    private String[] allColumns = {
+            EventStoreHelper.COLUMN_ID,
+            EventStoreHelper.COLUMN_EVENT_DATA,
+            EventStoreHelper.COLUMN_DATE_CREATED
+    };
     private long lastInsertedRowId = -1;
 
     private String TAG = EventStore.class.getName();
@@ -44,7 +47,7 @@ public class EventStore {
     public EventStore(Context context) {
         dbHelper = new EventStoreHelper(context);
         open();
-            System.out.println(database.getPath());
+        System.out.println(database.getPath());
     }
 
     public boolean open() {

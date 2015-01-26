@@ -11,10 +11,10 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.android.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.android.generic_utils.Util;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.generic_utils.Util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -39,8 +39,6 @@ public class Subject {
     private HashMap<String, String> mobilePairs = new HashMap<String, String>();
 
     public Subject() {
-        super();
-
         // Default timezone
         setDefaultTimezone();
 

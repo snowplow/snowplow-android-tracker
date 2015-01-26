@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.payload_utils;
+package com.snowplowanalytics.snowplow.tracker.payload_utils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import com.snowplowanalytics.snowplow.tracker.android.Payload;
-import com.snowplowanalytics.snowplow.tracker.android.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.android.generic_utils.Util;
-import com.snowplowanalytics.snowplow.tracker.android.generic_utils.Preconditions;
+import com.snowplowanalytics.snowplow.tracker.Payload;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.generic_utils.Util;
+import com.snowplowanalytics.snowplow.tracker.generic_utils.Preconditions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
