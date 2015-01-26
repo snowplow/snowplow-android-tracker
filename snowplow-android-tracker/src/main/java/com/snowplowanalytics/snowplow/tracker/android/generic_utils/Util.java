@@ -154,7 +154,7 @@ public class Util {
      */
 
     public static String base64Encode(String string) {
-        return Base64.encodeToString(string.getBytes(), Base64.DEFAULT);
+        return Base64.encodeToString(string.getBytes(), Base64.URL_SAFE);
     }
 
     public static String getEventId() {
