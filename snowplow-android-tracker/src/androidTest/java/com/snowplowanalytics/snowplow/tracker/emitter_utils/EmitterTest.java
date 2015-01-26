@@ -8,7 +8,7 @@ import android.test.AndroidTestCase;
 
 public class EmitterTest extends AndroidTestCase {
 
-    private static String testURL = "87f093a.ngrok.com";
+    private static String testURL = "10.0.2.2:4545";
 
     public void testSetRequestMethod() throws Exception {
         Emitter emitter = new Emitter
