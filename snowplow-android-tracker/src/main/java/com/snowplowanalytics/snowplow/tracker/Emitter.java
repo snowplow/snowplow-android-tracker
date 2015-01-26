@@ -11,22 +11,22 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.android.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.android.emitter_utils.RequestMethod;
-import com.snowplowanalytics.snowplow.tracker.android.payload_utils.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.android.payload_utils.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.android.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.android.storage.EventStoreHelper;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.emitter_utils.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter_utils.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter_utils.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.emitter_utils.RequestMethod;
+import com.snowplowanalytics.snowplow.tracker.payload_utils.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.payload_utils.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStoreHelper;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

@@ -90,7 +90,7 @@
  * @since 2.0 (imported from Google Collections Library)
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.generic_utils;
+package com.snowplowanalytics.snowplow.tracker.generic_utils;
 
 public final class Preconditions {
     private Preconditions() {}

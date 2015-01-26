@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.constants;
+package com.snowplowanalytics.snowplow.tracker.constants;
 
 public enum DevicePlatforms {
     Web {

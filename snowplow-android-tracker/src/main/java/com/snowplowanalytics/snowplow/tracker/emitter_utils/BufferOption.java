@@ -11,19 +11,31 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.emitter_utils;
+package com.snowplowanalytics.snowplow.tracker.emitter_utils;
 
 /**
- * RequestMethod is used to choose how network requests should be sent.
- * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ * BufferOption is used to set the buffer size of your Emitter.
  */
-public enum RequestMethod {
+public enum BufferOption {
     /**
-     * Requests are sent synchronously, so it should be used with caution.
+     * Sends events immediately when being tracked. This may cause a lot of network traffic
+     * depending on it's usage.
      */
-    Synchronous,
+    Instant(1),
+
     /**
-     * Requests are sent asynchronously using a background thread.
+     * Sends events in a group only after collecting 10 events. In a POST request, this is
+     * sent in one payload. For a GET request, individual requests are sent following each other.
      */
-    Asynchronous
+    Default(10);
+
+    private int code;
+
+    private BufferOption(int c) {
+        code = c;
+    }
+
+    public int getCode() {
+        return code;
+    }
 }

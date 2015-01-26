@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,10 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker.emitter_utils;
 
-// DO NOT EDIT. AUTO-GENERATED.
-public class Version {
-    static final String TRACKER = "andr-0.2.0";
-    static final String VERSION = "0.2.0";
+/**
+ * RequestMethod is used to choose how network requests should be sent.
+ * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ */
+public enum RequestMethod {
+    /**
+     * Requests are sent synchronously, so it should be used with caution.
+     */
+    Synchronous,
+    /**
+     * Requests are sent asynchronously using a background thread.
+     */
+    Asynchronous
 }
