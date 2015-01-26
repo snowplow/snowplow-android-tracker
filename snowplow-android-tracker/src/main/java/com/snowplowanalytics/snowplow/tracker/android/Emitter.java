@@ -47,8 +47,8 @@ import java.util.concurrent.ExecutionException;
 public class Emitter {
 
     private final String TAG = Emitter.class.getName();
-    private final Uri.Builder uriBuilder = new Uri.Builder();
     private final EventStore eventStore;
+    private Uri.Builder uriBuilder;
 
     private LinkedList<Payload> unsentPayloads;
     private LinkedList<Long> indexArray;
@@ -66,15 +66,16 @@ public class Emitter {
         this.requestCallback = builder.requestCallback;
         this.eventStore = new EventStore(builder.context);
 
+        // Need to create URI Builder in this way to preserve port keys
+        this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
+
         // Create URI based on request method
         if (httpMethod == HttpMethod.GET) {
             uriBuilder.scheme("http")
-                    .authority(builder.uri)
                     .appendPath("i");
         }
         else {
             uriBuilder.scheme("http")
-                    .authority(builder.uri)
                     .appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" + TrackerConstants.PROTOCOL_VERSION);
         }
 
@@ -265,6 +266,8 @@ public class Emitter {
             // Here we do the actual sending of the request
 
             HttpPost httpPost = new HttpPost(uriBuilder.build().toString());
+            Log.d("URI TAGGER - POST", uriBuilder.build().toString());
+
             httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
             HttpResponse httpResponse = null;
             HttpClient httpClient = new DefaultHttpClient();
@@ -366,6 +369,8 @@ public class Emitter {
 
             try {
                 HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
+                Log.d("URI TAGGER - GET", uriBuilder.build().toString());
+
                 httpResponse = httpClient.execute(httpGet);
                 Log.d(TAG, payload.toString());
                 Log.d(TAG, httpResponse.getStatusLine().toString());
