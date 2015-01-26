@@ -1,8 +1,8 @@
-package com.snowplowanalytics.snowplow.tracker.android.emitter_utils;
+package com.snowplowanalytics.snowplow.tracker.emitter_utils;
 
-import com.snowplowanalytics.snowplow.tracker.android.Emitter;
-import com.snowplowanalytics.snowplow.tracker.android.Subject;
-import com.snowplowanalytics.snowplow.tracker.android.Tracker;
+import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.Subject;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 
 import android.test.AndroidTestCase;
 
@@ -26,7 +26,7 @@ public class EmitterTest extends AndroidTestCase {
         emitter.setBufferOption(BufferOption.Instant);
         Tracker tracker = new Tracker
                 .TrackerBuilder(emitter, "myNamespace", "myAppId")
-                .base64(true)
+                .base64(false)
                 .subject(subject)
                 .build();
         tracker.trackScreenView("Screen 1", null);

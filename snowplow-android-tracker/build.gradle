@@ -94,7 +94,7 @@ publishing {
 }
 
 build {
-    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/android")
+    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
     doFirst {
         println outputDir
         def srcFile = new File((String)outputDir, "Version.java")
