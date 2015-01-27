@@ -33,16 +33,14 @@ import java.util.Map;
 
 public class Tracker {
 
+    private final String TAG = Tracker.class.getName();
+    private final String trackerVersion = Version.TRACKER;
     private Emitter emitter;
     private String namespace;
     private String appId;
     private Subject subject;
-    private boolean base64Encoded = true;
-
-    private String trackerVersion;
-    private DevicePlatforms platform;
-
-    private String TAG = Tracker.class.getName();
+    private boolean base64Encoded;
+    private DevicePlatforms devicePlatform;
 
     /**
      * Creates a Tracker object
@@ -54,8 +52,7 @@ public class Tracker {
         this.base64Encoded = builder.base64Encoded;
         this.namespace = builder.namespace;
         this.subject = builder.subject;
-        setTrackerVersion(Version.TRACKER);
-        setPlatform(DevicePlatforms.Mobile);
+        this.devicePlatform = builder.devicePlatform;
     }
 
     public static class TrackerBuilder {
@@ -64,6 +61,7 @@ public class Tracker {
         private final String appId; // Required
         private Subject subject = null; // Optional
         private boolean base64Encoded = true; // Optional
+        private DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -78,7 +76,6 @@ public class Tracker {
 
         /**
          * @param subject Subject to be tracked
-         * @return
          */
         public TrackerBuilder subject(Subject subject) {
             this.subject = subject;
@@ -87,10 +84,17 @@ public class Tracker {
 
         /**
          * @param base64 Whether JSONs in the payload should be base-64 encoded
-         * @return
          */
         public TrackerBuilder base64(Boolean base64) {
             this.base64Encoded = base64;
+            return this;
+        }
+
+        /**
+         * @param platform The device platform the tracker is running on
+         */
+        public TrackerBuilder platform(DevicePlatforms platform) {
+            this.devicePlatform = platform;
             return this;
         }
 
@@ -102,99 +106,150 @@ public class Tracker {
         }
     }
 
-    protected Payload completePayload(Payload payload, List<SchemaPayload> context,
-                                      long timestamp) {
-
-        if (this.subject != null) {
-
-            if (context == null) {
-                Log.d(TAG, "No list of user context passed in");
-                context = new LinkedList<SchemaPayload>();
-            }
-
-            if (!this.subject.getSubjectLocation().isEmpty()) {
-                SchemaPayload locationPayload = new SchemaPayload();
-                locationPayload.setSchema(TrackerConstants.GEOLOCATION_SCHEMA);
-                locationPayload.setData(this.subject.getSubjectLocation());
-                context.add(locationPayload);
-            }
-
-            if (!this.subject.getSubjectMobile().isEmpty()) {
-                SchemaPayload mobilePayload = new SchemaPayload();
-                mobilePayload.setSchema(TrackerConstants.MOBILE_SCHEMA);
-                mobilePayload.setData(this.subject.getSubjectMobile());
-                context.add(mobilePayload);
-            }
-        }
-
-        return completePayload2(payload, context, timestamp);
+    /**
+     * Adds a complete payload to the emitter
+     * @param payload The complete payload to be
+     *                sent to a collector
+     */
+    private void addTrackerPayload(Payload payload) {
+        this.emitter.addToBuffer(payload);
     }
 
     /**
+     * Builds a final payload by joining the event payload with
+     * the custom context and an optional timestamp.
      * @param payload Payload builder
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    protected Payload completePayload2(Payload payload, List<SchemaPayload> context,
+    private Payload completePayload(Payload payload, List<SchemaPayload> context,
                                       long timestamp) {
 
-        payload.add(Parameters.PLATFORM, this.platform.toString());
+        // Encodes context data
+        SchemaPayload envelope = new SchemaPayload();
+        envelope.setSchema(TrackerConstants.SCHEMA_CONTEXTS);
+
+        // Add default parameters to the payload
+        payload = addDefaultPayloadData(payload);
+
+        // If timestamp is set to 0, generate one and add it
+        payload.add(Parameters.TIMESTAMP,
+                (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
+
+        // Add default information to the custom context
+        List<SchemaPayload> final_context = addDefaultContextData(context);
+
+        // Convert context into a List<Map> object
+        List<Map> contextDataList = new LinkedList<>();
+        for (SchemaPayload schemaPayload : final_context) {
+            contextDataList.add(schemaPayload.getMap());
+        }
+
+        // Add the context map to the envelope
+        envelope.setData(contextDataList);
+        payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
+                Parameters.CONTEXT);
+
+        return payload;
+    }
+
+    /**
+     * Adds all of the default parameters to the Payload
+     * @param payload A raw payload from a tracker event
+     * @return a payload with default information appended
+     */
+    private Payload addDefaultPayloadData(Payload payload) {
+        payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
         payload.add(Parameters.APPID, this.appId);
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
         payload.add(Parameters.EID, Util.getEventId());
 
-        // If timestamp is set to 0, generate one
-        payload.add(Parameters.TIMESTAMP,
-                (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
-
-        // Encodes context data
-        if (context != null) {
-            SchemaPayload envelope = new SchemaPayload();
-            envelope.setSchema(TrackerConstants.SCHEMA_CONTEXTS);
-
-            // We can do better here, rather than re-iterate through the list
-            List<Map> contextDataList = new LinkedList<Map>();
-            for (SchemaPayload schemaPayload : context) {
-                contextDataList.add(schemaPayload.getMap());
-            }
-
-            envelope.setData(contextDataList);
-            payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
-                    Parameters.CONTEXT);
-        }
-
+        // If there is a subject present for the Tracker add it
         if (this.subject != null) {
             payload.addMap(new HashMap<String, Object>(subject.getSubject()));
         }
-
         return payload;
     }
 
-    public void setPlatform(DevicePlatforms platform) {
-        this.platform = platform;
+    /**
+     * Adds the default Android Tracker contextual
+     * information to the context.
+     * @param context Custom context for the event
+     * @return A final custom context
+     */
+    private List<SchemaPayload> addDefaultContextData(List<SchemaPayload> context) {
+        if (context == null) {
+            Log.d(TAG, "No list of user context passed in");
+            context = new LinkedList<>();
+        }
+        if (!this.subject.getSubjectLocation().isEmpty()) {
+            SchemaPayload locationPayload = new SchemaPayload();
+            locationPayload.setSchema(TrackerConstants.GEOLOCATION_SCHEMA);
+            locationPayload.setData(this.subject.getSubjectLocation());
+            context.add(locationPayload);
+        }
+        if (!this.subject.getSubjectMobile().isEmpty()) {
+            SchemaPayload mobilePayload = new SchemaPayload();
+            mobilePayload.setSchema(TrackerConstants.MOBILE_SCHEMA);
+            mobilePayload.setData(this.subject.getSubjectMobile());
+            context.add(mobilePayload);
+        }
+        return context;
     }
 
-    public DevicePlatforms getPlatform() {
-        return this.platform;
-    }
-
-    protected void setTrackerVersion(String version) {
-        this.trackerVersion = version;
-    }
-
-    private void addTrackerPayload(Payload payload) {
-        this.emitter.addToBuffer(payload);
-    }
-
+    /**
+     * Sets the trackers subject
+     * @param subject a valid subject object
+     */
     public void setSubject(Subject subject) {
         this.subject = subject;
     }
 
+    /**
+     * @return the tracker version that was set
+     */
+    public String getTrackerVersion() {
+        return this.trackerVersion;
+    }
+
+    /**
+     * @return the trackers namespace
+     */
+    public String getNamespace() {
+        return this.namespace;
+    }
+
+    /**
+     * @return the trackers set Application ID
+     */
+    public String getAppId() {
+        return this.appId;
+    }
+
+    /**
+     * @return the trackers subject object
+     */
     public Subject getSubject() {
         return this.subject;
     }
+
+    /**
+     * @return the base64 setting of the tracker
+     */
+    public boolean getBase64Encoded() {
+        return this.base64Encoded;
+    }
+
+    /**
+     * @return the trackers device platform
+     */
+    public DevicePlatforms getPlatform() {
+        return this.devicePlatform;
+    }
+
+    // TODO: Refactor events into builders
 
     /**
      * @param pageUrl URL of the viewed page
