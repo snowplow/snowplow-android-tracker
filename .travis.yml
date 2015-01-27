@@ -23,7 +23,10 @@ install:
 
 before_script:
   - mb &
-  - "curl -X POST -d @snowplow-android-tracker/src/androidTest/java/com/snowplowanalytics/snowplow/tracker/mountebank_mocks/generic_imposter.json http://localhost:2525/imposters"
   - chmod +x ./ci/wait_for_emulator
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
+
+script:
+  - "curl -X POST -d @snowplow-android-tracker/src/androidTest/java/com/snowplowanalytics/snowplow/tracker/mountebank_mocks/generic_imposter.json http://localhost:2525/imposters"
+  - ./gradlew build connectedCheck
