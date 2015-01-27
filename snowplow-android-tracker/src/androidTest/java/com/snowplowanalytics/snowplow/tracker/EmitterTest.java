@@ -1,21 +1,13 @@
-package com.snowplowanalytics.snowplow.tracker.emitter_utils;
+package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.emitter_utils.*;
 
 import android.test.AndroidTestCase;
 
 public class EmitterTest extends AndroidTestCase {
 
     private static String testURL = "10.0.2.2:4545";
-
-    public void testSetRequestMethod() throws Exception {
-        Emitter emitter = new Emitter
-                .EmitterBuilder(testURL, getContext())
-                .build();
-        emitter.setRequestMethod(RequestMethod.Synchronous);
-    }
+    //private static String testURL = "87f093a.ngrok.com";
 
     public void testSendGetData() throws Exception {
         Emitter emitter = new Emitter
