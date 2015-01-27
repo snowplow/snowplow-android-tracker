@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -28,30 +27,25 @@ import com.snowplowanalytics.snowplow.tracker.payload_utils.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStoreHelper;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Request;
 
 public class Emitter {
 
     private final String TAG = Emitter.class.getName();
+    private final OkHttpClient client = new OkHttpClient();
+    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final EventStore eventStore;
     private Uri.Builder uriBuilder;
-
-    private LinkedList<Payload> unsentPayloads;
-    private LinkedList<Long> indexArray;
 
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
@@ -88,7 +82,7 @@ public class Emitter {
     public static class EmitterBuilder {
         private final String uri; // Required
         private final Context context; // Required
-        protected RequestCallback requestCallback; // Optional
+        protected RequestCallback requestCallback = null; // Optional
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
 
         /**
@@ -102,7 +96,6 @@ public class Emitter {
 
         /**
          * @param httpMethod The method by which requests are emitted
-         * @return
          */
         public EmitterBuilder httpMethod(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
@@ -111,7 +104,6 @@ public class Emitter {
 
         /**
          * @param requestCallback Request callback function
-         * @return
          */
         public EmitterBuilder requestCallback(RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
@@ -132,117 +124,75 @@ public class Emitter {
      */
     @SuppressWarnings("unchecked")
     public void flushBuffer() {
-        indexArray = new LinkedList<Long>();
 
+        // Reset the indexArray on each buffer flush
+        LinkedList<Long> indexArray = new LinkedList<>();
+
+        // Store all events as payloads
+        ArrayList<Payload> events = new ArrayList<>();
+
+        // Loop through all non-pending events and convert them into Payloads
+        for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
+
+            // Create a TrackerPayload for each non-pending event
+            TrackerPayload payload = new TrackerPayload();
+            Map<String, Object> eventData = (Map<String, Object>)
+                    eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA);
+            payload.addMap(eventData);
+
+            // Set the event to pending status to prevent it being picked up again
+            Long eventId = (Long) eventMetadata.get(EventStoreHelper.METADATA_ID);
+            indexArray.add(eventId);
+            eventStore.setPending(eventId);
+
+            // Add the event payload
+            events.add(payload);
+        }
+
+        // If the request method is GET...
         if (httpMethod == HttpMethod.GET) {
+            for (Payload event : events) {
+                try {
+                    Request req = getRequestBuilder(event);
+                    int res = requestSender(req, event, indexArray);
+                    Log.d(TAG + "+GET Request Result: ", "" + res);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else { // If the request method is POST...
 
-            // We cycle through each event that is NOT pending.
-            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
-                // Because we get a raw Object from the database, we cast it to Map<String, Object>
-                // Then create a TrackerPayload map and add the contents to that.
-                // We do this because our overridden sendGetData method accepts a Payload parameter.
-                TrackerPayload payload = new TrackerPayload();
-                payload.addMap((Map<String, Object>)
-                        eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA));
-
-                // Each event's database index is added to a global array
-                // to be used later for removal of events from the database.
-                indexArray.add((Long) eventMetadata.get(EventStoreHelper.METADATA_ID));
-
-                // Setting the event to pending so we don't pick it up a second time.
-                eventStore.setPending((Long)eventMetadata.get(EventStoreHelper.METADATA_ID));
-
-                // Sending each event individually.
-                this.sendGetData(payload);
+            // Convert the ArrayList of Payloads into an ArrayList of Maps
+            ArrayList<Map> eventMaps = new ArrayList<>();
+            for (Payload event : events) {
+                eventMaps.add(event.getMap());
             }
 
-
-        } else if (httpMethod == HttpMethod.POST) {
-
-            // We can accept multiple events in a POST request so we create a wrapper for them.
+            // As we can send multiple events in a POST we need to create a wrapper
             SchemaPayload postPayload = new SchemaPayload();
             postPayload.setSchema(TrackerConstants.SCHEMA_PAYLOAD_DATA);
-            ArrayList<Map> eventMaps = new ArrayList<Map>();
-
-            // We cycle through each event that is NOT pending
-            for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
-
-                // Because we get a raw Object from the database, we cast it to Map<String, Object>
-                // Then create a TrackerPayload map and add the contents to that.
-                // We do this because our overridden sendGetData method accepts a Payload parameter.
-                TrackerPayload payload = new TrackerPayload();
-                payload.addMap((Map<String, Object>)
-                        eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA));
-
-                // Each event's database index is added to a global array
-                // to be used later for removal of events from the database.
-                indexArray.add((Long) eventMetadata.get(EventStoreHelper.METADATA_ID));
-
-                // Setting the event to pending so we don't pick it up a second time.
-                eventStore.setPending((Long)eventMetadata.get(EventStoreHelper.METADATA_ID));
-
-                // Adding the event to the wrapper payload.
-                eventMaps.add(payload.getMap());
-            }
-
-            // Setting the array of events as the 'data' of the wrapper.
-            Log.d(TAG, "indexArray before deleting: " + indexArray);
             postPayload.setData(eventMaps);
 
-            // We finally send this completed wrapper with all the events in it.
-            this.sendPostData(postPayload);
+            try {
+                Request req = postRequestBuilder(postPayload);
+                int res = requestSender(req, postPayload, indexArray);
+                Log.d(TAG + "+POST Request Result: ", "" + res);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    protected HttpResponse sendGetData(Payload payload) {
-        // This method is used to call the AsyncHttpGet class to actually send the events
-        // The httpResponse is almost always going to be empty, so avoid using it's return value
-
-        HttpResponse httpResponse = null;
-        AsyncHttpGet asyncHttpGet = new AsyncHttpGet(payload, indexArray);
-        asyncHttpGet.execute();
-
-        try {
-            httpResponse = asyncHttpGet.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return httpResponse;
-    }
-
-    protected HttpResponse sendPostData(Payload payload) {
-        // This method is used to call the AsyncHttpPost class to actually send the events
-        // The httpResponse is almost always going to be empty, so avoid using it's return value
-
-        HttpResponse httpResponse = null;
-        AsyncHttpPost asyncHttpPost = new AsyncHttpPost(payload, indexArray);
-        asyncHttpPost.execute();
-
-        try {
-            httpResponse = asyncHttpPost.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return httpResponse;
-    }
-
-    @Deprecated
-    public void setRequestMethod(RequestMethod option) {
-        Log.e(TAG, "Cannot change RequestMethod: Asynchronous requests only available.");
-    }
-
+    /**
+     * Checking that the eventStore is of appropriate size before calling 'addToBuffer'
+     * There doesn't seem to be any need for the in-memory buffer array,
+     * but we keep it for future development in case we find a better use for it.
+     * @param payload The Payload to add to the eventStore
+     * @return a boolean if insert was successful or not
+     */
     public boolean addToBuffer(Payload payload) {
-        // Checking that the eventStore is of appropriate size before calling super.addToBuffer
-        // There doesn't seem to be any need for the in-memory buffer array,
-        // but we keep it for future development in case we find a better use for it.
         long eventId = eventStore.insertPayload(payload);
-
         if (eventStore.size() >= option.getCode()) {
             flushBuffer();
         }
@@ -251,188 +201,96 @@ public class Emitter {
         return eventId != -1;
     }
 
-    private class AsyncHttpPost extends AsyncTask<Void, Void, HttpResponse> {
-        private Payload payload = null;
-        private String TAG = "Emitter" + "+AsyncHttpPost";
-        private LinkedList<Long> pendingEventIds = null;
+    /**
+     * Builds an OkHttp GET request which is ready
+     * to be executed.
+     * @param payload The payload to be sent in the
+     *                request.
+     * @return an OkHttp request object
+     */
+    @SuppressWarnings("unchecked")
+    private Request getRequestBuilder(Payload payload) {
 
-        AsyncHttpPost(Payload payload, LinkedList<Long> pendingEventIds) {
-            this.payload = payload;
-            this.pendingEventIds = pendingEventIds;
+        // Clear the previous query...
+        uriBuilder.clearQuery();
+
+        // Build the request query...
+        HashMap hashMap = (HashMap) payload.getMap();
+        Iterator<String> iterator = hashMap.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            String value = (String) hashMap.get(key);
+            uriBuilder.appendQueryParameter(key, value);
         }
 
-        @Override
-        protected HttpResponse doInBackground(Void... voids) {
-            // Here we do the actual sending of the request
-
-            HttpPost httpPost = new HttpPost(uriBuilder.build().toString());
-            Log.d("URI TAGGER - POST", uriBuilder.build().toString());
-
-            httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
-            HttpResponse httpResponse = null;
-            HttpClient httpClient = new DefaultHttpClient();
-
-            try {
-                StringEntity params = new StringEntity(payload.toString());
-                httpPost.setEntity(params);
-                httpResponse = httpClient.execute(httpPost);
-                Log.d(TAG, payload.toString());
-                Log.d(TAG, httpResponse.getStatusLine().toString());
-            } catch (UnsupportedEncodingException e) {
-                Log.e(TAG, "Encoding exception with the payload.");
-                e.printStackTrace();
-            } catch (IOException e) {
-                Log.e(TAG, "Error when sending HTTP POST.");
-                e.printStackTrace();
-            }
-
-            return httpResponse;
-        }
-
-        @Override
-        protected void onPostExecute(HttpResponse result) {
-            // When the task is done, we execute the onPostExecute to see
-            // what kind of a HTTP response code we get.
-
-            // Ths is used for the callback.
-            unsentPayloads = new LinkedList<Payload>();
-            int status_code = -1;
-
-            if (result != null)
-                status_code = result.getStatusLine().getStatusCode();
-            else
-                Log.w(TAG, "HttpResponse was null. There may be a network issue.");
-
-            Log.d(TAG, "Status code: " + status_code);
-
-            // If the events were successfully sent...
-            if (status_code == 200) {
-                // We remove the event from the database using the indexes from the pendingEventIds.
-                Log.d(TAG, "We're about to remove from pendingEventIds: " + this.pendingEventIds);
-                for (int i = 0; i < this.pendingEventIds.size(); i++) {
-                    eventStore.removeEvent(this.pendingEventIds.get(i));
-                    Log.d(TAG, "Removing event with index: " + this.pendingEventIds.get(i));
-                }
-
-                // If there is a RequestCallback set, we send the appropriate information
-                if(requestCallback != null) {
-                    int success_count = (int) eventStore.size();
-                    Log.d(TAG, "onPostExecute POST Success: " + success_count);
-                    requestCallback.onSuccess(success_count);
-                }
-
-            } else { // If there was any kind of failure..
-
-                // We remove the pending flag from the events so they can be picked up again
-                // when we try to send the events in another attempt.
-                for (int i = 0; i < this.pendingEventIds.size(); i++) {
-                    Log.d(TAG, "Removing PENDING with index: " + this.pendingEventIds.get(i));
-                    eventStore.removePending(this.pendingEventIds.get(i));
-                }
-
-                // If there is a RequestCallback set, we send the appropriate information
-                if (requestCallback != null) {
-                    Log.d(TAG, "onPostExecute POST Failure: 0");
-                    unsentPayloads.add(payload);
-                    requestCallback.onFailure(0, unsentPayloads);
-                }
-            }
-        }
+        // Build the request
+        String reqUrl = uriBuilder.build().toString();
+        return new Request.Builder()
+                .url(reqUrl)
+                .get()
+                .build();
     }
 
-    private class AsyncHttpGet extends AsyncTask<Void, Void, HttpResponse> {
-        private Payload payload = null;
-        private String TAG = "Emitter" + "+AsyncHttpGet";
-        private LinkedList<Long> pendingEventIds = null;
+    /**
+     * Builds an OkHttp POST request which is ready
+     * to be executed.
+     * @param payload The payload to be sent in the
+     *                request.
+     * @return an OkHttp request object
+     */
+    private Request postRequestBuilder(Payload payload) {
+        String reqUrl = uriBuilder.build().toString();
+        RequestBody reqBody = RequestBody.create(JSON, payload.toString());
+        return new Request.Builder()
+                .url(reqUrl)
+                .post(reqBody)
+                .build();
+    }
 
-        AsyncHttpGet(Payload payload, LinkedList<Long> pendingEventIds) {
-            this.payload = payload;
-            this.pendingEventIds = pendingEventIds;
+    /**
+     * Responsible for actually sending the request
+     * and returning the callback request.
+     * @param request The request to be sent
+     * @param payload The payload to be sent (in case
+     *                the request fails for whatever
+     *                reason).
+     * @param eventIds The indexArray at the time of
+     *                 sending
+     * @return the code returned from the request event.
+     * @throws IOException
+     * TODO: Make this Async (using RxJava library)
+     */
+    private int requestSender(Request request, Payload payload, LinkedList<Long> eventIds)
+            throws IOException {
+
+        // Send the request and record the response code
+        int code = client.newCall(request).execute().code();
+
+        // Create variable for all failed requests
+        LinkedList<Payload> unsentPayloads = new LinkedList<>();
+
+        // Remove eventIds from the eventStore
+        for (int i = 0; i < eventIds.size(); i++) {
+            eventStore.removeEvent(eventIds.get(i));
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        protected HttpResponse doInBackground(Void... voids) {
-            // Here we do the actual sending of the request
-
-            HashMap hashMap = (HashMap) payload.getMap();
-            Iterator<String> iterator = hashMap.keySet().iterator();
-            HttpResponse httpResponse = null;
-            HttpClient httpClient = new DefaultHttpClient();
-            uriBuilder.clearQuery();
-
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                String value = (String) hashMap.get(key);
-                uriBuilder.appendQueryParameter(key, value);
-            }
-
-            try {
-                HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
-                Log.d("URI TAGGER - GET", uriBuilder.build().toString());
-
-                httpResponse = httpClient.execute(httpGet);
-                Log.d(TAG, payload.toString());
-                Log.d(TAG, httpResponse.getStatusLine().toString());
-            } catch (IOException e) {
-                Log.d(TAG, "Error when sending HTTP GET error.");
-                e.printStackTrace();
-            }
-
-            return httpResponse;
+        // Check if event sending was successful...
+        if (code != 200) {
+            unsentPayloads.add(payload);
         }
 
-        @Override
-        protected void onPostExecute(HttpResponse response) {
-            // When the task is done, we execute the onPostExecute to see
-            // what kind of a HTTP response code we get.
-
-            // Ths is used for the callback.
-            unsentPayloads = new LinkedList<Payload>();
-
-            // The success count is reset before we start counting again.
-            int success_count = 0;
-            int status_code = -1;
-
-            if (response != null)
-                status_code = response.getStatusLine().getStatusCode();
-            else
-                Log.w(TAG, "HttpResponse was null. There may be a network issue.");
-
-            Log.d(TAG, "Status code: " + status_code);
-
-            // If the events were successfully sent...
-            if (status_code == 200) {
-                // Incrementing our success count
-                success_count++;
-
-                // We remove the event from the database using the indexes from the pendingEventIds.
-                for (int i = 0; i < this.pendingEventIds.size(); i++) {
-                    eventStore.removeEvent(this.pendingEventIds.get(i));
-                    Log.d(TAG, "Removing event with index: " + this.pendingEventIds.get(i));
-                }
-
-            } else { // If there was any kind of failure..
-                // Adding the payload to the array to be returned in the callback.
-                unsentPayloads.add(payload);
-
-                // We remove the pending flag from the events so they can be picked up again
-                // when we try to send the events in another attempt.
-                for (int i = 0; i < this.pendingEventIds.size(); i++) {
-                    Log.d(TAG, "Removing PENDING with index: " + this.pendingEventIds.get(i));
-                    eventStore.removePending(this.pendingEventIds.get(i));
-                }
-
+        // Send the request callback
+        if (requestCallback != null) {
+            if (unsentPayloads.size() != 0) {
+                requestCallback.onFailure(0, unsentPayloads);
             }
-
-            // If there is a RequestCallback set, we send the appropriate information
-            if (unsentPayloads.size() == 0) {
-                if (requestCallback != null)
-                    requestCallback.onSuccess(success_count);
-            } else if (requestCallback != null) {
-                requestCallback.onFailure(success_count, unsentPayloads);
+            else {
+                requestCallback.onSuccess(eventIds.size());
             }
         }
+
+        return code;
     }
 
     /**
@@ -442,5 +300,19 @@ public class Emitter {
      */
     public void setBufferOption(BufferOption option) {
         this.option = option;
+    }
+
+    /**
+     * @return the Emitters request method
+     */
+    public HttpMethod getHttpMethod() {
+        return this.httpMethod;
+    }
+
+    /**
+     * @return the buffer option selected for the emitter
+     */
+    public BufferOption getBufferOptions() {
+        return this.option;
     }
 }
