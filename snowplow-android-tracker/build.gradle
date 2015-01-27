@@ -60,6 +60,16 @@ dependencies {
 
     // Jackson JSON processor
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+
+    // RxJava
+    compile 'io.reactivex:rxjava:1.0.3'
+
+    // SquareUp
+    compile 'com.squareup:tape:1.2.3'
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 // build JAR file
