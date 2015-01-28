@@ -37,5 +37,8 @@ public class EmitterTest extends AndroidTestCase {
                 .subject(subject)
                 .build();
         tracker.trackScreenView("Screen 1", null);
+
+        // Sleep added to allow for background processes to complete
+        Thread.sleep(2000);
     }
 }
