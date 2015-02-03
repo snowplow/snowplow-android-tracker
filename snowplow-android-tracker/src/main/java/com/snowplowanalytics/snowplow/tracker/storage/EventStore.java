@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,22 +29,24 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
+import rx.Scheduler;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.service.EmitterService;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EventStoreOperation;
 
 public class EventStore {
 
     private String TAG = EventStore.class.getSimpleName();
-    private boolean DEBUG = true;
+
+    private final BufferOption option;
 
     private SQLiteDatabase database;
     private EventStoreHelper dbHelper;
@@ -56,42 +57,20 @@ public class EventStore {
     };
     private long lastInsertedRowId = -1;
 
-    private final PublishSubject<EventStoreOperation> eventStoreOperations;
+    private final Scheduler scheduler = Schedulers.io();
 
     /**
      * Creates a new Event Store
      *
      * @param context The android context object
      */
-    public EventStore(Context context) {
+    public EventStore(Context context, BufferOption option) {
+        this.option = option;
+
         dbHelper = new EventStoreHelper(context);
         open();
-        Logger.e(TAG, database.getPath());
 
-        // A background PublishSubject which is responsible for:
-        // - Adding events to the database.
-        // - Removing events from the database.
-        // - Starting the EmitterService
-
-        eventStoreOperations = PublishSubject.create();
-        eventStoreOperations
-                .observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .subscribe(operation -> {
-                    if (operation.getIsAdd()) {
-
-                        // Inserts the event into the database
-                        insertPayload(operation.getPayload());
-
-                        // Starts the emitter service
-                        context.startService(new Intent(context, EmitterService.class));
-                    }
-                    else {
-
-                        // Removes the event from the database
-                        removeEvent(operation.getEventId());
-                    }
-                });
+        Logger.ifDebug(TAG, "DB Path: " + database.getPath());
     }
 
     /**
@@ -102,7 +81,30 @@ public class EventStore {
      *                being added.
      */
     public void add(Payload payload) {
-        eventStoreOperations.onNext(new EventStoreOperation(payload, true, (long) -1));
+        Subscription subscription = insertEventObservable(payload)
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(result -> {
+                Logger.ifDebug(TAG, "Added event to database");
+
+            });
+    }
+
+    /**
+     * An observable object for
+     * inserting an event into the
+     * database.
+     *
+     * @param payload the event payload that is
+     *                being added.
+     * @return an observable event add
+     */
+    private Observable<Long> insertEventObservable(final Payload payload) {
+        return Observable.<Long>create(subscriber -> {
+            subscriber.onNext(insertPayload(payload));
+            subscriber.onCompleted();
+        })
+        .onBackpressureBuffer(10000);
     }
 
     /**
@@ -113,24 +115,27 @@ public class EventStore {
      *                to be removed.
      */
     public void remove(Long eventId) {
-        eventStoreOperations.onNext(new EventStoreOperation(null, false, eventId));
+        Subscription subscription = removeEventObservable(eventId)
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(result -> {
+                    Logger.ifDebug(TAG, "Removed event from database");
+                });
     }
 
     /**
-     * An observable that when subscribed to will
-     * return all non-pending events in the database
+     * An observable function too
+     * remove an event from the database.
      *
-     * @return An observable that emits all events
-     * currently in the database.
+     * @param id the rowId of the event
+     * @return an observable event remove
      */
-    public Observable<EmittableEvents> getEvents() {
-        return Observable.<EmittableEvents>create(subscriber -> {
-                    subscriber.onNext(getEmittableEvents());
-                })
-                .doOnUnsubscribe(() -> {
-                    Logger.ifDebug(TAG, "No longer getting events...");
-                })
-                .subscribeOn(Schedulers.io());
+    private Observable<Boolean> removeEventObservable(final long id) {
+        return Observable.<Boolean>create(subscriber -> {
+            subscriber.onNext(removeEvent(id));
+            subscriber.onCompleted();
+        })
+        .onBackpressureBuffer(10000);
     }
 
     /**
@@ -145,7 +150,7 @@ public class EventStore {
      * @return an EmittableEvents object containing
      * eventIds and event payloads.
      */
-    private EmittableEvents getEmittableEvents() {
+    public EmittableEvents getEmittableEvents() {
 
         // LinkedList of eventIds
         LinkedList<Long> eventIds = new LinkedList<>();
@@ -153,20 +158,18 @@ public class EventStore {
         // ArrayList of event payloads
         ArrayList<Payload> events = new ArrayList<>();
 
-        // Get all non-pending events and convert them into Payloads
-        for (Map<String, Object> eventMetadata : getAllNonPendingEvents()) {
+        // LIFO Pattern for sending events
+        for (Map<String, Object> eventMetadata : getEventRange(option.getCode())) {
 
-            // Create a TrackerPayload for each non-pending event
+            // Create a TrackerPayload for each event
             TrackerPayload payload = new TrackerPayload();
             Map<String, Object> eventData = (Map<String, Object>)
                     eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA);
             payload.addMap(eventData);
 
-            // TODO: remove function side affect
-            // Set the event to pending status to prevent it being picked up again
+            // Store the eventId
             Long eventId = (Long) eventMetadata.get(EventStoreHelper.METADATA_ID);
             eventIds.add(eventId);
-            setPending(eventId);
 
             // Add the payload to the list
             events.add(payload);
@@ -177,12 +180,20 @@ public class EventStore {
     }
 
     /**
-     * Opens a new writable database
+     * Opens a new writable database and
+     * sets the database to allow WAL.
+     *
+     * WAL: https://www.sqlite.org/wal.html
      *
      * @return success or failure to open
      */
     public boolean open() {
+
+        // Open the database
         database = dbHelper.getWritableDatabase();
+
+        // Enable write ahead logging
+        database.enableWriteAheadLogging();
         return database != null;
     }
 
@@ -218,7 +229,6 @@ public class EventStore {
             byte[] bytes = EventStore.serialize(map);
             ContentValues values = new ContentValues(2);
             values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes);
-            values.put(EventStoreHelper.COLUMN_PENDING, 0);
             lastInsertedRowId = database.insert(EventStoreHelper.TABLE_EVENTS, null, values);
         }
         return lastInsertedRowId;
@@ -236,6 +246,9 @@ public class EventStore {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS,
                     EventStoreHelper.COLUMN_ID + "=" + id, null);
         }
+
+        Logger.ifDebug(TAG, "Event Store size after delete: %s", size());
+
         return retval == 0;
     }
 
@@ -250,43 +263,6 @@ public class EventStore {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
         }
         return retval == 0;
-    }
-
-    /**
-     * Sets an event to a pending state to
-     * prevent asynchronous sending from
-     * picking it up again by accident.
-     *
-     * @param id The events rowId
-     * @return if row update was a success
-     */
-    public boolean setPending(long id) {
-        int retval = -1;
-        if (open()) {
-            ContentValues value = new ContentValues();
-            value.put(EventStoreHelper.COLUMN_PENDING, 1);
-            retval = database.update(EventStoreHelper.TABLE_EVENTS,
-                    value, EventStoreHelper.COLUMN_ID + "=" + id, null);
-        }
-        return retval == 1; // Update should only affect one row
-    }
-
-    /**
-     * Removes the pending state from the
-     * event.
-     *
-     * @param id The events rowId
-     * @return if row update was a success
-     */
-    public boolean removePending(long id) {
-        int retval = -1;
-        if (open()) {
-            ContentValues value = new ContentValues();
-            value.put(EventStoreHelper.COLUMN_PENDING, 0);
-            retval = database.update(EventStoreHelper.TABLE_EVENTS,
-                    value, EventStoreHelper.COLUMN_ID + "=" + id, null);
-        }
-        return retval == 1; // Update should only affect one row
     }
 
     /**
@@ -313,6 +289,7 @@ public class EventStore {
         if (open()) {
             Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns,
                     EventStoreHelper.COLUMN_ID + "=" + id, null, null, null, null);
+
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
@@ -339,11 +316,12 @@ public class EventStore {
      * @return the list of events that satisfied
      * the query
      */
-    public List<Map<String, Object>> getQueryEvents(String query) {
+    public List<Map<String, Object>> getQueryEvents(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
         if (open()) {
             Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
-                    null, null, null, null);
+                    null, null, null, orderBy);
+
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Map<String, Object> eventMetadata = new HashMap<String, Object>();
@@ -360,33 +338,25 @@ public class EventStore {
     }
 
     /**
+     * Returns an ascending range of events
+     * from the bottom of the database.
+     *
+     * @param range amount of rows to grab
+     * @return the event metadata
+     */
+    public List<Map<String, Object>> getEventRange(int range) {
+        Logger.ifDebug(TAG, "Getting range of events...");
+        return getQueryEvents(null, "id ASC LIMIT " + range);
+    }
+
+    /**
      * Returns a list of all the events in the
      * database.
      *
      * @return the events in the database
      */
     public List<Map<String, Object>> getAllEvents() {
-        return getQueryEvents(null);
-    }
-
-    /**
-     * Returns all non-pending events (events
-     * not yet queued for sending).
-     *
-     * @return all non-pending events
-     */
-    public List<Map<String, Object>> getAllNonPendingEvents() {
-        return getQueryEvents(EventStoreHelper.COLUMN_PENDING + "=0");
-    }
-
-    /**
-     * Returns all pending events (events
-     * queued for sending).
-     *
-     * @return all pending events
-     */
-    public List<Map<String, Object>> getAllPendingEvents() {
-        return getQueryEvents(EventStoreHelper.COLUMN_PENDING + "=1");
+        return getQueryEvents(null, null);
     }
 
     /**
@@ -407,7 +377,7 @@ public class EventStore {
      *            the event parameters
      * @return the byte[] or null
      */
-    public static byte[] serialize(Map<String, String> map) {
+    private static byte[] serialize(Map<String, String> map) {
         try {
             ByteArrayOutputStream mem_out = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(mem_out);
@@ -433,7 +403,7 @@ public class EventStore {
      * @return the Map or null
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, String> deserializer(byte[] bytes) {
+    private static Map<String, String> deserializer(byte[] bytes) {
         try {
             ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
             ObjectInputStream in = new ObjectInputStream(mem_in);

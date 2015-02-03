@@ -13,10 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-// Java
 import java.util.Map;
 
-// JSON
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
