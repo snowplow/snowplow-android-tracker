@@ -11,19 +11,32 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter_utils;
+package com.snowplowanalytics.snowplow.tracker.utils.storage;
+
+import com.snowplowanalytics.snowplow.tracker.Payload;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
- * RequestMethod is used to choose how network requests should be sent.
- * This can be used by <code>setRequestMethod(RequestMethod option)</code> to set accordingly.
+ * An object containing currently Pending
+ * events and their associated eventIds.
  */
-public enum RequestMethod {
-    /**
-     * Requests are sent synchronously, so it should be used with caution.
-     */
-    Synchronous,
-    /**
-     * Requests are sent asynchronously using a background thread.
-     */
-    Asynchronous
+public class EmittableEvents {
+
+    private final ArrayList<Payload> events;
+    private final LinkedList<Long> eventIds;
+
+    public EmittableEvents(ArrayList<Payload> events, LinkedList<Long> eventIds) {
+        this.events = events;
+        this.eventIds = eventIds;
+    }
+
+    public ArrayList<Payload> getEvents() {
+        return this.events;
+    }
+
+    public LinkedList<Long> getEventIds() {
+        return this.eventIds;
+    }
 }
