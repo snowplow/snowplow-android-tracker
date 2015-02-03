@@ -11,10 +11,10 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.tracker_events;
+package com.snowplowanalytics.snowplow.tracker.events;
 
-import com.snowplowanalytics.snowplow.tracker.generic_utils.Util;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 
 import java.util.HashMap;
