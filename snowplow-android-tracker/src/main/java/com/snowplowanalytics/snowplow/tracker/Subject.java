@@ -13,9 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.generic_utils.Util;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
@@ -25,65 +22,153 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.io.IOException;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+
+/**
+ * Provides Subject information for
+ * each event sent from the Snowplow
+ * Tracker.
+ */
 public class Subject {
 
-    private String TAG = Subject.class.getName();
-    private HashMap<String, String> standardPairs = new HashMap<String, String>();
-    private HashMap<String, Object> geoLocationPairs = new HashMap<String, Object>();
-    private HashMap<String, String> mobilePairs = new HashMap<String, String>();
+    private String TAG = Subject.class.getSimpleName();
 
+    private HashMap<String, String> standardPairs = new HashMap<>();
+    private HashMap<String, Object> geoLocationPairs = new HashMap<>();
+    private HashMap<String, String> mobilePairs = new HashMap<>();
+
+    /**
+     * Default Constructor
+     * Sets default information.
+     */
     public Subject() {
-        // Default timezone
         setDefaultTimezone();
-
-        // Default language
         setDefaultLanguage();
-
-        // Other mobile context data
         setOsType();
         setOsVersion();
         setDeviceModel();
         setDeviceVendor();
     }
 
+    /**
+     * Context based Constructor
+     * Sets extra information that can only
+     * be garnered with the use of the android
+     * context.
+     *
+     * @param context the android context
+     */
     public Subject(Context context) {
-        // Default constructor for Subject data we can get
+        // Get defaults..
         this();
 
-        // Default Screen Resolution
-        setDefaultScreenResolution(context);
-
-        // Advertising ID from Play Services
-        setAdvertisingID(context);
-
-        // Closest Location available
-        setLocation(context);
-
-        // Carrier Name
-        setCarrier(context);
+        // Set context based options
+        setContextualParams(context);
     }
 
+    /**
+     * Inserts a value into the mobilePairs
+     * subject storage.
+     *
+     * NOTE: Avoid putting null or empty
+     * values in the map
+     *
+     * @param key a key value
+     * @param value the value associated with
+     *              the key
+     */
     private void putToMobile(String key, String value) {
-        // Avoid putting null or empty values in the map
         if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
             this.mobilePairs.put(key, value);
         }
     }
 
+    /**
+     * Inserts a value into the geoLocation
+     * subject storage.
+     *
+     * NOTE: Avoid putting null or empty values
+     * in the map. If they are strings, avoid
+     * empty strings
+     *
+     * @param key a key value
+     * @param value the value associated with
+     *              the key
+     */
     private void putToGeoLocation(String key, Object value) {
-        // Avoid putting null or empty values in the map
-        // or if they are strings, avoid empty strings
         if (key != null && value != null && !key.isEmpty() || (value instanceof String) && !((String) value).isEmpty()) {
             this.geoLocationPairs.put(key, value);
         }
     }
 
+    /**
+     * Sets the default timezone of the
+     * device.
+     */
+    private void setDefaultTimezone() {
+        TimeZone tz = Calendar.getInstance().getTimeZone();
+        this.setTimezone(tz.getID());
+    }
+
+    /**
+     * Sets the default language of the
+     * device.
+     */
+    private void setDefaultLanguage() {
+        this.setLanguage(Locale.getDefault().getDisplayLanguage());
+    }
+
+    /**
+     * Sets the context based parameters
+     *
+     * @param context the android context
+     */
+    public void setContextualParams(Context context) {
+        setAdvertisingID(context);
+        setDefaultScreenResolution(context);
+        setLocation(context);
+        setCarrier(context);
+    }
+
+    /**
+     * Sets the advertising id of the
+     * device.
+     *
+     * @param context the android context
+     */
+    public void setAdvertisingID(Context context) {
+        try {
+            AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
+            putToMobile(Parameters.ANDROID_IDFA, info.getId());
+            Logger.e(TAG, "Got advertising id");
+        }
+        catch (IOException | GooglePlayServicesRepairableException |
+                GooglePlayServicesNotAvailableException e) {
+
+            Logger.e(TAG, "Cannot get advertising id", e);
+        }
+    }
+
+    /**
+     * Sets the default screen resolution
+     * of the device the Tracker is running
+     * on.
+     *
+     * @param context the android context
+     */
     @TargetApi(19)
     @SuppressWarnings("deprecation")
     private void setDefaultScreenResolution(Context context) {
@@ -104,25 +189,12 @@ public class Subject {
         }
     }
 
-    private void setDefaultTimezone() {
-        TimeZone tz = Calendar.getInstance().getTimeZone();
-        this.setTimezone(tz.getID());
-    }
-
-    private void setDefaultLanguage() {
-        this.setLanguage(Locale.getDefault().getDisplayLanguage());
-    }
-
-    private void setAdvertisingID(final Context context) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-            putToMobile(Parameters.ANDROID_IDFA, Util.getAdvertisingID(context));
-            }
-        });
-        thread.start();
-    }
-
+    /**
+     * Sets the location of the android
+     * device.
+     *
+     * @param context the android context
+     */
     private void setLocation(Context context) {
         Location location = Util.getLocation(context);
         if (location == null) // No location available
@@ -135,69 +207,132 @@ public class Subject {
         putToGeoLocation(Parameters.BEARING, location.getBearing());
     }
 
+    /**
+     * Sets the carrier of the android
+     * device.
+     *
+     * @param context the android context
+     */
     private void setCarrier(Context context) {
         putToMobile(Parameters.CARRIER, Util.getCarrier(context));
     }
 
+    /**
+     * Sets the device model.
+     */
     private void setDeviceModel() {
         putToMobile(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
     }
 
+    /**
+     * Sets the device vendor/manufacturer.
+     */
     private void setDeviceVendor() {
         putToMobile(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
     }
 
+    /**
+     * Sets the operating system version.
+     */
     private void setOsVersion() {
         putToMobile(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
     }
 
+    /**
+     * Set operating system type.
+     * Defaults too 'android' currently.
+     */
     private void setOsType() {
         putToMobile(Parameters.OS_TYPE, "android");
     }
 
-    public void setContext(Context context) {
-        setAdvertisingID(context);
-        setDefaultScreenResolution(context);
-        setLocation(context);
-        setCarrier(context);
-    }
-
+    /**
+     * Sets the subjects userId
+     *
+     * @param userId a user id string
+     */
     public void setUserId(String userId) {
         this.standardPairs.put(Parameters.UID, userId);
     }
 
+    /**
+     * Sets a custom screen resolution based
+     * on user inputted width and height.
+     *
+     * Measured in pixels: 1920x1080
+     *
+     * @param width the width of the screen
+     * @param height the height of the screen
+     */
     public void setScreenResolution(int width, int height) {
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameters.RESOLUTION, res);
     }
 
+    /**
+     * Sets the view port resolution
+     *
+     * Measured in pixels: 1280x1024
+     *
+     * @param width the width of the viewport
+     * @param height the height of the viewport
+     */
     public void setViewPort(int width, int height) {
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameters.VIEWPORT, res);
     }
 
+    /**
+     * user defined color depth.
+     *
+     * Measure as an integer
+     *
+     * @param depth the color depth
+     */
     public void setColorDepth(int depth) {
         this.standardPairs.put(Parameters.COLOR_DEPTH, Integer.toString(depth));
     }
 
+    /**
+     * User inputted timezone
+     *
+     * @param timezone a valid timezone
+     */
     public void setTimezone(String timezone) {
         this.standardPairs.put(Parameters.TIMEZONE, timezone);
     }
 
+    /**
+     * User inputted language for the
+     * subject.
+     *
+     * @param language language setting
+     */
     public void setLanguage(String language) {
         this.standardPairs.put(Parameters.LANGUAGE, language);
     }
 
+    // Get Functions
+
+    /**
+     * @return the geolocation subject pairs
+     */
     public Map<String, Object> getSubjectLocation() {
         return this.geoLocationPairs;
     }
 
+    /**
+     * @return the mobile subject pairs
+     */
     public Map<String, String> getSubjectMobile() {
         return this.mobilePairs;
     }
 
+    /**
+     * @return the standard subject pairs
+     */
     public Map<String, String> getSubject() {
-        HashMap<String, String> allPairs = new HashMap<String, String>();
+        HashMap<String, String> allPairs = new HashMap<>();
         allPairs.putAll(this.standardPairs);
         return allPairs;
     }
