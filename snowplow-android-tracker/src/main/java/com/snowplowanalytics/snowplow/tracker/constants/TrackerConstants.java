@@ -29,4 +29,6 @@ public class TrackerConstants {
     public static final String EVENT_UNSTRUCTURED = "ue";
     public static final String EVENT_ECOMM = "tr";
     public static final String EVENT_ECOMM_ITEM = "ti";
+
+    public static final Boolean DEBUG_MODE = true;
 }
