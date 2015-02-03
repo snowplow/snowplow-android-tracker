@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.generic_utils;
+package com.snowplowanalytics.snowplow.tracker.utils;
 
 import android.content.Context;
 import android.location.Criteria;
@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -36,12 +35,7 @@ import java.lang.reflect.Method;
 
 public class Util {
 
-    private static final Logger logger = LoggerFactory.getLogger(Util.class);
     private static ObjectMapper sObjectMapper = new ObjectMapper();
-
-    public static String getAdvertisingID(Context context) {
-        return getPlayAdId(context);
-    }
 
     public static String getCarrier(Context context) {
         String carrierName = "";
@@ -71,27 +65,6 @@ public class Util {
             }
         }
         return location;
-    }
-
-    public static String getPlayAdId(Context context) {
-        try {
-            Object AdvertisingInfoObject = getAdvertisingInfoObject(context);
-
-            String playAdid = (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
-
-            return playAdid;
-        }
-        catch (Throwable t) {
-            return null;
-        }
-    }
-
-    private static Object getAdvertisingInfoObject(Context context)
-            throws Exception {
-        return invokeStaticMethod("com.google.android.gms.ads.identifier.AdvertisingIdClient",
-                "getAdvertisingIdInfo",
-                new Class[] {Context.class} , context
-        );
     }
 
     private static Object invokeStaticMethod(String className, String methodName,
@@ -139,7 +112,7 @@ public class Util {
     }
 
     public static int getTransactionId() {
-        Random r = new Random(); //NEED ID RANGE
+        Random r = new Random();
         return r.nextInt(999999-100000+1) + 100000;
     }
 
@@ -147,10 +120,11 @@ public class Util {
         return Long.toString(System.currentTimeMillis());
     }
 
-    /** Addition functions
-     *  Used to add different sources of key=>value pairs to a map.
-     *  Map is then used to build "Associative array for getter function.
-     *  Some use Base64 encoding
+    /** 
+     * Addition functions
+     * Used to add different sources of key=>value pairs to a map.
+     * Map is then used to build "Associative array for getter function.
+     * Some use Base64 encoding
      */
 
     public static String base64Encode(String string) {

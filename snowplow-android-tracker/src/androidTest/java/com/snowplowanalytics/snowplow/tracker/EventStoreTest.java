@@ -3,8 +3,8 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.payload_utils.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStoreHelper;
 
