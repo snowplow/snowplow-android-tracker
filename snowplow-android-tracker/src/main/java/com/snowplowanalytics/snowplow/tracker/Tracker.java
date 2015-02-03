@@ -13,34 +13,41 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.util.Log;
-
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.generic_utils.Util;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.TrackerPayload;
-
-import com.snowplowanalytics.snowplow.tracker.generic_utils.Preconditions;
-
-import com.snowplowanalytics.snowplow.tracker.constants.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.tracker_events.TransactionItem;
+import android.content.Intent;
+import android.content.Context;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.service.EmitterService;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
+import com.snowplowanalytics.snowplow.tracker.constants.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+
 public class Tracker {
 
-    private final String TAG = Tracker.class.getName();
+    private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = Version.TRACKER;
+
+    public static Tracker trackerInstance;
     private Emitter emitter;
+    private Subject subject;
+
     private String namespace;
     private String appId;
-    private Subject subject;
     private boolean base64Encoded;
+
     private DevicePlatforms devicePlatform;
+    private EventStore eventStore;
 
     /**
      * Creates a Tracker object
@@ -53,12 +60,16 @@ public class Tracker {
         this.namespace = builder.namespace;
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
+        this.eventStore = new EventStore(builder.context);
     }
 
     public static class TrackerBuilder {
+
         private final Emitter emitter; // Required
         private final String namespace; // Required
         private final String appId; // Required
+        private final Context context; // Required
+
         private Subject subject = null; // Optional
         private boolean base64Encoded = true; // Optional
         private DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
@@ -68,10 +79,11 @@ public class Tracker {
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
          */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId) {
+        public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
             this.emitter = emitter;
             this.namespace = namespace;
             this.appId = appId;
+            this.context = context;
         }
 
         /**
@@ -99,20 +111,44 @@ public class Tracker {
         }
 
         /**
-         * @return a new Tracker object
+         * Creates a new Tracker instance
+         * Needs to be created as an instance to work with
+         * the emitter service.
          */
-        public Tracker build(){
-            return new Tracker(this);
+        public void build(){
+
+            // Create the Tracker instance
+            trackerInstance = new Tracker(this);
+
+            Logger.ifDebug(TAG, "Tracker Instance created.", trackerInstance);
+
+            // Start the emitter service
+            context.startService(new Intent(context, EmitterService.class));
+
+            Logger.ifDebug(TAG, "Emitter Service started.");
         }
     }
 
     /**
-     * Adds a complete payload to the emitter
+     * @return the Tracker instance
+     */
+    public static Tracker getInstance() {
+        if (trackerInstance == null) {
+            throw new RuntimeException("Tracker needs to be initialized.");
+        }
+        return trackerInstance;
+    }
+
+    /**
+     * Adds a complete payload to the EventStore
      * @param payload The complete payload to be
      *                sent to a collector
      */
-    private void addTrackerPayload(Payload payload) {
-        this.emitter.addToBuffer(payload);
+    private void addEventPayload(Payload payload) {
+
+        Logger.ifDebug(TAG, "Event Payload added to event storage", payload);
+
+        eventStore.add(payload);
     }
 
     /**
@@ -131,7 +167,16 @@ public class Tracker {
         envelope.setSchema(TrackerConstants.SCHEMA_CONTEXTS);
 
         // Add default parameters to the payload
-        payload = addDefaultPayloadData(payload);
+        payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
+        payload.add(Parameters.APPID, this.appId);
+        payload.add(Parameters.NAMESPACE, this.namespace);
+        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
+        payload.add(Parameters.EID, Util.getEventId());
+
+        // If there is a subject present for the Tracker add it
+        if (this.subject != null) {
+            payload.addMap(new HashMap<>(subject.getSubject()));
+        }
 
         // If timestamp is set to 0, generate one and add it
         payload.add(Parameters.TIMESTAMP,
@@ -151,25 +196,8 @@ public class Tracker {
         payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                 Parameters.CONTEXT);
 
-        return payload;
-    }
+        Logger.ifDebug(TAG, "Complete Payload", payload);
 
-    /**
-     * Adds all of the default parameters to the Payload
-     * @param payload A raw payload from a tracker event
-     * @return a payload with default information appended
-     */
-    private Payload addDefaultPayloadData(Payload payload) {
-        payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
-        payload.add(Parameters.APPID, this.appId);
-        payload.add(Parameters.NAMESPACE, this.namespace);
-        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
-        payload.add(Parameters.EID, Util.getEventId());
-
-        // If there is a subject present for the Tracker add it
-        if (this.subject != null) {
-            payload.addMap(new HashMap<String, Object>(subject.getSubject()));
-        }
         return payload;
     }
 
@@ -181,16 +209,16 @@ public class Tracker {
      */
     private List<SchemaPayload> addDefaultContextData(List<SchemaPayload> context) {
         if (context == null) {
-            Log.d(TAG, "No list of user context passed in");
+            Logger.i(TAG, "No user context passed in");
             context = new LinkedList<>();
         }
-        if (!this.subject.getSubjectLocation().isEmpty()) {
+        if (!subject.getSubjectLocation().isEmpty()) {
             SchemaPayload locationPayload = new SchemaPayload();
             locationPayload.setSchema(TrackerConstants.GEOLOCATION_SCHEMA);
             locationPayload.setData(this.subject.getSubjectLocation());
             context.add(locationPayload);
         }
-        if (!this.subject.getSubjectMobile().isEmpty()) {
+        if (!subject.getSubjectMobile().isEmpty()) {
             SchemaPayload mobilePayload = new SchemaPayload();
             mobilePayload.setSchema(TrackerConstants.MOBILE_SCHEMA);
             mobilePayload.setData(this.subject.getSubjectMobile());
@@ -198,6 +226,8 @@ public class Tracker {
         }
         return context;
     }
+
+    // Get & Set Functions
 
     /**
      * Sets the trackers subject
@@ -249,7 +279,21 @@ public class Tracker {
         return this.devicePlatform;
     }
 
-    // TODO: Refactor events into builders
+    /**
+     * @return the emitter associated with the tracker
+     */
+    public Emitter getEmitter() {
+        return this.emitter;
+    }
+
+    /**
+     * @return the Trackers eventStore
+     */
+    public EventStore getEventStore() {
+        return this.eventStore;
+    }
+
+    // Event Tracking Functions
 
     /**
      * @param pageUrl URL of the viewed page
@@ -305,7 +349,7 @@ public class Tracker {
 
         completePayload(payload, context, timestamp);
 
-        addTrackerPayload(payload);
+        addEventPayload(payload);
     }
 
     /**
@@ -375,7 +419,7 @@ public class Tracker {
 
         completePayload(payload, context, timestamp);
 
-        addTrackerPayload(payload);
+        addEventPayload(payload);
     }
 
     /**
@@ -432,7 +476,7 @@ public class Tracker {
 
         completePayload(payload, context, timestamp);
 
-        addTrackerPayload(payload);
+        addEventPayload(payload);
     }
 
     /**
@@ -473,7 +517,7 @@ public class Tracker {
 
         completePayload(payload, context, timestamp);
 
-        addTrackerPayload(payload);
+        addEventPayload(payload);
     }
 
     /**
@@ -598,7 +642,7 @@ public class Tracker {
                     timestamp);
         }
 
-        addTrackerPayload(payload);
+        addEventPayload(payload);
     }
 
     /**
