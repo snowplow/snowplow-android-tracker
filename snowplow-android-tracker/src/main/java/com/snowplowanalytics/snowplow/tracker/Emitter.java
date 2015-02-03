@@ -13,43 +13,37 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
-
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.emitter_utils.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter_utils.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter_utils.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.SchemaPayload;
-import com.snowplowanalytics.snowplow.tracker.payload_utils.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStoreHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.LinkedList;
 
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Request;
 
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+
 import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
 
 public class Emitter {
 
-    private final String TAG = Emitter.class.getName();
+    private final String TAG = Emitter.class.getSimpleName();
+
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private final EventStore eventStore;
     private Uri.Builder uriBuilder;
 
     protected RequestCallback requestCallback;
@@ -63,9 +57,9 @@ public class Emitter {
     private Emitter(EmitterBuilder builder) {
         this.httpMethod = builder.httpMethod;
         this.requestCallback = builder.requestCallback;
-        this.eventStore = new EventStore(builder.context);
 
-        // Need to create URI Builder in this way to preserve port keys
+        // Need to create URI Builder in this way to preserve port keys/characters that would
+        // be incorrectly encoded by the uriBuilder.
         this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
 
         // Create URI based on request method
@@ -85,17 +79,14 @@ public class Emitter {
 
     public static class EmitterBuilder {
         private final String uri; // Required
-        private final Context context; // Required
         protected RequestCallback requestCallback = null; // Optional
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
 
         /**
          * @param uri The uri of the collector
-         * @param context The android context object
          */
-        public EmitterBuilder(String uri, Context context) {
+        public EmitterBuilder(String uri) {
             this.uri = uri;
-            this.context = context;
         }
 
         /**
@@ -117,77 +108,67 @@ public class Emitter {
         /**
          * @return a new Emitter object
          */
-        public Emitter build(){
+        public Emitter build() {
             return new Emitter(this);
         }
     }
 
-    // TODO: Convert this function to an observable event that happens in a non-ui thread
     /**
-     * Checking that the eventStore is of appropriate size before calling 'addToBuffer'
-     * There doesn't seem to be any need for the in-memory buffer array,
-     * but we keep it for future development in case we find a better use for it.
-     * @param payload The Payload to add to the eventStore
-     * @return a boolean if insert was successful or not
+     * Emits all the events in the EmittableEvents
+     * object.
+     *
+     * @return Observable that will emit once containing
+     * the request result.
      */
-    public boolean addToBuffer(Payload payload) {
-        long eventId = eventStore.insertPayload(payload);
-        if (eventStore.size() >= option.getCode()) {
-            flushBuffer();
-        }
-
-        // Android returns -1 if an error occurred during insert.
-        return eventId != -1;
+    public Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
+        return Observable.just(events).map(this::performEmit);
     }
 
-    // TODO: Convert this function to an observable event that happens in a non-ui thread
     /**
-     * Empties the cached events manually. This shouldn't be used unless you're aware of it works.
-     * If you need events send instantly, use set the <code>Emitter</code> buffer to <code>BufferOption.Instant</code>
+     * Synchronously performs a request sending
+     * operation for either GET or POST.
+     *
+     * @param events the events to be sent
+     * @return a RequestResult
      */
-    @SuppressWarnings("unchecked")
-    public void flushBuffer() {
+    public LinkedList<RequestResult> performEmit(EmittableEvents events) {
 
-        // Reset the indexArray on each buffer flush
-        LinkedList<Long> indexArray = new LinkedList<>();
+        Logger.ifDebug(TAG, "Performing emit", events);
 
-        // Store all events as payloads
-        ArrayList<Payload> events = new ArrayList<>();
-
-        // Loop through all non-pending events and convert them into Payloads
-        for (Map<String, Object> eventMetadata : eventStore.getAllNonPendingEvents()) {
-
-            // Create a TrackerPayload for each non-pending event
-            TrackerPayload payload = new TrackerPayload();
-            Map<String, Object> eventData = (Map<String, Object>)
-                    eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA);
-            payload.addMap(eventData);
-
-            // Set the event to pending status to prevent it being picked up again
-            Long eventId = (Long) eventMetadata.get(EventStoreHelper.METADATA_ID);
-            indexArray.add(eventId);
-            eventStore.setPending(eventId);
-
-            // Add the event payload
-            events.add(payload);
-        }
+        ArrayList<Payload> payloads = events.getEvents();
+        LinkedList<Long> eventIds = events.getEventIds();
+        LinkedList<RequestResult> results = new LinkedList<>();
 
         // If the request method is GET...
         if (httpMethod == HttpMethod.GET) {
-            for (Payload event : events) {
+            Logger.ifDebug(TAG, "Performing GET requests");
 
-                // Build the request and send it
-                Request req = getRequestBuilder(event);
+            for (int i = 0; i < payloads.size(); i++) {
 
-                // Create a new subscriber and send the request
-                requestSubscribe(req, event, indexArray);
+                // Build the request and send it...
+                Request req = requestBuilderGet(events.getEvents().get(i));
+                int code = requestSender(req);
+
+                // Get the eventId for this particular event
+                LinkedList<Long> eventId = new LinkedList<>();
+                eventId.add(eventIds.get(i));
+
+                if (code == -1) {
+                    results.add(new RequestResult(false, eventId));
+                }
+                else {
+                    // Figure out if it was a success and if we can retry if it failed...
+                    boolean success = code >= 200 && code < 300;
+                    results.add(new RequestResult(success, eventId));
+                }
             }
         }
         else {
+            Logger.ifDebug(TAG, "Performing POST requests");
 
             // Convert the ArrayList of Payloads into an ArrayList of Maps
             ArrayList<Map> eventMaps = new ArrayList<>();
-            for (Payload event : events) {
+            for (Payload event : events.getEvents()) {
                 eventMaps.add(event.getMap());
             }
 
@@ -197,10 +178,35 @@ public class Emitter {
             postPayload.setData(eventMaps);
 
             // Build the request
-            Request req = postRequestBuilder(postPayload);
+            Request req = requestBuilderPost(postPayload);
+            int code = requestSender(req);
 
-            // Create a new subscriber and send the request
-            requestSubscribe(req, postPayload, indexArray);
+            if (code == -1) {
+                results.add(new RequestResult(false, eventIds));
+            }
+            else {
+                // Figure out if it was a success and if we can retry if it failed...
+                boolean success = code >= 200 && code < 300;
+                results.add(new RequestResult(success, eventIds));
+            }
+        }
+        return results;
+    }
+
+    /**
+     * The function responsible for actually sending
+     * the request to the collector.
+     *
+     * @param request The request to be sent
+     * @return a RequestResult
+     */
+    private int requestSender(Request request) {
+        try {
+            Logger.ifDebug(TAG, "Sending request...", request);
+            return client.newCall(request).execute().code();
+        } catch (IOException e) {
+            Logger.ifDebug(TAG, "Request sending failed exceptionally", e);
+            return -1;
         }
     }
 
@@ -214,7 +220,7 @@ public class Emitter {
      * @return an OkHttp request object
      */
     @SuppressWarnings("unchecked")
-    private Request getRequestBuilder(Payload payload) {
+    private Request requestBuilderGet(Payload payload) {
 
         // Clear the previous query...
         uriBuilder.clearQuery();
@@ -231,10 +237,13 @@ public class Emitter {
 
         // Build the request
         String reqUrl = uriBuilder.build().toString();
-        return new Request.Builder()
+        Request req = new Request.Builder()
                 .url(reqUrl)
                 .get()
                 .build();
+
+        Logger.ifDebug(TAG, "New GET Request made", req);
+        return req;
     }
 
     /**
@@ -244,135 +253,16 @@ public class Emitter {
      *                request.
      * @return an OkHttp request object
      */
-    private Request postRequestBuilder(Payload payload) {
+    private Request requestBuilderPost(Payload payload) {
         String reqUrl = uriBuilder.build().toString();
         RequestBody reqBody = RequestBody.create(JSON, payload.toString());
-        return new Request.Builder()
+        Request req = new Request.Builder()
                 .url(reqUrl)
                 .post(reqBody)
                 .build();
-    }
 
-    // RxAndroid Asynchronous request sending
-
-    /**
-     * The function responsible for actually sending
-     * the request to the collector.
-     *
-     * @param request The request to be sent
-     * @return success code or -1 for any exceptions
-     */
-    private Integer observableRequestSender(Request request) {
-        try {
-            // Send the request and record the response code
-            return client.newCall(request).execute().code();
-        } catch (IOException e) {
-            // Return -1 for an IOException
-            return -1;
-        }
-    }
-
-    /**
-     * Creates a new subscriber through which we can
-     * observe the sending of the Http Request in a
-     * different thread.
-     *
-     * @param request The request to be sent
-     * @param payload The payload to be sent (in case
-     *                the request fails for whatever
-     *                reason).
-     * @param eventIds The indexArray at the time of
-     *                 sending
-     * @return a subscription to the request
-     */
-    public Subscription requestSubscribe(Request request, Payload payload,
-                                         LinkedList<Long> eventIds) {
-
-        return getRequestSenderObservable(request)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(getRequestSenderObserver(payload, eventIds));
-    }
-
-    /**
-     * Creates a new Observable which is the object
-     * containing the action of sending the Request.
-     * Every time this is subscribed to it will send
-     * the request.
-     *
-     * @param request The request to be sent
-     * @return a new observable of type integer
-     */
-    @SuppressWarnings("unchecked")
-    public Observable<Integer> getRequestSenderObservable(final Request request) {
-
-        return Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override
-            public void call(Subscriber subscriber) {
-                subscriber.onNext(observableRequestSender(request));
-                subscriber.onCompleted();
-            }
-        });
-    }
-
-    /**
-     * Creates an observer which is responsible for
-     * responding to the outcome of the observable
-     * event.
-     *
-     * @param payload The payload to be sent (in case
-     *                the request fails for whatever
-     *                reason).
-     * @param eventIds The indexArray at the time of
-     *                 sending
-     * @return a custom observer
-     */
-    private Observer<Integer> getRequestSenderObserver(final Payload payload,
-                                                       final LinkedList<Long> eventIds) {
-
-        return new Observer<Integer>() {
-            @Override
-            public void onCompleted() {
-                Log.d(TAG+"Rx - Complete", "On complete");
-            }
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG+"Rx - Error", String.format(e.getMessage()));
-            }
-            @Override
-            public void onNext(Integer code) {
-
-                // TODO: Update how bad response codes are handled
-                // - what happens to the eventStore?
-                // - how can we retry?
-                // - should there be a check to see if we are online before even attempting?
-
-                // Remove events from the eventStore
-                for (int i = 0; i < eventIds.size(); i++) {
-                    eventStore.removeEvent(eventIds.get(i));
-                }
-
-                // Create variable for all failed requests
-                LinkedList<Payload> unsentPayloads = new LinkedList<>();
-
-                // Check if event sending was successful...
-                if (code != 200) {
-                    unsentPayloads.add(payload);
-                }
-
-                // Send the request callback
-                if (requestCallback != null) {
-                    if (unsentPayloads.size() != 0) {
-                        requestCallback.onFailure(0, unsentPayloads);
-                    }
-                    else {
-                        requestCallback.onSuccess(eventIds.size());
-                    }
-                }
-
-                Log.d(TAG+"Rx - Response Code", code.toString());
-            }
-        };
+        Logger.ifDebug(TAG, "New POST Request made", req);
+        return req;
     }
 
     // Setters and Getters
@@ -398,5 +288,12 @@ public class Emitter {
      */
     public BufferOption getBufferOption() {
         return this.option;
+    }
+
+    /**
+     * @return the request callback method
+     */
+    public RequestCallback getRequestCallback() {
+        return this.requestCallback;
     }
 }
