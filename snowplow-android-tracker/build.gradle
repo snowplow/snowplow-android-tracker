@@ -1,5 +1,6 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
@@ -22,6 +23,8 @@ android {
         targetSdkVersion 21
         versionCode 2
         versionName "$project.version"
+
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -50,6 +53,15 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -69,7 +81,6 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.3'
 
     // SquareUp
-    compile 'com.squareup:tape:1.2.3'
     compile 'com.squareup.okhttp:okhttp:2.1.0'
 
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
