@@ -11,31 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter_utils;
+package com.snowplowanalytics.snowplow.tracker.utils.emitter;
 
-/**
- * BufferOption is used to set the buffer size of your Emitter.
- */
-public enum BufferOption {
-    /**
-     * Sends events immediately when being tracked. This may cause a lot of network traffic
-     * depending on it's usage.
-     */
-    Instant(1),
+import com.snowplowanalytics.snowplow.tracker.Payload;
 
-    /**
-     * Sends events in a group only after collecting 10 events. In a POST request, this is
-     * sent in one payload. For a GET request, individual requests are sent following each other.
-     */
-    Default(10);
+import java.util.List;
 
-    private int code;
+public interface RequestCallback {
 
-    private BufferOption(int c) {
-        code = c;
-    }
+    void onSuccess(int successCount);
 
-    public int getCode() {
-        return code;
-    }
+    void onFailure(int successCount, int failureCount);
+
 }
