@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.content.Intent;
 import android.content.Context;
 
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.service.EmitterService;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -38,7 +36,6 @@ public class Tracker {
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = Version.TRACKER;
 
-    public static Tracker trackerInstance;
     private Emitter emitter;
     private Subject subject;
 
@@ -47,7 +44,6 @@ public class Tracker {
     private boolean base64Encoded;
 
     private DevicePlatforms devicePlatform;
-    private EventStore eventStore;
 
     /**
      * Creates a Tracker object
@@ -60,7 +56,6 @@ public class Tracker {
         this.namespace = builder.namespace;
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
-        this.eventStore = new EventStore(builder.context);
     }
 
     public static class TrackerBuilder {
@@ -68,7 +63,6 @@ public class Tracker {
         private final Emitter emitter; // Required
         private final String namespace; // Required
         private final String appId; // Required
-        private final Context context; // Required
 
         private Subject subject = null; // Optional
         private boolean base64Encoded = true; // Optional
@@ -79,11 +73,10 @@ public class Tracker {
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
          */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
+        public TrackerBuilder(Emitter emitter, String namespace, String appId) {
             this.emitter = emitter;
             this.namespace = namespace;
             this.appId = appId;
-            this.context = context;
         }
 
         /**
@@ -111,32 +104,11 @@ public class Tracker {
         }
 
         /**
-         * Creates a new Tracker instance
-         * Needs to be created as an instance to work with
-         * the emitter service.
+         * Creates a new Tracker
          */
-        public void build(){
-
-            // Create the Tracker instance
-            trackerInstance = new Tracker(this);
-
-            Logger.ifDebug(TAG, "Tracker Instance created.", trackerInstance);
-
-            // Start the emitter service
-            context.startService(new Intent(context, EmitterService.class));
-
-            Logger.ifDebug(TAG, "Emitter Service started.");
+        public Tracker build(){
+            return new Tracker(this);
         }
-    }
-
-    /**
-     * @return the Tracker instance
-     */
-    public static Tracker getInstance() {
-        if (trackerInstance == null) {
-            throw new RuntimeException("Tracker needs to be initialized.");
-        }
-        return trackerInstance;
     }
 
     /**
@@ -146,9 +118,9 @@ public class Tracker {
      */
     private void addEventPayload(Payload payload) {
 
-        Logger.ifDebug(TAG, "Event Payload added to event storage", payload);
+        Logger.ifDebug(TAG, "Adding Payload to event storage...", payload);
 
-        eventStore.add(payload);
+        emitter.add(payload);
     }
 
     /**
@@ -196,7 +168,7 @@ public class Tracker {
         payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                 Parameters.CONTEXT);
 
-        Logger.ifDebug(TAG, "Complete Payload", payload);
+        Logger.ifDebug(TAG, "Complete Payload: %s", payload);
 
         return payload;
     }
@@ -284,13 +256,6 @@ public class Tracker {
      */
     public Emitter getEmitter() {
         return this.emitter;
-    }
-
-    /**
-     * @return the Trackers eventStore
-     */
-    public EventStore getEventStore() {
-        return this.eventStore;
     }
 
     // Event Tracking Functions
