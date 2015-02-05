@@ -23,7 +23,6 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     public static final String TABLE_EVENTS         = "events";
     public static final String COLUMN_ID            = "id";
     public static final String COLUMN_EVENT_DATA    = "eventData";
-    public static final String COLUMN_PENDING       = "pending";
     public static final String COLUMN_DATE_CREATED  = "dateCreated";
 
     public static final String METADATA_ID          = "id";
@@ -37,7 +36,7 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     private static final String queryDropTable =
             "DROP TABLE IF EXISTS '" + TABLE_EVENTS + "'";
     private static final String queryCreateTable = "CREATE TABLE IF NOT EXISTS 'events' " +
-            "(id INTEGER PRIMARY KEY, eventData BLOB, pending INTEGER, " +
+            "(id INTEGER PRIMARY KEY, eventData BLOB, " +
             "dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
     public EventStoreHelper(Context context) {
