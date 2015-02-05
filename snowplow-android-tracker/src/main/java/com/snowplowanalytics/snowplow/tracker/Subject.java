@@ -16,8 +16,11 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -44,7 +47,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
  */
 public class Subject {
 
-    private String TAG = Subject.class.getSimpleName();
+    private static String TAG = Subject.class.getSimpleName();
 
     private HashMap<String, String> standardPairs = new HashMap<>();
     private HashMap<String, Object> geoLocationPairs = new HashMap<>();
@@ -153,7 +156,7 @@ public class Subject {
         try {
             AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
             putToMobile(Parameters.ANDROID_IDFA, info.getId());
-            Logger.e(TAG, "Got advertising id");
+            Logger.ifDebug(TAG, "Got advertising id: %s", info.getId());
         }
         catch (IOException | GooglePlayServicesRepairableException |
                 GooglePlayServicesNotAvailableException e) {
@@ -196,7 +199,7 @@ public class Subject {
      * @param context the android context
      */
     private void setLocation(Context context) {
-        Location location = Util.getLocation(context);
+        Location location = getLocation(context);
         if (location == null) // No location available
             return;
         putToGeoLocation(Parameters.LATITUDE, location.getLatitude());
@@ -214,7 +217,49 @@ public class Subject {
      * @param context the android context
      */
     private void setCarrier(Context context) {
-        putToMobile(Parameters.CARRIER, Util.getCarrier(context));
+        putToMobile(Parameters.CARRIER, getCarrier(context));
+    }
+
+    /**
+     * Returns the carrier name based
+     * on the android context supplied.
+     *
+     * @param context the android context
+     * @return a carrier name
+     */
+    private static String getCarrier(Context context) {
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager != null) {
+            return telephonyManager.getNetworkOperatorName();
+        }
+        return "";
+    }
+
+    /**
+     * Returns the location of the android
+     * device.
+     *
+     * @param context the android context
+     * @return the phones Location
+     */
+    private static Location getLocation(Context context) {
+        LocationManager locationManager =
+                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        String provider = locationManager.getBestProvider(criteria, true);
+        if (provider != null) {
+            try {
+                return locationManager.getLastKnownLocation(provider);
+            } catch (SecurityException ex) {
+                Logger.i(TAG, "No permission to retrieve location.");
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
