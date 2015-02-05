@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.net.Uri;
+import android.content.Context;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -28,6 +30,7 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Request;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
@@ -37,6 +40,9 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
 import rx.Observable;
+import rx.Subscription;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 public class Emitter {
 
@@ -44,11 +50,15 @@ public class Emitter {
 
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final Scheduler scheduler = Schedulers.io();
+    private EventStore eventStore;
     private Uri.Builder uriBuilder;
 
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption option = BufferOption.Default;
+
+    private Subscription sub;
 
     /**
      * Creates an emitter object
@@ -75,18 +85,24 @@ public class Emitter {
         if (httpMethod == HttpMethod.GET) {
             setBufferOption(BufferOption.Instant);
         }
+
+        // Create the event store with the context and the buffer option
+        this.eventStore = new EventStore(builder.context, option);
+        this.eventStore.removeAllEvents();
     }
 
     public static class EmitterBuilder {
         private final String uri; // Required
+        private final Context context; // Required
         protected RequestCallback requestCallback = null; // Optional
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
 
         /**
          * @param uri The uri of the collector
          */
-        public EmitterBuilder(String uri) {
+        public EmitterBuilder(String uri, Context context) {
             this.uri = uri;
+            this.context = context;
         }
 
         /**
@@ -114,14 +130,93 @@ public class Emitter {
     }
 
     /**
+     * @param payload the payload to be added to
+     *                the EventStore
+     */
+    public void add(Payload payload) {
+
+        // Adds the payload to the EventStore
+        eventStore.add(payload);
+
+        // If we have enough events in the event store
+        // start sending...
+        if (eventStore.size() >= option.getCode()) {
+            Logger.ifDebug(TAG, "Starting the emitter...");
+            emitterStart();
+        }
+    }
+
+    /**
+     * Starts the emitter process once
+     * we have added enough events
+     * to the event store.
+     */
+    public void emitterStart() {
+        sub = Observable.interval(30, TimeUnit.SECONDS)
+            .map((tick) -> {
+                EmittableEvents events = eventStore.getEmittableEvents();
+                if (events.getEvents().isEmpty()) {
+                    return events;
+                }
+                return events;
+            })
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .flatMap(this::emitEvent)
+            .subscribe(results -> {
+
+                Logger.ifDebug(TAG, "Got results: %s", results);
+
+                int successCount = 0;
+                int failureCount = 0;
+
+                // Loop through all request results
+                for (RequestResult res : results) {
+
+                    // If sending was a success
+                    if (res.getSuccess()) {
+
+                        successCount++;
+
+                        Logger.ifDebug(TAG, "Request sending was a success!");
+
+                        // Remove all eventIds associated with the request
+                        for (Long eventId : res.getEventIds()) {
+                            eventStore.remove(eventId);
+                        }
+                    }
+                    else if (!res.getSuccess()) {
+
+                        failureCount++;
+
+                        Logger.ifDebug(TAG, "Request sending failed but we can retry later!");
+                    }
+                }
+
+                // Send the callback if it is not null...
+                if (requestCallback != null) {
+                    if (failureCount != 0) {
+                        requestCallback.onFailure(successCount, failureCount);
+                    }
+                    else {
+                        requestCallback.onSuccess(successCount);
+                    }
+                }
+            });
+    }
+
+    /**
      * Emits all the events in the EmittableEvents
      * object.
      *
      * @return Observable that will emit once containing
-     * the request result.
+     * the request results.
      */
     public Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
-        return Observable.just(events).map(this::performEmit);
+        return Observable
+            .just(events)
+            .map(this::performEmit)
+            .onBackpressureBuffer(10000);
     }
 
     /**
@@ -133,15 +228,16 @@ public class Emitter {
      */
     public LinkedList<RequestResult> performEmit(EmittableEvents events) {
 
-        Logger.ifDebug(TAG, "Performing emit", events);
+        Logger.ifDebug(TAG, "Performing event emission: %s", events);
 
         ArrayList<Payload> payloads = events.getEvents();
         LinkedList<Long> eventIds = events.getEventIds();
+
         LinkedList<RequestResult> results = new LinkedList<>();
 
         // If the request method is GET...
         if (httpMethod == HttpMethod.GET) {
-            Logger.ifDebug(TAG, "Performing GET requests");
+            Logger.ifDebug(TAG, "Sending GET requests...");
 
             for (int i = 0; i < payloads.size(); i++) {
 
@@ -157,14 +253,14 @@ public class Emitter {
                     results.add(new RequestResult(false, eventId));
                 }
                 else {
-                    // Figure out if it was a success and if we can retry if it failed...
+                    // Figure out if it was a success
                     boolean success = code >= 200 && code < 300;
                     results.add(new RequestResult(success, eventId));
                 }
             }
         }
         else {
-            Logger.ifDebug(TAG, "Performing POST requests");
+            Logger.ifDebug(TAG, "Sending POST requests...");
 
             // Convert the ArrayList of Payloads into an ArrayList of Maps
             ArrayList<Map> eventMaps = new ArrayList<>();
@@ -185,11 +281,13 @@ public class Emitter {
                 results.add(new RequestResult(false, eventIds));
             }
             else {
-                // Figure out if it was a success and if we can retry if it failed...
+                // Figure out if it was a success
                 boolean success = code >= 200 && code < 300;
                 results.add(new RequestResult(success, eventIds));
             }
         }
+
+        Logger.ifDebug(TAG, "Request Results: %s", results);
         return results;
     }
 
@@ -205,7 +303,7 @@ public class Emitter {
             Logger.ifDebug(TAG, "Sending request...", request);
             return client.newCall(request).execute().code();
         } catch (IOException e) {
-            Logger.ifDebug(TAG, "Request sending failed exceptionally", e);
+            Logger.ifDebug(TAG, "Request sending failed exceptionally!", e);
             return -1;
         }
     }
@@ -295,5 +393,12 @@ public class Emitter {
      */
     public RequestCallback getRequestCallback() {
         return this.requestCallback;
+    }
+
+    /**
+     * @return the Emitters event store
+     */
+    public EventStore getEventStore() {
+        return this.eventStore;
     }
 }
