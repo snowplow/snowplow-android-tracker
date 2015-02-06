@@ -485,4 +485,11 @@ public class Emitter {
     public EventStore getEventStore() {
         return this.eventStore;
     }
+
+    /**
+     * @return the emitter subscription
+     */
+    public boolean getEmitterSubscriptionStatus() {
+        return this.emitterSub != null;
+    }
 }
