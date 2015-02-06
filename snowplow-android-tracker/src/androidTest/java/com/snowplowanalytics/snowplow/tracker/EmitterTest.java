@@ -1,34 +1,88 @@
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.test.AndroidTestCase;
+
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
-
-import android.test.AndroidTestCase;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
 
 public class EmitterTest extends AndroidTestCase {
 
-    private static String testURL = "10.0.2.2:4545";
-    //private static String testURL = "77278b85.ngrok.com";
+    private final static String TAG = Emitter.class.getSimpleName();
+    private final static String testURL = "10.0.2.2:4545";
 
-    public void testSendGetData() throws Exception {
-        Emitter emitter = new Emitter
+    // Helper Methods
+
+    private Emitter getEmitter(HttpMethod method, BufferOption option) {
+        return new Emitter
                 .EmitterBuilder(testURL, getContext())
-                .httpMethod(HttpMethod.POST)
+                .bufferOption(option)
+                .httpMethod(method)
+                .requestCallback(getCallback())
                 .build();
+    }
 
-        Subject subject = new Subject(getContext());
+    private RequestCallback getCallback() {
+        return new RequestCallback() {
+            @Override
+            public void onSuccess(int successCount) {
+                Logger.ifDebug(TAG, "Successful Sends: %s", successCount);
+            }
+            @Override
+            public void onFailure(int successCount, int failureCount) {
+                Logger.ifDebug(TAG,
+                        "Successful Sends: %s, Failed Sends: %s",
+                        successCount,
+                        failureCount);
+            }
+        };
+    }
 
-        emitter.setBufferOption(BufferOption.Default);
+    // Tests
 
-        Tracker tracker = new Tracker
-                .TrackerBuilder(emitter, "myNamespace", "myAppId")
-                .base64(false)
-                .subject(subject)
-                .build();
+    public void testHttpMethodSet() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        assertEquals(HttpMethod.GET, emitter.getHttpMethod());
 
-        for (int i = 0; i < 10; i++)
-            tracker.trackScreenView("Screen 1", null);
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup);
+        assertEquals(HttpMethod.POST, emitter.getHttpMethod());
+    }
 
-        Thread.sleep(10000);
+    public void testBufferOptionSet() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        assertEquals(BufferOption.Single, emitter.getBufferOption());
+
+        emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        assertEquals(BufferOption.DefaultGroup, emitter.getBufferOption());
+
+        emitter.setBufferOption(BufferOption.HeavyGroup);
+        assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
+    }
+
+    public void testCallbackSet() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        assertNotNull(emitter.getRequestCallback());
+    }
+
+    public void testUriSet() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        assertEquals("http://"+testURL+"/i", emitter.getEmitterUri());
+
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup);
+        assertEquals("http://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
+                emitter.getEmitterUri());
+    }
+
+    public void testIsOnlineIsSubscribed() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        boolean isOnline = emitter.isOnline();
+
+        if (isOnline) {
+            assertEquals(true, emitter.getEmitterSubscriptionStatus());
+        }
+        else {
+            assertEquals(false, emitter.getEmitterSubscriptionStatus());
+        }
     }
 }
