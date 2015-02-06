@@ -15,6 +15,8 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.net.Uri;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
@@ -51,14 +54,17 @@ public class Emitter {
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final Scheduler scheduler = Schedulers.io();
+    private Context context;
     private EventStore eventStore;
     private Uri.Builder uriBuilder;
-
+    private Subscription emitterSub;
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption option = BufferOption.Default;
 
-    private Subscription sub;
+    // TODO: Replace isRunning with a blocking state on the emitter process
+    private boolean isRunning = false;
+    private int emptyCounter = 0;
 
     /**
      * Creates an emitter object
@@ -67,6 +73,7 @@ public class Emitter {
     private Emitter(EmitterBuilder builder) {
         this.httpMethod = builder.httpMethod;
         this.requestCallback = builder.requestCallback;
+        this.context = builder.context;
 
         // Need to create URI Builder in this way to preserve port keys/characters that would
         // be incorrectly encoded by the uriBuilder.
@@ -87,8 +94,12 @@ public class Emitter {
         }
 
         // Create the event store with the context and the buffer option
-        this.eventStore = new EventStore(builder.context, option);
-        this.eventStore.removeAllEvents();
+        this.eventStore = new EventStore(this.context);
+
+        // If the device is not online do not send anything!
+        if (isOnline()) {
+            start();
+        }
     }
 
     public static class EmitterBuilder {
@@ -138,71 +149,107 @@ public class Emitter {
         // Adds the payload to the EventStore
         eventStore.add(payload);
 
-        // If we have enough events in the event store
-        // start sending...
-        if (eventStore.size() >= option.getCode()) {
-            Logger.ifDebug(TAG, "Starting the emitter...");
-            emitterStart();
+        // If the emitter is currently shutdown start it..
+        if (emitterSub == null && isOnline()) {
+            start();
         }
     }
 
     /**
-     * Starts the emitter process once
-     * we have added enough events
-     * to the event store.
+     * Starts a polling emitter subscription
+     * which will send all events to the collector.
+     *
+     * 1. If it is currently sending events we
+     *    cannot get new batches of events.
+     * 2. If it pulls an empty batch of events
+     *    a certain amount of times we
+     *    shutdown and wait for a new event add.
+     * 3. This subscription will only start if
+     *    we are online.
      */
-    public void emitterStart() {
-        sub = Observable.interval(30, TimeUnit.SECONDS)
+    public void start() {
+        emitterSub = Observable.interval(TrackerConstants.EMITTER_TICK, TimeUnit.SECONDS)
             .map((tick) -> {
-                EmittableEvents events = eventStore.getEmittableEvents();
-                if (events.getEvents().isEmpty()) {
-                    return events;
+                if (!isRunning) {
+                    isRunning = true;
+                    return eventStore.getEmittableEvents();
                 }
-                return events;
+                else {
+                    throw new EmitterException("Event sending concurrency exception");
+                }
             })
+            .doOnError((err) -> Logger.ifDebug(TAG, "Emitter Error: %s", err.toString()))
+            .retry()
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
+            .doOnSubscribe(() -> Logger.ifDebug(TAG, "Emitter has been started!"))
+            .doOnUnsubscribe(() -> Logger.ifDebug(TAG, "Emitter has been shutdown!"))
             .flatMap(this::emitEvent)
             .subscribe(results -> {
 
-                Logger.ifDebug(TAG, "Got results: %s", results);
+                Logger.ifDebug(TAG, "Processing emitter results.");
 
-                int successCount = 0;
-                int failureCount = 0;
+                if (results.size() == 0) {
+                    emptyCounter++;
+                    Logger.ifDebug(TAG, "Empty results counter: %s", emptyCounter);
 
-                // Loop through all request results
-                for (RequestResult res : results) {
+                    if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
+                        shutdown();
+                    }
+                }
+                else {
+                    emptyCounter = 0;
+                    int successCount = 0;
+                    int failureCount = 0;
 
-                    // If sending was a success
-                    if (res.getSuccess()) {
+                    for (RequestResult res : results) {
+                        if (res.getSuccess()) {
+                            successCount++;
+                            Logger.ifDebug(TAG, "Successful send.");
 
-                        successCount++;
-
-                        Logger.ifDebug(TAG, "Request sending was a success!");
-
-                        // Remove all eventIds associated with the request
-                        for (Long eventId : res.getEventIds()) {
-                            eventStore.remove(eventId);
+                            // Delete event rows for successfully sent requests
+                            for (Long eventId : res.getEventIds()) {
+                                eventStore.removeEvent(eventId);
+                            }
+                        }
+                        else if (!res.getSuccess()) {
+                            failureCount++;
+                            Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
                         }
                     }
-                    else if (!res.getSuccess()) {
 
-                        failureCount++;
+                    // If any events failed and the device is online
+                    if (isOnline() && failureCount != 0) {
+                        Logger.ifDebug(TAG, "Check your collector path: %s",
+                                uriBuilder.clearQuery().toString());
 
-                        Logger.ifDebug(TAG, "Request sending failed but we can retry later!");
+                        shutdown();
+                    }
+
+                    // Send the callback if it is not null...
+                    if (requestCallback != null) {
+                        if (failureCount != 0) {
+                            requestCallback.onFailure(successCount, failureCount);
+                        }
+                        else {
+                            requestCallback.onSuccess(successCount);
+                        }
                     }
                 }
 
-                // Send the callback if it is not null...
-                if (requestCallback != null) {
-                    if (failureCount != 0) {
-                        requestCallback.onFailure(successCount, failureCount);
-                    }
-                    else {
-                        requestCallback.onSuccess(successCount);
-                    }
-                }
+                // Reset isRunning after completion
+                isRunning = false;
             });
+    }
+
+    /**
+     * Shuts the emitter down!
+     */
+    public void shutdown() {
+        if (emitterSub != null) {
+            emitterSub.unsubscribe();
+            emitterSub = null;
+        }
     }
 
     /**
@@ -216,7 +263,7 @@ public class Emitter {
         return Observable
             .just(events)
             .map(this::performEmit)
-            .onBackpressureBuffer(10000);
+            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
     }
 
     /**
@@ -228,62 +275,73 @@ public class Emitter {
      */
     public LinkedList<RequestResult> performEmit(EmittableEvents events) {
 
-        Logger.ifDebug(TAG, "Performing event emission: %s", events);
-
         ArrayList<Payload> payloads = events.getEvents();
         LinkedList<Long> eventIds = events.getEventIds();
-
         LinkedList<RequestResult> results = new LinkedList<>();
+
+        // If there are no events to send...
+        if (events.getEvents().size() == 0) {
+            return results;
+        }
 
         // If the request method is GET...
         if (httpMethod == HttpMethod.GET) {
+
             Logger.ifDebug(TAG, "Sending GET requests...");
 
             for (int i = 0; i < payloads.size(); i++) {
+                // Get the eventId for this request
+                LinkedList<Long> reqEventId = new LinkedList<>();
+                reqEventId.add(eventIds.get(i));
 
-                // Build the request and send it...
+                // Build the request
                 Request req = requestBuilderGet(events.getEvents().get(i));
                 int code = requestSender(req);
 
-                // Get the eventId for this particular event
-                LinkedList<Long> eventId = new LinkedList<>();
-                eventId.add(eventIds.get(i));
+                Logger.ifDebug(TAG, "Sent a GET");
 
                 if (code == -1) {
-                    results.add(new RequestResult(false, eventId));
+                    results.add(new RequestResult(false, reqEventId));
                 }
                 else {
-                    // Figure out if it was a success
-                    boolean success = code >= 200 && code < 300;
-                    results.add(new RequestResult(success, eventId));
+                    boolean success = isSuccessfulSend(code);
+                    results.add(new RequestResult(success, reqEventId));
                 }
             }
         }
         else {
+
             Logger.ifDebug(TAG, "Sending POST requests...");
 
-            // Convert the ArrayList of Payloads into an ArrayList of Maps
-            ArrayList<Map> eventMaps = new ArrayList<>();
-            for (Payload event : events.getEvents()) {
-                eventMaps.add(event.getMap());
-            }
+            for (int i = 0; i < payloads.size(); i += option.getCode()) {
+                // Get the eventIds for this POST Request
+                LinkedList<Long> reqEventIds = new LinkedList<>();
 
-            // As we can send multiple events in a POST we need to create a wrapper
-            SchemaPayload postPayload = new SchemaPayload();
-            postPayload.setSchema(TrackerConstants.SCHEMA_PAYLOAD_DATA);
-            postPayload.setData(eventMaps);
+                // Add payloads together for a POST Event
+                ArrayList<Map> postPayloadMaps = new ArrayList<>();
+                for (int j = i; j < (i + option.getCode()) && j < payloads.size(); j++) {
+                    postPayloadMaps.add(events.getEvents().get(j).getMap());
+                    reqEventIds.add(eventIds.get(j));
+                }
 
-            // Build the request
-            Request req = requestBuilderPost(postPayload);
-            int code = requestSender(req);
+                // As we can send multiple events in a POST we need to create a wrapper
+                SchemaPayload postPayload = new SchemaPayload();
+                postPayload.setSchema(TrackerConstants.SCHEMA_PAYLOAD_DATA);
+                postPayload.setData(postPayloadMaps);
 
-            if (code == -1) {
-                results.add(new RequestResult(false, eventIds));
-            }
-            else {
-                // Figure out if it was a success
-                boolean success = code >= 200 && code < 300;
-                results.add(new RequestResult(success, eventIds));
+                // Build the request
+                Request req = requestBuilderPost(postPayload);
+                int code = requestSender(req);
+
+                Logger.ifDebug(TAG, "Sent a POST");
+
+                if (code == -1) {
+                    results.add(new RequestResult(false, reqEventIds));
+                }
+                else {
+                    boolean success = isSuccessfulSend(code);
+                    results.add(new RequestResult(success, reqEventIds));
+                }
             }
         }
 
@@ -339,8 +397,6 @@ public class Emitter {
                 .url(reqUrl)
                 .get()
                 .build();
-
-        Logger.ifDebug(TAG, "New GET Request made", req);
         return req;
     }
 
@@ -358,13 +414,10 @@ public class Emitter {
                 .url(reqUrl)
                 .post(reqBody)
                 .build();
-
-        Logger.ifDebug(TAG, "New POST Request made", req);
         return req;
     }
 
-    // Setters and Getters
-
+    // Setters, Getters and Checkers
     /**
      * Sets whether the buffer should send events instantly or after the buffer has reached
      * it's limit. By default, this is set to BufferOption Default.
@@ -372,6 +425,37 @@ public class Emitter {
      */
     public void setBufferOption(BufferOption option) {
         this.option = option;
+    }
+
+    /**
+     * Checks whether or not the device
+     * is online and able to communicate
+     * with the outside world.
+     */
+    public boolean isOnline() {
+
+        Logger.ifDebug(TAG, "Checking for connectivity...");
+
+        ConnectivityManager cm = (ConnectivityManager)
+                this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            return false;
+        }
+
+        return ni.isConnected();
+    }
+
+    /**
+     * Returns truth on if the request
+     * was sent successfully.
+     *
+     * @param code the response code
+     * @return the truth as to the success
+     */
+    public boolean isSuccessfulSend(int code) {
+        return code >= 200 && code < 300;
     }
 
     /**
