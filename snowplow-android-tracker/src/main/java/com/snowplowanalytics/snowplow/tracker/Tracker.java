@@ -13,15 +13,12 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.content.Context;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
@@ -59,11 +56,9 @@ public class Tracker {
     }
 
     public static class TrackerBuilder {
-
         private final Emitter emitter; // Required
         private final String namespace; // Required
         private final String appId; // Required
-
         private Subject subject = null; // Optional
         private boolean base64Encoded = true; // Optional
         private DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
@@ -197,65 +192,6 @@ public class Tracker {
             context.add(mobilePayload);
         }
         return context;
-    }
-
-    // Get & Set Functions
-
-    /**
-     * Sets the trackers subject
-     * @param subject a valid subject object
-     */
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
-    /**
-     * @return the tracker version that was set
-     */
-    public String getTrackerVersion() {
-        return this.trackerVersion;
-    }
-
-    /**
-     * @return the trackers namespace
-     */
-    public String getNamespace() {
-        return this.namespace;
-    }
-
-    /**
-     * @return the trackers set Application ID
-     */
-    public String getAppId() {
-        return this.appId;
-    }
-
-    /**
-     * @return the trackers subject object
-     */
-    public Subject getSubject() {
-        return this.subject;
-    }
-
-    /**
-     * @return the base64 setting of the tracker
-     */
-    public boolean getBase64Encoded() {
-        return this.base64Encoded;
-    }
-
-    /**
-     * @return the trackers device platform
-     */
-    public DevicePlatforms getPlatform() {
-        return this.devicePlatform;
-    }
-
-    /**
-     * @return the emitter associated with the tracker
-     */
-    public Emitter getEmitter() {
-        return this.emitter;
     }
 
     // Event Tracking Functions
@@ -655,5 +591,70 @@ public class Tracker {
         payload.setData(trackerPayload);
 
         trackUnstructuredEvent(payload, context, timestamp);
+    }
+
+    // Get & Set Functions
+
+    /**
+     * @param subject a valid subject object
+     */
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    /**
+     * @param emitter a valid emitter object
+     */
+    public void setEmitter(Emitter emitter) {
+        this.emitter = emitter;
+    }
+
+    /**
+     * @return the tracker version that was set
+     */
+    public String getTrackerVersion() {
+        return this.trackerVersion;
+    }
+
+    /**
+     * @return the trackers subject object
+     */
+    public Subject getSubject() {
+        return this.subject;
+    }
+
+    /**
+     * @return the emitter associated with the tracker
+     */
+    public Emitter getEmitter() {
+        return this.emitter;
+    }
+
+    /**
+     * @return the trackers namespace
+     */
+    public String getNamespace() {
+        return this.namespace;
+    }
+
+    /**
+     * @return the trackers set Application ID
+     */
+    public String getAppId() {
+        return this.appId;
+    }
+
+    /**
+     * @return the base64 setting of the tracker
+     */
+    public boolean getBase64Encoded() {
+        return this.base64Encoded;
+    }
+
+    /**
+     * @return the trackers device platform
+     */
+    public DevicePlatforms getPlatform() {
+        return this.devicePlatform;
     }
 }

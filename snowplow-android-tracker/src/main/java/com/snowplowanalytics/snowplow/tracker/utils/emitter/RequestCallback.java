@@ -13,10 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils.emitter;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
-
-import java.util.List;
-
+/**
+ * Interface for all Request callbacks
+ */
 public interface RequestCallback {
 
     void onSuccess(int successCount);

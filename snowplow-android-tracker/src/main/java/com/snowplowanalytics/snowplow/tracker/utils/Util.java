@@ -25,10 +25,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Util {
 
-    private static ObjectMapper sObjectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
-    public static ObjectMapper defaultMapper() {
-        return sObjectMapper;
+    /**
+     * @return returns a default ObjectMapper
+     */
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**

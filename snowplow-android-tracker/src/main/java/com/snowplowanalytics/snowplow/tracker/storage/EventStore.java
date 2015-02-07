@@ -29,17 +29,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.Scheduler;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
@@ -95,14 +92,15 @@ public class EventStore {
     }
 
     /**
-     * Creates a new operation which goes into a
-     * queue of operations to be actioned.
+     * Creates a new subscription to an observable
+     * operation which is loaded into a buffered
+     * queue.
      *
      * @param payload the event payload that is
      *                being added.
      */
     public void add(Payload payload) {
-        Subscription sub = addObservable(payload)
+        addObservable(payload)
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
             .subscribe();
@@ -161,7 +159,7 @@ public class EventStore {
 
         Logger.ifDebug(TAG, "Removed event from database: %s", "" + id);
 
-        return retval == 0;
+        return retval == 1;
     }
 
     /**
@@ -178,12 +176,12 @@ public class EventStore {
     }
 
     /**
-     * Serializes an event map to a
-     * byte array for storage.
+     * Converts an event map to a byte
+     * array for storage.
      *
      * @param map the map containing all
      *            the event parameters
-     * @return the byte[] or null
+     * @return the byte array or null
      */
     private static byte[] serialize(Map<String, String> map) {
         try {
@@ -203,11 +201,10 @@ public class EventStore {
     }
 
     /**
-     * Converts a byte[] back into a
-     * Map of parameters
+     * Converts a byte array back into an
+     * event map for sending.
      *
-     * @param bytes the bytes to be
-     *              converted
+     * @param bytes the bytes to be converted
      * @return the Map or null
      */
     @SuppressWarnings("unchecked")
@@ -221,12 +218,40 @@ public class EventStore {
             mem_in.close();
 
             return map;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Returns the events that validate a
+     * specific query.
+     *
+     * @param query the query to be passed against
+     *              the database
+     * @return the list of events that satisfied
+     * the query
+     */
+    public List<Map<String, Object>> queryDatabase(String query, String orderBy) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        if (open()) {
+            Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
+                    null, null, null, orderBy);
+
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Map<String, Object> eventMetadata = new HashMap<>();
+                eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
+                eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
+                        EventStore.deserializer(cursor.getBlob(1)));
+                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED, cursor.getString(2));
+                cursor.moveToNext();
+                res.add(eventMetadata);
+            }
+            cursor.close();
+        }
+        return res;
     }
 
     // Getters
@@ -246,7 +271,7 @@ public class EventStore {
      * Returns the last rowId to be
      * inserted.
      *
-     * @return a rowId
+     * @return the last inserted rowId
      */
     public long getLastInsertedRowId() {
         return lastInsertedRowId;
@@ -260,6 +285,7 @@ public class EventStore {
      * @return an EmittableEvents object containing
      * eventIds and event payloads.
      */
+    @SuppressWarnings("unchecked")
     public EmittableEvents getEmittableEvents() {
 
         // LinkedList of eventIds
@@ -331,35 +357,11 @@ public class EventStore {
     }
 
     /**
-     * Returns the events that validate a
-     * specific query.
+     * Returns truth on if database is open.
      *
-     * Such as returning all pending events
-     * -> EventStoreHelper.COLUMN_PENDING + "=1"
-     *
-     * @param query the query to be passed against
-     *              the database
-     * @return the list of events that satisfied
-     * the query
+     * @return a boolean for database status
      */
-    public List<Map<String, Object>> queryDatabase(String query, String orderBy) {
-        List<Map<String, Object>> res = new ArrayList<>();
-        if (open()) {
-            Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
-                    null, null, null, orderBy);
-
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                Map<String, Object> eventMetadata = new HashMap<>();
-                eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
-                eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
-                        EventStore.deserializer(cursor.getBlob(1)));
-                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED, cursor.getString(2));
-                cursor.moveToNext();
-                res.add(eventMetadata);
-            }
-            cursor.close();
-        }
-        return res;
+    public boolean isDatabaseOpen() {
+        return database.isOpen();
     }
 }
