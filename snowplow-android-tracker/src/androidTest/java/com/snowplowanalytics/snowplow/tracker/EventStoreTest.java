@@ -1,23 +1,24 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
+import java.util.Map;
+
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStoreHelper;
-
-import java.util.List;
-import java.util.Map;
-
 
 public class EventStoreTest extends AndroidTestCase {
 
-    private final BufferOption option = BufferOption.Instant;
+    // Helper Methods
 
-    public void testInsertPayload() throws Exception {
+    private EventStore getEventStore() {
+        EventStore eventStore = new EventStore(getContext());
+        eventStore.removeAllEvents();
+        return eventStore;
+    }
+
+    private SchemaPayload getEvent() {
         TrackerPayload trackerPayload = new TrackerPayload();
         SchemaPayload schemaPayload = new SchemaPayload();
         trackerPayload.add("someKey", "someValue");
@@ -25,15 +26,72 @@ public class EventStoreTest extends AndroidTestCase {
         schemaPayload.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
         schemaPayload.setData(trackerPayload);
 
-        EventStore eventStore = new EventStore(getContext(), option);
-        long id = eventStore.insertPayload(schemaPayload);
-        Map<String, Object> map = eventStore.getEvent(id);
-
-        Log.d("EventStoreTest", map.get(EventStoreHelper.METADATA_EVENT_DATA).toString());
+        return schemaPayload;
     }
 
-    public void testRemoveAllEvents() throws Exception {
-        EventStore eventStore = new EventStore(getContext(), option);
+    // Tests
+
+    public void testInsertPayload() {
+        EventStore eventStore = getEventStore();
+        long id = eventStore.insertEvent(getEvent());
+        long lastRowId = eventStore.getLastInsertedRowId();
+        Map<String, Object> event = eventStore.getEvent(id);
+
+        assertEquals(id, lastRowId);
+        assertEquals(1, eventStore.getSize());
+        assertNotNull(event);
+    }
+
+    public void testEventStoreQueries() {
+        EventStore eventStore = getEventStore();
+        eventStore.insertEvent(getEvent());
+
+        assertEquals(1, eventStore.getAllEvents().size());
+        assertEquals(1, eventStore.getDescEventsInRange(1).size());
+    }
+
+    public void testRemoveAllEvents() {
+        EventStore eventStore = getEventStore();
+
+        // Add 6 events
+        eventStore.insertEvent(getEvent());
+        eventStore.insertEvent(getEvent());
+        eventStore.insertEvent(getEvent());
+        eventStore.insertEvent(getEvent());
+        eventStore.insertEvent(getEvent());
+        eventStore.insertEvent(getEvent());
+
+        assertEquals(6, eventStore.getSize());
+
         eventStore.removeAllEvents();
+
+        assertEquals(0, eventStore.getSize());
+    }
+
+    public void testRemoveIndividualEvent() {
+        EventStore eventStore = getEventStore();
+        long id = eventStore.insertEvent(getEvent());
+        boolean res = eventStore.removeEvent(id);
+
+        assertEquals(0, eventStore.getSize());
+        assertEquals(true, res);
+    }
+
+    public void testCloseDatabase() {
+        EventStore eventStore = getEventStore();
+
+        assertEquals(true, eventStore.isDatabaseOpen());
+
+        eventStore.close();
+
+        assertEquals(false, eventStore.isDatabaseOpen());
+    }
+
+    public void testStressTestAddToDatabase() {
+        EventStore eventStore = getEventStore();
+        for (int i = 0; i < 10000; i++)
+            eventStore.add(getEvent());
+
+        assertEquals(10000, eventStore.getSize());
     }
 }
