@@ -32,10 +32,16 @@ public class EmittableEvents {
         this.eventIds = eventIds;
     }
 
+    /**
+     * @return the objects ArrayList of payloads
+     */
     public ArrayList<Payload> getEvents() {
         return this.events;
     }
 
+    /**
+     * @return the object LinkedList of event ids
+     */
     public LinkedList<Long> getEventIds() {
         return this.eventIds;
     }
