@@ -18,16 +18,22 @@ package com.snowplowanalytics.snowplow.tracker.utils.emitter;
  */
 public enum BufferOption {
     /**
-     * Sends events immediately when being tracked. This may cause a lot of network traffic
-     * depending on it's usage.
+     * Sends both GET and POST requests with only a single event.  Can cause a spike in
+     * network traffic if used in correlation with a large amount of events.
      */
-    Instant(1),
+    Single(1),
 
     /**
-     * Sends events in a group only after collecting 10 events. In a POST request, this is
-     * sent in one payload. For a GET request, individual requests are sent following each other.
+     * Sends POST requests in groups of 10 events.  This is the default amount of events too
+     * package into a POST.  All GET requests will still emit one at a time.
      */
-    Default(10);
+    DefaultGroup(10),
+
+    /**
+     * Sends POST requests in groups of 25 events.  Useful for situations where many events
+     * need to be sent.  All GET requests will still emit one at a time.
+     */
+    HeavyGroup(25);
 
     private int code;
 
