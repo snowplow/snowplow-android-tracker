@@ -6,6 +6,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 
 public class EmitterTest extends AndroidTestCase {
 
@@ -14,11 +15,12 @@ public class EmitterTest extends AndroidTestCase {
 
     // Helper Methods
 
-    private Emitter getEmitter(HttpMethod method, BufferOption option) {
+    private Emitter getEmitter(HttpMethod method, BufferOption option, RequestSecurity security) {
         return new Emitter
                 .EmitterBuilder(testURL, getContext())
                 .bufferOption(option)
                 .httpMethod(method)
+                .requestSecurity(security)
                 .requestCallback(getCallback())
                 .build();
     }
@@ -42,18 +44,18 @@ public class EmitterTest extends AndroidTestCase {
     // Tests
 
     public void testHttpMethodSet() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
         assertEquals(HttpMethod.GET, emitter.getHttpMethod());
 
-        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup);
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
         assertEquals(HttpMethod.POST, emitter.getHttpMethod());
     }
 
     public void testBufferOptionSet() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
         assertEquals(BufferOption.Single, emitter.getBufferOption());
 
-        emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
         assertEquals(BufferOption.DefaultGroup, emitter.getBufferOption());
 
         emitter.setBufferOption(BufferOption.HeavyGroup);
@@ -61,21 +63,37 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testCallbackSet() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup);
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
         assertNotNull(emitter.getRequestCallback());
     }
 
     public void testUriSet() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
         assertEquals("http://"+testURL+"/i", emitter.getEmitterUri());
 
-        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup);
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
         assertEquals("http://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
+                emitter.getEmitterUri());
+
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
+        assertEquals("https://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
+                emitter.getEmitterUri());
+
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
+        assertEquals("https://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
     }
 
+    public void testSecuritySet() {
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
+        assertEquals(RequestSecurity.HTTP, emitter.getRequestSecurity());
+
+        emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
+        assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
+    }
+
     public void testIsOnlineIsSubscribed() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single);
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
         boolean isOnline = emitter.isOnline();
 
         if (isOnline) {
