@@ -16,7 +16,7 @@ apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 11
@@ -58,6 +58,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -98,7 +102,6 @@ publishing {
             artifact androidSourcesJar {
                 classifier "sources"
             }
-
         }
     }
     repositories {
@@ -116,7 +119,7 @@ build {
         srcFile.parentFile.mkdirs()
         srcFile.write(
                 """/*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.

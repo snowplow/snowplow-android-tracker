@@ -1,4 +1,7 @@
 language: android
+# Turning off caching to avoid caching Issues
+cache: false
+# Using JDK8 for retrolambda compatibility
 jdk: oraclejdk8
 
 env:
@@ -7,7 +10,7 @@ env:
 
 android:
   components:
-    - build-tools-19.1.0
+    - build-tools-21.1.2
   licenses:
     - android-sdk-license-5be876d5
 
@@ -27,6 +30,5 @@ before_script:
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
 
-script:
-  - "curl -X POST -d @snowplow-android-tracker/src/androidTest/java/com/snowplowanalytics/snowplow/tracker/mountebank_mocks/generic_imposter.json http://localhost:2525/imposters"
-  - ./gradlew build connectedCheck
+after_script:
+  - adb logcat -t 1000
