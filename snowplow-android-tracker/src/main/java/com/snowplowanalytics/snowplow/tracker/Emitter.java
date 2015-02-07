@@ -44,6 +44,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
@@ -63,6 +64,7 @@ public class Emitter {
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption bufferOption;
+    protected RequestSecurity requestSecurity;
 
     // TODO: Replace isRunning with a blocking state on the emitter process
     private boolean isRunning = false;
@@ -77,17 +79,23 @@ public class Emitter {
         this.requestCallback = builder.requestCallback;
         this.context = builder.context;
         this.bufferOption = builder.bufferOption;
+        this.requestSecurity = builder.requestSecurity;
 
         // Need to create URI Builder in this way to preserve port keys/characters that would
         // be incorrectly encoded by the uriBuilder.
-        this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
+        if (requestSecurity == RequestSecurity.HTTP) {
+            this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
+        }
+        else {
+            this.uriBuilder = Uri.parse("https://" + builder.uri).buildUpon();
+        }
 
         // Create URI based on request method
         if (httpMethod == HttpMethod.GET) {
-            uriBuilder.scheme("http").appendPath("i");
+            uriBuilder.appendPath("i");
         }
         else {
-            uriBuilder.scheme("http").appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
+            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
                             TrackerConstants.PROTOCOL_VERSION);
         }
 
@@ -106,6 +114,7 @@ public class Emitter {
         protected RequestCallback requestCallback = null; // Optional
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
         protected BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
+        protected RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
 
         /**
          * @param uri The uri of the collector
@@ -128,6 +137,14 @@ public class Emitter {
          */
         public EmitterBuilder bufferOption(BufferOption option) {
             this.bufferOption = option;
+            return this;
+        }
+
+        /**
+         * @param requestSecurity the security chosen for requests
+         */
+        public EmitterBuilder requestSecurity(RequestSecurity requestSecurity) {
+            this.requestSecurity = requestSecurity;
             return this;
         }
 
@@ -223,8 +240,7 @@ public class Emitter {
                         for (Long eventId : res.getEventIds()) {
                             eventStore.removeEvent(eventId);
                         }
-                    }
-                    else if (!res.getSuccess()) {
+                    } else if (!res.getSuccess()) {
                         failureCount++;
                         Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
                     }
@@ -243,8 +259,7 @@ public class Emitter {
                 if (requestCallback != null) {
                     if (failureCount != 0) {
                         requestCallback.onFailure(successCount, failureCount);
-                    }
-                    else {
+                    } else {
                         requestCallback.onSuccess(successCount);
                     }
                 }
@@ -512,4 +527,10 @@ public class Emitter {
         return this.bufferOption;
     }
 
+    /**
+     * @return the request security selected for the emitter
+     */
+    public RequestSecurity getRequestSecurity() {
+        return this.requestSecurity;
+    }
 }
