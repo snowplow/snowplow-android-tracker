@@ -18,10 +18,6 @@ package com.snowplowanalytics.snowplow.tracker.utils.emitter;
  */
 public class EmitterException extends RuntimeException {
 
-    public EmitterException() {
-        super();
-    }
-
     public EmitterException(String message) {
         super(message);
     }
