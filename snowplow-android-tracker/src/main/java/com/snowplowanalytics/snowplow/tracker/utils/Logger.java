@@ -53,7 +53,7 @@ public class Logger {
     }
 
     /**
-     * Returns updated tag.
+     * Returns the updated tag.
      *
      * @param tag the tag to be appended to
      * @return the appended tag
@@ -63,8 +63,7 @@ public class Logger {
     }
 
     /**
-     * Gets the current thread
-     * name.
+     * Gets the current thread name.
      *
      * @return the thread name
      */

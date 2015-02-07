@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,31 +29,25 @@ import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 public class SchemaPayload implements Payload {
 
-    private final ObjectMapper objectMapper = Util.defaultMapper();
-    private final Logger logger = LoggerFactory.getLogger(SchemaPayload.class);
+    private final String TAG = SchemaPayload.class.getSimpleName();
+    private final ObjectMapper objectMapper = Util.getObjectMapper();
     private ObjectNode objectNode = objectMapper.createObjectNode();
 
-    public SchemaPayload() { }
+    public SchemaPayload() {}
 
     public SchemaPayload(Payload payload) {
         ObjectNode data;
 
         if (payload.getClass() == TrackerPayload.class) {
-            logger.debug("Payload class is a TrackerPayload instance.");
-            logger.debug("Trying getNode()");
+            Logger.ifDebug(TAG, "Payload class is a TrackerPayload instance.");
+            Logger.ifDebug(TAG, "Trying getNode()");
             data = (ObjectNode) payload.getNode();
         } else {
-            logger.debug("Converting Payload map to ObjectNode.");
+            Logger.ifDebug(TAG, "Converting Payload map to ObjectNode.");
             data = objectMapper.valueToTree(payload.getMap());
         }
         objectNode.set(Parameters.DATA, data);
@@ -59,7 +57,7 @@ public class SchemaPayload implements Payload {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
 
-        logger.debug("Setting schema: {}", schema);
+        Logger.ifDebug(TAG, "Setting schema: %s", schema);
         objectNode.put(Parameters.SCHEMA, schema);
         return this;
     }
@@ -89,7 +87,7 @@ public class SchemaPayload implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        logger.debug("add(String, String) method called: Doing nothing.");
+        Logger.ifDebug(TAG, "add(String, String) method called: Doing nothing.");
     }
 
     @Deprecated
@@ -99,7 +97,7 @@ public class SchemaPayload implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        logger.debug("add(String, Object) method called: Doing nothing.");
+        Logger.ifDebug(TAG, "add(String, Object) method called: Doing nothing.");
     }
 
     @Deprecated
@@ -109,7 +107,7 @@ public class SchemaPayload implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        logger.debug("addMap(Map<String, Object>) method called: Doing nothing.");
+        Logger.ifDebug(TAG, "addMap(Map<String, Object>) method called: Doing nothing.");
     }
 
     @Deprecated
@@ -120,7 +118,7 @@ public class SchemaPayload implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        logger.debug("addMap(Map, Boolean, String, String) method called: Doing nothing.");
+        Logger.ifDebug(TAG, "addMap(Map, Boolean, String, String) method called: Doing nothing.");
     }
 
     public Map<String, Object> getMap() {

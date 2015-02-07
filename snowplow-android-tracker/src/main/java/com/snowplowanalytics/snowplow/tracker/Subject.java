@@ -83,6 +83,18 @@ public class Subject {
     }
 
     /**
+     * Sets the context based parameters
+     *
+     * @param context the android context
+     */
+    public void setContextualParams(Context context) {
+        setAdvertisingID(context);
+        setDefaultScreenResolution(context);
+        setLocation(context);
+        setCarrier(context);
+    }
+
+    /**
      * Inserts a value into the mobilePairs
      * subject storage.
      *
@@ -112,10 +124,13 @@ public class Subject {
      *              the key
      */
     private void putToGeoLocation(String key, Object value) {
-        if (key != null && value != null && !key.isEmpty() || (value instanceof String) && !((String) value).isEmpty()) {
+        if (key != null && value != null && !key.isEmpty() ||
+                (value instanceof String) && !((String) value).isEmpty()) {
             this.geoLocationPairs.put(key, value);
         }
     }
+
+    // Default information setters
 
     /**
      * Sets the default timezone of the
@@ -135,16 +150,35 @@ public class Subject {
     }
 
     /**
-     * Sets the context based parameters
-     *
-     * @param context the android context
+     * Set operating system type.
+     * Defaults too 'android' currently.
      */
-    public void setContextualParams(Context context) {
-        setAdvertisingID(context);
-        setDefaultScreenResolution(context);
-        setLocation(context);
-        setCarrier(context);
+    private void setOsType() {
+        putToMobile(Parameters.OS_TYPE, "android");
     }
+
+    /**
+     * Sets the operating system version.
+     */
+    private void setOsVersion() {
+        putToMobile(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
+    }
+
+    /**
+     * Sets the device model.
+     */
+    private void setDeviceModel() {
+        putToMobile(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
+    }
+
+    /**
+     * Sets the device vendor/manufacturer.
+     */
+    private void setDeviceVendor() {
+        putToMobile(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
+    }
+
+    // Context information setters
 
     /**
      * Sets the advertising id of the
@@ -152,16 +186,14 @@ public class Subject {
      *
      * @param context the android context
      */
-    public void setAdvertisingID(Context context) {
+    private void setAdvertisingID(Context context) {
         try {
             AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
             putToMobile(Parameters.ANDROID_IDFA, info.getId());
-            Logger.ifDebug(TAG, "Got advertising id: %s", info.getId());
         }
         catch (IOException | GooglePlayServicesRepairableException |
                 GooglePlayServicesNotAvailableException e) {
-
-            Logger.e(TAG, "Cannot get advertising id", e);
+            Logger.ifDebug(TAG, "Cannot get advertising id: %s", e.toString());
         }
     }
 
@@ -187,7 +219,7 @@ public class Subject {
             display.getSize(size);
             this.setScreenResolution(size.x, size.y);
         } catch (NoSuchMethodException e) {
-            Log.e(Subject.class.toString(), "Display.getSize isn't available on older devices.");
+            Logger.ifDebug(TAG, "Display.getSize isn't available on older devices.");
             this.setScreenResolution(display.getWidth(), display.getHeight());
         }
     }
@@ -217,79 +249,13 @@ public class Subject {
      * @param context the android context
      */
     private void setCarrier(Context context) {
+        String carrier = getCarrier(context);
+        if (carrier == null)
+            return;
         putToMobile(Parameters.CARRIER, getCarrier(context));
     }
 
-    /**
-     * Returns the carrier name based
-     * on the android context supplied.
-     *
-     * @param context the android context
-     * @return a carrier name
-     */
-    private static String getCarrier(Context context) {
-        TelephonyManager telephonyManager =
-                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager != null) {
-            return telephonyManager.getNetworkOperatorName();
-        }
-        return "";
-    }
-
-    /**
-     * Returns the location of the android
-     * device.
-     *
-     * @param context the android context
-     * @return the phones Location
-     */
-    private static Location getLocation(Context context) {
-        LocationManager locationManager =
-                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-
-        String provider = locationManager.getBestProvider(criteria, true);
-        if (provider != null) {
-            try {
-                return locationManager.getLastKnownLocation(provider);
-            } catch (SecurityException ex) {
-                Logger.i(TAG, "No permission to retrieve location.");
-                return null;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Sets the device model.
-     */
-    private void setDeviceModel() {
-        putToMobile(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
-    }
-
-    /**
-     * Sets the device vendor/manufacturer.
-     */
-    private void setDeviceVendor() {
-        putToMobile(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
-    }
-
-    /**
-     * Sets the operating system version.
-     */
-    private void setOsVersion() {
-        putToMobile(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
-    }
-
-    /**
-     * Set operating system type.
-     * Defaults too 'android' currently.
-     */
-    private void setOsType() {
-        putToMobile(Parameters.OS_TYPE, "android");
-    }
+    // Public Subject information setters
 
     /**
      * Sets the subjects userId
@@ -360,6 +326,51 @@ public class Subject {
     // Get Functions
 
     /**
+     * Returns the carrier name based
+     * on the android context supplied.
+     *
+     * @param context the android context
+     * @return a carrier name
+     */
+    private static String getCarrier(Context context) {
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (telephonyManager != null) {
+            return telephonyManager.getNetworkOperatorName();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the location of the android
+     * device.
+     *
+     * @param context the android context
+     * @return the phones Location
+     */
+    private static Location getLocation(Context context) {
+        LocationManager locationManager =
+                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        String provider = locationManager.getBestProvider(criteria, true);
+        if (provider != null) {
+            try {
+                return locationManager.getLastKnownLocation(provider);
+            } catch (SecurityException ex) {
+                Logger.ifDebug(TAG, "No permission to retrieve location.");
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // Functions too return individual maps of information
+
+    /**
      * @return the geolocation subject pairs
      */
     public Map<String, Object> getSubjectLocation() {
@@ -377,8 +388,6 @@ public class Subject {
      * @return the standard subject pairs
      */
     public Map<String, String> getSubject() {
-        HashMap<String, String> allPairs = new HashMap<>();
-        allPairs.putAll(this.standardPairs);
-        return allPairs;
+        return this.standardPairs;
     }
 }

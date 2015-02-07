@@ -28,10 +28,16 @@ public class RequestResult {
         this.eventIds = eventIds;
     }
 
+    /**
+     * @return the requests success status
+     */
     public boolean getSuccess() {
         return this.success;
     }
 
+    /**
+     * @return the requests LinkedList of eventIds
+     */
     public LinkedList<Long> getEventIds() {
         return this.eventIds;
     }

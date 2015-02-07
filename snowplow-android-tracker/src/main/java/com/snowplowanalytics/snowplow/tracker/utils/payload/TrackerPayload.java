@@ -13,6 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,42 +25,36 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 public class TrackerPayload implements Payload {
 
-    private final ObjectMapper objectMapper = Util.defaultMapper();
-    private final Logger logger = LoggerFactory.getLogger(TrackerPayload.class);
+    private final String TAG = TrackerPayload.class.getSimpleName();
+    private final ObjectMapper objectMapper = Util.getObjectMapper();
     private ObjectNode objectNode = objectMapper.createObjectNode();
 
     @Override
     public void add(String key, String value) {
         if (value == null || value.isEmpty()) {
-            logger.debug("kv-value is empty. Returning out without adding key..");
+            Logger.ifDebug(TAG, "kv-value is empty. Returning out without adding key..");
             return;
         }
 
-        logger.debug("Adding new key: {} with value: {}", key, value);
+        Logger.ifDebug(TAG, "Adding new key-value pair: " + key + "->" + value);
         objectNode.put(key, value);
     }
 
     @Override
     public void add(String key, Object value) {
         if (value == null) {
-            logger.debug("kv-value is empty. Returning out without adding key..");
+            Logger.ifDebug(TAG, "kv-value is empty. Returning out without adding key..");
             return;
         }
 
-        logger.debug("Adding new key: {} with object value: {}", key, value);
+        Logger.ifDebug(TAG, "Adding new key-value pair: " + key + "->" + value);
         try {
             objectNode.putPOJO(key, objectMapper.writeValueAsString(value));
         } catch (JsonProcessingException e) {
@@ -67,7 +66,7 @@ public class TrackerPayload implements Payload {
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null) {
-            logger.debug("Map passed in is null. Returning without adding map..");
+            Logger.ifDebug(TAG, "Map passed in is null. Returning without adding map..");
             return;
         }
 
@@ -81,7 +80,7 @@ public class TrackerPayload implements Payload {
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
         if (map == null) {
-            logger.debug("Map passed in is null. Returning nothing..");
+            Logger.ifDebug(TAG, "Map passed in is null. Returning nothing..");
             return;
         }
 
@@ -108,7 +107,7 @@ public class TrackerPayload implements Payload {
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
-            logger.debug("Attempting to create a Map structure from ObjectNode.");
+            Logger.ifDebug(TAG, "Attempting to create a Map structure from ObjectNode.");
             map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
         } catch (JsonMappingException e) {
             e.printStackTrace();
