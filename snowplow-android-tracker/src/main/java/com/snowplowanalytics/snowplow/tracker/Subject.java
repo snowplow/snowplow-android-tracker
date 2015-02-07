@@ -21,7 +21,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -37,7 +36,6 @@ import java.util.TimeZone;
 import java.io.IOException;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 /**
