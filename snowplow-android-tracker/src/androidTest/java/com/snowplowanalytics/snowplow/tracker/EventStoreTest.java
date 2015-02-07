@@ -86,12 +86,4 @@ public class EventStoreTest extends AndroidTestCase {
 
         assertEquals(false, eventStore.isDatabaseOpen());
     }
-
-    public void testStressTestAddToDatabase() {
-        EventStore eventStore = getEventStore();
-        for (int i = 0; i < 10000; i++)
-            eventStore.add(getEvent());
-
-        assertEquals(10000, eventStore.getSize());
-    }
 }
