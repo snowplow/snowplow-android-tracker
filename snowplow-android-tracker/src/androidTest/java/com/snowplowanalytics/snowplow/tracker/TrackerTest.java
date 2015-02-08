@@ -2,8 +2,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.constants.DevicePlatforms;
-
 public class TrackerTest extends AndroidTestCase {
 
     // Helper Methods
@@ -68,5 +66,13 @@ public class TrackerTest extends AndroidTestCase {
 
         tracker.setSubject(null);
         assertNull(tracker.getSubject());
+    }
+
+    public void testPlatformUpdate() {
+        Tracker tracker = getTracker();
+        assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
+
+        tracker.setPlatform(DevicePlatforms.Mobile);
+        assertEquals(DevicePlatforms.Mobile, tracker.getPlatform());
     }
 }
