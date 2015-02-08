@@ -61,26 +61,21 @@ public class EventStore {
      * @param context The android context object
      */
     public EventStore(Context context) {
-        dbHelper = new EventStoreHelper(context);
+        dbHelper = EventStoreHelper.getInstance(context);
         open();
         Logger.ifDebug(TAG, "DB Path: " + database.getPath());
     }
 
     /**
-     * Opens a new writable database and
-     * sets the database to allow WAL.
-     *
-     * WAL: https://www.sqlite.org/wal.html
+     * Opens a new writable database if it
+     * is currently closed.
      *
      * @return success or failure to open
      */
     public boolean open() {
-
-        // Opens the database
-        database = dbHelper.getWritableDatabase();
-
-        // Enable write ahead logging
-        database.enableWriteAheadLogging();
+        if (!isDatabaseOpen()) {
+            database = dbHelper.getWritableDatabase();
+        }
         return database != null;
     }
 
@@ -362,6 +357,9 @@ public class EventStore {
      * @return a boolean for database status
      */
     public boolean isDatabaseOpen() {
+        if (database == null) {
+            return false;
+        }
         return database.isOpen();
     }
 }
