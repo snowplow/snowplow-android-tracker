@@ -39,12 +39,8 @@ import rx.schedulers.Schedulers;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
@@ -127,7 +123,7 @@ public class Emitter {
         /**
          * @param httpMethod The method by which requests are emitted
          */
-        public EmitterBuilder httpMethod(HttpMethod httpMethod) {
+        public EmitterBuilder method(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
@@ -135,7 +131,7 @@ public class Emitter {
         /**
          * @param option the buffer option for the emitter
          */
-        public EmitterBuilder bufferOption(BufferOption option) {
+        public EmitterBuilder option(BufferOption option) {
             this.bufferOption = option;
             return this;
         }
@@ -143,7 +139,7 @@ public class Emitter {
         /**
          * @param requestSecurity the security chosen for requests
          */
-        public EmitterBuilder requestSecurity(RequestSecurity requestSecurity) {
+        public EmitterBuilder security(RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
             return this;
         }
@@ -151,7 +147,7 @@ public class Emitter {
         /**
          * @param requestCallback Request callback function
          */
-        public EmitterBuilder requestCallback(RequestCallback requestCallback) {
+        public EmitterBuilder callback(RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
             return this;
         }
