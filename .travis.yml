@@ -27,8 +27,7 @@ before_script:
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
 
-script:
-  - ./gradlew connectedCheck -PdisablePreDex
+script: ./gradlew connectedAndroidTest --info
 
 after_script:
   - adb logcat
