@@ -16,15 +16,13 @@ apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.2'
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 21
         versionCode 2
         versionName "$project.version"
-
-        multiDexEnabled true
     }
 
     buildTypes {
@@ -58,10 +56,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    lintOptions {
-        abortOnError false
-    }
 }
 
 dependencies {
@@ -76,9 +70,6 @@ dependencies {
 
     // SquareUp
     compile 'com.squareup.okhttp:okhttp:2.1.0'
-
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 // build JAR file
