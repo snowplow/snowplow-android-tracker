@@ -8,30 +8,13 @@ import org.json.JSONObject;
 
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.utils.LogFetcher;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 
 public class EventSendingTest extends AndroidTestCase {
 
     private static final String testURL = "10.0.2.2:4545";
 
     // Helper methods
-
-    private Tracker getTracker(HttpMethod method) {
-        // Make an emitter
-        Emitter emitter = new Emitter
-                .EmitterBuilder(testURL, getContext())
-                .httpMethod(method)
-                .build();
-        emitter.getEventStore().removeAllEvents();
-
-        // Make a subject
-        Subject subject = new Subject(getContext());
-
-        // Make and return the Tracker object
-        return new Tracker
-                .TrackerBuilder(emitter, "myNamespace", "myAppId")
-                .subject(subject)
-                .build();
-    }
 
     private void setup() {
         LogFetcher.deleteImposter();
@@ -54,7 +37,25 @@ public class EventSendingTest extends AndroidTestCase {
         // Ensure Mountebank is ready
         Thread.sleep(1000);
 
-        Tracker tracker = getTracker(HttpMethod.GET);
+        // Make an emitter
+        Emitter emitter = new Emitter
+                .EmitterBuilder(testURL, getContext())
+                .httpMethod(HttpMethod.GET)
+                .build();
+
+        // Ensure eventStore is empty
+        emitter.getEventStore().removeAllEvents();
+
+        // Make a subject
+        Subject subject = new Subject(getContext());
+
+        // Make and return the Tracker object
+        Tracker tracker = new Tracker
+                .TrackerBuilder(emitter, "myNamespace", "myAppId")
+                .subject(subject)
+                .build();
+
+        // Track an event!
         tracker.trackScreenView("Screen 1", null);
 
         // Wait for Tracker to shutdown...
@@ -72,7 +73,25 @@ public class EventSendingTest extends AndroidTestCase {
         // Ensure Mountebank is ready
         Thread.sleep(1000);
 
-        Tracker tracker = getTracker(HttpMethod.POST);
+        // Make an emitter
+        Emitter emitter = new Emitter
+                .EmitterBuilder(testURL, getContext())
+                .httpMethod(HttpMethod.POST)
+                .build();
+
+        // Ensure eventStore is empty
+        emitter.getEventStore().removeAllEvents();
+
+        // Make a subject
+        Subject subject = new Subject(getContext());
+
+        // Make and return the Tracker object
+        Tracker tracker = new Tracker
+                .TrackerBuilder(emitter, "myNamespace", "myAppId")
+                .subject(subject)
+                .build();
+
+        // Track an event!
         tracker.trackScreenView("Screen 1", null);
 
         // Wait for Tracker to shutdown...

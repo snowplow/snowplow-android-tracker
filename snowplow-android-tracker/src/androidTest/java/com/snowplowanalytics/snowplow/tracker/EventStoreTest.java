@@ -86,17 +86,4 @@ public class EventStoreTest extends AndroidTestCase {
 
         assertEquals(false, eventStore.isDatabaseOpen());
     }
-
-    // TODO: This test only fails in Travis - cannot replicate
-//    public void testStressTestAddToDatabase() throws Exception{
-//        EventStore eventStore = getEventStore();
-//        for (int i = 0; i < 1000; i++)
-//            eventStore.add(getEvent());
-//
-//        while (eventStore.getSize() != 1000) {
-//            Thread.sleep(500);
-//        }
-//
-//        assertEquals(1000, eventStore.getSize());
-//    }
 }
