@@ -1,16 +1,13 @@
 language: android
-# Turning off caching to avoid caching Issues
-cache: false
-# Using JDK8 for retrolambda compatibility
 jdk: oraclejdk8
 
 env:
   matrix:
-    - ANDROID_SDKS=android-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
 
 android:
   components:
-    - build-tools-21.1.2
+    - build-tools-21.1.1
   licenses:
     - android-sdk-license-5be876d5
 
@@ -30,5 +27,8 @@ before_script:
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
 
+script:
+  - ./gradlew connectedCheck -PdisablePreDex
+
 after_script:
-  - adb logcat -t 1000
+  - adb logcat
