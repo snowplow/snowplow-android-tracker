@@ -39,7 +39,23 @@ public class EventStoreHelper extends SQLiteOpenHelper {
             "(id INTEGER PRIMARY KEY, eventData BLOB, " +
             "dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
-    public EventStoreHelper(Context context) {
+    // Prevents multiple instances being created and avoids
+    // memory leaks.
+    private static EventStoreHelper sInstance;
+
+    /**
+     * Use the application context, which will ensure that you
+     * don't accidentally leak an Activity's context.
+     * See this article for more information: http://bit.ly/6LRzfx
+     */
+    public static EventStoreHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new EventStoreHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    private EventStoreHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
