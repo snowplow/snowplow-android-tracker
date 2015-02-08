@@ -1,3 +1,15 @@
+Version 0.3.0 (2015-02-09)
+--------------------------
+Added Emitter option to use either HTTP or HTTPS for event sending (#66)
+Updated contexts schema to 1-0-1 (#65)
+Updated payload data schema to 1-0-2 (#64)
+Changed package to com.snowplowanalytics.snowplow.tracker (#61)
+Replaced Base64.java with Android Base64 implementation (#58)
+Removed dependency on Java Tracker Core (#57)
+Refactored AsyncTask to RxJava (#49)
+Refactored HttpClient to OkHttp (#48)
+Made the default Emitter method POST for Android (#27)
+
 Version 0.2.0 (2014-12-27)
 --------------------------
 Added dedicated Vagrant setup (#40)
