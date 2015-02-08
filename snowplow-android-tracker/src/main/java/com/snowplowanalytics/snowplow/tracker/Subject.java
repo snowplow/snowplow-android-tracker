@@ -321,6 +321,46 @@ public class Subject {
         this.standardPairs.put(Parameters.LANGUAGE, language);
     }
 
+    /**
+     * User inputted ip address for the
+     * subject.
+     *
+     * @param ipAddress an ip address
+     */
+    public void setIpAddress(String ipAddress) {
+        this.standardPairs.put(Parameters.IP_ADDRESS, ipAddress);
+    }
+
+    /**
+     * User inputted useragent for the
+     * subject.
+     *
+     * @param useragent a useragent
+     */
+    public void setUseragent(String useragent) {
+        this.standardPairs.put(Parameters.USERAGENT, useragent);
+    }
+
+    /**
+     * User inputted Network User Id for the
+     * subject.
+     *
+     * @param networkUserId a network user id
+     */
+    public void setNetworkUserId(String networkUserId) {
+        this.standardPairs.put(Parameters.NETWORK_UID, networkUserId);
+    }
+
+    /**
+     * User inputted Domain User Id for the
+     * subject.
+     *
+     * @param domainUserId a domain user id
+     */
+    public void setDomainUserId(String domainUserId) {
+        this.standardPairs.put(Parameters.DOMAIN_UID, domainUserId);
+    }
+
     // Get Functions
 
     /**

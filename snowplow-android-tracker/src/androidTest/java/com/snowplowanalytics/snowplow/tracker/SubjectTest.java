@@ -65,4 +65,28 @@ public class SubjectTest extends AndroidTestCase {
         subject.setLanguage("French");
         assertEquals("French", subject.getSubject().get("lang"));
     }
+
+    public void testSetIpAddress() {
+        Subject subject = getSubject();
+        subject.setIpAddress("127.0.0.1");
+        assertEquals("127.0.0.1", subject.getSubject().get("ip"));
+    }
+
+    public void testSetUseragent() {
+        Subject subject = getSubject();
+        subject.setUseragent("Agent");
+        assertEquals("Agent", subject.getSubject().get("ua"));
+    }
+
+    public void testSetNetworkUID() {
+        Subject subject = getSubject();
+        subject.setNetworkUserId("nuid-test");
+        assertEquals("nuid-test", subject.getSubject().get("tnuid"));
+    }
+
+    public void testSetDomainUID() {
+        Subject subject = getSubject();
+        subject.setDomainUserId("duid-test");
+        assertEquals("duid-test", subject.getSubject().get("duid"));
+    }
 }
