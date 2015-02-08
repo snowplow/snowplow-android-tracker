@@ -3,10 +3,6 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 
 public class EmitterTest extends AndroidTestCase {
 
@@ -18,10 +14,10 @@ public class EmitterTest extends AndroidTestCase {
     private Emitter getEmitter(HttpMethod method, BufferOption option, RequestSecurity security) {
         return new Emitter
                 .EmitterBuilder(testURL, getContext())
-                .bufferOption(option)
-                .httpMethod(method)
-                .requestSecurity(security)
-                .requestCallback(getCallback())
+                .option(option)
+                .method(method)
+                .security(security)
+                .callback(getCallback())
                 .build();
     }
 
