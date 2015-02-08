@@ -52,7 +52,7 @@ public class EventSendingTest extends AndroidTestCase {
         setup();
 
         // Ensure Mountebank is ready
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         Tracker tracker = getTracker(HttpMethod.GET);
         tracker.trackScreenView("Screen 1", null);
@@ -70,7 +70,7 @@ public class EventSendingTest extends AndroidTestCase {
         setup();
 
         // Ensure Mountebank is ready
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         Tracker tracker = getTracker(HttpMethod.POST);
         tracker.trackScreenView("Screen 1", null);
