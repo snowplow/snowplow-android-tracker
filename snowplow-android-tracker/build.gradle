@@ -23,8 +23,6 @@ android {
         targetSdkVersion 21
         versionCode 2
         versionName "$project.version"
-
-        multiDexEnabled true
     }
 
     buildTypes {
@@ -72,9 +70,6 @@ dependencies {
 
     // SquareUp
     compile 'com.squareup.okhttp:okhttp:2.1.0'
-
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 // build JAR file
