@@ -19,13 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.constants.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 
 public class Tracker {
@@ -607,6 +606,13 @@ public class Tracker {
      */
     public void setEmitter(Emitter emitter) {
         this.emitter = emitter;
+    }
+
+    /**
+     * @param platform a valid DevicePlatforms object
+     */
+    public void setPlatform(DevicePlatforms platform) {
+        this.devicePlatform = platform;
     }
 
     /**
