@@ -11,18 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.utils.emitter;
+package com.snowplowanalytics.snowplow.tracker;
 
 /**
- * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
+ * RequestSecurity is used to set the protocol used for sending Requests.
+ * Either HTTP or HTTPS.
  */
-public enum HttpMethod {
+public enum RequestSecurity {
     /**
-     * Each event is sent individually in separate GET requests.
+     * Events are sent without security.
      */
-    GET,
+    HTTP,
     /**
-     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     * Events are sent with added security.
      */
-    POST
+    HTTPS,
 }
