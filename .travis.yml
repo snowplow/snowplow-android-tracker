@@ -4,7 +4,6 @@ jdk: oraclejdk8
 env:
   matrix:
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
-    - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
 
 android:
   components:
@@ -27,6 +26,9 @@ before_script:
   - chmod +x ./ci/wait_for_emulator
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
+
+script:
+  - ./gradlew connectedCheck -PdisablePreDex
 
 after_script:
   - adb logcat
