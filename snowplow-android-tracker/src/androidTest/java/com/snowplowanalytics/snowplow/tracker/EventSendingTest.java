@@ -19,16 +19,32 @@ public class EventSendingTest extends AndroidTestCase {
         LogFetcher.createImposter();
     }
 
-    private void sendAsserts(LinkedList<JSONObject> requests, int eventCount) throws Exception {
+    private void checkLogs(LinkedList<JSONObject> requests, int eventCount) throws Exception {
+        // Checks that the correct amount of events was received
         assertEquals(eventCount, requests.size());
+
         for (JSONObject request : requests) {
             int code = request.getJSONObject("response").getInt("statusCode");
+
+            // Double checks that the response code was 200
             assertEquals(200, code);
         }
     }
 
+    private void checkGetContents(LinkedList<JSONObject> requests) throws Exception {
+        for (JSONObject request : requests) {
+            JSONObject query = request.getJSONObject("request").getJSONObject("query");
+            assertEquals("ue", query.getString("e"));
+            assertEquals("mob", query.getString("p"));
+            assertEquals("myAppId", query.getString("aid"));
+            assertEquals("myNamespace", query.getString("tna"));
+            assertEquals("andr-0.2.0", query.getString("tv"));
+            assertEquals("English", query.getString("lang"));
+        }
+    }
+
     // Tests
-    // TODO: This test only fails in Travis - cannot replicate
+
     public void testSendGetData() throws Exception {
         setup();
 
@@ -50,8 +66,8 @@ public class EventSendingTest extends AndroidTestCase {
         // Make and return the Tracker object
         Tracker tracker = new Tracker
                 .TrackerBuilder(emitter, "myNamespace", "myAppId")
-                .platform(DevicePlatforms.InternetOfThings)
                 .subject(subject)
+                .base64(false)
                 .build();
 
         // Track an event!
@@ -62,8 +78,11 @@ public class EventSendingTest extends AndroidTestCase {
             Thread.sleep(500);
         }
 
-        // Fetch the requests from mountebank and run tests
-        //sendAsserts(LogFetcher.getMountebankGetRequests(), 1);
+        LinkedList<JSONObject> logs = LogFetcher.getMountebankGetRequests();
+
+        // Check size and response codes of returned logs
+        checkLogs(logs, 1);
+        checkGetContents(logs);
     }
 
     public void testSendPostData() throws Exception {
@@ -88,6 +107,7 @@ public class EventSendingTest extends AndroidTestCase {
         Tracker tracker = new Tracker
                 .TrackerBuilder(emitter, "myNamespace", "myAppId")
                 .subject(subject)
+                .base64(false)
                 .build();
 
         // Track an event!
@@ -98,7 +118,9 @@ public class EventSendingTest extends AndroidTestCase {
             Thread.sleep(500);
         }
 
-        // Fetch the requests from mountebank and run tests
-        //sendAsserts(LogFetcher.getMountebankPostRequests(), 1);
+        LinkedList<JSONObject> logs = LogFetcher.getMountebankPostRequests();
+
+        // Check size and response codes of returned logs
+        checkLogs(logs, 1);
     }
 }
