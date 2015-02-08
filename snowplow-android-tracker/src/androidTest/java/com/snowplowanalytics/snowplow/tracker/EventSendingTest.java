@@ -6,9 +6,7 @@ import java.util.LinkedList;
 
 import org.json.JSONObject;
 
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.utils.LogFetcher;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestSecurity;
 
 public class EventSendingTest extends AndroidTestCase {
 
@@ -40,7 +38,7 @@ public class EventSendingTest extends AndroidTestCase {
         // Make an emitter
         Emitter emitter = new Emitter
                 .EmitterBuilder(testURL, getContext())
-                .httpMethod(HttpMethod.GET)
+                .method(HttpMethod.GET)
                 .build();
 
         // Ensure eventStore is empty
@@ -52,6 +50,7 @@ public class EventSendingTest extends AndroidTestCase {
         // Make and return the Tracker object
         Tracker tracker = new Tracker
                 .TrackerBuilder(emitter, "myNamespace", "myAppId")
+                .platform(DevicePlatforms.InternetOfThings)
                 .subject(subject)
                 .build();
 
@@ -76,7 +75,7 @@ public class EventSendingTest extends AndroidTestCase {
         // Make an emitter
         Emitter emitter = new Emitter
                 .EmitterBuilder(testURL, getContext())
-                .httpMethod(HttpMethod.POST)
+                .method(HttpMethod.POST)
                 .build();
 
         // Ensure eventStore is empty
