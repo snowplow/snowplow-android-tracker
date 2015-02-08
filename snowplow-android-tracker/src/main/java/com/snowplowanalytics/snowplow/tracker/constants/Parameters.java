@@ -37,6 +37,10 @@ public class Parameters {
     public static final String COLOR_DEPTH = "cd";
     public static final String TIMEZONE = "tz";
     public static final String LANGUAGE = "lang";
+    public static final String IP_ADDRESS = "ip";
+    public static final String USERAGENT = "ua";
+    public static final String NETWORK_UID = "tnuid";
+    public static final String DOMAIN_UID = "duid";
 
     // Page View
     public static final String PAGE_URL = "url";
