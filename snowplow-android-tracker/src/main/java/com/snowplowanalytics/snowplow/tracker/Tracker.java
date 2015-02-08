@@ -605,6 +605,10 @@ public class Tracker {
      * @param emitter a valid emitter object
      */
     public void setEmitter(Emitter emitter) {
+        // Need to shutdown prior emitter before updating
+        this.emitter.shutdown();
+
+        // Set the new emitter
         this.emitter = emitter;
     }
 
