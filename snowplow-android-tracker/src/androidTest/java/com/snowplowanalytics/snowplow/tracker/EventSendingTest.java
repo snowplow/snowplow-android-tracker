@@ -11,7 +11,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.LogFetcher;
 
 public class EventSendingTest extends AndroidTestCase {
 
-    private static final String testURL = "70d7306b.ngrok.com";
+    private static final String testURL = "10.0.2.2:4545";
 
     // Helper methods
 
@@ -51,6 +51,9 @@ public class EventSendingTest extends AndroidTestCase {
     public void testSendGetData() throws Exception {
         setup();
 
+        // Ensure Mountebank is ready
+        Thread.sleep(500);
+
         Tracker tracker = getTracker(HttpMethod.GET);
         tracker.trackScreenView("Screen 1", null);
 
@@ -65,6 +68,9 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendPostData() throws Exception {
         setup();
+
+        // Ensure Mountebank is ready
+        Thread.sleep(500);
 
         Tracker tracker = getTracker(HttpMethod.POST);
         tracker.trackScreenView("Screen 1", null);
