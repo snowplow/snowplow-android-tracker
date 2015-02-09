@@ -26,6 +26,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.generated.Version;
 
 public class Tracker {
 

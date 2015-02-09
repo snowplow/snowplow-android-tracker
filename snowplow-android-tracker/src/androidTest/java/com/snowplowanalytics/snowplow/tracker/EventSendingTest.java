@@ -38,7 +38,7 @@ public class EventSendingTest extends AndroidTestCase {
             assertEquals("mob", query.getString("p"));
             assertEquals("myAppId", query.getString("aid"));
             assertEquals("myNamespace", query.getString("tna"));
-            assertEquals("andr-0.2.0", query.getString("tv"));
+            assertEquals("andr-0.3.0", query.getString("tv"));
             assertEquals("English", query.getString("lang"));
         }
     }
