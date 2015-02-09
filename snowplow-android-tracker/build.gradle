@@ -2,6 +2,10 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
+gradle.projectsEvaluated {
+    preBuild.dependsOn(generateVersion)
+}
+
 buildscript {
     repositories {
         mavenCentral()
@@ -102,8 +106,9 @@ publishing {
     }
 }
 
-build {
-    project.ext.set("outputDir", "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker")
+task generateVersion {
+    project.ext.set("outputDir",
+            "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/generated")
     doFirst {
         println outputDir
         def srcFile = new File((String)outputDir, "Version.java")
@@ -122,12 +127,12 @@ build {
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker.generated;
 
 // DO NOT EDIT. AUTO-GENERATED.
 public class Version {
-    static final String TRACKER = "andr-$project.version";
-    static final String VERSION = "$project.version";
+    public static final String TRACKER = "andr-$project.version";
+    public static final String VERSION = "$project.version";
 }
 """)
     }
