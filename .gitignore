@@ -16,6 +16,9 @@ gen/
 .gradle/
 build/
 
+# Generated files
+snowplow-android-tracker/src/main/java/com/snowplowanalytics/snowplow/tracker/generated/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
