@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -11,7 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.android.payload;
+package com.snowplowanalytics.snowplow.tracker;
 
-public class SchemaPayload extends com.snowplowanalytics.snowplow.tracker.core.payload.SchemaPayload {
+/**
+ * RequestSecurity is used to set the protocol used for sending Requests.
+ * Either HTTP or HTTPS.
+ */
+public enum RequestSecurity {
+    /**
+     * Events are sent without security.
+     */
+    HTTP,
+    /**
+     * Events are sent with added security.
+     */
+    HTTPS,
 }
