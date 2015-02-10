@@ -32,6 +32,7 @@ Emitter.addToBuffer was doing a sync write to database (#53)
 Emitter.addToBuffer was leading to network on UI thread if set to immediately flush (#52)
 Advertising ID was not being fetched before events sent (#51)
 Advertising ID retrieval was creating new thread (#50)
+Refactored SchemaPayload to make the API easier to use and understand (#89)
 
 Version 0.2.0 (2014-12-27)
 --------------------------
