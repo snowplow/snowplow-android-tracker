@@ -4,7 +4,7 @@ import android.test.AndroidTestCase;
 
 import java.util.Map;
 
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 
@@ -18,15 +18,12 @@ public class EventStoreTest extends AndroidTestCase {
         return eventStore;
     }
 
-    private SchemaPayload getEvent() {
+    private SelfDescribingJson getEvent() {
         TrackerPayload trackerPayload = new TrackerPayload();
-        SchemaPayload schemaPayload = new SchemaPayload();
         trackerPayload.add("someKey", "someValue");
         trackerPayload.add("anotherKey", "anotherValue");
-        schemaPayload.setSchema("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0");
-        schemaPayload.setData(trackerPayload);
 
-        return schemaPayload;
+        return new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0", trackerPayload);
     }
 
     // Tests

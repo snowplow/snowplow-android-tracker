@@ -14,7 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class TransactionItem extends HashMap {
     }
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,
-                            String category, String currency, List<SchemaPayload> context) {
+                            String category, String currency, List<SelfDescribingJson> context) {
         put(Parameters.EVENT, "ti");
         put(Parameters.TI_ITEM_ID, order_id);
         put(Parameters.TI_ITEM_SKU, sku);

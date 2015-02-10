@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
@@ -126,12 +126,8 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    private Payload completePayload(Payload payload, List<SchemaPayload> context,
+    private Payload completePayload(Payload payload, List<SelfDescribingJson> context,
                                       long timestamp) {
-
-        // Encodes context data
-        SchemaPayload envelope = new SchemaPayload();
-        envelope.setSchema(TrackerConstants.SCHEMA_CONTEXTS);
 
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
@@ -150,16 +146,18 @@ public class Tracker {
                 (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
 
         // Add default information to the custom context
-        List<SchemaPayload> final_context = addDefaultContextData(context);
+        List<SelfDescribingJson> final_context = addDefaultContextData(context);
 
         // Convert context into a List<Map> object
         List<Map> contextDataList = new LinkedList<>();
-        for (SchemaPayload schemaPayload : final_context) {
-            contextDataList.add(schemaPayload.getMap());
+        for (SelfDescribingJson selfDescribingJson : final_context) {
+            contextDataList.add(selfDescribingJson.getMap());
         }
 
-        // Add the context map to the envelope
-        envelope.setData(contextDataList);
+        // Encodes context data and sets the data
+        SelfDescribingJson envelope = new SelfDescribingJson(
+                TrackerConstants.SCHEMA_CONTEXTS, contextDataList);
+
         payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                 Parameters.CONTEXT);
 
@@ -174,21 +172,19 @@ public class Tracker {
      * @param context Custom context for the event
      * @return A final custom context
      */
-    private List<SchemaPayload> addDefaultContextData(List<SchemaPayload> context) {
+    private List<SelfDescribingJson> addDefaultContextData(List<SelfDescribingJson> context) {
         if (context == null) {
             Logger.i(TAG, "No user context passed in");
             context = new LinkedList<>();
         }
         if (!subject.getSubjectLocation().isEmpty()) {
-            SchemaPayload locationPayload = new SchemaPayload();
-            locationPayload.setSchema(TrackerConstants.GEOLOCATION_SCHEMA);
-            locationPayload.setData(this.subject.getSubjectLocation());
+            SelfDescribingJson locationPayload = new SelfDescribingJson(
+                    TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());
             context.add(locationPayload);
         }
         if (!subject.getSubjectMobile().isEmpty()) {
-            SchemaPayload mobilePayload = new SchemaPayload();
-            mobilePayload.setSchema(TrackerConstants.MOBILE_SCHEMA);
-            mobilePayload.setData(this.subject.getSubjectMobile());
+            SelfDescribingJson mobilePayload = new SelfDescribingJson(
+                    TrackerConstants.MOBILE_SCHEMA, this.subject.getSubjectMobile());
             context.add(mobilePayload);
         }
         return context;
@@ -212,7 +208,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              List<SchemaPayload> context) {
+                              List<SelfDescribingJson> context) {
         trackPageView(pageUrl,pageTitle, referrer, context, 0);
     }
 
@@ -235,7 +231,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              List<SchemaPayload> context, long timestamp) {
+                              List<SelfDescribingJson> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(pageUrl);
         Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
@@ -274,7 +270,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<SchemaPayload> context) {
+                                     int value, List<SelfDescribingJson> context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
@@ -301,7 +297,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<SchemaPayload> context, long timestamp) {
+                                     int value, List<SelfDescribingJson> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(label);
         Preconditions.checkNotNull(property);
@@ -329,7 +325,7 @@ public class Tracker {
      *                   A "data" field containing the event properties and
      *                  A "schema" field identifying the schema against which the data is validated
      */
-    public void trackUnstructuredEvent(SchemaPayload eventData) {
+    public void trackUnstructuredEvent(SelfDescribingJson eventData) {
         trackUnstructuredEvent(eventData, null, 0);
     }
 
@@ -340,7 +336,7 @@ public class Tracker {
      *                   A "schema" field identifying the schema against which the data is validated
      * @param context Custom context for the event
      */
-    public void trackUnstructuredEvent(SchemaPayload eventData, List<SchemaPayload> context) {
+    public void trackUnstructuredEvent(SelfDescribingJson eventData, List<SelfDescribingJson> context) {
         trackUnstructuredEvent(eventData, context, 0);
     }
 
@@ -351,7 +347,7 @@ public class Tracker {
      *                   A "schema" field identifying the schema against which the data is validated
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(SchemaPayload eventData, long timestamp) {
+    public void trackUnstructuredEvent(SelfDescribingJson eventData, long timestamp) {
         trackUnstructuredEvent(eventData, null, timestamp);
     }
 
@@ -363,14 +359,11 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackUnstructuredEvent(SchemaPayload eventData, List<SchemaPayload> context,
+    public void trackUnstructuredEvent(SelfDescribingJson eventData, List<SelfDescribingJson> context,
                                        long timestamp) {
         Payload payload = new TrackerPayload();
-        SchemaPayload envelope = new SchemaPayload();
-
-        envelope.setSchema(TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
-        envelope.setData(eventData.getMap());
-
+        SelfDescribingJson envelope = new SelfDescribingJson(
+                TrackerConstants.SCHEMA_UNSTRUCT_EVENT, eventData.getMap());
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
         payload.addMap(envelope.getMap(), base64Encoded,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
@@ -394,7 +387,7 @@ public class Tracker {
      */
     protected void trackEcommerceTransactionItem(String order_id, String sku, Double price,
                                                  Integer quantity, String name, String category,
-                                                 String currency, List<SchemaPayload> context,
+                                                 String currency, List<SelfDescribingJson> context,
                                                  long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(name);
@@ -457,7 +450,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, List<SchemaPayload> context) {
+                                          List<TransactionItem> items, List<SelfDescribingJson> context) {
         trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping, city,
                 state, country, currency, items, context, 0);
     }
@@ -501,7 +494,7 @@ public class Tracker {
     public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
                                           Double tax_value, Double shipping, String city,
                                           String state, String country, String currency,
-                                          List<TransactionItem> items, List<SchemaPayload> context,
+                                          List<TransactionItem> items, List<SelfDescribingJson> context,
                                           long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(affiliation);
@@ -539,7 +532,7 @@ public class Tracker {
                     (String) item.get(Parameters.TI_ITEM_NAME),
                     (String) item.get(Parameters.TI_ITEM_CATEGORY),
                     (String) item.get(Parameters.TI_ITEM_CURRENCY),
-                    (List<SchemaPayload>) item.get(Parameters.CONTEXT),
+                    (List<SelfDescribingJson>) item.get(Parameters.CONTEXT),
                     timestamp);
         }
 
@@ -559,7 +552,7 @@ public class Tracker {
      * @param id Screen view ID
      * @param context Custom context for the event
      */
-    public void trackScreenView(String name, String id, List<SchemaPayload> context) {
+    public void trackScreenView(String name, String id, List<SelfDescribingJson> context) {
         trackScreenView(name, id, context, 0);
     }
 
@@ -578,7 +571,7 @@ public class Tracker {
      * @param context Custom context for the event
      * @param timestamp Optional user-provided timestamp for the event
      */
-    public void trackScreenView(String name, String id, List<SchemaPayload> context,
+    public void trackScreenView(String name, String id, List<SelfDescribingJson> context,
                                 long timestamp) {
         Preconditions.checkArgument(name != null || id != null);
         TrackerPayload trackerPayload = new TrackerPayload();
@@ -586,9 +579,8 @@ public class Tracker {
         trackerPayload.add(Parameters.SV_NAME, name);
         trackerPayload.add(Parameters.SV_ID, id);
 
-        SchemaPayload payload = new SchemaPayload();
-        payload.setSchema(TrackerConstants.SCHEMA_SCREEN_VIEW);
-        payload.setData(trackerPayload);
+        SelfDescribingJson payload = new SelfDescribingJson(
+                TrackerConstants.SCHEMA_SCREEN_VIEW, trackerPayload);
 
         trackUnstructuredEvent(payload, context, timestamp);
     }

@@ -41,7 +41,7 @@ import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SchemaPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
 public class Emitter {
@@ -343,9 +343,8 @@ public class Emitter {
                 }
 
                 // As we can send multiple events in a POST we need to create a wrapper
-                SchemaPayload postPayload = new SchemaPayload();
-                postPayload.setSchema(TrackerConstants.SCHEMA_PAYLOAD_DATA);
-                postPayload.setData(postPayloadMaps);
+                SelfDescribingJson postPayload = new SelfDescribingJson(
+                        TrackerConstants.SCHEMA_PAYLOAD_DATA, postPayloadMaps);
 
                 // Build the request
                 Request req = requestBuilderPost(postPayload);

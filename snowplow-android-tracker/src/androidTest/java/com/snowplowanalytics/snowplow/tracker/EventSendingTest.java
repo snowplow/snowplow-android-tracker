@@ -3,10 +3,15 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.test.AndroidTestCase;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.json.JSONObject;
 
 import com.snowplowanalytics.snowplow.tracker.utils.LogFetcher;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 public class EventSendingTest extends AndroidTestCase {
 
@@ -43,6 +48,24 @@ public class EventSendingTest extends AndroidTestCase {
         }
     }
 
+    private List<SelfDescribingJson> getCustomContexts() {
+        List<SelfDescribingJson> contexts = new ArrayList<>();
+
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("key-1", "value-1");
+
+        SelfDescribingJson json1 = new SelfDescribingJson(
+                "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-1", attributes);
+
+        SelfDescribingJson json2 = new SelfDescribingJson(
+                "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-2", json1);
+
+        contexts.add(json1);
+        contexts.add(json2);
+
+        return contexts;
+    }
+
     // Tests
 
     public void testSendGetData() throws Exception {
@@ -71,7 +94,7 @@ public class EventSendingTest extends AndroidTestCase {
                 .build();
 
         // Track an event!
-        tracker.trackScreenView("Screen 1", null);
+        tracker.trackScreenView("Screen 1", null, getCustomContexts());
 
         // Wait for Tracker to shutdown...
         while (tracker.getEmitter().getEmitterSubscriptionStatus()) {

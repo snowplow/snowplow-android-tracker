@@ -31,38 +31,53 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
-public class SchemaPayload implements Payload {
+public class SelfDescribingJson implements Payload {
 
-    private final String TAG = SchemaPayload.class.getSimpleName();
+    private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final ObjectMapper objectMapper = Util.getObjectMapper();
     private ObjectNode objectNode = objectMapper.createObjectNode();
 
-    public SchemaPayload() {}
-
-    public SchemaPayload(Payload payload) {
-        ObjectNode data;
-
-        if (payload.getClass() == TrackerPayload.class) {
-            Logger.ifDebug(TAG, "Payload class is a TrackerPayload instance.");
-            Logger.ifDebug(TAG, "Trying getNode()");
-            data = (ObjectNode) payload.getNode();
-        } else {
-            Logger.ifDebug(TAG, "Converting Payload map to ObjectNode.");
-            data = objectMapper.valueToTree(payload.getMap());
-        }
-        objectNode.set(Parameters.DATA, data);
+    public SelfDescribingJson(String schema) {
+        this(schema, new HashMap<>());
     }
 
-    public SchemaPayload setSchema(String schema) {
+    public SelfDescribingJson(String schema, TrackerPayload data) {
+        setSchema(schema);
+        setData(data);
+    }
+
+    public SelfDescribingJson(String schema, SelfDescribingJson data) {
+        setSchema(schema);
+        setData(data);
+    }
+
+    public SelfDescribingJson(String schema, Object data) {
+        setSchema(schema);
+        setData(data);
+    }
+
+    /**
+     * Sets the Schema for the SelfDescribingJson
+     *
+     * @param schema a valid schema string
+     */
+    public SelfDescribingJson setSchema(String schema) {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
-
-        Logger.ifDebug(TAG, "Setting schema: %s", schema);
         objectNode.put(Parameters.SCHEMA, schema);
         return this;
     }
 
-    public SchemaPayload setData(Payload data) {
+    /**
+     * Adds data to the SelfDescribingJson
+     * - Accepts a TrackerPayload object
+     *
+     * @param data the data to be added to the SelfDescribingJson
+     */
+    public SelfDescribingJson setData(TrackerPayload data) {
+        if (data == null) {
+            return this;
+        }
         try {
             objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data.getMap()));
         } catch (JsonProcessingException e) {
@@ -71,13 +86,35 @@ public class SchemaPayload implements Payload {
         return this;
     }
 
-    public SchemaPayload setData(Object data) {
+    /**
+     * Adds data to the SelfDescribingJson
+     *
+     * @param data the data to be added to the SelfDescribingJson
+     */
+    public SelfDescribingJson setData(Object data) {
+        if (data == null) {
+            return this;
+        }
         try {
             objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return this;
+    }
+
+    /**
+     * Allows us to add data from one SelfDescribingJson into another
+     * without copying over the Schema.
+     *
+     * @param payload the payload to add to the SelfDescribingJson
+     */
+    private void setData(SelfDescribingJson payload) {
+        if (payload == null) {
+            return;
+        }
+        ObjectNode data = objectMapper.valueToTree(payload.getMap());
+        objectNode.set(Parameters.DATA, data);
     }
 
     @Deprecated
