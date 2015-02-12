@@ -31,11 +31,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Request;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
-
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -50,12 +45,12 @@ public class Emitter {
 
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private final Scheduler scheduler = Schedulers.io();
+    //private final Scheduler scheduler = Schedulers.io();
 
     private Context context;
     private EventStore eventStore;
     private Uri.Builder uriBuilder;
-    private Subscription emitterSub;
+    //private Subscription emitterSub;
 
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
@@ -100,7 +95,7 @@ public class Emitter {
 
         // If the device is not online do not send anything!
         if (isOnline()) {
-            start();
+            //start();
         }
     }
 
@@ -170,9 +165,9 @@ public class Emitter {
         eventStore.add(payload);
 
         // If the emitter is currently shutdown start it..
-        if (emitterSub == null && isOnline()) {
-            start();
-        }
+//        if (emitterSub == null && isOnline()) {
+//            start();
+//        }
     }
 
     /**
@@ -187,107 +182,109 @@ public class Emitter {
      * 3. This subscription will only start if
      *    we are online.
      */
-    private void start() {
-        emitterSub = Observable.interval(TrackerConstants.EMITTER_TICK, TimeUnit.SECONDS)
-            .map((tick) -> {
-                if (!isRunning) {
-                    if (eventStore.getSize() == 0) {
-                        emptyCounter++;
-
-                        Logger.ifDebug(TAG, "EventStore empty counter: %s", emptyCounter);
-
-                        if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
-                            shutdown();
-                            throw new EmitterException("EventStore empty exception - limit");
-                        }
-                        throw new EmitterException("EventStore empty exception");
-                    }
-                    else {
-                        emptyCounter = 0;
-                        isRunning = true;
-                        return eventStore.getEmittableEvents();
-                    }
-                }
-                else {
-                    throw new EmitterException("Emitter concurrency exception");
-                }
-            })
-            .doOnError((err) -> Logger.ifDebug(TAG, "Emitter Error: %s", err.toString()))
-            .retry()
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .doOnSubscribe(() -> Logger.ifDebug(TAG, "Emitter has been started!"))
-            .doOnUnsubscribe(() -> Logger.ifDebug(TAG, "Emitter has been shutdown!"))
-            .flatMap(this::emitEvent)
-            .subscribe(results -> {
-
-                Logger.ifDebug(TAG, "Processing emitter results.");
-
-                // Start counting successes and failures
-                int successCount = 0;
-                int failureCount = 0;
-
-                for (RequestResult res : results) {
-                    if (res.getSuccess()) {
-                        successCount++;
-                        Logger.ifDebug(TAG, "Successful send.");
-
-                        // Delete event rows for successfully sent requests
-                        for (Long eventId : res.getEventIds()) {
-                            eventStore.removeEvent(eventId);
-                        }
-                    } else if (!res.getSuccess()) {
-                        failureCount++;
-                        Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
-                    }
-                }
-
-                // If we have any failures shut the emitter down
-                if (failureCount != 0) {
-                    if (isOnline()) {
-                        Logger.ifDebug(TAG, "Check your collector path: %s",
-                                getEmitterUri());
-                    }
-                    shutdown();
-                }
-
-                // Send the callback
-                if (requestCallback != null) {
-                    if (failureCount != 0) {
-                        requestCallback.onFailure(successCount, failureCount);
-                    } else {
-                        requestCallback.onSuccess(successCount);
-                    }
-                }
-
-                // Reset isRunning after completion
-                isRunning = false;
-            });
-    }
+//    private void start() {
+//        // TODO SOMETHING HERE
+//
+//        emitterSub = Observable.interval(TrackerConstants.EMITTER_TICK, TimeUnit.SECONDS)
+//            .map((tick) -> {
+//                if (!isRunning) {
+//                    if (eventStore.getSize() == 0) {
+//                        emptyCounter++;
+//
+//                        Logger.ifDebug(TAG, "EventStore empty counter: %s", emptyCounter);
+//
+//                        if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
+//                            shutdown();
+//                            throw new EmitterException("EventStore empty exception - limit");
+//                        }
+//                        throw new EmitterException("EventStore empty exception");
+//                    }
+//                    else {
+//                        emptyCounter = 0;
+//                        isRunning = true;
+//                        return eventStore.getEmittableEvents();
+//                    }
+//                }
+//                else {
+//                    throw new EmitterException("Emitter concurrency exception");
+//                }
+//            })
+//            .doOnError((err) -> Logger.ifDebug(TAG, "Emitter Error: %s", err.toString()))
+//            .retry()
+//            .subscribeOn(scheduler)
+//            .unsubscribeOn(scheduler)
+//            .doOnSubscribe(() -> Logger.ifDebug(TAG, "Emitter has been started!"))
+//            .doOnUnsubscribe(() -> Logger.ifDebug(TAG, "Emitter has been shutdown!"))
+//            .flatMap(this::emitEvent)
+//            .subscribe(results -> {
+//
+//                Logger.ifDebug(TAG, "Processing emitter results.");
+//
+//                // Start counting successes and failures
+//                int successCount = 0;
+//                int failureCount = 0;
+//
+//                for (RequestResult res : results) {
+//                    if (res.getSuccess()) {
+//                        successCount++;
+//                        Logger.ifDebug(TAG, "Successful send.");
+//
+//                        // Delete event rows for successfully sent requests
+//                        for (Long eventId : res.getEventIds()) {
+//                            eventStore.removeEvent(eventId);
+//                        }
+//                    } else if (!res.getSuccess()) {
+//                        failureCount++;
+//                        Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
+//                    }
+//                }
+//
+//                // If we have any failures shut the emitter down
+//                if (failureCount != 0) {
+//                    if (isOnline()) {
+//                        Logger.ifDebug(TAG, "Check your collector path: %s",
+//                                getEmitterUri());
+//                    }
+//                    shutdown();
+//                }
+//
+//                // Send the callback
+//                if (requestCallback != null) {
+//                    if (failureCount != 0) {
+//                        requestCallback.onFailure(successCount, failureCount);
+//                    } else {
+//                        requestCallback.onSuccess(successCount);
+//                    }
+//                }
+//
+//                // Reset isRunning after completion
+//                isRunning = false;
+//            });
+//    }
 
     /**
      * Shuts the emitter down!
      */
     public void shutdown() {
-        if (emitterSub != null) {
-            emitterSub.unsubscribe();
-            emitterSub = null;
-        }
+//        if (emitterSub != null) {
+//            emitterSub.unsubscribe();
+//            emitterSub = null;
+//        }
     }
 
-    /**
-     * Emits all the events in the EmittableEvents
-     * object.
-     *
-     * @return Observable that will emit once containing
-     * the request results.
-     */
-    private Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
-        return Observable
-            .just(events)
-            .map(this::performEmit)
-            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
-    }
+//    /**
+//     * Emits all the events in the EmittableEvents
+//     * object.
+//     *
+//     * @return Observable that will emit once containing
+//     * the request results.
+//     */
+//    private Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
+//        return Observable
+//            .just(events)
+//            .map(this::performEmit)
+//            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
+//    }
 
     /**
      * Synchronously performs a request sending
@@ -498,7 +495,9 @@ public class Emitter {
      * @return the emitter subscription status
      */
     public boolean getEmitterSubscriptionStatus() {
-        return this.emitterSub != null;
+        //return this.emitterSub != null;
+        // TODO something useful here
+        return false;
     }
 
     /**

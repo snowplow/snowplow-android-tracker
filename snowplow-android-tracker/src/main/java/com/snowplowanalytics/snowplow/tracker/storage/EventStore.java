@@ -30,12 +30,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
-import rx.schedulers.Schedulers;
-import rx.Scheduler;
-
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.utils.Executor;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
@@ -52,8 +49,6 @@ public class EventStore {
             EventStoreHelper.COLUMN_DATE_CREATED
     };
     private long lastInsertedRowId = -1;
-
-    private final Scheduler scheduler = Schedulers.io();
 
     /**
      * Creates a new Event Store
@@ -94,27 +89,12 @@ public class EventStore {
      * @param payload the event payload that is
      *                being added.
      */
-    public void add(Payload payload) {
-        addObservable(payload)
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .subscribe();
-    }
-
-    /**
-     * An observable object for inserting an event
-     * into the database.
-     *
-     * @param payload the event payload that is
-     *                being added.
-     * @return an observable event add
-     */
-    private Observable<Long> addObservable(final Payload payload) {
-        return Observable.<Long>create(subscriber -> {
-            subscriber.onNext(insertEvent(payload));
-            subscriber.onCompleted();
-        })
-        .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
+    public void add(final Payload payload) {
+        Executor.execute(new Runnable() {
+            public void run() {
+                insertEvent(payload);
+            }
+        });
     }
 
     /**

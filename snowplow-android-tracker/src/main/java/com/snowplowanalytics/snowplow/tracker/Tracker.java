@@ -138,7 +138,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(subject.getSubject()));
+            payload.addMap(new HashMap<String,Object>(subject.getSubject()));
         }
 
         // If timestamp is set to 0, generate one and add it
