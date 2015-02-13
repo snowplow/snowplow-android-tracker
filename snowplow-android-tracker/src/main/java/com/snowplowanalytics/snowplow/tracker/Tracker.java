@@ -362,10 +362,8 @@ public class Tracker {
     public void trackUnstructuredEvent(SelfDescribingJson eventData, List<SelfDescribingJson> context,
                                        long timestamp) {
         Payload payload = new TrackerPayload();
-        SelfDescribingJson envelope = new SelfDescribingJson(
-                TrackerConstants.SCHEMA_UNSTRUCT_EVENT, eventData.getMap());
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
-        payload.addMap(envelope.getMap(), base64Encoded,
+        payload.addMap(eventData.getMap(), base64Encoded,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
 
         completePayload(payload, context, timestamp);
