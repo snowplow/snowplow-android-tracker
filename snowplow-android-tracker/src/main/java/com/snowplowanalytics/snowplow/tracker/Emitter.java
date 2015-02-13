@@ -24,11 +24,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.snowplowanalytics.snowplow.tracker.utils.Executor;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
@@ -54,8 +53,8 @@ public class Emitter {
     private EventStore eventStore;
     private Uri.Builder uriBuilder;
     //private Subscription emitterSub;
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
@@ -168,9 +167,65 @@ public class Emitter {
         executor.execute(new Runnable() {
             public void run() {
                 eventStore.insertEvent(payload);
-                // TODO nudge emitter to send event
+                attemptEmit();
             }
         });
+    }
+    
+    
+    private void attemptEmit() {
+        if (isOnline() && eventStore.getSize() > 0) {
+            // TODO respect the buffer setting 
+            
+            EmittableEvents events = eventStore.getEmittableEvents();
+            LinkedList<RequestResult> results = performEmit(events);
+            
+            Logger.ifDebug(TAG, "Processing emitter results.");
+            // Start counting successes and failures
+            int successCount = 0;
+            int failureCount = 0;
+            
+            for (RequestResult res : results) {
+                if (res.getSuccess()) {
+                    successCount++;
+                    Logger.ifDebug(TAG, "Successful send.");
+
+                    // Delete event rows for successfully sent requests
+                    for (Long eventId : res.getEventIds()) {
+                        eventStore.removeEvent(eventId);
+                    }
+                } else if (!res.getSuccess()) {
+                    failureCount++;
+                    Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
+                }
+            }
+
+            // If we have any failures shut the emitter down
+            // TODO on all failures? Or just some?
+            if (failureCount != 0) {
+                if (isOnline()) {
+                    Logger.ifDebug(TAG, "Check your collector path: %s",
+                            getEmitterUri());
+                }
+                //shutdown(); // TODO sort out when we should shut down on failures
+            }
+
+            // Send the callback
+            if (requestCallback != null) {
+                if (failureCount != 0) {
+                    requestCallback.onFailure(successCount, failureCount);
+                } else {
+                    requestCallback.onSuccess(successCount);
+                }
+            }
+            
+    
+        } else {
+            // TODO use parameters for deciding attempt schedule
+            executor.schedule(new Runnable() {
+               public void run() { attemptEmit(); }
+            }, 1, TimeUnit.MINUTES);
+        }
     }
 
     /**
