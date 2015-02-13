@@ -32,7 +32,6 @@ import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.utils.Executor;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
