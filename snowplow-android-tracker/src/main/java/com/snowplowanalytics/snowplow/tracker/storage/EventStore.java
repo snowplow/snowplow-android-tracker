@@ -82,22 +82,6 @@ public class EventStore {
     }
 
     /**
-     * Creates a new subscription to an observable
-     * operation which is loaded into a buffered
-     * queue.
-     *
-     * @param payload the event payload that is
-     *                being added.
-     */
-    public void add(final Payload payload) {
-        Executor.execute(new Runnable() {
-            public void run() {
-                insertEvent(payload);
-            }
-        });
-    }
-
-    /**
      * Inserts a payload into the database
      *
      * @param payload The event payload to
@@ -105,7 +89,6 @@ public class EventStore {
      * @return a boolean stating if the insert
      * was a success or not
      */
-    @SuppressWarnings("unchecked")
     public long insertEvent(Payload payload) {
         if (open()) {
             byte[] bytes = EventStore.serialize(payload.getMap());

@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.snowplowanalytics.snowplow.tracker.utils.Executor;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
@@ -52,6 +55,8 @@ public class Emitter {
     private Uri.Builder uriBuilder;
     //private Subscription emitterSub;
 
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption bufferOption;
@@ -159,15 +164,13 @@ public class Emitter {
      * @param payload the payload to be added to
      *                the EventStore
      */
-    public void add(Payload payload) {
-
-        // Adds the payload to the EventStore
-        eventStore.add(payload);
-
-        // If the emitter is currently shutdown start it..
-//        if (emitterSub == null && isOnline()) {
-//            start();
-//        }
+    public void add(final Payload payload) {
+        executor.execute(new Runnable() {
+            public void run() {
+                eventStore.insertEvent(payload);
+                // TODO nudge emitter to send event
+            }
+        });
     }
 
     /**
