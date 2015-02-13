@@ -20,6 +20,12 @@ guest$ cd /vagrant
 guest$ ./gradlew clean build
 ```
 
+To run the test suite you will need to have a Mountebank server running.  Simply type the following to launch the Mountebank server:
+
+```bash
+guest$ mb &
+```
+
 ## Find out more
 
 | Technical Docs                  | Setup Guide               | Roadmap                 | Contributing                      |
