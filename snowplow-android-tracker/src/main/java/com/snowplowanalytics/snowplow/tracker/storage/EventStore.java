@@ -30,10 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
-import rx.schedulers.Schedulers;
-import rx.Scheduler;
-
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -52,8 +48,6 @@ public class EventStore {
             EventStoreHelper.COLUMN_DATE_CREATED
     };
     private long lastInsertedRowId = -1;
-
-    private final Scheduler scheduler = Schedulers.io();
 
     /**
      * Creates a new Event Store
@@ -87,37 +81,6 @@ public class EventStore {
     }
 
     /**
-     * Creates a new subscription to an observable
-     * operation which is loaded into a buffered
-     * queue.
-     *
-     * @param payload the event payload that is
-     *                being added.
-     */
-    public void add(Payload payload) {
-        addObservable(payload)
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .subscribe();
-    }
-
-    /**
-     * An observable object for inserting an event
-     * into the database.
-     *
-     * @param payload the event payload that is
-     *                being added.
-     * @return an observable event add
-     */
-    private Observable<Long> addObservable(final Payload payload) {
-        return Observable.<Long>create(subscriber -> {
-            subscriber.onNext(insertEvent(payload));
-            subscriber.onCompleted();
-        })
-        .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
-    }
-
-    /**
      * Inserts a payload into the database
      *
      * @param payload The event payload to
@@ -125,7 +88,6 @@ public class EventStore {
      * @return a boolean stating if the insert
      * was a success or not
      */
-    @SuppressWarnings("unchecked")
     public long insertEvent(Payload payload) {
         if (open()) {
             byte[] bytes = EventStore.serialize(payload.getMap());

@@ -138,7 +138,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(subject.getSubject()));
+            payload.addMap(new HashMap<String,Object>(subject.getSubject()));
         }
 
         // If timestamp is set to 0, generate one and add it
@@ -362,10 +362,8 @@ public class Tracker {
     public void trackUnstructuredEvent(SelfDescribingJson eventData, List<SelfDescribingJson> context,
                                        long timestamp) {
         Payload payload = new TrackerPayload();
-        SelfDescribingJson envelope = new SelfDescribingJson(
-                TrackerConstants.SCHEMA_UNSTRUCT_EVENT, eventData.getMap());
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
-        payload.addMap(envelope.getMap(), base64Encoded,
+        payload.addMap(eventData.getMap(), base64Encoded,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
 
         completePayload(payload, context, timestamp);
