@@ -20,10 +20,21 @@ guest$ cd /vagrant
 guest$ ./gradlew clean build
 ```
 
-To run the test suite you will need to have a Mountebank server running.  Simply type the following to launch the Mountebank server:
+The following commands will then get the test suite environment ready:
 
 ```bash
-guest$ mb &
+guest$ mb & ## This will launch the Mountebank server in the background
+guest$ echo no | android create avd --force -n test -t android-19 --abi default/x86
+guest$ emulator -avd test -no-skin -no-audio -no-window &
+guest$ chmod +x ./ci/wait_for_emulator
+guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
+guest$ adb shell input keyevent 82 &
+```
+
+Once this is finished run the following command to launch the test suite:
+
+```bash
+guest$ ./gradlew connectedCheck 
 ```
 
 ## Find out more
