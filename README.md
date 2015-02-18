@@ -10,6 +10,8 @@ With this tracker you can collect event data from your Android-based application
 
 ## Quickstart
 
+### Building
+
 Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
 
 ```bash
@@ -20,20 +22,17 @@ guest$ cd /vagrant
 guest$ ./gradlew clean build
 ```
 
-The following commands will then get the test suite environment ready:
+### Testing
+
+Continuing from the instructions above:
 
 ```bash
-guest$ mb & ## This will launch the Mountebank server in the background
+guest$ mb &
 guest$ echo no | android create avd --force -n test -t android-19 --abi default/x86
 guest$ emulator -avd test -no-skin -no-audio -no-window &
 guest$ chmod +x ./ci/wait_for_emulator
 guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
 guest$ adb shell input keyevent 82 &
-```
-
-Once this is finished run the following command to launch the test suite:
-
-```bash
 guest$ ./gradlew connectedCheck 
 ```
 
