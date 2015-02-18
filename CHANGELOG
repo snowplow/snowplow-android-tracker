@@ -1,4 +1,4 @@
-Version 0.3.0 (2014-02-09)
+Version 0.3.0 (2014-02-18)
 --------------------------
 Added new BufferOption for heavier event sending (#85)
 Added function for users to update the DevicePlatform after Tracker creation (#82)
