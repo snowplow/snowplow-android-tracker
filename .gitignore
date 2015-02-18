@@ -11,6 +11,9 @@
 # Generated files
 bin/
 gen/
+mountebank/
+mb.log
+mb.pid
 
 # Gradle files
 .gradle/
