@@ -86,16 +86,4 @@ public class EmitterTest extends AndroidTestCase {
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
         assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
     }
-
-    public void testIsOnlineIsSubscribed() {
-        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        boolean isOnline = emitter.isOnline();
-
-        if (isOnline) {
-            assertEquals(true, emitter.getEmitterSubscriptionStatus());
-        }
-        else {
-            assertEquals(false, emitter.getEmitterSubscriptionStatus());
-        }
-    }
 }

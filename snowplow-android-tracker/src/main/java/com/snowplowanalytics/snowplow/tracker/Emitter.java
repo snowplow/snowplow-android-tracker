@@ -99,7 +99,7 @@ public class Emitter {
         this.eventStore = new EventStore(this.context);
 
         // If the device is not online do not send anything!
-        if (isOnline()) {
+        if (isOnline() && eventStore.getSize() > 0) {
             start();
         }
     }
