@@ -2,9 +2,10 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
-gradle.projectsEvaluated {
+def evaluated = gradle.projectsEvaluated {
     preBuild.dependsOn(generateVersion)
 }
+evaluated
 
 buildscript {
     repositories {
@@ -109,8 +110,7 @@ publishing {
 }
 
 task generateVersion {
-    project.ext.set("outputDir",
-            "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/generated")
+    def outputDir = "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/generated"
     doFirst {
         println outputDir
         def srcFile = new File((String)outputDir, "Version.java")
