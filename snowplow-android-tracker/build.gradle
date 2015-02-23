@@ -68,14 +68,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':snowplow-android-core')
 
-    // Jackson JSON processor
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
-
     // RxJava
     compile 'io.reactivex:rxjava:1.0.3'
-
-    // SquareUp
-    compile 'com.squareup.okhttp:okhttp:2.1.0'
 }
 
 // build JAR file
