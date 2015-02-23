@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.tracker.android;
+package com.snowplowanalytics.snowplow.tracker;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

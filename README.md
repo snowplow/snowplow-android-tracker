@@ -10,6 +10,8 @@ With this tracker you can collect event data from your Android-based application
 
 ## Quickstart
 
+### Building
+
 Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
 
 ```bash
@@ -18,6 +20,20 @@ Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-ins
  host$ vagrant up && vagrant ssh
 guest$ cd /vagrant
 guest$ ./gradlew clean build
+```
+
+### Testing
+
+Continuing from the instructions above:
+
+```bash
+guest$ mb &
+guest$ echo no | android create avd --force -n test -t android-19 --abi default/x86
+guest$ emulator -avd test -no-skin -no-audio -no-window &
+guest$ chmod +x ./ci/wait_for_emulator
+guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
+guest$ adb shell input keyevent 82 &
+guest$ ./gradlew connectedCheck 
 ```
 
 ## Find out more
@@ -53,7 +69,7 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: https://github.com/snowplow/snowplow/wiki/Android-and-Java-Tracker
+[techdocs]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
 [setup]: https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
