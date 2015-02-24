@@ -13,13 +13,13 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        debug {
-            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
-            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
-        }
+//        debug {
+//            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+//            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+//        }
         release {
-            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
-            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+//            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+//            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
             
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
