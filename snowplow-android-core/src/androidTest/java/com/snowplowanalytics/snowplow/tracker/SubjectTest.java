@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import java.util.Map;
 
@@ -21,13 +22,23 @@ public class SubjectTest extends AndroidTestCase {
 
         assertTrue(standardPairs.containsKey("tz"));
         assertTrue(standardPairs.containsKey("lang"));
+        assertTrue(standardPairs.containsKey("res"));
+
         assertTrue(mobilePairs.containsKey("osType"));
         assertTrue(mobilePairs.containsKey("osVersion"));
         assertTrue(mobilePairs.containsKey("deviceModel"));
         assertTrue(mobilePairs.containsKey("deviceManufacturer"));
-        //assertTrue(mobilePairs.containsKey("androidIdfa")); Does not work in Travis!
-        assertTrue(standardPairs.containsKey("res"));
-        assertTrue(mobilePairs.containsKey("carrier"));
+        if (System.getenv("ANDROID_TRAVIS") == null) {
+            assertTrue(mobilePairs.containsKey("androidIdfa"));
+        } else {
+            Log.i("test", "Skipping androidIdfa test on Travis");
+        }
+
+        if(mobilePairs.get("deviceModel") == "Android SDK built for x86") {
+            assertTrue(mobilePairs.containsKey("carrier"));
+        } else {
+            Log.i("test", "Skipping carrier key test on live device");
+        }
     }
 
     public void testSetUserId() {
