@@ -9,7 +9,7 @@
     <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
 
     <application android:allowBackup="true"
-        android:label="snowplow-android-tracker">
+        android:label="snowplow-android-tracker"  tools:replace="android:label">
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
