@@ -28,13 +28,14 @@ public class SubjectTest extends AndroidTestCase {
         assertTrue(mobilePairs.containsKey("osVersion"));
         assertTrue(mobilePairs.containsKey("deviceModel"));
         assertTrue(mobilePairs.containsKey("deviceManufacturer"));
+        
         if (System.getenv("ANDROID_TRAVIS") == null) {
             assertTrue(mobilePairs.containsKey("androidIdfa"));
         } else {
             Log.i("test", "Skipping androidIdfa test on Travis");
         }
 
-        if(mobilePairs.get("deviceModel") == "Android SDK built for x86") {
+        if(mobilePairs.get("deviceModel").equals("Android SDK built for x86")) {
             assertTrue(mobilePairs.containsKey("carrier"));
         } else {
             Log.i("test", "Skipping carrier key test on live device");
