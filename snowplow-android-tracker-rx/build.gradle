@@ -1,4 +1,3 @@
-apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
@@ -8,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
         classpath 'me.tatarka:gradle-retrolambda:2.5.0'
     }
 }
