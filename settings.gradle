@@ -1,1 +1,3 @@
-include ':snowplow-android-core', ':snowplow-android-tracker', ':snowplow-android-tracker-lite'
+include ':snowplow-android-core'
+include ':snowplow-android-tracker-lite'
+include ':snowplow-android-tracker-rx' 
