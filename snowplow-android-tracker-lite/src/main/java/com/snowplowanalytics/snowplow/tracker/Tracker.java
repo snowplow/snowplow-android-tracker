@@ -26,12 +26,11 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
-import com.snowplowanalytics.snowplow.tracker.generated.Version;
 
 public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
-    private final String trackerVersion = Version.TRACKER;
+    private final String trackerVersion = BuildConfig.TRACKER_VERSION;
 
     private Emitter emitter;
     private Subject subject;
