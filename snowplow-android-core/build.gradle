@@ -25,6 +25,10 @@ android {
         exclude 'META-INF/DEPENDENCIES'
     }
 
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
 }
 
 dependencies {
