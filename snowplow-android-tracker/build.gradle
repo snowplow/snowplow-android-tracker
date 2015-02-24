@@ -2,11 +2,6 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
-def evaluated = gradle.projectsEvaluated {
-    preBuild.dependsOn(generateVersion)
-}
-evaluated
-
 buildscript {
     repositories {
         mavenCentral()
@@ -132,3 +127,6 @@ public class Version {
 """)
     }
 }
+
+
+preBuild.dependsOn generateVersion
