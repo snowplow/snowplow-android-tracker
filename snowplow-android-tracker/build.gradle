@@ -2,11 +2,6 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
-def evaluated = gradle.projectsEvaluated {
-    preBuild.dependsOn(generateVersion)
-}
-evaluated
-
 buildscript {
     repositories {
         mavenCentral()
@@ -111,11 +106,11 @@ publishing {
 
 task generateVersion {
     def outputDir = "$projectDir/src/main/java/com/snowplowanalytics/snowplow/tracker/generated"
-    doFirst {
-        println outputDir
-        def srcFile = new File((String)outputDir, "Version.java")
-        srcFile.parentFile.mkdirs()
-        srcFile.write(
+
+    println outputDir
+    def srcFile = new File((String)outputDir, "Version.java")
+    srcFile.parentFile.mkdirs()
+    srcFile.write(
                 """/*
  * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
  *
@@ -137,5 +132,7 @@ public class Version {
     public static final String VERSION = "$project.version";
 }
 """)
-    }
+
 }
+
+preBuild.dependsOn(generateVersion)
