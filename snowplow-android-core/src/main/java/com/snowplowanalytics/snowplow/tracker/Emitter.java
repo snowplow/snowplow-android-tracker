@@ -116,7 +116,7 @@ public abstract class Emitter {
          * @return a new Emitter object
          */
         public Emitter build() {
-            if (emitterClass == null) throw new IllegalStateException("No emitter class defined");
+            if (emitterClass == null) throw new IllegalStateException("No emitter class found or defined");
 
             try {
                 Constructor<? extends Emitter> c =  emitterClass.getDeclaredConstructor(EmitterBuilder.class);
