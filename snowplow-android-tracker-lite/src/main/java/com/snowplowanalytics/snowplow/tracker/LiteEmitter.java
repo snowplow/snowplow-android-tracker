@@ -138,7 +138,7 @@ public class LiteEmitter extends Emitter {
 
         } else {
             // TODO use parameters for deciding attempt schedule
-            executor.schedule(new Runnable() {
+            Executor.executor.schedule(new Runnable() {
                 public void run() { attemptEmit(); }
             }, 1, TimeUnit.MINUTES);
         }
@@ -148,7 +148,7 @@ public class LiteEmitter extends Emitter {
      * Shuts the emitter down!
      */
     public void shutdown() {
-        executor.shutdown();
+        Executor.executor.shutdown();
     }
 
 }
