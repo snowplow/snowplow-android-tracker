@@ -14,31 +14,15 @@ package com.snowplowanalytics.snowplow.tracker;
  */
 
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.LinkedList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Request;
-
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
 public class LiteEmitter extends Emitter {
@@ -70,8 +54,6 @@ public class LiteEmitter extends Emitter {
         }
     }
 
-
-
     /**
      * @param payload the payload to be added to
      *                the EventStore
@@ -87,7 +69,6 @@ public class LiteEmitter extends Emitter {
             }
         });
     }
-
 
     private void attemptEmit() {
         if (isOnline() && eventStore.getSize() > 0) {
