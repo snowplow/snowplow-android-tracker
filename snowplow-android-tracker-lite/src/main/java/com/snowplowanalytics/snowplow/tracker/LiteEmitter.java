@@ -48,9 +48,7 @@ public class LiteEmitter extends Emitter {
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    private EventStore eventStore;
-
-    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private LiteEventStore eventStore;
 
     // TODO: Replace isRunning with a blocking state on the emitter process
     private boolean isRunning = false;
@@ -63,7 +61,7 @@ public class LiteEmitter extends Emitter {
     protected LiteEmitter(Emitter.EmitterBuilder builder) {
         super(builder);
         // Create the event store with the context and the buffer option
-        this.eventStore = new EventStore(this.context);
+        this.eventStore = new LiteEventStore(this.context);
 
         // If the device is not online do not send anything!
         if (isOnline()) {
@@ -79,9 +77,12 @@ public class LiteEmitter extends Emitter {
      *                the EventStore
      */
     public void add(final Payload payload) {
-        executor.execute(new Runnable() {
+        eventStore.add(payload);
+
+        // TODO, this actually needs to be started and do the right thing timer wise..
+
+        Executor.executor.execute(new Runnable() {
             public void run() {
-                eventStore.insertEvent(payload);
                 attemptEmit();
             }
         });
