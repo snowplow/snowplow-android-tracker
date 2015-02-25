@@ -2,9 +2,12 @@ package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
 import android.test.AndroidTestCase;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class SelfDescribingJsonTest extends AndroidTestCase {
@@ -18,9 +21,17 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         testList = new ArrayList<Object>();
     }
 
-    public void testCreateWithSchemaOnly() {
+    public void testCreateWithSchemaOnly() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+
+        // {"schema":"org.test.scheme","data":{}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject d = map.getJSONObject("data");
+        assertEquals(0, d.length());
+
     }
 
     public void testCreateWithNullSchema() {
@@ -31,56 +42,124 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         // TODO fill in
     }
 
-    public void testCreateWithOurEmptyMap() {
+    public void testCreateWithOurEmptyMap() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testMap);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+
+        // {"schema":"org.test.scheme","data":{}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject d = map.getJSONObject("data");
+        assertEquals(0, d.length());
     }
 
-    public void testCreateWithSimpleMap() {
+    public void testCreateWithSimpleMap() throws JSONException {
         testMap.put("alpha", "beta");
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testMap);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{\"alpha\":\"beta\"}}", json.toString());
+
+        // {"schema":"org.test.scheme","data":{"alpha":"beta"}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject d = map.getJSONObject("data");
+        assertEquals(1, d.length());
+        assertEquals("beta", d.getString("alpha"));
     }
 
-    public void testCreateWithEmtpyList() {
+    public void testCreateWithEmtpyList() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":[]}", json.toString());
+
+        // {"schema":"org.test.scheme","data":[]}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONArray d = map.getJSONArray("data");
+        assertEquals(0, d.length());
     }
 
-    public void testCreateWithSimpleList() {
+    public void testCreateWithSimpleList() throws JSONException {
         testList.add("delta");
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":[\"delta\"]}", json.toString());
+
+        // {"schema":"org.test.scheme","data":["delta"]}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONArray d = map.getJSONArray("data");
+        assertEquals(1, d.length());
+        assertEquals("delta", d.get(0));
     }
 
-    public void testCreateWithNestedList() {
-        List<String> innerList = new ArrayList<String>();
-        innerList.add("gamma");
-        innerList.add("epsilon");
-        testList.add(innerList);
+    public void testCreateWithNestedList() throws JSONException {
+        List<String> testInnerList = new ArrayList<String>();
+        testInnerList.add("gamma");
+        testInnerList.add("epsilon");
+        testList.add(testInnerList);
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":[[\"gamma\",\"epsilon\"]]}", json.toString());
+
+        // {"schema":"org.test.scheme","data":[["gamma","epsilon"]]}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONArray list = map.getJSONArray("data");
+        assertEquals(1, list.length());
+        JSONArray innerList = list.getJSONArray(0);
+        assertEquals(2, innerList.length());
+        assertEquals("gamma", innerList.get(0));
+        assertEquals("epsilon", innerList.get(1));
     }
 
-    public void testCreateWithListOfMaps() {
+    public void testCreateWithListOfMaps() throws JSONException {
         testMap.put("a", "b");
         testList.add(testMap);
         testList.add(testMap);
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":[{\"a\":\"b\"},{\"a\":\"b\"}]}", json.toString());
+
+        // {"schema":"org.test.scheme","data":[{"a":"b"},{"a":"b"}]}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONArray list = map.getJSONArray("data");
+        assertEquals(2, list.length());
+        JSONObject innerListMap1 = list.getJSONObject(0);
+        assertEquals("b", innerListMap1.getString("a"));
+        JSONObject innerListMap2 = list.getJSONObject(0);
+        assertEquals("b", innerListMap2.getString("a"));
     }
 
-    public void testCreateWithSelfDescribingJson() {
+    public void testCreateWithSelfDescribingJson() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, new SelfDescribingJson(testSchema, testMap));
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{\"schema\":\"org.test.scheme\",\"data\":{}}}", json.toString());
+
+        // {"schema":"org.test.scheme","data":{"schema":"org.test.scheme","data":{}}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject innerMap = map.getJSONObject("data");
+        assertEquals(testSchema, innerMap.getString("schema"));
+        JSONObject innerData = innerMap.getJSONObject("data");
+        assertEquals(0, innerData.length());
     }
 
-    public void testCreateWithTrackerPayload() {
+    public void testCreateWithTrackerPayload() throws JSONException {
         TrackerPayload payload = new TrackerPayload();
         testMap.put("a", "b");
         payload.addMap(testMap);
         SelfDescribingJson json = new SelfDescribingJson(testSchema, payload);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{\"a\":\"b\"}}", json.toString());
+
+        // {"schema":"org.test.scheme","data":{"a":"b"}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject innerMap = map.getJSONObject("data");
+        assertEquals("b", innerMap.getString("a"));
     }
 
 

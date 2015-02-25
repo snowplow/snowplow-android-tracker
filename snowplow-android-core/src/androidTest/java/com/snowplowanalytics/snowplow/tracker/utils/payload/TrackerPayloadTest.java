@@ -2,6 +2,9 @@ package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
 import android.test.AndroidTestCase;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 
 public class TrackerPayloadTest extends AndroidTestCase {
@@ -24,16 +27,19 @@ public class TrackerPayloadTest extends AndroidTestCase {
         return map;
     }
 
-    public void testAddStringString() {
+    public void testAddStringString() throws JSONException {
         payload.add("a", "b");
         assertEquals(abMap(), payload.getMap());
-        assertEquals("{\"a\":\"b\"}", payload.toString());
+        JSONObject map = new JSONObject(payload.toString());
+        assertEquals("b", map.getString("a"));
     }
 
-    public void testAddStringObject() {
+    public void testAddStringObject() throws JSONException {
         payload.add("a", abMap());
         assertEquals(ababMap(), payload.getMap());
-        assertEquals("{\"a\":{\"a\":\"b\"}}", payload.toString());
+        JSONObject map = new JSONObject(payload.toString());
+        JSONObject innerMap = map.getJSONObject("a");
+        assertEquals("b", innerMap.getString("a"));
     }
 
     public void testAddMapBase64Encoded() {
