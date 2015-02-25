@@ -41,6 +41,7 @@ public abstract class Emitter {
 
         protected static Class<? extends Emitter> defaultEmitterClass;
 
+        /* Prefer Rx, then lite versions of our emitters */
         static {
             try {
                 defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Emitter");
