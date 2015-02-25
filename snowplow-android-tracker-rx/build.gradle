@@ -1,16 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
-        classpath 'me.tatarka:gradle-retrolambda:2.5.0'
-    }
-}
-
 apply plugin: 'maven-publish'
 
 android {

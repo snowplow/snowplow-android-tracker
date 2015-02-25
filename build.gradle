@@ -7,10 +7,13 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'me.tatarka:gradle-retrolambda:2.5.0'
     }
 }
 
-allprojects {
+subprojects {
+    group = 'com.snowplowanalytics'
+    version = '0.3.0'
     repositories {
         maven {
             url "http://maven.snplow.com/releases"
@@ -18,9 +21,4 @@ allprojects {
         mavenCentral()
         jcenter()
     }
-}
-
-subprojects {
-    group = 'com.snowplowanalytics'
-    version = '0.3.0'
 }

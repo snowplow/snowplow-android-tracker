@@ -1,14 +1,4 @@
 apply plugin: 'com.android.library'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
-    }
-}
-
 apply plugin: 'maven-publish'
 
 android {
@@ -16,11 +6,12 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 11
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
