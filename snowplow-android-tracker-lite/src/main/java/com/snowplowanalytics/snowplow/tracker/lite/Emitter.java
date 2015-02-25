@@ -30,14 +30,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
 
-    private final OkHttpClient client = new OkHttpClient();
-    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
     private EventStore eventStore;
-
-    // TODO: Replace isRunning with a blocking state on the emitter process
-    private boolean isRunning = false;
-    private int emptyCounter = 0;
 
     /**
      * Creates an emitter object
@@ -45,13 +38,15 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      */
     protected Emitter(com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder builder) {
         super(builder);
-        // Create the event store with the context and the buffer option
         this.eventStore = new EventStore(this.context);
 
         // If the device is not online do not send anything!
-        if (isOnline()) {
-            // TODO fix this up to go...
-            //start();
+        if (isOnline() && eventStore.getSize() > 0) {
+            Executor.execute(new Runnable() {
+                public void run() {
+                    attemptEmit();
+                }
+            });
         }
     }
 
@@ -64,7 +59,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
         // TODO, this actually needs to be started and do the right thing timer wise..
 
-        Executor.executor.execute(new Runnable() {
+        Executor.execute(new Runnable() {
             public void run() {
                 attemptEmit();
             }
@@ -121,7 +116,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
         } else {
             // TODO use parameters for deciding attempt schedule
-            Executor.executor.schedule(new Runnable() {
+            Executor.schedule(new Runnable() {
                 public void run() { attemptEmit(); }
             }, 1, TimeUnit.MINUTES);
         }
@@ -131,7 +126,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * Shuts the emitter down!
      */
     public void shutdown() {
-        Executor.executor.shutdown();
+        Executor.shutdown();
     }
 
 }
