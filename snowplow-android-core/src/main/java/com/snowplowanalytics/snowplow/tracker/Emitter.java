@@ -27,8 +27,8 @@ import java.util.Map;
 public abstract class Emitter {
     private final String TAG = Emitter.class.getSimpleName();
 
-    private final OkHttpClient client = new OkHttpClient();
-    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    protected final OkHttpClient client = new OkHttpClient();
+    protected final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     protected Context context;
     protected Uri.Builder uriBuilder;
