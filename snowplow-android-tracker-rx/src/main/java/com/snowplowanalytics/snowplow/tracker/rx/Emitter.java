@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.rx;
 
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
@@ -21,15 +21,16 @@ import rx.Scheduler;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
+import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
-public class RxEmitter extends Emitter {
+public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
-    private final String TAG = RxEmitter.class.getSimpleName();
+    private final String TAG = Emitter.class.getSimpleName();
 
     private final Scheduler scheduler = Schedulers.io();
 
@@ -38,13 +39,13 @@ public class RxEmitter extends Emitter {
     private int emptyCounter = 0;
 
     private Subscription emitterSub;
-    private RxEventStore eventStore;
+    private EventStore eventStore;
 
-    protected RxEmitter(EmitterBuilder builder) {
+    protected Emitter(EmitterBuilder builder) {
         super(builder);
 
         // Create the event store with the context and the buffer option
-        this.eventStore = new RxEventStore(this.context);
+        this.eventStore = new EventStore(this.context);
 
         // If the device is not online do not send anything!
         if (isOnline() && eventStore.getSize() > 0) {

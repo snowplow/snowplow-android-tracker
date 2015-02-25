@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.rx;
 
 import android.content.Context;
 
@@ -19,15 +19,16 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.Scheduler;
 
+import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 
-public class RxEventStore extends EventStore {
+public class EventStore extends com.snowplowanalytics.snowplow.tracker.EventStore {
 
-    private String TAG = RxEventStore.class.getSimpleName();
+    private String TAG = EventStore.class.getSimpleName();
 
     private final Scheduler scheduler = Schedulers.io();
 
-    public RxEventStore(Context context) {
+    public EventStore(Context context) {
         super(context);
     }
 
