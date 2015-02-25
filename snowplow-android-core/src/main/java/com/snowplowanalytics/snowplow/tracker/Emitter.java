@@ -16,6 +16,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,6 +39,21 @@ public abstract class Emitter {
 
     public static class EmitterBuilder {
 
+        protected static Class<? extends Emitter> defaultEmitterClass;
+
+        static {
+            try {
+                defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Emitter");
+            } catch (ClassNotFoundException e) {
+                try {
+                    defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.lite.Emitter");
+                } catch (ClassNotFoundException e1) {
+                    defaultEmitterClass = null;
+                }
+            }
+        }
+
+        private Class<? extends Emitter> emitterClass;
         protected final String uri; // Required
         protected final Context context; // Required
         protected RequestCallback requestCallback = null; // Optional
@@ -48,8 +65,19 @@ public abstract class Emitter {
          * @param uri The uri of the collector
          */
         public EmitterBuilder(String uri, Context context) {
+            this(uri, context, defaultEmitterClass);
+        }
+
+        /**
+         *
+         * @param uri
+         * @param context
+         * @param emitterClass
+         */
+        public EmitterBuilder(String uri, Context context, Class<? extends Emitter> emitterClass) {
             this.uri = uri;
             this.context = context;
+            this.emitterClass = emitterClass;
         }
 
         /**
@@ -88,16 +116,14 @@ public abstract class Emitter {
          * @return a new Emitter object
          */
         public Emitter build() {
-            // look for rx or lite Emitter, make one of those, and return it
-            // for now, this returns a blank impl so that we can test things up...
+            if (emitterClass == null) throw new IllegalStateException("No emitter class defined");
 
-            if (this.uri.equals("testUrl")) {
-                return new Emitter(this) {
-                    public void add(Payload payload) {}
-                    public void shutdown() {}
-                };
-            } else {
-                throw new IllegalStateException("Can only run core without -rx or -lite in testing");
+            try {
+                Constructor<? extends Emitter> c =  emitterClass.getDeclaredConstructor(EmitterBuilder.class);
+                return c.newInstance(this);
+            } catch (NoSuchMethodException|InvocationTargetException|
+                    InstantiationException|IllegalAccessException e) {
+                throw new IllegalStateException("Can’t create emitter", e);
             }
         }
     }
@@ -106,7 +132,7 @@ public abstract class Emitter {
      * Creates an emitter object
      * @param builder The builder that constructs an emitter
      */
-    protected Emitter(EmitterBuilder builder) {
+    public Emitter(EmitterBuilder builder) {
         this.httpMethod = builder.httpMethod;
         this.requestCallback = builder.requestCallback;
         this.context = builder.context;

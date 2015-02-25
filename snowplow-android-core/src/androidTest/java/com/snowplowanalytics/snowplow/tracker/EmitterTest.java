@@ -14,7 +14,7 @@ public class EmitterTest extends AndroidTestCase {
     // Helper Methods
 
     private Emitter getEmitter(HttpMethod method, BufferOption option, RequestSecurity security) {
-        return new Emitter.EmitterBuilder(testURL, getContext())
+        return new com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder(testURL, getContext(), TestEmitter.class)
                 .option(option)
                 .method(method)
                 .security(security)

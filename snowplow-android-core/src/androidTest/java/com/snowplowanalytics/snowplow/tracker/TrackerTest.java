@@ -8,8 +8,7 @@ public class TrackerTest extends AndroidTestCase {
 
     private Tracker getTracker() {
         // Make an emitter
-        Emitter emitter = new Emitter
-                .EmitterBuilder("testUrl", getContext())
+        Emitter emitter = new com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder("testUrl", getContext(), TestEmitter.class)
                 .build();
 
         Subject subject = new Subject(getContext());
