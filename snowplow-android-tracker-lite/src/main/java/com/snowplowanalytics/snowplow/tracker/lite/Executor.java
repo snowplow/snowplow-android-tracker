@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.lite;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

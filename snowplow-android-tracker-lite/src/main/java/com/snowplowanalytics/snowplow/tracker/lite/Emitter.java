@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.lite;
 
 /*
  * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
@@ -17,6 +17,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
+import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -25,14 +26,14 @@ import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
-public class LiteEmitter extends Emitter {
+public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
-    private final String TAG = LiteEmitter.class.getSimpleName();
+    private final String TAG = Emitter.class.getSimpleName();
 
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    private LiteEventStore eventStore;
+    private EventStore eventStore;
 
     // TODO: Replace isRunning with a blocking state on the emitter process
     private boolean isRunning = false;
@@ -42,10 +43,10 @@ public class LiteEmitter extends Emitter {
      * Creates an emitter object
      * @param builder The builder that constructs an emitter
      */
-    protected LiteEmitter(Emitter.EmitterBuilder builder) {
+    protected Emitter(com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder builder) {
         super(builder);
         // Create the event store with the context and the buffer option
-        this.eventStore = new LiteEventStore(this.context);
+        this.eventStore = new EventStore(this.context);
 
         // If the device is not online do not send anything!
         if (isOnline()) {
