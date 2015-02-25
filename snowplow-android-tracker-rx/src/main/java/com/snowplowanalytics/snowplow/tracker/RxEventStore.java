@@ -13,31 +13,13 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.Scheduler;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
 public class RxEventStore extends EventStore {
 
