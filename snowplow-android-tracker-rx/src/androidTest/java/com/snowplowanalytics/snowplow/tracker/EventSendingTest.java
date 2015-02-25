@@ -81,7 +81,8 @@ public class EventSendingTest extends AndroidTestCase {
                 .build();
 
         // Ensure eventStore is empty
-        emitter.getEventStore().removeAllEvents();
+        // TODO checkup on this? Maybe we do need an EventStore interface
+        //emitter.getEventStore().removeAllEvents();
 
         // Make a subject
         Subject subject = new Subject(getContext());
@@ -97,9 +98,13 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.trackScreenView("Screen 1", null, getCustomContexts());
 
         // Wait for Tracker to shutdown...
-        while (tracker.getEmitter().getEmitterSubscriptionStatus()) {
-            Thread.sleep(500);
-        }
+
+        // TODO fix the shutdown here...
+        //while (tracker.getEmitter().getEmitterSubscriptionStatus()) {
+        //    Thread.sleep(500);
+        //}
+
+        Thread.sleep(500);
 
         LinkedList<JSONObject> logs = LogFetcher.getMountebankGetRequests();
 
@@ -121,7 +126,8 @@ public class EventSendingTest extends AndroidTestCase {
                 .build();
 
         // Ensure eventStore is empty
-        emitter.getEventStore().removeAllEvents();
+        // TODO check this up, see above
+        //emitter.getEventStore().removeAllEvents();
 
         // Make a subject
         Subject subject = new Subject(getContext());
@@ -137,9 +143,12 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.trackScreenView("Screen 1", null);
 
         // Wait for Tracker to shutdown...
-        while (tracker.getEmitter().getEmitterSubscriptionStatus()) {
-            Thread.sleep(500);
-        }
+        // TODO check this...
+        //while (tracker.getEmitter().getEmitterSubscriptionStatus()) {
+        //    Thread.sleep(500);
+        //}
+
+        Thread.sleep(500);
 
         LinkedList<JSONObject> logs = LogFetcher.getMountebankPostRequests();
 

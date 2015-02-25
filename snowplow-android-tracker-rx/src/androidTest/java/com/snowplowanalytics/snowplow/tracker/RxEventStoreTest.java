@@ -6,14 +6,13 @@ import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 
-public class EventStoreTest extends AndroidTestCase {
+public class RxEventStoreTest extends AndroidTestCase {
 
     // Helper Methods
 
-    private EventStore getEventStore() {
-        EventStore eventStore = new EventStore(getContext());
+    private RxEventStore getEventStore() {
+        RxEventStore eventStore = new RxEventStore(getContext());
         eventStore.removeAllEvents();
         return eventStore;
     }
@@ -29,7 +28,7 @@ public class EventStoreTest extends AndroidTestCase {
     // Tests
 
     public void testInsertPayload() {
-        EventStore eventStore = getEventStore();
+        RxEventStore eventStore = getEventStore();
         long id = eventStore.insertEvent(getEvent());
         long lastRowId = eventStore.getLastInsertedRowId();
         Map<String, Object> event = eventStore.getEvent(id);
@@ -40,7 +39,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testEventStoreQueries() {
-        EventStore eventStore = getEventStore();
+        RxEventStore eventStore = getEventStore();
         eventStore.insertEvent(getEvent());
 
         assertEquals(1, eventStore.getAllEvents().size());
@@ -48,7 +47,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testRemoveAllEvents() {
-        EventStore eventStore = getEventStore();
+        RxEventStore eventStore = getEventStore();
 
         // Add 6 events
         eventStore.insertEvent(getEvent());
@@ -66,7 +65,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testRemoveIndividualEvent() {
-        EventStore eventStore = getEventStore();
+        RxEventStore eventStore = getEventStore();
         long id = eventStore.insertEvent(getEvent());
         boolean res = eventStore.removeEvent(id);
 
@@ -75,7 +74,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testCloseDatabase() {
-        EventStore eventStore = getEventStore();
+        RxEventStore eventStore = getEventStore();
 
         assertEquals(true, eventStore.isDatabaseOpen());
 

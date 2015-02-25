@@ -1,112 +1,44 @@
-/*
- * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.net.Uri;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Request;
-
-import rx.Observable;
-import rx.Subscription;
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
-
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
-
-public class Emitter {
-
+public abstract class Emitter {
     private final String TAG = Emitter.class.getSimpleName();
 
     private final OkHttpClient client = new OkHttpClient();
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private final Scheduler scheduler = Schedulers.io();
 
-    private Context context;
-    private EventStore eventStore;
-    private Uri.Builder uriBuilder;
-    private Subscription emitterSub;
-
+    protected Context context;
+    protected Uri.Builder uriBuilder;
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption bufferOption;
     protected RequestSecurity requestSecurity;
 
-    // TODO: Replace isRunning with a blocking state on the emitter process
-    private boolean isRunning = false;
-    private int emptyCounter = 0;
-
-    /**
-     * Creates an emitter object
-     * @param builder The builder that constructs an emitter
-     */
-    private Emitter(EmitterBuilder builder) {
-        this.httpMethod = builder.httpMethod;
-        this.requestCallback = builder.requestCallback;
-        this.context = builder.context;
-        this.bufferOption = builder.bufferOption;
-        this.requestSecurity = builder.requestSecurity;
-
-        // Need to create URI Builder in this way to preserve port keys/characters that would
-        // be incorrectly encoded by the uriBuilder.
-        if (requestSecurity == RequestSecurity.HTTP) {
-            this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
-        }
-        else {
-            this.uriBuilder = Uri.parse("https://" + builder.uri).buildUpon();
-        }
-
-        // Create URI based on request method
-        if (httpMethod == HttpMethod.GET) {
-            uriBuilder.appendPath("i");
-        }
-        else {
-            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
-                            TrackerConstants.PROTOCOL_VERSION);
-        }
-
-        // Create the event store with the context and the buffer option
-        this.eventStore = new EventStore(this.context);
-
-        // If the device is not online do not send anything!
-        if (isOnline() && eventStore.getSize() > 0) {
-            start();
-        }
-    }
-
     public static class EmitterBuilder {
-        private final String uri; // Required
-        private final Context context; // Required
+
+        protected final String uri; // Required
+        protected final Context context; // Required
         protected RequestCallback requestCallback = null; // Optional
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
         protected BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
@@ -156,7 +88,47 @@ public class Emitter {
          * @return a new Emitter object
          */
         public Emitter build() {
-            return new Emitter(this);
+            // look for rx or lite Emitter, make one of those, and return it
+            // for now, this returns a blank impl so that we can test things up...
+
+            if (this.uri.equals("testUrl")) {
+                return new Emitter(this) {
+                    public void add(Payload payload) {}
+                    public void shutdown() {}
+                };
+            } else {
+                throw new IllegalStateException("Can only run core without -rx or -lite in testing");
+            }
+        }
+    }
+
+    /**
+     * Creates an emitter object
+     * @param builder The builder that constructs an emitter
+     */
+    protected Emitter(EmitterBuilder builder) {
+        this.httpMethod = builder.httpMethod;
+        this.requestCallback = builder.requestCallback;
+        this.context = builder.context;
+        this.bufferOption = builder.bufferOption;
+        this.requestSecurity = builder.requestSecurity;
+
+        // Need to create URI Builder in this way to preserve port keys/characters that would
+        // be incorrectly encoded by the uriBuilder.
+        if (requestSecurity == RequestSecurity.HTTP) {
+            this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
+        }
+        else {
+            this.uriBuilder = Uri.parse("https://" + builder.uri).buildUpon();
+        }
+
+        // Create URI based on request method
+        if (httpMethod == HttpMethod.GET) {
+            uriBuilder.appendPath("i");
+        }
+        else {
+            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
+                    TrackerConstants.PROTOCOL_VERSION);
         }
     }
 
@@ -164,130 +136,14 @@ public class Emitter {
      * @param payload the payload to be added to
      *                the EventStore
      */
-    public void add(Payload payload) {
-
-        // Adds the payload to the EventStore
-        eventStore.add(payload);
-
-        // If the emitter is currently shutdown start it..
-        if (emitterSub == null && isOnline()) {
-            start();
-        }
-    }
-
-    /**
-     * Starts a polling emitter subscription
-     * which will send all events to the collector.
-     *
-     * 1. If it is currently sending events we
-     *    cannot get new batches of events.
-     * 2. If it pulls an empty batch of events
-     *    a certain amount of times we
-     *    shutdown and wait for a new event add.
-     * 3. This subscription will only start if
-     *    we are online.
-     */
-    private void start() {
-        emitterSub = Observable.interval(TrackerConstants.EMITTER_TICK, TimeUnit.SECONDS)
-            .map((tick) -> {
-                if (!isRunning) {
-                    if (eventStore.getSize() == 0) {
-                        emptyCounter++;
-
-                        Logger.ifDebug(TAG, "EventStore empty counter: %s", emptyCounter);
-
-                        if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
-                            shutdown();
-                            throw new EmitterException("EventStore empty exception - limit");
-                        }
-                        throw new EmitterException("EventStore empty exception");
-                    }
-                    else {
-                        emptyCounter = 0;
-                        isRunning = true;
-                        return eventStore.getEmittableEvents();
-                    }
-                }
-                else {
-                    throw new EmitterException("Emitter concurrency exception");
-                }
-            })
-            .doOnError((err) -> Logger.ifDebug(TAG, "Emitter Error: %s", err.toString()))
-            .retry()
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .doOnSubscribe(() -> Logger.ifDebug(TAG, "Emitter has been started!"))
-            .doOnUnsubscribe(() -> Logger.ifDebug(TAG, "Emitter has been shutdown!"))
-            .flatMap(this::emitEvent)
-            .subscribe(results -> {
-
-                Logger.ifDebug(TAG, "Processing emitter results.");
-
-                // Start counting successes and failures
-                int successCount = 0;
-                int failureCount = 0;
-
-                for (RequestResult res : results) {
-                    if (res.getSuccess()) {
-                        successCount++;
-                        Logger.ifDebug(TAG, "Successful send.");
-
-                        // Delete event rows for successfully sent requests
-                        for (Long eventId : res.getEventIds()) {
-                            eventStore.removeEvent(eventId);
-                        }
-                    } else if (!res.getSuccess()) {
-                        failureCount++;
-                        Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
-                    }
-                }
-
-                // If we have any failures shut the emitter down
-                if (failureCount != 0) {
-                    if (isOnline()) {
-                        Logger.ifDebug(TAG, "Check your collector path: %s",
-                                getEmitterUri());
-                    }
-                    shutdown();
-                }
-
-                // Send the callback
-                if (requestCallback != null) {
-                    if (failureCount != 0) {
-                        requestCallback.onFailure(successCount, failureCount);
-                    } else {
-                        requestCallback.onSuccess(successCount);
-                    }
-                }
-
-                // Reset isRunning after completion
-                isRunning = false;
-            });
-    }
+    public abstract void add(Payload payload);
 
     /**
      * Shuts the emitter down!
      */
-    public void shutdown() {
-        if (emitterSub != null) {
-            emitterSub.unsubscribe();
-            emitterSub = null;
-        }
-    }
+    public abstract void shutdown();
 
-    /**
-     * Emits all the events in the EmittableEvents
-     * object.
-     *
-     * @return Observable that will emit once containing
-     * the request results.
-     */
-    private Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
-        return Observable
-            .just(events)
-            .map(this::performEmit)
-            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
-    }
+
 
     /**
      * Synchronously performs a request sending
@@ -296,7 +152,7 @@ public class Emitter {
      * @param events the events to be sent
      * @return a RequestResult
      */
-    private LinkedList<RequestResult> performEmit(EmittableEvents events) {
+    protected LinkedList<RequestResult> performEmit(EmittableEvents events) {
 
         ArrayList<Payload> payloads = events.getEvents();
         LinkedList<Long> eventIds = events.getEventIds();
@@ -371,7 +227,7 @@ public class Emitter {
      * @param request The request to be sent
      * @return a RequestResult
      */
-    private int requestSender(Request request) {
+    protected int requestSender(Request request) {
         try {
             Logger.ifDebug(TAG, "Sending request..");
             return client.newCall(request).execute().code();
@@ -391,7 +247,7 @@ public class Emitter {
      * @return an OkHttp request object
      */
     @SuppressWarnings("unchecked")
-    private Request requestBuilderGet(Payload payload) {
+    protected Request requestBuilderGet(Payload payload) {
 
         // Clear the previous query...
         uriBuilder.clearQuery();
@@ -421,7 +277,7 @@ public class Emitter {
      *                request.
      * @return an OkHttp request object
      */
-    private Request requestBuilderPost(Payload payload) {
+    protected Request requestBuilderPost(Payload payload) {
         String reqUrl = uriBuilder.build().toString();
         RequestBody reqBody = RequestBody.create(JSON, payload.toString());
         return new Request.Builder()
@@ -429,8 +285,6 @@ public class Emitter {
                 .post(reqBody)
                 .build();
     }
-
-    // Setters, Getters and Checkers
 
     /**
      * Checks whether or not the device
@@ -460,7 +314,7 @@ public class Emitter {
      * @param code the response code
      * @return the truth as to the success
      */
-    private boolean isSuccessfulSend(int code) {
+    protected boolean isSuccessfulSend(int code) {
         return code >= 200 && code < 300;
     }
 
@@ -481,13 +335,6 @@ public class Emitter {
     }
 
     /**
-     * @return the emitter event store
-     */
-    public EventStore getEventStore() {
-        return this.eventStore;
-    }
-
-    /**
      * @return the emitter uri
      */
     public String getEmitterUri() {
@@ -495,11 +342,11 @@ public class Emitter {
     }
 
     /**
-     * @return the emitter subscription status
+     * @return the emitter event store
      */
-    public boolean getEmitterSubscriptionStatus() {
-        return this.emitterSub != null;
-    }
+//    public EventStore getEventStore() {
+//        return this.eventStore;
+//    }
 
     /**
      * @return the request callback method

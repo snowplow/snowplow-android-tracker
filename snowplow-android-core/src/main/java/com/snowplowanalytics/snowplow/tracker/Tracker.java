@@ -30,7 +30,7 @@ import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
-    private final String trackerVersion = BuildConfig.TRACKER_VERSION;
+    private final String trackerVersion = BuildConfig.TRACKER_LABEL;
 
     private Emitter emitter;
     private Subject subject;
@@ -137,7 +137,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(subject.getSubject()));
+            payload.addMap(new HashMap<String,Object>(subject.getSubject()));
         }
 
         // If timestamp is set to 0, generate one and add it

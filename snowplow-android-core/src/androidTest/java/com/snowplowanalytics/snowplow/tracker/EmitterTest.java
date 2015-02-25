@@ -4,16 +4,17 @@ import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
+import junit.framework.Assert;
+
 public class EmitterTest extends AndroidTestCase {
 
     private final static String TAG = Emitter.class.getSimpleName();
-    private final static String testURL = "10.0.2.2:4545";
+    private final static String testURL = "testUrl";
 
     // Helper Methods
 
     private Emitter getEmitter(HttpMethod method, BufferOption option, RequestSecurity security) {
-        return new Emitter
-                .EmitterBuilder(testURL, getContext())
+        return new Emitter.EmitterBuilder(testURL, getContext())
                 .option(option)
                 .method(method)
                 .security(security)
@@ -41,21 +42,21 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testHttpMethodSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        assertEquals(HttpMethod.GET, emitter.getHttpMethod());
+        Assert.assertEquals(HttpMethod.GET, emitter.getHttpMethod());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        assertEquals(HttpMethod.POST, emitter.getHttpMethod());
+        Assert.assertEquals(HttpMethod.POST, emitter.getHttpMethod());
     }
 
     public void testBufferOptionSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        assertEquals(BufferOption.Single, emitter.getBufferOption());
+        Assert.assertEquals(BufferOption.Single, emitter.getBufferOption());
 
         emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        assertEquals(BufferOption.DefaultGroup, emitter.getBufferOption());
+        Assert.assertEquals(BufferOption.DefaultGroup, emitter.getBufferOption());
 
         emitter.setBufferOption(BufferOption.HeavyGroup);
-        assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
+        Assert.assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
     }
 
     public void testCallbackSet() {
@@ -65,25 +66,25 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testUriSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        assertEquals("http://"+testURL+"/i", emitter.getEmitterUri());
+        Assert.assertEquals("http://" + testURL + "/i", emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        assertEquals("http://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
+        Assert.assertEquals("http://" + testURL + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        assertEquals("https://"+testURL+"/i", emitter.getEmitterUri());
+        Assert.assertEquals("https://" + testURL + "/i", emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        assertEquals("https://"+testURL+"/com.snowplowanalytics.snowplow/tp2",
+        Assert.assertEquals("https://" + testURL + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
     }
 
     public void testSecuritySet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        assertEquals(RequestSecurity.HTTP, emitter.getRequestSecurity());
+        Assert.assertEquals(RequestSecurity.HTTP, emitter.getRequestSecurity());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
+        Assert.assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
     }
 }
