@@ -44,10 +44,12 @@ dependencies {
 
 // build JAR file
 task androidReleaseJar(type: Jar, dependsOn: assembleRelease) {
+    from "$projectDir/../snowplow-android-core/build/intermediates/classes/release/"
     from "$buildDir/intermediates/classes/release/"
 }
 
 task androidSourcesJar(type: Jar, dependsOn: assembleRelease) {
+    from "$projectDir/../snowplow-android-core/src/main/java"
     from "$projectDir/src/main/java"
 }
 
