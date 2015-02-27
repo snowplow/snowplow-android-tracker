@@ -147,6 +147,27 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(0, innerData.length());
     }
 
+    /*
+     * NOTE this should create the same JSON as above, but the Jackson based implementation
+     * returns {"schema":"org.test.scheme","data":{"map":{"schema":"org.test.scheme","data":{}},"node":{"schema":"org.test.scheme","data":"{}"}}}
+     * I think that's a bug
+     */
+    public void testCreateThenSetSelfDescribingJson() throws JSONException {
+        SelfDescribingJson json = new SelfDescribingJson(testSchema);
+        json.setData(new SelfDescribingJson(testSchema, testMap));
+
+        // {"schema":"org.test.scheme","data":{"schema":"org.test.scheme","data":{}}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject innerMap = map.getJSONObject("data");
+        assertEquals(testSchema, innerMap.getString("schema"));
+        JSONObject innerData = innerMap.getJSONObject("data");
+        assertEquals(0, innerData.length());
+        
+    }
+
     public void testCreateWithTrackerPayload() throws JSONException {
         TrackerPayload payload = new TrackerPayload();
         testMap.put("a", "b");
@@ -162,6 +183,22 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("b", innerMap.getString("a"));
     }
 
+    public void testCreateThenSetTrackerPayload() throws JSONException {
+        TrackerPayload payload = new TrackerPayload();
+        testMap.put("a", "b");
+        payload.addMap(testMap);
+        SelfDescribingJson json = new SelfDescribingJson(testSchema);
+        json.setData(payload);
+
+        // {"schema":"org.test.scheme","data":{"a":"b"}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject innerMap = map.getJSONObject("data");
+        assertEquals("b", innerMap.getString("a"));
+        
+    }
 
 
 }
