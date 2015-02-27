@@ -17,22 +17,11 @@ import android.util.Base64;
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Provides basic Utilities for the
  * Snowplow Tracker.
  */
 public class Util {
-
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    /**
-     * @return returns a default ObjectMapper
-     */
-    public static ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
 
     /**
      * Returns the current System time

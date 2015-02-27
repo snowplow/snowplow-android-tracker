@@ -17,26 +17,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
+import org.json.JSONObject;
+
 public class SelfDescribingJson implements Payload {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
-    private final ObjectMapper objectMapper = Util.getObjectMapper();
-    private ObjectNode objectNode = objectMapper.createObjectNode();
-
+    private final HashMap<String,Object> payload = new HashMap<String,Object>();
+    
     public SelfDescribingJson(String schema) {
         this(schema, new HashMap<>());
     }
@@ -64,7 +57,7 @@ public class SelfDescribingJson implements Payload {
     public SelfDescribingJson setSchema(String schema) {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
-        objectNode.put(Parameters.SCHEMA, schema);
+        payload.put(Parameters.SCHEMA, schema);
         return this;
     }
 
@@ -78,11 +71,7 @@ public class SelfDescribingJson implements Payload {
         if (data == null) {
             return this;
         }
-        try {
-            objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data.getMap()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        payload.put(Parameters.DATA, data.getMap());
         return this;
     }
 
@@ -95,11 +84,7 @@ public class SelfDescribingJson implements Payload {
         if (data == null) {
             return this;
         }
-        try {
-            objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        payload.put(Parameters.DATA, data);
         return this;
     }
 
@@ -107,14 +92,13 @@ public class SelfDescribingJson implements Payload {
      * Allows us to add data from one SelfDescribingJson into another
      * without copying over the Schema.
      *
-     * @param payload the payload to add to the SelfDescribingJson
+     * @param selfDescribingJson the payload to add to the SelfDescribingJson
      */
-    private void setData(SelfDescribingJson payload) {
+    public void setData(SelfDescribingJson selfDescribingJson) {
         if (payload == null) {
             return;
         }
-        ObjectNode data = objectMapper.valueToTree(payload.getMap());
-        objectNode.set(Parameters.DATA, data);
+        payload.put(Parameters.DATA, selfDescribingJson.getMap());
     }
 
     @Deprecated
@@ -159,25 +143,10 @@ public class SelfDescribingJson implements Payload {
     }
 
     public Map<String, Object> getMap() {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        try {
-            map = objectMapper.readValue(objectNode.toString(),
-                    new TypeReference<HashMap>(){});
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return map;
-    }
-
-    public JsonNode getNode() {
-        return objectNode;
+        return payload;
     }
 
     public String toString() {
-        return objectNode.toString();
+        return new JSONObject(payload).toString();
     }
 }
