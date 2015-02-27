@@ -15,8 +15,6 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * Payload interface
  * The Payload is used to store all the parameters and configurations that are used
@@ -62,12 +60,6 @@ public interface Payload {
      * @return A HashMap
      */
     public Map getMap();
-
-    /**
-     * Returns the Payload using Jackson JSON to return a JsonNode.
-     * @return A JsonNode
-     */
-    public JsonNode getNode();
 
     /**
      * Returns the Payload as a string. This is essentially the toString from the ObjectNode used
