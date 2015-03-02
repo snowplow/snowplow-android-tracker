@@ -20,6 +20,7 @@ android {
     }
 
     packagingOptions {
+        exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE.txt'
@@ -40,7 +41,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':snowplow-android-core')
-    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.2.0'
+    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
 }
 
 // build JAR file
