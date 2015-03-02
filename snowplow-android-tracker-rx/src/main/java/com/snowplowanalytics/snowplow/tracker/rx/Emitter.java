@@ -41,7 +41,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private Subscription emitterSub;
     private EventStore eventStore;
 
-    protected Emitter(EmitterBuilder builder) {
+    public Emitter(EmitterBuilder builder) {
         super(builder);
 
         // Create the event store with the context and the buffer option

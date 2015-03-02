@@ -36,7 +36,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * Creates an emitter object
      * @param builder The builder that constructs an emitter
      */
-    protected Emitter(com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder builder) {
+    public Emitter(com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder builder) {
         super(builder);
         this.eventStore = new EventStore(this.context);
 
