@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.snowplowanalytics.snowplow.tracker.lite">
 
-    <application android:allowBackup="true" android:label="snowplow-android-tracker-lite" tools:replace="android:label">
+    <application>
 
     </application>
 
