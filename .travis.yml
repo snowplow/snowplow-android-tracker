@@ -3,7 +3,7 @@ jdk: oraclejdk8
 
 env:
   matrix:
-    - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a ANDROID_TRAVIS=1
 
 android:
   components:
