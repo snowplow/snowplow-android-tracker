@@ -31,14 +31,12 @@ public class TrackerPayloadTest extends AndroidTestCase {
 
     public void testAddStringString() throws JSONException {
         payload.add("a", "b");
-        assertEquals(abMap(), payload.getMap());
         JSONObject map = new JSONObject(payload.toString());
         assertEquals("b", map.getString("a"));
     }
 
     public void testAddStringObject() throws JSONException {
         payload.add("a", abMap());
-        assertEquals(ababMap(), payload.getMap());
         JSONObject map = new JSONObject(payload.toString());
         JSONObject innerMap = map.getJSONObject("a");
         assertEquals("b", innerMap.getString("a"));
@@ -47,7 +45,6 @@ public class TrackerPayloadTest extends AndroidTestCase {
     public void testAddMap() throws JSONException {
         Map<String,Object> testMap = new HashMap<String,Object>(abMap());
         payload.addMap(testMap);
-        assertEquals(abMap(), payload.getMap());
         
         // {"a":"b"}
         String s = payload.toString();
