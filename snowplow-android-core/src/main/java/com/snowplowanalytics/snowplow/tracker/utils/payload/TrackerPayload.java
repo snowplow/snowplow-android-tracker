@@ -68,7 +68,7 @@ public class TrackerPayload implements Payload {
             return;
         }
         
-        String mapString = new JSONObject(map).toString();
+        String mapString = Util.mapToJSONObject(map).toString();
 
         if (base64_encoded) { // base64 encoded data
             payload.put(type_encoded, Util.base64Encode(mapString));
@@ -84,6 +84,6 @@ public class TrackerPayload implements Payload {
 
     @Override
     public String toString() {
-        return new JSONObject(payload).toString();
+        return Util.mapToJSONObject(payload).toString();
     }
 }

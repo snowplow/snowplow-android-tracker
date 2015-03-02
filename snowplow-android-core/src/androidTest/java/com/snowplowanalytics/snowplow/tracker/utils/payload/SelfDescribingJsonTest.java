@@ -122,6 +122,8 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
 
         // {"schema":"org.test.scheme","data":[{"a":"b"},{"a":"b"}]}
         String s = json.toString();
+        
+        // {"schema":"org.test.scheme","data":["{a=b}","{a=b}"]} on pre KITKAT
 
         JSONObject map = new JSONObject(s);
         assertEquals(testSchema, map.getString("schema"));
@@ -145,6 +147,24 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(testSchema, innerMap.getString("schema"));
         JSONObject innerData = innerMap.getJSONObject("data");
         assertEquals(0, innerData.length());
+    }
+    
+    public void testCreateWithSelfDescribingJsonWithMore() throws JSONException {
+        testMap.put("a", "b");
+        testMap.put("c", "d");
+        SelfDescribingJson json = new SelfDescribingJson(testSchema, new SelfDescribingJson(testSchema, testMap));
+
+        // {"schema":"org.test.scheme","data":{"schema":"org.test.scheme","data":{"a":"b","c":"d"}}}
+        String s = json.toString();
+
+        JSONObject map = new JSONObject(s);
+        assertEquals(testSchema, map.getString("schema"));
+        JSONObject innerMap = map.getJSONObject("data");
+        assertEquals(testSchema, innerMap.getString("schema"));
+        JSONObject innerData = innerMap.getJSONObject("data");
+        assertEquals(2, innerData.length());
+        assertEquals("b", innerData.getString("a"));
+        assertEquals("d", innerData.getString("c"));
     }
 
     /*

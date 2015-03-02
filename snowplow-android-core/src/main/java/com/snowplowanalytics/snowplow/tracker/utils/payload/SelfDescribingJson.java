@@ -13,15 +13,14 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import org.json.JSONObject;
 
@@ -147,6 +146,6 @@ public class SelfDescribingJson implements Payload {
     }
 
     public String toString() {
-        return new JSONObject(payload).toString();
+        return Util.mapToJSONObject(payload).toString();
     }
 }

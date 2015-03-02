@@ -13,8 +13,18 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils;
 
+import android.os.Build;
 import android.util.Base64;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -51,5 +61,75 @@ public class Util {
      */
     public static String getEventId() {
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     *  
+     */
+    public static JSONObject mapToJSONObject(Map map) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return new JSONObject(map);
+        } else {
+            JSONObject retObject = new JSONObject();
+            Set<Map.Entry> entries = map.entrySet();
+            for (Map.Entry entry : entries) {
+                String key = (String)entry.getKey();
+                Object value = getJsonSafeObject(entry.getValue());
+                try {
+                    retObject.put(key, value);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            return retObject;
+        }
+    }
+    
+    /**
+     *
+     */
+    public static Object getJsonSafeObject(Object o) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return o;
+        } else if (o == null) {
+            return new Object() {
+                @Override
+                public boolean equals(Object o) { return o == this || o == null;  }
+                @Override
+                public String toString() {
+                    return "null";
+                }
+            };
+        } else if (o instanceof JSONObject || o instanceof JSONArray) {
+            return o;
+        } else if (o instanceof Collection) {
+            JSONArray retArray = new JSONArray();
+            for (Object entry : (Collection) o) {
+                retArray.put(getJsonSafeObject(entry));
+            }
+            return retArray;
+        } else if (o.getClass().isArray()) {
+            JSONArray retArray = new JSONArray();
+            int length = Array.getLength(o);
+            for (int i = 0; i < length; i++) {
+                retArray.put(getJsonSafeObject(Array.get(o, i)));
+            }
+            return retArray;
+        } else if (o instanceof Map) {
+            return mapToJSONObject((Map)o);
+        } else  if (o instanceof Boolean || 
+                o instanceof Byte ||
+                o instanceof Character ||
+                o instanceof Double ||
+                o instanceof Float ||
+                o instanceof Integer ||
+                o instanceof Long ||
+                o instanceof Short ||
+                o instanceof String) {
+            return o;
+        } else if (o.getClass().getPackage().getName().startsWith("java.")) {
+            return o.toString();
+        }
+        return null;
     }
 }
