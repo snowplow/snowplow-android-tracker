@@ -122,8 +122,6 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
 
         // {"schema":"org.test.scheme","data":[{"a":"b"},{"a":"b"}]}
         String s = json.toString();
-        
-        // {"schema":"org.test.scheme","data":["{a=b}","{a=b}"]} on pre KITKAT
 
         JSONObject map = new JSONObject(s);
         assertEquals(testSchema, map.getString("schema"));
