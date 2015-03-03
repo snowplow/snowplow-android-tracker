@@ -11,10 +11,6 @@ public class EventStore extends com.snowplowanalytics.snowplow.tracker.EventStor
     }
 
     public void add(final Payload payload) {
-        Executor.execute(new Runnable() {
-            public void run() {
-                insertEvent(payload);
-            }
-        });
+        insertEvent(payload);
     }
 }
