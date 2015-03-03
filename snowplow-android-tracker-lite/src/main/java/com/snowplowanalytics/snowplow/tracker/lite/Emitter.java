@@ -55,12 +55,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *                the EventStore
      */
     public void add(final Payload payload) {
-        eventStore.add(payload);
-
-        // TODO, this actually needs to be started and do the right thing timer wise..
-
         Executor.execute(new Runnable() {
             public void run() {
+                eventStore.add(payload);
                 attemptEmit();
             }
         });
