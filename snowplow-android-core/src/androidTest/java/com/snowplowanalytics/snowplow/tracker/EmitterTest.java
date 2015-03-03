@@ -23,50 +23,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
-public class EmitterTest extends AndroidTestCase {
+public class EmitterTest extends SnowplowTestCase {
 
     private final static String TAG = Emitter.class.getSimpleName();
 
-    private MockWebServer server;
-    private String testHost = "nothing";
-    private Integer testPort = 8888;
-    private String testServer = "nothing:8888";
     
     public void setUp()  {
         
     }
-    
-    public void startMockServer() throws IOException {
-        server = new MockWebServer();
-        server.play();
-        testHost = server.getHostName();
-        testPort = server.getPort();
-        testServer = String.format("%s:%d", testHost, testPort);
-    }
-
-    public EmittableEvents setupEmittableEvents(int count) {
-        ArrayList<Payload> events = new ArrayList<Payload>();
-        LinkedList<Long> eventIds = new LinkedList<Long>();
-        for (int i = 0; i < count; i++) {
-            TrackerPayload payload = new TrackerPayload();
-            payload.add("a", String.valueOf(i));
-            events.add(payload);
-            eventIds.add(new Long(i));
-            server.enqueue(new MockResponse());
-        }
-        return new EmittableEvents(events, eventIds);
-    }
-
-
-    public void tearDown() throws IOException {
-        if (server != null) {
-            server.shutdown(); 
-            server = null;
-        }
-    }
 
     private Emitter getEmitter(HttpMethod method, BufferOption option, RequestSecurity security) {
-        return new com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder(testServer, getContext(), TestEmitter.class)
+        return new com.snowplowanalytics.snowplow.tracker.Emitter.EmitterBuilder(mockServerName(), getContext(), TestEmitter.class)
                 .option(option)
                 .method(method)
                 .security(security)
@@ -138,17 +105,17 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testUriSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals("http://" + testServer + "/i", emitter.getEmitterUri());
+        Assert.assertEquals("http://" + mockServerName() + "/i", emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        Assert.assertEquals("http://" + testServer + "/com.snowplowanalytics.snowplow/tp2",
+        Assert.assertEquals("http://" + mockServerName() + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        Assert.assertEquals("https://" + testServer + "/i", emitter.getEmitterUri());
+        Assert.assertEquals("https://" + mockServerName() + "/i", emitter.getEmitterUri());
 
         emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        Assert.assertEquals("https://" + testServer + "/com.snowplowanalytics.snowplow/tp2",
+        Assert.assertEquals("https://" + mockServerName() + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
     }
 
@@ -161,13 +128,13 @@ public class EmitterTest extends AndroidTestCase {
     }
    
     public void testEmitSingleGetEvent() throws InterruptedException, IOException {
-        startMockServer();
+        setupMockServer();
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
        
         LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
 
-        RecordedRequest req = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("GET", req.getMethod());
         assertEquals("/i?a=0", req.getPath());
@@ -177,18 +144,18 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitTwoGetEvents() throws InterruptedException, IOException {
-        startMockServer();
+        setupMockServer();
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
 
-        RecordedRequest req = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("GET", req.getMethod());
         assertEquals("/i?a=0", req.getPath());
 
-        req = server.takeRequest(2, TimeUnit.SECONDS);
+        req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("GET", req.getMethod());
         assertEquals("/i?a=1", req.getPath());
@@ -200,13 +167,13 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitSinglePostEvent() throws InterruptedException, IOException, JSONException {
-        startMockServer();
+        setupMockServer();
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
 
-        RecordedRequest req = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("POST", req.getMethod());
         assertEquals("/com.snowplowanalytics.snowplow/tp2", req.getPath());
@@ -226,13 +193,13 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitTwoEventsPostAsGroup() throws InterruptedException, IOException, JSONException {
-        startMockServer();
+        setupMockServer();
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
 
-        RecordedRequest req = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("POST", req.getMethod());
         assertEquals("/com.snowplowanalytics.snowplow/tp2", req.getPath());
@@ -258,13 +225,13 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitTwoEventsPostAsSingles() throws InterruptedException, IOException, JSONException {
-        startMockServer();
+        setupMockServer();
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.Single, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
 
-        RecordedRequest req = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
         assertEquals("POST", req.getMethod());
         assertEquals("/com.snowplowanalytics.snowplow/tp2", req.getPath());
@@ -282,7 +249,7 @@ public class EmitterTest extends AndroidTestCase {
 
         // pull the second post off the queue
 
-        RecordedRequest req2 = server.takeRequest(2, TimeUnit.SECONDS);
+        RecordedRequest req2 = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req2);
         assertEquals("POST", req2.getMethod());
         assertEquals("/com.snowplowanalytics.snowplow/tp2", req2.getPath());
