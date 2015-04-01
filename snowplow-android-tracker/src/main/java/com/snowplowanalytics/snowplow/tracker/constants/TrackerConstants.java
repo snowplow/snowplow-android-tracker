@@ -35,5 +35,5 @@ public class TrackerConstants {
     public static final int EMITTER_TICK = 5;
     public static final int EMITTER_EMPTY_EVENTS_LIMIT = 5;
 
-    public static final Boolean DEBUG_MODE = true;
+    public static final Boolean DEBUG_MODE = false;
 }
