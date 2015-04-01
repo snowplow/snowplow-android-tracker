@@ -177,15 +177,17 @@ public class Tracker {
             Logger.i(TAG, "No user context passed in");
             context = new LinkedList<>();
         }
-        if (!subject.getSubjectLocation().isEmpty()) {
-            SelfDescribingJson locationPayload = new SelfDescribingJson(
-                    TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());
-            context.add(locationPayload);
-        }
-        if (!subject.getSubjectMobile().isEmpty()) {
-            SelfDescribingJson mobilePayload = new SelfDescribingJson(
-                    TrackerConstants.MOBILE_SCHEMA, this.subject.getSubjectMobile());
-            context.add(mobilePayload);
+        if (subject != null) {
+            if (!subject.getSubjectLocation().isEmpty()) {
+                SelfDescribingJson locationPayload = new SelfDescribingJson(
+                        TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());
+                context.add(locationPayload);
+            }
+            if (!subject.getSubjectMobile().isEmpty()) {
+                SelfDescribingJson mobilePayload = new SelfDescribingJson(
+                        TrackerConstants.MOBILE_SCHEMA, this.subject.getSubjectMobile());
+                context.add(mobilePayload);
+            }
         }
         return context;
     }
