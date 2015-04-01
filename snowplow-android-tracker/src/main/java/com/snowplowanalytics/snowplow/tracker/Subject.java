@@ -189,7 +189,7 @@ public class Subject {
             AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
             putToMobile(Parameters.ANDROID_IDFA, info.getId());
         }
-        catch (IOException | GooglePlayServicesRepairableException |
+        catch (IOException | GooglePlayServicesRepairableException | IllegalStateException | 
                 GooglePlayServicesNotAvailableException e) {
             Logger.ifDebug(TAG, "Cannot get advertising id: %s", e.toString());
         }
