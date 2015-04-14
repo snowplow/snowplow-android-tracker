@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -146,11 +147,13 @@ public class Tracker {
                 (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
 
         // Add default information to the custom context
-        List<SelfDescribingJson> final_context = addDefaultContextData(context);
+
+        List<SelfDescribingJson> finalContext =
+                addDefaultContextData(getMutableList(context));
 
         // Convert context into a List<Map> object
         List<Map> contextDataList = new LinkedList<>();
-        for (SelfDescribingJson selfDescribingJson : final_context) {
+        for (SelfDescribingJson selfDescribingJson : finalContext) {
             contextDataList.add(selfDescribingJson.getMap());
         }
 
@@ -585,6 +588,22 @@ public class Tracker {
                 TrackerConstants.SCHEMA_SCREEN_VIEW, trackerPayload);
 
         trackUnstructuredEvent(payload, context, timestamp);
+    }
+
+    // Utilities
+
+    /**
+     * Converts a potentially immutable list of
+     * SelfDescribingJson into a mutable list.
+     *
+     * @param list a list of SelfDescribingJson
+     * @return the mutable list
+     */
+    private List<SelfDescribingJson> getMutableList(List<SelfDescribingJson> list) {
+        if (list == null)
+            return null;
+        else
+            return new ArrayList<>(list);
     }
 
     // Get & Set Functions
