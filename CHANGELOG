@@ -1,3 +1,10 @@
+Version 0.3.1 (2015-06-02)
+--------------------------
+Can now process immutable lists of custom contexts (#115)
+Changed Debug mode to be off by default (#112)
+Fixed NullPointerException when subject is null (#107)
+Fixed java.lang.IllegalStateException in setAdvertisingID (#105)
+
 Version 0.3.0 (2014-02-18)
 --------------------------
 Added new BufferOption for heavier event sending (#85)
