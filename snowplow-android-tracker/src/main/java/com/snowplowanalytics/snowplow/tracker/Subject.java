@@ -187,9 +187,9 @@ public class Subject {
             putToMobile(Parameters.ANDROID_IDFA, playAdId);
         }
         catch (Exception e) {
-            Logger.ifDebug(TAG, "Unable to obtain Google AdvertisingIdClient.Info via reflection.",
+            Logger.d(TAG, "Unable to obtain Google AdvertisingIdClient.Info via reflection.", null,
                     e.toString());
-            Logger.ifDebug(TAG, "Exception cause: " + e.getCause().toString());
+            Logger.d(TAG, "Exception cause: %s", null, e.getCause().toString());
         }
     }
 
@@ -282,7 +282,7 @@ public class Subject {
             display.getSize(size);
             this.setScreenResolution(size.x, size.y);
         } catch (NoSuchMethodException e) {
-            Logger.ifDebug(TAG, "Display.getSize isn't available on older devices.");
+            Logger.e(TAG, "Display.getSize isn't available on older devices.", null);
             this.setScreenResolution(display.getWidth(), display.getHeight());
         }
     }
@@ -464,7 +464,7 @@ public class Subject {
             try {
                 return locationManager.getLastKnownLocation(provider);
             } catch (SecurityException ex) {
-                Logger.ifDebug(TAG, "No permission to retrieve location.");
+                Logger.e(TAG, "Failed to retrieve retrieve location: %s", null, ex.toString());
                 return null;
             }
         }

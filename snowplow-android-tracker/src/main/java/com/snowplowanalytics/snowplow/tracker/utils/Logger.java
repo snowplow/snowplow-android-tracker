@@ -13,43 +13,65 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils;
 
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-
 /**
- * Custom logger class to easily manage debug
- * mode and appending of 'SnowplowTracker->'
- * to the log TAG.
+ * Custom logger class to easily manage debug mode and appending of 'SnowplowTracker->' to the log TAG.
  */
 public class Logger {
 
-    public static void ifDebug(String tag, String msg, Object... args) {
-        if (TrackerConstants.DEBUG_MODE) {
-            Log.d(getTag(tag), getThread() + "|" + String.format(msg, args));
+    private static int level = 0;
+
+    public static void i(String tag, String msg, Throwable e, Object... args) {
+        if (level >= 1) {
+            if (e == null) {
+                Log.i(getTag(tag), getMessage(msg, args), e);
+            } else {
+                Log.i(getTag(tag), getMessage(msg, args));
+            }
         }
     }
 
-    public static void ifDebug(String tag, String msg, Throwable e, Object... args) {
-        if (TrackerConstants.DEBUG_MODE) {
-            Log.d(getTag(tag), getThread() + "|" + String.format(msg, args), e);
+    public static void e(String tag, String msg, Throwable e, Object... args) {
+        if (level >= 2) {
+            if (e == null) {
+                Log.e(getTag(tag), getMessage(msg, args), e);
+            } else {
+                Log.e(getTag(tag), getMessage(msg, args));
+            }
         }
     }
 
-    public static void i(String tag, String msg) {
-        Log.i(getTag(tag), msg);
+    public static void d(String tag, String msg, Throwable e, Object... args) {
+        if (level >= 3) {
+            if (e == null) {
+                Log.d(getTag(tag), getMessage(msg, args), e);
+            } else {
+                Log.d(getTag(tag), getMessage(msg, args));
+            }
+        }
     }
 
-    public static void i(String tag, String msg, Throwable e) {
-        Log.i(getTag(tag), msg, e);
+    public static void v(String tag, String msg, Throwable e, Object... args) {
+        if (level >= 4) {
+            if (e == null) {
+                Log.v(getTag(tag), getMessage(msg, args), e);
+            } else {
+                Log.v(getTag(tag), getMessage(msg, args));
+            }
+        }
     }
 
-    public static void e(String tag, String msg) {
-        Log.e(getTag(tag), msg);
-    }
-
-    public static void e(String tag, String msg, Throwable e) {
-        Log.e(getTag(tag), msg, e);
+    /**
+     * Returns a formatted logging String
+     *
+     * @param msg The message to log
+     * @param args Any extra args to log
+     * @return the formatted message
+     */
+    private static String getMessage(String msg, Object... args) {
+        return getThread() + "|" + String.format(msg, args);
     }
 
     /**
@@ -69,5 +91,14 @@ public class Logger {
      */
     private static String getThread() {
         return Thread.currentThread().getName();
+    }
+
+    /**
+     * Updates the logging level.
+     *
+     * @param newLevel The new log-level to use
+     */
+    public static void updateLogLevel(LogLevel newLevel) {
+        level = newLevel.getLevel();
     }
 }

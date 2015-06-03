@@ -25,12 +25,12 @@ public class EmitterTest extends AndroidTestCase {
         return new RequestCallback() {
             @Override
             public void onSuccess(int successCount) {
-                Logger.ifDebug(TAG, "Successful Sends: %s", successCount);
+                Logger.d(TAG, "Successful Sends: %s", null, successCount);
             }
             @Override
             public void onFailure(int successCount, int failureCount) {
-                Logger.ifDebug(TAG,
-                        "Successful Sends: %s, Failed Sends: %s",
+                Logger.d(TAG,
+                        "Successful Sends: %s, Failed Sends: %s", null,
                         successCount,
                         failureCount);
             }

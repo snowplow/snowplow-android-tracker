@@ -81,7 +81,7 @@ public class SelfDescribingJson implements Payload {
         try {
             objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data.getMap()));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error putting POJO into Map: %s", null, e.toString());
         }
         return this;
     }
@@ -98,7 +98,7 @@ public class SelfDescribingJson implements Payload {
         try {
             objectNode.putPOJO(Parameters.DATA, objectMapper.writeValueAsString(data));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error putting POJO into Map: %s", null, e.toString());
         }
         return this;
     }
@@ -124,7 +124,7 @@ public class SelfDescribingJson implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        Logger.ifDebug(TAG, "add(String, String) method called: Doing nothing.");
+        Logger.d(TAG, "Payload: add(String, String) method called - Doing nothing.", null);
     }
 
     @Deprecated
@@ -134,7 +134,7 @@ public class SelfDescribingJson implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        Logger.ifDebug(TAG, "add(String, Object) method called: Doing nothing.");
+        Logger.d(TAG, "Payload: add(String, Object) method called - Doing nothing.", null);
     }
 
     @Deprecated
@@ -144,7 +144,7 @@ public class SelfDescribingJson implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        Logger.ifDebug(TAG, "addMap(Map<String, Object>) method called: Doing nothing.");
+        Logger.d(TAG, "Payload: addMap(Map<String, Object>) method called - Doing nothing.", null);
     }
 
     @Deprecated
@@ -155,20 +155,20 @@ public class SelfDescribingJson implements Payload {
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
          */
-        Logger.ifDebug(TAG, "addMap(Map, Boolean, String, String) method called: Doing nothing.");
+        Logger.d(TAG, "Payload: addMap(Map, Boolean, String, String) method called - Doing nothing.", null);
     }
 
     public Map<String, Object> getMap() {
         HashMap<String, Object> map = new HashMap<String, Object>();
         try {
-            map = objectMapper.readValue(objectNode.toString(),
-                    new TypeReference<HashMap>(){});
+            Logger.i(TAG, "Attempting to create a Map structure from ObjectNode.", null);
+            map = objectMapper.readValue(objectNode.toString(), new TypeReference<HashMap>(){});
         } catch (JsonMappingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         } catch (JsonParseException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         }
         return map;
     }

@@ -54,6 +54,9 @@ public class Tracker {
         this.namespace = builder.namespace;
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
+
+        Logger.updateLogLevel(builder.logLevel);
+        Logger.i(TAG, "Tracker created successfully", null);
     }
 
     public static class TrackerBuilder {
@@ -63,6 +66,7 @@ public class Tracker {
         private Subject subject = null; // Optional
         private boolean base64Encoded = true; // Optional
         private DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        private LogLevel logLevel = LogLevel.OFF; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -100,6 +104,14 @@ public class Tracker {
         }
 
         /**
+         * @param log The log level for the Tracker class
+         */
+        public TrackerBuilder level(LogLevel log) {
+            this.logLevel = log;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker
          */
         public Tracker build(){
@@ -113,8 +125,7 @@ public class Tracker {
      *                sent to a collector
      */
     private void addEventPayload(Payload payload) {
-
-        Logger.ifDebug(TAG, "Adding Payload to event storage...", payload);
+        Logger.i(TAG, "Adding new payload to event storage", null, payload);
 
         emitter.add(payload);
     }
@@ -164,7 +175,7 @@ public class Tracker {
         payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                 Parameters.CONTEXT);
 
-        Logger.ifDebug(TAG, "Complete Payload: %s", payload);
+        Logger.d(TAG, "Complete Payload: %s", null, payload);
 
         return payload;
     }
@@ -177,10 +188,13 @@ public class Tracker {
      */
     private List<SelfDescribingJson> addDefaultContextData(List<SelfDescribingJson> context) {
         if (context == null) {
-            Logger.i(TAG, "No user context passed in");
+            Logger.d(TAG, "Custom context not provided for event, creating empty context", null);
+
             context = new LinkedList<>();
         }
         if (subject != null) {
+            Logger.d(TAG, "Subject is not null: attempting to populate mobile contexts ", null);
+
             if (!subject.getSubjectLocation().isEmpty()) {
                 SelfDescribingJson locationPayload = new SelfDescribingJson(
                         TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());

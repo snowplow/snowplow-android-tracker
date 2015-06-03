@@ -63,7 +63,7 @@ public class EventStore {
     public EventStore(Context context) {
         dbHelper = EventStoreHelper.getInstance(context);
         open();
-        Logger.ifDebug(TAG, "DB Path: " + database.getPath());
+        Logger.i(TAG, "DB Path: " + database.getPath(), null);
     }
 
     /**
@@ -134,7 +134,7 @@ public class EventStore {
             lastInsertedRowId = database.insert(EventStoreHelper.TABLE_EVENTS, null, values);
         }
 
-        Logger.ifDebug(TAG, "Added event too database: %s", lastInsertedRowId);
+        Logger.i(TAG, "Added event too database: %s", null, lastInsertedRowId);
 
         return lastInsertedRowId;
     }
@@ -152,7 +152,7 @@ public class EventStore {
                     EventStoreHelper.COLUMN_ID + "=" + id, null);
         }
 
-        Logger.ifDebug(TAG, "Removed event from database: %s", "" + id);
+        Logger.i(TAG, "Removed event from database: %s", null, "" + id);
 
         return retval == 1;
     }

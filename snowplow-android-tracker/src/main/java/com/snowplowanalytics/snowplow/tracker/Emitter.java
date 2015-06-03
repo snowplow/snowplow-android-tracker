@@ -102,6 +102,8 @@ public class Emitter {
         if (isOnline() && eventStore.getSize() > 0) {
             start();
         }
+
+        Logger.i(TAG, "Emitter created successfully", null);
     }
 
     public static class EmitterBuilder {
@@ -194,9 +196,10 @@ public class Emitter {
                     if (eventStore.getSize() == 0) {
                         emptyCounter++;
 
-                        Logger.ifDebug(TAG, "EventStore empty counter: %s", emptyCounter);
+                        Logger.d(TAG, "EventStore empty counter: %s", null, emptyCounter);
 
                         if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
+                            Logger.d(TAG, "Emitter shutting down as empty limit reached.", null);
                             shutdown();
                             throw new EmitterException("EventStore empty exception - limit");
                         }
@@ -212,16 +215,16 @@ public class Emitter {
                     throw new EmitterException("Emitter concurrency exception");
                 }
             })
-            .doOnError((err) -> Logger.ifDebug(TAG, "Emitter Error: %s", err.toString()))
+            .doOnError((err) -> Logger.d(TAG, "Emitter Error: %s", null, err.toString()))
             .retry()
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
-            .doOnSubscribe(() -> Logger.ifDebug(TAG, "Emitter has been started!"))
-            .doOnUnsubscribe(() -> Logger.ifDebug(TAG, "Emitter has been shutdown!"))
+            .doOnSubscribe(() -> Logger.d(TAG, "Emitter has been started.", null))
+            .doOnUnsubscribe(() -> Logger.d(TAG, "Emitter has been shutdown.", null))
             .flatMap(this::emitEvent)
             .subscribe(results -> {
 
-                Logger.ifDebug(TAG, "Processing emitter results.");
+                Logger.i(TAG, "Processing emitter results...", null);
 
                 // Start counting successes and failures
                 int successCount = 0;
@@ -230,24 +233,31 @@ public class Emitter {
                 for (RequestResult res : results) {
                     if (res.getSuccess()) {
                         successCount++;
-                        Logger.ifDebug(TAG, "Successful send.");
+                        Logger.d(TAG, "Event sent successfully.", null);
 
                         // Delete event rows for successfully sent requests
                         for (Long eventId : res.getEventIds()) {
+                            Logger.d(TAG, "Removing sent event from database...", null);
                             eventStore.removeEvent(eventId);
                         }
                     } else if (!res.getSuccess()) {
                         failureCount++;
-                        Logger.ifDebug(TAG, "Request sending failed but we will retry later.");
+                        Logger.e(TAG, "Request sending failed: will retry later.", null);
                     }
                 }
 
                 // If we have any failures shut the emitter down
                 if (failureCount != 0) {
                     if (isOnline()) {
-                        Logger.ifDebug(TAG, "Check your collector path: %s",
-                                getEmitterUri());
+                        Logger.e(TAG,
+                                "Failures occurred when sending: count - %s",
+                                null, failureCount);
+                        Logger.e(TAG,
+                                "Ensure collector path is valid: %s",
+                                null, getEmitterUri());
                     }
+
+                    Logger.d(TAG, "Emitter is shutting down due to failures...", null);
                     shutdown();
                 }
 
@@ -305,7 +315,7 @@ public class Emitter {
         // If the request method is GET...
         if (httpMethod == HttpMethod.GET) {
 
-            Logger.ifDebug(TAG, "Sending GET requests...");
+            Logger.i(TAG, "Sending %s GET requests", null, payloads.size());
 
             for (int i = 0; i < payloads.size(); i++) {
                 // Get the eventId for this request
@@ -316,7 +326,7 @@ public class Emitter {
                 Request req = requestBuilderGet(events.getEvents().get(i));
                 int code = requestSender(req);
 
-                Logger.ifDebug(TAG, "Sent a GET request - code: %s", "" + code);
+                Logger.d(TAG, "Sent a GET request: response %s", null, "" + code);
 
                 if (code == -1) {
                     results.add(new RequestResult(false, reqEventId));
@@ -329,7 +339,8 @@ public class Emitter {
         }
         else {
 
-            Logger.ifDebug(TAG, "Sending POST requests...");
+            Logger.i(TAG, "Sending %s POST requests", null,
+                    payloads.size() / bufferOption.getCode());
 
             for (int i = 0; i < payloads.size(); i += bufferOption.getCode()) {
                 // Get the eventIds for this POST Request
@@ -350,7 +361,7 @@ public class Emitter {
                 Request req = requestBuilderPost(postPayload);
                 int code = requestSender(req);
 
-                Logger.ifDebug(TAG, "Sent a POST request - code: %s", "" + code);
+                Logger.d(TAG, "Sent a POST request - code: %s", null, "" + code);
 
                 if (code == -1) {
                     results.add(new RequestResult(false, reqEventIds));
@@ -373,10 +384,10 @@ public class Emitter {
      */
     private int requestSender(Request request) {
         try {
-            Logger.ifDebug(TAG, "Sending request..");
+            Logger.i(TAG, "Sending request...", null);
             return client.newCall(request).execute().code();
         } catch (IOException e) {
-            Logger.ifDebug(TAG, "Request sending failed exceptionally: %s", e.toString());
+            Logger.e(TAG, "Request sending failed: %s", null, e.toString());
             return -1;
         }
     }
@@ -439,16 +450,24 @@ public class Emitter {
      */
     public boolean isOnline() {
 
-        Logger.ifDebug(TAG, "Checking for connectivity...");
+        Logger.i(TAG, "Checking tracker internet connectivity.", null);
 
         ConnectivityManager cm = (ConnectivityManager)
                 this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         try {
             NetworkInfo ni = cm.getActiveNetworkInfo();
-            return ni != null && ni.isConnected();
+            boolean connected = ni != null && ni.isConnected();
+
+            if (connected) {
+                Logger.d(TAG, "Tracker is online.", null);
+            } else {
+                Logger.d(TAG, "Tracker is not online.", null);
+            }
+
+            return connected;
         } catch (SecurityException e) {
-            Logger.ifDebug(TAG, "SecurityException: %s", e.toString());
+            Logger.e(TAG, "Security exception checking connection level: %s", null, e.toString());
             return true;
         }
     }

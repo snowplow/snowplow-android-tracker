@@ -39,26 +39,26 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(String key, String value) {
         if (value == null || value.isEmpty()) {
-            Logger.ifDebug(TAG, "kv-value is empty. Returning out without adding key..");
+            Logger.d(TAG, "Key value is empty, returning without adding key.", null);
             return;
         }
 
-        Logger.ifDebug(TAG, "Adding new key-value pair: " + key + "->" + value);
+        Logger.d(TAG, "Adding new key-value pair: " + key + "->" + value, null);
         objectNode.put(key, value);
     }
 
     @Override
     public void add(String key, Object value) {
         if (value == null) {
-            Logger.ifDebug(TAG, "kv-value is empty. Returning out without adding key..");
+            Logger.d(TAG, "Key value is empty, returning without adding key.", null);
             return;
         }
 
-        Logger.ifDebug(TAG, "Adding new key-value pair: " + key + "->" + value);
+        Logger.d(TAG, "Adding new key-value pair: " + key + "->" + value, null);
         try {
             objectNode.putPOJO(key, objectMapper.writeValueAsString(value));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error putting POJO into Map: %s", null, e.toString());
         }
     }
 
@@ -66,7 +66,7 @@ public class TrackerPayload implements Payload {
     public void addMap(Map<String, Object> map) {
         // Return if we don't have a map
         if (map == null) {
-            Logger.ifDebug(TAG, "Map passed in is null. Returning without adding map..");
+            Logger.d(TAG, "Map passed in is null, returning without adding map.", null);
             return;
         }
 
@@ -80,7 +80,7 @@ public class TrackerPayload implements Payload {
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
         // Return if we don't have a map
         if (map == null) {
-            Logger.ifDebug(TAG, "Map passed in is null. Returning nothing..");
+            Logger.d(TAG, "Map passed in is null, returning nothing.", null);
             return;
         }
 
@@ -88,7 +88,7 @@ public class TrackerPayload implements Payload {
         try {
             mapString = objectMapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Writing map failed: %s", null, e.toString());
             return; // Return because we can't continue
         }
 
@@ -107,14 +107,14 @@ public class TrackerPayload implements Payload {
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
-            Logger.ifDebug(TAG, "Attempting to create a Map structure from ObjectNode.");
+            Logger.i(TAG, "Attempting to create a Map structure from ObjectNode.", null);
             map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
         } catch (JsonMappingException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         } catch (JsonParseException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         }
         return map;
     }
