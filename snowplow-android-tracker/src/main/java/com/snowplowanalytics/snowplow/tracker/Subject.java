@@ -24,16 +24,12 @@ import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.io.IOException;
+import java.lang.reflect.Method;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -186,13 +182,82 @@ public class Subject {
      */
     private void setAdvertisingID(Context context) {
         try {
-            AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
-            putToMobile(Parameters.ANDROID_IDFA, info.getId());
+            Object AdvertisingInfoObject = getAdvertisingInfoObject(context);
+            String playAdId = (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
+            putToMobile(Parameters.ANDROID_IDFA, playAdId);
         }
-        catch (IOException | GooglePlayServicesRepairableException | IllegalStateException | 
-                GooglePlayServicesNotAvailableException e) {
-            Logger.ifDebug(TAG, "Cannot get advertising id: %s", e.toString());
+        catch (Exception e) {
+            Logger.ifDebug(TAG, "Unable to obtain Google AdvertisingIdClient.Info via reflection.",
+                    e.toString());
+            Logger.ifDebug(TAG, "Exception cause: " + e.getCause().toString());
         }
+    }
+
+    /**
+     * Returns the AdvertisingIdInfo object
+     *
+     * @param context the android context
+     * @return the advertising id information object
+     * @throws Exception
+     */
+    private Object getAdvertisingInfoObject(Context context) throws Exception {
+        return invokeStaticMethod(
+                "com.google.android.gms.ads.identifier.AdvertisingIdClient",
+                "getAdvertisingIdInfo",
+                new Class[] {Context.class},
+                context
+        );
+    }
+
+    /**
+     * Invokes a static method within a class
+     * if it can be found on the classpath.
+     *
+     * @param className The full defined classname
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private Object invokeStaticMethod(String className, String methodName,
+                                             Class[] cArgs, Object... args) throws Exception {
+        Class classObject = Class.forName(className);
+        return invokeMethod(classObject, methodName, null, cArgs, args);
+    }
+
+    /**
+     * Invokes a method on a static instance
+     * within a class by reflection.
+     *
+     * @param instance The instance to invoke a method on
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private Object invokeInstanceMethod(Object instance, String methodName,
+                                               Class[] cArgs, Object... args) throws Exception {
+        Class classObject = instance.getClass();
+        return invokeMethod(classObject, methodName, instance, cArgs, args);
+    }
+
+    /**
+     * Invokes methods of a class via reflection
+     *
+     * @param classObject The class to attempt invocation on
+     * @param methodName The name of the method to invoke
+     * @param instance The object instance to invoke on
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private Object invokeMethod(Class classObject, String methodName, Object instance,
+                                       Class[] cArgs, Object... args) throws Exception {
+        Method methodObject = classObject.getMethod(methodName, cArgs);
+        return methodObject.invoke(instance, args);
     }
 
     /**
