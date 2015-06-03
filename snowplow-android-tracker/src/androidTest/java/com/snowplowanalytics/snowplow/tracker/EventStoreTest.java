@@ -13,7 +13,7 @@ public class EventStoreTest extends AndroidTestCase {
     // Helper Methods
 
     private EventStore getEventStore() {
-        EventStore eventStore = new EventStore(getContext());
+        EventStore eventStore = new EventStore(getContext(), 250);
         eventStore.removeAllEvents();
         return eventStore;
     }

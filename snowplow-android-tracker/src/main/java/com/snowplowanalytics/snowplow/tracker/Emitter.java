@@ -57,6 +57,10 @@ public class Emitter {
     private Uri.Builder uriBuilder;
     private Subscription emitterSub;
 
+    private int emitterTick;
+    private int sendLimit;
+    private int emptyLimit;
+
     protected RequestCallback requestCallback;
     protected HttpMethod httpMethod;
     protected BufferOption bufferOption;
@@ -76,6 +80,9 @@ public class Emitter {
         this.context = builder.context;
         this.bufferOption = builder.bufferOption;
         this.requestSecurity = builder.requestSecurity;
+        this.emitterTick = builder.emitterTick;
+        this.sendLimit = builder.sendLimit;
+        this.emptyLimit = builder.emptyLimit;
 
         // Need to create URI Builder in this way to preserve port keys/characters that would
         // be incorrectly encoded by the uriBuilder.
@@ -96,7 +103,7 @@ public class Emitter {
         }
 
         // Create the event store with the context and the buffer option
-        this.eventStore = new EventStore(this.context);
+        this.eventStore = new EventStore(this.context, this.sendLimit);
 
         // If the device is not online do not send anything!
         if (isOnline() && eventStore.getSize() > 0) {
@@ -113,6 +120,9 @@ public class Emitter {
         protected HttpMethod httpMethod = HttpMethod.POST; // Optional
         protected BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
         protected RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        private int emitterTick = 5; // Optional
+        private int sendLimit = 250; // Optional
+        private int emptyLimit = 5; // Optional
 
         /**
          * @param uri The uri of the collector
@@ -155,6 +165,31 @@ public class Emitter {
         }
 
         /**
+         * @param emitterTick The tick count between emitter attempts
+         */
+        public EmitterBuilder tick(int emitterTick) {
+            this.emitterTick = emitterTick;
+            return this;
+        }
+
+        /**
+         * @param sendLimit The maximum amount of events to grab for an emit attempt
+         */
+        public EmitterBuilder sendLimit(int sendLimit) {
+            this.sendLimit = sendLimit;
+            return this;
+        }
+
+        /**
+         * @param emptyLimit The amount of emitter ticks that are performed before we shut down
+         *                   due to the database being empty.
+         */
+        public EmitterBuilder emptyLimit(int emptyLimit) {
+            this.emptyLimit = emptyLimit;
+            return this;
+        }
+
+        /**
          * @return a new Emitter object
          */
         public Emitter build() {
@@ -190,7 +225,7 @@ public class Emitter {
      *    we are online.
      */
     private void start() {
-        emitterSub = Observable.interval(TrackerConstants.EMITTER_TICK, TimeUnit.SECONDS)
+        emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS)
             .map((tick) -> {
                 if (!isRunning) {
                     if (eventStore.getSize() == 0) {
@@ -198,7 +233,7 @@ public class Emitter {
 
                         Logger.d(TAG, "EventStore empty counter: %s", null, emptyCounter);
 
-                        if (emptyCounter >= TrackerConstants.EMITTER_EMPTY_EVENTS_LIMIT) {
+                        if (emptyCounter >= this.emptyLimit) {
                             Logger.d(TAG, "Emitter shutting down as empty limit reached.", null);
                             shutdown();
                             throw new EmitterException("EventStore empty exception - limit");

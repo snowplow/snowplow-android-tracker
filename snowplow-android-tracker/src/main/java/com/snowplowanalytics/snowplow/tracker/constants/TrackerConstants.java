@@ -31,9 +31,6 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM_ITEM = "ti";
 
     public static final int BACK_PRESSURE_LIMIT = 10000;
-    public static final int EMITTER_SEND_LIMIT = 250;
-    public static final int EMITTER_TICK = 5;
-    public static final int EMITTER_EMPTY_EVENTS_LIMIT = 5;
 
     public static final Boolean DEBUG_MODE = true;
 }

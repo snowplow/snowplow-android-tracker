@@ -53,6 +53,8 @@ public class EventStore {
     };
     private long lastInsertedRowId = -1;
 
+    private int sendLimit;
+
     private final Scheduler scheduler = Schedulers.io();
 
     /**
@@ -60,9 +62,11 @@ public class EventStore {
      *
      * @param context The android context object
      */
-    public EventStore(Context context) {
+    public EventStore(Context context, int sendLimit) {
         dbHelper = EventStoreHelper.getInstance(context);
         open();
+        this.sendLimit = sendLimit;
+
         Logger.i(TAG, "DB Path: " + database.getPath(), null);
     }
 
@@ -291,7 +295,7 @@ public class EventStore {
 
         // FIFO Pattern for sending events
         for (Map<String, Object> eventMetadata :
-                getDescEventsInRange(TrackerConstants.EMITTER_SEND_LIMIT)) {
+                getDescEventsInRange(this.sendLimit)) {
 
             // Create a TrackerPayload for each event
             TrackerPayload payload = new TrackerPayload();
