@@ -12,7 +12,10 @@ public class TrackerTest extends AndroidTestCase {
                 .EmitterBuilder("testUrl", getContext())
                 .build();
 
-        Subject subject = new Subject(getContext());
+        Subject subject = new Subject
+                .SubjectBuilder()
+                .context(getContext())
+                .build();
 
         // Make and return the Tracker object
         return new Tracker

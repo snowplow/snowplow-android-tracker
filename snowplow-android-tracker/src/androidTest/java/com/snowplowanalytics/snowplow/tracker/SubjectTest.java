@@ -9,7 +9,10 @@ public class SubjectTest extends AndroidTestCase {
     // Helper Methods
 
     private Subject getSubject() {
-        return new Subject(getContext());
+        return new Subject
+                .SubjectBuilder()
+                .context(getContext())
+                .build();
     }
 
     // Tests

@@ -48,32 +48,39 @@ public class Subject {
     private HashMap<String, String> mobilePairs = new HashMap<>();
 
     /**
-     * Default Constructor
-     * Sets default information.
+     * Creates a Subject object
+     * @param builder The builder that constructs a subject
      */
-    public Subject() {
+    private Subject(SubjectBuilder builder) {
         setDefaultTimezone();
         setDefaultLanguage();
         setOsType();
         setOsVersion();
         setDeviceModel();
         setDeviceVendor();
+
+        if (builder.context != null) {
+            setContextualParams(builder.context);
+        }
     }
 
-    /**
-     * Context based Constructor
-     * Sets extra information that can only
-     * be garnered with the use of the android
-     * context.
-     *
-     * @param context the android context
-     */
-    public Subject(Context context) {
-        // Get defaults..
-        this();
+    public static class SubjectBuilder {
+        private Context context = null; // Optional
 
-        // Set context based options
-        setContextualParams(context);
+        /**
+         * @param context The android context to pass to the subject
+         */
+        public SubjectBuilder context(Context context) {
+            this.context = context;
+            return this;
+        }
+
+        /**
+         * Creates a new Subject
+         */
+        public Subject build() {
+            return new Subject(this);
+        }
     }
 
     /**

@@ -84,7 +84,10 @@ public class EventSendingTest extends AndroidTestCase {
         emitter.getEventStore().removeAllEvents();
 
         // Make a subject
-        Subject subject = new Subject(getContext());
+        Subject subject = new Subject
+                .SubjectBuilder()
+                .context(getContext())
+                .build();
 
         // Make and return the Tracker object
         Tracker tracker = new Tracker
@@ -124,7 +127,10 @@ public class EventSendingTest extends AndroidTestCase {
         emitter.getEventStore().removeAllEvents();
 
         // Make a subject
-        Subject subject = new Subject(getContext());
+        Subject subject = new Subject
+                .SubjectBuilder()
+                .context(getContext())
+                .build();
 
         // Make and return the Tracker object
         Tracker tracker = new Tracker
