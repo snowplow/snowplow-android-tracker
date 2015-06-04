@@ -649,7 +649,9 @@ public class Tracker {
                                         String label, List<SelfDescribingJson> context,
                                         long timestamp) {
 
-        Preconditions.checkArgument(category != null || variable != null || label != null);
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(variable);
+        Preconditions.checkNotNull(label);
 
         TrackerPayload trackerPayload = new TrackerPayload();
 
