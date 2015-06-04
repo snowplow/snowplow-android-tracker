@@ -39,7 +39,7 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(String key, String value) {
         if (value == null || value.isEmpty()) {
-            Logger.d(TAG, "Key value is empty, returning without adding key.", null);
+            Logger.d(TAG, "The keys value is empty, returning without adding key: %s", null, key);
             return;
         }
 
@@ -50,7 +50,7 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(String key, Object value) {
         if (value == null) {
-            Logger.d(TAG, "Key value is empty, returning without adding key.", null);
+            Logger.d(TAG, "The keys value is empty, returning without adding key: %s", null, key);
             return;
         }
 
