@@ -138,7 +138,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      * @return A completed Payload
      */
-    private Payload completePayload(Payload payload, List<SelfDescribingJson> context,
+    private void completePayload(Payload payload, List<SelfDescribingJson> context,
                                       long timestamp) {
 
         // Add default parameters to the payload
@@ -176,8 +176,6 @@ public class Tracker {
                 Parameters.CONTEXT);
 
         Logger.d(TAG, "Complete Payload: %s", null, payload);
-
-        return payload;
     }
 
     /**
@@ -228,7 +226,7 @@ public class Tracker {
      */
     public void trackPageView(String pageUrl, String pageTitle, String referrer,
                               List<SelfDescribingJson> context) {
-        trackPageView(pageUrl,pageTitle, referrer, context, 0);
+        trackPageView(pageUrl, pageTitle, referrer, context, 0);
     }
 
     /**
@@ -600,6 +598,68 @@ public class Tracker {
 
         SelfDescribingJson payload = new SelfDescribingJson(
                 TrackerConstants.SCHEMA_SCREEN_VIEW, trackerPayload);
+
+        trackUnstructuredEvent(payload, context, timestamp);
+    }
+
+    /**
+     * @param category The category of the timed event
+     * @param variable Identify the timing being recorded
+     * @param timing The number of milliseconds in elapsed time to report
+     * @param label Optional description of this timing
+     */
+    public void trackTimingWithCategory(String category, String variable, int timing,
+                                        String label) {
+        trackTimingWithCategory(category, variable, timing, label, null, 0);
+    }
+
+    /**
+     * @param category The category of the timed event
+     * @param variable Identify the timing being recorded
+     * @param timing The number of milliseconds in elapsed time to report
+     * @param label Optional description of this timing
+     * @param context Custom context for the event
+     */
+    public void trackTimingWithCategory(String category, String variable, int timing,
+                                        String label, List<SelfDescribingJson> context) {
+        trackTimingWithCategory(category, variable, timing, label, context, 0);
+    }
+
+    /**
+     * @param category The category of the timed event
+     * @param variable Identify the timing being recorded
+     * @param timing The number of milliseconds in elapsed time to report
+     * @param label Optional description of this timing
+     * @param timestamp Optional timestamp for the event
+     */
+    public void trackTimingWithCategory(String category, String variable, int timing,
+                                        String label, long timestamp) {
+        trackTimingWithCategory(category, variable, timing, label, null, timestamp);
+    }
+
+    /**
+     * @param category The category of the timed event
+     * @param variable Identify the timing being recorded
+     * @param timing The number of milliseconds in elapsed time to report
+     * @param label Optional description of this timing
+     * @param context Custom context for the event
+     * @param timestamp Optional timestamp for the event
+     */
+    public void trackTimingWithCategory(String category, String variable, int timing,
+                                        String label, List<SelfDescribingJson> context,
+                                        long timestamp) {
+
+        Preconditions.checkArgument(category != null || variable != null || label != null);
+
+        TrackerPayload trackerPayload = new TrackerPayload();
+
+        trackerPayload.add(Parameters.UT_CATEGORY, category);
+        trackerPayload.add(Parameters.UT_VARIABLE, variable);
+        trackerPayload.add(Parameters.UT_TIMING, timing);
+        trackerPayload.add(Parameters.UT_LABEL, label);
+
+        SelfDescribingJson payload = new SelfDescribingJson(
+                TrackerConstants.SCHEMA_USER_TIMINGS, trackerPayload);
 
         trackUnstructuredEvent(payload, context, timestamp);
     }
