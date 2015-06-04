@@ -274,7 +274,7 @@ public class Tracker {
      * @param value A value associated with the user action
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value) {
+                                     double value) {
         trackStructuredEvent(category, action, label, property, value, null, 0);
     }
 
@@ -287,7 +287,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<SelfDescribingJson> context) {
+                                     double value, List<SelfDescribingJson> context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
@@ -300,7 +300,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, long timestamp) {
+                                     double value, long timestamp) {
         trackStructuredEvent(category, action, label, property, value, null, timestamp);
     }
 
@@ -314,7 +314,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     int value, List<SelfDescribingJson> context, long timestamp) {
+                                     double value, List<SelfDescribingJson> context, long timestamp) {
         // Precondition checks
         Preconditions.checkNotNull(label);
         Preconditions.checkNotNull(property);
