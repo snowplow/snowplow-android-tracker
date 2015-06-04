@@ -20,6 +20,7 @@ public class Parameters {
     public static final String EVENT = "e";
     public static final String EID = "eid";
     public static final String TIMESTAMP = "dtm";
+    public static final String SENT_TIMESTAMP = "stm";
     public static final String TRACKER_VERSION = "tv";
     public static final String APPID = "aid";
     public static final String NAMESPACE = "tna";

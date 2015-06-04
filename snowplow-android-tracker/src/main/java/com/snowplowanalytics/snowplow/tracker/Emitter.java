@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
@@ -358,7 +360,10 @@ public class Emitter {
                 reqEventId.add(eventIds.get(i));
 
                 // Build the request
-                Request req = requestBuilderGet(events.getEvents().get(i));
+                Payload payload = events.getEvents().get(i);
+                addStmToEvent(payload, "");
+
+                Request req = requestBuilderGet(payload);
                 int code = requestSender(req);
 
                 Logger.d(TAG, "Sent a GET request: response %s", null, "" + code);
@@ -373,18 +378,23 @@ public class Emitter {
             }
         }
         else {
-
-            Logger.i(TAG, "Sending %s POST requests", null,
-                    payloads.size() / bufferOption.getCode());
+            int sendCount = payloads.size() / bufferOption.getCode();
+            Logger.i(TAG, "Sending %s POST requests", null, sendCount);
 
             for (int i = 0; i < payloads.size(); i += bufferOption.getCode()) {
+                // Store Sending Timestamp
+                String timestamp = Util.getTimestamp();
+
                 // Get the eventIds for this POST Request
                 LinkedList<Long> reqEventIds = new LinkedList<>();
 
                 // Add payloads together for a POST Event
                 ArrayList<Map> postPayloadMaps = new ArrayList<>();
                 for (int j = i; j < (i + bufferOption.getCode()) && j < payloads.size(); j++) {
-                    postPayloadMaps.add(events.getEvents().get(j).getMap());
+                    Payload payload = events.getEvents().get(j);
+                    addStmToEvent(payload, timestamp);
+
+                    postPayloadMaps.add(payload.getMap());
                     reqEventIds.add(eventIds.get(j));
                 }
 
@@ -474,6 +484,18 @@ public class Emitter {
                 .url(reqUrl)
                 .post(reqBody)
                 .build();
+    }
+
+    /**
+     * Adds the Sending Time (stm) field
+     * to each event payload.
+     *
+     * @param payload The payload to append the field to
+     * @param timestamp An optional timestamp String
+     */
+    private void addStmToEvent(Payload payload, String timestamp) {
+        payload.add(Parameters.SENT_TIMESTAMP,
+                timestamp.equals("") ? Util.getTimestamp() : timestamp);
     }
 
     // Setters, Getters and Checkers
