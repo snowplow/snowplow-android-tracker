@@ -274,7 +274,7 @@ public class Tracker {
      * @param value A value associated with the user action
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     double value) {
+                                     Double value) {
         trackStructuredEvent(category, action, label, property, value, null, 0);
     }
 
@@ -287,7 +287,7 @@ public class Tracker {
      * @param context Custom context for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     double value, List<SelfDescribingJson> context) {
+                                     Double value, List<SelfDescribingJson> context) {
         trackStructuredEvent(category, action, label, property, value, context, 0);
     }
 
@@ -300,7 +300,7 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     double value, long timestamp) {
+                                     Double value, long timestamp) {
         trackStructuredEvent(category, action, label, property, value, null, timestamp);
     }
 
@@ -314,14 +314,10 @@ public class Tracker {
      * @param timestamp Optional user-provided timestamp for the event
      */
     public void trackStructuredEvent(String category, String action, String label, String property,
-                                     double value, List<SelfDescribingJson> context, long timestamp) {
+                                     Double value, List<SelfDescribingJson> context, long timestamp) {
         // Precondition checks
-        Preconditions.checkNotNull(label);
-        Preconditions.checkNotNull(property);
-        Preconditions.checkArgument(!label.isEmpty(), "label cannot be empty");
-        Preconditions.checkArgument(!property.isEmpty(), "property cannot be empty");
-        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
-        Preconditions.checkArgument(!action.isEmpty(), "action cannot be empty");
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(action);
 
         Payload payload = new TrackerPayload();
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_STRUCTURED);
@@ -329,7 +325,7 @@ public class Tracker {
         payload.add(Parameters.SE_ACTION, action);
         payload.add(Parameters.SE_LABEL, label);
         payload.add(Parameters.SE_PROPERTY, property);
-        payload.add(Parameters.SE_VALUE, Double.toString(value));
+        payload.add(Parameters.SE_VALUE, value != null ? Double.toString(value) : null);
 
         completePayload(payload, context, timestamp);
 
