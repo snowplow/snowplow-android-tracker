@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -99,16 +100,13 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    public JsonNode getNode() {
-        return objectNode;
-    }
-
     @Override
     public Map getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         try {
             Logger.i(TAG, "Attempting to create a Map structure from ObjectNode.", null);
-            map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>(){});
+            map = objectMapper.readValue(objectNode.toString(), new TypeReference<Map>() {
+            });
         } catch (JsonMappingException e) {
             Logger.e(TAG, "Error creating map structure from ObjectNode: %s", null, e.toString());
         } catch (JsonParseException e) {
@@ -120,7 +118,17 @@ public class TrackerPayload implements Payload {
     }
 
     @Override
+    public JsonNode getNode() {
+        return objectNode;
+    }
+
+    @Override
     public String toString() {
         return objectNode.toString();
+    }
+
+    @Override
+    public long getByteSize() {
+        return objectNode.toString().getBytes(Charset.forName("UTF-8")).length;
     }
 }

@@ -75,4 +75,10 @@ public interface Payload {
      * @return A string value of the Payload.
      */
     public String toString();
+
+    /**
+     * Returns the byte size of a payload.
+     * @return A long representing the byte size of the payload.
+     */
+    public long getByteSize();
 }

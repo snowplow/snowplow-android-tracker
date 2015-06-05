@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -158,6 +159,7 @@ public class SelfDescribingJson implements Payload {
         Logger.d(TAG, "Payload: addMap(Map, Boolean, String, String) method called - Doing nothing.", null);
     }
 
+    @Override
     public Map<String, Object> getMap() {
         HashMap<String, Object> map = new HashMap<String, Object>();
         try {
@@ -173,11 +175,18 @@ public class SelfDescribingJson implements Payload {
         return map;
     }
 
+    @Override
     public JsonNode getNode() {
         return objectNode;
     }
 
+    @Override
     public String toString() {
         return objectNode.toString();
+    }
+
+    @Override
+    public long getByteSize() {
+        return objectNode.toString().getBytes(Charset.forName("UTF-8")).length;
     }
 }

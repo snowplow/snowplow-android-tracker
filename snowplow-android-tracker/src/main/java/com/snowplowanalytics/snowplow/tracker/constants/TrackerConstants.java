@@ -32,4 +32,6 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM_ITEM = "ti";
 
     public static final int BACK_PRESSURE_LIMIT = 10000;
+
+    public static final long POST_ENVELOPE_SIZE = 88;
 }
