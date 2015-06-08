@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 11
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    
+    buildTypes {
+        debug {
+            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+        }
+        release {
+            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.gms:play-services-analytics:7.5.0'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
+}
