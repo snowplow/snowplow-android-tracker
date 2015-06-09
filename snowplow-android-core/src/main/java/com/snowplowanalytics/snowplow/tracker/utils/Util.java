@@ -13,7 +13,12 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils;
 
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.util.Base64;
 
 import org.json.JSONArray;
@@ -21,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -141,5 +147,126 @@ public class Util {
             return o.toString();
         }
         return null;
+    }
+
+    /**
+     * Returns the Advertising ID or null
+     * if it fails to get the id.
+     *
+     * @param context the android context
+     * @return the id or null
+     */
+    public static String getAdvertisingId(Context context) {
+        try {
+            Object AdvertisingInfoObject = invokeStaticMethod(
+                    "com.google.android.gms.ads.identifier.AdvertisingIdClient",
+                    "getAdvertisingIdInfo", new Class[]{Context.class}, context);
+            return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
+        }
+        catch (Exception e) {
+            Logger.e(TAG, "Exception occurred getting the Advertising ID: %s - Cause: %s",
+                    e.toString(), e.getCause().toString());
+            return null;
+        }
+    }
+
+    /**
+     * Returns the carrier name based
+     * on the android context supplied.
+     *
+     * @param context the android context
+     * @return a carrier name or null
+     */
+    public static String getCarrier(Context context) {
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (telephonyManager != null) {
+            return telephonyManager.getNetworkOperatorName();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the location of the android
+     * device.
+     *
+     * @param context the android context
+     * @return the phones Location
+     */
+    public static Location getLocation(Context context) {
+        LocationManager locationManager =
+                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        String provider = locationManager.getBestProvider(criteria, true);
+
+        if (provider != null) {
+            try {
+                Location location = locationManager.getLastKnownLocation(provider);
+                Logger.d(TAG, "Location found: %s", location);
+                return location;
+            } catch (SecurityException ex) {
+                Logger.e(TAG, "Failed to retrieve location: %s", ex.toString());
+                return null;
+            }
+        }
+
+        Logger.e(TAG, "Location Manager provider is null.");
+        return null;
+    }
+
+    /**
+     * Invokes a static method within a class
+     * if it can be found on the classpath.
+     *
+     * @param className The full defined classname
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private static Object invokeStaticMethod(String className, String methodName,
+                                      Class[] cArgs, Object... args) throws Exception {
+        Class classObject = Class.forName(className);
+        return invokeMethod(classObject, methodName, null, cArgs, args);
+    }
+
+    /**
+     * Invokes a method on a static instance
+     * within a class by reflection.
+     *
+     * @param instance The instance to invoke a method on
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private static Object invokeInstanceMethod(Object instance, String methodName,
+                                        Class[] cArgs, Object... args) throws Exception {
+        Class classObject = instance.getClass();
+        return invokeMethod(classObject, methodName, instance, cArgs, args);
+    }
+
+    /**
+     * Invokes methods of a class via reflection
+     *
+     * @param classObject The class to attempt invocation on
+     * @param methodName The name of the method to invoke
+     * @param instance The object instance to invoke on
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private static Object invokeMethod(Class classObject, String methodName, Object instance,
+                                Class[] cArgs, Object... args) throws Exception {
+        Method methodObject = classObject.getMethod(methodName, cArgs);
+        return methodObject.invoke(instance, args);
     }
 }
