@@ -16,11 +16,8 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
-import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -190,9 +187,13 @@ public class Subject {
      *
      * @param context the android context
      */
-    private void setAdvertisingID(Context context) {
-        String playAdId = Util.getAdvertisingId(context);
-        putToMobile(Parameters.ANDROID_IDFA, playAdId);
+    public void setAdvertisingID(final Context context) {
+        new Thread(new Runnable() {
+            public void run() {
+                String playAdId = Util.getAdvertisingId(context);
+                putToMobile(Parameters.ANDROID_IDFA, playAdId);
+            }
+        }).start();
     }
 
     /**
@@ -204,7 +205,7 @@ public class Subject {
      */
     @TargetApi(19)
     @SuppressWarnings("deprecation")
-    private void setDefaultScreenResolution(Context context) {
+    public void setDefaultScreenResolution(Context context) {
         WindowManager windowManager =
                 (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
@@ -228,7 +229,7 @@ public class Subject {
      *
      * @param context the android context
      */
-    private void setLocation(Context context) {
+    public void setLocation(Context context) {
         Location location = Util.getLocation(context);
         if (location == null) {
             Logger.e(TAG, "Location information not available.");
@@ -248,7 +249,7 @@ public class Subject {
      *
      * @param context the android context
      */
-    private void setCarrier(Context context) {
+    public void setCarrier(Context context) {
         String carrier = Util.getCarrier(context);
         if (carrier != null) {
             putToMobile(Parameters.CARRIER, carrier);
@@ -384,5 +385,15 @@ public class Subject {
      */
     public Map<String, String> getSubject() {
         return this.standardPairs;
+    }
+
+    // Extra function to return IDFA code
+
+    /**
+     * Attempts to return the IDFA code from the mobile pairs
+     * map.  Will either return the IDFA String or null.
+     */
+    public String getIdfa() {
+        return this.mobilePairs.get(Parameters.ANDROID_IDFA);
     }
 }
