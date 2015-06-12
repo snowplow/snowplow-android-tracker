@@ -26,7 +26,6 @@ public class DemoUtils {
     public static Emitter getEmitterLite(Context context, RequestCallback callback) {
         return new Emitter.EmitterBuilder("", context,
                 com.snowplowanalytics.snowplow.tracker.lite.Emitter.class)
-                .tick(1)
                 .callback(callback)
                 .build();
     }
@@ -34,7 +33,6 @@ public class DemoUtils {
     public static Emitter getEmitterRx(Context context, RequestCallback callback) {
         return new Emitter.EmitterBuilder("", context,
                 com.snowplowanalytics.snowplow.tracker.rx.Emitter.class)
-                .tick(1)
                 .callback(callback)
                 .build();
     }
