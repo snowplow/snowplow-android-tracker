@@ -38,6 +38,7 @@ public abstract class Emitter {
     protected HttpMethod httpMethod;
     protected BufferOption bufferOption;
     protected RequestSecurity requestSecurity;
+    protected String uri;
     protected int emitterTick;
     protected int emptyLimit;
     protected int sendLimit;
@@ -206,26 +207,29 @@ public abstract class Emitter {
         this.sendLimit = builder.sendLimit;
         this.byteLimitGet = builder.byteLimitGet;
         this.byteLimitPost = builder.byteLimitPost;
+        this.uri = builder.uri;
+        buildEmitterUri();
 
-        // Need to create URI Builder in this way to preserve port keys/characters that would
-        // be incorrectly encoded by the uriBuilder.
-        if (requestSecurity == RequestSecurity.HTTP) {
-            this.uriBuilder = Uri.parse("http://" + builder.uri).buildUpon();
+        Logger.v(TAG, "Emitter created successfully!");
+    }
+
+    /**
+     * Sets the Emitter URI
+     */
+    private void buildEmitterUri() {
+        if (this.requestSecurity == RequestSecurity.HTTP) {
+            this.uriBuilder = Uri.parse("http://" + this.uri).buildUpon();
         }
         else {
-            this.uriBuilder = Uri.parse("https://" + builder.uri).buildUpon();
+            this.uriBuilder = Uri.parse("https://" + this.uri).buildUpon();
         }
-
-        // Create URI based on request method
-        if (httpMethod == HttpMethod.GET) {
+        if (this.httpMethod == HttpMethod.GET) {
             uriBuilder.appendPath("i");
         }
         else {
             uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
                     TrackerConstants.PROTOCOL_VERSION);
         }
-
-        Logger.v(TAG, "Emitter created successfully!");
     }
 
     /**
@@ -513,6 +517,33 @@ public abstract class Emitter {
      */
     public void setBufferOption(BufferOption option) {
         this.bufferOption = option;
+    }
+
+    /**
+     * Sets the HttpMethod for the Emitter
+     * @param method the HttpMethod
+     */
+    public void setHttpMethod(HttpMethod method) {
+        this.httpMethod = method;
+        buildEmitterUri();
+    }
+
+    /**
+     * Sets the RequestSecurity for the Emitter
+     * @param security the RequestSecurity
+     */
+    public void setRequestSecurity(RequestSecurity security) {
+        this.requestSecurity = security;
+        buildEmitterUri();
+    }
+
+    /**
+     * Updates the URI for the Emitter
+     * @param uri new Emitter URI
+     */
+    public void setEmitterUri(String uri) {
+        this.uri = uri;
+        buildEmitterUri();
     }
 
     /**
