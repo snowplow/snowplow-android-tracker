@@ -24,7 +24,8 @@ public class Executor {
     private static ScheduledExecutorService getExecutor() {
         synchronized (Executor.class) {
             if (executor == null) {
-                executor = Executors.newSingleThreadScheduledExecutor();
+                // TODO: Should this thread pool be configurable?
+                executor = Executors.newScheduledThreadPool(3);
             }
         }
         return executor;
@@ -46,6 +47,10 @@ public class Executor {
     }
 
     public static boolean status() {
-        return executor.isShutdown();
+        if (executor == null) {
+            return false;
+        } else {
+            return executor.isShutdown();
+        }
     }
 }

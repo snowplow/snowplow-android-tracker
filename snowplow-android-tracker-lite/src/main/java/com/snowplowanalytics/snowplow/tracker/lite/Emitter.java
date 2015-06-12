@@ -26,6 +26,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private final String TAG = Emitter.class.getSimpleName();
 
     private EventStore eventStore;
+    private int emptyCount;
+
+    private volatile boolean isRunning = false;
 
     /**
      * Creates an emitter object
@@ -40,7 +43,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         if (isOnline() && eventStore.getSize() > 0) {
             Executor.execute(new Runnable() {
                 public void run() {
-                    attemptEmit(false);
+                    isRunning = true;
+                    attemptEmit();
                 }
             });
         }
@@ -57,19 +61,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         Executor.execute(new Runnable() {
             public void run() {
                 eventStore.add(payload);
-                attemptEmit(false);
-            }
-        });
-    }
-
-    /**
-     * Will send everything in the event store
-     * to the collector.
-     */
-    public void flush() {
-        Executor.execute(new Runnable() {
-            public void run() {
-                attemptEmit(true);
+                if (!isRunning) {
+                    isRunning = true;
+                    attemptEmit();
+                }
             }
         });
     }
@@ -77,19 +72,26 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     /**
      * Attempts to send events in the database to
      * a collector.
-     *
-     * @param flush A boolean override for the buffer
-     *              limit of the emit attempt.
+     * - If the emitter is not online it will not send
+     * - If the emitter is online but there are no events:
+     *   - Increment empty counter until emptyLimit reached
+     *   - Incurs a backoff period between empty counters
+     * - If the emitter is online and we have events:
+     *   - Pulls allowed amount of events from database and
+     *     attempts to send.
+     *   - If there are failures resets running state
+     *   - Otherwise will attempt to emit again
      */
-    private void attemptEmit(boolean flush) {
-        if (isOnline() && (flush || eventStore.getSize() >= this.bufferOption.getCode())) {
+    private void attemptEmit() {
+        boolean online = isOnline();
+        if (online && eventStore.getSize() > 0) {
+            emptyCount = 0;
 
             EmittableEvents events = eventStore.getEmittableEvents();
             LinkedList<RequestResult> results = performEmit(events);
 
             Logger.v(TAG, "Processing emitter results.");
 
-            // Start counting successes and failures
             int successCount = 0;
             int failureCount = 0;
 
@@ -108,7 +110,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             Logger.d(TAG, "Success Count: %s", successCount);
             Logger.d(TAG, "Failure Count: %s", failureCount);
 
-            // Send the callback
             if (requestCallback != null) {
                 if (failureCount != 0) {
                     requestCallback.onFailure(successCount, failureCount);
@@ -117,20 +118,34 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 }
             }
 
-            // If we have any failures shut the emitter down
             if (failureCount != 0) {
                 if (isOnline()) {
                     Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
                 }
-                Logger.e(TAG, "Emitter is shutting down due to failures.");
-                shutdown();
+                Logger.e(TAG, "Emitter loop stopping: failures.");
+                isRunning = false;
+            } else {
+                attemptEmit();
+            }
+        } else if (online) {
+            if (emptyCount >= this.emptyLimit) {
+                Logger.e(TAG, "Emitter loop stopping: empty limit reached.");
+                isRunning = false;
+            } else {
+                emptyCount++;
+                Logger.e(TAG, "Emitter database empty: " + emptyCount);
+
+                try {
+                    TimeUnit.SECONDS.sleep(this.emitterTick);
+                } catch (InterruptedException e) {
+                    Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
+                }
+
+                attemptEmit();
             }
         } else {
-            Executor.schedule(new Runnable() {
-                public void run() {
-                    attemptEmit(eventStore.getSize() > 0);
-                }
-            }, this.emitterTick, TimeUnit.SECONDS);
+            Logger.e(TAG, "Emitter loop stopping: emitter offline.");
+            isRunning = false;
         }
     }
 
