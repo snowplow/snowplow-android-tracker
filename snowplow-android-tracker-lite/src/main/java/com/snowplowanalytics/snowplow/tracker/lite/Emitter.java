@@ -123,7 +123,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                     Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
                 }
                 Logger.e(TAG, "Emitter is shutting down due to failures.");
-                //shutdown();
+                shutdown();
             }
         } else {
             Executor.schedule(new Runnable() {
@@ -138,6 +138,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * Shuts the emitter down!
      */
     public void shutdown() {
+        Logger.d(TAG, "Shutting down emitter.");
         Executor.shutdown();
     }
 
