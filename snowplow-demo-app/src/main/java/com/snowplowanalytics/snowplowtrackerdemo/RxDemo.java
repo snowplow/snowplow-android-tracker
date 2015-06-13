@@ -95,7 +95,7 @@ public class RxDemo extends Activity {
         Context context = getApplicationContext();
         Emitter emitter = DemoUtils.getEmitterRx(context, getCallback());
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTracker(emitter, subject);
+        return DemoUtils.getTrackerRx(emitter, subject);
     }
 
     /**

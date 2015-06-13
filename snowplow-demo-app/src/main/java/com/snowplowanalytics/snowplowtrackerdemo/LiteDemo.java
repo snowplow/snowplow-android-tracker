@@ -95,7 +95,7 @@ public class LiteDemo extends Activity {
         Context context = getApplicationContext();
         Emitter emitter = DemoUtils.getEmitterLite(context, getCallback());
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTracker(emitter, subject);
+        return DemoUtils.getTrackerLite(emitter, subject);
     }
 
     /**

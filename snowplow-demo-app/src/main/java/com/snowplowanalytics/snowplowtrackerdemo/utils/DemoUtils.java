@@ -14,8 +14,19 @@ public class DemoUtils {
     public static final String namespace = "SnowplowAndroidTrackerDemo";
     public static final String appId = "DemoID";
 
-    public static Tracker getTracker(Emitter emitter, Subject subject) {
-        return new Tracker.TrackerBuilder(emitter, namespace, appId)
+    public static Tracker getTrackerLite(Emitter emitter, Subject subject) {
+        return new Tracker.TrackerBuilder(emitter, namespace, appId,
+                com.snowplowanalytics.snowplow.tracker.lite.Tracker.class)
+                .level(LogLevel.VERBOSE)
+                .base64(false)
+                .platform(DevicePlatforms.Mobile)
+                .subject(subject)
+                .build();
+    }
+
+    public static Tracker getTrackerRx(Emitter emitter, Subject subject) {
+        return new Tracker.TrackerBuilder(emitter, namespace, appId,
+                com.snowplowanalytics.snowplow.tracker.rx.Tracker.class)
                 .level(LogLevel.VERBOSE)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
