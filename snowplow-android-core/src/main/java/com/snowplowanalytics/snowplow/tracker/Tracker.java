@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,44 +30,43 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 
-public class Tracker {
+public abstract class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
-    private final String trackerVersion = BuildConfig.TRACKER_LABEL;
-    private Emitter emitter;
-    private Subject subject;
-    private String namespace;
-    private String appId;
-    private boolean base64Encoded;
-    private DevicePlatforms devicePlatform;
-    private LogLevel level;
-
-    /**
-     * Creates a new Snowplow Tracker.
-     *
-     * @param builder The builder that constructs a tracker
-     */
-    private Tracker(TrackerBuilder builder) {
-        this.emitter = builder.emitter;
-        this.appId = builder.appId;
-        this.base64Encoded = builder.base64Encoded;
-        this.namespace = builder.namespace;
-        this.subject = builder.subject;
-        this.devicePlatform = builder.devicePlatform;
-        this.level = builder.logLevel;
-
-        Logger.updateLogLevel(builder.logLevel);
-        Logger.v(TAG, "Tracker created successfully.");
-    }
+    protected final String trackerVersion = BuildConfig.TRACKER_LABEL;
+    protected Emitter emitter;
+    protected Subject subject;
+    protected String namespace;
+    protected String appId;
+    protected boolean base64Encoded;
+    protected DevicePlatforms devicePlatform;
+    protected LogLevel level;
 
     public static class TrackerBuilder {
-        private final Emitter emitter; // Required
-        private final String namespace; // Required
-        private final String appId; // Required
-        private Subject subject = null; // Optional
-        private boolean base64Encoded = true; // Optional
-        private DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
-        private LogLevel logLevel = LogLevel.OFF; // Optional
+
+        protected static Class<? extends Tracker> defaultTrackerClass;
+
+        /* Prefer Rx, then lite versions of our trackers */
+        static {
+            try {
+                defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Tracker");
+            } catch (ClassNotFoundException e) {
+                try {
+                    defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.lite.Tracker");
+                } catch (ClassNotFoundException e1) {
+                    defaultTrackerClass = null;
+                }
+            }
+        }
+
+        private Class<? extends Tracker> trackerClass;
+        protected final Emitter emitter; // Required
+        protected final String namespace; // Required
+        protected final String appId; // Required
+        protected Subject subject = null; // Optional
+        protected boolean base64Encoded = true; // Optional
+        protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        protected LogLevel logLevel = LogLevel.OFF; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -73,9 +74,21 @@ public class Tracker {
          * @param appId Application ID
          */
         public TrackerBuilder(Emitter emitter, String namespace, String appId) {
+            this(emitter, namespace, appId, defaultTrackerClass);
+        }
+
+        /**
+         * @param emitter Emitter to which events will be sent
+         * @param namespace Identifier for the Tracker instance
+         * @param appId Application ID
+         * @param trackerClass Default tracker class
+         */
+        public TrackerBuilder(Emitter emitter, String namespace, String appId,
+                              Class<? extends Tracker> trackerClass) {
             this.emitter = emitter;
             this.namespace = namespace;
             this.appId = appId;
+            this.trackerClass = trackerClass;
         }
 
         /**
@@ -114,8 +127,41 @@ public class Tracker {
          * Creates a new Tracker
          */
         public Tracker build(){
-            return new Tracker(this);
+            if (trackerClass == null) {
+                throw new IllegalStateException("No tracker class found or defined");
+            }
+
+            try {
+                Constructor<? extends Tracker> c =  trackerClass.getDeclaredConstructor(TrackerBuilder.class);
+                return c.newInstance(this);
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException("Can’t create tracker", e);
+            } catch (InvocationTargetException e) {
+                throw new IllegalStateException("Can’t create tracker", e);
+            } catch (InstantiationException e) {
+                throw new IllegalStateException("Can’t create tracker", e);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Can’t create tracker", e);
+            }
         }
+    }
+
+    /**
+     * Creates a new Snowplow Tracker.
+     *
+     * @param builder The builder that constructs a tracker
+     */
+    public Tracker(TrackerBuilder builder) {
+        this.emitter = builder.emitter;
+        this.appId = builder.appId;
+        this.base64Encoded = builder.base64Encoded;
+        this.namespace = builder.namespace;
+        this.subject = builder.subject;
+        this.devicePlatform = builder.devicePlatform;
+        this.level = builder.logLevel;
+
+        Logger.updateLogLevel(builder.logLevel);
+        Logger.v(TAG, "Tracker created successfully.");
     }
 
     /**

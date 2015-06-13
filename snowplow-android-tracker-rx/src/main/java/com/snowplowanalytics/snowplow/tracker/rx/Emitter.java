@@ -14,6 +14,8 @@
 package com.snowplowanalytics.snowplow.tracker.rx;
 
 import java.util.LinkedList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -31,7 +33,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
-    private final Scheduler scheduler = Schedulers.io();
+    private final Executor executor = Executors.newSingleThreadScheduledExecutor();
+    private final Scheduler scheduler = Schedulers.from(executor);
     private int emptyCounter = 0;
     private Subscription emitterSub;
     private EventStore eventStore;
