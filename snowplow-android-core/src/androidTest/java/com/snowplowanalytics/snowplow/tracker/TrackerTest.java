@@ -20,7 +20,7 @@ public class TrackerTest extends AndroidTestCase {
 
         // Make and return the Tracker object
         return new Tracker
-                .TrackerBuilder(emitter, "myNamespace", "myAppId")
+                .TrackerBuilder(emitter, "myNamespace", "myAppId", TestTracker.class)
                 .subject(subject)
                 .platform(DevicePlatforms.InternetOfThings)
                 .base64(false)

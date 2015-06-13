@@ -28,9 +28,8 @@ public class SnowplowRxTestCase extends AndroidTestCase {
 
     // Tracker Builder
 
-    public Tracker getTracker(com.snowplowanalytics.snowplow.tracker.Emitter emitter,
-                              Subject subject) {
-
+    public com.snowplowanalytics.snowplow.tracker.Tracker getTracker(
+            com.snowplowanalytics.snowplow.tracker.Emitter emitter, Subject subject) {
         return new Tracker
             .TrackerBuilder(emitter, "myNamespace", "myAppId")
             .subject(subject)
@@ -39,12 +38,9 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             .build();
     }
 
-    public com.snowplowanalytics.snowplow.tracker.Emitter getEmitter(
-            HttpMethod method,
-            BufferOption option,
-            RequestSecurity security) {
-
-        return new com.snowplowanalytics.snowplow.tracker.Emitter
+    public com.snowplowanalytics.snowplow.tracker.Emitter getEmitter(HttpMethod method,
+                                                 BufferOption option, RequestSecurity security) {
+        return new Emitter
             .EmitterBuilder(testURL, getContext())
             .option(option)
             .method(method)
@@ -236,35 +232,35 @@ public class SnowplowRxTestCase extends AndroidTestCase {
 
     // Event Tracker Functions
 
-    public void trackPageView(Tracker tracker) throws Exception {
+    public void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer");
         tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext());
         tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", (long) 1433791172);
         tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext(), (long) 1433791172);
     }
 
-    public void trackStructuredEvent(Tracker tracker) throws Exception {
+    public void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         tracker.trackStructuredEvent("category", "action", "label", "property", 0.00);
         tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext());
         tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, (long) 1433791172);
         tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext(), (long) 1433791172);
     }
 
-    public void trackScreenView(Tracker tracker) throws Exception {
+    public void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         tracker.trackScreenView("screenName", "screenId");
         tracker.trackScreenView("screenName", "screenId", getCustomContext());
         tracker.trackScreenView("screenName", "screenId", (long) 1433791172);
         tracker.trackScreenView("screenName", "screenId", getCustomContext(), (long) 1433791172);
     }
 
-    public void trackTimings(Tracker tracker) throws Exception {
+    public void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         tracker.trackTimingWithCategory("category", "variable", 1, "label");
         tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext());
         tracker.trackTimingWithCategory("category", "variable", 1, "label", (long) 1433791172);
         tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext(), (long) 1433791172);
     }
 
-    public void trackUnStructuredEvent(Tracker tracker) throws Exception {
+    public void trackUnStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
@@ -274,7 +270,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
         tracker.trackUnstructuredEvent(test, getCustomContext(), (long) 1433791172);
     }
 
-    public void trackEcommerceEvent(Tracker tracker) throws Exception {
+    public void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         TransactionItem item = new TransactionItem("item-1", "sku-1", 35.00, 1, "Acme 1", "Stuff", "AUD");
         List<TransactionItem> items = new LinkedList<>();
         items.add(item);

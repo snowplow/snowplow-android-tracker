@@ -21,7 +21,7 @@ public class SubjectTest extends AndroidTestCase {
 
     // Tests
 
-    public void testGetSubjectStandardPairs() {
+    public void testGetSubjectStandardPairs() throws Exception {
         Subject subject = getSubject();
         Map<String, String> standardPairs = subject.getSubject();
         Map<String, String> mobilePairs = subject.getSubjectMobile();
@@ -35,6 +35,7 @@ public class SubjectTest extends AndroidTestCase {
         assertTrue(mobilePairs.containsKey("deviceModel"));
         
         if (System.getenv("ANDROID_TRAVIS") == null) {
+            Thread.sleep(1000);
             assertTrue(mobilePairs.containsKey("androidIdfa"));
         } else {
             Log.i("test", "Skipping androidIdfa test on Travis");
