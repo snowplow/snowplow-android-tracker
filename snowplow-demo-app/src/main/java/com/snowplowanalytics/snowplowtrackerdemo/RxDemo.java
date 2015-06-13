@@ -27,12 +27,18 @@ public class RxDemo extends Activity {
     private EditText _uriField;
     private RadioGroup _type, _security;
     private RadioButton _radio_get, _radio_http;
-    private TextView _log_output;
+    private TextView _log_output, _events_created, _events_sent, _emitter_online, _emitter_status,
+            _database_size;
+
+    private int events_created = 0;
+    private int events_sent = 0;
+    private boolean isRx = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rx_demo);
+        isRx = true;
         setupTrackerListener();
     }
 
@@ -41,7 +47,7 @@ public class RxDemo extends Activity {
         super.onBackPressed();
         Emitter e = tracker.getEmitter();
         e.shutdown();
-        e.getEventStore().removeAllEvents();
+        isRx = false;
     }
 
     /**
@@ -56,10 +62,16 @@ public class RxDemo extends Activity {
         _radio_get   = (RadioButton)findViewById(R.id.radio_get);
         _radio_http  = (RadioButton)findViewById(R.id.radio_http);
         _log_output  = (TextView)findViewById(R.id.log_output);
+        _events_created  = (TextView)findViewById(R.id.created_events);
+        _events_sent     = (TextView)findViewById(R.id.sent_events);
+        _emitter_online  = (TextView)findViewById(R.id.online_status);
+        _emitter_status  = (TextView)findViewById(R.id.emitter_status);
+        _database_size   = (TextView)findViewById(R.id.database_size);
 
         _log_output.setMovementMethod(new ScrollingMovementMethod());
         _log_output.setText("");
-        tracker = getTracker();
+        tracker = DemoUtils.getAndroidTrackerRx(getApplicationContext(), getCallback());
+        makePollingUpdater();
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -78,24 +90,14 @@ public class RxDemo extends Activity {
 
                 // If the URI is not empty send event..
                 if (!uri.equals("")) {
-                    _startButton.setText("Sending events...");
-                    updateLogger("Sending events to endpoint:\n");
+                    events_created += 28;
+                    _events_created.setText("Events made: " + events_created);
                     TrackerEvents.trackAll(tracker);
                 } else {
                     updateLogger("Empty URI found, please fill in first\n");
                 }
             }
         });
-    }
-
-    /**
-     * Returns a Lite Tracker instance.
-     */
-    private Tracker getTracker() {
-        Context context = getApplicationContext();
-        Emitter emitter = DemoUtils.getEmitterRx(context, getCallback());
-        Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerRx(emitter, subject);
     }
 
     /**
@@ -107,7 +109,7 @@ public class RxDemo extends Activity {
             @Override
             public void onSuccess(int successCount) {
                 updateLogger("Emitter Success:\n " + "- Events sent: " + successCount + "\n");
-                resetStartButton();
+                updateEventsSent(successCount);
             }
 
             @Override
@@ -115,7 +117,7 @@ public class RxDemo extends Activity {
                 updateLogger("Emitter Failure:\n " +
                         "- Events sent: " + successCount + "\n " +
                         "- Events failed: " + failureCount + "\n");
-                resetStartButton();
+                updateEventsSent(successCount);
             }
         };
     }
@@ -135,13 +137,60 @@ public class RxDemo extends Activity {
     }
 
     /**
-     * Resets the start button from running state.
+     * Updates the events sent counter.
+     *
+     * @param count the amount of successful events
      */
-    private void resetStartButton() {
+    private void updateEventsSent(final int count) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                _startButton.setText("Send more?");
+                events_sent += count;
+                _events_sent.setText("Events sent: " + events_sent);
+            }
+        });
+    }
+
+    /**
+     * Starts a polling updater.
+     */
+    private void makePollingUpdater() {
+        DemoUtils.executor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        while (isRx) {
+                            updateEmitterStats();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    /**
+     * Updates the state of the emitter being online.
+     */
+    private void updateEmitterStats() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String online = tracker.getEmitter().isOnline() ? "yes" : "no";
+                _emitter_online.setText("Online: " + online);
+                String status = tracker.getEmitter().getEmitterStatus() ? "yes" : "no";
+                _emitter_status.setText("Running: " + status);
+                long db_size = tracker.getEmitter().getEventStore().getSize();
+                _database_size.setText("DB Size: " + db_size);
+
+                if (status.equals("yes")) {
+                    _startButton.setText("Running...");
+                } else {
+                    _startButton.setText("Start!");
+                }
             }
         });
     }

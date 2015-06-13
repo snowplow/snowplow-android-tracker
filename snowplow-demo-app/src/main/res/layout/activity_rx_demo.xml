@@ -155,8 +155,11 @@
         android:id="@+id/logger_header"
         android:textSize="16sp"
         android:paddingTop="10dp"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:layout_below="@+id/btn_rx_start"/>
+        android:layout_below="@+id/btn_rx_start"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -165,16 +168,96 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/logger_header"
         android:paddingTop="5dp"
         android:paddingLeft="10dp"
-        android:layout_below="@+id/logger_header"
         android:layout_marginTop="10dp"
         android:maxLines = "200"
         android:scrollbars = "vertical"
         android:textColor="@android:color/white"
         android:background="@color/button_material_dark"
-        android:gravity="top" />
+        android:gravity="bottom"
+        android:layout_toStartOf="@+id/radio_send_type"
+        android:layout_marginRight="26dp"
+        android:layout_marginEnd="26dp"
+        android:layout_toLeftOf="@+id/radio_send_type" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/emitter_statistics"
+        android:id="@+id/statistics"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/btn_rx_start"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/created_events"
+        android:id="@+id/created_events"
+        android:textSize="16sp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_alignTop="@+id/log_output"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sent_events"
+        android:id="@+id/sent_events"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/created_events"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/online_status"
+        android:id="@+id/online_status"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/sent_events"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/emitter_status"
+        android:id="@+id/emitter_status"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/online_status"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/database_size"
+        android:id="@+id/database_size"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/emitter_status"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
 
 </RelativeLayout>

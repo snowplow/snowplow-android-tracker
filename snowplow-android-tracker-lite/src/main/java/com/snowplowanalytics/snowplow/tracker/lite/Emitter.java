@@ -101,7 +101,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                         eventStore.removeEvent(eventId);
                     }
                     successCount += res.getEventIds().size();
-                } else if (!res.getSuccess()) {
+                } else {
                     failureCount += res.getEventIds().size();
                     Logger.e(TAG, "Request sending failed but we will retry later.");
                 }

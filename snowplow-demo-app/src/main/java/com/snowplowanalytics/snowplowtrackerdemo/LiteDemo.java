@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Button;
-import android.content.Context;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -16,7 +15,6 @@ import com.snowplowanalytics.snowplow.tracker.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
@@ -27,12 +25,18 @@ public class LiteDemo extends Activity {
     private EditText _uriField;
     private RadioGroup _type, _security;
     private RadioButton _radio_get, _radio_http;
-    private TextView _log_output;
+    private TextView _log_output, _events_created, _events_sent, _emitter_online, _emitter_status,
+            _database_size;
+
+    private int events_created = 0;
+    private int events_sent = 0;
+    private boolean isLite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lite_demo);
+        isLite = true;
         setupTrackerListener();
     }
 
@@ -41,7 +45,7 @@ public class LiteDemo extends Activity {
         super.onBackPressed();
         Emitter e = tracker.getEmitter();
         e.shutdown();
-        e.getEventStore().removeAllEvents();
+        isLite = false;
     }
 
     /**
@@ -56,10 +60,16 @@ public class LiteDemo extends Activity {
         _radio_get   = (RadioButton)findViewById(R.id.radio_get);
         _radio_http  = (RadioButton)findViewById(R.id.radio_http);
         _log_output  = (TextView)findViewById(R.id.log_output);
+        _events_created  = (TextView)findViewById(R.id.created_events);
+        _events_sent     = (TextView)findViewById(R.id.sent_events);
+        _emitter_online  = (TextView)findViewById(R.id.online_status);
+        _emitter_status  = (TextView)findViewById(R.id.emitter_status);
+        _database_size   = (TextView)findViewById(R.id.database_size);
 
         _log_output.setMovementMethod(new ScrollingMovementMethod());
         _log_output.setText("");
-        tracker = getTracker();
+        tracker = DemoUtils.getAndroidTrackerLite(getApplicationContext(), getCallback());
+        makePollingUpdater();
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -78,24 +88,14 @@ public class LiteDemo extends Activity {
 
                 // If the URI is not empty send event..
                 if (!uri.equals("")) {
-                    _startButton.setText("Sending events...");
-                    updateLogger("Sending events to endpoint:\n");
+                    events_created += 28;
+                    _events_created.setText("Made: " + events_created);
                     TrackerEvents.trackAll(tracker);
                 } else {
                     updateLogger("Empty URI found, please fill in first\n");
                 }
             }
         });
-    }
-
-    /**
-     * Returns a Lite Tracker instance.
-     */
-    private Tracker getTracker() {
-        Context context = getApplicationContext();
-        Emitter emitter = DemoUtils.getEmitterLite(context, getCallback());
-        Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerLite(emitter, subject);
     }
 
     /**
@@ -107,14 +107,14 @@ public class LiteDemo extends Activity {
             public void onSuccess(int successCount) {
                 updateLogger("Emitter Send Success:\n " +
                         "- Events sent: " + successCount + "\n");
-                resetStartButton();
+                updateEventsSent(successCount);
             }
             @Override
             public void onFailure(int successCount, int failureCount) {
                 updateLogger("Emitter Send Failure:\n " +
                         "- Events sent: " + successCount + "\n " +
                         "- Events failed: " + failureCount + "\n");
-                resetStartButton();
+                updateEventsSent(successCount);
             }
         };
     }
@@ -129,18 +129,66 @@ public class LiteDemo extends Activity {
             @Override
             public void run() {
                 _log_output.append(message);
+
             }
         });
     }
 
     /**
-     * Resets the start button from running state.
+     * Updates the events sent counter.
+     *
+     * @param count the amount of successful events
      */
-    private void resetStartButton() {
+    private void updateEventsSent(final int count) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                _startButton.setText("Send more?");
+                events_sent += count;
+                _events_sent.setText("Sent: " + events_sent);
+            }
+        });
+    }
+
+    /**
+     * Starts a polling updater.
+     */
+    private void makePollingUpdater() {
+        DemoUtils.executor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        while (isLite) {
+                            updateEmitterStats();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    /**
+     * Updates the state of the emitter being online.
+     */
+    private void updateEmitterStats() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String online = tracker.getEmitter().isOnline() ? "yes" : "no";
+                _emitter_online.setText("Online: " + online);
+                String status = tracker.getEmitter().getEmitterStatus() ? "yes" : "no";
+                _emitter_status.setText("Running: " + status);
+                long db_size = tracker.getEmitter().getEventStore().getSize();
+                _database_size.setText("DB Size: " + db_size);
+
+                if (status.equals("yes")) {
+                    _startButton.setText("Running...");
+                } else {
+                    _startButton.setText("Start!");
+                }
             }
         });
     }
