@@ -41,7 +41,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
         this.eventStore = new EventStore(this.context, this.sendLimit);
 
-        if (isOnline() && eventStore.getSize() > 0) {
+        if (eventStore.getSize() > 0) {
             Executor.execute(new Runnable() {
                 public void run() {
                     isRunning.compareAndSet(false, true);
@@ -67,6 +67,22 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 }
             }
         });
+    }
+
+    /**
+     * Starts the emitter if it is not running
+     * and the eventStore is greater than zero.
+     */
+    public void flush() {
+        if (eventStore.getSize() > 0) {
+            Executor.execute(new Runnable() {
+                public void run() {
+                    if (isRunning.compareAndSet(false, true)) {
+                        attemptEmit();
+                    }
+                }
+            });
+        }
     }
 
     /**

@@ -244,6 +244,11 @@ public abstract class Emitter {
     public abstract void shutdown();
 
     /**
+     * Sends everything in the database to the endpoint.
+     */
+    public abstract void flush();
+
+    /**
      * Synchronously performs a request sending
      * operation for either GET or POST.
      *

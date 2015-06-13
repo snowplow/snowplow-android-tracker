@@ -67,6 +67,16 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
+     * Starts the emitter if it is currently
+     * shutdown.
+     */
+    public void flush() {
+        if (isRunning.compareAndSet(false, true) && isOnline()) {
+            start();
+        }
+    }
+
+    /**
      * Starts a polling emitter subscription
      * which will send all events to the collector.
      *

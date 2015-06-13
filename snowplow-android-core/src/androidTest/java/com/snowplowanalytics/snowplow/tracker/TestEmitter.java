@@ -17,4 +17,6 @@ public class TestEmitter extends Emitter {
     public boolean getEmitterStatus() {
         return false;
     }
+
+    public void flush() {}
 }
