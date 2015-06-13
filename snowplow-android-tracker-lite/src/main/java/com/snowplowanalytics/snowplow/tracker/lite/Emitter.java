@@ -169,6 +169,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * @return the emitter status
      */
     public boolean getEmitterStatus() {
-        return Executor.status();
+        return isRunning.get() && Executor.status();
     }
 }

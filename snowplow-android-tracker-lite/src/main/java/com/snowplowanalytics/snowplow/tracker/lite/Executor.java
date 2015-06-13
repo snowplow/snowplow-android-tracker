@@ -47,10 +47,10 @@ public class Executor {
     }
 
     public static boolean status() {
-        if (executor == null) {
+        if (executor == null || executor.isShutdown()) {
             return false;
         } else {
-            return executor.isShutdown();
+            return true;
         }
     }
 }
