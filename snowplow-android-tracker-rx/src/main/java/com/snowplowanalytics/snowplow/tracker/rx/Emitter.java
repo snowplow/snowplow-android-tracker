@@ -14,14 +14,12 @@
 package com.snowplowanalytics.snowplow.tracker.rx;
 
 import java.util.LinkedList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
-import rx.schedulers.Schedulers;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -33,11 +31,12 @@ import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
-    private final Executor executor = Executors.newSingleThreadScheduledExecutor();
-    private final Scheduler scheduler = Schedulers.from(executor);
+    private final Scheduler scheduler = SchedulerRx.getScheduler();
     private int emptyCounter = 0;
     private Subscription emitterSub;
     private EventStore eventStore;
+
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     public Emitter(EmitterBuilder builder) {
         super(builder);
@@ -47,6 +46,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
         // If the device is not online do not send anything!
         if (isOnline() && eventStore.getSize() > 0) {
+            isRunning.compareAndSet(false, true);
             start();
         }
     }
@@ -61,7 +61,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         eventStore.add(payload);
 
         // If the emitter is currently shutdown start it..
-        if (emitterSub == null && isOnline()) {
+        if (isRunning.compareAndSet(false, true) && isOnline()) {
             start();
         }
     }
@@ -81,7 +81,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private void start() {
         emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS)
             .map((tick) -> doEmitterTick())
-            .doOnError((err) -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
+            .doOnError(err -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
             .retry()
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
@@ -97,6 +97,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     public void shutdown() {
         if (emitterSub != null) {
             emitterSub.unsubscribe();
+            isRunning.compareAndSet(true, false);
             emitterSub = null;
         }
     }
@@ -143,7 +144,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             if (res.getSuccess()) {
                 for (Long eventId : res.getEventIds()) {
                     eventStore.removeEvent(eventId);
-                    successCount++;
                 }
                 successCount += res.getEventIds().size();
             } else if (!res.getSuccess()) {

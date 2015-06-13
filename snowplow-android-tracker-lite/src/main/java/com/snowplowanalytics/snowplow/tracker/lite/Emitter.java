@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.lite;
 
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -28,7 +29,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private EventStore eventStore;
     private int emptyCount;
 
-    private volatile boolean isRunning = false;
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     /**
      * Creates an emitter object
@@ -43,7 +44,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         if (isOnline() && eventStore.getSize() > 0) {
             Executor.execute(new Runnable() {
                 public void run() {
-                    isRunning = true;
+                    isRunning.compareAndSet(false, true);
                     attemptEmit();
                 }
             });
@@ -61,8 +62,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         Executor.execute(new Runnable() {
             public void run() {
                 eventStore.add(payload);
-                if (!isRunning) {
-                    isRunning = true;
+                if (isRunning.compareAndSet(false, true)) {
                     attemptEmit();
                 }
             }
@@ -123,14 +123,14 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                     Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
                 }
                 Logger.e(TAG, "Emitter loop stopping: failures.");
-                isRunning = false;
+                isRunning.compareAndSet(true, false);
             } else {
                 attemptEmit();
             }
         } else if (online) {
             if (emptyCount >= this.emptyLimit) {
                 Logger.e(TAG, "Emitter loop stopping: empty limit reached.");
-                isRunning = false;
+                isRunning.compareAndSet(true, false);
             } else {
                 emptyCount++;
                 Logger.e(TAG, "Emitter database empty: " + emptyCount);
@@ -145,7 +145,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             }
         } else {
             Logger.e(TAG, "Emitter loop stopping: emitter offline.");
-            isRunning = false;
+            isRunning.compareAndSet(true, false);
         }
     }
 
@@ -154,6 +154,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      */
     public void shutdown() {
         Logger.d(TAG, "Shutting down emitter.");
+        isRunning.compareAndSet(true, false);
         Executor.shutdown();
     }
 

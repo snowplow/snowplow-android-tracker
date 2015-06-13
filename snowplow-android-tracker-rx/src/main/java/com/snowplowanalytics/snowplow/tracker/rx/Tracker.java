@@ -4,17 +4,13 @@ import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.schedulers.Schedulers;
 
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
-    private final Executor executor = Executors.newSingleThreadScheduledExecutor();
-    private final Scheduler scheduler = Schedulers.from(executor);
+    private final Scheduler scheduler = SchedulerRx.getScheduler();
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
