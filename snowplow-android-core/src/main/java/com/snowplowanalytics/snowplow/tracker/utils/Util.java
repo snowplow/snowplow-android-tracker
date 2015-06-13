@@ -31,6 +31,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Provides basic Utilities for the
@@ -150,11 +157,11 @@ public class Util {
     }
 
     /**
-     * Returns the Advertising ID or null
-     * if it fails to get the id.
+     * The function that actually fetches the Advertising ID.
+     * - If called from the UI Thread will throw an Exception
      *
      * @param context the android context
-     * @return the id or null
+     * @return the advertising id or null
      */
     public static String getAdvertisingId(Context context) {
         try {
@@ -164,10 +171,50 @@ public class Util {
             return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
         }
         catch (Exception e) {
-            Logger.e(TAG, "Exception occurred getting the Advertising ID: %s - Cause: %s",
+            Logger.e(TAG, "Exception getting the Advertising ID: %s - Cause: %s",
                     e.toString(), e.getCause().toString());
             return null;
         }
+    }
+
+    /**
+     * Returns the Advertising ID or null if it is not available.
+     * - Must not be called from onStart() or application will hang
+     *
+     * @param context the android context
+     * @return the advertising id or null
+     */
+    public static String getAdvertisingIdFuture(Context context) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Callable<String> callable = getAdvertisingIdCallable(context);
+        Future<String> future = executor.submit(callable);
+        String idfa = null;
+        try {
+            idfa = future.get();
+            Logger.d(TAG, "Advertising ID: %s", idfa);
+        } catch (InterruptedException ie) {
+            Logger.e(TAG, "Exception getting the Advertising ID: %s", ie.toString());
+        } catch (ExecutionException ee) {
+            Logger.e(TAG, "Exception getting the Advertising ID: %s", ee.toString());
+        }
+        executor.shutdown();
+        return idfa;
+    }
+
+    /**
+     * Returns a Callable String which when executed will
+     * attempt to get the Advertising ID.
+     *
+     * @param context the android context
+     * @return a callable string
+     */
+    private static Callable<String> getAdvertisingIdCallable(final Context context) {
+        return new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return getAdvertisingId(context);
+            }
+        };
     }
 
     /**

@@ -35,7 +35,7 @@ public class SubjectTest extends AndroidTestCase {
         assertTrue(mobilePairs.containsKey("deviceModel"));
         
         if (System.getenv("ANDROID_TRAVIS") == null) {
-            Thread.sleep(1000);
+            Thread.sleep(500);
             assertTrue(mobilePairs.containsKey("androidIdfa"));
         } else {
             Log.i("test", "Skipping androidIdfa test on Travis");

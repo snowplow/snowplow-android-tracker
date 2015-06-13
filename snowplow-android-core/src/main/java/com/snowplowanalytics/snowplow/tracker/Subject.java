@@ -386,14 +386,4 @@ public class Subject {
     public Map<String, String> getSubject() {
         return this.standardPairs;
     }
-
-    // Extra function to return IDFA code
-
-    /**
-     * Attempts to return the IDFA code from the mobile pairs
-     * map.  Will either return the IDFA String or null.
-     */
-    public String getIdfa() {
-        return this.mobilePairs.get(Parameters.ANDROID_IDFA);
-    }
 }
