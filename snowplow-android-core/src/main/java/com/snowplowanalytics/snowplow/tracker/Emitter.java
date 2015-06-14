@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
@@ -55,7 +68,7 @@ public abstract class Emitter {
                 defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Emitter");
             } catch (ClassNotFoundException e) {
                 try {
-                    defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.lite.Emitter");
+                    defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.classic.Emitter");
                 } catch (ClassNotFoundException e1) {
                     defaultEmitterClass = null;
                 }
@@ -480,29 +493,6 @@ public abstract class Emitter {
      * @return the emitter status
      */
     public abstract boolean getEmitterStatus();
-
-    /**
-     * Checks whether or not the device
-     * is online and able to communicate
-     * with the outside world.
-     */
-    public boolean isOnline() {
-
-        Logger.v(TAG, "Checking tracker internet connectivity.");
-
-        ConnectivityManager cm = (ConnectivityManager)
-                this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        try {
-            NetworkInfo ni = cm.getActiveNetworkInfo();
-            boolean connected = ni != null && ni.isConnected();
-            Logger.d(TAG, "Tracker connection online: %s", connected);
-            return connected;
-        } catch (SecurityException e) {
-            Logger.e(TAG, "Security exception checking connection: %s", e.toString());
-            return true;
-        }
-    }
 
     /**
      * Returns truth on if the request

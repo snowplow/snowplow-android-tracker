@@ -33,7 +33,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
-public class RxDemo extends Activity {
+public class ClassicDemo extends Activity {
 
     private Tracker tracker;
     private Button _startButton;
@@ -45,14 +45,14 @@ public class RxDemo extends Activity {
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
-    private boolean isRx = false;
+    private boolean isClassic = false;
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rx_demo);
-        isRx = true;
+        setContentView(R.layout.activity_classic_demo);
+        isClassic = true;
         setupTrackerListener();
     }
 
@@ -61,7 +61,7 @@ public class RxDemo extends Activity {
         super.onBackPressed();
         Emitter e = tracker.getEmitter();
         e.shutdown();
-        isRx = false;
+        isClassic = false;
     }
 
     /**
@@ -69,7 +69,7 @@ public class RxDemo extends Activity {
      */
     private void setupTrackerListener() {
 
-        _startButton = (Button)findViewById(R.id.btn_rx_start);
+        _startButton = (Button)findViewById(R.id.btn_lite_start);
         _uriField    = (EditText)findViewById(R.id.emitter_uri_field);
         _type        = (RadioGroup)findViewById(R.id.radio_send_type);
         _security    = (RadioGroup)findViewById(R.id.radio_send_security);
@@ -87,7 +87,7 @@ public class RxDemo extends Activity {
         _logOutput.setMovementMethod(new ScrollingMovementMethod());
         _logOutput.setText("");
 
-        tracker = DemoUtils.getAndroidTrackerRx(context, getCallback());
+        tracker = DemoUtils.getAndroidTrackerClassic(context, getCallback());
 
         makePollingUpdater(context);
 
@@ -174,7 +174,7 @@ public class RxDemo extends Activity {
         DemoUtils.execute(new Runnable() {
             @Override
             public void run() {
-                while (isRx) {
+                while (isClassic) {
                     boolean isOnline = Util.isOnline(context);
                     boolean isRunning = tracker.getEmitter().getEmitterStatus();
                     long dbSize = tracker.getEmitter().getEventStore().getSize();

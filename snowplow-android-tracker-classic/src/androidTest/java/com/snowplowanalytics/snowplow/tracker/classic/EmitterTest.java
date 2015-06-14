@@ -11,19 +11,15 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.rx;
+package com.snowplowanalytics.snowplow.tracker.classic;
 
 import com.snowplowanalytics.snowplow.tracker.*;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 
-public class EmitterTest extends SnowplowRxTestCase {
+public class EmitterTest extends SnowplowLiteTestCase {
 
     public void testDefaultEmitterShouldBeLiteEmitter() {
-        Emitter emitter = getEmitter(
-                HttpMethod.GET,
-                BufferOption.DefaultGroup,
-                RequestSecurity.HTTP
-        );
-        assertEquals(com.snowplowanalytics.snowplow.tracker.rx.Emitter.class, emitter.getClass());
+        Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
+        assertEquals(com.snowplowanalytics.snowplow.tracker.classic.Emitter.class, emitter.getClass());
     }
 }

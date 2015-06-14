@@ -52,7 +52,7 @@ public abstract class Tracker {
                 defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Tracker");
             } catch (ClassNotFoundException e) {
                 try {
-                    defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.lite.Tracker");
+                    defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.classic.Tracker");
                 } catch (ClassNotFoundException e1) {
                     defaultTrackerClass = null;
                 }

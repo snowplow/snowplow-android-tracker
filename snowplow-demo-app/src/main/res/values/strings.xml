@@ -9,14 +9,14 @@
     </string>
 
     <string name="main_demo_button_rx">RxJava Tracker Demo</string>
-    <string name="main_demo_button_lite">Lite Tracker Demo</string>
+    <string name="main_demo_button_lite">Classic Tracker Demo</string>
 
     <string name="title_activity_rx_demo">RxJava Demo</string>
     <string name="rx_demo_header">RxJava Tracker Demo</string>
     <string name="rx_demo_info">Enter settings below and then hit start.</string>
 
-    <string name="title_activity_lite_demo">Lite Demo</string>
-    <string name="lite_demo_header">Lite Tracker Demo</string>
+    <string name="title_activity_lite_demo">Classic Demo</string>
+    <string name="lite_demo_header">Classic Tracker Demo</string>
     <string name="lite_demo_info">Enter settings below and then hit start.</string>
 
     <string name="emitter_uri_text">Emitter URI:</string>

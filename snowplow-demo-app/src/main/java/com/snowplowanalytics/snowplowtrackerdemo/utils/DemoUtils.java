@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
@@ -11,7 +24,6 @@ import android.content.Context;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class DemoUtils {
 
@@ -20,10 +32,10 @@ public class DemoUtils {
 
     // Tracker Utils
 
-    public static Tracker getAndroidTrackerLite(Context context, RequestCallback callback) {
-        Emitter emitter = DemoUtils.getEmitterLite(context, callback);
+    public static Tracker getAndroidTrackerClassic(Context context, RequestCallback callback) {
+        Emitter emitter = DemoUtils.getEmitterClassic(context, callback);
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerLite(emitter, subject);
+        return DemoUtils.getTrackerClassic(emitter, subject);
     }
 
     public static Tracker getAndroidTrackerRx(Context context, RequestCallback callback) {
@@ -32,9 +44,9 @@ public class DemoUtils {
         return DemoUtils.getTrackerRx(emitter, subject);
     }
 
-    private static Tracker getTrackerLite(Emitter emitter, Subject subject) {
+    private static Tracker getTrackerClassic(Emitter emitter, Subject subject) {
         return new Tracker.TrackerBuilder(emitter, namespace, appId,
-                com.snowplowanalytics.snowplow.tracker.lite.Tracker.class)
+                com.snowplowanalytics.snowplow.tracker.classic.Tracker.class)
                 .level(LogLevel.VERBOSE)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
@@ -52,10 +64,11 @@ public class DemoUtils {
                 .build();
     }
 
-    private static Emitter getEmitterLite(Context context, RequestCallback callback) {
+    private static Emitter getEmitterClassic(Context context, RequestCallback callback) {
         return new Emitter.EmitterBuilder("", context,
-                com.snowplowanalytics.snowplow.tracker.lite.Emitter.class)
+                com.snowplowanalytics.snowplow.tracker.classic.Emitter.class)
                 .callback(callback)
+                .tick(1)
                 .build();
     }
 
@@ -63,16 +76,20 @@ public class DemoUtils {
         return new Emitter.EmitterBuilder("", context,
                 com.snowplowanalytics.snowplow.tracker.rx.Emitter.class)
                 .callback(callback)
+                .tick(1)
                 .build();
     }
 
     private static Subject getSubject(Context context) {
-        return new Subject.SubjectBuilder().context(context).build();
+        return new Subject
+                .SubjectBuilder()
+                .context(context)
+                .build();
     }
 
     // Executor Utils
 
-    public static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public static void execute(Runnable runnable) {
         executor.execute(runnable);

@@ -22,7 +22,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".LiteDemo"
+            android:name=".ClassicDemo"
             android:label="@string/title_activity_lite_demo"
             android:screenOrientation="portrait">
         </activity>

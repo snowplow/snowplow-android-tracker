@@ -11,20 +11,15 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.rx;
+package com.snowplowanalytics.snowplow.tracker.classic;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.*;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
-import com.snowplowanalytics.snowplow.tracker.rx.utils.LogFetcher;
+import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,39 +30,41 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class SnowplowRxTestCase extends AndroidTestCase {
+public class SnowplowLiteTestCase extends AndroidTestCase {
 
     private static final String testURL = "10.0.2.2:4545";
 
     // Tracker Builder
 
-    public com.snowplowanalytics.snowplow.tracker.Tracker getTracker(
-            com.snowplowanalytics.snowplow.tracker.Emitter emitter, Subject subject) {
-        return new Tracker
-            .TrackerBuilder(emitter, "myNamespace", "myAppId")
-            .subject(subject)
-            .base64(false)
-            .level(LogLevel.DEBUG)
-            .build();
+    public com.snowplowanalytics.snowplow.tracker.Tracker getTracker(com.snowplowanalytics.snowplow.tracker.Emitter emitter,
+                              Subject subject) {
+
+        return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId")
+                .subject(subject)
+                .base64(false)
+                .level(LogLevel.DEBUG)
+                .build();
     }
 
-    public com.snowplowanalytics.snowplow.tracker.Emitter getEmitter(HttpMethod method,
-                                                 BufferOption option, RequestSecurity security) {
+    public com.snowplowanalytics.snowplow.tracker.Emitter getEmitter(
+            HttpMethod method,
+            BufferOption option,
+            RequestSecurity security) {
+
         return new Emitter
-            .EmitterBuilder(testURL, getContext())
-            .option(option)
-            .method(method)
-            .security(security)
-            .tick(1)
-            .emptyLimit(2)
-            .build();
+                .EmitterBuilder(testURL, getContext())
+                .option(option)
+                .method(method)
+                .security(security)
+                .tick(1)
+                .build();
     }
 
     public Subject getSubject() {
         return new Subject
-            .SubjectBuilder()
-            .context(getContext())
-            .build();
+                .SubjectBuilder()
+                .context(getContext())
+                .build();
     }
 
     public List<SelfDescribingJson> getCustomContext() {

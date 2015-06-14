@@ -22,8 +22,10 @@ import rx.Scheduler;
 import rx.Subscription;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
+import com.snowplowanalytics.snowplow.tracker.EventStore;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
@@ -45,7 +47,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         this.eventStore = new EventStore(this.context, this.sendLimit);
 
         // If the device is not online do not send anything!
-        if (isOnline() && eventStore.getSize() > 0) {
+        if (eventStore.getSize() > 0) {
             isRunning.compareAndSet(false, true);
             start();
         }
@@ -61,7 +63,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         eventStore.add(payload);
 
         // If the emitter is currently shutdown start it..
-        if (isRunning.compareAndSet(false, true) && isOnline()) {
+        if (isRunning.compareAndSet(false, true)) {
             start();
         }
     }
@@ -71,7 +73,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * shutdown.
      */
     public void flush() {
-        if (isRunning.compareAndSet(false, true) && isOnline()) {
+        if (isRunning.compareAndSet(false, true)) {
             start();
         }
     }
@@ -90,7 +92,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      */
     private void start() {
         emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS)
-            .map((tick) -> doEmitterTick())
+            .map(tick -> doEmitterTick())
             .doOnError(err -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
             .retry()
             .subscribeOn(scheduler)
@@ -119,20 +121,25 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *         throw an Exception
      */
     private EmittableEvents doEmitterTick() {
-        if (eventStore.getSize() == 0) {
-            emptyCounter++;
-            Logger.d(TAG, "EventStore empty counter: %s", emptyCounter);
-            if (emptyCounter >= this.emptyLimit) {
-                Logger.d(TAG, "Emitter empty count reached.");
-                shutdown();
-                throw new EmitterException("EventStore empty limit reached.");
-            }
-            else {
-                throw new EmitterException("EventStore empty exception.");
+        if (Util.isOnline(this.context)) {
+            if (eventStore.getSize() > 0) {
+                emptyCounter = 0;
+                return eventStore.getEmittableEvents();
+            } else {
+                emptyCounter++;
+                Logger.d(TAG, "EventStore empty counter: %s", emptyCounter);
+                if (emptyCounter >= this.emptyLimit) {
+                    Logger.d(TAG, "Emitter empty count reached.");
+                    shutdown();
+                    throw new EmitterException("EventStore empty limit reached.");
+                }
+                else {
+                    throw new EmitterException("EventStore empty exception.");
+                }
             }
         } else {
-            emptyCounter = 0;
-            return eventStore.getEmittableEvents();
+            shutdown();
+            throw new EmitterException("Emitter is offline.");
         }
     }
 
@@ -146,7 +153,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private void processEmitterResults(LinkedList<RequestResult> results) {
         Logger.v(TAG, "Processing emitter results.");
 
-        // Start counting successes and failures
         int successCount = 0;
         int failureCount = 0;
 
@@ -165,7 +171,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         Logger.d(TAG, "Success Count: %s", successCount);
         Logger.d(TAG, "Failure Count: %s", failureCount);
 
-        // Send the callback
         if (requestCallback != null) {
             if (failureCount != 0) {
                 requestCallback.onFailure(successCount, failureCount);
@@ -174,9 +179,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             }
         }
 
-        // If we have any failures shut the emitter down
-        if (failureCount != 0) {
-            if (isOnline()) {
+        if (failureCount > 0 && successCount == 0) {
+            if (Util.isOnline(this.context)) {
                 Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
             }
             Logger.e(TAG, "Emitter is shutting down due to failures.");

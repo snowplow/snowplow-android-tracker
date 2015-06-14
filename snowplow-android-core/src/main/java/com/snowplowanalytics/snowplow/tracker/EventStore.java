@@ -66,6 +66,15 @@ public class EventStore {
     }
 
     /**
+     * Adds an event to the database.
+     *
+     * @param payload the payload to be added
+     */
+    public void add(Payload payload) {
+        insertEvent(payload);
+    }
+
+    /**
      * Opens a new writable database if it
      * is currently closed.
      *

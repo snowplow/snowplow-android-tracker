@@ -11,19 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.rx;
+package com.snowplowanalytics.snowplow.tracker.classic;
 
-import com.snowplowanalytics.snowplow.tracker.*;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
+import android.app.Application;
+import android.test.ApplicationTestCase;
 
-public class EmitterTest extends SnowplowRxTestCase {
-
-    public void testDefaultEmitterShouldBeLiteEmitter() {
-        Emitter emitter = getEmitter(
-                HttpMethod.GET,
-                BufferOption.DefaultGroup,
-                RequestSecurity.HTTP
-        );
-        assertEquals(com.snowplowanalytics.snowplow.tracker.rx.Emitter.class, emitter.getClass());
+/**
+ * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ */
+public class ApplicationTest extends ApplicationTestCase<Application> {
+    public ApplicationTest() {
+        super(Application.class);
     }
 }

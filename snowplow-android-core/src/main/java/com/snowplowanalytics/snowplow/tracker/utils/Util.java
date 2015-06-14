@@ -17,6 +17,8 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
@@ -154,6 +156,29 @@ public class Util {
             return o.toString();
         }
         return null;
+    }
+
+    /**
+     * Checks whether or not the device
+     * is online and able to communicate
+     * with the outside world.
+     */
+    public static boolean isOnline(Context context) {
+
+        Logger.v(TAG, "Checking tracker internet connectivity.");
+
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        try {
+            NetworkInfo ni = cm.getActiveNetworkInfo();
+            boolean connected = ni != null && ni.isConnected();
+            Logger.d(TAG, "Tracker connection online: %s", connected);
+            return connected;
+        } catch (SecurityException e) {
+            Logger.e(TAG, "Security exception checking connection: %s", e.toString());
+            return true;
+        }
     }
 
     /**

@@ -59,6 +59,8 @@ public class Subject {
         if (builder.context != null) {
             setContextualParams(builder.context);
         }
+
+        Logger.v(TAG, "Subject created successfully.");
     }
 
     public static class SubjectBuilder {
@@ -191,6 +193,7 @@ public class Subject {
         new Thread(new Runnable() {
             public void run() {
                 String playAdId = Util.getAdvertisingId(context);
+                Logger.d(TAG, "Advertising ID: %s", playAdId);
                 putToMobile(Parameters.ANDROID_IDFA, playAdId);
             }
         }).start();

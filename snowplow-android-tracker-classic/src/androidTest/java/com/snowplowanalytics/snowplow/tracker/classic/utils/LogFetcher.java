@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.rx.utils;
+package com.snowplowanalytics.snowplow.tracker.classic.utils;
 
 import android.util.Log;
 
@@ -26,10 +26,6 @@ import com.squareup.okhttp.RequestBody;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-/**
- * A helper class to fetch logs back
- * from mountebank.
- */
 public class LogFetcher {
 
     private static final String TAG = LogFetcher.class.getSimpleName();
