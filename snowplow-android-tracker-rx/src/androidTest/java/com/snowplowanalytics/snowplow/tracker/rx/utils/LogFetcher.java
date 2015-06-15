@@ -36,66 +36,8 @@ public class LogFetcher {
     private static final OkHttpClient client = new OkHttpClient();
     private static final String port = "4545";
     private static final String mbUrl = "http://10.0.2.2:2525/imposters/";
-    private static final String imposter =
-            "{\n"+
-            "  \"port\": "+ port +",\n"+
-            "  \"protocol\": \"http\",\n"+
-            "  \"stubs\": [{\n"+
-            "      \"responses\": [{\n"+
-            "        \"is\": {\n"+
-            "          \"statusCode\": 200,\n"+
-            "          \"body\": \"Successful Snowplow POST Request\"\n"+
-            "        }\n"+
-            "      }],\n"+
-            "      \"predicates\": [{\n"+
-            "        \"contains\": {\n"+
-            "          \"path\": \"/com.snowplowanalytics.snowplow/tp2\",\n"+
-            "          \"method\": \"POST\",\n"+
-            "          \"query\": {},\n"+
-            "          \"headers\": {\n"+
-            "            \"Content-Type\": \"application/json; charset=utf-8\"\n"+
-            "          }\n"+
-            "        },\n"+
-            "        \"exists\": {\n"+
-            "          \"body\": true\n"+
-            "        }\n"+
-            "      }]\n"+
-            "    },\n"+
-            "    {\n"+
-            "      \"responses\": [{\n"+
-            "        \"is\": {\n"+
-            "          \"statusCode\": 200,\n"+
-            "          \"body\": \"Successful Snowplow GET Request\"\n"+
-            "        }\n"+
-            "      }],\n"+
-            "      \"predicates\": [{\n"+
-            "        \"contains\": {\n"+
-            "          \"path\": \"/i\",\n"+
-            "          \"method\": \"GET\",\n"+
-            "          \"body\": \"\"\n"+
-            "        },\n"+
-            "        \"exists\": {\n"+
-            "          \"query\": {\n"+
-            "            \"e\": true,\n"+
-            "            \"dtm\": true,\n"+
-            "            \"p\": true,\n"+
-            "            \"eid\": true,\n"+
-            "            \"tv\": true\n"+
-            "          }\n"+
-            "        }\n"+
-            "      }]\n"+
-            "    },\n"+
-            "    {\n"+
-            "      \"responses\": [{\n"+
-            "        \"is\": {\n"+
-            "          \"statusCode\": 404\n"+
-            "        }\n"+
-            "      }]\n"+
-            "    }\n"+
-            "  ]\n"+
-            "}\n";
 
-    public static void createImposter() {
+    public static void createImposter(String imposter) {
         MediaType JSON = MediaType.parse("application/json");
         RequestBody reqBody = RequestBody.create(JSON, imposter);
         Request req = new Request.Builder()

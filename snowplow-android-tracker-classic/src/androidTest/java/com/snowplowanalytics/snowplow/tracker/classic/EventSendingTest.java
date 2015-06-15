@@ -20,7 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 
 import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
 
-public class EventSendingTest extends SnowplowLiteTestCase {
+public class EventSendingTest extends SnowplowClassicTestCase {
 
     public void testSendGet() throws Exception {
         setup();

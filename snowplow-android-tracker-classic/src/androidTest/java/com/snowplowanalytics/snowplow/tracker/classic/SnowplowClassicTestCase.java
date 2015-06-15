@@ -24,13 +24,15 @@ import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
-public class SnowplowLiteTestCase extends AndroidTestCase {
+public class SnowplowClassicTestCase extends AndroidTestCase {
 
     private static final String testURL = "10.0.2.2:4545";
 
@@ -82,8 +84,15 @@ public class SnowplowLiteTestCase extends AndroidTestCase {
 
     public void setup() throws Exception {
         LogFetcher.deleteImposter();
-        LogFetcher.createImposter();
+        LogFetcher.createImposter(getImposter());
         Thread.sleep(1000);
+    }
+
+    private String getImposter() {
+        String file = "assets/imposters.json";
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);
+        Scanner s = new Scanner(in).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 
     public void checkLogs(LinkedList<JSONObject> requests, int eventCount) throws Exception {
