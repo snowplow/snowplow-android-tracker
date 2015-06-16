@@ -28,8 +28,8 @@ public class EventSendingTest extends SnowplowRxTestCase {
         setup();
 
         // Setup the Tracker
-        com.snowplowanalytics.snowplow.tracker.Emitter emitter =
-                getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
+        com.snowplowanalytics.snowplow.tracker.Emitter emitter = getEmitter(
+            HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
         emitter.getEventStore().removeAllEvents();
         Tracker tracker = getTracker(emitter, getSubject());
 
@@ -40,11 +40,11 @@ public class EventSendingTest extends SnowplowRxTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        // Wait for Tracker to shutdown
-        while (tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-        }
-        Thread.sleep(500);
+        Thread.sleep(15000);
+
+        tracker.getEmitter().flush();
+
+        Thread.sleep(5000);
 
         checkGetRequest(LogFetcher.getMountebankGetRequests());
     }
@@ -65,11 +65,11 @@ public class EventSendingTest extends SnowplowRxTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        // Wait for Tracker to shutdown
-        while (tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-        }
-        Thread.sleep(500);
+        Thread.sleep(15000);
+
+        tracker.getEmitter().flush();
+
+        Thread.sleep(5000);
 
         checkPostRequest(LogFetcher.getMountebankPostRequests());
     }

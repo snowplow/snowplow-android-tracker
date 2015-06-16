@@ -38,11 +38,13 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(2000);
+        Thread.sleep(15000);
+
+        tracker.getEmitter().flush();
+
+        Thread.sleep(5000);
 
         checkGetRequest(LogFetcher.getMountebankGetRequests());
-
-        tracker.getEmitter().shutdown();
     }
 
     public void testSendPost() throws Exception {
@@ -61,10 +63,12 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(2000);
+        Thread.sleep(15000);
+
+        tracker.getEmitter().flush();
+
+        Thread.sleep(5000);
 
         checkPostRequest(LogFetcher.getMountebankPostRequests());
-
-        tracker.getEmitter().shutdown();
     }
 }

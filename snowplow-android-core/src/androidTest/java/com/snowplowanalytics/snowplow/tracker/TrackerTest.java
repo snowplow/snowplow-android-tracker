@@ -24,6 +24,8 @@ public class TrackerTest extends AndroidTestCase {
         // Make an emitter
         Emitter emitter = new com.snowplowanalytics.snowplow.tracker.Emitter
                 .EmitterBuilder("testUrl", getContext(), TestEmitter.class)
+                .tick(0)
+                .emptyLimit(0)
                 .build();
 
         Subject subject = new Subject

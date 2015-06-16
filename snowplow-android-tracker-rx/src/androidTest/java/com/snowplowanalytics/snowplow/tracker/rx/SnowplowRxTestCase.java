@@ -61,8 +61,8 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             .option(option)
             .method(method)
             .security(security)
-            .tick(1)
-            .emptyLimit(2)
+            .tick(0)
+            .emptyLimit(0)
             .build();
     }
 
@@ -108,6 +108,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
     }
 
     public void checkGetRequest(LinkedList<JSONObject> requests) throws Exception {
+        assertEquals(28, requests.size());
         for (JSONObject request : requests) {
             JSONObject request1 = request.getJSONObject("request");
             JSONObject query = request1.getJSONObject("query");
@@ -144,6 +145,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
     }
 
     public void checkPostRequest(LinkedList<JSONObject> requests) throws Exception {
+        assertEquals(28, requests.size());
         for (JSONObject request : requests) {
             JSONObject request1 = request.getJSONObject("request");
 

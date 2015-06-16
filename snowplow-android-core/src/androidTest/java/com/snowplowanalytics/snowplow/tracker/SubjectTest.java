@@ -46,13 +46,6 @@ public class SubjectTest extends AndroidTestCase {
         assertTrue(mobilePairs.containsKey("osType"));
         assertTrue(mobilePairs.containsKey("osVersion"));
         assertTrue(mobilePairs.containsKey("deviceModel"));
-        
-        if (System.getenv("ANDROID_TRAVIS") == null) {
-            Thread.sleep(500);
-            assertTrue(mobilePairs.containsKey("androidIdfa"));
-        } else {
-            Log.i("test", "Skipping androidIdfa test on Travis");
-        }
 
         if(mobilePairs.get("deviceModel").equals("Android SDK built for x86")) {
             assertTrue(mobilePairs.containsKey("carrier"));

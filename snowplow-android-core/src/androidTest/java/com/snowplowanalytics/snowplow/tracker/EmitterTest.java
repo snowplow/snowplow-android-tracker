@@ -51,8 +51,8 @@ public class EmitterTest extends SnowplowTestCase {
                 .method(method)
                 .security(security)
                 .callback(getCallback())
-                .tick(5)
-                .emptyLimit(1)
+                .tick(0)
+                .emptyLimit(0)
                 .sendLimit(200)
                 .byteLimitGet(20000)
                 .byteLimitPost(25000)
@@ -126,12 +126,12 @@ public class EmitterTest extends SnowplowTestCase {
 
     public void testTickSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(5, emitter.getEmitterTick());
+        Assert.assertEquals(0, emitter.getEmitterTick());
     }
 
     public void testEmptyLimitSet() {
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(1, emitter.getEmptyLimit());
+        Assert.assertEquals(0, emitter.getEmptyLimit());
     }
 
     public void testSendLimitSet() {
