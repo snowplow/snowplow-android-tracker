@@ -462,7 +462,7 @@ public abstract class Tracker {
         payload.add(Parameters.TI_ITEM_NAME, name);
         payload.add(Parameters.TI_ITEM_CATEGORY, category);
         payload.add(Parameters.TI_ITEM_PRICE, Double.toString(price));
-        payload.add(Parameters.TI_ITEM_QUANTITY, Double.toString(quantity));
+        payload.add(Parameters.TI_ITEM_QUANTITY, Integer.toString(quantity));
         payload.add(Parameters.TI_ITEM_CURRENCY, currency);
 
         completePayload(payload, context, timestamp);

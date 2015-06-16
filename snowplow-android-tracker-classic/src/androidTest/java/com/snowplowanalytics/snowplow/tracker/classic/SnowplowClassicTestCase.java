@@ -38,9 +38,9 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
 
     // Tracker Builder
 
-    public com.snowplowanalytics.snowplow.tracker.Tracker getTracker(com.snowplowanalytics.snowplow.tracker.Emitter emitter,
-                              Subject subject) {
-
+    public com.snowplowanalytics.snowplow.tracker.Tracker getTracker(
+            com.snowplowanalytics.snowplow.tracker.Emitter emitter,
+            Subject subject) {
         return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId")
                 .subject(subject)
                 .base64(false)
@@ -62,7 +62,7 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
                 .build();
     }
 
-    public Subject getSubject() {
+    public com.snowplowanalytics.snowplow.tracker.Subject getSubject() {
         return new Subject
                 .SubjectBuilder()
                 .context(getContext())
@@ -227,7 +227,7 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
         assertEquals("Acme 1", json.getString("ti_nm"));
         assertEquals("item-1", json.getString("ti_id"));
         assertEquals("AUD", json.getString("ti_cu"));
-        assertEquals("1.0", json.getString("ti_qu"));
+        assertEquals("1", json.getString("ti_qu"));
         assertEquals("35.0", json.getString("ti_pr"));
         assertEquals("Stuff", json.getString("ti_ca"));
         assertEquals("sku-1", json.getString("ti_sk"));
