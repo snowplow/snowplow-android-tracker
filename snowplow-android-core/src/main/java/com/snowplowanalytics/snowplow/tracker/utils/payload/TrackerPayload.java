@@ -83,6 +83,6 @@ public class TrackerPayload implements Payload {
     }
 
     public long getByteSize() {
-        return toString().getBytes(Charset.forName("UTF-8")).length;
+        return Util.getUTF8Length(toString());
     }
 }

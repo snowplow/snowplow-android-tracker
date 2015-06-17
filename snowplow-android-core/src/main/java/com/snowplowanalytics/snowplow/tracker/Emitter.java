@@ -320,7 +320,7 @@ public abstract class Emitter {
                 ArrayList<Map> postPayloadMaps = new ArrayList<>();
 
                 // Keep record of total byte size
-                long totalByteSize = TrackerConstants.POST_ENVELOPE_SIZE;
+                long totalByteSize = 0;
 
                 for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
 
@@ -328,7 +328,7 @@ public abstract class Emitter {
                     addStmToEvent(payload, timestamp);
                     long payloadByteSize = payload.getByteSize();
 
-                    if (payloadByteSize + TrackerConstants.POST_ENVELOPE_SIZE > byteLimitPost) {
+                    if (payloadByteSize > byteLimitPost) {
 
                         // Add needed information to collections
                         ArrayList<Map> singlePayloadMap = new ArrayList<>();
@@ -369,7 +369,7 @@ public abstract class Emitter {
 
                         postPayloadMaps.add(payload.getMap());
                         reqEventIds.add(eventIds.get(j));
-                        totalByteSize = payloadByteSize + TrackerConstants.POST_ENVELOPE_SIZE;
+                        totalByteSize = payloadByteSize;
                     }
                     else {
                         totalByteSize += payloadByteSize;

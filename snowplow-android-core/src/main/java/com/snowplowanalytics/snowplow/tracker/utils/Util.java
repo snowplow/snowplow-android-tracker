@@ -159,6 +159,33 @@ public class Util {
     }
 
     /**
+     * Count the number of bytes a string will occupy when UTF-8 encoded
+     *
+     * @param s the String to process
+     * @return number Length of s in bytes when UTF-8 encoded
+     */
+    public static long getUTF8Length(String s) {
+        long len = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char code = s.charAt(i);
+            if (code <= 0x7f) {
+                len += 1;
+            } else if (code <= 0x7ff) {
+                len += 2;
+            } else if (code >= 0xd800 && code <= 0xdfff) {
+                // Surrogate pair: These take 4 bytes in UTF-8 and 2 chars in UCS-2
+                // (Assume next char is the other [valid] half and just skip it)
+                len += 4; i++;
+            } else if (code < 0xffff) {
+                len += 3;
+            } else {
+                len += 4;
+            }
+        }
+        return len;
+    }
+
+    /**
      * Checks whether or not the device
      * is online and able to communicate
      * with the outside world.
