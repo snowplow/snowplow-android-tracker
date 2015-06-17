@@ -30,6 +30,10 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 
+/**
+ * Builds a Tracker object which is used to
+ * send events to a Snowplow Collector.
+ */
 public abstract class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
@@ -42,11 +46,14 @@ public abstract class Tracker {
     protected DevicePlatforms devicePlatform;
     protected LogLevel level;
 
+    /**
+     * Builder for the Tracker
+     */
     public static class TrackerBuilder {
 
         protected static Class<? extends Tracker> defaultTrackerClass;
 
-        /* Prefer Rx, then lite versions of our trackers */
+        /* Prefer Rx, then Classic versions of our trackers */
         static {
             try {
                 defaultTrackerClass = (Class<? extends Tracker>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Tracker");
@@ -131,17 +138,18 @@ public abstract class Tracker {
                 throw new IllegalStateException("No tracker class found or defined");
             }
 
+            String err = "Can’t create tracker";
             try {
                 Constructor<? extends Tracker> c =  trackerClass.getDeclaredConstructor(TrackerBuilder.class);
                 return c.newInstance(this);
             } catch (NoSuchMethodException e) {
-                throw new IllegalStateException("Can’t create tracker", e);
+                throw new IllegalStateException(err, e);
             } catch (InvocationTargetException e) {
-                throw new IllegalStateException("Can’t create tracker", e);
+                throw new IllegalStateException(err, e);
             } catch (InstantiationException e) {
-                throw new IllegalStateException("Can’t create tracker", e);
+                throw new IllegalStateException(err, e);
             } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Can’t create tracker", e);
+                throw new IllegalStateException(err, e);
             }
         }
     }

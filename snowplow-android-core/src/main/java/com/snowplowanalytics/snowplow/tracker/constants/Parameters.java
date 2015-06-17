@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.constants;
 
+/**
+ * All of the keys for each type of event
+ * that can be sent by the Tracker.
+ */
 public class Parameters {
     // General
     public static final String SCHEMA = "schema";

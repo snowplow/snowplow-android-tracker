@@ -23,6 +23,12 @@ public class RequestResult {
     private final boolean success;
     private final LinkedList<Long> eventIds;
 
+    /**
+     * Builds a result from a request attempt.
+     *
+     * @param success if the event returned a 200
+     * @param eventIds a list of event ids involved in the sending
+     */
     public RequestResult(boolean success, LinkedList<Long> eventIds) {
         this.success = success;
         this.eventIds = eventIds;

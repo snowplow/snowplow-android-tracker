@@ -18,6 +18,10 @@ import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.List;
 
+/**
+ * Builds a Tracker object which is used to
+ * send events to a Snowplow Collector.
+ */
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();

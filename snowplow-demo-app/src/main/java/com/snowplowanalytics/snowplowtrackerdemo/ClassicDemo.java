@@ -33,6 +33,9 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+/**
+ * Classic Demo Activity.
+ */
 public class ClassicDemo extends Activity {
 
     private Tracker tracker;

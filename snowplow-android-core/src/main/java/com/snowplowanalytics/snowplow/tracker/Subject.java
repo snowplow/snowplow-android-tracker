@@ -33,9 +33,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
- * Provides Subject information for
- * each event sent from the Snowplow
- * Tracker.
+ * Provides Subject information for each
+ * event sent from the Snowplow Tracker.
  */
 public class Subject {
 
@@ -64,6 +63,9 @@ public class Subject {
         Logger.v(TAG, "Subject created successfully.");
     }
 
+    /**
+     * Builder for the Subject
+     */
     public static class SubjectBuilder {
         private Context context = null; // Optional
 
@@ -106,7 +108,7 @@ public class Subject {
      * @param value the value associated with
      *              the key
      */
-    private void putToMobile(String key, String value) {
+    private void addToMobileContext(String key, String value) {
         if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
             this.mobilePairs.put(key, value);
         }
@@ -124,7 +126,7 @@ public class Subject {
      * @param value the value associated with
      *              the key
      */
-    private void putToGeoLocation(String key, Object value) {
+    private void addToGeoLocationContext(String key, Object value) {
         if (key != null && value != null && !key.isEmpty() ||
                 (value instanceof String) && !((String) value).isEmpty()) {
             this.geoLocationPairs.put(key, value);
@@ -155,21 +157,21 @@ public class Subject {
      * Defaults too 'android' currently.
      */
     private void setOsType() {
-        putToMobile(Parameters.OS_TYPE, "android");
+        addToMobileContext(Parameters.OS_TYPE, "android");
     }
 
     /**
      * Sets the operating system version.
      */
     private void setOsVersion() {
-        putToMobile(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
+        addToMobileContext(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
     }
 
     /**
      * Sets the device model.
      */
     private void setDeviceModel() {
-        putToMobile(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
+        addToMobileContext(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
     }
 
     /**
@@ -178,7 +180,7 @@ public class Subject {
     private void setDeviceVendor() {
         String manufacturer = Build.MANUFACTURER;
         if (!manufacturer.equals("unknown")) {
-            putToMobile(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
+            addToMobileContext(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
         }
     }
 
@@ -191,18 +193,20 @@ public class Subject {
      * @param context the android context
      */
     public void setAdvertisingID(final Context context) {
+        // Checks if the Thread we are on is Main/UI
+        // - If yes runs this function in a new Thread
         if (Looper.myLooper() == Looper.getMainLooper()) {
             new Thread(new Runnable() {
                 public void run() {
                     String playAdId = Util.getAdvertisingId(context);
                     Logger.d(TAG, "Advertising ID: %s", playAdId);
-                    putToMobile(Parameters.ANDROID_IDFA, playAdId);
+                    addToMobileContext(Parameters.ANDROID_IDFA, playAdId);
                 }
             }).start();
         } else {
             String playAdId = Util.getAdvertisingId(context);
             Logger.d(TAG, "Advertising ID: %s", playAdId);
-            putToMobile(Parameters.ANDROID_IDFA, playAdId);
+            addToMobileContext(Parameters.ANDROID_IDFA, playAdId);
         }
     }
 
@@ -244,12 +248,12 @@ public class Subject {
         if (location == null) {
             Logger.e(TAG, "Location information not available.");
         } else {
-            putToGeoLocation(Parameters.LATITUDE, location.getLatitude());
-            putToGeoLocation(Parameters.LONGITUDE, location.getLongitude());
-            putToGeoLocation(Parameters.ALTITUDE, location.getAltitude());
-            putToGeoLocation(Parameters.LATLONG_ACCURACY, location.getAccuracy());
-            putToGeoLocation(Parameters.SPEED, location.getSpeed());
-            putToGeoLocation(Parameters.BEARING, location.getBearing());
+            addToGeoLocationContext(Parameters.LATITUDE, location.getLatitude());
+            addToGeoLocationContext(Parameters.LONGITUDE, location.getLongitude());
+            addToGeoLocationContext(Parameters.ALTITUDE, location.getAltitude());
+            addToGeoLocationContext(Parameters.LATLONG_ACCURACY, location.getAccuracy());
+            addToGeoLocationContext(Parameters.SPEED, location.getSpeed());
+            addToGeoLocationContext(Parameters.BEARING, location.getBearing());
         }
     }
 
@@ -262,7 +266,7 @@ public class Subject {
     public void setCarrier(Context context) {
         String carrier = Util.getCarrier(context);
         if (carrier != null) {
-            putToMobile(Parameters.CARRIER, carrier);
+            addToMobileContext(Parameters.CARRIER, carrier);
         }
     }
 

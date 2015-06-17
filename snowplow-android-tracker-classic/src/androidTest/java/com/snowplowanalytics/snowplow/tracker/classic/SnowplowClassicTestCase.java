@@ -282,7 +282,7 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
         tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext(), (long) 1433791172);
     }
 
-    public void trackUnStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
+    public void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);

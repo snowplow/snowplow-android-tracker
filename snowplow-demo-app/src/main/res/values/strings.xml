@@ -7,6 +7,11 @@
         Each demo will send every combination of event construction available to the tracker to an
         endpoint you will enter on the demo page.
     </string>
+    <string name="link_header">Useful Links:</string>
+    <string name="link_tech_docs">- Technical Documentation</string>
+    <string name="link_integration">- Integration Examples</string>
+    <string name="link_setup_guide">- Setup Guide</string>
+    <string name="link_repo">- Github Repository</string>
 
     <string name="main_demo_button_rx">RxJava Tracker Demo</string>
     <string name="main_demo_button_lite">Classic Tracker Demo</string>
@@ -22,8 +27,8 @@
     <string name="emitter_uri_text">Emitter URI:</string>
     <string name="emitter_protocol_text">Emitter Protocol:</string>
     <string name="emitter_type_text">Emitter Type:</string>
-    <string name="emitter_logging_text">Logging:</string>
-    <string name="emitter_statistics">Statistics:</string>
+    <string name="emitter_logging_text">Emitter Callback:</string>
+    <string name="emitter_statistics">Metrics:</string>
     <string name="created_events">Made: 0</string>
     <string name="sent_events">Sent: 0</string>
     <string name="emitter_status">Running: no</string>

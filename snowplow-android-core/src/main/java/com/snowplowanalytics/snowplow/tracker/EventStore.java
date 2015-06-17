@@ -30,11 +30,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
+/**
+ * Helper class for storing, getting and removing
+ * events from the SQLite database.
+ */
 public class EventStore {
 
     private String TAG = EventStore.class.getSimpleName();

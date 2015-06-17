@@ -23,6 +23,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Utility Class used to send all
+ * combinations of Tracker Events.
+ */
 public class TrackerEvents {
 
     public static void trackAll(Tracker tracker) {

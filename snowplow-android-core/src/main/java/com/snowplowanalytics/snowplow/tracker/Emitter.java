@@ -14,8 +14,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -40,6 +38,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * Build an emitter object which controls the
+ * sending of events to the Snowplow Collector.
+ */
 public abstract class Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
@@ -58,11 +60,14 @@ public abstract class Emitter {
     protected long byteLimitGet;
     protected long byteLimitPost;
 
+    /**
+     * Builder for the Emitter.
+     */
     public static class EmitterBuilder {
 
         protected static Class<? extends Emitter> defaultEmitterClass;
 
-        /* Prefer Rx, then lite versions of our emitters */
+        /* Prefer Rx, then Classic versions of our emitters */
         static {
             try {
                 defaultEmitterClass = (Class<? extends Emitter>)Class.forName("com.snowplowanalytics.snowplow.tracker.rx.Emitter");
@@ -190,17 +195,18 @@ public abstract class Emitter {
                 throw new IllegalStateException("No emitter class found or defined");
             }
 
+            String err = "Can’t create emitter";
             try {
                 Constructor<? extends Emitter> c =  emitterClass.getDeclaredConstructor(EmitterBuilder.class);
                 return c.newInstance(this);
             } catch (NoSuchMethodException e) {
-                throw new IllegalStateException("Can’t create emitter", e);
+                throw new IllegalStateException(err, e);
             } catch (InvocationTargetException e) {
-                throw new IllegalStateException("Can’t create emitter", e);
+                throw new IllegalStateException(err, e);
             } catch (InstantiationException e) {
-                throw new IllegalStateException("Can’t create emitter", e);
+                throw new IllegalStateException(err, e);
             } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Can’t create emitter", e);
+                throw new IllegalStateException(err, e);
             }
         }
     }
@@ -292,7 +298,6 @@ public abstract class Emitter {
 
                 // If the payload is too large we will attempt to send anyway
                 // but will not re-attempt.
-
                 long payloadByteSize = payload.getByteSize();
 
                 if (payloadByteSize > byteLimitGet) {

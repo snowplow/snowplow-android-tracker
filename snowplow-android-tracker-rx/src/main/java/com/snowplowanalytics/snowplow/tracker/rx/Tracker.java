@@ -21,6 +21,10 @@ import java.util.List;
 import rx.Observable;
 import rx.Scheduler;
 
+/**
+ * Builds a Tracker object which is used to
+ * send events to a Snowplow Collector.
+ */
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final Scheduler scheduler = SchedulerRx.getScheduler();

@@ -24,6 +24,10 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
 
+/**
+ * Build an emitter object which controls the
+ * sending of events to the Snowplow Collector.
+ */
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();

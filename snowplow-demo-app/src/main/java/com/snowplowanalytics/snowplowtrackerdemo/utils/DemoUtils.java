@@ -25,6 +25,10 @@ import android.content.Context;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * Utility class to build the Trackers and
+ * to hold a static executor.
+ */
 public class DemoUtils {
 
     public static final String namespace = "SnowplowAndroidTrackerDemo";

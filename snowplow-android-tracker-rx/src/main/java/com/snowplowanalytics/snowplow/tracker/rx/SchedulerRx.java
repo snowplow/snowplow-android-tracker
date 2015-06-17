@@ -24,6 +24,11 @@ public class SchedulerRx {
 
     private static final Scheduler scheduler = Schedulers.io();
 
+    /**
+     * Returns the Rx Scheduler
+     *
+     * @return the scheduler
+     */
     public static Scheduler getScheduler() {
         return scheduler;
     }

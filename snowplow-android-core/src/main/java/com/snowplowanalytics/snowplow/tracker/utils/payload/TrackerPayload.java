@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +20,10 @@ import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
+/**
+ * Returns a standard Tracker Payload consisting of
+ * many key -> pair values.
+ */
 public class TrackerPayload implements Payload {
 
     private final String TAG = TrackerPayload.class.getSimpleName();

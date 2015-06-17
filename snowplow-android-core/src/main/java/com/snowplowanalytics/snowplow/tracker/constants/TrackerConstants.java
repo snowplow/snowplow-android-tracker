@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.constants;
 
+/**
+ * Constants which apply to schemas, event types
+ * and sending protocols.
+ */
 public class TrackerConstants {
     public static final String PROTOCOL_VENDOR = "com.snowplowanalytics.snowplow";
     public static final String PROTOCOL_VERSION = "tp2";

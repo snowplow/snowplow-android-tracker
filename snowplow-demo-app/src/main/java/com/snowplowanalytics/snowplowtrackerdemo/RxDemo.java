@@ -33,6 +33,9 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+/**
+ * RxJava Demo Activity.
+ */
 public class RxDemo extends Activity {
 
     private Tracker tracker;

@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+/**
+ * The different platforms available to the Tracker.
+ */
 public enum DevicePlatforms {
     Web {
         public String toString() {

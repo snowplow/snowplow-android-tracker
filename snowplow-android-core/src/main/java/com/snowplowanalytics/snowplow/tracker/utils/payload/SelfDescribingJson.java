@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker.utils.payload;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.charset.Charset;
 
 import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -23,6 +22,10 @@ import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
+/**
+ * Returns a SelfDescribingJson object which will contain
+ * both the Schema and data.
+ */
 public class SelfDescribingJson implements Payload {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();

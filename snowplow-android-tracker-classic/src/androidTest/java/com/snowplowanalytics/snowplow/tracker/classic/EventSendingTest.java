@@ -32,7 +32,7 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         Tracker tracker = getTracker(emitter, getSubject());
 
         trackStructuredEvent(tracker);
-        trackUnStructuredEvent(tracker);
+        trackUnstructuredEvent(tracker);
         trackPageView(tracker);
         trackTimings(tracker);
         trackScreenView(tracker);
@@ -57,7 +57,7 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         Tracker tracker = getTracker(emitter, getSubject());
 
         trackStructuredEvent(tracker);
-        trackUnStructuredEvent(tracker);
+        trackUnstructuredEvent(tracker);
         trackPageView(tracker);
         trackTimings(tracker);
         trackScreenView(tracker);

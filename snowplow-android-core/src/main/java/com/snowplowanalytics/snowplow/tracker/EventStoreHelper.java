@@ -19,6 +19,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
+/**
+ * Helper class for building and maintaining the SQLite
+ * Database used by the Tracker.
+ */
 public class EventStoreHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_EVENTS         = "events";

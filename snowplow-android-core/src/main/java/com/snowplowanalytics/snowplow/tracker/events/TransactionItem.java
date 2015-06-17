@@ -20,6 +20,11 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Returns a new TransactionItem which is
+ * essentially just a HashMap of the pairs
+ * that go into this event.
+ */
 public class TransactionItem extends HashMap {
 
     public TransactionItem (String order_id, String sku, double price, int quantity, String name,

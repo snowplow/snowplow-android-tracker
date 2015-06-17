@@ -17,7 +17,9 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import android.util.Log;
 
 /**
- * Custom logger class to easily manage debug mode and appending of 'SnowplowTracker->' to the log TAG.
+ * Custom logger class to easily manage debug mode and appending
+ * of 'SnowplowTracker->' to the log TAG as well as logging the
+ * Thread.
  */
 public class Logger {
 
