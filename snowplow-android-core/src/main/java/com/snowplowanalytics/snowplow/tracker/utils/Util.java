@@ -230,30 +230,6 @@ public class Util {
     }
 
     /**
-     * Returns the Advertising ID or null if it is not available.
-     * - Must not be called from onStart() or application will hang
-     *
-     * @param context the android context
-     * @return the advertising id or null
-     */
-    public static String getAdvertisingIdFuture(Context context) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Callable<String> callable = getAdvertisingIdCallable(context);
-        Future<String> future = executor.submit(callable);
-        String idfa = null;
-        try {
-            idfa = future.get();
-            Logger.d(TAG, "Advertising ID: %s", idfa);
-        } catch (InterruptedException ie) {
-            Logger.e(TAG, "Exception getting the Advertising ID: %s", ie.toString());
-        } catch (ExecutionException ee) {
-            Logger.e(TAG, "Exception getting the Advertising ID: %s", ee.toString());
-        }
-        executor.shutdown();
-        return idfa;
-    }
-
-    /**
      * Returns a Callable String which when executed will
      * attempt to get the Advertising ID.
      *

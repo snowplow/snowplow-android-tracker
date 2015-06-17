@@ -18,6 +18,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
+import android.os.Looper;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -190,13 +191,19 @@ public class Subject {
      * @param context the android context
      */
     public void setAdvertisingID(final Context context) {
-        new Thread(new Runnable() {
-            public void run() {
-                String playAdId = Util.getAdvertisingId(context);
-                Logger.d(TAG, "Advertising ID: %s", playAdId);
-                putToMobile(Parameters.ANDROID_IDFA, playAdId);
-            }
-        }).start();
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            new Thread(new Runnable() {
+                public void run() {
+                    String playAdId = Util.getAdvertisingId(context);
+                    Logger.d(TAG, "Advertising ID: %s", playAdId);
+                    putToMobile(Parameters.ANDROID_IDFA, playAdId);
+                }
+            }).start();
+        } else {
+            String playAdId = Util.getAdvertisingId(context);
+            Logger.d(TAG, "Advertising ID: %s", playAdId);
+            putToMobile(Parameters.ANDROID_IDFA, playAdId);
+        }
     }
 
     /**
