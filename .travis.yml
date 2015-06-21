@@ -3,32 +3,37 @@ jdk: oraclejdk8
 
 env:
   matrix:
-    - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a ANDROID_TRAVIS=1
 
 android:
   components:
-    - build-tools-21.1.1
-  licenses:
-    - android-sdk-license-5be876d5
+    - tools
+    - platform-tools
+    - build-tools-21.1.2
+    - android-21
+    - android-20
+    - android-19
+    - addon-google_apis-google-22
+    - extra-android-support
+    - extra-google-m2repository
+    - extra-google-google_play_services
+    - extra-android-m2repository
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install nodejs
   - sudo apt-get install npm
-  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
 
 install:
   - npm install -g mountebank --production
 
 before_script:
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
   - mb &
   - chmod +x ./ci/wait_for_emulator
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew connectedCheck -PdisablePreDex
-
-after_script:
-  - adb logcat
+  - ./gradlew build connectedCheck

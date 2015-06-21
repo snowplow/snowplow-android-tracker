@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Tracker Demo</string>
+
+    <string name="main_demo_header">Android Tracker Demo</string>
+    <string name="main_demo_info">
+        To launch the demonstrations simply click one of the below buttons.
+        Each demo will send every combination of event construction available to the tracker to an
+        endpoint you will enter on the demo page.
+    </string>
+    <string name="link_header">Useful Links:</string>
+    <string name="link_tech_docs">- Technical Documentation</string>
+    <string name="link_integration">- Integration Examples</string>
+    <string name="link_setup_guide">- Setup Guide</string>
+    <string name="link_repo">- Github Repository</string>
+
+    <string name="main_demo_button_rx">RxJava Tracker Demo</string>
+    <string name="main_demo_button_lite">Classic Tracker Demo</string>
+
+    <string name="title_activity_rx_demo">RxJava Demo</string>
+    <string name="rx_demo_header">RxJava Tracker Demo</string>
+    <string name="rx_demo_info">Enter settings below and then hit start.</string>
+
+    <string name="title_activity_lite_demo">Classic Demo</string>
+    <string name="lite_demo_header">Classic Tracker Demo</string>
+    <string name="lite_demo_info">Enter settings below and then hit start.</string>
+
+    <string name="emitter_uri_text">Emitter URI:</string>
+    <string name="emitter_protocol_text">Emitter Protocol:</string>
+    <string name="emitter_type_text">Emitter Type:</string>
+    <string name="emitter_logging_text">Emitter Callback:</string>
+    <string name="emitter_statistics">Metrics:</string>
+    <string name="created_events">Made: 0</string>
+    <string name="sent_events">Sent: 0</string>
+    <string name="emitter_status">Running: no</string>
+    <string name="online_status">Online: no</string>
+    <string name="database_size">DB Size: 0</string>
+
+    <string name="radio_http">HTTP</string>
+    <string name="radio_https">HTTPS</string>
+    <string name="radio_get">GET</string>
+    <string name="radio_post">POST</string>
+
+    <string name="emitter_uri_hint">Enter endpoint here...</string>
+    <string name="start">Start!</string>
+
+    <string name="action_settings">Settings</string>
+</resources>

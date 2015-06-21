@@ -2,6 +2,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.hostname = "snowplow-android-tracker"
+  config.vm.network "forwarded_port", guest: 4040, host: 4040
+  config.vm.network "forwarded_port", guest: 2525, host: 2525
   config.ssh.forward_agent = true
 
   config.vm.provider :virtualbox do |vb|

@@ -28,13 +28,29 @@ Continuing from the instructions above:
 
 ```bash
 guest$ mb &
-guest$ echo no | android create avd --force -n test -t android-19 --abi default/x86
+guest$ echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 guest$ emulator -avd test -no-skin -no-audio -no-window &
 guest$ chmod +x ./ci/wait_for_emulator
 guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
 guest$ adb shell input keyevent 82 &
 guest$ ./gradlew connectedCheck 
 ```
+
+### Setting up a testing endpoint
+
+You can now also setup a testing endpoint to send events to a local server using the combination of Ngrok and Mountebank.
+
+```bash
+guest$ cd /vagrant
+guest$ chmod +x ./testing/setup.bash
+guest$ ./testing/setup.bash ## Will launch Mountebank and Ngrok in the background
+```
+
+Then go to any browser in your host machine and type:
+- `http://localhost:4040/` - Ngrok Web Interface
+- `http://localhost:2525/` - Mountebank Web Interface
+
+In the Ngrok interface take note of the `tunnel` URL, this is what you will use to send events.
 
 ## Find out more
 
