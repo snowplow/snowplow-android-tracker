@@ -13,13 +13,17 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
+import com.snowplowanalytics.snowplow.tracker.Session;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 /**
  * Builds a Tracker object which is used to
@@ -27,10 +31,23 @@ import rx.Scheduler;
  */
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
+    private final String TAG = Tracker.class.getSimpleName();
     private final Scheduler scheduler = SchedulerRx.getScheduler();
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
+    }
+
+    /**
+     * Begins a recurring session checker which
+     * will run every 5 seconds.
+     */
+    protected void startSessionChecker() {
+        final Session session = this.trackerSession;
+        Observable.interval(5, TimeUnit.SECONDS, Schedulers.newThread())
+            .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
+            .retry()
+            .subscribe(tick -> session.checkAndUpdateSession());
     }
 
     @Override

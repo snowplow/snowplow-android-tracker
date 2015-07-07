@@ -13,10 +13,12 @@
 
 package com.snowplowanalytics.snowplow.tracker.classic;
 
+import com.snowplowanalytics.snowplow.tracker.Session;
 import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Builds a Tracker object which is used to
@@ -28,6 +30,20 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
+    }
+
+    /**
+     * Begins a recurring session checker which
+     * will run every 5 seconds.
+     */
+    protected void startSessionChecker() {
+        final Session session = this.trackerSession;
+        Executor.scheduleRepeating(new Runnable() {
+            @Override
+            public void run() {
+                session.checkAndUpdateSession();
+            }
+        }, 5, 5, TimeUnit.SECONDS);
     }
 
     @Override

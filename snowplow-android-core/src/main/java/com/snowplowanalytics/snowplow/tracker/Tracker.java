@@ -40,6 +40,7 @@ public abstract class Tracker {
     protected final String trackerVersion = BuildConfig.TRACKER_LABEL;
     protected Emitter emitter;
     protected Subject subject;
+    protected Session trackerSession;
     protected String namespace;
     protected String appId;
     protected boolean base64Encoded;
@@ -74,6 +75,8 @@ public abstract class Tracker {
         protected boolean base64Encoded = true; // Optional
         protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
         protected LogLevel logLevel = LogLevel.OFF; // Optional
+        protected long foregroundTimeout = 60000; // Optional
+        protected long backgroundTimeout = 60000; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -131,6 +134,22 @@ public abstract class Tracker {
         }
 
         /**
+         * @param timeout The session foreground timeout
+         */
+        public TrackerBuilder foregroundTimeout(long timeout) {
+            this.foregroundTimeout = timeout;
+            return this;
+        }
+
+        /**
+         * @param timeout The session background timeout
+         */
+        public TrackerBuilder backgroundTimeout(long timeout) {
+            this.backgroundTimeout = timeout;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker
          */
         public Tracker build(){
@@ -167,6 +186,9 @@ public abstract class Tracker {
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
         this.level = builder.logLevel;
+
+        this.trackerSession = new Session(builder.foregroundTimeout, builder.backgroundTimeout);
+        startSessionChecker();
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
@@ -249,6 +271,7 @@ public abstract class Tracker {
                 context.add(mobilePayload);
             }
         }
+        context.add(this.trackerSession.getSessionContext());
         return context;
     }
 
@@ -736,6 +759,12 @@ public abstract class Tracker {
         else
             return new ArrayList<>(list);
     }
+
+    /**
+     * Needed function to check session on a
+     * recurring basis.
+     */
+    protected abstract void startSessionChecker();
 
     // Get & Set Functions
 

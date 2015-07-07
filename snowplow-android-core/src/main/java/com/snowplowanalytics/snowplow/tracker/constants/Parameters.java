@@ -104,4 +104,11 @@ public class Parameters {
     public static final String LATLONG_ACCURACY = "latitudeLongitudeAccuracy";
     public static final String SPEED = "speed";
     public static final String BEARING = "bearing";
+
+    // Session Context
+    public static final String SESSION_USER_ID = "userId";
+    public static final String SESSION_ID = "sessionId";
+    public static final String SESSION_PREVIOUS_ID = "previousSessionId";
+    public static final String SESSION_INDEX = "sessionIndex";
+    public static final String SESSION_STORAGE = "storageMechanism";
 }

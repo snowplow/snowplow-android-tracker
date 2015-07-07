@@ -18,4 +18,8 @@ public class TestTracker extends Tracker {
     public TestTracker(TrackerBuilder builder) {
         super(builder);
     }
+
+    protected void startSessionChecker() {
+        // Do nothing.
+    }
 }

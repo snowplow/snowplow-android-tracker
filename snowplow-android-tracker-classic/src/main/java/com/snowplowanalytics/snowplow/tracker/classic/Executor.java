@@ -63,6 +63,21 @@ public class Executor {
     }
 
     /**
+     * Schedules a recurring runnable to run at some
+     * point in the future.
+     *
+     * @param runnable the runnable to be queued
+     * @param initDelay the initial delay before
+     *                  executing
+     * @param delay the count of units to delay
+     *              execution by
+     * @param timeUnit the time unit for the delay
+     */
+    public static void scheduleRepeating(Runnable runnable, long initDelay, long delay, TimeUnit timeUnit) {
+        getExecutor().scheduleAtFixedRate(runnable, initDelay, delay, timeUnit);
+    }
+
+    /**
      * Shuts the executor service down and resets
      * the executor to a null state.
      */

@@ -337,4 +337,24 @@ public class Util {
         Method methodObject = classObject.getMethod(methodName, cArgs);
         return methodObject.invoke(instance, args);
     }
+
+    /**
+     * The startTime must be greater than the endTime minus the
+     * interval to be within an acceptable range.
+     *
+     * Example:
+     * - Start Time = 1425060000000 // Fri, 27 Feb 2015 18:00:00 GMT
+     * - Check Time = 1425060300000 // Fri, 27 Feb 2015 18:05:00 GMT
+     * - Range = 600000 // 10 minutes
+     *
+     * If the start time is greater than 17:55:00 then it is in range.
+     *
+     * @param startTime the startTime of the check
+     * @param checkTime the time of the check
+     * @param range the allowed range the startTime must be in
+     * @return whether the time is in range or not
+     */
+    public static boolean isTimeInRange(long startTime, long checkTime, long range) {
+        return startTime > (checkTime - range);
+    }
 }
