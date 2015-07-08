@@ -260,4 +260,17 @@
         android:layout_toRightOf="@+id/log_output"
         android:layout_toEndOf="@+id/log_output" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/session_index"
+        android:id="@+id/session_index"
+        android:textSize="16sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/database_size"
+        android:layout_toRightOf="@+id/log_output"
+        android:layout_toEndOf="@+id/log_output" />
+
 </RelativeLayout>

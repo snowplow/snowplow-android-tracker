@@ -33,6 +33,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Classic Demo Activity.
  */
@@ -44,27 +46,42 @@ public class ClassicDemo extends Activity {
     private RadioGroup _type, _security;
     private RadioButton _radioGet, _radioHttp;
     private TextView _logOutput, _eventsCreated, _eventsSent, _emitterOnline, _emitterStatus,
-            _databaseSize;
+            _databaseSize, _sessionIndex;
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
-    private boolean isClassic = false;
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_classic_demo);
-        isClassic = true;
         setupTrackerListener();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Emitter e = tracker.getEmitter();
-        e.shutdown();
-        isClassic = false;
+        if (tracker != null) {
+            tracker.shutdown();
+        }
+        DemoUtils.resetExecutor();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (tracker != null) {
+            tracker.getSession().setIsBackground(true);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tracker != null) {
+            tracker.getSession().setIsBackground(false);
+        }
     }
 
     /**
@@ -84,6 +101,7 @@ public class ClassicDemo extends Activity {
         _emitterOnline  = (TextView)findViewById(R.id.online_status);
         _emitterStatus  = (TextView)findViewById(R.id.emitter_status);
         _databaseSize   = (TextView)findViewById(R.id.database_size);
+        _sessionIndex   = (TextView)findViewById(R.id.session_index);
 
         context = getApplicationContext();
 
@@ -97,16 +115,18 @@ public class ClassicDemo extends Activity {
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                Emitter e = tracker.getEmitter();
                 String uri = _uriField.getText().toString();
                 HttpMethod method = _type.getCheckedRadioButtonId() ==
                         _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
                 RequestSecurity security = _security.getCheckedRadioButtonId() ==
                         _radioHttp.getId() ? RequestSecurity.HTTP : RequestSecurity.HTTPS;
 
-                Emitter e = tracker.getEmitter();
-                e.setEmitterUri(uri);
-                e.setRequestSecurity(security);
-                e.setHttpMethod(method);
+                if (!e.getEmitterStatus()) {
+                    e.setEmitterUri(uri);
+                    e.setRequestSecurity(security);
+                    e.setHttpMethod(method);
+                }
 
                 if (!uri.equals("")) {
                     eventsCreated += 28;
@@ -171,45 +191,44 @@ public class ClassicDemo extends Activity {
     }
 
     /**
-     * Starts a polling updater.
+     * Starts a polling updater which will fetch
+     * and update the UI.
+     *
+     * @param context the activity context
      */
     private void makePollingUpdater(final Context context) {
-        DemoUtils.execute(new Runnable() {
+        DemoUtils.scheduleRepeating(new Runnable() {
             @Override
             public void run() {
-                while (isClassic) {
-                    boolean isOnline = Util.isOnline(context);
-                    boolean isRunning = tracker.getEmitter().getEmitterStatus();
-                    long dbSize = tracker.getEmitter().getEventStore().getSize();
-                    updateEmitterStats(isOnline, isRunning, dbSize);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                boolean isOnline = Util.isOnline(context);
+                Emitter e = tracker.getEmitter();
+                boolean isRunning = e.getEmitterStatus();
+                long dbSize = e.getEventStore().getSize();
+                int sessionIndex = tracker.getSession().getSessionIndex();
+                updateEmitterStats(isOnline, isRunning, dbSize, sessionIndex);
             }
-        });
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
     /**
-     * Updates the state of the emitter being online.
+     * Updates the various UI elements based on information
+     * about the Tracker and Emitter.
+     *
+     * @param isOnline is the device online
+     * @param isRunning is the emitter running
+     * @param dbSize the database event size
      */
-    private void updateEmitterStats(final boolean isOnline, final boolean isRunning, final long dbSize) {
+    private void updateEmitterStats(final boolean isOnline, final boolean isRunning, final long dbSize,
+                                    final int sessionIndex) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 String online = isOnline ? "Online: yes" : "Online: no";
-                if (!_emitterOnline.getText().toString().equals(online)) {
-                    _emitterOnline.setText(online);
-                }
-
+                _emitterOnline.setText(online);
                 String status = isRunning ? "Running: yes" : "Running: no";
-                if (!_emitterStatus.getText().toString().equals(status)) {
-                    _emitterStatus.setText(status);
-                }
-
+                _emitterStatus.setText(status);
                 _databaseSize.setText("DB Size: " + dbSize);
+                _sessionIndex.setText("Session Index: " + sessionIndex);
 
                 if (isRunning) {
                     String startButtonText = _startButton.getText().toString();

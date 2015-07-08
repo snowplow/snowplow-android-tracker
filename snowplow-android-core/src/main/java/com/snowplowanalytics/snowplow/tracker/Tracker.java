@@ -848,4 +848,11 @@ public abstract class Tracker {
     public LogLevel getLogLevel() {
         return this.level;
     }
+
+    /**
+     * @return the trackers session object
+     */
+    public Session getSession() {
+        return this.trackerSession;
+    }
 }

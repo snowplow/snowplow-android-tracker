@@ -113,6 +113,7 @@ public class Session {
      *                     the background or not
      */
     public void setIsBackground(boolean isBackground) {
+        Logger.d(TAG, "Application is in the background: %s", isBackground);
         this.isBackground.set(isBackground);
     }
 

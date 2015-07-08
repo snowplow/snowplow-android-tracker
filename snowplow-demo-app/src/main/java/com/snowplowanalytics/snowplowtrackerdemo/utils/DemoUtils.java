@@ -24,6 +24,7 @@ import android.content.Context;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class to build the Trackers and
@@ -36,18 +37,39 @@ public class DemoUtils {
 
     // Tracker Utils
 
+    /**
+     * Returns a Classic Tracker
+     *
+     * @param context the application context
+     * @param callback the emitter callback
+     * @return a new Classic Tracker
+     */
     public static Tracker getAndroidTrackerClassic(Context context, RequestCallback callback) {
         Emitter emitter = DemoUtils.getEmitterClassic(context, callback);
         Subject subject = DemoUtils.getSubject(context);
         return DemoUtils.getTrackerClassic(emitter, subject);
     }
 
+    /**
+     * Returns an RxJava Tracker
+     *
+     * @param context the application context
+     * @param callback the emitter callback
+     * @return a new RxJava Tracker
+     */
     public static Tracker getAndroidTrackerRx(Context context, RequestCallback callback) {
         Emitter emitter = DemoUtils.getEmitterRx(context, callback);
         Subject subject = DemoUtils.getSubject(context);
         return DemoUtils.getTrackerRx(emitter, subject);
     }
 
+    /**
+     * Returns a Classic Tracker
+     *
+     * @param emitter a Classic emitter
+     * @param subject the tracker subject
+     * @return a new Classic Tracker
+     */
     private static Tracker getTrackerClassic(Emitter emitter, Subject subject) {
         return new Tracker.TrackerBuilder(emitter, namespace, appId,
                 com.snowplowanalytics.snowplow.tracker.classic.Tracker.class)
@@ -58,6 +80,13 @@ public class DemoUtils {
                 .build();
     }
 
+    /**
+     * Returns an RxJava Tracker
+     *
+     * @param emitter an RxJava emitter
+     * @param subject the tracker subject
+     * @return a new RxJava Tracker
+     */
     private static Tracker getTrackerRx(Emitter emitter, Subject subject) {
         return new Tracker.TrackerBuilder(emitter, namespace, appId,
                 com.snowplowanalytics.snowplow.tracker.rx.Tracker.class)
@@ -68,6 +97,13 @@ public class DemoUtils {
                 .build();
     }
 
+    /**
+     * Returns a Classic Emitter
+     *
+     * @param context the application context
+     * @param callback the emitter callback
+     * @return a new Classic Emitter
+     */
     private static Emitter getEmitterClassic(Context context, RequestCallback callback) {
         return new Emitter.EmitterBuilder("", context,
                 com.snowplowanalytics.snowplow.tracker.classic.Emitter.class)
@@ -76,6 +112,13 @@ public class DemoUtils {
                 .build();
     }
 
+    /**
+     * Returns an RxJava Emitter
+     *
+     * @param context the application context
+     * @param callback the emitter callback
+     * @return a new RxJava Emitter
+     */
     private static Emitter getEmitterRx(Context context, RequestCallback callback) {
         return new Emitter.EmitterBuilder("", context,
                 com.snowplowanalytics.snowplow.tracker.rx.Emitter.class)
@@ -84,6 +127,12 @@ public class DemoUtils {
                 .build();
     }
 
+    /**
+     * Returns a Subject Object
+     *
+     * @param context the application context
+     * @return a new subject
+     */
     private static Subject getSubject(Context context) {
         return new Subject
                 .SubjectBuilder()
@@ -95,7 +144,32 @@ public class DemoUtils {
 
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * Executes a runnable on the executor service
+     *
+     * @param runnable a new task
+     */
     public static void execute(Runnable runnable) {
         executor.execute(runnable);
+    }
+
+    /**
+     * Executes a repeating runnable
+     *
+     * @param runnable a new task
+     * @param initDelay the delay before polling
+     * @param delay the delay between polls
+     * @param timeUnit the timeunit for the delays
+     */
+    public static void scheduleRepeating(Runnable runnable, long initDelay, long delay, TimeUnit timeUnit) {
+        executor.scheduleAtFixedRate(runnable, initDelay, delay, timeUnit);
+    }
+
+    /**
+     * Shuts the executor down and resets it.
+     */
+    public static void resetExecutor() {
+        executor.shutdown();
+        executor = Executors.newSingleThreadScheduledExecutor();
     }
 }
