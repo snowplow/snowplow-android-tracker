@@ -14,11 +14,14 @@
 package com.snowplowanalytics.snowplow.tracker.rx;
 
 import com.snowplowanalytics.snowplow.tracker.Session;
-import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
+import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -65,59 +68,49 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     }
 
     @Override
-    public void trackPageView(String pageUrl, String pageTitle, String referrer,
-                              List<SelfDescribingJson> context, long timestamp) {
+    public void track(PageView event) {
         Observable.create(subscriber -> {
-            super.trackPageView(pageUrl, pageTitle, referrer, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }
 
     @Override
-    public void trackStructuredEvent(String category, String action, String label, String property,
-                                 Double value, List<SelfDescribingJson> context, long timestamp) {
+    public void track(Structured event) {
         Observable.create(subscriber -> {
-            super.trackStructuredEvent(category, action, label, property, value, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }
 
     @Override
-    public void trackUnstructuredEvent(SelfDescribingJson eventData, List<SelfDescribingJson> context,
-                                       long timestamp) {
+    public void track(Unstructured event) {
         Observable.create(subscriber -> {
-            super.trackUnstructuredEvent(eventData, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }
 
     @Override
-    public void trackEcommerceTransaction(String order_id, Double total_value, String affiliation,
-                                          Double tax_value, Double shipping, String city,
-                                          String state, String country, String currency,
-                                          List<TransactionItem> items, List<SelfDescribingJson> context,
-                                          long timestamp) {
+    public void track(EcommerceTransaction event) {
         Observable.create(subscriber -> {
-            super.trackEcommerceTransaction(order_id, total_value, affiliation, tax_value, shipping,
-                    city, state, country, currency, items, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }
 
     @Override
-    public void trackScreenView(String name, String id, List<SelfDescribingJson> context,
-                                long timestamp) {
+    public void track(ScreenView event) {
         Observable.create(subscriber -> {
-            super.trackScreenView(name, id, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }
 
     @Override
-    public void trackTimingWithCategory(String category, String variable, int timing, String label,
-                                        List<SelfDescribingJson> context, long timestamp) {
+    public void track(TimingWithCategory event) {
         Observable.create(subscriber -> {
-            super.trackTimingWithCategory(category, variable, timing, label, context, timestamp);
+            super.track(event);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }

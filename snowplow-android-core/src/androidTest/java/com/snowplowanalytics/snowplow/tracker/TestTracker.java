@@ -22,4 +22,8 @@ public class TestTracker extends Tracker {
     protected void startSessionChecker() {
         // Do nothing.
     }
+
+    public void shutdownSessionChecker() {
+        // Do nothing.
+    }
 }

@@ -40,13 +40,19 @@ public class EventSendingTest extends SnowplowRxTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(15000);
+        // Wait for emitter to start
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+        }
 
-        tracker.getEmitter().flush();
-
-        Thread.sleep(5000);
+        // Wait for emitter to end
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+        }
+        Thread.sleep(500);
 
         checkGetRequest(LogFetcher.getMountebankGetRequests());
+        tracker.shutdown();
     }
 
     public void testSendPost() throws Exception {
@@ -65,12 +71,18 @@ public class EventSendingTest extends SnowplowRxTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(15000);
+        // Wait for emitter to start
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+        }
 
-        tracker.getEmitter().flush();
-
-        Thread.sleep(5000);
+        // Wait for emitter to end
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+        }
+        Thread.sleep(500);
 
         checkPostRequest(LogFetcher.getMountebankPostRequests());
+        tracker.shutdown();
     }
 }

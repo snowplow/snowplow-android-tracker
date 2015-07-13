@@ -16,7 +16,13 @@ package com.snowplowanalytics.snowplow.tracker.classic;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.*;
-import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
+import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
@@ -237,7 +243,12 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
     }
 
     public void checkUnstructuredEvent(JSONObject json) throws Exception {
+        System.out.println(json);
+
         JSONObject unstructEvent = new JSONObject(json.getString("ue_pr"));
+
+        System.out.println(unstructEvent);
+
         assertEquals("iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0", unstructEvent.getString("schema"));
         String innerSchema = unstructEvent.getJSONObject("data").getString("schema");
         JSONObject innerData = unstructEvent.getJSONObject("data").getJSONObject("data");
@@ -255,50 +266,50 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
     // Event Tracker Functions
 
     public void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer");
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext());
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", (long) 1433791172);
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext(), (long) 1433791172);
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").customContext(getCustomContext()).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00);
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext());
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, (long) 1433791172);
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext(), (long) 1433791172);
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).customContext(getCustomContext()).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackScreenView("screenName", "screenId");
-        tracker.trackScreenView("screenName", "screenId", getCustomContext());
-        tracker.trackScreenView("screenName", "screenId", (long) 1433791172);
-        tracker.trackScreenView("screenName", "screenId", getCustomContext(), (long) 1433791172);
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").customContext(getCustomContext()).build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackTimingWithCategory("category", "variable", 1, "label");
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext());
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", (long) 1433791172);
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext(), (long) 1433791172);
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
-        tracker.trackUnstructuredEvent(test);
-        tracker.trackUnstructuredEvent(test, getCustomContext());
-        tracker.trackUnstructuredEvent(test, (long) 1433791172);
-        tracker.trackUnstructuredEvent(test, getCustomContext(), (long) 1433791172);
+        tracker.track(Unstructured.builder().eventData(test).build());
+        tracker.track(Unstructured.builder().eventData(test).customContext(getCustomContext()).build());
+        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).build());
+        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        TransactionItem item = new TransactionItem("item-1", "sku-1", 35.00, 1, "Acme 1", "Stuff", "AUD");
-        List<TransactionItem> items = new LinkedList<>();
+        EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
+        List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, getCustomContext());
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, (long) 1433791172);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, getCustomContext(), (long) 1433791172);
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).customContext(getCustomContext()).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).timestamp((long) 1433791172).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 }
