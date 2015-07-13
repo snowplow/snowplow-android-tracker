@@ -16,6 +16,10 @@ package com.snowplowanalytics.snowplow.tracker.classic;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.*;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
@@ -23,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
 

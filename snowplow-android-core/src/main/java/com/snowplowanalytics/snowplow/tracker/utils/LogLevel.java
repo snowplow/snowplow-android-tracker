@@ -10,19 +10,40 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-
-package com.snowplowanalytics.snowplow.tracker.utils.emitter;
+package com.snowplowanalytics.snowplow.tracker.utils;
 
 /**
- * Exception SubClass for the Emitter
+ * LogLevel contains the different levels of configurable logging in the Tracker.
  */
-public class EmitterException extends RuntimeException {
+public enum LogLevel {
 
-    public EmitterException() {
-        super();
+    /**
+     * Nothing from the Tracker is logged.
+     */
+    OFF(0),
+
+    /**
+     * All errors are logged for the Tracker.
+     */
+    ERROR(1),
+
+    /**
+     * All debugging errors are logged for the Tracker.
+     */
+    DEBUG(2),
+
+    /**
+     * Everything that can be logged is logged.
+     */
+    VERBOSE(3);
+
+    private int level;
+
+    private LogLevel(int c) {
+        level = c;
     }
 
-    public EmitterException(String message) {
-        super(message);
+    public int getLevel() {
+        return level;
     }
 }

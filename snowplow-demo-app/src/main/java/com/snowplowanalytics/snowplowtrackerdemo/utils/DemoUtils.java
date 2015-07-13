@@ -14,8 +14,8 @@
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Emitter;

@@ -17,12 +17,12 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
-import com.snowplowanalytics.snowplow.tracker.EventStore;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 
 /**
  * Build an emitter object which controls the

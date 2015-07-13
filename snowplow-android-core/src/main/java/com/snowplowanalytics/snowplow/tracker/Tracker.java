@@ -21,10 +21,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
@@ -34,7 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 /**
  * Builds a Tracker object which is used to
@@ -194,15 +195,14 @@ public abstract class Tracker {
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
         this.level = builder.logLevel;
-
         this.trackerSession = new Session(
                 builder.foregroundTimeout,
                 builder.backgroundTimeout,
                 builder.context);
-        startSessionChecker();
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
+        startSessionChecker();
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class Tracker {
 
         // Add default information to the custom context
         List<SelfDescribingJson> finalContext =
-                addDefaultContextData(getMutableList(context));
+                addDefaultContextData(Util.getMutableList(context));
 
         // Convert context into a List<Map> object
         List<Map> contextDataList = new LinkedList<>();
@@ -409,20 +409,6 @@ public abstract class Tracker {
     }
 
     // Utilities
-
-    /**
-     * Converts a potentially immutable list of
-     * SelfDescribingJson into a mutable list.
-     *
-     * @param list a list of SelfDescribingJson
-     * @return the mutable list
-     */
-    private List<SelfDescribingJson> getMutableList(List<SelfDescribingJson> list) {
-        if (list == null)
-            return null;
-        else
-            return new ArrayList<>(list);
-    }
 
     /**
      * Shuts down all concurrent services in the Tracker:

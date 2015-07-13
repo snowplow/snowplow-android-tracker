@@ -16,6 +16,8 @@ package com.snowplowanalytics.snowplow.tracker.utils.payload;
 import android.test.AndroidTestCase;
 import android.util.Base64;
 
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

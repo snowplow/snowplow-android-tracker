@@ -13,11 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.List;
 

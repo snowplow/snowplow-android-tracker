@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,9 +30,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 
 /**
  * Helper class for storing, getting and removing

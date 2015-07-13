@@ -13,8 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
-import com.snowplowanalytics.snowplow.tracker.*;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 
 public class EmitterTest extends SnowplowRxTestCase {
 

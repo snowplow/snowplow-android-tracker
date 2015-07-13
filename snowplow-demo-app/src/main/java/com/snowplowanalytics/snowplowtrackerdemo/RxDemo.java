@@ -24,9 +24,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 
-import com.snowplowanalytics.snowplow.tracker.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;

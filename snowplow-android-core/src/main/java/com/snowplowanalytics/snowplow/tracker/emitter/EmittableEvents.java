@@ -11,38 +11,36 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.utils.emitter;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
- * Stores the result of a Request Attempt
+ * An object containing currently Pending
+ * events and their associated eventIds.
  */
-public class RequestResult {
+public class EmittableEvents {
 
-    private final boolean success;
+    private final ArrayList<Payload> events;
     private final LinkedList<Long> eventIds;
 
-    /**
-     * Builds a result from a request attempt.
-     *
-     * @param success if the event returned a 200
-     * @param eventIds a list of event ids involved in the sending
-     */
-    public RequestResult(boolean success, LinkedList<Long> eventIds) {
-        this.success = success;
+    public EmittableEvents(ArrayList<Payload> events, LinkedList<Long> eventIds) {
+        this.events = events;
         this.eventIds = eventIds;
     }
 
     /**
-     * @return the requests success status
+     * @return the objects ArrayList of payloads
      */
-    public boolean getSuccess() {
-        return this.success;
+    public ArrayList<Payload> getEvents() {
+        return this.events;
     }
 
     /**
-     * @return the requests LinkedList of eventIds
+     * @return the object LinkedList of event ids
      */
     public LinkedList<Long> getEventIds() {
         return this.eventIds;

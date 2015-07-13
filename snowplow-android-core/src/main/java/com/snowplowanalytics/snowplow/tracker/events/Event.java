@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.List;
 

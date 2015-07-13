@@ -13,9 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
-import com.snowplowanalytics.snowplow.tracker.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
-import com.snowplowanalytics.snowplow.tracker.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 
 import com.snowplowanalytics.snowplow.tracker.rx.utils.LogFetcher;

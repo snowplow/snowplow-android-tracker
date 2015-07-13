@@ -11,15 +11,18 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * Interface for all Emitter Callbacks
+ * Exception SubClass for the Emitter
  */
-public interface RequestCallback {
+public class EmitterException extends RuntimeException {
 
-    void onSuccess(int successCount);
+    public EmitterException() {
+        super();
+    }
 
-    void onFailure(int successCount, int failureCount);
-
+    public EmitterException(String message) {
+        super(message);
+    }
 }

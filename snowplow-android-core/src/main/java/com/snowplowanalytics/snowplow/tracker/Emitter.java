@@ -18,10 +18,16 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import com.squareup.okhttp.MediaType;

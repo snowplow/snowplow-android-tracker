@@ -15,6 +15,8 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+
 public class TrackerTest extends AndroidTestCase {
 
     // Helper Methods

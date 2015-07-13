@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils;
 
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import android.util.Log;
 
 /**

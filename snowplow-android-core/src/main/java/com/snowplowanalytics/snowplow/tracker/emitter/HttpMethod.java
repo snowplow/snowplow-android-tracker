@@ -10,40 +10,19 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker;
+
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * LogLevel contains the different levels of configurable logging in the Tracker.
+ * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
  */
-public enum LogLevel {
-
+public enum HttpMethod {
     /**
-     * Nothing from the Tracker is logged.
+     * Each event is sent individually in separate GET requests.
      */
-    OFF(0),
-
+    GET,
     /**
-     * All errors are logged for the Tracker.
+     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
      */
-    ERROR(1),
-
-    /**
-     * All debugging errors are logged for the Tracker.
-     */
-    DEBUG(2),
-
-    /**
-     * Everything that can be logged is logged.
-     */
-    VERBOSE(3);
-
-    private int level;
-
-    private LogLevel(int c) {
-        level = c;
-    }
-
-    public int getLevel() {
-        return level;
-    }
+    POST
 }

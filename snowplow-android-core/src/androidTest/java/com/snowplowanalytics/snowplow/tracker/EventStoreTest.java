@@ -17,8 +17,9 @@ import android.test.AndroidTestCase;
 
 import java.util.Map;
 
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 
 import junit.framework.Assert;
 

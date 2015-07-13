@@ -23,13 +23,17 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -356,5 +360,19 @@ public class Util {
      */
     public static boolean isTimeInRange(long startTime, long checkTime, long range) {
         return startTime > (checkTime - range);
+    }
+
+    /**
+     * Converts a potentially immutable list of
+     * SelfDescribingJson into a mutable list.
+     *
+     * @param list a list of SelfDescribingJson
+     * @return the mutable list
+     */
+    public static List<SelfDescribingJson> getMutableList(List<SelfDescribingJson> list) {
+        if (list == null)
+            return null;
+        else
+            return new ArrayList<>(list);
     }
 }
