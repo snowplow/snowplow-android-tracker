@@ -47,7 +47,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             com.snowplowanalytics.snowplow.tracker.Emitter emitter,
             Subject subject) {
         return new Tracker
-            .TrackerBuilder(emitter, "myNamespace", "myAppId")
+            .TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .subject(subject)
             .base64(false)
             .level(LogLevel.DEBUG)

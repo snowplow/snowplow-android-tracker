@@ -39,4 +39,6 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM_ITEM = "ti";
 
     public static final int BACK_PRESSURE_LIMIT = 10000;
+
+    public static final String SNOWPLOW_SESSION_VARS = "snowplow_session_vars";
 }

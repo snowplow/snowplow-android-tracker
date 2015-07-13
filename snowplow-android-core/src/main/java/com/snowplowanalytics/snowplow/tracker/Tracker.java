@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.content.Context;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -71,6 +73,7 @@ public abstract class Tracker {
         protected final Emitter emitter; // Required
         protected final String namespace; // Required
         protected final String appId; // Required
+        protected final Context context; // Required
         protected Subject subject = null; // Optional
         protected boolean base64Encoded = true; // Optional
         protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
@@ -83,8 +86,8 @@ public abstract class Tracker {
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
          */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId) {
-            this(emitter, namespace, appId, defaultTrackerClass);
+        public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
+            this(emitter, namespace, appId, context, defaultTrackerClass);
         }
 
         /**
@@ -93,11 +96,12 @@ public abstract class Tracker {
          * @param appId Application ID
          * @param trackerClass Default tracker class
          */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId,
+        public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context,
                               Class<? extends Tracker> trackerClass) {
             this.emitter = emitter;
             this.namespace = namespace;
             this.appId = appId;
+            this.context = context;
             this.trackerClass = trackerClass;
         }
 
@@ -187,7 +191,10 @@ public abstract class Tracker {
         this.devicePlatform = builder.devicePlatform;
         this.level = builder.logLevel;
 
-        this.trackerSession = new Session(builder.foregroundTimeout, builder.backgroundTimeout);
+        this.trackerSession = new Session(
+                builder.foregroundTimeout,
+                builder.backgroundTimeout,
+                builder.context);
         startSessionChecker();
 
         Logger.updateLogLevel(builder.logLevel);
@@ -761,10 +768,25 @@ public abstract class Tracker {
     }
 
     /**
+     * Shuts down all concurrent services in the Tracker:
+     * - Emitter polling sender
+     * - Session polling checker
+     */
+    public void shutdown() {
+        this.emitter.shutdown();
+        this.shutdownSessionChecker();
+    }
+
+    /**
      * Needed function to check session on a
      * recurring basis.
      */
     protected abstract void startSessionChecker();
+
+    /**
+     * Shuts the session checker down.
+     */
+    public abstract void shutdownSessionChecker();
 
     // Get & Set Functions
 

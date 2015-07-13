@@ -13,10 +13,13 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.content.Context;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.HashMap;
@@ -29,6 +32,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * on:
  * - Timeout of use while app is in foreground
  * - Timeout of use while app is in background
+ *
+ * Session data is maintained for the life of the
+ * application being installed on a device.
  *
  * Essentially will update if it is not accessed within
  * a configurable timeout.
@@ -49,6 +55,7 @@ public class Session {
     private long accessedLast;
     private long foregroundTimeout;
     private long backgroundTimeout;
+    private Context context;
 
     /**
      * Creates a new Session object which will
@@ -62,10 +69,30 @@ public class Session {
      *                          background.
      *
      */
-    public Session(long foregroundTimeout, long backgroundTimeout) {
-        this.userId = Util.getEventId();
+    public Session(long foregroundTimeout, long backgroundTimeout, Context context) {
         this.foregroundTimeout = foregroundTimeout;
         this.backgroundTimeout = backgroundTimeout;
+        this.context = context;
+        Map sessionInfo = getSessionFromFile();
+        if (sessionInfo == null) {
+            this.userId = Util.getEventId();
+        } else {
+            try {
+                String uid = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
+                String sid = sessionInfo.get(Parameters.SESSION_ID).toString();
+                String psid = sessionInfo.get(Parameters.SESSION_PREVIOUS_ID).toString();
+                int si = (int) sessionInfo.get(Parameters.SESSION_INDEX);
+
+                this.userId = uid;
+                this.previousSessionId = psid;
+                this.sessionIndex = si;
+                this.currentSessionId = sid;
+            } catch (Exception e){
+                Logger.e(TAG, "Exception occurred retrieving session info from file: %s", e.getMessage());
+            }
+
+        }
+
         updateSessionInfo();
         updateAccessedTime();
 
@@ -141,10 +168,35 @@ public class Session {
         this.currentSessionId = Util.getEventId();
         this.sessionIndex++;
 
-        Logger.d(TAG, "Session information is updating:");
+        Logger.d(TAG, "Session information is updated:");
         Logger.d(TAG, " + Session ID: %s", this.currentSessionId);
         Logger.d(TAG, " + Previous Session ID: %s", this.previousSessionId);
         Logger.d(TAG, " + Session Index: %s", this.sessionIndex);
+
+        saveSessionToFile();
+    }
+
+    /**
+     * Saves the session information to internal storage.
+     *
+     * @return truth on save success.
+     */
+    private boolean saveSessionToFile() {
+        return FileStore.saveMapToFile(
+                TrackerConstants.SNOWPLOW_SESSION_VARS,
+                getSessionValues(),
+                context);
+    }
+
+    /**
+     * Gets the session information from a file.
+     *
+     * @return a map or null.
+     */
+    private Map getSessionFromFile() {
+        return FileStore.getMapFromFile(
+                TrackerConstants.SNOWPLOW_SESSION_VARS,
+                context);
     }
 
     /**

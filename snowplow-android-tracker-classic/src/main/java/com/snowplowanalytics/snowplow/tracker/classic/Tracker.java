@@ -18,6 +18,8 @@ import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
 import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
+    private static ScheduledExecutorService sessionExecutor;
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
@@ -38,12 +41,25 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      */
     protected void startSessionChecker() {
         final Session session = this.trackerSession;
-        Executor.scheduleRepeating(new Runnable() {
+        if (sessionExecutor == null) {
+            sessionExecutor = Executors.newSingleThreadScheduledExecutor();
+        }
+        sessionExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 session.checkAndUpdateSession();
             }
         }, 5, 5, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Shuts the session checker down.
+     */
+    public void shutdownSessionChecker() {
+        if (sessionExecutor != null) {
+            sessionExecutor.shutdown();
+            sessionExecutor = null;
+        }
     }
 
     @Override

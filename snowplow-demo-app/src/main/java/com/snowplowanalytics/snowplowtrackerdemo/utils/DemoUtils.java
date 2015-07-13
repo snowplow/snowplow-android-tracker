@@ -47,7 +47,7 @@ public class DemoUtils {
     public static Tracker getAndroidTrackerClassic(Context context, RequestCallback callback) {
         Emitter emitter = DemoUtils.getEmitterClassic(context, callback);
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerClassic(emitter, subject);
+        return DemoUtils.getTrackerClassic(emitter, subject, context);
     }
 
     /**
@@ -60,7 +60,7 @@ public class DemoUtils {
     public static Tracker getAndroidTrackerRx(Context context, RequestCallback callback) {
         Emitter emitter = DemoUtils.getEmitterRx(context, callback);
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerRx(emitter, subject);
+        return DemoUtils.getTrackerRx(emitter, subject, context);
     }
 
     /**
@@ -70,8 +70,8 @@ public class DemoUtils {
      * @param subject the tracker subject
      * @return a new Classic Tracker
      */
-    private static Tracker getTrackerClassic(Emitter emitter, Subject subject) {
-        return new Tracker.TrackerBuilder(emitter, namespace, appId,
+    private static Tracker getTrackerClassic(Emitter emitter, Subject subject, Context context) {
+        return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
                 com.snowplowanalytics.snowplow.tracker.classic.Tracker.class)
                 .level(LogLevel.VERBOSE)
                 .base64(false)
@@ -87,8 +87,8 @@ public class DemoUtils {
      * @param subject the tracker subject
      * @return a new RxJava Tracker
      */
-    private static Tracker getTrackerRx(Emitter emitter, Subject subject) {
-        return new Tracker.TrackerBuilder(emitter, namespace, appId,
+    private static Tracker getTrackerRx(Emitter emitter, Subject subject, Context context) {
+        return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
                 com.snowplowanalytics.snowplow.tracker.rx.Tracker.class)
                 .level(LogLevel.VERBOSE)
                 .base64(false)

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.schedulers.Schedulers;
 
 /**
@@ -33,6 +34,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final String TAG = Tracker.class.getSimpleName();
     private final Scheduler scheduler = SchedulerRx.getScheduler();
+    private Subscription sessionSub;
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
@@ -44,10 +46,22 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      */
     protected void startSessionChecker() {
         final Session session = this.trackerSession;
-        Observable.interval(5, TimeUnit.SECONDS, Schedulers.newThread())
+        sessionSub = Observable.interval(5, TimeUnit.SECONDS, Schedulers.newThread())
             .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
             .retry()
+            .doOnSubscribe(() -> Logger.d(TAG, "Session checker has been started."))
+            .doOnUnsubscribe(() -> Logger.d(TAG, "Session checker has been shutdown."))
             .subscribe(tick -> session.checkAndUpdateSession());
+    }
+
+    /**
+     * Shuts the session checker down.
+     */
+    public void shutdownSessionChecker() {
+        if (sessionSub != null) {
+            sessionSub.unsubscribe();
+            sessionSub = null;
+        }
     }
 
     @Override
