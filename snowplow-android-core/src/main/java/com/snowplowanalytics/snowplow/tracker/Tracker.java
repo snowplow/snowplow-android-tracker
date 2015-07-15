@@ -82,8 +82,9 @@ public abstract class Tracker {
         protected boolean base64Encoded = true; // Optional
         protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
         protected LogLevel logLevel = LogLevel.OFF; // Optional
-        protected long foregroundTimeout = 60000; // Optional
-        protected long backgroundTimeout = 60000; // Optional
+        protected long foregroundTimeout = 600000; // Optional - 10 minutes
+        protected long backgroundTimeout = 300000; // Optional - 5 minutes
+        protected long sessionCheckInterval = 15000; // Optional - 15 seconds
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -158,6 +159,14 @@ public abstract class Tracker {
         }
 
         /**
+         * @param sessionCheckInterval The session check interval
+         */
+        public TrackerBuilder sessionCheckInterval(long sessionCheckInterval) {
+            this.sessionCheckInterval = sessionCheckInterval;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker
          */
         public Tracker build(){
@@ -201,7 +210,7 @@ public abstract class Tracker {
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
-        startSessionChecker();
+        startSessionChecker(builder.sessionCheckInterval);
     }
 
     /**
@@ -396,8 +405,10 @@ public abstract class Tracker {
     /**
      * Needed function to check session on a
      * recurring basis.
+     *
+     * @param interval the checking interval
      */
-    protected abstract void startSessionChecker();
+    protected abstract void startSessionChecker(final long interval);
 
     /**
      * Shuts the session checker down.

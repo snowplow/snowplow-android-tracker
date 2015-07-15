@@ -41,8 +41,10 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     /**
      * Begins a recurring session checker which
      * will run every 5 seconds.
+     *
+     * @param interval the checking interval
      */
-    protected void startSessionChecker() {
+    protected void startSessionChecker(final long interval) {
         final Session session = this.trackerSession;
         if (sessionExecutor == null) {
             sessionExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -52,7 +54,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
             public void run() {
                 session.checkAndUpdateSession();
             }
-        }, 5, 5, TimeUnit.SECONDS);
+        }, interval, interval, TimeUnit.MILLISECONDS);
     }
 
     /**

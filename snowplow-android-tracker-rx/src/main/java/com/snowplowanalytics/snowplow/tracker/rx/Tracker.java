@@ -47,9 +47,9 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      * Begins a recurring session checker which
      * will run every 5 seconds.
      */
-    protected void startSessionChecker() {
+    protected void startSessionChecker(final long interval) {
         final Session session = this.trackerSession;
-        sessionSub = Observable.interval(5, TimeUnit.SECONDS, Schedulers.newThread())
+        sessionSub = Observable.interval(interval, TimeUnit.MILLISECONDS, Schedulers.newThread())
             .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
             .retry()
             .doOnSubscribe(() -> Logger.d(TAG, "Session checker has been started."))
