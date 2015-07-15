@@ -99,6 +99,6 @@ public class PageView extends Event {
         payload.add(Parameters.PAGE_URL, this.pageUrl);
         payload.add(Parameters.PAGE_TITLE, this.pageTitle);
         payload.add(Parameters.PAGE_REFR, this.referrer);
-        return payload;
+        return putDefaultParams(payload);
     }
 }

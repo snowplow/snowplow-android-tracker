@@ -188,7 +188,7 @@ public class EcommerceTransaction extends Event {
         payload.add(Parameters.TR_STATE, this.state);
         payload.add(Parameters.TR_COUNTRY, this.country);
         payload.add(Parameters.TR_CURRENCY, this.currency);
-        return payload;
+        return putDefaultParams(payload);
     }
 
     /**

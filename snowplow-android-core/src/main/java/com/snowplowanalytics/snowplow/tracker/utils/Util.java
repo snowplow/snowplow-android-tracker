@@ -370,9 +370,11 @@ public class Util {
      * @return the mutable list
      */
     public static List<SelfDescribingJson> getMutableList(List<SelfDescribingJson> list) {
-        if (list == null)
+        if (list == null) {
             return null;
-        else
+        }
+        else {
             return new ArrayList<>(list);
+        }
     }
 }

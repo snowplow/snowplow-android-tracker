@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
@@ -241,8 +242,7 @@ public abstract class Tracker {
         }
 
         // Add default information to the custom context
-        List<SelfDescribingJson> finalContext =
-                addDefaultContextData(Util.getMutableList(context));
+        List<SelfDescribingJson> finalContext = addDefaultContextData(context);
 
         // Convert context into a List<Map> object
         List<Map> contextDataList = new LinkedList<>();
@@ -266,10 +266,6 @@ public abstract class Tracker {
      * @return A final custom context
      */
     private List<SelfDescribingJson> addDefaultContextData(List<SelfDescribingJson> context) {
-        if (context == null) {
-            Logger.v(TAG, "Custom context not provided for event, creating empty context.");
-            context = new LinkedList<>();
-        }
         if (subject != null) {
             Logger.v(TAG, "Subject is not null, attempting to populate mobile contexts.");
 

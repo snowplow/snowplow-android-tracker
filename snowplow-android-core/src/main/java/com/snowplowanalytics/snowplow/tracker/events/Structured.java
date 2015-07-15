@@ -121,6 +121,6 @@ public class Structured extends Event {
         payload.add(Parameters.SE_LABEL, this.label);
         payload.add(Parameters.SE_PROPERTY, this.property);
         payload.add(Parameters.SE_VALUE, this.value != null ? Double.toString(this.value) : null);
-        return payload;
+        return putDefaultParams(payload);
     }
 }

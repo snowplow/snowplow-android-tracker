@@ -74,6 +74,6 @@ public class Unstructured extends Event {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
         payload.addMap(envelope.getMap(), base64Encoded,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
-        return payload;
+        return putDefaultParams(payload);
     }
 }

@@ -81,7 +81,7 @@ public class ScreenView extends Event {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.SV_NAME, this.name);
         payload.add(Parameters.SV_ID, this.id);
-        return payload;
+        return putDefaultParams(payload);
     }
 
     /**

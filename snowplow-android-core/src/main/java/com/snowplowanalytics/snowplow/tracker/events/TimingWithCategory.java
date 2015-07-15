@@ -107,7 +107,7 @@ public class TimingWithCategory extends Event {
         payload.add(Parameters.UT_VARIABLE, this.variable);
         payload.add(Parameters.UT_TIMING, this.timing);
         payload.add(Parameters.UT_LABEL, this.label);
-        return payload;
+        return putDefaultParams(payload);
     }
 
     /**

@@ -148,6 +148,6 @@ public class EcommerceTransactionItem extends Event {
         payload.add(Parameters.TI_ITEM_PRICE, Double.toString(this.price));
         payload.add(Parameters.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
         payload.add(Parameters.TI_ITEM_CURRENCY, this.currency);
-        return payload;
+        return putDefaultParams(payload);
     }
 }
