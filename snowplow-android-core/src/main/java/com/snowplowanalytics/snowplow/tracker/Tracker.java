@@ -24,7 +24,6 @@ import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
@@ -34,7 +33,6 @@ import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
@@ -207,81 +205,73 @@ public abstract class Tracker {
     }
 
     /**
-     * Adds a complete payload to the EventStore
+     * Builds and adds a finalized payload by adding in extra
+     * information to the payload:
+     * - The event contexts
+     * - The Tracker Subject
+     * - The Tracker parameters
      *
-     * @param payload The complete payload to be
-     *                sent to a collector
+     * @param payload Payload the raw event payload to be
+     *                decorated.
+     * @param context The raw context list
      */
-    private void addEventPayload(Payload payload) {
-        Logger.d(TAG, "Adding new payload to event storage: %s", payload);
-        emitter.add(payload);
-    }
-
-    /**
-     * Builds a final payload by joining the event payload with
-     * the custom context and an optional timestamp.
-     * @param payload Payload builder
-     * @param context Custom context for the event
-     * @param timestamp Optional user-provided timestamp for the event
-     */
-    private void completePayload(Payload payload, List<SelfDescribingJson> context,
-                                      long timestamp) {
+    private void addEventPayload(Payload payload, List<SelfDescribingJson> context) {
 
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
         payload.add(Parameters.APPID, this.appId);
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
-        payload.add(Parameters.EID, Util.getEventId());
-        payload.add(Parameters.TIMESTAMP,
-                (timestamp == 0 ? Util.getTimestamp() : Long.toString(timestamp)));
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<String,Object>(subject.getSubject()));
+            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
         }
 
-        // Add default information to the custom context
-        List<SelfDescribingJson> finalContext = addDefaultContextData(context);
-
-        // Convert context into a List<Map> object
-        List<Map> contextDataList = new LinkedList<>();
-        for (SelfDescribingJson selfDescribingJson : finalContext) {
-            contextDataList.add(selfDescribingJson.getMap());
-        }
-
-        // Encodes context data and sets the data
-        SelfDescribingJson envelope = new SelfDescribingJson(
-                TrackerConstants.SCHEMA_CONTEXTS, contextDataList);
-
+        // Build the final context and add it
+        SelfDescribingJson envelope = getFinalContext(context);
         payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                 Parameters.CONTEXT);
+
+        // Add this payload to the emitter
+        Logger.v(TAG, "Adding new payload to event storage: %s", payload);
+        this.emitter.add(payload);
     }
 
     /**
-     * Adds the default Android Tracker contextual
-     * information to the context.
+     * Builds the final event context.
      *
-     * @param context Custom context for the event
-     * @return A final custom context
+     * @param context the base event context
+     * @return the final event context json with
+     *         many contexts inside
      */
-    private List<SelfDescribingJson> addDefaultContextData(List<SelfDescribingJson> context) {
-        if (subject != null) {
-            Logger.v(TAG, "Subject is not null, attempting to populate mobile contexts.");
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> context) {
 
-            if (!subject.getSubjectLocation().isEmpty()) {
+        // Add session context
+        context.add(this.trackerSession.getSessionContext());
+
+        // Add subject context's
+        if (this.subject != null) {
+            if (!this.subject.getSubjectLocation().isEmpty()) {
                 SelfDescribingJson locationPayload = new SelfDescribingJson(
                         TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());
                 context.add(locationPayload);
             }
-            if (!subject.getSubjectMobile().isEmpty()) {
+            if (!this.subject.getSubjectMobile().isEmpty()) {
                 SelfDescribingJson mobilePayload = new SelfDescribingJson(
                         TrackerConstants.MOBILE_SCHEMA, this.subject.getSubjectMobile());
                 context.add(mobilePayload);
             }
         }
-        context.add(this.trackerSession.getSessionContext());
-        return context;
+
+        // Convert List of SelfDescribingJson into a List of Map
+        List<Map> contextMaps = new LinkedList<>();
+        for (SelfDescribingJson selfDescribingJson : context) {
+            contextMaps.add(selfDescribingJson.getMap());
+        }
+
+        // Return the contexts as a new SelfDescribingJson
+        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
     }
 
     // Event Tracking Functions
@@ -293,13 +283,10 @@ public abstract class Tracker {
      */
     public void track(PageView event) {
         List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
         Payload payload = event.getPayload();
+        addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Page View Event: %s", payload);
-
-        completePayload(payload, context, timestamp);
-        addEventPayload(payload);
     }
 
     /**
@@ -309,13 +296,10 @@ public abstract class Tracker {
      */
     public void track(Structured event) {
         List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
         Payload payload = event.getPayload();
+        addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Structured Event: %s", payload);
-
-        completePayload(payload, context, timestamp);
-        addEventPayload(payload);
     }
 
     /**
@@ -327,14 +311,13 @@ public abstract class Tracker {
      */
     public void track(EcommerceTransaction event) {
         List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
         Payload payload = event.getPayload();
+        addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking EcommerceTransaction Event: %s", payload);
 
-        completePayload(payload, context, timestamp);
-        addEventPayload(payload);
-
+        // Track each TransactionItem individually
+        long timestamp = event.getTimestamp();
         for(EcommerceTransactionItem item : event.getItems()) {
             track(item, timestamp);
         }
@@ -350,10 +333,11 @@ public abstract class Tracker {
         List<SelfDescribingJson> context = event.getContext();
         Payload payload = event.getPayload();
 
-        Logger.v(TAG, "Tracking EcommerceTransactionItem Event: %s", payload);
+        // Force timestamp for TransactionItems
+        payload.add(Parameters.TIMESTAMP, Long.toString(timestamp));
+        addEventPayload(payload, context);
 
-        completePayload(payload, context, timestamp);
-        addEventPayload(payload);
+        Logger.v(TAG, "Tracking EcommerceTransactionItem Event: %s", payload);
     }
 
     /**
@@ -363,13 +347,10 @@ public abstract class Tracker {
      */
     public void track(Unstructured event) {
         List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
         Payload payload = event.getPayload(base64Encoded);
+        addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Unstructured Event: %s", payload);
-
-        completePayload(payload, context, timestamp);
-        addEventPayload(payload);
     }
 
     /**
@@ -378,14 +359,12 @@ public abstract class Tracker {
      * @param event the ScreenView event.
      */
     public void track(ScreenView event) {
-        List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
-        SelfDescribingJson wrappedPayload = event.getSelfDescribingJson();
-
         this.track(Unstructured.builder()
-                .eventData(wrappedPayload)
-                .customContext(context)
-                .timestamp(timestamp).build());
+            .eventData(event.getSelfDescribingJson())
+            .customContext(event.getContext())
+            .timestamp(event.getTimestamp())
+            .eventId(event.getEventId())
+            .build());
     }
 
     /**
@@ -394,14 +373,12 @@ public abstract class Tracker {
      * @param event the TimingWithCategory event.
      */
     public void track(TimingWithCategory event) {
-        List<SelfDescribingJson> context = event.getContext();
-        long timestamp = event.getTimestamp();
-        SelfDescribingJson wrappedPayload = event.getSelfDescribingJson();
-
         this.track(Unstructured.builder()
-                .eventData(wrappedPayload)
-                .customContext(context)
-                .timestamp(timestamp).build());
+            .eventData(event.getSelfDescribingJson())
+            .customContext(event.getContext())
+            .timestamp(event.getTimestamp())
+            .eventId(event.getEventId())
+            .build());
     }
 
     // Utilities

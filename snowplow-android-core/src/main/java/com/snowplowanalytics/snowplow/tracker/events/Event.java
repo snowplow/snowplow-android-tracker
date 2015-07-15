@@ -13,7 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import java.util.LinkedList;
@@ -24,16 +26,19 @@ import java.util.List;
  * elements to all events:
  * - Custom Context: list of custom contexts or null
  * - Timestamp: user defined event timestamp or 0
+ * - Event Id: a unique id for the event
  */
 public class Event {
 
-    private final List<SelfDescribingJson> context;
-    private final long timestamp;
+    protected final List<SelfDescribingJson> context;
+    protected final long timestamp;
+    protected final String eventId;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private long timestamp = 0;
+        private long timestamp = System.currentTimeMillis();
+        private String eventId = Util.getEventId();
 
         protected abstract T self();
 
@@ -58,6 +63,16 @@ public class Event {
             return self();
         }
 
+        /**
+         * A custom eventId for the event.
+         *
+         * @param eventId the eventId
+         */
+        public T eventId(String eventId) {
+            this.eventId = eventId;
+            return self();
+        }
+
         public Event build() {
             return new Event(this);
         }
@@ -77,6 +92,7 @@ public class Event {
     protected Event(Builder<?> builder) {
         this.context = Util.getMutableList(builder.context);
         this.timestamp = builder.timestamp;
+        this.eventId = builder.eventId;
     }
 
     /**
@@ -91,5 +107,24 @@ public class Event {
      */
     public long getTimestamp() {
         return this.timestamp;
+    }
+
+    /**
+     * @return the event id
+     */
+    public String getEventId() {
+        return this.eventId;
+    }
+
+    /**
+     * Adds the default parameters to a TrackerPayload object.
+     *
+     * @param payload the payload to add too.
+     * @return the TrackerPayload with appended values.
+     */
+    protected TrackerPayload putDefaultParams(TrackerPayload payload) {
+        payload.add(Parameters.EID, getEventId());
+        payload.add(Parameters.TIMESTAMP, Long.toString(getTimestamp()));
+        return payload;
     }
 }
