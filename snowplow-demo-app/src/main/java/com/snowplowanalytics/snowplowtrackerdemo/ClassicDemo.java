@@ -43,7 +43,7 @@ public class ClassicDemo extends Activity {
     private Tracker tracker;
     private Button _startButton;
     private EditText _uriField;
-    private RadioGroup _type, _security;
+    private RadioGroup _type, _security, _collection;
     private RadioButton _radioGet, _radioHttp;
     private TextView _logOutput, _eventsCreated, _eventsSent, _emitterOnline, _emitterStatus,
             _databaseSize, _sessionIndex;
@@ -93,6 +93,7 @@ public class ClassicDemo extends Activity {
         _uriField    = (EditText)findViewById(R.id.emitter_uri_field);
         _type        = (RadioGroup)findViewById(R.id.radio_send_type);
         _security    = (RadioGroup)findViewById(R.id.radio_send_security);
+        _collection  = (RadioGroup)findViewById(R.id.radio_data_collection);
         _radioGet   = (RadioButton)findViewById(R.id.radio_get);
         _radioHttp  = (RadioButton)findViewById(R.id.radio_http);
         _logOutput  = (TextView)findViewById(R.id.log_output);
@@ -111,6 +112,22 @@ public class ClassicDemo extends Activity {
         tracker = DemoUtils.getAndroidTrackerClassic(context, getCallback());
 
         makePollingUpdater(context);
+
+        _collection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
+                DemoUtils.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (i == R.id.radio_data_on) {
+                            tracker.startDataCollection();
+                        } else if (i == R.id.radio_data_off) {
+                            tracker.stopDataCollection();
+                        }
+                    }
+                });
+            }
+        });
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

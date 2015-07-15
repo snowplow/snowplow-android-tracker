@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -52,6 +53,9 @@ public abstract class Tracker {
     protected boolean base64Encoded;
     protected DevicePlatforms devicePlatform;
     protected LogLevel level;
+    protected long sessionCheckInterval;
+
+    protected AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
      * Builder for the Tracker
@@ -207,10 +211,11 @@ public abstract class Tracker {
                 builder.foregroundTimeout,
                 builder.backgroundTimeout,
                 builder.context);
+        this.sessionCheckInterval = builder.sessionCheckInterval;
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
-        startSessionChecker(builder.sessionCheckInterval);
+        startSessionChecker(this.sessionCheckInterval);
     }
 
     /**
@@ -291,6 +296,10 @@ public abstract class Tracker {
      * @param event the PageView event.
      */
     public void track(PageView event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         List<SelfDescribingJson> context = event.getContext();
         Payload payload = event.getPayload();
         addEventPayload(payload, context);
@@ -304,6 +313,10 @@ public abstract class Tracker {
      * @param event the Structured event.
      */
     public void track(Structured event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         List<SelfDescribingJson> context = event.getContext();
         Payload payload = event.getPayload();
         addEventPayload(payload, context);
@@ -319,6 +332,10 @@ public abstract class Tracker {
      * @param event the Ecommerce Transaction event.
      */
     public void track(EcommerceTransaction event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         List<SelfDescribingJson> context = event.getContext();
         Payload payload = event.getPayload();
         addEventPayload(payload, context);
@@ -355,6 +372,10 @@ public abstract class Tracker {
      * @param event the Structured event.
      */
     public void track(Unstructured event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         List<SelfDescribingJson> context = event.getContext();
         Payload payload = event.getPayload(base64Encoded);
         addEventPayload(payload, context);
@@ -368,6 +389,10 @@ public abstract class Tracker {
      * @param event the ScreenView event.
      */
     public void track(ScreenView event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         this.track(Unstructured.builder()
             .eventData(event.getSelfDescribingJson())
             .customContext(event.getContext())
@@ -382,6 +407,10 @@ public abstract class Tracker {
      * @param event the TimingWithCategory event.
      */
     public void track(TimingWithCategory event) {
+        if (!dataCollection.get()) {
+            return;
+        }
+
         this.track(Unstructured.builder()
             .eventData(event.getSelfDescribingJson())
             .customContext(event.getContext())
@@ -420,6 +449,27 @@ public abstract class Tracker {
      */
     public void shutdownEmitter() {
         this.emitter.shutdown();
+    }
+
+    /**
+     * Stops data collection and ends all
+     * concurrent processes.
+     */
+    public void stopDataCollection() {
+        if (dataCollection.compareAndSet(true, false)) {
+            shutdown();
+        }
+    }
+
+    /**
+     * Starts data collection processes again.
+     * - Emitter service will start automatically.
+     */
+    public void startDataCollection() {
+        if (dataCollection.compareAndSet(false, true)) {
+            startSessionChecker(this.sessionCheckInterval);
+            getEmitter().flush();
+        }
     }
 
     // Get & Set Functions
@@ -510,5 +560,12 @@ public abstract class Tracker {
      */
     public Session getSession() {
         return this.trackerSession;
+    }
+
+    /**
+     * @return the state of data collection
+     */
+    public boolean getDataCollection() {
+        return this.dataCollection.get();
     }
 }

@@ -58,7 +58,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:inputType="textNoSuggestions"
+            android:inputType="textUri"
             android:hint="@string/emitter_uri_hint"
             android:paddingLeft="5dp"
             android:textSize="13sp"
@@ -67,74 +67,105 @@
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout android:id="@+id/radio_groups"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/emitter_protocol_text"
-        android:id="@+id/protocol_text"
-        android:layout_above="@+id/radio_send_security"
+        android:orientation="horizontal"
+        android:layout_below="@+id/emitter_uri_block"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/emitter_type_text"
-        android:id="@+id/type_text"
-        android:layout_alignTop="@+id/protocol_text"
-        android:layout_alignLeft="@+id/radio_send_type"
-        android:layout_alignStart="@+id/radio_send_type"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"/>
-
-    <RadioGroup
-        android:id="@+id/radio_send_security"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/radio_send_type"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <RadioButton
-            android:id="@+id/radio_http"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/radio_http" />
-
-        <RadioButton
-            android:id="@+id/radio_https"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/radio_https" />
-    </RadioGroup>
-
-    <RadioGroup
-        android:id="@+id/radio_send_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/emitter_uri_block"
+        android:weightSum="1"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="62dp"
-        android:layout_marginEnd="62dp"
-        android:layout_marginTop="31dp">
+        android:layout_marginTop="10dp">
 
-        <RadioButton
-            android:id="@+id/radio_get"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/radio_get" />
+        <RadioGroup
+            android:id="@+id/radio_send_type"
+            android:layout_width="0dip"
+            android:layout_weight="0.33"
+            android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/radio_post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/radio_post" />
-    </RadioGroup>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="@string/emitter_type_text"
+                android:id="@+id/type_text"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"/>
+
+            <RadioButton
+                android:id="@+id/radio_get"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radio_get" />
+
+            <RadioButton
+                android:id="@+id/radio_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_post" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/radio_send_security"
+            android:layout_width="0dip"
+            android:layout_weight="0.33"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="@string/emitter_protocol_text"
+                android:id="@+id/protocol_text"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"/>
+
+            <RadioButton
+                android:id="@+id/radio_http"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radio_http" />
+
+            <RadioButton
+                android:id="@+id/radio_https"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_https" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/radio_data_collection"
+            android:layout_width="0dip"
+            android:layout_weight="0.33"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="@string/data_collection_text"
+                android:id="@+id/data_collection"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"/>
+
+            <RadioButton
+                android:id="@+id/radio_data_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radio_data_on" />
+
+            <RadioButton
+                android:id="@+id/radio_data_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_data_off" />
+        </RadioGroup>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_lite_start"
@@ -144,133 +175,155 @@
         android:gravity="center"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_below="@+id/radio_send_security"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/emitter_logging_text"
-        android:id="@+id/logger_header"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/btn_lite_start"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/log_output"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/radio_groups"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/logger_header"
-        android:paddingTop="5dp"
-        android:paddingLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:maxLines = "200"
-        android:scrollbars = "vertical"
-        android:textColor="@android:color/white"
-        android:background="@color/button_material_dark"
-        android:gravity="bottom"
-        android:layout_toStartOf="@+id/radio_send_type"
-        android:layout_marginRight="26dp"
-        android:layout_marginEnd="26dp"
-        android:layout_toLeftOf="@+id/radio_send_type" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout android:id="@+id/bottom_section"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/emitter_statistics"
-        android:id="@+id/statistics"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:orientation="horizontal"
         android:layout_below="@+id/btn_lite_start"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="1"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/created_events"
-        android:id="@+id/created_events"
-        android:textSize="16sp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_alignTop="@+id/log_output"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/emitter_logging_text"
+            android:id="@+id/logger_header"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sent_events"
-        android:id="@+id/sent_events"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/created_events"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/log_output"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/logger_header"
+            android:paddingTop="5dp"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:maxLines = "200"
+            android:scrollbars = "vertical"
+            android:textColor="@android:color/white"
+            android:background="@color/button_material_dark"
+            android:gravity="bottom"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="26dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/online_status"
-        android:id="@+id/online_status"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/sent_events"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/emitter_statistics"
+            android:id="@+id/statistics"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/emitter_status"
-        android:id="@+id/emitter_status"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/online_status"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/created_events"
+            android:id="@+id/created_events"
+            android:textSize="16sp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_alignTop="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"
+            android:layout_toRightOf="@+id/log_output" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/database_size"
-        android:id="@+id/database_size"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/emitter_status"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sent_events"
+            android:id="@+id/sent_events"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/created_events"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/session_index"
-        android:id="@+id/session_index"
-        android:textSize="16sp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/database_size"
-        android:layout_toRightOf="@+id/log_output"
-        android:layout_toEndOf="@+id/log_output" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/online_status"
+            android:id="@+id/online_status"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/sent_events"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/emitter_status"
+            android:id="@+id/emitter_status"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/online_status"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/database_size"
+            android:id="@+id/database_size"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/emitter_status"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/session_index"
+            android:id="@+id/session_index"
+            android:textSize="16sp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/database_size"
+            android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
