@@ -34,7 +34,7 @@
     <string name="emitter_status">Running: no</string>
     <string name="online_status">Online: no</string>
     <string name="database_size">DB Size: 0</string>
-    <string name="session_index">Session Index: 0</string>
+    <string name="session_index">Sessions: 0</string>
 
     <string name="radio_http">HTTP</string>
     <string name="radio_https">HTTPS</string>
