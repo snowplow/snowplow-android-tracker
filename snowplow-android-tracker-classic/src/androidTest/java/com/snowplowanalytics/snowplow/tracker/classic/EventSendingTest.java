@@ -18,11 +18,10 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 
-import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
-
 public class EventSendingTest extends SnowplowClassicTestCase {
 
     public void testSendGet() throws Exception {
+
         setup();
 
         // Setup the Tracker
@@ -39,21 +38,33 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackEcommerceEvent(tracker);
 
         // Wait for emitter to start
+        int counter = 0;
         while (!tracker.getEmitter().getEmitterStatus()) {
             Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                throw new NullPointerException("Emitter is hanging on startup...");
+            }
         }
 
         // Wait for emitter to end
+        counter = 0;
         while (tracker.getEmitter().getEmitterStatus()) {
             Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                throw new NullPointerException("Emitter is hanging on shutdown...");
+            }
         }
         Thread.sleep(500);
 
-        checkGetRequest(LogFetcher.getMountebankGetRequests());
+        checkGetRequest(getRequests(28));
         tracker.shutdown();
+        tearDown();
     }
 
     public void testSendPost() throws Exception {
+
         setup();
 
         // Setup the Tracker
@@ -70,17 +81,28 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackEcommerceEvent(tracker);
 
         // Wait for emitter to start
+        int counter = 0;
         while (!tracker.getEmitter().getEmitterStatus()) {
             Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                throw new NullPointerException("Emitter is hanging on startup...");
+            }
         }
 
         // Wait for emitter to end
+        counter = 0;
         while (tracker.getEmitter().getEmitterStatus()) {
             Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                throw new NullPointerException("Emitter is hanging on shutdown...");
+            }
         }
         Thread.sleep(500);
 
-        checkPostRequest(LogFetcher.getMountebankPostRequests());
+        checkPostRequest(getRequests(28));
         tracker.shutdown();
+        tearDown();
     }
 }

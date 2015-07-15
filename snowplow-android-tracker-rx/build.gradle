@@ -50,6 +50,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':snowplow-android-core')
     compile 'io.reactivex:rxjava:1.0.11'
+    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
 }
 
 // build JAR file

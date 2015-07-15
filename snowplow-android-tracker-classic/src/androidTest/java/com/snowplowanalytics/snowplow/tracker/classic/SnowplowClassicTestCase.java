@@ -29,22 +29,56 @@ import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
+
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
+import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class SnowplowClassicTestCase extends AndroidTestCase {
 
-    private static final String testURL = "10.0.2.2:4545";
+    // Mock Server
+
+    MockWebServer mockServer;
+
+    public void setupMockServer() throws IOException {
+        if (mockServer != null) {
+            mockServer.shutdown();
+        }
+        mockServer = new MockWebServer();
+        mockServer.play();
+    }
+
+    public String mockServerName() {
+        if (mockServer != null) {
+            return String.format("%s:%d", mockServer.getHostName(), mockServer.getPort());
+        }
+        return null;
+    }
+
+    public void enqueueResponses(int count) {
+        MockResponse mockResponse = new MockResponse().setResponseCode(200);
+        for (int i = 0; i < count; i++) {
+            mockServer.enqueue(mockResponse);
+        }
+    }
+
+    public void tearDown() throws IOException {
+        if (mockServer != null) {
+            mockServer.shutdown();
+            mockServer = null;
+        }
+    }
 
     // Tracker Builder
 
@@ -64,7 +98,7 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
             RequestSecurity security) {
 
         return new Emitter
-                .EmitterBuilder(testURL, getContext())
+                .EmitterBuilder(mockServerName(), getContext())
                 .option(option)
                 .method(method)
                 .security(security)
@@ -91,50 +125,71 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
     }
 
 
-    // Mountebank Setup/Helpers
+    // Setup/Helpers
 
     public void setup() throws Exception {
-        LogFetcher.deleteImposter();
-        LogFetcher.createImposter(getImposter());
-        Thread.sleep(1000);
+        setupMockServer();
+        enqueueResponses(28);
     }
 
-    private String getImposter() {
-        String file = "assets/imposters.json";
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);
-        Scanner s = new Scanner(in).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    public void checkLogs(LinkedList<JSONObject> requests, int eventCount) throws Exception {
-        assertEquals(eventCount, requests.size());
-        for (JSONObject request : requests) {
-            int code = request.getJSONObject("response").getInt("statusCode");
-            assertEquals(200, code);
+    /**
+     * Fetched N amount of requests from the Mock Web Server
+     *
+     * @param count the amount of requests to get
+     * @return the list of requests
+     * @throws Exception
+     */
+    public LinkedList<RecordedRequest> getRequests(int count) throws Exception {
+        LinkedList<RecordedRequest> requests = new LinkedList<>();
+        for (int i = 0; i < count; i++) {
+            requests.add(mockServer.takeRequest());
         }
+        return requests;
     }
 
-    public void checkGetRequest(LinkedList<JSONObject> requests) throws Exception {
+    /**
+     * Takes a query string and returns the name-value
+     * pairs in map form.
+     *
+     * @param query the query string
+     * @return the map of decoded query strings
+     * @throws Exception
+     */
+    public Map<String, String> getQueryMap(String query) throws Exception {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<String, String>();
+        for (String param : params) {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(URLDecoder.decode(name, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
+        }
+        return map;
+    }
+
+    // Event Validation
+
+    public void checkGetRequest(LinkedList<RecordedRequest> requests) throws Exception {
         assertEquals(28, requests.size());
-        for (JSONObject request : requests) {
-            JSONObject request1 = request.getJSONObject("request");
-            JSONObject query = request1.getJSONObject("query");
+        for (RecordedRequest request : requests) {
 
-            assertEquals("/i", request1.getString("path"));
-            assertEquals("GET", request1.getString("method"));
+            assertEquals("/i", request.getPath().substring(0, 2));
+            assertEquals("GET", request.getMethod());
 
-            assertEquals("mob", query.getString("p"));
-            assertEquals("myAppId", query.getString("aid"));
-            assertEquals("myNamespace", query.getString("tna"));
-            assertEquals("andr-0.5.0", query.getString("tv"));
-            assertEquals("English", query.getString("lang"));
+            JSONObject query = new JSONObject(getQueryMap(request.getPath().substring(3)));
+
+            assertEquals("mob", query.get("p"));
+            assertEquals("myAppId", query.get("aid"));
+            assertEquals("myNamespace", query.get("tna"));
+            assertEquals("andr-0.5.0", query.get("tv"));
+            assertEquals("English", query.get("lang"));
             assertTrue(query.has("dtm"));
             assertTrue(query.has("stm"));
             assertTrue(query.has("e"));
             assertTrue(query.has("co"));
             assertTrue(query.has("eid"));
 
-            String eventType = query.getString("e");
+            String eventType = query.get("e").toString();
+
             switch (eventType) {
                 case "pv" : checkPageView(query);
                     break;
@@ -151,15 +206,13 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
         }
     }
 
-    public void checkPostRequest(LinkedList<JSONObject> requests) throws Exception {
+    public void checkPostRequest(LinkedList<RecordedRequest> requests) throws Exception {
         assertEquals(28, requests.size());
-        for (JSONObject request : requests) {
-            JSONObject request1 = request.getJSONObject("request");
+        for (RecordedRequest request : requests) {
+            assertEquals("/com.snowplowanalytics.snowplow/tp2", request.getPath());
+            assertEquals("POST", request.getMethod());
 
-            assertEquals("/com.snowplowanalytics.snowplow/tp2", request1.getString("path"));
-            assertEquals("POST", request1.getString("method"));
-
-            JSONObject body = new JSONObject(request1.getString("body"));
+            JSONObject body = new JSONObject(request.getUtf8Body());
             assertEquals("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3", body.getString("schema"));
 
             JSONArray data = body.getJSONArray("data");

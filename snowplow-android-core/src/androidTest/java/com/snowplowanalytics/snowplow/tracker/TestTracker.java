@@ -26,4 +26,8 @@ public class TestTracker extends Tracker {
     public void shutdownSessionChecker() {
         // Do nothing.
     }
+
+    public void startSessionChecker(final long interval) {
+        // Do nothing.
+    }
 }
