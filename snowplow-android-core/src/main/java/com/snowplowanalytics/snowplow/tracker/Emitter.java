@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Build an emitter object which controls the
@@ -234,6 +235,9 @@ public abstract class Emitter {
         this.byteLimitPost = builder.byteLimitPost;
         this.uri = builder.uri;
         buildEmitterUri();
+
+        client.setConnectTimeout(15, TimeUnit.SECONDS); // connect timeout
+        client.setReadTimeout(15, TimeUnit.SECONDS);    // socket timeout
 
         Logger.v(TAG, "Emitter created successfully!");
     }
