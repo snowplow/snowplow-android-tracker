@@ -178,10 +178,7 @@ public class Subject {
      * Sets the device vendor/manufacturer.
      */
     private void setDeviceVendor() {
-        String manufacturer = Build.MANUFACTURER;
-        if (!manufacturer.equals("unknown")) {
-            addToMobileContext(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
-        }
+        addToMobileContext(Parameters.DEVICE_MANUFACTURER, android.os.Build.MANUFACTURER);
     }
 
     // Context information setters
