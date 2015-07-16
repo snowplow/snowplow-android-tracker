@@ -73,7 +73,7 @@ public class DemoUtils {
     private static Tracker getTrackerClassic(Emitter emitter, Subject subject, Context context) {
         return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
                 com.snowplowanalytics.snowplow.tracker.classic.Tracker.class)
-                .level(LogLevel.VERBOSE)
+                .level(LogLevel.DEBUG)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
@@ -90,7 +90,7 @@ public class DemoUtils {
     private static Tracker getTrackerRx(Emitter emitter, Subject subject, Context context) {
         return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
                 com.snowplowanalytics.snowplow.tracker.rx.Tracker.class)
-                .level(LogLevel.VERBOSE)
+                .level(LogLevel.DEBUG)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)

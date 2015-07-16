@@ -245,7 +245,7 @@ public class ClassicDemo extends Activity {
                 String status = isRunning ? "Running: yes" : "Running: no";
                 _emitterStatus.setText(status);
                 _databaseSize.setText("DB Size: " + dbSize);
-                _sessionIndex.setText("Sessions: " + sessionIndex);
+                _sessionIndex.setText("Session #: " + sessionIndex);
 
                 if (isRunning) {
                     String startButtonText = _startButton.getText().toString();
