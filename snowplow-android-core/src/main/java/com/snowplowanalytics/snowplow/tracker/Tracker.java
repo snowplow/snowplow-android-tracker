@@ -345,22 +345,31 @@ public abstract class Tracker {
         // Track each TransactionItem individually
         long timestamp = event.getTimestamp();
         for(EcommerceTransactionItem item : event.getItems()) {
-            track(item, timestamp);
+            trackEcommerceItem(item, timestamp);
         }
     }
 
     /**
-     * Tracks an Ecommerce Transaction Item event.
+     * At high volumes some track e-commerce item events can be dropped.
+     * To prevent any drops from happening it needs to be pushed into
+     * its own Observable/Runnable.
      *
-     * @param event the Ecommerce Transaction Item event.
+     * It is currently not understood why this fixes the issue.
+     *
+     * @param event the Ecommerce Transaction Item event
      * @param timestamp the Timestamp of the Transaction
      */
-    private void track(EcommerceTransactionItem event, long timestamp) {
-        List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload();
+    protected abstract void trackEcommerceItem(EcommerceTransactionItem event, long timestamp);
 
-        // Force timestamp for TransactionItems
-        payload.add(Parameters.TIMESTAMP, Long.toString(timestamp));
+    /**
+     * Tracks an Ecommerce Transaction Item event.
+     *
+     * @param event the Ecommerce Transaction Item event
+     * @param timestamp the Timestamp of the Transaction
+     */
+    protected void track(EcommerceTransactionItem event, long timestamp) {
+        List<SelfDescribingJson> context = event.getContext();
+        Payload payload = event.getPayload(timestamp);
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking EcommerceTransactionItem Event: %s", payload);

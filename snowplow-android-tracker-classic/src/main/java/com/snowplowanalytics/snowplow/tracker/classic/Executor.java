@@ -13,9 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.classic;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 /**
  * Static Class which holds the logic for controlling
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Executor {
 
-    private static ScheduledExecutorService executor;
+    private static ExecutorService executor;
 
     /**
      * If the executor is null creates a
@@ -31,7 +32,7 @@ public class Executor {
      *
      * @return the executor
      */
-    private static ScheduledExecutorService getExecutor() {
+    private static ExecutorService getExecutor() {
         synchronized (Executor.class) {
             if (executor == null) {
                 executor = Executors.newScheduledThreadPool(10);
@@ -50,31 +51,14 @@ public class Executor {
     }
 
     /**
-     * Schedules a runnable to run at some point in
-     * the future.
+     * Sends a callable to the executor service and
+     * returns a Future.
      *
-     * @param runnable the runnable to be queued
-     * @param delay the count of units to delay
-     *              execution by
-     * @param timeUnit the time unit for the delay
+     * @param callable the callable to be queued
+     * @return the future object to be queried
      */
-    public static void schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        getExecutor().schedule(runnable, delay, timeUnit);
-    }
-
-    /**
-     * Schedules a recurring runnable to run at some
-     * point in the future.
-     *
-     * @param runnable the runnable to be queued
-     * @param initDelay the initial delay before
-     *                  executing
-     * @param delay the count of units to delay
-     *              execution by
-     * @param timeUnit the time unit for the delay
-     */
-    public static void scheduleRepeating(Runnable runnable, long initDelay, long delay, TimeUnit timeUnit) {
-        getExecutor().scheduleAtFixedRate(runnable, initDelay, delay, timeUnit);
+    public static Future futureCallable(Callable callable) {
+        return getExecutor().submit(callable);
     }
 
     /**

@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -278,128 +279,20 @@ public abstract class Emitter {
     public abstract void flush();
 
     /**
-     * Synchronously performs a request sending
-     * operation for either GET or POST.
+     * Performs a synchronous sending of a list of
+     * ReadyRequests.
      *
-     * @param events the events to be sent
-     * @return a RequestResult
+     * @param requests the requests to send
+     * @return the request results.
      */
-    protected LinkedList<RequestResult> performEmit(EmittableEvents events) {
-
-        int payloadCount = events.getEvents().size();
-        LinkedList<Long> eventIds = events.getEventIds();
+    protected LinkedList<RequestResult> performSyncEmit(LinkedList<ReadyRequest> requests) {
         LinkedList<RequestResult> results = new LinkedList<>();
-
-        if (httpMethod == HttpMethod.GET) {
-
-            Logger.v(TAG, "Sending events with GET requests: count %s", payloadCount);
-
-            for (int i = 0; i < payloadCount; i++) {
-
-                // Get the eventId for this request
-                LinkedList<Long> reqEventId = new LinkedList<>();
-                reqEventId.add(eventIds.get(i));
-
-                // Build and send the request
-                Payload payload = events.getEvents().get(i);
-                addStmToEvent(payload, "");
-                Request req = requestBuilderGet(payload);
-                int code = requestSender(req);
-
-                // If the payload is too large we will attempt to send anyway
-                // but will not re-attempt.
-                long payloadByteSize = payload.getByteSize();
-
-                if (payloadByteSize > byteLimitGet) {
-                    Logger.d(TAG, "Over-sized GET request - result: %s", "" + code);
-                    code = 200;
-                }
-                else {
-                    Logger.d(TAG, "GET request - result: %s", "" + code);
-                }
-                Logger.d(TAG, "GET request - byte-size: %s", payloadByteSize);
-
-                results.add(new RequestResult(isSuccessfulSend(code), reqEventId));
-            }
-        }
-        else {
-
-            Logger.v(TAG, "Sending events with POST requests: count %s", payloadCount);
-
-            for (int i = 0; i < payloadCount; i += bufferOption.getCode()) {
-
-                String timestamp = Util.getTimestamp();
-
-                // Collections for Multi-Event Posts
-                LinkedList<Long> reqEventIds = new LinkedList<>();
-                ArrayList<Map> postPayloadMaps = new ArrayList<>();
-
-                // Keep record of total byte size
-                long totalByteSize = 0;
-
-                for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
-
-                    Payload payload = events.getEvents().get(j);
-                    addStmToEvent(payload, timestamp);
-                    long payloadByteSize = payload.getByteSize();
-
-                    if (payloadByteSize > byteLimitPost) {
-
-                        // Add needed information to collections
-                        ArrayList<Map> singlePayloadMap = new ArrayList<>();
-                        LinkedList<Long> reqEventId = new LinkedList<>();
-
-                        // Update the sent time
-                        addStmToEvent(payload, Util.getTimestamp());
-
-                        singlePayloadMap.add(payload.getMap());
-                        reqEventId.add(eventIds.get(j));
-
-                        // Build and send request
-                        int code = buildAndSendPost(singlePayloadMap);
-
-                        Logger.d(TAG, "Over-sized POST request - result: %s", "" + code);
-                        Logger.d(TAG, "Over-sized POST request - byte-size: %s", payloadByteSize);
-
-                        // Add successful send
-                        results.add(new RequestResult(true, reqEventId));
-                    }
-                    else if (totalByteSize + payloadByteSize > byteLimitPost) {
-                        // Build and send request
-                        int code = buildAndSendPost(postPayloadMaps);
-
-                        Logger.d(TAG, "POST request - result: %s", "" + code);
-                        Logger.d(TAG, "POST request - byte-size: %s", totalByteSize);
-
-                        // Add result
-                        results.add(new RequestResult(isSuccessfulSend(code), reqEventIds));
-
-                        // Clear collections and add new event
-                        postPayloadMaps = new ArrayList<>();
-                        reqEventIds = new LinkedList<>();
-
-                        // Update the sent time
-                        timestamp = Util.getTimestamp();
-                        addStmToEvent(payload, timestamp);
-
-                        postPayloadMaps.add(payload.getMap());
-                        reqEventIds.add(eventIds.get(j));
-                        totalByteSize = payloadByteSize;
-                    }
-                    else {
-                        totalByteSize += payloadByteSize;
-                        postPayloadMaps.add(payload.getMap());
-                        reqEventIds.add(eventIds.get(j));
-                    }
-                }
-
-                if (!postPayloadMaps.isEmpty()) {
-                    int code = buildAndSendPost(postPayloadMaps);
-                    results.add(new RequestResult(isSuccessfulSend(code), reqEventIds));
-
-                    Logger.d(TAG, "POST request - result: %s", "" + code);
-                    Logger.d(TAG, "POST request - byte-size: %s", totalByteSize);
-                }
+        for (ReadyRequest request : requests) {
+            int code = requestSender(request.getRequest());
+            if (request.isOversize()) {
+                results.add(new RequestResult(true, request.getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), request.getEventIds()));
             }
         }
         return results;
@@ -412,9 +305,9 @@ public abstract class Emitter {
      * @param request The request to be sent
      * @return a RequestResult
      */
-    private int requestSender(Request request) {
+    protected int requestSender(Request request) {
         try {
-            Logger.v(TAG, "Sending request: %s", request);
+            Logger.d(TAG, "Sending request: %s", request);
             return client.newCall(request).execute().code();
         } catch (IOException e) {
             Logger.e(TAG, "Request sending failed: %s", e.toString());
@@ -423,17 +316,92 @@ public abstract class Emitter {
     }
 
     /**
-     * Builds and sends the POST event
-     * to the configured collector.
+     * Returns a list of ReadyRequests which can
+     * all be sent regardless of if it is GET or POST.
+     * - Checks if the event is over-sized.
+     * - Stores all of the relevant event ids.
      *
-     * @param payload The payload to be sent
-     * @return the response code
+     * @param events a list of EmittableEvents pulled
+     *               from the database.
+     * @return a list of ready to send requests
      */
-    private int buildAndSendPost(ArrayList<Map> payload) {
-        SelfDescribingJson postPayload =
-                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payload);
-        Request req = requestBuilderPost(postPayload);
-        return requestSender(req);
+    protected LinkedList<ReadyRequest> buildRequests(EmittableEvents events) {
+
+        int payloadCount = events.getEvents().size();
+        LinkedList<Long> eventIds = events.getEventIds();
+        LinkedList<ReadyRequest> requests = new LinkedList<>();
+
+        if (httpMethod == HttpMethod.GET) {
+            for (int i = 0; i < payloadCount; i++) {
+
+                // Get the eventId for this request
+                LinkedList<Long> reqEventId = new LinkedList<>();
+                reqEventId.add(eventIds.get(i));
+
+                // Build and store the request
+                Payload payload = events.getEvents().get(i);
+                addStmToEvent(payload, "");
+                boolean oversize = payload.getByteSize() > byteLimitGet;
+                Request request = requestBuilderGet(payload);
+                requests.add(new ReadyRequest(oversize, request, reqEventId));
+            }
+        } else {
+            for (int i = 0; i < payloadCount; i += bufferOption.getCode()) {
+
+                // Get STM Timestamp
+                String timestamp = Util.getTimestamp();
+
+                // Collections
+                LinkedList<Long> reqEventIds = new LinkedList<>();
+                ArrayList<Map> postPayloadMaps = new ArrayList<>();
+                long totalByteSize = 0;
+
+                for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
+                    Payload payload = events.getEvents().get(j);
+                    addStmToEvent(payload, timestamp);
+                    long payloadByteSize = payload.getByteSize();
+
+                    if (payloadByteSize > byteLimitPost) {
+                        ArrayList<Map> singlePayloadMap = new ArrayList<>();
+                        LinkedList<Long> reqEventId = new LinkedList<>();
+
+                        // Build and store the request
+                        addStmToEvent(payload, "");
+                        singlePayloadMap.add(payload.getMap());
+                        reqEventId.add(eventIds.get(j));
+                        Request request = requestBuilderPost(singlePayloadMap);
+                        requests.add(new ReadyRequest(true, request, reqEventId));
+                    }
+                    else if (totalByteSize + payloadByteSize > byteLimitPost) {
+                        Request request = requestBuilderPost(postPayloadMaps);
+                        requests.add(new ReadyRequest(false, request, reqEventIds));
+
+                        // Clear collections and build a new POST
+                        postPayloadMaps = new ArrayList<>();
+                        reqEventIds = new LinkedList<>();
+
+                        // Build and store the request
+                        timestamp = Util.getTimestamp();
+                        addStmToEvent(payload, timestamp);
+                        postPayloadMaps.add(payload.getMap());
+                        reqEventIds.add(eventIds.get(j));
+                        totalByteSize = payloadByteSize;
+                    }
+                    else {
+                        totalByteSize += payloadByteSize;
+                        postPayloadMaps.add(payload.getMap());
+                        reqEventIds.add(eventIds.get(j));
+                    }
+                }
+
+                // Check if all payloads have been processed
+                if (!postPayloadMaps.isEmpty()) {
+                    Request request = requestBuilderPost(postPayloadMaps);
+                    requests.add(new ReadyRequest(false, request, reqEventIds));
+                }
+            }
+        }
+        return requests;
     }
 
     // Request Builders
@@ -476,9 +444,11 @@ public abstract class Emitter {
      *                request.
      * @return an OkHttp request object
      */
-    private Request requestBuilderPost(Payload payload) {
+    private Request requestBuilderPost(ArrayList<Map> payload) {
+        SelfDescribingJson postPayload =
+                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payload);
         String reqUrl = uriBuilder.build().toString();
-        RequestBody reqBody = RequestBody.create(JSON, payload.toString());
+        RequestBody reqBody = RequestBody.create(JSON, postPayload.toString());
         return new Request.Builder()
                 .url(reqUrl)
                 .post(reqBody)

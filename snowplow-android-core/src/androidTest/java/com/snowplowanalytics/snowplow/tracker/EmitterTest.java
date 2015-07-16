@@ -150,7 +150,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
        
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -166,7 +166,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result = emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -189,7 +189,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result = emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -216,7 +216,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -248,7 +248,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.Single, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);

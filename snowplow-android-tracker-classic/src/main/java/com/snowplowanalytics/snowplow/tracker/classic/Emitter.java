@@ -14,15 +14,21 @@
 package com.snowplowanalytics.snowplow.tracker.classic;
 
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
+import com.squareup.okhttp.Request;
 
 /**
  * Build an emitter object which controls the
@@ -65,14 +71,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *                the EventStore
      */
     public void add(final Payload payload) {
-        Executor.execute(new Runnable() {
-            public void run() {
-                eventStore.add(payload);
-                if (isRunning.compareAndSet(false, true)) {
-                    attemptEmit();
-                }
-            }
-        });
+        eventStore.add(payload);
+        if (isRunning.compareAndSet(false, true)) {
+            attemptEmit();
+        }
     }
 
     /**
@@ -107,17 +109,19 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 emptyCount = 0;
 
                 EmittableEvents events = eventStore.getEmittableEvents();
-                LinkedList<RequestResult> results = performEmit(events);
+                LinkedList<ReadyRequest> requests = buildRequests(events);
+                LinkedList<RequestResult> results = performAsyncEmit(requests);
 
                 Logger.v(TAG, "Processing emitter results.");
 
                 int successCount = 0;
                 int failureCount = 0;
+                LinkedList<Long> removableEvents = new LinkedList<>();
 
                 for (RequestResult res : results) {
                     if (res.getSuccess()) {
-                        for (Long eventId : res.getEventIds()) {
-                            eventStore.removeEvent(eventId);
+                        for (final Long eventId : res.getEventIds()) {
+                            removableEvents.add(eventId);
                         }
                         successCount += res.getEventIds().size();
                     } else {
@@ -125,6 +129,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                         Logger.e(TAG, "Request sending failed but we will retry later.");
                     }
                 }
+                performAsyncEventRemoval(removableEvents);
 
                 Logger.d(TAG, "Success Count: %s", successCount);
                 Logger.d(TAG, "Failure Count: %s", failureCount);
@@ -165,6 +170,117 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             Logger.e(TAG, "Emitter loop stopping: emitter offline.");
             isRunning.compareAndSet(true, false);
         }
+    }
+
+    /**
+     * Performs asynchronous sending of a list of
+     * ReadyRequests.
+     *
+     * @param requests the requests to send
+     * @return the request results
+     */
+    private LinkedList<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
+        LinkedList<RequestResult> results = new LinkedList<>();
+        LinkedList<Future> futures = new LinkedList<>();
+
+        // Start all requests in the ThreadPool
+        for (ReadyRequest request : requests) {
+            futures.add(Executor.futureCallable(requestFuture(request.getRequest())));
+        }
+
+        Logger.d(TAG, "Request Futures: %s", futures.size());
+
+        // Get results of futures
+        // - Wait up to 5 seconds for the request
+        for (int i = 0; i < futures.size(); i++) {
+            int code = -1;
+
+            try {
+                code = (int) futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Request Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Request Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Request Future had a timeout: %s", te.getMessage());
+            }
+
+            if (requests.get(i).isOversize()) {
+                results.add(new RequestResult(true, requests.get(i).getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Asynchronously removes all the marked
+     * event ids from successfully sent events.
+     * - If events fail to be removed they will be
+     *   double sent.  At small levels this should
+     *   not be an issue as we can de-dupe later.
+     *
+     * @param eventIds the events ids to remove
+     * @return a list of booleans stating success
+     */
+    private LinkedList<Boolean> performAsyncEventRemoval(LinkedList<Long> eventIds) {
+        LinkedList<Boolean> results = new LinkedList<>();
+        LinkedList<Future> futures = new LinkedList<>();
+
+        // Start all requests in the ThreadPool
+        for (Long id : eventIds) {
+            futures.add(Executor.futureCallable(removeFuture(id)));
+        }
+
+        Logger.d(TAG, "Removal Futures: %s", futures.size());
+
+        // Get results of futures
+        for (int i = 0; i < futures.size(); i++) {
+            boolean result = false;
+            try {
+                result = (boolean) futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Removal Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Removal Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Removal Future had a timeout: %s", te.getMessage());
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
+    /**
+     * Returns a Callable Request
+     *
+     * @param request the request to nest into
+     *                the callable.
+     * @return the new Callable object
+     */
+    private Callable<Integer> requestFuture(final Request request) {
+        return new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return requestSender(request);
+            }
+        };
+    }
+
+    /**
+     * Returns a Callable Event Removal
+     *
+     * @param eventId the eventId to remove
+     * @return the new Callable object
+     */
+    private Callable<Boolean> removeFuture(final Long eventId) {
+        return new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return eventStore.removeEvent(eventId);
+            }
+        };
     }
 
     /**

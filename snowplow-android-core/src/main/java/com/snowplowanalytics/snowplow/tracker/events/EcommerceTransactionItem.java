@@ -136,11 +136,13 @@ public class EcommerceTransactionItem extends Event {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @param timestamp The timestamp of the transaction
      * @return the payload to be sent.
      */
-    public TrackerPayload getPayload() {
+    public TrackerPayload getPayload(long timestamp) {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_ECOMM_ITEM);
+        payload.add(Parameters.TIMESTAMP, Long.toString(timestamp));
         payload.add(Parameters.TI_ITEM_ID, this.itemId);
         payload.add(Parameters.TI_ITEM_SKU, this.sku);
         payload.add(Parameters.TI_ITEM_NAME, this.name);

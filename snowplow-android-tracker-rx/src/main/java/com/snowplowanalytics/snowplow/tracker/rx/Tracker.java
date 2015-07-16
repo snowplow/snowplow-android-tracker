@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.rx;
 
 import com.snowplowanalytics.snowplow.tracker.Session;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
@@ -95,6 +96,13 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     public void track(EcommerceTransaction event) {
         Observable.create(subscriber -> {
             super.track(event);
+            subscriber.onCompleted();
+        }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
+    }
+
+    protected void trackEcommerceItem(EcommerceTransactionItem event, long timestamp) {
+        Observable.create(subscriber -> {
+            super.track(event, timestamp);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }

@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.classic;
 
 import com.snowplowanalytics.snowplow.tracker.Session;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
@@ -99,6 +100,14 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
         Executor.execute(new Runnable() {
             public void run() {
                 Tracker.super.track(event);
+            }
+        });
+    }
+
+    protected void trackEcommerceItem(final EcommerceTransactionItem event, final long timestamp) {
+        Executor.execute(new Runnable() {
+            public void run() {
+                Tracker.super.track(event, timestamp);
             }
         });
     }

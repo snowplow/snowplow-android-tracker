@@ -13,17 +13,22 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
@@ -103,7 +108,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             .unsubscribeOn(scheduler)
             .doOnSubscribe(() -> Logger.d(TAG, "Emitter has been started."))
             .doOnUnsubscribe(() -> Logger.d(TAG, "Emitter has been shutdown."))
-            .flatMap(this::emitEvent)
+            .map(this::buildRequestsRx)
+            .map(this::performAsyncEmit)
             .subscribe(this::processEmitterResults);
     }
 
@@ -154,16 +160,17 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * @param results A list of results returned
      *                from the emitter.
      */
-    private void processEmitterResults(LinkedList<RequestResult> results) {
+    private void processEmitterResults(List<RequestResult> results) {
         Logger.v(TAG, "Processing emitter results.");
 
         int successCount = 0;
         int failureCount = 0;
+        List<Long> removableEvents = new ArrayList<>();
 
         for (RequestResult res : results) {
             if (res.getSuccess()) {
                 for (Long eventId : res.getEventIds()) {
-                    eventStore.removeEvent(eventId);
+                    removableEvents.add(eventId);
                 }
                 successCount += res.getEventIds().size();
             } else {
@@ -171,6 +178,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 Logger.e(TAG, "Request sending failed; will retry later.");
             }
         }
+        performAsyncEventRemoval(removableEvents);
 
         Logger.d(TAG, "Success Count: %s", successCount);
         Logger.d(TAG, "Failure Count: %s", failureCount);
@@ -193,16 +201,13 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Emits all the events in the Emittable Events object.
+     * Necessary wrapper to avoid Rx issue with 'protected' functions.
      *
-     * @return Observable that will emit once containing
-     * the request results.
+     * @param events the events ready to be built into requests
+     * @return the list of request ready for sending
      */
-    private Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
-        return Observable
-            .just(events)
-            .map(this::performEmitRx)
-            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
+    private LinkedList<ReadyRequest> buildRequestsRx(EmittableEvents events) {
+        return buildRequests(events);
     }
 
     /**
@@ -211,8 +216,115 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * @param events the events to send to the collector
      * @return a list of RequestResults
      */
-    private LinkedList<RequestResult> performEmitRx(EmittableEvents events) {
-        return performEmit(events);
+    private LinkedList<RequestResult> performSyncEmitRx(LinkedList<ReadyRequest> events) {
+        return performSyncEmit(events);
+    }
+
+    /**
+     * Performs asynchronous sending of a list of
+     * ReadyRequests.
+     *
+     * @param requests the requests to send
+     * @return the request results
+     */
+    private List<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
+        List<RequestResult> results = new ArrayList<>();
+        List<Future<Integer>> futures = new ArrayList<>();
+
+        for (ReadyRequest request : requests) {
+            futures.add(requestFuture(request));
+        }
+
+        Logger.d(TAG, "Request Futures: %s", futures.size());
+
+        // Get results of futures
+        // - Wait up to 5 seconds for the request
+        for (int i = 0; i < futures.size(); i++) {
+            int code = -1;
+
+            try {
+                code = futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Request Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Request Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Request Future had a timeout: %s", te.getMessage());
+            }
+
+            if (requests.get(i).isOversize()) {
+                results.add(new RequestResult(true, requests.get(i).getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Asynchronously removes all the marked
+     * event ids from successfully sent events.
+     * - If events fail to be removed they will be
+     *   double sent.  At small levels this should
+     *   not be an issue as we can de-dupe later.
+     *
+     * @param eventIds the events ids to remove
+     * @return a list of booleans stating success
+     */
+    private List<Boolean> performAsyncEventRemoval(List<Long> eventIds) {
+        List<Boolean> results = new ArrayList<>();
+        List<Future<Boolean>> futures = new ArrayList<>();
+
+        // Start all requests in the ThreadPool
+        for (Long id : eventIds) {
+            futures.add(removeFuture(id));
+        }
+
+        Logger.d(TAG, "Removal Futures: %s", futures.size());
+
+        // Get results of futures
+        for (int i = 0; i < futures.size(); i++) {
+            boolean result = false;
+            try {
+                result = futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Removal Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Removal Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Removal Future had a timeout: %s", te.getMessage());
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
+    /**
+     * Returns a Future to an operation to send and
+     * get a RequestResult.
+     *
+     * @param request the request that needs to be sent
+     * @return the observable function
+     */
+    private Future<Integer> requestFuture(ReadyRequest request) {
+        return Observable.<Integer> create(subscriber -> {
+            subscriber.onNext(requestSender(request.getRequest()));
+            subscriber.onCompleted();
+        }).subscribeOn(scheduler).unsubscribeOn(scheduler).toBlocking().toFuture();
+    }
+
+    /**
+     * Returns a Future to an operation to remove an
+     * event from the database
+     *
+     * @param eventId the id of the event to be removed
+     * @return the observable function
+     */
+    private Future<Boolean> removeFuture(long eventId) {
+        return Observable.<Boolean> create(subscriber -> {
+            subscriber.onNext(this.eventStore.removeEvent(eventId));
+            subscriber.onCompleted();
+        }).subscribeOn(scheduler).unsubscribeOn(scheduler).toBlocking().toFuture();
     }
 
     // Setters, Getters and Checkers

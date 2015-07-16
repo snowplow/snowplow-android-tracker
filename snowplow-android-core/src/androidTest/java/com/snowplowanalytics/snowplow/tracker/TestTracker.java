@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
+
 public class TestTracker extends Tracker {
 
     public TestTracker(TrackerBuilder builder) {
@@ -28,6 +30,10 @@ public class TestTracker extends Tracker {
     }
 
     public void startSessionChecker(final long interval) {
+        // Do nothing.
+    }
+
+    protected void trackEcommerceItem(EcommerceTransactionItem event, long timestamp) {
         // Do nothing.
     }
 }
