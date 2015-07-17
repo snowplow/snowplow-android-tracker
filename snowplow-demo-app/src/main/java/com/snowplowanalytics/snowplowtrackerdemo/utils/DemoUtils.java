@@ -77,6 +77,7 @@ public class DemoUtils {
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
+                .threadCount(20)
                 .build();
     }
 
@@ -94,6 +95,7 @@ public class DemoUtils {
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
+                .threadCount(20)
                 .build();
     }
 
