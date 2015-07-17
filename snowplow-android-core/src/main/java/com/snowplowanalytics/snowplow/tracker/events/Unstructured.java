@@ -33,6 +33,7 @@ public class Unstructured extends Event {
          * @param eventData The properties of the event. Has two field:
          *                  A "data" field containing the event properties and
          *                  A "schema" field identifying the schema against which the data is validated
+         * @return itself
          */
         public T eventData(SelfDescribingJson eventData) {
             this.eventData = eventData;

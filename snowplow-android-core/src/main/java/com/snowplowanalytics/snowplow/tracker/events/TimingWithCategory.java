@@ -35,6 +35,7 @@ public class TimingWithCategory extends Event {
 
         /**
          * @param category The category of the timed event
+         * @return itself
          */
         public T category(String category) {
             this.category = category;
@@ -43,6 +44,7 @@ public class TimingWithCategory extends Event {
 
         /**
          * @param variable Identify the timing being recorded
+         * @return itself
          */
         public T variable(String variable) {
             this.variable = variable;
@@ -51,6 +53,7 @@ public class TimingWithCategory extends Event {
 
         /**
          * @param timing The number of milliseconds in elapsed time to report
+         * @return itself
          */
         public T timing(int timing) {
             this.timing = timing;
@@ -59,6 +62,7 @@ public class TimingWithCategory extends Event {
 
         /**
          * @param label Optional description of this timing
+         * @return itself
          */
         public T label(String label) {
             this.label = label;

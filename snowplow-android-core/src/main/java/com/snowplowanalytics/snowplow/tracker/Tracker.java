@@ -96,6 +96,7 @@ public abstract class Tracker {
          * @param emitter Emitter to which events will be sent
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
+         * @param context The Android application context
          */
         public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
             this(emitter, namespace, appId, context, defaultTrackerClass);
@@ -105,6 +106,7 @@ public abstract class Tracker {
          * @param emitter Emitter to which events will be sent
          * @param namespace Identifier for the Tracker instance
          * @param appId Application ID
+         * @param context The Android application context
          * @param trackerClass Default tracker class
          */
         public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context,
@@ -118,6 +120,7 @@ public abstract class Tracker {
 
         /**
          * @param subject Subject to be tracked
+         * @return itself
          */
         public TrackerBuilder subject(Subject subject) {
             this.subject = subject;
@@ -126,6 +129,7 @@ public abstract class Tracker {
 
         /**
          * @param base64 Whether JSONs in the payload should be base-64 encoded
+         * @return itself
          */
         public TrackerBuilder base64(Boolean base64) {
             this.base64Encoded = base64;
@@ -134,6 +138,7 @@ public abstract class Tracker {
 
         /**
          * @param platform The device platform the tracker is running on
+         * @return itself
          */
         public TrackerBuilder platform(DevicePlatforms platform) {
             this.devicePlatform = platform;
@@ -142,6 +147,7 @@ public abstract class Tracker {
 
         /**
          * @param log The log level for the Tracker class
+         * @return itself
          */
         public TrackerBuilder level(LogLevel log) {
             this.logLevel = log;
@@ -150,6 +156,7 @@ public abstract class Tracker {
 
         /**
          * @param timeout The session foreground timeout
+         * @return itself
          */
         public TrackerBuilder foregroundTimeout(long timeout) {
             this.foregroundTimeout = timeout;
@@ -158,6 +165,7 @@ public abstract class Tracker {
 
         /**
          * @param timeout The session background timeout
+         * @return itself
          */
         public TrackerBuilder backgroundTimeout(long timeout) {
             this.backgroundTimeout = timeout;
@@ -166,6 +174,7 @@ public abstract class Tracker {
 
         /**
          * @param sessionCheckInterval The session check interval
+         * @return itself
          */
         public TrackerBuilder sessionCheckInterval(long sessionCheckInterval) {
             this.sessionCheckInterval = sessionCheckInterval;
@@ -174,6 +183,7 @@ public abstract class Tracker {
 
         /**
          * @param threadCount the amount of threads to use for concurrency
+         * @return itself
          */
         public TrackerBuilder threadCount(int threadCount) {
             this.threadCount = threadCount;
@@ -181,7 +191,11 @@ public abstract class Tracker {
         }
 
         /**
-         * Creates a new Tracker
+         * Creates a new Tracker or throws an
+         * Exception of we cannot find a suitable
+         * extensible class.
+         *
+         * @return the new Tracker object
          */
         public Tracker build(){
             if (trackerClass == null) {
@@ -451,8 +465,8 @@ public abstract class Tracker {
     }
 
     /**
-     * Needed function to check session on a
-     * recurring basis.
+     * Starts the session checker on a
+     * polling interval.
      *
      * @param interval the checking interval
      */
@@ -481,8 +495,8 @@ public abstract class Tracker {
     }
 
     /**
-     * Starts data collection processes again.
-     * - Emitter service will start automatically.
+     * Starts data collection processes
+     * again.
      */
     public void startDataCollection() {
         if (dataCollection.compareAndSet(false, true)) {

@@ -36,6 +36,11 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     private final static String TAG = Tracker.class.getSimpleName();
     private static ScheduledExecutorService sessionExecutor;
 
+    /**
+     * Constructs a Tracker object.
+     *
+     * @param builder the base tracker builder
+     */
     public Tracker(TrackerBuilder builder) {
         super(builder);
 
@@ -47,10 +52,10 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     }
 
     /**
-     * Begins a recurring session checker which
-     * will run every 5 seconds.
+     * Starts a polling session checker to
+     * run at a defined interval.
      *
-     * @param interval the checking interval
+     * @param interval the time between checks
      */
     protected void startSessionChecker(final long interval) {
         final Session session = this.trackerSession;
@@ -66,7 +71,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     }
 
     /**
-     * Shuts the session checker down.
+     * Ends the polling session checker.
      */
     public void shutdownSessionChecker() {
         if (sessionExecutor != null) {

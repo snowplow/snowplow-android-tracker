@@ -71,6 +71,7 @@ public class Subject {
 
         /**
          * @param context The android context to pass to the subject
+         * @return itself
          */
         public SubjectBuilder context(Context context) {
             this.context = context;
@@ -79,6 +80,8 @@ public class Subject {
 
         /**
          * Creates a new Subject
+         *
+         * @return a new Subject object
          */
         public Subject build() {
             return new Subject(this);

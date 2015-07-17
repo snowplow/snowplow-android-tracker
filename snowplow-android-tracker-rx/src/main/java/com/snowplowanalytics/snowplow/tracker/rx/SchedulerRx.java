@@ -20,8 +20,8 @@ import rx.schedulers.Schedulers;
 import rx.Scheduler;
 
 /**
- * Creates a single Scheduler for use
- * by the Tracker and Emitter.
+ * Creates an RxJava Scheduler for use by the Tracker
+ * and Emitter objects.
  */
 public class SchedulerRx {
 
@@ -30,9 +30,10 @@ public class SchedulerRx {
     private static int threadCount = 2; // Minimum amount of threads.
 
     /**
-     * Returns the Rx Scheduler
+     * Returns the Scheduler, if it has not been made
+     * yet it will also create a new one.
      *
-     * @return the scheduler
+     * @return the RxJava Scheduler
      */
     public static Scheduler getScheduler() {
         if (scheduler == null) {
@@ -42,9 +43,10 @@ public class SchedulerRx {
     }
 
     /**
-     * Returns the executor for the scheduler.
+     * Returns the Executor Service, if it has not been made
+     * yet it will also create a new one.
      *
-     * @return the executor
+     * @return the Executor Service
      */
     private static ExecutorService getExecutor() {
         if (executor == null) {
@@ -56,11 +58,12 @@ public class SchedulerRx {
     /**
      * Changes the amount of threads the
      * scheduler will be able to use.
-     * - This can only be set before the scheduler
-     *   is first accessed, after this point the
-     *   function will not effect anything.
      *
-     * @param count the thread count.
+     * This can only be set before the scheduler
+     * is first accessed, after this point the
+     * function will not effect anything.
+     *
+     * @param count the amount of threads
      */
     public static void setThreadCount(final int count) {
         threadCount = count;

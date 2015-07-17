@@ -67,7 +67,7 @@ public class Session {
      * @param backgroundTimeout the amount of time that can elapse before the
      *                          session id is updated while the app is in the
      *                          background.
-     *
+     * @param context the android context
      */
     public Session(long foregroundTimeout, long backgroundTimeout, Context context) {
         this.foregroundTimeout = foregroundTimeout;

@@ -197,6 +197,7 @@ public class EventStore {
      *
      * @param query the query to be passed against
      *              the database
+     * @param orderBy what to order the query by
      * @return the list of events that satisfied
      * the query
      */
@@ -278,8 +279,8 @@ public class EventStore {
     }
 
     /**
-     * Returns a Map<String, String> containing the
-     * event payload values, the table row ID and
+     * Returns a Map containing the event 
+     * payload values, the table row ID and
      * the date it was created.
      *
      * @param id the row id of the event to get

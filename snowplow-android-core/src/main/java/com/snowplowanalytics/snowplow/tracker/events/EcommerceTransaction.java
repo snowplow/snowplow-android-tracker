@@ -48,6 +48,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param orderId ID of the eCommerce transaction
+         * @return itself
          */
         public T orderId(String orderId) {
             this.orderId = orderId;
@@ -56,6 +57,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param totalValue Total transaction value
+         * @return itself
          */
         public T totalValue(Double totalValue) {
             this.totalValue = totalValue;
@@ -64,6 +66,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param affiliation Transaction affiliation
+         * @return itself
          */
         public T affiliation(String affiliation) {
             this.affiliation = affiliation;
@@ -72,6 +75,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param taxValue Transaction tax value
+         * @return itself
          */
         public T taxValue(Double taxValue) {
             this.taxValue = taxValue;
@@ -80,6 +84,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param shipping Delivery cost charged
+         * @return itself
          */
         public T shipping(Double shipping) {
             this.shipping = shipping;
@@ -88,6 +93,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param city Delivery address city
+         * @return itself
          */
         public T city(String city) {
             this.city = city;
@@ -96,6 +102,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param state Delivery address state
+         * @return itself
          */
         public T state(String state) {
             this.state = state;
@@ -104,6 +111,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param country Delivery address country
+         * @return itself
          */
         public T country(String country) {
             this.country = country;
@@ -112,6 +120,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param currency The currency the price is expressed in
+         * @return itself
          */
         public T currency(String currency) {
             this.currency = currency;
@@ -120,6 +129,7 @@ public class EcommerceTransaction extends Event {
 
         /**
          * @param items The items in the transaction
+         * @return itself
          */
         public T items(List<EcommerceTransactionItem> items) {
             this.items = items;

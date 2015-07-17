@@ -39,6 +39,7 @@ public class Structured extends Event {
 
         /**
          * @param category Category of the event
+         * @return itself
          */
         public T category(String category) {
             this.category = category;
@@ -47,6 +48,7 @@ public class Structured extends Event {
 
         /**
          * @param action The event itself
+         * @return itself
          */
         public T action(String action) {
             this.action = action;
@@ -55,6 +57,7 @@ public class Structured extends Event {
 
         /**
          * @param label Refer to the object the action is performed on
+         * @return itself
          */
         public T label(String label) {
             this.label = label;
@@ -63,6 +66,7 @@ public class Structured extends Event {
 
         /**
          * @param property Property associated with either the action or the object
+         * @return itself
          */
         public T property(String property) {
             this.property = property;
@@ -71,6 +75,7 @@ public class Structured extends Event {
 
         /**
          * @param value A value associated with the user action
+         * @return itself
          */
         public T value(Double value) {
             this.value = value;

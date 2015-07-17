@@ -46,6 +46,7 @@ public class Event {
          * Adds a list of custom contexts.
          *
          * @param context the list of contexts
+         * @return itself
          */
         public T customContext(List<SelfDescribingJson> context) {
             this.context = context;
@@ -57,6 +58,7 @@ public class Event {
          *
          * @param timestamp the event timestamp as
          *                  unix epoch
+         * @return itself
          */
         public T timestamp(long timestamp) {
             this.timestamp = timestamp;
@@ -67,6 +69,7 @@ public class Event {
          * A custom eventId for the event.
          *
          * @param eventId the eventId
+         * @return itself
          */
         public T eventId(String eventId) {
             this.eventId = eventId;

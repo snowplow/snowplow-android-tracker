@@ -31,6 +31,7 @@ public class ScreenView extends Event {
 
         /**
          * @param name The name of the screen view event
+         * @return itself
          */
         public T name(String name) {
             this.name = name;
@@ -39,6 +40,7 @@ public class ScreenView extends Event {
 
         /**
          * @param id Screen view ID
+         * @return itself
          */
         public T id(String id) {
             this.id = id;

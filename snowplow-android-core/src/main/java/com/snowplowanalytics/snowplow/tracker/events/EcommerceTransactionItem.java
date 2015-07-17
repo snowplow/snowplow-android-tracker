@@ -40,6 +40,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param itemId Item ID
+         * @return itself
          */
         public T itemId(String itemId) {
             this.itemId = itemId;
@@ -48,6 +49,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param sku Item SKU
+         * @return itself
          */
         public T sku(String sku) {
             this.sku = sku;
@@ -56,6 +58,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param price Item price
+         * @return itself
          */
         public T price(Double price) {
             this.price = price;
@@ -64,6 +67,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param quantity Item quantity
+         * @return itself
          */
         public T quantity(Integer quantity) {
             this.quantity = quantity;
@@ -72,6 +76,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param name Item name
+         * @return itself
          */
         public T name(String name) {
             this.name = name;
@@ -80,6 +85,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param category Item category
+         * @return itself
          */
         public T category(String category) {
             this.category = category;
@@ -88,6 +94,7 @@ public class EcommerceTransactionItem extends Event {
 
         /**
          * @param currency The currency the price is expressed in
+         * @return itself
          */
         public T currency(String currency) {
             this.currency = currency;

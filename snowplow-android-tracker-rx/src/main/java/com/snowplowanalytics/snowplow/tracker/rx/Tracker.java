@@ -31,8 +31,8 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 
 /**
- * Builds a Tracker object which is used to
- * send events to a Snowplow Collector.
+ * Builds a Tracker object which is used to build and send events
+ * to a Snowplow Collector.
  */
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
@@ -40,6 +40,11 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     private final Scheduler scheduler;
     private Subscription sessionSub;
 
+    /**
+     * Constructs a Tracker object.
+     *
+     * @param builder the base tracker builder
+     */
     public Tracker(TrackerBuilder builder) {
         super(builder);
 
@@ -52,8 +57,10 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     }
 
     /**
-     * Begins a recurring session checker which
-     * will run every 5 seconds.
+     * Starts a polling session checker subscription to
+     * run at a defined interval.
+     *
+     * @param interval the time between checks
      */
     protected void startSessionChecker(final long interval) {
         final Session session = this.trackerSession;
@@ -66,7 +73,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     }
 
     /**
-     * Shuts the session checker down.
+     * Ends the polling session checker subscription.
      */
     public void shutdownSessionChecker() {
         if (sessionSub != null) {

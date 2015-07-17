@@ -103,6 +103,7 @@ public abstract class Emitter {
 
         /**
          * @param uri The uri of the collector
+         * @param context the android context
          */
         public EmitterBuilder(String uri, Context context) {
             this(uri, context, defaultEmitterClass);
@@ -122,6 +123,7 @@ public abstract class Emitter {
 
         /**
          * @param httpMethod The method by which requests are emitted
+         * @return itself
          */
         public EmitterBuilder method(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
@@ -130,6 +132,7 @@ public abstract class Emitter {
 
         /**
          * @param option the buffer option for the emitter
+         * @return itself
          */
         public EmitterBuilder option(BufferOption option) {
             this.bufferOption = option;
@@ -138,6 +141,7 @@ public abstract class Emitter {
 
         /**
          * @param requestSecurity the security chosen for requests
+         * @return itself
          */
         public EmitterBuilder security(RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
@@ -146,6 +150,7 @@ public abstract class Emitter {
 
         /**
          * @param requestCallback Request callback function
+         * @return itself
          */
         public EmitterBuilder callback(RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
@@ -154,6 +159,7 @@ public abstract class Emitter {
 
         /**
          * @param emitterTick The tick count between emitter attempts
+         * @return itself
          */
         public EmitterBuilder tick(int emitterTick) {
             this.emitterTick = emitterTick;
@@ -162,6 +168,7 @@ public abstract class Emitter {
 
         /**
          * @param sendLimit The maximum amount of events to grab for an emit attempt
+         * @return itself
          */
         public EmitterBuilder sendLimit(int sendLimit) {
             this.sendLimit = sendLimit;
@@ -171,6 +178,7 @@ public abstract class Emitter {
         /**
          * @param emptyLimit The amount of emitter ticks that are performed before we shut down
          *                   due to the database being empty.
+         * @return itself
          */
         public EmitterBuilder emptyLimit(int emptyLimit) {
             this.emptyLimit = emptyLimit;
@@ -180,6 +188,7 @@ public abstract class Emitter {
         /**
          * @param byteLimitGet The maximum amount of bytes allowed to be sent in a payload
          *                     in a GET request.
+         * @return itself
          */
         public EmitterBuilder byteLimitGet(long byteLimitGet) {
             this.byteLimitGet = byteLimitGet;
@@ -189,6 +198,7 @@ public abstract class Emitter {
         /**
          * @param byteLimitPost The maximum amount of bytes allowed to be sent in a payload
          *                      in a POST request.
+         * @return itself
          */
         public EmitterBuilder byteLimitPost(long byteLimitPost) {
             this.byteLimitPost = byteLimitPost;
@@ -196,6 +206,8 @@ public abstract class Emitter {
         }
 
         /**
+         * Builds a new Emitter object
+         *
          * @return a new Emitter object
          */
         public Emitter build() {
@@ -221,6 +233,7 @@ public abstract class Emitter {
 
     /**
      * Creates an emitter object
+     *
      * @param builder The builder that constructs an emitter
      */
     public Emitter(EmitterBuilder builder) {

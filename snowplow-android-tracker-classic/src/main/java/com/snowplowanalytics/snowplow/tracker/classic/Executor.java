@@ -76,7 +76,7 @@ public class Executor {
     /**
      * Returns the status of the executor.
      *
-     * @return if the executor is active
+     * @return executor is alive or not
      */
     public static boolean status() {
         if (executor == null || executor.isShutdown()) {
@@ -89,11 +89,12 @@ public class Executor {
     /**
      * Changes the amount of threads the
      * scheduler will be able to use.
-     * - This can only be set before the scheduler
-     *   is first accessed, after this point the
-     *   function will not effect anything.
      *
-     * @param count the thread count.
+     * NOTE: This can only be set before the
+     * scheduler is first accessed, after this
+     * point the function will not effect anything.
+     *
+     * @param count the thread count
      */
     public static void setThreadCount(final int count) {
         threadCount = count;

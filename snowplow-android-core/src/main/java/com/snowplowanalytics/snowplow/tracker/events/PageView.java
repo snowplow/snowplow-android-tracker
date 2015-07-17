@@ -35,6 +35,7 @@ public class PageView extends Event {
 
         /**
          * @param pageUrl URL of the viewed page
+         * @return itself
          */
         public T pageUrl(String pageUrl) {
             this.pageUrl = pageUrl;
@@ -43,6 +44,7 @@ public class PageView extends Event {
 
         /**
          * @param pageTitle Title of the viewed page
+         * @return itself
          */
         public T pageTitle(String pageTitle) {
             this.pageTitle = pageTitle;
@@ -51,6 +53,7 @@ public class PageView extends Event {
 
         /**
          * @param referrer Referrer of the page
+         * @return itself
          */
         public T referrer(String referrer) {
             this.referrer = referrer;

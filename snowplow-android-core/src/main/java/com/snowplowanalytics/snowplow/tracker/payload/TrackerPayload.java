@@ -21,7 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 /**
  * Returns a standard Tracker Payload consisting of
- * many key -> pair values.
+ * many key - pair values.
  */
 public class TrackerPayload implements Payload {
 

@@ -186,6 +186,9 @@ public class Util {
      * Checks whether or not the device
      * is online and able to communicate
      * with the outside world.
+     *
+     * @param context the android context
+     * @return whether the tracker is online
      */
     public static boolean isOnline(Context context) {
 
