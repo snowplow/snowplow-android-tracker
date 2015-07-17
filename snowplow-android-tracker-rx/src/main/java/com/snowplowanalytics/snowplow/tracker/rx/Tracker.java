@@ -37,11 +37,18 @@ import rx.schedulers.Schedulers;
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final String TAG = Tracker.class.getSimpleName();
-    private final Scheduler scheduler = SchedulerRx.getScheduler();
+    private final Scheduler scheduler;
     private Subscription sessionSub;
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
+
+        // Setup the Scheduler
+        SchedulerRx.setThreadCount(this.threadCount);
+        scheduler = SchedulerRx.getScheduler();
+
+        // Start Checking Sessions
+        startSessionChecker(this.sessionCheckInterval);
     }
 
     /**

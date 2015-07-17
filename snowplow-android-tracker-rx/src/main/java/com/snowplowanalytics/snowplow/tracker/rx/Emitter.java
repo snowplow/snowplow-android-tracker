@@ -23,7 +23,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscription;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
@@ -42,7 +41,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
-    private final Scheduler scheduler = SchedulerRx.getScheduler();
     private int emptyCounter = 0;
     private Subscription emitterSub;
     private EventStore eventStore;
@@ -54,12 +52,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
         // Create the event store with the context and the buffer option
         this.eventStore = new EventStore(this.context, this.sendLimit);
-
-        // If the device is not online do not send anything!
-        if (eventStore.getSize() > 0) {
-            isRunning.compareAndSet(false, true);
-            start();
-        }
     }
 
     /**
@@ -100,12 +92,12 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *    we are online.
      */
     private void start() {
-        emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS, scheduler)
+        emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS, SchedulerRx.getScheduler())
             .map(tick -> doEmitterTick())
             .doOnError(err -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
             .retry()
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
+            .subscribeOn(SchedulerRx.getScheduler())
+            .unsubscribeOn(SchedulerRx.getScheduler())
             .doOnSubscribe(() -> Logger.d(TAG, "Emitter has been started."))
             .doOnUnsubscribe(() -> Logger.d(TAG, "Emitter has been shutdown."))
             .map(this::buildRequestsRx)
@@ -310,7 +302,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         return Observable.<Integer> create(subscriber -> {
             subscriber.onNext(requestSender(request.getRequest()));
             subscriber.onCompleted();
-        }).subscribeOn(scheduler).unsubscribeOn(scheduler).toBlocking().toFuture();
+        }).subscribeOn(SchedulerRx.getScheduler()).unsubscribeOn(SchedulerRx.getScheduler())
+                .toBlocking().toFuture();
     }
 
     /**
@@ -324,7 +317,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         return Observable.<Boolean> create(subscriber -> {
             subscriber.onNext(this.eventStore.removeEvent(eventId));
             subscriber.onCompleted();
-        }).subscribeOn(scheduler).unsubscribeOn(scheduler).toBlocking().toFuture();
+        }).subscribeOn(SchedulerRx.getScheduler()).unsubscribeOn(SchedulerRx.getScheduler())
+                .toBlocking().toFuture();
     }
 
     // Setters, Getters and Checkers

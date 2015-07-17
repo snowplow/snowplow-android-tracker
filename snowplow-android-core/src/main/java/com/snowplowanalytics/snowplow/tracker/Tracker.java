@@ -54,6 +54,7 @@ public abstract class Tracker {
     protected DevicePlatforms devicePlatform;
     protected LogLevel level;
     protected long sessionCheckInterval;
+    protected int threadCount;
 
     protected AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -89,6 +90,7 @@ public abstract class Tracker {
         protected long foregroundTimeout = 600000; // Optional - 10 minutes
         protected long backgroundTimeout = 300000; // Optional - 5 minutes
         protected long sessionCheckInterval = 15000; // Optional - 15 seconds
+        protected int threadCount = 10; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -171,6 +173,14 @@ public abstract class Tracker {
         }
 
         /**
+         * @param threadCount the amount of threads to use for concurrency
+         */
+        public TrackerBuilder threadCount(int threadCount) {
+            this.threadCount = threadCount;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker
          */
         public Tracker build(){
@@ -212,10 +222,10 @@ public abstract class Tracker {
                 builder.backgroundTimeout,
                 builder.context);
         this.sessionCheckInterval = builder.sessionCheckInterval;
+        this.threadCount = builder.threadCount;
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
-        startSessionChecker(this.sessionCheckInterval);
     }
 
     /**
@@ -577,4 +587,9 @@ public abstract class Tracker {
     public boolean getDataCollection() {
         return this.dataCollection.get();
     }
+
+    /**
+     * @return the amount of threads to use
+     */
+    public int getThreadCount() { return this.threadCount; }
 }

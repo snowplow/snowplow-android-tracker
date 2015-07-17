@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,6 +38,12 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     public Tracker(TrackerBuilder builder) {
         super(builder);
+
+        // Set the thread count
+        Executor.setThreadCount(this.threadCount);
+
+        // Start Checking Sessions
+        startSessionChecker(this.sessionCheckInterval);
     }
 
     /**

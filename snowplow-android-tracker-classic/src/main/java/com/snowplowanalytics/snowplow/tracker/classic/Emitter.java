@@ -52,15 +52,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         super(builder);
 
         this.eventStore = new EventStore(this.context, this.sendLimit);
-
-        if (eventStore.getSize() > 0) {
-            Executor.execute(new Runnable() {
-                public void run() {
-                    isRunning.compareAndSet(false, true);
-                    attemptEmit();
-                }
-            });
-        }
     }
 
     /**

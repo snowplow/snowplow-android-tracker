@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 public class Executor {
 
     private static ExecutorService executor;
+    private static int threadCount = 2; // Minimum amount of threads.
 
     /**
      * If the executor is null creates a
@@ -35,7 +36,7 @@ public class Executor {
     private static ExecutorService getExecutor() {
         synchronized (Executor.class) {
             if (executor == null) {
-                executor = Executors.newScheduledThreadPool(10);
+                executor = Executors.newScheduledThreadPool(threadCount);
             }
         }
         return executor;
@@ -83,5 +84,18 @@ public class Executor {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Changes the amount of threads the
+     * scheduler will be able to use.
+     * - This can only be set before the scheduler
+     *   is first accessed, after this point the
+     *   function will not effect anything.
+     *
+     * @param count the thread count.
+     */
+    public static void setThreadCount(final int count) {
+        threadCount = count;
     }
 }
