@@ -247,7 +247,7 @@ public abstract class Tracker {
         this.level = builder.logLevel;
         this.sessionContext = builder.sessionContext;
         this.sessionCheckInterval = builder.sessionCheckInterval;
-        this.threadCount = builder.threadCount;
+        this.threadCount = builder.threadCount < 2 ? 2 : builder.threadCount;
 
         // If session context is True
         if (this.sessionContext) {
