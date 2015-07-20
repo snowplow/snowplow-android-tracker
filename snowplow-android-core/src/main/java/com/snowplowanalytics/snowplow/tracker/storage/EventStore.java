@@ -85,6 +85,7 @@ public class EventStore {
     public void open() {
         if (!isDatabaseOpen()) {
             database = dbHelper.getWritableDatabase();
+            database.enableWriteAheadLogging();
         }
     }
 
