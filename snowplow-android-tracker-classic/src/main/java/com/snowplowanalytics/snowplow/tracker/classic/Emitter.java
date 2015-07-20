@@ -107,6 +107,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 LinkedList<ReadyRequest> requests = buildRequests(events);
                 LinkedList<RequestResult> results = performAsyncEmit(requests);
 
+                events = null;
+                requests = null;
+
                 Logger.v(TAG, "Processing emitter results.");
 
                 int successCount = 0;
@@ -125,6 +128,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                     }
                 }
                 performAsyncEventRemoval(removableEvents);
+
+                results = null;
+                removableEvents = null;
 
                 Logger.d(TAG, "Success Count: %s", successCount);
                 Logger.d(TAG, "Failure Count: %s", failureCount);
@@ -208,6 +214,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
             }
         }
+
+        requests = null;
+        futures = null;
+
         return results;
     }
 
@@ -247,6 +257,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             }
             results.add(result);
         }
+
+        eventIds = null;
+        futures = null;
+
         return results;
     }
 

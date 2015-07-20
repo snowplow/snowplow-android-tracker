@@ -110,7 +110,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             .unsubscribeOn(SchedulerRx.getScheduler())
             .doOnSubscribe(() -> Logger.d(TAG, "Emitter has been started."))
             .doOnUnsubscribe(() -> Logger.d(TAG, "Emitter has been shutdown."))
-            .map(this::buildRequestsRx)
             .map(this::performAsyncEmit)
             .subscribe(this::processEmitterResults);
     }
@@ -190,6 +189,9 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
         }
         performAsyncEventRemoval(removableEvents);
 
+        results = null;
+        removableEvents = null;
+
         Logger.d(TAG, "Success Count: %s", successCount);
         Logger.d(TAG, "Failure Count: %s", failureCount);
 
@@ -211,28 +213,16 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Necessary wrapper to avoid Rx issue
-     * with 'protected' functions.
-     *
-     * @param events the events ready to
-     *               be built into requests
-     * @return the list of request ready
-     *         for sending
-     */
-    private LinkedList<ReadyRequest> buildRequestsRx(EmittableEvents events) {
-        return buildRequests(events);
-    }
-
-    /**
      * Asynchronously sends all of the
      * ReadyRequests in the List to the
      * defined endpoint.
      *
-     * @param requests the requests to be
-     *                 sent
+     * @param events the events ready to
+     *               be built into requests
      * @return the results of each request
      */
-    private List<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
+    private List<RequestResult> performAsyncEmit(EmittableEvents events) {
+        LinkedList<ReadyRequest> requests = buildRequests(events);
         List<RequestResult> results = new ArrayList<>();
         List<Future<Integer>> futures = new ArrayList<>();
 
@@ -263,6 +253,11 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
             }
         }
+
+        events = null;
+        requests = null;
+        futures = null;
+
         return results;
     }
 
@@ -302,6 +297,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
             }
             results.add(result);
         }
+
+        eventIds = null;
+        futures = null;
+
         return results;
     }
 
