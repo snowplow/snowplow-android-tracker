@@ -15,7 +15,11 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TrackerTest extends AndroidTestCase {
 
@@ -42,6 +46,10 @@ public class TrackerTest extends AndroidTestCase {
                 .platform(DevicePlatforms.InternetOfThings)
                 .base64(false)
                 .level(LogLevel.DEBUG)
+                .threadCount(20)
+                .sessionCheckInterval(15)
+                .backgroundTimeout(4000)
+                .foregroundTimeout(20000)
                 .build();
     }
 
@@ -101,5 +109,46 @@ public class TrackerTest extends AndroidTestCase {
 
         tracker.setPlatform(DevicePlatforms.Mobile);
         assertEquals(DevicePlatforms.Mobile, tracker.getPlatform());
+    }
+
+    public void testDataCollectionSwitch() {
+        Tracker tracker = getTracker();
+        assertTrue(tracker.getDataCollection());
+
+        tracker.stopDataCollection();
+        assertTrue(!tracker.getDataCollection());
+
+        tracker.startDataCollection();
+        assertTrue(tracker.getDataCollection());
+    }
+
+    public void testThreadCountSet() {
+        Tracker tracker = getTracker();
+        assertEquals(20, tracker.getThreadCount());
+    }
+
+    public void testTrackerSessionSet() {
+        Tracker tracker = getTracker();
+        Session session = tracker.getSession();
+
+        assertNotNull(session);
+        assertNotNull(session.getCurrentSessionId());
+        assertNotNull(session.getPreviousSessionId());
+        assertNotNull(session.getSessionIndex());
+        assertNotNull(session.getUserId());
+        assertEquals("SQLITE", session.getSessionStorage());
+        assertEquals(4000, session.getBackgroundTimeout());
+        assertEquals(20000, session.getForegroundTimeout());
+
+        Map<String, Object> sessionInfo = session.getSessionContext().getMap();
+        assertTrue(sessionInfo.containsKey("schema"));
+        assertTrue(sessionInfo.containsKey("data"));
+
+        Map sessionData = session.getSessionValues();
+        assertTrue(sessionData.containsKey(Parameters.SESSION_USER_ID));
+        assertTrue(sessionData.containsKey(Parameters.SESSION_INDEX));
+        assertTrue(sessionData.containsKey(Parameters.SESSION_ID));
+        assertTrue(sessionData.containsKey(Parameters.SESSION_PREVIOUS_ID));
+        assertTrue(sessionData.containsKey(Parameters.SESSION_STORAGE));
     }
 }

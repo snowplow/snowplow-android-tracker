@@ -21,19 +21,9 @@ public class TestTracker extends Tracker {
         super(builder);
     }
 
-    protected void startSessionChecker() {
-        // Do nothing.
-    }
+    public void startSessionChecker() {}
 
-    public void shutdownSessionChecker() {
-        // Do nothing.
-    }
+    public void shutdownSessionChecker() {}
 
-    public void startSessionChecker(final long interval) {
-        // Do nothing.
-    }
-
-    protected void trackEcommerceItem(EcommerceTransactionItem event, long timestamp) {
-        // Do nothing.
-    }
+    public void startSessionChecker(final long interval) {}
 }
