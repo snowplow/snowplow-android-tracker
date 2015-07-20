@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -82,6 +81,7 @@ public class Util {
      *  @param map The map to convert
      *  @return The JSONObject
      */
+    @SuppressWarnings("unchecked")
     public static JSONObject mapToJSONObject(Map map) {
         Logger.v(TAG, "Converting a map to a JSONObject: %s", map);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -230,22 +230,6 @@ public class Util {
     }
 
     /**
-     * Returns a Callable String which when executed will
-     * attempt to get the Advertising ID.
-     *
-     * @param context the android context
-     * @return a callable string
-     */
-    private static Callable<String> getAdvertisingIdCallable(final Context context) {
-        return new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return getAdvertisingId(context);
-            }
-        };
-    }
-
-    /**
      * Returns the carrier name based
      * on the android context supplied.
      *
@@ -339,6 +323,7 @@ public class Util {
      * @return the result of the method invoke
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     private static Object invokeMethod(Class classObject, String methodName, Object instance,
                                 Class[] cArgs, Object... args) throws Exception {
         Method methodObject = classObject.getMethod(methodName, cArgs);
@@ -363,21 +348,5 @@ public class Util {
      */
     public static boolean isTimeInRange(long startTime, long checkTime, long range) {
         return startTime > (checkTime - range);
-    }
-
-    /**
-     * Converts a potentially immutable list of
-     * SelfDescribingJson into a mutable list.
-     *
-     * @param list a list of SelfDescribingJson
-     * @return the mutable list
-     */
-    public static List<SelfDescribingJson> getMutableList(List<SelfDescribingJson> list) {
-        if (list == null) {
-            return null;
-        }
-        else {
-            return new ArrayList<>(list);
-        }
     }
 }

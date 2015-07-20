@@ -79,11 +79,7 @@ public class Executor {
      * @return executor is alive or not
      */
     public static boolean status() {
-        if (executor == null || executor.isShutdown()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(executor == null || executor.isShutdown());
     }
 
     /**

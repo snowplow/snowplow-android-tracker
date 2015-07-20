@@ -62,14 +62,16 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      *
      * @param interval the time between checks
      */
-    protected void startSessionChecker(final long interval) {
-        final Session session = this.trackerSession;
-        sessionSub = Observable.interval(interval, TimeUnit.MILLISECONDS, Schedulers.newThread())
-            .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
-            .retry()
-            .doOnSubscribe(() -> Logger.d(TAG, "Session checker has been started."))
-            .doOnUnsubscribe(() -> Logger.d(TAG, "Session checker has been shutdown."))
-            .subscribe(tick -> session.checkAndUpdateSession());
+    public void startSessionChecker(final long interval) {
+        if (sessionSub == null) {
+            final Session session = this.trackerSession;
+            sessionSub = Observable.interval(interval, TimeUnit.MILLISECONDS, scheduler)
+                    .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
+                    .retry()
+                    .doOnSubscribe(() -> Logger.d(TAG, "Session checker has been started."))
+                    .doOnUnsubscribe(() -> Logger.d(TAG, "Session checker has been shutdown."))
+                    .subscribe(tick -> session.checkAndUpdateSession());
+        }
     }
 
     /**
@@ -110,13 +112,6 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     public void track(EcommerceTransaction event) {
         Observable.create(subscriber -> {
             super.track(event);
-            subscriber.onCompleted();
-        }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
-    }
-
-    protected void trackEcommerceItem(EcommerceTransactionItem event, long timestamp) {
-        Observable.create(subscriber -> {
-            super.track(event, timestamp);
             subscriber.onCompleted();
         }).subscribeOn(scheduler).unsubscribeOn(scheduler).subscribe();
     }

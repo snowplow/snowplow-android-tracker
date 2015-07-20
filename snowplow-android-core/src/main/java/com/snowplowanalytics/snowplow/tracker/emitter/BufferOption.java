@@ -37,7 +37,7 @@ public enum BufferOption {
 
     private int code;
 
-    private BufferOption(int c) {
+    BufferOption(int c) {
         code = c;
     }
 

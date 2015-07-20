@@ -17,7 +17,6 @@ package com.snowplowanalytics.snowplow.tracker.utils;
 import android.content.Context;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -54,9 +53,7 @@ public class FileStore {
             oos.close();
             Logger.d(TAG, " + Successfully saved KV Pairs to: %s", filename);
             return true;
-        } catch (FileNotFoundException fnfe) {
-            Logger.e(TAG, " + Exception saving vars map: %s", fnfe.getMessage());
-        }catch(IOException ioe){
+        } catch(IOException ioe){
             Logger.e(TAG, " + Exception saving vars map: %s", ioe.getMessage());
         }
         return false;
@@ -80,12 +77,8 @@ public class FileStore {
             ois.close();
             Logger.d(TAG, " + Retrieved map from file: %s", varsMap);
             return varsMap;
-        } catch (FileNotFoundException fnfe) {
-            Logger.e(TAG, " + Exception getting vars map: %s", fnfe.getMessage());
-        } catch (IOException ioe) {
+        } catch (IOException | ClassNotFoundException ioe) {
             Logger.e(TAG, " + Exception getting vars map: %s", ioe.getMessage());
-        } catch (ClassNotFoundException cnfe) {
-            Logger.e(TAG, " + Exception getting vars map: %s", cnfe.getMessage());
         }
         return null;
     }

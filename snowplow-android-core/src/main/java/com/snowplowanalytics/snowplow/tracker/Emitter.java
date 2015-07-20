@@ -41,7 +41,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +70,7 @@ public abstract class Emitter {
     /**
      * Builder for the Emitter.
      */
+    @SuppressWarnings("unchecked")
     public static class EmitterBuilder {
 
         protected static Class<? extends Emitter> defaultEmitterClass;
@@ -434,10 +434,8 @@ public abstract class Emitter {
 
         // Build the request query
         HashMap hashMap = (HashMap) payload.getMap();
-        Iterator<String> iterator = hashMap.keySet().iterator();
 
-        while (iterator.hasNext()) {
-            String key = iterator.next();
+        for (String key : (Iterable<String>) hashMap.keySet()) {
             String value = (String) hashMap.get(key);
             uriBuilder.appendQueryParameter(key, value);
         }
@@ -506,6 +504,7 @@ public abstract class Emitter {
     /**
      * Sets whether the buffer should send events instantly or after the buffer has reached
      * it's limit. By default, this is set to BufferOption Default.
+     *
      * @param option Set the BufferOption enum to Instant send events upon creation.
      */
     public void setBufferOption(BufferOption option) {
@@ -514,6 +513,7 @@ public abstract class Emitter {
 
     /**
      * Sets the HttpMethod for the Emitter
+     *
      * @param method the HttpMethod
      */
     public void setHttpMethod(HttpMethod method) {
@@ -523,6 +523,7 @@ public abstract class Emitter {
 
     /**
      * Sets the RequestSecurity for the Emitter
+     *
      * @param security the RequestSecurity
      */
     public void setRequestSecurity(RequestSecurity security) {
@@ -532,18 +533,12 @@ public abstract class Emitter {
 
     /**
      * Updates the URI for the Emitter
+     *
      * @param uri new Emitter URI
      */
     public void setEmitterUri(String uri) {
         this.uri = uri;
         buildEmitterUri();
-    }
-
-    /**
-     * @return the emitter context
-     */
-    public Context getEmitterContext() {
-        return this.context;
     }
 
     /**

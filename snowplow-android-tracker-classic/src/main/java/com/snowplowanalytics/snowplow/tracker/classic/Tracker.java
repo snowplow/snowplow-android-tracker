@@ -57,17 +57,18 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      *
      * @param interval the time between checks
      */
-    protected void startSessionChecker(final long interval) {
-        final Session session = this.trackerSession;
+    public void startSessionChecker(final long interval) {
         if (sessionExecutor == null) {
+            Logger.d(TAG, "Session checker has been started.");
+            final Session session = this.trackerSession;
             sessionExecutor = Executors.newSingleThreadScheduledExecutor();
+            sessionExecutor.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    session.checkAndUpdateSession();
+                }
+            }, interval, interval, TimeUnit.MILLISECONDS);
         }
-        sessionExecutor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                session.checkAndUpdateSession();
-            }
-        }, interval, interval, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -75,6 +76,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      */
     public void shutdownSessionChecker() {
         if (sessionExecutor != null) {
+            Logger.d(TAG, "Session checker has been shutdown.");
             sessionExecutor.shutdown();
             sessionExecutor = null;
         }
@@ -112,14 +114,6 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
         Executor.execute(new Runnable() {
             public void run() {
                 Tracker.super.track(event);
-            }
-        });
-    }
-
-    protected void trackEcommerceItem(final EcommerceTransactionItem event, final long timestamp) {
-        Executor.execute(new Runnable() {
-            public void run() {
-                Tracker.super.track(event, timestamp);
             }
         });
     }

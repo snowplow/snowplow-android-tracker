@@ -17,7 +17,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
-import android.os.Build;
 import android.os.Looper;
 import android.view.Display;
 import android.view.WindowManager;

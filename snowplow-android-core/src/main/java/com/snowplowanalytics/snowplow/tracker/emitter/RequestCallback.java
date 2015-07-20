@@ -21,5 +21,4 @@ public interface RequestCallback {
     void onSuccess(int successCount);
 
     void onFailure(int successCount, int failureCount);
-
 }

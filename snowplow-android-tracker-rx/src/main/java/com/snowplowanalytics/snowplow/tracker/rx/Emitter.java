@@ -224,18 +224,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Necessary wrapper to avoid Rx issue
-     * with 'protected' functions.
-     *
-     * @param events the events to send to
-     *               the collector
-     * @return the results of each request
-     */
-    private LinkedList<RequestResult> performSyncEmitRx(LinkedList<ReadyRequest> events) {
-        return performSyncEmit(events);
-    }
-
-    /**
      * Asynchronously sends all of the
      * ReadyRequests in the List to the
      * defined endpoint.

@@ -81,14 +81,11 @@ public class EventStore {
     /**
      * Opens a new writable database if it
      * is currently closed.
-     *
-     * @return success or failure to open
      */
-    public boolean open() {
+    public void open() {
         if (!isDatabaseOpen()) {
             database = dbHelper.getWritableDatabase();
         }
-        return database != null;
     }
 
     /**
@@ -106,8 +103,9 @@ public class EventStore {
      * @return a boolean stating if the insert
      * was a success or not
      */
+    @SuppressWarnings("unchecked")
     public long insertEvent(Payload payload) {
-        if (open()) {
+        if (isDatabaseOpen()) {
             byte[] bytes = EventStore.serialize(payload.getMap());
             ContentValues values = new ContentValues(2);
             values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes);
@@ -125,7 +123,7 @@ public class EventStore {
      */
     public boolean removeEvent(long id) {
         int retval = -1;
-        if (open()) {
+        if (isDatabaseOpen()) {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS,
                     EventStoreHelper.COLUMN_ID + "=" + id, null);
         }
@@ -140,7 +138,7 @@ public class EventStore {
      */
     public boolean removeAllEvents() {
         int retval = -1;
-        if (open()) {
+        if (isDatabaseOpen()) {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
         }
         Logger.d(TAG, "Removing all events from database.");
@@ -203,7 +201,7 @@ public class EventStore {
      */
     public List<Map<String, Object>> queryDatabase(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
-        if (open()) {
+        if (isDatabaseOpen()) {
             Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
                     null, null, null, orderBy);
 
@@ -324,9 +322,6 @@ public class EventStore {
      * @return a boolean for database status
      */
     public boolean isDatabaseOpen() {
-        if (database == null) {
-            return false;
-        }
-        return database.isOpen();
+        return database != null && database.isOpen();
     }
 }

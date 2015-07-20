@@ -149,7 +149,7 @@ public class Session {
      *
      * @return a map containing all session values
      */
-    private Map getSessionValues() {
+    public Map getSessionValues() {
         Map<String, Object> sessionValues = new HashMap<>();
         sessionValues.put(Parameters.SESSION_USER_ID,this.userId);
         sessionValues.put(Parameters.SESSION_ID, this.currentSessionId);
@@ -242,5 +242,18 @@ public class Session {
     public String getSessionStorage() {
         return this.sessionStorage;
     }
-}
 
+    /**
+     * @return the foreground session timeout
+     */
+    public long getForegroundTimeout() {
+        return this.foregroundTimeout;
+    }
+
+    /**
+     * @return the background session timeout
+     */
+    public long getBackgroundTimeout() {
+        return this.backgroundTimeout;
+    }
+}
