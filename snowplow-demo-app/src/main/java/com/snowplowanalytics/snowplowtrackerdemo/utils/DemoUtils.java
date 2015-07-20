@@ -78,6 +78,7 @@ public class DemoUtils {
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
                 .threadCount(20)
+                .sessionContext(true)
                 .build();
     }
 
@@ -96,6 +97,7 @@ public class DemoUtils {
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
                 .threadCount(20)
+                .sessionContext(true)
                 .build();
     }
 

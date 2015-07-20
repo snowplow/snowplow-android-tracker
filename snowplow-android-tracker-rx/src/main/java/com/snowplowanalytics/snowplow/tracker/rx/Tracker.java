@@ -63,7 +63,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      * @param interval the time between checks
      */
     public void startSessionChecker(final long interval) {
-        if (sessionSub == null) {
+        if (sessionSub == null && this.sessionContext) {
             final Session session = this.trackerSession;
             sessionSub = Observable.interval(interval, TimeUnit.MILLISECONDS, scheduler)
                     .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))

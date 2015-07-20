@@ -55,6 +55,7 @@ public abstract class Tracker {
     protected boolean base64Encoded;
     protected DevicePlatforms devicePlatform;
     protected LogLevel level;
+    protected boolean sessionContext;
     protected long sessionCheckInterval;
     protected int threadCount;
 
@@ -90,6 +91,7 @@ public abstract class Tracker {
         protected boolean base64Encoded = true; // Optional
         protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
         protected LogLevel logLevel = LogLevel.OFF; // Optional
+        protected boolean sessionContext = false; // Optional
         protected long foregroundTimeout = 600000; // Optional - 10 minutes
         protected long backgroundTimeout = 300000; // Optional - 5 minutes
         protected long sessionCheckInterval = 15000; // Optional - 15 seconds
@@ -154,6 +156,15 @@ public abstract class Tracker {
          */
         public TrackerBuilder level(LogLevel log) {
             this.logLevel = log;
+            return this;
+        }
+
+        /**
+         * @param sessionContext whether to add a session context
+         * @return itself
+         */
+        public TrackerBuilder sessionContext(boolean sessionContext) {
+            this.sessionContext = sessionContext;
             return this;
         }
 
@@ -234,12 +245,17 @@ public abstract class Tracker {
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
         this.level = builder.logLevel;
-        this.trackerSession = new Session(
+        this.sessionContext = builder.sessionContext;
+        this.sessionCheckInterval = builder.sessionCheckInterval;
+        this.threadCount = builder.threadCount;
+
+        // If session context is True
+        if (this.sessionContext) {
+            this.trackerSession = new Session(
                 builder.foregroundTimeout,
                 builder.backgroundTimeout,
                 builder.context);
-        this.sessionCheckInterval = builder.sessionCheckInterval;
-        this.threadCount = builder.threadCount;
+        }
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
@@ -289,7 +305,9 @@ public abstract class Tracker {
     private SelfDescribingJson getFinalContext(List<SelfDescribingJson> context) {
 
         // Add session context
-        context.add(this.trackerSession.getSessionContext());
+        if (this.sessionContext) {
+            context.add(this.trackerSession.getSessionContext());
+        }
 
         // Add subject context's
         if (this.subject != null) {

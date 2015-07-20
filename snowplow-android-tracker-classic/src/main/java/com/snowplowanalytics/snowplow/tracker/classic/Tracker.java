@@ -58,7 +58,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      * @param interval the time between checks
      */
     public void startSessionChecker(final long interval) {
-        if (sessionExecutor == null) {
+        if (sessionExecutor == null && this.sessionContext) {
             Logger.d(TAG, "Session checker has been started.");
             final Session session = this.trackerSession;
             sessionExecutor = Executors.newSingleThreadScheduledExecutor();
