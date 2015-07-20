@@ -18,6 +18,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class Event {
     }
 
     protected Event(Builder<?> builder) {
-        this.context = Util.getMutableList(builder.context);
+        this.context = builder.context;
         this.timestamp = builder.timestamp;
         this.eventId = builder.eventId;
     }
@@ -102,7 +103,7 @@ public class Event {
      * @return the events custom context
      */
     public List<SelfDescribingJson> getContext() {
-        return this.context;
+        return new ArrayList<>(this.context);
     }
 
     /**

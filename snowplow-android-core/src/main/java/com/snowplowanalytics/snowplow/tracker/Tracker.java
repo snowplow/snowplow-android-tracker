@@ -17,6 +17,7 @@ import android.content.Context;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
@@ -61,6 +63,7 @@ public abstract class Tracker {
     /**
      * Builder for the Tracker
      */
+    @SuppressWarnings("unchecked")
     public static class TrackerBuilder {
 
         protected static Class<? extends Tracker> defaultTrackerClass;
@@ -253,7 +256,7 @@ public abstract class Tracker {
      *                decorated.
      * @param context The raw context list
      */
-    private void addEventPayload(Payload payload, List<SelfDescribingJson> context) {
+    private void addEventPayload(TrackerPayload payload, List<SelfDescribingJson> context) {
 
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
@@ -325,7 +328,7 @@ public abstract class Tracker {
         }
 
         List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload();
+        TrackerPayload payload = event.getPayload();
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Page View Event: %s", payload);
@@ -342,7 +345,7 @@ public abstract class Tracker {
         }
 
         List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload();
+        TrackerPayload payload = event.getPayload();
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Structured Event: %s", payload);
@@ -361,7 +364,7 @@ public abstract class Tracker {
         }
 
         List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload();
+        TrackerPayload payload = event.getPayload();
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking EcommerceTransaction Event: %s", payload);
@@ -369,21 +372,9 @@ public abstract class Tracker {
         // Track each TransactionItem individually
         long timestamp = event.getTimestamp();
         for(EcommerceTransactionItem item : event.getItems()) {
-            trackEcommerceItem(item, timestamp);
+            track(item, timestamp);
         }
     }
-
-    /**
-     * At high volumes some track e-commerce item events can be dropped.
-     * To prevent any drops from happening it needs to be pushed into
-     * its own Observable/Runnable.
-     *
-     * It is currently not understood why this fixes the issue.
-     *
-     * @param event the Ecommerce Transaction Item event
-     * @param timestamp the Timestamp of the Transaction
-     */
-    protected abstract void trackEcommerceItem(EcommerceTransactionItem event, long timestamp);
 
     /**
      * Tracks an Ecommerce Transaction Item event.
@@ -391,9 +382,9 @@ public abstract class Tracker {
      * @param event the Ecommerce Transaction Item event
      * @param timestamp the Timestamp of the Transaction
      */
-    protected void track(EcommerceTransactionItem event, long timestamp) {
+    private void track(EcommerceTransactionItem event, long timestamp) {
         List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload(timestamp);
+        TrackerPayload payload = event.getPayload(timestamp);
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking EcommerceTransactionItem Event: %s", payload);
@@ -410,7 +401,7 @@ public abstract class Tracker {
         }
 
         List<SelfDescribingJson> context = event.getContext();
-        Payload payload = event.getPayload(base64Encoded);
+        TrackerPayload payload = event.getPayload(base64Encoded);
         addEventPayload(payload, context);
 
         Logger.v(TAG, "Tracking Unstructured Event: %s", payload);
@@ -460,8 +451,8 @@ public abstract class Tracker {
      * - Session polling checker
      */
     public void shutdown() {
-        this.shutdownEmitter();
-        this.shutdownSessionChecker();
+        shutdownEmitter();
+        shutdownSessionChecker();
     }
 
     /**
@@ -470,7 +461,7 @@ public abstract class Tracker {
      *
      * @param interval the checking interval
      */
-    protected abstract void startSessionChecker(final long interval);
+    public abstract void startSessionChecker(final long interval);
 
     /**
      * Shuts the session checker down.
