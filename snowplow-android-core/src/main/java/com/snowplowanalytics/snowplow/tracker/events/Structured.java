@@ -104,6 +104,8 @@ public class Structured extends Event {
         // Precondition checks
         Preconditions.checkNotNull(builder.category);
         Preconditions.checkNotNull(builder.action);
+        Preconditions.checkArgument(!builder.category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!builder.action.isEmpty(), "action cannot be empty");
 
         this.category = builder.category;
         this.action = builder.action;
@@ -125,7 +127,8 @@ public class Structured extends Event {
         payload.add(Parameters.SE_ACTION, this.action);
         payload.add(Parameters.SE_LABEL, this.label);
         payload.add(Parameters.SE_PROPERTY, this.property);
-        payload.add(Parameters.SE_VALUE, this.value != null ? Double.toString(this.value) : null);
+        payload.add(Parameters.SE_VALUE,
+                this.value != null ? Double.toString(this.value) : null);
         return putDefaultParams(payload);
     }
 }

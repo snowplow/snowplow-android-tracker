@@ -121,14 +121,12 @@ public class EcommerceTransactionItem extends Event {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.name);
-        Preconditions.checkNotNull(builder.category);
-        Preconditions.checkNotNull(builder.currency);
+        Preconditions.checkNotNull(builder.itemId);
+        Preconditions.checkNotNull(builder.sku);
+        Preconditions.checkNotNull(builder.price);
+        Preconditions.checkNotNull(builder.quantity);
         Preconditions.checkArgument(!builder.itemId.isEmpty(), "itemId cannot be empty");
         Preconditions.checkArgument(!builder.sku.isEmpty(), "sku cannot be empty");
-        Preconditions.checkArgument(!builder.name.isEmpty(), "name cannot be empty");
-        Preconditions.checkArgument(!builder.category.isEmpty(), "category cannot be empty");
-        Preconditions.checkArgument(!builder.currency.isEmpty(), "currency cannot be empty");
 
         this.itemId = builder.itemId;
         this.sku = builder.sku;

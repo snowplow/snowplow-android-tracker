@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import java.util.ArrayList;
@@ -94,6 +95,12 @@ public class Event {
     }
 
     protected Event(Builder<?> builder) {
+
+        // Precondition checks
+        Preconditions.checkNotNull(builder.context);
+        Preconditions.checkNotNull(builder.eventId);
+        Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
+
         this.context = builder.context;
         this.timestamp = builder.timestamp;
         this.eventId = builder.eventId;

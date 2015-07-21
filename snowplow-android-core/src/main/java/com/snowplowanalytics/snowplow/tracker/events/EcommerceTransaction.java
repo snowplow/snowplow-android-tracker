@@ -156,17 +156,10 @@ public class EcommerceTransaction extends Event {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.affiliation);
-        Preconditions.checkNotNull(builder.city);
-        Preconditions.checkNotNull(builder.state);
-        Preconditions.checkNotNull(builder.country);
-        Preconditions.checkNotNull(builder.currency);
+        Preconditions.checkNotNull(builder.orderId);
+        Preconditions.checkNotNull(builder.totalValue);
+        Preconditions.checkNotNull(builder.items);
         Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
-        Preconditions.checkArgument(!builder.affiliation.isEmpty(), "affiliation cannot be empty");
-        Preconditions.checkArgument(!builder.city.isEmpty(), "city cannot be empty");
-        Preconditions.checkArgument(!builder.state.isEmpty(), "state cannot be empty");
-        Preconditions.checkArgument(!builder.country.isEmpty(), "country cannot be empty");
-        Preconditions.checkArgument(!builder.currency.isEmpty(), "currency cannot be empty");
 
         this.orderId = builder.orderId;
         this.totalValue = builder.totalValue;
@@ -192,8 +185,10 @@ public class EcommerceTransaction extends Event {
         payload.add(Parameters.TR_ID, this.orderId);
         payload.add(Parameters.TR_TOTAL, Double.toString(this.totalValue));
         payload.add(Parameters.TR_AFFILIATION, this.affiliation);
-        payload.add(Parameters.TR_TAX, Double.toString(this.taxValue));
-        payload.add(Parameters.TR_SHIPPING, Double.toString(this.shipping));
+        payload.add(Parameters.TR_TAX,
+                this.taxValue != null ? Double.toString(this.taxValue) : null);
+        payload.add(Parameters.TR_SHIPPING,
+                this.shipping != null ? Double.toString(this.shipping) : null);
         payload.add(Parameters.TR_CITY, this.city);
         payload.add(Parameters.TR_STATE, this.state);
         payload.add(Parameters.TR_COUNTRY, this.country);

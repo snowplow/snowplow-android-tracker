@@ -82,8 +82,6 @@ public class PageView extends Event {
         // Precondition checks
         Preconditions.checkNotNull(builder.pageUrl);
         Preconditions.checkArgument(!builder.pageUrl.isEmpty(), "pageUrl cannot be empty");
-        Preconditions.checkArgument(!builder.pageTitle.isEmpty(), "pageTitle cannot be empty");
-        Preconditions.checkArgument(!builder.referrer.isEmpty(), "referrer cannot be empty");
 
         this.pageUrl = builder.pageUrl;
         this.pageTitle = builder.pageTitle;

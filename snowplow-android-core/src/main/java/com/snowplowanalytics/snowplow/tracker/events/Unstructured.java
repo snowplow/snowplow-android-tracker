@@ -17,6 +17,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 
 /**
  * Constructs an Unstructured event object.
@@ -58,6 +59,10 @@ public class Unstructured extends Event {
 
     protected Unstructured(Builder<?> builder) {
         super(builder);
+
+        // Precondition checks
+        Preconditions.checkNotNull(builder.eventData);
+
         this.eventData = builder.eventData;
     }
 

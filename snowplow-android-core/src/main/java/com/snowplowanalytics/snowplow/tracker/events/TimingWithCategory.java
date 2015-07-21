@@ -23,14 +23,14 @@ public class TimingWithCategory extends Event {
 
     private final String category;
     private final String variable;
-    private final int timing;
+    private final Integer timing;
     private final String label;
 
     public static abstract class Builder<T extends Builder<T>> extends Event.Builder<T> {
 
         private String category;
         private String variable;
-        private int timing;
+        private Integer timing;
         private String label;
 
         /**
@@ -55,7 +55,7 @@ public class TimingWithCategory extends Event {
          * @param timing The number of milliseconds in elapsed time to report
          * @return itself
          */
-        public T timing(int timing) {
+        public T timing(Integer timing) {
             this.timing = timing;
             return self();
         }
@@ -90,8 +90,10 @@ public class TimingWithCategory extends Event {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.category);
+        Preconditions.checkNotNull(builder.timing);
         Preconditions.checkNotNull(builder.variable);
-        Preconditions.checkNotNull(builder.label);
+        Preconditions.checkArgument(!builder.category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!builder.variable.isEmpty(), "variable cannot be empty");
 
         this.category = builder.category;
         this.variable = builder.variable;
@@ -109,7 +111,7 @@ public class TimingWithCategory extends Event {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.UT_CATEGORY, this.category);
         payload.add(Parameters.UT_VARIABLE, this.variable);
-        payload.add(Parameters.UT_TIMING, this.timing);
+        payload.add(Parameters.UT_TIMING, Integer.toString(this.timing));
         payload.add(Parameters.UT_LABEL, this.label);
         return putDefaultParams(payload);
     }
