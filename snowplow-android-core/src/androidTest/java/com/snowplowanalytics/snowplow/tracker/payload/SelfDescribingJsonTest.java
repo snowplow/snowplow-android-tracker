@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.utils.payload;
+package com.snowplowanalytics.snowplow.tracker.payload;
 
 import android.test.AndroidTestCase;
 

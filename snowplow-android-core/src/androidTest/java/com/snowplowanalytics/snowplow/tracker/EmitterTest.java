@@ -13,15 +13,13 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.test.AndroidTestCase;
-
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import junit.framework.Assert;
@@ -31,8 +29,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
@@ -154,7 +150,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
        
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -170,7 +166,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result = emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -193,7 +189,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(1);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result = emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -220,7 +216,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);
@@ -252,7 +248,7 @@ public class EmitterTest extends SnowplowTestCase {
         EmittableEvents emittableEvents = setupEmittableEvents(2);
         Emitter emitter = getEmitter(HttpMethod.POST, BufferOption.Single, RequestSecurity.HTTP);
 
-        LinkedList<RequestResult> result= emitter.performEmit(emittableEvents);
+        LinkedList<RequestResult> result= emitter.performSyncEmit(emitter.buildRequests(emittableEvents));
 
         RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
         assertNotNull(req);

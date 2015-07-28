@@ -28,6 +28,7 @@ public class TrackerConstants {
     public static final String SCHEMA_USER_TIMINGS = "iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0";
     public static final String GEOLOCATION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-0-0";
     public static final String MOBILE_SCHEMA = "iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-0";
+    public static final String SESSION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-0";
 
     public static final String POST_CONTENT_TYPE = "application/json; charset=utf-8";
 
@@ -37,5 +38,5 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM = "tr";
     public static final String EVENT_ECOMM_ITEM = "ti";
 
-    public static final int BACK_PRESSURE_LIMIT = 10000;
+    public static final String SNOWPLOW_SESSION_VARS = "snowplow_session_vars";
 }

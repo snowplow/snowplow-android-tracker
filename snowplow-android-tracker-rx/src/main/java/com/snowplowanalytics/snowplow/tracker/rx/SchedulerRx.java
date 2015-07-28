@@ -13,23 +13,59 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import rx.schedulers.Schedulers;
 import rx.Scheduler;
 
 /**
- * Creates a single Scheduler for use
- * by the Tracker and Emitter.
+ * Creates an RxJava Scheduler for use by the Tracker
+ * and Emitter objects.
  */
 public class SchedulerRx {
 
-    private static final Scheduler scheduler = Schedulers.io();
+    private static Scheduler scheduler;
+    private static ExecutorService executor;
+    private static int threadCount = 2; // Minimum amount of threads.
 
     /**
-     * Returns the Rx Scheduler
+     * Returns the Scheduler, if it has not been made
+     * yet it will also create a new one.
      *
-     * @return the scheduler
+     * @return the RxJava Scheduler
      */
     public static Scheduler getScheduler() {
+        if (scheduler == null) {
+            scheduler = Schedulers.from(getExecutor());
+        }
         return scheduler;
+    }
+
+    /**
+     * Returns the Executor Service, if it has not been made
+     * yet it will also create a new one.
+     *
+     * @return the Executor Service
+     */
+    private static ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newScheduledThreadPool(threadCount);
+        }
+        return executor;
+    }
+
+    /**
+     * Changes the amount of threads the
+     * scheduler will be able to use.
+     *
+     * This can only be set before the scheduler
+     * is first accessed, after this point the
+     * function will not effect anything.
+     *
+     * @param count the amount of threads
+     */
+    public static void setThreadCount(final int count) {
+        threadCount = count;
     }
 }

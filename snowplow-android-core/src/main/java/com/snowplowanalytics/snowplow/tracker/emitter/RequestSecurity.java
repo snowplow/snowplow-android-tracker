@@ -11,18 +11,19 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.utils.emitter;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * Exception SubClass for the Emitter
+ * RequestSecurity is used to set the protocol used for sending Requests.
+ * Either HTTP or HTTPS.
  */
-public class EmitterException extends RuntimeException {
-
-    public EmitterException() {
-        super();
-    }
-
-    public EmitterException(String message) {
-        super(message);
-    }
+public enum RequestSecurity {
+    /**
+     * Events are sent without security.
+     */
+    HTTP,
+    /**
+     * Events are sent with added security.
+     */
+    HTTPS,
 }

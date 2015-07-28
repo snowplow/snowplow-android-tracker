@@ -11,12 +11,11 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.utils.payload;
+package com.snowplowanalytics.snowplow.tracker.payload;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -24,27 +23,53 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
  * Returns a SelfDescribingJson object which will contain
- * both the Schema and data.
+ * both the Schema and Data.
  */
 public class SelfDescribingJson implements Payload {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final HashMap<String,Object> payload = new HashMap<String,Object>();
     
+    /**
+     * Builds a SelfDescribingJson object
+     *
+     * @param schema the schema string
+     */
     public SelfDescribingJson(String schema) {
         this(schema, new HashMap<>());
     }
 
+    /**
+     * Builds a SelfDescribingJson object
+     *
+     * @param schema the schema string
+     * @param data to nest into the object
+     *        as a TrackerPayload
+     */
     public SelfDescribingJson(String schema, TrackerPayload data) {
         setSchema(schema);
         setData(data);
     }
 
+    /**
+     * Builds a SelfDescribingJson object
+     *
+     * @param schema the schema string
+     * @param data to nest into the object
+     *        as a SelfDescribingJson
+     */
     public SelfDescribingJson(String schema, SelfDescribingJson data) {
         setSchema(schema);
         setData(data);
     }
 
+    /**
+     * Builds a SelfDescribingJson object
+     *
+     * @param schema the schema string
+     * @param data to nest into the object
+     *        as a POJO
+     */
     public SelfDescribingJson(String schema, Object data) {
         setSchema(schema);
         setData(data);
@@ -54,6 +79,8 @@ public class SelfDescribingJson implements Payload {
      * Sets the Schema for the SelfDescribingJson
      *
      * @param schema a valid schema string
+     * @return itself if it passes precondition
+     *         checks
      */
     public SelfDescribingJson setSchema(String schema) {
         Preconditions.checkNotNull(schema, "schema cannot be null");
@@ -67,6 +94,7 @@ public class SelfDescribingJson implements Payload {
      * - Accepts a TrackerPayload object
      *
      * @param trackerPayload the data to be added to the SelfDescribingJson
+     * @return itself
      */
     public SelfDescribingJson setData(TrackerPayload trackerPayload) {
         if (trackerPayload == null) {
@@ -78,8 +106,10 @@ public class SelfDescribingJson implements Payload {
 
     /**
      * Adds data to the SelfDescribingJson
+     * - Accepts a POJO
      *
      * @param data the data to be added to the SelfDescribingJson
+     * @return itself
      */
     public SelfDescribingJson setData(Object data) {
         if (data == null) {
@@ -94,6 +124,7 @@ public class SelfDescribingJson implements Payload {
      * without copying over the Schema.
      *
      * @param selfDescribingJson the payload to add to the SelfDescribingJson
+     * @return itself
      */
     public SelfDescribingJson setData(SelfDescribingJson selfDescribingJson) {
         if (payload == null) {

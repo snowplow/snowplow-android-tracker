@@ -11,15 +11,18 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
-public class TestTracker extends Tracker {
-
-    public TestTracker(TrackerBuilder builder) {
-        super(builder);
-    }
-
-    public void pauseSessionChecking() {}
-
-    public void resumeSessionChecking() {}
+/**
+ * HttpMethod is used to set the request method for your Emitter (i.e. GET or POST requests).
+ */
+public enum HttpMethod {
+    /**
+     * Each event is sent individually in separate GET requests.
+     */
+    GET,
+    /**
+     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     */
+    POST
 }

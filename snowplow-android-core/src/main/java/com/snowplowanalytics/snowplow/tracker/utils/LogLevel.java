@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.utils;
 
 /**
  * LogLevel contains the different levels of configurable logging in the Tracker.
@@ -39,7 +39,7 @@ public enum LogLevel {
 
     private int level;
 
-    private LogLevel(int c) {
+    LogLevel(int c) {
         level = c;
     }
 

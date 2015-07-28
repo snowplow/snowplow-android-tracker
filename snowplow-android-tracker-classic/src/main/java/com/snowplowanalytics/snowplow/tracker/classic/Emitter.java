@@ -14,19 +14,25 @@
 package com.snowplowanalytics.snowplow.tracker.classic;
 
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeoutException;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
-import com.snowplowanalytics.snowplow.tracker.EventStore;
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
+import com.squareup.okhttp.Request;
 
 /**
- * Build an emitter object which controls the
- * sending of events to the Snowplow Collector.
+ * Builds a Emitter object which is used to store events
+ * in a SQLite Database and to send events to a Snowplow
+ * Collector.
  */
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
@@ -35,48 +41,35 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private EventStore eventStore;
     private int emptyCount;
 
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-
     /**
-     * Creates an emitter object
+     * Constructs the Emitter Object.
      *
-     * @param builder The builder that constructs an emitter
+     * @param builder the base emitter builder.
      */
     public Emitter(EmitterBuilder builder) {
         super(builder);
 
         this.eventStore = new EventStore(this.context, this.sendLimit);
+    }
 
-        if (eventStore.getSize() > 0) {
-            Executor.execute(new Runnable() {
-                public void run() {
-                    isRunning.compareAndSet(false, true);
-                    attemptEmit();
-                }
-            });
+    /**
+     * Adds a payload to the EventStore and
+     * then attempts to start the emitter
+     * if it is not currently running.
+     *
+     * @param payload the event payload
+     *                to be added.
+     */
+    public void add(final Payload payload) {
+        eventStore.add(payload);
+        if (isRunning.compareAndSet(false, true)) {
+            attemptEmit();
         }
     }
 
     /**
-     * Adds a payload to the Event Store and
-     * begins the emit function.
-     *
-     * @param payload the payload to be added to
-     *                the EventStore
-     */
-    public void add(final Payload payload) {
-        Executor.execute(new Runnable() {
-            public void run() {
-                eventStore.add(payload);
-                if (isRunning.compareAndSet(false, true)) {
-                    attemptEmit();
-                }
-            }
-        });
-    }
-
-    /**
-     * Starts the emitter if it is not running.
+     * Attempts to start the emitter if it
+     * is not currently running.
      */
     public void flush() {
         Executor.execute(new Runnable() {
@@ -91,15 +84,16 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     /**
      * Attempts to send events in the database to
      * a collector.
+     *
      * - If the emitter is not online it will not send
      * - If the emitter is online but there are no events:
-     *   - Increment empty counter until emptyLimit reached
-     *   - Incurs a backoff period between empty counters
+     *   + Increment empty counter until emptyLimit reached
+     *   + Incurs a backoff period between empty counters
      * - If the emitter is online and we have events:
-     *   - Pulls allowed amount of events from database and
+     *   + Pulls allowed amount of events from database and
      *     attempts to send.
-     *   - If there are failures resets running state
-     *   - Otherwise will attempt to emit again
+     *   + If there are failures resets running state
+     *   + Otherwise will attempt to emit again
      */
     private void attemptEmit() {
         if (Util.isOnline(this.context)) {
@@ -107,17 +101,22 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 emptyCount = 0;
 
                 EmittableEvents events = eventStore.getEmittableEvents();
-                LinkedList<RequestResult> results = performEmit(events);
+                LinkedList<ReadyRequest> requests = buildRequests(events);
+                LinkedList<RequestResult> results = performAsyncEmit(requests);
+
+                events = null;
+                requests = null;
 
                 Logger.v(TAG, "Processing emitter results.");
 
                 int successCount = 0;
                 int failureCount = 0;
+                LinkedList<Long> removableEvents = new LinkedList<>();
 
                 for (RequestResult res : results) {
                     if (res.getSuccess()) {
-                        for (Long eventId : res.getEventIds()) {
-                            eventStore.removeEvent(eventId);
+                        for (final Long eventId : res.getEventIds()) {
+                            removableEvents.add(eventId);
                         }
                         successCount += res.getEventIds().size();
                     } else {
@@ -125,6 +124,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                         Logger.e(TAG, "Request sending failed but we will retry later.");
                     }
                 }
+                performAsyncEventRemoval(removableEvents);
+
+                results = null;
+                removableEvents = null;
 
                 Logger.d(TAG, "Success Count: %s", successCount);
                 Logger.d(TAG, "Failure Count: %s", failureCount);
@@ -154,7 +157,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                     emptyCount++;
                     Logger.e(TAG, "Emitter database empty: " + emptyCount);
                     try {
-                        TimeUnit.SECONDS.sleep(this.emitterTick);
+                        this.timeUnit.sleep(this.emitterTick);
                     } catch (InterruptedException e) {
                         Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
                     }
@@ -168,7 +171,130 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Shuts the emitter down!
+     * Asynchronously sends all of the
+     * ReadyRequests in the List to the
+     * defined endpoint.
+     *
+     * @param requests the requests to be
+     *                 sent
+     * @return the results of each request
+     */
+    private LinkedList<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
+        LinkedList<RequestResult> results = new LinkedList<>();
+        LinkedList<Future> futures = new LinkedList<>();
+
+        // Start all requests in the ThreadPool
+        for (ReadyRequest request : requests) {
+            futures.add(Executor.futureCallable(getRequestCallable(request.getRequest())));
+        }
+
+        Logger.d(TAG, "Request Futures: %s", futures.size());
+
+        // Get results of futures
+        // - Wait up to 5 seconds for the request
+        for (int i = 0; i < futures.size(); i++) {
+            int code = -1;
+
+            try {
+                code = (int) futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Request Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Request Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Request Future had a timeout: %s", te.getMessage());
+            }
+
+            if (requests.get(i).isOversize()) {
+                results.add(new RequestResult(true, requests.get(i).getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
+            }
+        }
+
+        requests = null;
+        futures = null;
+
+        return results;
+    }
+
+    /**
+     * Asynchronously removes all the marked
+     * event ids from successfully sent events.
+     *
+     * NOTE: If events fail to be removed they
+     * will be double sent.  At small levels this
+     * should not be an issue as we can de-dupe later.
+     *
+     * @param eventIds the events ids to remove
+     * @return a list of booleans
+     */
+    private LinkedList<Boolean> performAsyncEventRemoval(LinkedList<Long> eventIds) {
+        LinkedList<Boolean> results = new LinkedList<>();
+        LinkedList<Future> futures = new LinkedList<>();
+
+        // Start all requests in the ThreadPool
+        for (Long id : eventIds) {
+            futures.add(Executor.futureCallable(getRemoveCallable(id)));
+        }
+
+        Logger.d(TAG, "Removal Futures: %s", futures.size());
+
+        // Get results of futures
+        for (int i = 0; i < futures.size(); i++) {
+            boolean result = false;
+            try {
+                result = (boolean) futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Removal Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Removal Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Removal Future had a timeout: %s", te.getMessage());
+            }
+            results.add(result);
+        }
+
+        eventIds = null;
+        futures = null;
+
+        return results;
+    }
+
+    /**
+     * Returns a Callable Request Send
+     *
+     * @param request the request to be
+     *                sent
+     * @return the new Callable object
+     */
+    private Callable<Integer> getRequestCallable(final Request request) {
+        return new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return requestSender(request);
+            }
+        };
+    }
+
+    /**
+     * Returns a Callable Event Removal
+     *
+     * @param eventId the eventId to
+     *                remove
+     * @return the new Callable object
+     */
+    private Callable<Boolean> getRemoveCallable(final Long eventId) {
+        return new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return eventStore.removeEvent(eventId);
+            }
+        };
+    }
+
+    /**
+     * Resets the `isRunning` truth to false.
      */
     public void shutdown() {
         Logger.d(TAG, "Shutting down emitter.");
@@ -177,7 +303,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * @return the emitter event store
+     * @return the emitter event store object
      */
     public EventStore getEventStore() {
         return this.eventStore;
@@ -187,6 +313,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * @return the emitter status
      */
     public boolean getEmitterStatus() {
-        return isRunning.get() && Executor.status();
+        return isRunning.get();
     }
 }

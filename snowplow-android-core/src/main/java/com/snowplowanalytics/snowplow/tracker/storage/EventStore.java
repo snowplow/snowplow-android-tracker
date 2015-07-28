@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,9 +30,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 
 /**
  * Helper class for storing, getting and removing
@@ -80,14 +81,12 @@ public class EventStore {
     /**
      * Opens a new writable database if it
      * is currently closed.
-     *
-     * @return success or failure to open
      */
-    public boolean open() {
+    public void open() {
         if (!isDatabaseOpen()) {
             database = dbHelper.getWritableDatabase();
+            database.enableWriteAheadLogging();
         }
-        return database != null;
     }
 
     /**
@@ -105,8 +104,9 @@ public class EventStore {
      * @return a boolean stating if the insert
      * was a success or not
      */
+    @SuppressWarnings("unchecked")
     public long insertEvent(Payload payload) {
-        if (open()) {
+        if (isDatabaseOpen()) {
             byte[] bytes = EventStore.serialize(payload.getMap());
             ContentValues values = new ContentValues(2);
             values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes);
@@ -124,7 +124,7 @@ public class EventStore {
      */
     public boolean removeEvent(long id) {
         int retval = -1;
-        if (open()) {
+        if (isDatabaseOpen()) {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS,
                     EventStoreHelper.COLUMN_ID + "=" + id, null);
         }
@@ -139,7 +139,7 @@ public class EventStore {
      */
     public boolean removeAllEvents() {
         int retval = -1;
-        if (open()) {
+        if (isDatabaseOpen()) {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
         }
         Logger.d(TAG, "Removing all events from database.");
@@ -196,12 +196,13 @@ public class EventStore {
      *
      * @param query the query to be passed against
      *              the database
+     * @param orderBy what to order the query by
      * @return the list of events that satisfied
      * the query
      */
     public List<Map<String, Object>> queryDatabase(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
-        if (open()) {
+        if (isDatabaseOpen()) {
             Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
                     null, null, null, orderBy);
 
@@ -277,8 +278,8 @@ public class EventStore {
     }
 
     /**
-     * Returns a Map<String, String> containing the
-     * event payload values, the table row ID and
+     * Returns a Map containing the event 
+     * payload values, the table row ID and
      * the date it was created.
      *
      * @param id the row id of the event to get
@@ -322,9 +323,6 @@ public class EventStore {
      * @return a boolean for database status
      */
     public boolean isDatabaseOpen() {
-        if (database == null) {
-            return false;
-        }
-        return database.isOpen();
+        return database != null && database.isOpen();
     }
 }

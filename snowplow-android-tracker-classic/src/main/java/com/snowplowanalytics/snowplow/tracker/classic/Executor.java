@@ -13,9 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker.classic;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 /**
  * Static Class which holds the logic for controlling
@@ -23,7 +24,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class Executor {
 
-    private static ScheduledExecutorService executor;
+    private static ExecutorService executor;
+    private static int threadCount = 2; // Minimum amount of threads.
 
     /**
      * If the executor is null creates a
@@ -31,10 +33,10 @@ public class Executor {
      *
      * @return the executor
      */
-    private static ScheduledExecutorService getExecutor() {
+    private static ExecutorService getExecutor() {
         synchronized (Executor.class) {
             if (executor == null) {
-                executor = Executors.newScheduledThreadPool(10);
+                executor = Executors.newScheduledThreadPool(threadCount);
             }
         }
         return executor;
@@ -50,16 +52,14 @@ public class Executor {
     }
 
     /**
-     * Schedules a runnable to run at some point in
-     * the future.
+     * Sends a callable to the executor service and
+     * returns a Future.
      *
-     * @param runnable the runnable to be queued
-     * @param delay the count of units to delay
-     *              execution by
-     * @param timeUnit the time unit for the delay
+     * @param callable the callable to be queued
+     * @return the future object to be queried
      */
-    public static void schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        getExecutor().schedule(runnable, delay, timeUnit);
+    public static Future futureCallable(Callable callable) {
+        return getExecutor().submit(callable);
     }
 
     /**
@@ -76,13 +76,23 @@ public class Executor {
     /**
      * Returns the status of the executor.
      *
-     * @return if the executor is active
+     * @return executor is alive or not
      */
     public static boolean status() {
-        if (executor == null || executor.isShutdown()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(executor == null || executor.isShutdown());
+    }
+
+    /**
+     * Changes the amount of threads the
+     * scheduler will be able to use.
+     *
+     * NOTE: This can only be set before the
+     * scheduler is first accessed, after this
+     * point the function will not effect anything.
+     *
+     * @param count the thread count
+     */
+    public static void setThreadCount(final int count) {
+        threadCount = count;
     }
 }

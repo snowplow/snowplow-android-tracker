@@ -11,19 +11,14 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * RequestSecurity is used to set the protocol used for sending Requests.
- * Either HTTP or HTTPS.
+ * Interface for all Emitter Callbacks
  */
-public enum RequestSecurity {
-    /**
-     * Events are sent without security.
-     */
-    HTTP,
-    /**
-     * Events are sent with added security.
-     */
-    HTTPS,
+public interface RequestCallback {
+
+    void onSuccess(int successCount);
+
+    void onFailure(int successCount, int failureCount);
 }

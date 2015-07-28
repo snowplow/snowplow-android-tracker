@@ -11,16 +11,14 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.test.AndroidTestCase;
 
 import java.util.Map;
 
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.TrackerPayload;
-
-import junit.framework.Assert;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class EventStoreTest extends AndroidTestCase {
 
@@ -51,7 +49,7 @@ public class EventStoreTest extends AndroidTestCase {
         Map<String, Object> event = eventStore.getEvent(id);
 
         assertEquals(id, lastRowId);
-        Assert.assertEquals(1, eventStore.getSize());
+        assertEquals(1, eventStore.getSize());
         assertNotNull(event);
     }
 
@@ -59,8 +57,8 @@ public class EventStoreTest extends AndroidTestCase {
         EventStore eventStore = getEventStore();
         eventStore.insertEvent(getEvent());
 
-        Assert.assertEquals(1, eventStore.getAllEvents().size());
-        Assert.assertEquals(1, eventStore.getDescEventsInRange(1).size());
+        assertEquals(1, eventStore.getAllEvents().size());
+        assertEquals(1, eventStore.getDescEventsInRange(1).size());
     }
 
     public void testRemoveAllEvents() {
@@ -74,11 +72,11 @@ public class EventStoreTest extends AndroidTestCase {
         eventStore.insertEvent(getEvent());
         eventStore.insertEvent(getEvent());
 
-        Assert.assertEquals(6, eventStore.getSize());
+        assertEquals(6, eventStore.getSize());
 
         eventStore.removeAllEvents();
 
-        Assert.assertEquals(0, eventStore.getSize());
+        assertEquals(0, eventStore.getSize());
     }
 
     public void testRemoveIndividualEvent() {
@@ -86,17 +84,17 @@ public class EventStoreTest extends AndroidTestCase {
         long id = eventStore.insertEvent(getEvent());
         boolean res = eventStore.removeEvent(id);
 
-        Assert.assertEquals(0, eventStore.getSize());
+        assertEquals(0, eventStore.getSize());
         assertEquals(true, res);
     }
 
     public void testCloseDatabase() {
         EventStore eventStore = getEventStore();
 
-        Assert.assertEquals(true, eventStore.isDatabaseOpen());
+        assertEquals(true, eventStore.isDatabaseOpen());
 
         eventStore.close();
 
-        Assert.assertEquals(false, eventStore.isDatabaseOpen());
+        assertEquals(false, eventStore.isDatabaseOpen());
     }
 }

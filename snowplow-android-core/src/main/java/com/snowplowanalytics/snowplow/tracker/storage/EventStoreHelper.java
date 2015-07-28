@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -51,6 +51,9 @@ public class EventStoreHelper extends SQLiteOpenHelper {
      * Use the application context, which will ensure that you
      * don't accidentally leak an Activity's context.
      * See this article for more information: http://bit.ly/6LRzfx
+     *
+     * @param context the android context
+     * @return the EventStoreHelper instance
      */
     public static EventStoreHelper getInstance(Context context) {
         if (sInstance == null) {
@@ -59,6 +62,9 @@ public class EventStoreHelper extends SQLiteOpenHelper {
         return sInstance;
     }
 
+    /**
+     * @param context the android context
+     */
     private EventStoreHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

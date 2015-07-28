@@ -13,16 +13,15 @@
 
 package com.snowplowanalytics.snowplow.tracker.classic;
 
-import com.snowplowanalytics.snowplow.tracker.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
-
-import com.snowplowanalytics.snowplow.tracker.classic.utils.LogFetcher;
 
 public class EventSendingTest extends SnowplowClassicTestCase {
 
     public void testSendGet() throws Exception {
+
         setup();
 
         // Setup the Tracker
@@ -38,16 +37,35 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(15000);
+        // Wait for emitter to start
+        int counter = 0;
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
 
-        tracker.getEmitter().flush();
+        // Wait for emitter to end
+        counter = 0;
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        Thread.sleep(500);
 
-        Thread.sleep(5000);
-
-        checkGetRequest(LogFetcher.getMountebankGetRequests());
+        checkGetRequest(getRequests(28));
+        tracker.pauseEventTracking();
+        Executor.shutdown();
+        tearDown();
     }
 
     public void testSendPost() throws Exception {
+
         setup();
 
         // Setup the Tracker
@@ -63,12 +81,30 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        Thread.sleep(15000);
+        // Wait for emitter to start
+        int counter = 0;
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
 
-        tracker.getEmitter().flush();
+        // Wait for emitter to end
+        counter = 0;
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        Thread.sleep(500);
 
-        Thread.sleep(5000);
-
-        checkPostRequest(LogFetcher.getMountebankPostRequests());
+        checkPostRequest(getRequests(28));
+        tracker.pauseEventTracking();
+        Executor.shutdown();
+        tearDown();
     }
 }

@@ -13,10 +13,19 @@
 
 package com.snowplowanalytics.snowplow.tracker.classic;
 
-import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.Session;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
+import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
-import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Builds a Tracker object which is used to
@@ -25,75 +34,102 @@ import java.util.List;
 public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
+    private static ScheduledExecutorService sessionExecutor;
 
+    /**
+     * Constructs a Tracker object.
+     *
+     * @param builder the base tracker builder
+     */
     public Tracker(TrackerBuilder builder) {
         super(builder);
+
+        // Set the thread count
+        Executor.setThreadCount(this.threadCount);
+
+        // Start Checking Sessions
+        resumeSessionChecking();
+    }
+
+    /**
+     * Starts a polling session checker to
+     * run at a defined interval.
+     */
+    public void resumeSessionChecking() {
+        if (sessionExecutor == null && this.sessionContext) {
+            Logger.d(TAG, "Session checking has been resumed.");
+            final Session session = this.trackerSession;
+            sessionExecutor = Executors.newSingleThreadScheduledExecutor();
+            sessionExecutor.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    session.checkAndUpdateSession();
+                }
+            }, this.sessionCheckInterval, this.sessionCheckInterval, this.timeUnit);
+        }
+    }
+
+    /**
+     * Ends the polling session checker.
+     */
+    public void pauseSessionChecking() {
+        if (sessionExecutor != null) {
+            Logger.d(TAG, "Session checking has been paused.");
+            sessionExecutor.shutdown();
+            sessionExecutor = null;
+        }
     }
 
     @Override
-    public void trackPageView(final String pageUrl, final String pageTitle, final String referrer,
-                              final List<SelfDescribingJson> context, final long timestamp) {
+    public void track(final PageView event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackPageView(pageUrl, pageTitle, referrer, context, timestamp);
+                Tracker.super.track(event);
             }
         });
     }
 
     @Override
-    public void trackStructuredEvent(final String category, final String action, final String label,
-                                     final String property, final Double value,
-                                     final List<SelfDescribingJson> context, final long timestamp) {
+    public void track(final Structured event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackStructuredEvent(category, action, label, property, value, context, timestamp);
+                Tracker.super.track(event);
             }
         });
     }
 
     @Override
-    public void trackUnstructuredEvent(final SelfDescribingJson eventData,
-                                       final List<SelfDescribingJson> context, final long timestamp) {
+    public void track(final Unstructured event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackUnstructuredEvent(eventData, context, timestamp);
+                Tracker.super.track(event);
             }
         });
     }
 
     @Override
-    public void trackEcommerceTransaction(final String order_id, final Double total_value, final String affiliation,
-                                          final Double tax_value, final Double shipping, final String city,
-                                          final String state, final String country, final String currency,
-                                          final List<TransactionItem> items, final List<SelfDescribingJson> context,
-                                          final long timestamp) {
+    public void track(final EcommerceTransaction event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackEcommerceTransaction(order_id, total_value, affiliation,
-                        tax_value, shipping, city, state, country, currency, items, context,
-                        timestamp);
+                Tracker.super.track(event);
             }
         });
     }
 
     @Override
-    public void trackScreenView(final String name, final String id, final List<SelfDescribingJson> context,
-                                final long timestamp) {
+    public void track(final ScreenView event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackScreenView(name, id, context, timestamp);
+                Tracker.super.track(event);
             }
         });
     }
 
     @Override
-    public void trackTimingWithCategory(final String category, final String variable, final int timing,
-                                        final String label, final List<SelfDescribingJson> context,
-                                        final long timestamp) {
+    public void track(final TimingWithCategory event) {
         Executor.execute(new Runnable() {
             public void run() {
-                Tracker.super.trackTimingWithCategory(category, variable, timing, label, context,
-                        timestamp);
+                Tracker.super.track(event);
             }
         });
     }

@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+
 public class TestEmitter extends Emitter {
 
     protected TestEmitter(Emitter.EmitterBuilder builder) {

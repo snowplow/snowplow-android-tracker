@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.tracker.payload;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ public interface Payload {
      * @param key The parameter key
      * @param value The parameter value as a String
      */
-    public void add(String key, String value);
+    void add(String key, String value);
 
     /**
      * Add a basic parameter.
@@ -39,7 +39,7 @@ public interface Payload {
      * @param key The parameter key
      * @param value The parameter value
      */
-    public void add(String key, Object value);
+    void add(String key, Object value);
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to that of calling
@@ -47,7 +47,7 @@ public interface Payload {
      *
      * @param map Mappings to be stored in this map
      */
-    public void addMap(Map<String, Object> map);
+    void addMap(Map<String, Object> map);
 
     /**
      * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
@@ -58,14 +58,14 @@ public interface Payload {
      * @param type_encoded The key that would be set if the encoding option was set to true
      * @param type_no_encoded They key that would be set if the encoding option was set to false
      */
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
+    void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
 
     /**
      * Returns the Payload as a HashMap.
      *
      * @return A HashMap
      */
-    public Map getMap();
+    Map getMap();
 
     /**
      * Returns the Payload as a string. This is essentially the toString from the ObjectNode used
@@ -73,12 +73,12 @@ public interface Payload {
      *
      * @return A string value of the Payload.
      */
-    public String toString();
+    String toString();
 
     /**
      * Returns the byte size of a payload.
      *
      * @return A long representing the byte size of the payload.
      */
-    public long getByteSize();
+    long getByteSize();
 }

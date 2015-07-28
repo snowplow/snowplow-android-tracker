@@ -23,17 +23,20 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -78,6 +81,7 @@ public class Util {
      *  @param map The map to convert
      *  @return The JSONObject
      */
+    @SuppressWarnings("unchecked")
     public static JSONObject mapToJSONObject(Map map) {
         Logger.v(TAG, "Converting a map to a JSONObject: %s", map);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -182,6 +186,9 @@ public class Util {
      * Checks whether or not the device
      * is online and able to communicate
      * with the outside world.
+     *
+     * @param context the android context
+     * @return whether the tracker is online
      */
     public static boolean isOnline(Context context) {
 
@@ -220,22 +227,6 @@ public class Util {
                     e.toString(), e.getCause().toString());
             return null;
         }
-    }
-
-    /**
-     * Returns a Callable String which when executed will
-     * attempt to get the Advertising ID.
-     *
-     * @param context the android context
-     * @return a callable string
-     */
-    private static Callable<String> getAdvertisingIdCallable(final Context context) {
-        return new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return getAdvertisingId(context);
-            }
-        };
     }
 
     /**
@@ -332,9 +323,30 @@ public class Util {
      * @return the result of the method invoke
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     private static Object invokeMethod(Class classObject, String methodName, Object instance,
                                 Class[] cArgs, Object... args) throws Exception {
         Method methodObject = classObject.getMethod(methodName, cArgs);
         return methodObject.invoke(instance, args);
+    }
+
+    /**
+     * The startTime must be greater than the endTime minus the
+     * interval to be within an acceptable range.
+     *
+     * Example:
+     * - Start Time = 1425060000000 // Fri, 27 Feb 2015 18:00:00 GMT
+     * - Check Time = 1425060300000 // Fri, 27 Feb 2015 18:05:00 GMT
+     * - Range = 600000 // 10 minutes
+     *
+     * If the start time is greater than 17:55:00 then it is in range.
+     *
+     * @param startTime the startTime of the check
+     * @param checkTime the time of the check
+     * @param range the allowed range the startTime must be in
+     * @return whether the time is in range or not
+     */
+    public static boolean isTimeInRange(long startTime, long checkTime, long range) {
+        return startTime > (checkTime - range);
     }
 }

@@ -22,7 +22,7 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.TextView;
 
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 /**
@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RxDemo.class);
                 startActivity(intent);
-                Logger.updateLogLevel(LogLevel.VERBOSE);
+                Logger.updateLogLevel(LogLevel.DEBUG);
             }
         });
 
@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ClassicDemo.class);
                 startActivity(intent);
-                Logger.updateLogLevel(LogLevel.VERBOSE);
+                Logger.updateLogLevel(LogLevel.DEBUG);
             }
         });
 

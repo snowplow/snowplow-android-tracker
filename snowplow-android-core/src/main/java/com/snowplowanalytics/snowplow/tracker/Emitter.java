@@ -18,10 +18,17 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import com.squareup.okhttp.MediaType;
@@ -34,9 +41,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Build an emitter object which controls the
@@ -59,10 +67,14 @@ public abstract class Emitter {
     protected int sendLimit;
     protected long byteLimitGet;
     protected long byteLimitPost;
+    protected TimeUnit timeUnit;
+
+    protected AtomicBoolean isRunning = new AtomicBoolean(false);
 
     /**
      * Builder for the Emitter.
      */
+    @SuppressWarnings("unchecked")
     public static class EmitterBuilder {
 
         protected static Class<? extends Emitter> defaultEmitterClass;
@@ -92,9 +104,11 @@ public abstract class Emitter {
         protected int emptyLimit = 5; // Optional
         protected long byteLimitGet = 40000; // Optional
         protected long byteLimitPost = 40000; // Optional
+        protected TimeUnit timeUnit = TimeUnit.SECONDS;
 
         /**
          * @param uri The uri of the collector
+         * @param context the android context
          */
         public EmitterBuilder(String uri, Context context) {
             this(uri, context, defaultEmitterClass);
@@ -114,6 +128,7 @@ public abstract class Emitter {
 
         /**
          * @param httpMethod The method by which requests are emitted
+         * @return itself
          */
         public EmitterBuilder method(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
@@ -122,6 +137,7 @@ public abstract class Emitter {
 
         /**
          * @param option the buffer option for the emitter
+         * @return itself
          */
         public EmitterBuilder option(BufferOption option) {
             this.bufferOption = option;
@@ -130,6 +146,7 @@ public abstract class Emitter {
 
         /**
          * @param requestSecurity the security chosen for requests
+         * @return itself
          */
         public EmitterBuilder security(RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
@@ -138,6 +155,7 @@ public abstract class Emitter {
 
         /**
          * @param requestCallback Request callback function
+         * @return itself
          */
         public EmitterBuilder callback(RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
@@ -146,6 +164,7 @@ public abstract class Emitter {
 
         /**
          * @param emitterTick The tick count between emitter attempts
+         * @return itself
          */
         public EmitterBuilder tick(int emitterTick) {
             this.emitterTick = emitterTick;
@@ -154,6 +173,7 @@ public abstract class Emitter {
 
         /**
          * @param sendLimit The maximum amount of events to grab for an emit attempt
+         * @return itself
          */
         public EmitterBuilder sendLimit(int sendLimit) {
             this.sendLimit = sendLimit;
@@ -163,6 +183,7 @@ public abstract class Emitter {
         /**
          * @param emptyLimit The amount of emitter ticks that are performed before we shut down
          *                   due to the database being empty.
+         * @return itself
          */
         public EmitterBuilder emptyLimit(int emptyLimit) {
             this.emptyLimit = emptyLimit;
@@ -172,6 +193,7 @@ public abstract class Emitter {
         /**
          * @param byteLimitGet The maximum amount of bytes allowed to be sent in a payload
          *                     in a GET request.
+         * @return itself
          */
         public EmitterBuilder byteLimitGet(long byteLimitGet) {
             this.byteLimitGet = byteLimitGet;
@@ -181,6 +203,7 @@ public abstract class Emitter {
         /**
          * @param byteLimitPost The maximum amount of bytes allowed to be sent in a payload
          *                      in a POST request.
+         * @return itself
          */
         public EmitterBuilder byteLimitPost(long byteLimitPost) {
             this.byteLimitPost = byteLimitPost;
@@ -188,6 +211,17 @@ public abstract class Emitter {
         }
 
         /**
+         * @param timeUnit a valid TimeUnit
+         * @return itself
+         */
+        public EmitterBuilder timeUnit(TimeUnit timeUnit) {
+            this.timeUnit = timeUnit;
+            return this;
+        }
+
+        /**
+         * Builds a new Emitter object
+         *
          * @return a new Emitter object
          */
         public Emitter build() {
@@ -213,6 +247,7 @@ public abstract class Emitter {
 
     /**
      * Creates an emitter object
+     *
      * @param builder The builder that constructs an emitter
      */
     public Emitter(EmitterBuilder builder) {
@@ -227,7 +262,11 @@ public abstract class Emitter {
         this.byteLimitGet = builder.byteLimitGet;
         this.byteLimitPost = builder.byteLimitPost;
         this.uri = builder.uri;
+        this.timeUnit = builder.timeUnit;
         buildEmitterUri();
+
+        client.setConnectTimeout(15, TimeUnit.SECONDS); // connect timeout
+        client.setReadTimeout(15, TimeUnit.SECONDS);    // socket timeout
 
         Logger.v(TAG, "Emitter created successfully!");
     }
@@ -268,128 +307,20 @@ public abstract class Emitter {
     public abstract void flush();
 
     /**
-     * Synchronously performs a request sending
-     * operation for either GET or POST.
+     * Performs a synchronous sending of a list of
+     * ReadyRequests.
      *
-     * @param events the events to be sent
-     * @return a RequestResult
+     * @param requests the requests to send
+     * @return the request results.
      */
-    protected LinkedList<RequestResult> performEmit(EmittableEvents events) {
-
-        int payloadCount = events.getEvents().size();
-        LinkedList<Long> eventIds = events.getEventIds();
+    protected LinkedList<RequestResult> performSyncEmit(LinkedList<ReadyRequest> requests) {
         LinkedList<RequestResult> results = new LinkedList<>();
-
-        if (httpMethod == HttpMethod.GET) {
-
-            Logger.v(TAG, "Sending events with GET requests: count %s", payloadCount);
-
-            for (int i = 0; i < payloadCount; i++) {
-
-                // Get the eventId for this request
-                LinkedList<Long> reqEventId = new LinkedList<>();
-                reqEventId.add(eventIds.get(i));
-
-                // Build and send the request
-                Payload payload = events.getEvents().get(i);
-                addStmToEvent(payload, "");
-                Request req = requestBuilderGet(payload);
-                int code = requestSender(req);
-
-                // If the payload is too large we will attempt to send anyway
-                // but will not re-attempt.
-                long payloadByteSize = payload.getByteSize();
-
-                if (payloadByteSize > byteLimitGet) {
-                    Logger.d(TAG, "Over-sized GET request - result: %s", "" + code);
-                    code = 200;
-                }
-                else {
-                    Logger.d(TAG, "GET request - result: %s", "" + code);
-                }
-                Logger.d(TAG, "GET request - byte-size: %s", payloadByteSize);
-
-                results.add(new RequestResult(isSuccessfulSend(code), reqEventId));
-            }
-        }
-        else {
-
-            Logger.v(TAG, "Sending events with POST requests: count %s", payloadCount);
-
-            for (int i = 0; i < payloadCount; i += bufferOption.getCode()) {
-
-                String timestamp = Util.getTimestamp();
-
-                // Collections for Multi-Event Posts
-                LinkedList<Long> reqEventIds = new LinkedList<>();
-                ArrayList<Map> postPayloadMaps = new ArrayList<>();
-
-                // Keep record of total byte size
-                long totalByteSize = 0;
-
-                for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
-
-                    Payload payload = events.getEvents().get(j);
-                    addStmToEvent(payload, timestamp);
-                    long payloadByteSize = payload.getByteSize();
-
-                    if (payloadByteSize > byteLimitPost) {
-
-                        // Add needed information to collections
-                        ArrayList<Map> singlePayloadMap = new ArrayList<>();
-                        LinkedList<Long> reqEventId = new LinkedList<>();
-
-                        // Update the sent time
-                        addStmToEvent(payload, Util.getTimestamp());
-
-                        singlePayloadMap.add(payload.getMap());
-                        reqEventId.add(eventIds.get(j));
-
-                        // Build and send request
-                        int code = buildAndSendPost(singlePayloadMap);
-
-                        Logger.d(TAG, "Over-sized POST request - result: %s", "" + code);
-                        Logger.d(TAG, "Over-sized POST request - byte-size: %s", payloadByteSize);
-
-                        // Add successful send
-                        results.add(new RequestResult(true, reqEventId));
-                    }
-                    else if (totalByteSize + payloadByteSize > byteLimitPost) {
-                        // Build and send request
-                        int code = buildAndSendPost(postPayloadMaps);
-
-                        Logger.d(TAG, "POST request - result: %s", "" + code);
-                        Logger.d(TAG, "POST request - byte-size: %s", totalByteSize);
-
-                        // Add result
-                        results.add(new RequestResult(isSuccessfulSend(code), reqEventIds));
-
-                        // Clear collections and add new event
-                        postPayloadMaps = new ArrayList<>();
-                        reqEventIds = new LinkedList<>();
-
-                        // Update the sent time
-                        timestamp = Util.getTimestamp();
-                        addStmToEvent(payload, timestamp);
-
-                        postPayloadMaps.add(payload.getMap());
-                        reqEventIds.add(eventIds.get(j));
-                        totalByteSize = payloadByteSize;
-                    }
-                    else {
-                        totalByteSize += payloadByteSize;
-                        postPayloadMaps.add(payload.getMap());
-                        reqEventIds.add(eventIds.get(j));
-                    }
-                }
-
-                if (!postPayloadMaps.isEmpty()) {
-                    int code = buildAndSendPost(postPayloadMaps);
-                    results.add(new RequestResult(isSuccessfulSend(code), reqEventIds));
-
-                    Logger.d(TAG, "POST request - result: %s", "" + code);
-                    Logger.d(TAG, "POST request - byte-size: %s", totalByteSize);
-                }
+        for (ReadyRequest request : requests) {
+            int code = requestSender(request.getRequest());
+            if (request.isOversize()) {
+                results.add(new RequestResult(true, request.getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), request.getEventIds()));
             }
         }
         return results;
@@ -402,9 +333,9 @@ public abstract class Emitter {
      * @param request The request to be sent
      * @return a RequestResult
      */
-    private int requestSender(Request request) {
+    protected int requestSender(Request request) {
         try {
-            Logger.v(TAG, "Sending request: %s", request);
+            Logger.d(TAG, "Sending request: %s", request);
             return client.newCall(request).execute().code();
         } catch (IOException e) {
             Logger.e(TAG, "Request sending failed: %s", e.toString());
@@ -413,17 +344,92 @@ public abstract class Emitter {
     }
 
     /**
-     * Builds and sends the POST event
-     * to the configured collector.
+     * Returns a list of ReadyRequests which can
+     * all be sent regardless of if it is GET or POST.
+     * - Checks if the event is over-sized.
+     * - Stores all of the relevant event ids.
      *
-     * @param payload The payload to be sent
-     * @return the response code
+     * @param events a list of EmittableEvents pulled
+     *               from the database.
+     * @return a list of ready to send requests
      */
-    private int buildAndSendPost(ArrayList<Map> payload) {
-        SelfDescribingJson postPayload =
-                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payload);
-        Request req = requestBuilderPost(postPayload);
-        return requestSender(req);
+    protected LinkedList<ReadyRequest> buildRequests(EmittableEvents events) {
+
+        int payloadCount = events.getEvents().size();
+        LinkedList<Long> eventIds = events.getEventIds();
+        LinkedList<ReadyRequest> requests = new LinkedList<>();
+
+        if (httpMethod == HttpMethod.GET) {
+            for (int i = 0; i < payloadCount; i++) {
+
+                // Get the eventId for this request
+                LinkedList<Long> reqEventId = new LinkedList<>();
+                reqEventId.add(eventIds.get(i));
+
+                // Build and store the request
+                Payload payload = events.getEvents().get(i);
+                addStmToEvent(payload, "");
+                boolean oversize = payload.getByteSize() > byteLimitGet;
+                Request request = requestBuilderGet(payload);
+                requests.add(new ReadyRequest(oversize, request, reqEventId));
+            }
+        } else {
+            for (int i = 0; i < payloadCount; i += bufferOption.getCode()) {
+
+                // Get STM Timestamp
+                String timestamp = Util.getTimestamp();
+
+                // Collections
+                LinkedList<Long> reqEventIds = new LinkedList<>();
+                ArrayList<Map> postPayloadMaps = new ArrayList<>();
+                long totalByteSize = 0;
+
+                for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
+                    Payload payload = events.getEvents().get(j);
+                    addStmToEvent(payload, timestamp);
+                    long payloadByteSize = payload.getByteSize();
+
+                    if (payloadByteSize > byteLimitPost) {
+                        ArrayList<Map> singlePayloadMap = new ArrayList<>();
+                        LinkedList<Long> reqEventId = new LinkedList<>();
+
+                        // Build and store the request
+                        addStmToEvent(payload, "");
+                        singlePayloadMap.add(payload.getMap());
+                        reqEventId.add(eventIds.get(j));
+                        Request request = requestBuilderPost(singlePayloadMap);
+                        requests.add(new ReadyRequest(true, request, reqEventId));
+                    }
+                    else if (totalByteSize + payloadByteSize > byteLimitPost) {
+                        Request request = requestBuilderPost(postPayloadMaps);
+                        requests.add(new ReadyRequest(false, request, reqEventIds));
+
+                        // Clear collections and build a new POST
+                        postPayloadMaps = new ArrayList<>();
+                        reqEventIds = new LinkedList<>();
+
+                        // Build and store the request
+                        timestamp = Util.getTimestamp();
+                        addStmToEvent(payload, timestamp);
+                        postPayloadMaps.add(payload.getMap());
+                        reqEventIds.add(eventIds.get(j));
+                        totalByteSize = payloadByteSize;
+                    }
+                    else {
+                        totalByteSize += payloadByteSize;
+                        postPayloadMaps.add(payload.getMap());
+                        reqEventIds.add(eventIds.get(j));
+                    }
+                }
+
+                // Check if all payloads have been processed
+                if (!postPayloadMaps.isEmpty()) {
+                    Request request = requestBuilderPost(postPayloadMaps);
+                    requests.add(new ReadyRequest(false, request, reqEventIds));
+                }
+            }
+        }
+        return requests;
     }
 
     // Request Builders
@@ -443,10 +449,8 @@ public abstract class Emitter {
 
         // Build the request query
         HashMap hashMap = (HashMap) payload.getMap();
-        Iterator<String> iterator = hashMap.keySet().iterator();
 
-        while (iterator.hasNext()) {
-            String key = iterator.next();
+        for (String key : (Iterable<String>) hashMap.keySet()) {
             String value = (String) hashMap.get(key);
             uriBuilder.appendQueryParameter(key, value);
         }
@@ -466,9 +470,11 @@ public abstract class Emitter {
      *                request.
      * @return an OkHttp request object
      */
-    private Request requestBuilderPost(Payload payload) {
+    private Request requestBuilderPost(ArrayList<Map> payload) {
+        SelfDescribingJson postPayload =
+                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payload);
         String reqUrl = uriBuilder.build().toString();
-        RequestBody reqBody = RequestBody.create(JSON, payload.toString());
+        RequestBody reqBody = RequestBody.create(JSON, postPayload.toString());
         return new Request.Builder()
                 .url(reqUrl)
                 .post(reqBody)
@@ -513,44 +519,49 @@ public abstract class Emitter {
     /**
      * Sets whether the buffer should send events instantly or after the buffer has reached
      * it's limit. By default, this is set to BufferOption Default.
+     *
      * @param option Set the BufferOption enum to Instant send events upon creation.
      */
     public void setBufferOption(BufferOption option) {
-        this.bufferOption = option;
+        if (!isRunning.get()) {
+            this.bufferOption = option;
+        }
     }
 
     /**
      * Sets the HttpMethod for the Emitter
+     *
      * @param method the HttpMethod
      */
     public void setHttpMethod(HttpMethod method) {
-        this.httpMethod = method;
-        buildEmitterUri();
+        if (!isRunning.get()) {
+            this.httpMethod = method;
+            buildEmitterUri();
+        }
     }
 
     /**
      * Sets the RequestSecurity for the Emitter
+     *
      * @param security the RequestSecurity
      */
     public void setRequestSecurity(RequestSecurity security) {
-        this.requestSecurity = security;
-        buildEmitterUri();
+        if (!isRunning.get()) {
+            this.requestSecurity = security;
+            buildEmitterUri();
+        }
     }
 
     /**
      * Updates the URI for the Emitter
+     *
      * @param uri new Emitter URI
      */
     public void setEmitterUri(String uri) {
-        this.uri = uri;
-        buildEmitterUri();
-    }
-
-    /**
-     * @return the emitter context
-     */
-    public Context getEmitterContext() {
-        return this.context;
+        if (!isRunning.get()) {
+            this.uri = uri;
+            buildEmitterUri();
+        }
     }
 
     /**

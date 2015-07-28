@@ -15,31 +15,70 @@ package com.snowplowanalytics.snowplow.tracker.rx;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.events.TransactionItem;
-import com.snowplowanalytics.snowplow.tracker.utils.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
+import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import com.snowplowanalytics.snowplow.tracker.rx.utils.LogFetcher;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
+import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class SnowplowRxTestCase extends AndroidTestCase {
 
-    private static final String testURL = "10.0.2.2:4545";
+    // Mock Server
+
+    MockWebServer mockServer;
+
+    public void setupMockServer() throws IOException {
+        if (mockServer != null) {
+            mockServer.shutdown();
+        }
+        mockServer = new MockWebServer();
+        mockServer.play();
+    }
+
+    public String mockServerName() {
+        if (mockServer != null) {
+            return String.format("%s:%d", mockServer.getHostName(), mockServer.getPort());
+        }
+        return null;
+    }
+
+    public void enqueueResponses(int count) {
+        MockResponse mockResponse = new MockResponse().setResponseCode(200);
+        for (int i = 0; i < count; i++) {
+            mockServer.enqueue(mockResponse);
+        }
+    }
+
+    public void tearDown() throws IOException {
+        if (mockServer != null) {
+            mockServer.shutdown();
+            mockServer = null;
+        }
+    }
 
     // Tracker Builder
 
@@ -47,7 +86,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             com.snowplowanalytics.snowplow.tracker.Emitter emitter,
             Subject subject) {
         return new Tracker
-            .TrackerBuilder(emitter, "myNamespace", "myAppId")
+            .TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .subject(subject)
             .base64(false)
             .level(LogLevel.DEBUG)
@@ -57,7 +96,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
     public com.snowplowanalytics.snowplow.tracker.Emitter getEmitter(HttpMethod method,
                                                  BufferOption option, RequestSecurity security) {
         return new Emitter
-            .EmitterBuilder(testURL, getContext())
+            .EmitterBuilder(mockServerName(), getContext())
             .option(option)
             .method(method)
             .security(security)
@@ -83,51 +122,71 @@ public class SnowplowRxTestCase extends AndroidTestCase {
         return contexts;
     }
 
-
-    // Mountebank Setup/Helpers
+    // Setup/Helpers
 
     public void setup() throws Exception {
-        LogFetcher.deleteImposter();
-        LogFetcher.createImposter(getImposter());
-        Thread.sleep(1000);
+        setupMockServer();
+        enqueueResponses(28);
     }
 
-    private String getImposter() {
-        String file = "assets/imposters.json";
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);
-        Scanner s = new Scanner(in).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    public void checkLogs(LinkedList<JSONObject> requests, int eventCount) throws Exception {
-        assertEquals(eventCount, requests.size());
-        for (JSONObject request : requests) {
-            int code = request.getJSONObject("response").getInt("statusCode");
-            assertEquals(200, code);
+    /**
+     * Fetched N amount of requests from the Mock Web Server
+     *
+     * @param count the amount of requests to get
+     * @return the list of requests
+     * @throws Exception
+     */
+    public LinkedList<RecordedRequest> getRequests(int count) throws Exception {
+        LinkedList<RecordedRequest> requests = new LinkedList<>();
+        for (int i = 0; i < count; i++) {
+            requests.add(mockServer.takeRequest());
         }
+        return requests;
     }
 
-    public void checkGetRequest(LinkedList<JSONObject> requests) throws Exception {
+    /**
+     * Takes a query string and returns the name-value
+     * pairs in map form.
+     *
+     * @param query the query string
+     * @return the map of decoded query strings
+     * @throws Exception
+     */
+    public Map<String, String> getQueryMap(String query) throws Exception {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<String, String>();
+        for (String param : params) {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(URLDecoder.decode(name, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
+        }
+        return map;
+    }
+
+    // Event Validation
+
+    public void checkGetRequest(LinkedList<RecordedRequest> requests) throws Exception {
         assertEquals(28, requests.size());
-        for (JSONObject request : requests) {
-            JSONObject request1 = request.getJSONObject("request");
-            JSONObject query = request1.getJSONObject("query");
+        for (RecordedRequest request : requests) {
 
-            assertEquals("/i", request1.getString("path"));
-            assertEquals("GET", request1.getString("method"));
+            assertEquals("/i", request.getPath().substring(0, 2));
+            assertEquals("GET", request.getMethod());
 
-            assertEquals("mob", query.getString("p"));
-            assertEquals("myAppId", query.getString("aid"));
-            assertEquals("myNamespace", query.getString("tna"));
-            assertEquals("andr-0.4.0", query.getString("tv"));
-            assertEquals("English", query.getString("lang"));
+            JSONObject query = new JSONObject(getQueryMap(request.getPath().substring(3)));
+
+            assertEquals("mob", query.get("p"));
+            assertEquals("myAppId", query.get("aid"));
+            assertEquals("myNamespace", query.get("tna"));
+            assertEquals("andr-0.5.0", query.get("tv"));
+            assertEquals("English", query.get("lang"));
             assertTrue(query.has("dtm"));
             assertTrue(query.has("stm"));
             assertTrue(query.has("e"));
             assertTrue(query.has("co"));
             assertTrue(query.has("eid"));
 
-            String eventType = query.getString("e");
+            String eventType = query.get("e").toString();
+
             switch (eventType) {
                 case "pv" : checkPageView(query);
                     break;
@@ -144,15 +203,13 @@ public class SnowplowRxTestCase extends AndroidTestCase {
         }
     }
 
-    public void checkPostRequest(LinkedList<JSONObject> requests) throws Exception {
+    public void checkPostRequest(LinkedList<RecordedRequest> requests) throws Exception {
         assertEquals(28, requests.size());
-        for (JSONObject request : requests) {
-            JSONObject request1 = request.getJSONObject("request");
+        for (RecordedRequest request : requests) {
+            assertEquals("/com.snowplowanalytics.snowplow/tp2", request.getPath());
+            assertEquals("POST", request.getMethod());
 
-            assertEquals("/com.snowplowanalytics.snowplow/tp2", request1.getString("path"));
-            assertEquals("POST", request1.getString("method"));
-
-            JSONObject body = new JSONObject(request1.getString("body"));
+            JSONObject body = new JSONObject(request.getUtf8Body());
             assertEquals("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3", body.getString("schema"));
 
             JSONArray data = body.getJSONArray("data");
@@ -161,7 +218,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
                 assertEquals("mob", json.getString("p"));
                 assertEquals("myAppId", json.getString("aid"));
                 assertEquals("myNamespace", json.getString("tna"));
-                assertEquals("andr-0.4.0", json.getString("tv"));
+                assertEquals("andr-0.5.0", json.getString("tv"));
                 assertEquals("English", json.getString("lang"));
                 assertTrue(json.has("dtm"));
                 assertTrue(json.has("stm"));
@@ -258,50 +315,50 @@ public class SnowplowRxTestCase extends AndroidTestCase {
     // Event Tracker Functions
 
     public void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer");
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext());
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", (long) 1433791172);
-        tracker.trackPageView("pageUrl", "pageTitle", "pageReferrer", getCustomContext(), (long) 1433791172);
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").customContext(getCustomContext()).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00);
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext());
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, (long) 1433791172);
-        tracker.trackStructuredEvent("category", "action", "label", "property", 0.00, getCustomContext(), (long) 1433791172);
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).customContext(getCustomContext()).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackScreenView("screenName", "screenId");
-        tracker.trackScreenView("screenName", "screenId", getCustomContext());
-        tracker.trackScreenView("screenName", "screenId", (long) 1433791172);
-        tracker.trackScreenView("screenName", "screenId", getCustomContext(), (long) 1433791172);
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").customContext(getCustomContext()).build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).build());
+        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        tracker.trackTimingWithCategory("category", "variable", 1, "label");
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext());
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", (long) 1433791172);
-        tracker.trackTimingWithCategory("category", "variable", 1, "label", getCustomContext(), (long) 1433791172);
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
+        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
-        tracker.trackUnstructuredEvent(test);
-        tracker.trackUnstructuredEvent(test, getCustomContext());
-        tracker.trackUnstructuredEvent(test, (long) 1433791172);
-        tracker.trackUnstructuredEvent(test, getCustomContext(), (long) 1433791172);
+        tracker.track(Unstructured.builder().eventData(test).build());
+        tracker.track(Unstructured.builder().eventData(test).customContext(getCustomContext()).build());
+        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).build());
+        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) throws Exception {
-        TransactionItem item = new TransactionItem("item-1", "sku-1", 35.00, 1, "Acme 1", "Stuff", "AUD");
-        List<TransactionItem> items = new LinkedList<>();
+        EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
+        List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, getCustomContext());
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, (long) 1433791172);
-        tracker.trackEcommerceTransaction("order-1", 42.50, "affiliation", 2.50, 5.00, "Sydney", "NSW", "Australia", "AUD", items, getCustomContext(), (long) 1433791172);
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).customContext(getCustomContext()).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).timestamp((long) 1433791172).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 }

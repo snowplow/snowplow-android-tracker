@@ -1,6 +1,6 @@
 # Android Analytics for Snowplow
 
-[ ![Build Status] [travis-image] ] [travis]
+[ ![Build Status] [travis-image] ] [travis] [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
 
 ## Overview
 
@@ -27,7 +27,6 @@ guest$ ./gradlew clean build
 Continuing from the instructions above:
 
 ```bash
-guest$ mb &
 guest$ echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 guest$ emulator -avd test -no-skin -no-audio -no-window &
 guest$ chmod +x ./ci/wait_for_emulator
@@ -93,4 +92,8 @@ limitations under the License.
 [travis]: https://travis-ci.org/snowplow/snowplow-android-tracker
 [travis-image]: https://travis-ci.org/snowplow/snowplow-android-tracker.svg?branch=master
 
+[release-image]: http://img.shields.io/badge/release-0.5.0-blue.svg?style=flat
+[releases]: https://github.com/snowplow/snowplow-android-tracker/releases
+
+[license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0

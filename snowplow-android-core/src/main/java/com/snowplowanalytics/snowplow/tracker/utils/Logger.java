@@ -13,12 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.utils;
 
-import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import android.util.Log;
 
 /**
  * Custom logger class to easily manage debug mode and appending
- * of 'SnowplowTracker->' to the log TAG as well as logging the
+ * of 'SnowplowTracker' to the log TAG as well as logging the
  * Thread.
  */
 public class Logger {
@@ -26,7 +25,11 @@ public class Logger {
     private static int level = 0;
 
     /**
-     * Error logging
+     * Error Level Logging
+     *
+     * @param tag the log tag
+     * @param msg the log message
+     * @param args extra arguments to be formatted
      */
     public static void e(String tag, String msg, Object... args) {
         if (level >= 1) {
@@ -35,7 +38,11 @@ public class Logger {
     }
 
     /**
-     * Debug logging
+     * Debug Level Logging
+     *
+     * @param tag the log tag
+     * @param msg the log message
+     * @param args extra arguments to be formatted
      */
     public static void d(String tag, String msg, Object... args) {
         if (level >= 2) {
@@ -44,7 +51,11 @@ public class Logger {
     }
 
     /**
-     * Verbose logging
+     * Verbose Level Logging
+     *
+     * @param tag the log tag
+     * @param msg the log message
+     * @param args extra arguments to be formatted
      */
     public static void v(String tag, String msg, Object... args) {
         if (level >= 3) {
@@ -74,9 +85,10 @@ public class Logger {
     }
 
     /**
-     * Gets the current thread name.
+     * Returns the name of the current
+     * thread.
      *
-     * @return the thread name
+     * @return the threads name
      */
     private static String getThread() {
         return Thread.currentThread().getName();

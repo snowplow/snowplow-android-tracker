@@ -17,7 +17,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
-import android.os.Build;
 import android.os.Looper;
 import android.view.Display;
 import android.view.WindowManager;
@@ -71,6 +70,7 @@ public class Subject {
 
         /**
          * @param context The android context to pass to the subject
+         * @return itself
          */
         public SubjectBuilder context(Context context) {
             this.context = context;
@@ -79,6 +79,8 @@ public class Subject {
 
         /**
          * Creates a new Subject
+         *
+         * @return a new Subject object
          */
         public Subject build() {
             return new Subject(this);
@@ -178,10 +180,7 @@ public class Subject {
      * Sets the device vendor/manufacturer.
      */
     private void setDeviceVendor() {
-        String manufacturer = Build.MANUFACTURER;
-        if (!manufacturer.equals("unknown")) {
-            addToMobileContext(Parameters.DEVICE_MANUFACTURER, Build.MANUFACTURER);
-        }
+        addToMobileContext(Parameters.DEVICE_MANUFACTURER, android.os.Build.MANUFACTURER);
     }
 
     // Context information setters

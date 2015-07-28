@@ -13,53 +13,57 @@
 
 package com.snowplowanalytics.snowplow.tracker.rx;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeoutException;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscription;
 
-import com.snowplowanalytics.snowplow.tracker.Payload;
-import com.snowplowanalytics.snowplow.tracker.EventStore;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.utils.emitter.EmitterException;
-import com.snowplowanalytics.snowplow.tracker.utils.storage.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmitterException;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 
 /**
- * Build an emitter object which controls the
- * sending of events to the Snowplow Collector.
+ * Builds a Emitter object which is used to store events
+ * in a SQLite Database and to send events to a Snowplow
+ * Collector.
  */
 public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private final String TAG = Emitter.class.getSimpleName();
-    private final Scheduler scheduler = SchedulerRx.getScheduler();
     private int emptyCounter = 0;
     private Subscription emitterSub;
     private EventStore eventStore;
 
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-
+    /**
+     * Constructs the Emitter Object.
+     *
+     * @param builder the base emitter builder.
+     */
     public Emitter(EmitterBuilder builder) {
         super(builder);
 
         // Create the event store with the context and the buffer option
         this.eventStore = new EventStore(this.context, this.sendLimit);
-
-        // If the device is not online do not send anything!
-        if (eventStore.getSize() > 0) {
-            isRunning.compareAndSet(false, true);
-            start();
-        }
     }
 
     /**
-     * @param payload the payload to be added to
-     *                the EventStore
+     * Adds a payload to the EventStore and
+     * then attempts to start the emitter
+     * if it is not currently running.
+     *
+     * @param payload the event payload
+     *                to be added.
      */
     public void add(Payload payload) {
 
@@ -73,8 +77,8 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Starts the emitter if it is currently
-     * shutdown.
+     * Attempts to start the emitter if it
+     * is not currently running.
      */
     public void flush() {
         if (isRunning.compareAndSet(false, true)) {
@@ -95,20 +99,21 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *    we are online.
      */
     private void start() {
-        emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS)
+        emitterSub = Observable.interval(this.emitterTick, this.timeUnit, SchedulerRx.getScheduler())
             .map(tick -> doEmitterTick())
             .doOnError(err -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
             .retry()
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
+            .subscribeOn(SchedulerRx.getScheduler())
+            .unsubscribeOn(SchedulerRx.getScheduler())
             .doOnSubscribe(() -> Logger.d(TAG, "Emitter has been started."))
             .doOnUnsubscribe(() -> Logger.d(TAG, "Emitter has been shutdown."))
-            .flatMap(this::emitEvent)
+            .map(this::performAsyncEmit)
             .subscribe(this::processEmitterResults);
     }
 
     /**
-     * Shuts the emitter down!
+     * Un-subscribes from the polling emitter
+     * service and resets the isRunning truth.
      */
     public void shutdown() {
         if (emitterSub != null) {
@@ -119,10 +124,15 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * The logic controlling each emitter tick.
+     * Checks whether the application is
+     * online and whether or not there
+     * are any events to be sent.
      *
-     * @return an EmittableEvents object or
-     *         throw an Exception
+     * If there are no events after a
+     * configured amount of ticks the
+     * emitter is shutdown.
+     *
+     * @return an EmittableEvents object
      */
     private EmittableEvents doEmitterTick() {
         if (Util.isOnline(this.context)) {
@@ -148,22 +158,25 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * The logic controlling what to do with the
-     * returned Emitter Results.
+     * Processes a list of Request Results:
+     * - Removes successfully sent requests
+     * - Keeps requests that failed to send
+     * - Sends the emitter callback
+     * - Determines whether to shutdown or not
      *
-     * @param results A list of results returned
-     *                from the emitter.
+     * @param results a list of Request Results
      */
-    private void processEmitterResults(LinkedList<RequestResult> results) {
+    private void processEmitterResults(List<RequestResult> results) {
         Logger.v(TAG, "Processing emitter results.");
 
         int successCount = 0;
         int failureCount = 0;
+        List<Long> removableEvents = new ArrayList<>();
 
         for (RequestResult res : results) {
             if (res.getSuccess()) {
                 for (Long eventId : res.getEventIds()) {
-                    eventStore.removeEvent(eventId);
+                    removableEvents.add(eventId);
                 }
                 successCount += res.getEventIds().size();
             } else {
@@ -171,6 +184,10 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                 Logger.e(TAG, "Request sending failed; will retry later.");
             }
         }
+        performAsyncEventRemoval(removableEvents);
+
+        results = null;
+        removableEvents = null;
 
         Logger.d(TAG, "Success Count: %s", successCount);
         Logger.d(TAG, "Failure Count: %s", failureCount);
@@ -193,32 +210,136 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Emits all the events in the Emittable Events object.
+     * Asynchronously sends all of the
+     * ReadyRequests in the List to the
+     * defined endpoint.
      *
-     * @return Observable that will emit once containing
-     * the request results.
+     * @param events the events ready to
+     *               be built into requests
+     * @return the results of each request
      */
-    private Observable<LinkedList<RequestResult>> emitEvent(final EmittableEvents events) {
-        return Observable
-            .just(events)
-            .map(this::performEmitRx)
-            .onBackpressureBuffer(TrackerConstants.BACK_PRESSURE_LIMIT);
+    private List<RequestResult> performAsyncEmit(EmittableEvents events) {
+        LinkedList<ReadyRequest> requests = buildRequests(events);
+        List<RequestResult> results = new ArrayList<>();
+        List<Future<Integer>> futures = new ArrayList<>();
+
+        for (ReadyRequest request : requests) {
+            futures.add(getRequestFuture(request));
+        }
+
+        Logger.d(TAG, "Request Futures: %s", futures.size());
+
+        // Get results of futures
+        // - Wait up to 5 seconds for the request
+        for (int i = 0; i < futures.size(); i++) {
+            int code = -1;
+
+            try {
+                code = futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Request Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Request Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Request Future had a timeout: %s", te.getMessage());
+            }
+
+            if (requests.get(i).isOversize()) {
+                results.add(new RequestResult(true, requests.get(i).getEventIds()));
+            } else {
+                results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
+            }
+        }
+
+        events = null;
+        requests = null;
+        futures = null;
+
+        return results;
     }
 
     /**
-     * Necessary wrapper to avoid Rx issue with 'protected' functions.
+     * Asynchronously removes all the marked
+     * event ids from successfully sent events.
      *
-     * @param events the events to send to the collector
-     * @return a list of RequestResults
+     * NOTE: If events fail to be removed they
+     * will be double sent.  At small levels this
+     * should not be an issue as we can de-dupe later.
+     *
+     * @param eventIds the events ids to remove
+     * @return a list of booleans
      */
-    private LinkedList<RequestResult> performEmitRx(EmittableEvents events) {
-        return performEmit(events);
+    private List<Boolean> performAsyncEventRemoval(List<Long> eventIds) {
+        List<Boolean> results = new ArrayList<>();
+        List<Future<Boolean>> futures = new ArrayList<>();
+
+        // Start all requests in the ThreadPool
+        for (Long id : eventIds) {
+            futures.add(getRemoveFuture(id));
+        }
+
+        Logger.d(TAG, "Removal Futures: %s", futures.size());
+
+        // Get results of futures
+        for (int i = 0; i < futures.size(); i++) {
+            boolean result = false;
+            try {
+                result = futures.get(i).get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                Logger.e(TAG, "Removal Future was interrupted: %s", ie.getMessage());
+            } catch (ExecutionException ee) {
+                Logger.e(TAG, "Removal Future failed: %s", ee.getMessage());
+            } catch (TimeoutException te) {
+                Logger.e(TAG, "Removal Future had a timeout: %s", te.getMessage());
+            }
+            results.add(result);
+        }
+
+        eventIds = null;
+        futures = null;
+
+        return results;
+    }
+
+    /**
+     * Returns a Future to an operation to
+     * send a Request and get the HTTP
+     * response code.
+     *
+     * @param request the request that needs
+     *                to be sent
+     * @return a new Future for an event
+     *         sending operation
+     */
+    private Future<Integer> getRequestFuture(ReadyRequest request) {
+        return Observable.<Integer> create(subscriber -> {
+            subscriber.onNext(requestSender(request.getRequest()));
+            subscriber.onCompleted();
+        }).subscribeOn(SchedulerRx.getScheduler()).unsubscribeOn(SchedulerRx.getScheduler())
+                .toBlocking().toFuture();
+    }
+
+    /**
+     * Returns a Future to an operation to
+     * remove an event from the database.
+     *
+     * @param eventId the row id of the
+     *                event to be removed
+     * @return a new Future for an event
+     *         removal operation
+     */
+    private Future<Boolean> getRemoveFuture(long eventId) {
+        return Observable.<Boolean> create(subscriber -> {
+            subscriber.onNext(this.eventStore.removeEvent(eventId));
+            subscriber.onCompleted();
+        }).subscribeOn(SchedulerRx.getScheduler()).unsubscribeOn(SchedulerRx.getScheduler())
+                .toBlocking().toFuture();
     }
 
     // Setters, Getters and Checkers
 
     /**
-     * @return the emitter event store
+     * @return the emitter event store object
      */
     public EventStore getEventStore() {
         return this.eventStore;
