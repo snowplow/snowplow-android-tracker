@@ -18,6 +18,8 @@ import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class EcommerceTransaction extends Event {
@@ -132,6 +134,17 @@ public class EcommerceTransaction extends Event {
          * @return itself
          */
         public T items(List<EcommerceTransactionItem> items) {
+            this.items = items;
+            return self();
+        }
+
+        /**
+         * @param itemArgs The items as a varargs argument
+         * @return itself
+         */
+        public T items(EcommerceTransactionItem... itemArgs) {
+            List<EcommerceTransactionItem> items = new ArrayList<>();
+            Collections.addAll(items, itemArgs);
             this.items = items;
             return self();
         }
