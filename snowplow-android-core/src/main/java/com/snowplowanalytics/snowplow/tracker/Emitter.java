@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Build an emitter object which controls the
@@ -66,6 +67,8 @@ public abstract class Emitter {
     protected int sendLimit;
     protected long byteLimitGet;
     protected long byteLimitPost;
+
+    protected AtomicBoolean isRunning = new AtomicBoolean(false);
 
     /**
      * Builder for the Emitter.
@@ -508,7 +511,9 @@ public abstract class Emitter {
      * @param option Set the BufferOption enum to Instant send events upon creation.
      */
     public void setBufferOption(BufferOption option) {
-        this.bufferOption = option;
+        if (!isRunning.get()) {
+            this.bufferOption = option;
+        }
     }
 
     /**
@@ -517,8 +522,10 @@ public abstract class Emitter {
      * @param method the HttpMethod
      */
     public void setHttpMethod(HttpMethod method) {
-        this.httpMethod = method;
-        buildEmitterUri();
+        if (!isRunning.get()) {
+            this.httpMethod = method;
+            buildEmitterUri();
+        }
     }
 
     /**
@@ -527,8 +534,10 @@ public abstract class Emitter {
      * @param security the RequestSecurity
      */
     public void setRequestSecurity(RequestSecurity security) {
-        this.requestSecurity = security;
-        buildEmitterUri();
+        if (!isRunning.get()) {
+            this.requestSecurity = security;
+            buildEmitterUri();
+        }
     }
 
     /**
@@ -537,8 +546,10 @@ public abstract class Emitter {
      * @param uri new Emitter URI
      */
     public void setEmitterUri(String uri) {
-        this.uri = uri;
-        buildEmitterUri();
+        if (!isRunning.get()) {
+            this.uri = uri;
+            buildEmitterUri();
+        }
     }
 
     /**

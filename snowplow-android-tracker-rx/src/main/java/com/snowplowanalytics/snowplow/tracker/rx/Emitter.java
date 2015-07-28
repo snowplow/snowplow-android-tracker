@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
 import rx.Subscription;
@@ -45,8 +44,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     private int emptyCounter = 0;
     private Subscription emitterSub;
     private EventStore eventStore;
-
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     /**
      * Constructs the Emitter Object.

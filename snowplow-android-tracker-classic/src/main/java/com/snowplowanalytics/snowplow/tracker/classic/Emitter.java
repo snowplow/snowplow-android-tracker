@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -41,8 +40,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
 
     private EventStore eventStore;
     private int emptyCount;
-
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     /**
      * Constructs the Emitter Object.
