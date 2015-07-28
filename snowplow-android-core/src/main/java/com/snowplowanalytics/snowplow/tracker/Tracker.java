@@ -497,7 +497,7 @@ public abstract class Tracker {
      * Stops data collection and ends all
      * concurrent processes.
      */
-    public void stopDataCollection() {
+    public void pauseEventTracking() {
         if (dataCollection.compareAndSet(true, false)) {
             shutdown();
         }
@@ -507,7 +507,7 @@ public abstract class Tracker {
      * Starts data collection processes
      * again.
      */
-    public void startDataCollection() {
+    public void resumeEventTracking() {
         if (dataCollection.compareAndSet(false, true)) {
             startSessionChecker(this.sessionCheckInterval);
             getEmitter().flush();

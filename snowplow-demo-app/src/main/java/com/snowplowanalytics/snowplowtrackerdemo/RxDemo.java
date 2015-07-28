@@ -120,9 +120,9 @@ public class RxDemo extends Activity {
                     @Override
                     public void run() {
                         if (i == R.id.radio_data_on) {
-                            tracker.startDataCollection();
+                            tracker.resumeEventTracking();
                         } else if (i == R.id.radio_data_off) {
-                            tracker.stopDataCollection();
+                            tracker.pauseEventTracking();
                         }
                     }
                 });

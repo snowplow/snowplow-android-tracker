@@ -13,15 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
-
 public class TestTracker extends Tracker {
 
     public TestTracker(TrackerBuilder builder) {
         super(builder);
     }
-
-    public void startSessionChecker() {}
 
     public void shutdownSessionChecker() {}
 

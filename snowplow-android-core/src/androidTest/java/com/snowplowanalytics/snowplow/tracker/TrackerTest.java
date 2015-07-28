@@ -50,6 +50,7 @@ public class TrackerTest extends AndroidTestCase {
                 .sessionCheckInterval(15)
                 .backgroundTimeout(4000)
                 .foregroundTimeout(20000)
+                .sessionContext(true)
                 .build();
     }
 
@@ -115,10 +116,10 @@ public class TrackerTest extends AndroidTestCase {
         Tracker tracker = getTracker();
         assertTrue(tracker.getDataCollection());
 
-        tracker.stopDataCollection();
+        tracker.pauseEventTracking();
         assertTrue(!tracker.getDataCollection());
 
-        tracker.startDataCollection();
+        tracker.resumeEventTracking();
         assertTrue(tracker.getDataCollection());
     }
 
