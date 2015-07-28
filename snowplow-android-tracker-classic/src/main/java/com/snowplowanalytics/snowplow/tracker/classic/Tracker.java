@@ -48,7 +48,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
         Executor.setThreadCount(this.threadCount);
 
         // Start Checking Sessions
-        startSessionChecker(this.sessionCheckInterval);
+        resumeSessionChecking(this.sessionCheckInterval);
     }
 
     /**
@@ -57,9 +57,9 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
      *
      * @param interval the time between checks
      */
-    public void startSessionChecker(final long interval) {
+    public void resumeSessionChecking(final long interval) {
         if (sessionExecutor == null && this.sessionContext) {
-            Logger.d(TAG, "Session checker has been started.");
+            Logger.d(TAG, "Session checking has been resumed.");
             final Session session = this.trackerSession;
             sessionExecutor = Executors.newSingleThreadScheduledExecutor();
             sessionExecutor.scheduleAtFixedRate(new Runnable() {
@@ -74,9 +74,9 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
     /**
      * Ends the polling session checker.
      */
-    public void shutdownSessionChecker() {
+    public void pauseSessionChecking() {
         if (sessionExecutor != null) {
-            Logger.d(TAG, "Session checker has been shutdown.");
+            Logger.d(TAG, "Session checking has been paused.");
             sessionExecutor.shutdown();
             sessionExecutor = null;
         }

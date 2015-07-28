@@ -59,7 +59,8 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         Thread.sleep(500);
 
         checkGetRequest(getRequests(28));
-        tracker.shutdown();
+        tracker.pauseEventTracking();
+        Executor.shutdown();
         tearDown();
     }
 
@@ -102,7 +103,8 @@ public class EventSendingTest extends SnowplowClassicTestCase {
         Thread.sleep(500);
 
         checkPostRequest(getRequests(28));
-        tracker.shutdown();
+        tracker.pauseEventTracking();
+        Executor.shutdown();
         tearDown();
     }
 }

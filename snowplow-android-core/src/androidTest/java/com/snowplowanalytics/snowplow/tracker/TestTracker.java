@@ -19,7 +19,7 @@ public class TestTracker extends Tracker {
         super(builder);
     }
 
-    public void shutdownSessionChecker() {}
+    public void pauseSessionChecking() {}
 
-    public void startSessionChecker(final long interval) {}
+    public void resumeSessionChecking(final long interval) {}
 }

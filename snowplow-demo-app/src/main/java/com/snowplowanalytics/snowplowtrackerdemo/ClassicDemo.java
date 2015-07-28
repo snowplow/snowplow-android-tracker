@@ -24,6 +24,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 
+import com.snowplowanalytics.snowplow.tracker.classic.Executor;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
@@ -63,7 +64,8 @@ public class ClassicDemo extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         if (tracker != null) {
-            tracker.shutdown();
+            tracker.pauseEventTracking();
+            tracker = null;
         }
         DemoUtils.resetExecutor();
     }

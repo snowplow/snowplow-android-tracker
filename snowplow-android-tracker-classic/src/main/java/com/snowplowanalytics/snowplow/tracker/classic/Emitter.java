@@ -297,9 +297,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
     }
 
     /**
-     * Resets the `isRunning` truth to false
-     * and initiates a shutdown on the
-     * ExecutorService.
+     * Resets the `isRunning` truth to false.
      */
     public void shutdown() {
         Logger.d(TAG, "Shutting down emitter.");
@@ -318,6 +316,6 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      * @return the emitter status
      */
     public boolean getEmitterStatus() {
-        return isRunning.get() && Executor.status();
+        return isRunning.get();
     }
 }

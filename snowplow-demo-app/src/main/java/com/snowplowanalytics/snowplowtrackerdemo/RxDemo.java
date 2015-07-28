@@ -63,7 +63,8 @@ public class RxDemo extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         if (tracker != null) {
-            tracker.shutdown();
+            tracker.pauseEventTracking();
+            tracker = null;
         }
         DemoUtils.resetExecutor();
     }

@@ -464,52 +464,36 @@ public abstract class Tracker {
     // Utilities
 
     /**
-     * Shuts down all concurrent services in the Tracker:
-     * - Emitter polling sender
-     * - Session polling checker
-     */
-    public void shutdown() {
-        shutdownEmitter();
-        shutdownSessionChecker();
-    }
-
-    /**
      * Starts the session checker on a
      * polling interval.
      *
      * @param interval the checking interval
      */
-    public abstract void startSessionChecker(final long interval);
+    public abstract void resumeSessionChecking(final long interval);
 
     /**
      * Shuts the session checker down.
      */
-    public abstract void shutdownSessionChecker();
+    public abstract void pauseSessionChecking();
 
     /**
-     * Shuts the emitter down.
-     */
-    public void shutdownEmitter() {
-        this.emitter.shutdown();
-    }
-
-    /**
-     * Stops data collection and ends all
+     * Stops event collection and ends all
      * concurrent processes.
      */
     public void pauseEventTracking() {
         if (dataCollection.compareAndSet(true, false)) {
-            shutdown();
+            pauseSessionChecking();
+            getEmitter().shutdown();
         }
     }
 
     /**
-     * Starts data collection processes
+     * Starts event collection processes
      * again.
      */
     public void resumeEventTracking() {
         if (dataCollection.compareAndSet(false, true)) {
-            startSessionChecker(this.sessionCheckInterval);
+            resumeSessionChecking(this.sessionCheckInterval);
             getEmitter().flush();
         }
     }
@@ -528,7 +512,7 @@ public abstract class Tracker {
      */
     public void setEmitter(Emitter emitter) {
         // Need to shutdown prior emitter before updating
-        this.shutdownEmitter();
+        getEmitter().shutdown();
 
         // Set the new emitter
         this.emitter = emitter;
