@@ -21,5 +21,5 @@ public class TestTracker extends Tracker {
 
     public void pauseSessionChecking() {}
 
-    public void resumeSessionChecking(final long interval) {}
+    public void resumeSessionChecking() {}
 }

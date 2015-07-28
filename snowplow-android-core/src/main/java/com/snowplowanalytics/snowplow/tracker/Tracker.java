@@ -480,10 +480,8 @@ public abstract class Tracker {
     /**
      * Starts the session checker on a
      * polling interval.
-     *
-     * @param interval the checking interval
      */
-    public abstract void resumeSessionChecking(final long interval);
+    public abstract void resumeSessionChecking();
 
     /**
      * Shuts the session checker down.
@@ -507,7 +505,7 @@ public abstract class Tracker {
      */
     public void resumeEventTracking() {
         if (dataCollection.compareAndSet(false, true)) {
-            resumeSessionChecking(this.sessionCheckInterval);
+            resumeSessionChecking();
             getEmitter().flush();
         }
     }

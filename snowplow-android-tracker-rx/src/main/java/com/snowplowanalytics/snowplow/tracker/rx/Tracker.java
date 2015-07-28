@@ -53,19 +53,17 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
         scheduler = SchedulerRx.getScheduler();
 
         // Start Checking Sessions
-        resumeSessionChecking(this.sessionCheckInterval);
+        resumeSessionChecking();
     }
 
     /**
      * Starts a polling session checker subscription to
      * run at a defined interval.
-     *
-     * @param interval the time between checks
      */
-    public void resumeSessionChecking(final long interval) {
+    public void resumeSessionChecking() {
         if (sessionSub == null && this.sessionContext) {
             final Session session = this.trackerSession;
-            sessionSub = Observable.interval(interval, this.timeUnit, scheduler)
+            sessionSub = Observable.interval(this.sessionCheckInterval, this.timeUnit, scheduler)
                     .doOnError(err -> Logger.e(TAG, "Error checking session: %s", err))
                     .retry()
                     .doOnSubscribe(() -> Logger.d(TAG, "Session checking has been resumed."))
