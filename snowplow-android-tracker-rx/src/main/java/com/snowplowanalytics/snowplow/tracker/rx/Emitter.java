@@ -99,7 +99,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
      *    we are online.
      */
     private void start() {
-        emitterSub = Observable.interval(this.emitterTick, TimeUnit.SECONDS, SchedulerRx.getScheduler())
+        emitterSub = Observable.interval(this.emitterTick, this.timeUnit, SchedulerRx.getScheduler())
             .map(tick -> doEmitterTick())
             .doOnError(err -> Logger.e(TAG, "Emitter Error: %s", err.toString()))
             .retry()

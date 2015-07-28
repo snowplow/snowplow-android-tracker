@@ -157,7 +157,7 @@ public class Emitter extends com.snowplowanalytics.snowplow.tracker.Emitter {
                     emptyCount++;
                     Logger.e(TAG, "Emitter database empty: " + emptyCount);
                     try {
-                        TimeUnit.SECONDS.sleep(this.emitterTick);
+                        this.timeUnit.sleep(this.emitterTick);
                     } catch (InterruptedException e) {
                         Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
                     }

@@ -67,7 +67,7 @@ public class Tracker extends com.snowplowanalytics.snowplow.tracker.Tracker {
                 public void run() {
                     session.checkAndUpdateSession();
                 }
-            }, interval, interval, TimeUnit.MILLISECONDS);
+            }, interval, interval, this.timeUnit);
         }
     }
 

@@ -67,6 +67,7 @@ public abstract class Emitter {
     protected int sendLimit;
     protected long byteLimitGet;
     protected long byteLimitPost;
+    protected TimeUnit timeUnit;
 
     protected AtomicBoolean isRunning = new AtomicBoolean(false);
 
@@ -103,6 +104,7 @@ public abstract class Emitter {
         protected int emptyLimit = 5; // Optional
         protected long byteLimitGet = 40000; // Optional
         protected long byteLimitPost = 40000; // Optional
+        protected TimeUnit timeUnit = TimeUnit.SECONDS;
 
         /**
          * @param uri The uri of the collector
@@ -209,6 +211,15 @@ public abstract class Emitter {
         }
 
         /**
+         * @param timeUnit a valid TimeUnit
+         * @return itself
+         */
+        public EmitterBuilder timeUnit(TimeUnit timeUnit) {
+            this.timeUnit = timeUnit;
+            return this;
+        }
+
+        /**
          * Builds a new Emitter object
          *
          * @return a new Emitter object
@@ -251,6 +262,7 @@ public abstract class Emitter {
         this.byteLimitGet = builder.byteLimitGet;
         this.byteLimitPost = builder.byteLimitPost;
         this.uri = builder.uri;
+        this.timeUnit = builder.timeUnit;
         buildEmitterUri();
 
         client.setConnectTimeout(15, TimeUnit.SECONDS); // connect timeout

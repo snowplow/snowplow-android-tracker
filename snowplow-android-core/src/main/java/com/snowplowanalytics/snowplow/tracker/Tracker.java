@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -58,6 +59,7 @@ public abstract class Tracker {
     protected boolean sessionContext;
     protected long sessionCheckInterval;
     protected int threadCount;
+    protected TimeUnit timeUnit;
 
     protected AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -92,10 +94,11 @@ public abstract class Tracker {
         protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
         protected LogLevel logLevel = LogLevel.OFF; // Optional
         protected boolean sessionContext = false; // Optional
-        protected long foregroundTimeout = 600000; // Optional - 10 minutes
-        protected long backgroundTimeout = 300000; // Optional - 5 minutes
-        protected long sessionCheckInterval = 15000; // Optional - 15 seconds
+        protected long foregroundTimeout = 600; // Optional - 10 minutes
+        protected long backgroundTimeout = 300; // Optional - 5 minutes
+        protected long sessionCheckInterval = 15; // Optional - 15 seconds
         protected int threadCount = 10; // Optional
+        protected TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -205,6 +208,15 @@ public abstract class Tracker {
         }
 
         /**
+         * @param timeUnit a valid TimeUnit
+         * @return itself
+         */
+        public TrackerBuilder timeUnit(TimeUnit timeUnit) {
+            this.timeUnit = timeUnit;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -248,12 +260,14 @@ public abstract class Tracker {
         this.sessionContext = builder.sessionContext;
         this.sessionCheckInterval = builder.sessionCheckInterval;
         this.threadCount = builder.threadCount < 2 ? 2 : builder.threadCount;
+        this.timeUnit = builder.timeUnit;
 
         // If session context is True
         if (this.sessionContext) {
             this.trackerSession = new Session(
                 builder.foregroundTimeout,
                 builder.backgroundTimeout,
+                builder.timeUnit,
                 builder.context);
         }
 

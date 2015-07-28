@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class TrackerTest extends AndroidTestCase {
 
@@ -50,6 +51,7 @@ public class TrackerTest extends AndroidTestCase {
                 .sessionCheckInterval(15)
                 .backgroundTimeout(4000)
                 .foregroundTimeout(20000)
+                .timeUnit(TimeUnit.MILLISECONDS)
                 .sessionContext(true)
                 .build();
     }

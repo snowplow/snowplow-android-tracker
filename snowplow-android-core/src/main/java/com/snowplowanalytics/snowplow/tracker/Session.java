@@ -24,6 +24,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -67,11 +68,12 @@ public class Session {
      * @param backgroundTimeout the amount of time that can elapse before the
      *                          session id is updated while the app is in the
      *                          background.
+     * @param timeUnit the time units of the timeout measurements
      * @param context the android context
      */
-    public Session(long foregroundTimeout, long backgroundTimeout, Context context) {
-        this.foregroundTimeout = foregroundTimeout;
-        this.backgroundTimeout = backgroundTimeout;
+    public Session(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit, Context context) {
+        this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
+        this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         this.context = context;
         Map sessionInfo = getSessionFromFile();
         if (sessionInfo == null) {
