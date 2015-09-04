@@ -1,3 +1,8 @@
+Version 0.5.1 (2015-09-04)
+--------------------------
+Core: fixed eid and dtm being incorrectly added to screen_view and timing context (#163)
+Common: fixed test environment imposter path (#161)
+
 Version 0.5.0 (2015-07-28)
 --------------------------
 App: bumped version to 0.2.0 (#145)
