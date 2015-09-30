@@ -90,7 +90,7 @@ public class TrackerTest extends AndroidTestCase {
 
     public void testVersionSet() {
         Tracker tracker = getTracker();
-        assertEquals("andr-0.5.1", tracker.getTrackerVersion());
+        assertEquals("andr-0.5.2", tracker.getTrackerVersion());
     }
 
     public void testLogLevelSet() {
