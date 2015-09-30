@@ -259,7 +259,7 @@ public class SnowplowClassicTestCase extends AndroidTestCase {
     }
 
     public void checkTimings(JSONObject json) throws Exception {
-        assertEquals("1", json.getString("timing"));
+        assertEquals(1, json.getInt("timing"));
         assertEquals("variable", json.getString("variable"));
         assertEquals("category", json.getString("category"));
         assertEquals("label", json.getString("label"));

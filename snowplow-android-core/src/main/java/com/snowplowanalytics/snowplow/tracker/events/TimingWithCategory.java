@@ -17,7 +17,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import java.util.HashMap;
 
 public class TimingWithCategory extends Event {
 
@@ -107,12 +107,12 @@ public class TimingWithCategory extends Event {
      *
      * @return the payload to be sent.
      */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.UT_CATEGORY, this.category);
-        payload.add(Parameters.UT_VARIABLE, this.variable);
-        payload.add(Parameters.UT_TIMING, Integer.toString(this.timing));
-        payload.add(Parameters.UT_LABEL, this.label);
+    public HashMap<String,Object> getPayload() {
+        HashMap<String,Object> payload = new HashMap<>();
+        payload.put(Parameters.UT_CATEGORY, this.category);
+        payload.put(Parameters.UT_VARIABLE, this.variable);
+        payload.put(Parameters.UT_TIMING, this.timing);
+        payload.put(Parameters.UT_LABEL, this.label);
         return payload;
     }
 
