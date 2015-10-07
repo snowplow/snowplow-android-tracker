@@ -1,4 +1,4 @@
-Version 0.5.2 (2015-09-30)
+Version 0.5.2 (2015-10-07)
 --------------------------
 Core: Timing event field is incorrectly converted to a String (#168)
 
