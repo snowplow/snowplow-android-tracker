@@ -29,7 +29,6 @@ Continuing from the instructions above:
 ```bash
 guest$ echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 guest$ emulator -avd test -no-skin -no-audio -no-window &
-guest$ chmod +x ./ci/wait_for_emulator
 guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
 guest$ adb shell input keyevent 82 &
 guest$ ./gradlew connectedCheck 
