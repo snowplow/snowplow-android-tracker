@@ -52,6 +52,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class Emitter {
 
+    protected int POST_WRAPPER_BYTES = 88; // "schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3","data":[]
+    protected int POST_STM_BYTES = 22;     // "stm":"1443452851000",
+
     private final String TAG = Emitter.class.getSimpleName();
     protected final OkHttpClient client = new OkHttpClient();
     protected final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
@@ -368,39 +371,33 @@ public abstract class Emitter {
 
                 // Build and store the request
                 Payload payload = events.getEvents().get(i);
-                addStmToEvent(payload, "");
-                boolean oversize = payload.getByteSize() > byteLimitGet;
+                boolean oversize = payload.getByteSize() + POST_STM_BYTES > byteLimitGet;
                 Request request = requestBuilderGet(payload);
                 requests.add(new ReadyRequest(oversize, request, reqEventId));
             }
         } else {
             for (int i = 0; i < payloadCount; i += bufferOption.getCode()) {
 
-                // Get STM Timestamp
-                String timestamp = Util.getTimestamp();
-
-                // Collections
                 LinkedList<Long> reqEventIds = new LinkedList<>();
-                ArrayList<Map> postPayloadMaps = new ArrayList<>();
+                ArrayList<Payload> postPayloadMaps = new ArrayList<>();
                 long totalByteSize = 0;
 
                 for (int j = i; j < (i + bufferOption.getCode()) && j < payloadCount; j++) {
                     Payload payload = events.getEvents().get(j);
-                    addStmToEvent(payload, timestamp);
-                    long payloadByteSize = payload.getByteSize();
+                    long payloadByteSize = payload.getByteSize() + POST_STM_BYTES;
 
-                    if (payloadByteSize > byteLimitPost) {
-                        ArrayList<Map> singlePayloadMap = new ArrayList<>();
+                    if ((payloadByteSize + POST_WRAPPER_BYTES) > byteLimitPost) {
+                        ArrayList<Payload> singlePayloadMap = new ArrayList<>();
                         LinkedList<Long> reqEventId = new LinkedList<>();
 
                         // Build and store the request
-                        addStmToEvent(payload, "");
-                        singlePayloadMap.add(payload.getMap());
+                        singlePayloadMap.add(payload);
                         reqEventId.add(eventIds.get(j));
                         Request request = requestBuilderPost(singlePayloadMap);
                         requests.add(new ReadyRequest(true, request, reqEventId));
                     }
-                    else if (totalByteSize + payloadByteSize > byteLimitPost) {
+                    else if ((totalByteSize + payloadByteSize + POST_WRAPPER_BYTES +
+                            (postPayloadMaps.size() -1)) > byteLimitPost) {
                         Request request = requestBuilderPost(postPayloadMaps);
                         requests.add(new ReadyRequest(false, request, reqEventIds));
 
@@ -409,15 +406,13 @@ public abstract class Emitter {
                         reqEventIds = new LinkedList<>();
 
                         // Build and store the request
-                        timestamp = Util.getTimestamp();
-                        addStmToEvent(payload, timestamp);
-                        postPayloadMaps.add(payload.getMap());
+                        postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
                         totalByteSize = payloadByteSize;
                     }
                     else {
                         totalByteSize += payloadByteSize;
-                        postPayloadMaps.add(payload.getMap());
+                        postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
                     }
                 }
@@ -443,6 +438,7 @@ public abstract class Emitter {
      */
     @SuppressWarnings("unchecked")
     private Request requestBuilderGet(Payload payload) {
+        addStmToEvent(payload, "");
 
         // Clear the previous query
         uriBuilder.clearQuery();
@@ -466,13 +462,20 @@ public abstract class Emitter {
     /**
      * Builds an OkHttp POST request which is ready
      * to be executed.
-     * @param payload The payload to be sent in the
-     *                request.
+     * @param payloads The payloads to be sent in the
+     *                 request.
      * @return an OkHttp request object
      */
-    private Request requestBuilderPost(ArrayList<Map> payload) {
+    private Request requestBuilderPost(ArrayList<Payload> payloads) {
+        ArrayList<Map> finalPayloads = new ArrayList<>();
+        String stm = Util.getTimestamp();
+        for (Payload payload : payloads) {
+            addStmToEvent(payload, stm);
+            finalPayloads.add(payload.getMap());
+        }
+
         SelfDescribingJson postPayload =
-                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payload);
+                new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, finalPayloads);
         String reqUrl = uriBuilder.build().toString();
         RequestBody reqBody = RequestBody.create(JSON, postPayload.toString());
         return new Request.Builder()
