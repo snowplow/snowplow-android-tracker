@@ -1,3 +1,9 @@
+// For integrating the library please follow the setup guide: https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup
+//
+// DO NOT USE THIS GRADLE FILE:
+// - Uses local projects for compilation
+// - Includes both -rx and -classic
+
 apply plugin: 'com.android.application'
 
 android {
