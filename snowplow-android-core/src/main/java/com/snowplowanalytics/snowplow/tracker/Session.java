@@ -46,7 +46,7 @@ public class Session {
 
     // Session Variables
     private String userId;
-    private String currentSessionId = "";
+    private String currentSessionId = null;
     private String previousSessionId;
     private int sessionIndex = 0;
     private String sessionStorage = "SQLITE";
@@ -82,17 +82,15 @@ public class Session {
             try {
                 String uid = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
                 String sid = sessionInfo.get(Parameters.SESSION_ID).toString();
-                String psid = sessionInfo.get(Parameters.SESSION_PREVIOUS_ID).toString();
                 int si = (int) sessionInfo.get(Parameters.SESSION_INDEX);
 
                 this.userId = uid;
-                this.previousSessionId = psid;
                 this.sessionIndex = si;
                 this.currentSessionId = sid;
             } catch (Exception e){
                 Logger.e(TAG, "Exception occurred retrieving session info from file: %s", e.getMessage());
+                this.userId = Util.getEventId();
             }
-
         }
 
         updateSessionInfo();

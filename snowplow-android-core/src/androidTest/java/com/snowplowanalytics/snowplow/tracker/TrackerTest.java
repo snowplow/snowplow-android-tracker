@@ -136,7 +136,6 @@ public class TrackerTest extends AndroidTestCase {
 
         assertNotNull(session);
         assertNotNull(session.getCurrentSessionId());
-        assertNotNull(session.getPreviousSessionId());
         assertNotNull(session.getSessionIndex());
         assertNotNull(session.getUserId());
         assertEquals("SQLITE", session.getSessionStorage());
