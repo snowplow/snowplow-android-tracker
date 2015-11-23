@@ -90,7 +90,7 @@ public class TrackerTest extends AndroidTestCase {
 
     public void testVersionSet() {
         Tracker tracker = getTracker();
-        assertEquals("andr-0.5.2", tracker.getTrackerVersion());
+        assertEquals("andr-0.5.3", tracker.getTrackerVersion());
     }
 
     public void testLogLevelSet() {
@@ -136,7 +136,6 @@ public class TrackerTest extends AndroidTestCase {
 
         assertNotNull(session);
         assertNotNull(session.getCurrentSessionId());
-        assertNotNull(session.getPreviousSessionId());
         assertNotNull(session.getSessionIndex());
         assertNotNull(session.getUserId());
         assertEquals("SQLITE", session.getSessionStorage());

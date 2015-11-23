@@ -29,7 +29,6 @@ Continuing from the instructions above:
 ```bash
 guest$ echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 guest$ emulator -avd test -no-skin -no-audio -no-window &
-guest$ chmod +x ./ci/wait_for_emulator
 guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
 guest$ adb shell input keyevent 82 &
 guest$ ./gradlew connectedCheck 
@@ -92,7 +91,7 @@ limitations under the License.
 [travis]: https://travis-ci.org/snowplow/snowplow-android-tracker
 [travis-image]: https://travis-ci.org/snowplow/snowplow-android-tracker.svg?branch=master
 
-[release-image]: http://img.shields.io/badge/release-0.5.2-blue.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.5.3-blue.svg?style=flat
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat

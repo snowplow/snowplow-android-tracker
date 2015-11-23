@@ -1,3 +1,10 @@
+Version 0.5.3 (2015-11-22)
+--------------------------
+Core: fixed session context fails on first session (#176)
+Core: fixed adding STM to events is not in order (#169)
+Added comments to demo-app's build.gradle to explain why it shouldn't be copied (#158)
+Removed chmod +x ./ci/wait_for_emulator from README (#157)
+
 Version 0.5.2 (2015-10-07)
 --------------------------
 Core: Timing event field is incorrectly converted to a String (#168)
