@@ -97,8 +97,7 @@ public class Subject {
         setDefaultScreenResolution(context);
         setLocation(context);
         setCarrier(context);
-        setNetworkType(context);
-        setNetworkTechnology(context);
+        setNetwork(context);
     }
 
     /**
@@ -215,23 +214,11 @@ public class Subject {
      * Sets the current network type
      * @param context
      */
-    public void setNetworkType(Context context){
+    public void setNetwork(Context context){
         NetworkInfo info = Connectivity.getNetworkInfo(context);
         if (info != null && Util.isOnline(context)) {
-            networkType = info.getTypeName());
-            addToMobileContext(Parameters.NETWORK_TYPE, networkType);
-        }
-    }
-
-    /**
-     * Sets the current network technology
-     * @param context
-     */
-    public void setNetworkTechnology(Context context){
-        NetworkInfo info = Connectivity.getNetworkInfo(context);
-        if(info != null && Util.isOnline(context) && info.getType() == ConnectivityManager.TYPE_MOBILE){
-            networkTechnology = info.getSubtypeName();
-            addToMobileContext(Parameters.NETWORK_TECHNOLOGY, networkTechnology);
+            addToMobileContext(Parameters.NETWORK_TYPE, info.getTypeName());
+            addToMobileContext(Parameters.NETWORK_TECHNOLOGY, info.getSubtypeName());
         }
     }
 
