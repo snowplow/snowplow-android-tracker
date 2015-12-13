@@ -211,7 +211,7 @@ public class Subject {
     }
 
     /**
-     * Sets the current network type
+     * Sets the current network type and technology
      * @param context
      */
     public void setNetwork(Context context){
