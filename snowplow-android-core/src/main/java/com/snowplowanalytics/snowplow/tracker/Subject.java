@@ -226,13 +226,11 @@ public class Subject {
         }
     }
 
-/**
+    /**
      * Sets the current network technology
-     * @param type
-     * @param subType
-     * @return
+     * @param context
      */
-    public void setNetworkTechnology(int type, int subType){
+    public void setNetworkTechnology(Context context){
         NetworkInfo info = Connectivity.getNetworkInfo(context);
         if(info != null && Util.isOnline(context) && info.getType() == ConnectivityManager.TYPE_MOBILE){
             switch(info.getSubtype()){
