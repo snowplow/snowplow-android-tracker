@@ -215,10 +215,13 @@ public class Subject {
      * @param context
      */
     public void setNetwork(Context context){
-        NetworkInfo info = Connectivity.getNetworkInfo(context);
-        if (info != null && Util.isOnline(context)) {
-            addToMobileContext(Parameters.NETWORK_TYPE, info.getTypeName());
-            addToMobileContext(Parameters.NETWORK_TECHNOLOGY, info.getSubtypeName());
+        NetworkInfo ni = Util.getNetworkInfo;
+        if (ni != null) {
+            networkType = ni.getTypeName();
+            addToMobileContext(Parameters.NETWORK_TYPE, networkType);
+            if (networkType.equalsIgnoreCase("MOBILE")) {
+                addToMobileContext(Parameters.NETWORK_TECHNOLOGY, ni.getSubtypeName());
+            }
         }
     }
 
