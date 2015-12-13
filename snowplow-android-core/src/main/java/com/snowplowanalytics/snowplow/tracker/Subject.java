@@ -217,10 +217,10 @@ public class Subject {
         NetworkInfo info = Connectivity.getNetworkInfo(context);
         if (info != null && Util.isOnline(context)) {
             switch(info.getType()) {
-            case ConnectivityManager.TYPE_WIFI:
-                networkType = "wifi";
-            case ConnectivityManager.TYPE_MOBILE:
-                networkType = "mobile";
+                case ConnectivityManager.TYPE_WIFI:
+                    networkType = "wifi";
+                case ConnectivityManager.TYPE_MOBILE:
+                    networkType = "mobile";
             }
             addToMobileContext(Parameters.NETWORK_TYPE, networkType);
         }
@@ -236,38 +236,38 @@ public class Subject {
         NetworkInfo info = Connectivity.getNetworkInfo(context);
         if(info != null && Util.isOnline(context) && info.getType() == ConnectivityManager.TYPE_MOBILE){
             switch(info.getSubtype()){
-            case TelephonyManager.NETWORK_TYPE_1xRTT:
-                networkTechnology = "1xRTT"; // ~ 50-100 kbps
-            case TelephonyManager.NETWORK_TYPE_CDMA:
-                networkTechnology = "CDMA"; // ~ 14-64 kbps
-            case TelephonyManager.NETWORK_TYPE_EDGE:
-                networkTechnology = "EDGE"; // ~ 50-100 kbps
-            case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                networkTechnology = "EVDO_0"; // ~ 400-1000 kbps
-            case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                networkTechnology = "EVDO_A"; // ~ 600-1400 kbps
-            case TelephonyManager.NETWORK_TYPE_GPRS:
-                networkTechnology = "GPRS"; // ~ 100 kbps
-            case TelephonyManager.NETWORK_TYPE_HSDPA:
-                networkTechnology = "HSDPA"; // ~ 2-14 Mbps
-            case TelephonyManager.NETWORK_TYPE_HSPA:
-                networkTechnology = "HSPA"; // ~ 700-1700 kbps
-            case TelephonyManager.NETWORK_TYPE_HSUPA:
-                networkTechnology = "HSUPA"; // ~ 1-23 Mbps
-            case TelephonyManager.NETWORK_TYPE_UMTS:
-                networkTechnology = "UMTS"; // ~ 400-7000 kbps
-            case TelephonyManager.NETWORK_TYPE_EHRPD:
-                networkTechnology = "EHRPD"; // ~ 1-2 Mbps
-            case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                networkTechnology = "EVDO_B"; // ~ 5 Mbps
-            case TelephonyManager.NETWORK_TYPE_HSPAP:
-                networkTechnology = "HSPAP"; // ~ 10-20 Mbps
-            case TelephonyManager.NETWORK_TYPE_IDEN:
-                networkTechnology = "IDEN"; // ~25 kbps 
-            case TelephonyManager.NETWORK_TYPE_LTE:
-                networkTechnology = "LTE"; // ~ 10+ Mbps
-            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-                networkTechnology = "unknown"; // Unknown
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                    networkTechnology = "1xRTT"; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                    networkTechnology = "CDMA"; // ~ 14-64 kbps
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                    networkTechnology = "EDGE"; // ~ 50-100 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    networkTechnology = "EVDO_0"; // ~ 400-1000 kbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    networkTechnology = "EVDO_A"; // ~ 600-1400 kbps
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                    networkTechnology = "GPRS"; // ~ 100 kbps
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    networkTechnology = "HSDPA"; // ~ 2-14 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                    networkTechnology = "HSPA"; // ~ 700-1700 kbps
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    networkTechnology = "HSUPA"; // ~ 1-23 Mbps
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    networkTechnology = "UMTS"; // ~ 400-7000 kbps
+                case TelephonyManager.NETWORK_TYPE_EHRPD:
+                    networkTechnology = "EHRPD"; // ~ 1-2 Mbps
+                case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                    networkTechnology = "EVDO_B"; // ~ 5 Mbps
+                case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    networkTechnology = "HSPAP"; // ~ 10-20 Mbps
+                case TelephonyManager.NETWORK_TYPE_IDEN:
+                    networkTechnology = "IDEN"; // ~25 kbps 
+                case TelephonyManager.NETWORK_TYPE_LTE:
+                    networkTechnology = "LTE"; // ~ 10+ Mbps
+                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                    networkTechnology = "unknown"; // Unknown
             }
             addToMobileContext(Parameters.NETWORK_TECHNOLOGY, networkTechnology);
         }
