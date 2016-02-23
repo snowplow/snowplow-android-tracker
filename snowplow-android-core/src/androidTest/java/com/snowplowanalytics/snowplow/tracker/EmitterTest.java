@@ -20,7 +20,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import junit.framework.Assert;
 
@@ -31,6 +30,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.mockwebserver.RecordedRequest;
 
 public class EmitterTest extends SnowplowTestCase {
 

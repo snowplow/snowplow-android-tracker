@@ -31,11 +31,6 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -45,6 +40,11 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 /**
  * Build an emitter object which controls the
@@ -56,8 +56,8 @@ public abstract class Emitter {
     protected int POST_STM_BYTES = 22;     // "stm":"1443452851000",
 
     private final String TAG = Emitter.class.getSimpleName();
-    protected final OkHttpClient client = new OkHttpClient();
     protected final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
+    protected OkHttpClient client;
     protected Context context;
     protected Uri.Builder uriBuilder;
     protected RequestCallback requestCallback;
@@ -268,8 +268,10 @@ public abstract class Emitter {
         this.timeUnit = builder.timeUnit;
         buildEmitterUri();
 
-        client.setConnectTimeout(15, TimeUnit.SECONDS); // connect timeout
-        client.setReadTimeout(15, TimeUnit.SECONDS);    // socket timeout
+        client = new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .build();
 
         Logger.v(TAG, "Emitter created successfully!");
     }
