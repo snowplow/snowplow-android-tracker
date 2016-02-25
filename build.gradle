@@ -13,7 +13,7 @@ buildscript {
 
 subprojects {
     group = 'com.snowplowanalytics'
-    version = '0.5.3'
+    version = '0.5.4'
     repositories {
         maven {
             url "http://maven.snplow.com/releases"
