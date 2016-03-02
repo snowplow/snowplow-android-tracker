@@ -1,3 +1,8 @@
+Version 0.5.4 (2016-03-02)
+--------------------------
+Core: fixed input string \"null\" is not a valid UUID with previousSessionId on Android Versions lower than KitKat (#185)
+Add speed optimisations to Vagrantfile (#188)
+
 Version 0.5.3 (2015-11-22)
 --------------------------
 Core: fixed session context fails on first session (#176)

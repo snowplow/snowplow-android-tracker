@@ -114,14 +114,7 @@ public class Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return o;
         } else if (o == null) {
-            return new Object() {
-                @Override
-                public boolean equals(Object o) { return o == this || o == null;  }
-                @Override
-                public String toString() {
-                    return "null";
-                }
-            };
+            return JSONObject.NULL;
         } else if (o instanceof JSONObject || o instanceof JSONArray) {
             return o;
         } else if (o instanceof Collection) {

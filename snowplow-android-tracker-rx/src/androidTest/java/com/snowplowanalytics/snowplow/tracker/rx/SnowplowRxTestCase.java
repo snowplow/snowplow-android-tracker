@@ -177,7 +177,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             assertEquals("mob", query.get("p"));
             assertEquals("myAppId", query.get("aid"));
             assertEquals("myNamespace", query.get("tna"));
-            assertEquals("andr-0.5.3", query.get("tv"));
+            assertEquals("andr-0.5.4", query.get("tv"));
             assertEquals("English", query.get("lang"));
             assertTrue(query.has("dtm"));
             assertTrue(query.has("stm"));
@@ -218,7 +218,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
                 assertEquals("mob", json.getString("p"));
                 assertEquals("myAppId", json.getString("aid"));
                 assertEquals("myNamespace", json.getString("tna"));
-                assertEquals("andr-0.5.3", json.getString("tv"));
+                assertEquals("andr-0.5.4", json.getString("tv"));
                 assertEquals("English", json.getString("lang"));
                 assertTrue(json.has("dtm"));
                 assertTrue(json.has("stm"));
