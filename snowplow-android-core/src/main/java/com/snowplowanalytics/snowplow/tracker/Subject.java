@@ -97,6 +97,7 @@ public class Subject {
         setDefaultScreenResolution(context);
         setLocation(context);
         setCarrier(context);
+        setNetwork(context);
     }
 
     /**
@@ -206,6 +207,21 @@ public class Subject {
             String playAdId = Util.getAdvertisingId(context);
             Logger.d(TAG, "Advertising ID: %s", playAdId);
             addToMobileContext(Parameters.ANDROID_IDFA, playAdId);
+        }
+    }
+
+    /**
+     * Sets the current network type and technology
+     * @param context
+     */
+    public void setNetwork(Context context){
+        NetworkInfo ni = Util.getNetworkInfo;
+        if (ni != null) {
+            networkType = ni.getTypeName();
+            addToMobileContext(Parameters.NETWORK_TYPE, networkType);
+            if (networkType.equalsIgnoreCase("MOBILE")) {
+                addToMobileContext(Parameters.NETWORK_TECHNOLOGY, ni.getSubtypeName());
+            }
         }
     }
 

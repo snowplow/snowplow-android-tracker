@@ -223,6 +223,22 @@ public class Util {
     }
 
     /**
+     * Returns an instance that represents the current network connection
+     *
+     * @param context the android context
+     * @return the representation of the current network connection or null
+     */
+    public static NetworkInfo getNetworkInfo(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni != null && ni.isConnected()) {
+            return ni;
+        }
+        return null;
+    }
+
+    /**
      * Returns the carrier name based
      * on the android context supplied.
      *
