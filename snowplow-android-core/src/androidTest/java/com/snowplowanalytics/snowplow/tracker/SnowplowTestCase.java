@@ -18,12 +18,13 @@ import android.test.AndroidTestCase;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 public class SnowplowTestCase extends AndroidTestCase {
 
@@ -34,7 +35,7 @@ public class SnowplowTestCase extends AndroidTestCase {
             mockServer.shutdown();
         }
         mockServer = new MockWebServer();
-        mockServer.play();
+        mockServer.start();
     }
 
     public String mockServerName() {

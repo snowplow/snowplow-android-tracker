@@ -27,7 +27,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
-import com.squareup.okhttp.Request;
+
+import okhttp3.Request;
 
 /**
  * Builds a Emitter object which is used to store events

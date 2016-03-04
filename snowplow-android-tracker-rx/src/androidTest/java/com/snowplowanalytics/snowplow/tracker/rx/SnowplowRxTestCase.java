@@ -30,9 +30,6 @@ import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,6 +42,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+
 public class SnowplowRxTestCase extends AndroidTestCase {
 
     // Mock Server
@@ -56,7 +57,7 @@ public class SnowplowRxTestCase extends AndroidTestCase {
             mockServer.shutdown();
         }
         mockServer = new MockWebServer();
-        mockServer.play();
+        mockServer.start();
     }
 
     public String mockServerName() {
