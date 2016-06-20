@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.snowplowanalytics.snowplowtrackerdemo.ClassicDemo">
+    tools:context=".Demo">
 
     <TextView
         android:id="@+id/header"
@@ -44,7 +44,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true">
 
-        <TextView android:id="@+id/emitter_uri_name"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/emitter_uri_text"
@@ -90,7 +90,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:text="@string/emitter_type_text"
-                android:id="@+id/type_text"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"/>
 
@@ -102,7 +101,6 @@
                 android:text="@string/radio_get" />
 
             <RadioButton
-                android:id="@+id/radio_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_post" />
@@ -119,7 +117,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:text="@string/emitter_protocol_text"
-                android:id="@+id/protocol_text"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"/>
 
@@ -131,7 +128,6 @@
                 android:text="@string/radio_http" />
 
             <RadioButton
-                android:id="@+id/radio_https"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_https" />
@@ -148,7 +144,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:text="@string/data_collection_text"
-                android:id="@+id/data_collection"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"/>
 
@@ -181,7 +176,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 
-    <RelativeLayout android:id="@+id/bottom_section"
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -217,7 +212,7 @@
             android:maxLines = "200"
             android:scrollbars = "vertical"
             android:textColor="@android:color/white"
-            android:background="@color/button_material_dark"
+            android:background="@android:color/darker_gray"
             android:gravity="bottom"
             android:layout_marginRight="15dp"
             android:layout_marginEnd="26dp" />
@@ -226,7 +221,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/emitter_statistics"
-            android:id="@+id/statistics"
             android:textSize="16sp"
             android:paddingTop="10dp"
             android:paddingLeft="10dp"

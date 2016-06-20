@@ -44,35 +44,35 @@ public class TrackerEvents {
         trackEcommerceEvent(tracker);
     }
 
-    public static void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").customContext(getCustomContext()).build());
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).build());
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
-    public static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).customContext(getCustomContext()).build());
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
-    public static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
         tracker.track(ScreenView.builder().name("screenName").id("screenId").customContext(getCustomContext()).build());
         tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).build());
         tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
-    public static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").build());
         tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
         tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
         tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
-    public static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
@@ -82,7 +82,7 @@ public class TrackerEvents {
         tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
-    public static void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    private static void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);

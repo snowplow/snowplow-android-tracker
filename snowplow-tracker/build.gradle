@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 11
+        targetSdkVersion 24
+        versionCode 1
+        versionName "$project.version"
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+        }
+        release {
+            buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
+            buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+// generate javadoc
+android.libraryVariants.all { variant ->
+    task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
+        title = "Documentation for snowplow-android-core $version API"
+        description "Generates Javadoc for $variant.name."
+        source = variant.javaCompile.source
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        options.links("http://docs.oracle.com/javase/7/docs/api/");
+        exclude '**/R.java'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.google.android.gms:play-services-analytics:9.0.2'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
+
+    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
+}

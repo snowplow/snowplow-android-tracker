@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class DemoUtils {
 
-    public static final String namespace = "SnowplowAndroidTrackerDemo";
-    public static final String appId = "DemoID";
+    private static final String namespace = "SnowplowAndroidTrackerDemo";
+    private static final String appId = "DemoID";
 
     // Tracker Utils
 
@@ -44,23 +44,10 @@ public class DemoUtils {
      * @param callback the emitter callback
      * @return a new Classic Tracker
      */
-    public static Tracker getAndroidTrackerClassic(Context context, RequestCallback callback) {
-        Emitter emitter = DemoUtils.getEmitterClassic(context, callback);
+    public static Tracker getAndroidTracker(Context context, RequestCallback callback) {
+        Emitter emitter = DemoUtils.getEmitter(context, callback);
         Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerClassic(emitter, subject, context);
-    }
-
-    /**
-     * Returns an RxJava Tracker
-     *
-     * @param context the application context
-     * @param callback the emitter callback
-     * @return a new RxJava Tracker
-     */
-    public static Tracker getAndroidTrackerRx(Context context, RequestCallback callback) {
-        Emitter emitter = DemoUtils.getEmitterRx(context, callback);
-        Subject subject = DemoUtils.getSubject(context);
-        return DemoUtils.getTrackerRx(emitter, subject, context);
+        return DemoUtils.getTracker(emitter, subject, context);
     }
 
     /**
@@ -70,28 +57,8 @@ public class DemoUtils {
      * @param subject the tracker subject
      * @return a new Classic Tracker
      */
-    private static Tracker getTrackerClassic(Emitter emitter, Subject subject, Context context) {
-        return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
-                com.snowplowanalytics.snowplow.tracker.classic.Tracker.class)
-                .level(LogLevel.DEBUG)
-                .base64(false)
-                .platform(DevicePlatforms.Mobile)
-                .subject(subject)
-                .threadCount(20)
-                .sessionContext(true)
-                .build();
-    }
-
-    /**
-     * Returns an RxJava Tracker
-     *
-     * @param emitter an RxJava emitter
-     * @param subject the tracker subject
-     * @return a new RxJava Tracker
-     */
-    private static Tracker getTrackerRx(Emitter emitter, Subject subject, Context context) {
-        return new Tracker.TrackerBuilder(emitter, namespace, appId, context,
-                com.snowplowanalytics.snowplow.tracker.rx.Tracker.class)
+    private static Tracker getTracker(Emitter emitter, Subject subject, Context context) {
+        return new Tracker.TrackerBuilder(emitter, namespace, appId, context)
                 .level(LogLevel.DEBUG)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
@@ -108,24 +75,8 @@ public class DemoUtils {
      * @param callback the emitter callback
      * @return a new Classic Emitter
      */
-    private static Emitter getEmitterClassic(Context context, RequestCallback callback) {
-        return new Emitter.EmitterBuilder("", context,
-                com.snowplowanalytics.snowplow.tracker.classic.Emitter.class)
-                .callback(callback)
-                .tick(1)
-                .build();
-    }
-
-    /**
-     * Returns an RxJava Emitter
-     *
-     * @param context the application context
-     * @param callback the emitter callback
-     * @return a new RxJava Emitter
-     */
-    private static Emitter getEmitterRx(Context context, RequestCallback callback) {
-        return new Emitter.EmitterBuilder("", context,
-                com.snowplowanalytics.snowplow.tracker.rx.Emitter.class)
+    private static Emitter getEmitter(Context context, RequestCallback callback) {
+        return new Emitter.EmitterBuilder("", context)
                 .callback(callback)
                 .tick(1)
                 .build();
@@ -163,7 +114,7 @@ public class DemoUtils {
      * @param runnable a new task
      * @param initDelay the delay before polling
      * @param delay the delay between polls
-     * @param timeUnit the timeunit for the delays
+     * @param timeUnit the time-unit for the delays
      */
     public static void scheduleRepeating(Runnable runnable, long initDelay, long delay, TimeUnit timeUnit) {
         executor.scheduleAtFixedRate(runnable, initDelay, delay, timeUnit);
