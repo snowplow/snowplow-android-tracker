@@ -319,8 +319,10 @@ public class Tracker {
 
         // Build the final context and add it
         SelfDescribingJson envelope = getFinalContext(context);
-        payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
-                Parameters.CONTEXT);
+        if (envelope != null) {
+            payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
+                    Parameters.CONTEXT);
+        }
 
         // Add this payload to the emitter
         Logger.v(TAG, "Adding new payload to event storage: %s", payload);
@@ -355,14 +357,16 @@ public class Tracker {
             }
         }
 
-        // Convert List of SelfDescribingJson into a List of Map
-        List<Map> contextMaps = new LinkedList<>();
-        for (SelfDescribingJson selfDescribingJson : context) {
-            contextMaps.add(selfDescribingJson.getMap());
+        // If there are contexts to nest
+        if (context.size() == 0) {
+            return null;
+        } else {
+            List<Map> contextMaps = new LinkedList<>();
+            for (SelfDescribingJson selfDescribingJson : context) {
+                contextMaps.add(selfDescribingJson.getMap());
+            }
+            return new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
         }
-
-        // Return the contexts as a new SelfDescribingJson
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
     }
 
     // --- Controls
