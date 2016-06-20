@@ -253,6 +253,7 @@ public class Subject {
             addToGeoLocationContext(Parameters.LATLONG_ACCURACY, location.getAccuracy());
             addToGeoLocationContext(Parameters.SPEED, location.getSpeed());
             addToGeoLocationContext(Parameters.BEARING, location.getBearing());
+            addToGeoLocationContext(Parameters.GEO_TIMESTAMP, System.currentTimeMillis());
         }
     }
 

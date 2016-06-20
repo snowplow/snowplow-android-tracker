@@ -105,6 +105,7 @@ public class Parameters {
     public static final String LATLONG_ACCURACY = "latitudeLongitudeAccuracy";
     public static final String SPEED = "speed";
     public static final String BEARING = "bearing";
+    public static final String GEO_TIMESTAMP = "timestamp";
 
     // Session Context
     public static final String SESSION_USER_ID = "userId";
