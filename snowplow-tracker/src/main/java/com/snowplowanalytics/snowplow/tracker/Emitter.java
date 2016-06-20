@@ -31,10 +31,10 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class Emitter {
     private static final int POST_STM_BYTES = 22;     // "stm":"1443452851000",
 
     private final String TAG = Emitter.class.getSimpleName();
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client;
     private final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
 
     private Context context;
@@ -232,8 +232,10 @@ public class Emitter {
 
         buildEmitterUri();
 
-        client.setConnectTimeout(15, TimeUnit.SECONDS); // connect timeout
-        client.setReadTimeout(15, TimeUnit.SECONDS);    // socket timeout
+        client = new OkHttpClient.Builder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .build();
 
         Logger.v(TAG, "Emitter created successfully!");
     }

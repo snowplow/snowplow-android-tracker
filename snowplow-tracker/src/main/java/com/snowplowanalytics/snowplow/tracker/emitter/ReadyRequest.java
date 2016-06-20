@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import com.squareup.okhttp.Request;
+import okhttp3.Request;
 
 import java.util.LinkedList;
 

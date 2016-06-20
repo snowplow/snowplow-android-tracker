@@ -58,7 +58,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:9.0.2'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:support-v4:24.0.0'
-    compile 'com.squareup.okhttp:okhttp:2.7.5'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 
-    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
 }
