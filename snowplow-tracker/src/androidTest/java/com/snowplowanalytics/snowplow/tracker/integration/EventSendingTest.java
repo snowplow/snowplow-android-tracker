@@ -27,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
@@ -414,10 +414,10 @@ public class EventSendingTest extends AndroidTestCase {
     }
 
     public void trackTimings(Tracker tracker) throws Exception {
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackUnstructuredEvent(Tracker tracker) throws Exception {

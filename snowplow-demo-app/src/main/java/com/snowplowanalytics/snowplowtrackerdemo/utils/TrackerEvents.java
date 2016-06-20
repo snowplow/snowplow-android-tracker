@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
@@ -66,10 +66,10 @@ public class TrackerEvents {
     }
 
     private static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
-        tracker.track(TimingWithCategory.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {

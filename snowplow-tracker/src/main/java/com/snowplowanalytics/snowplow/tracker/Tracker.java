@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
-import com.snowplowanalytics.snowplow.tracker.events.TimingWithCategory;
+import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
@@ -278,7 +278,7 @@ public class Tracker {
             Unstructured unstructured = (Unstructured) event;
             unstructured.setBase64Encode(base64Encoded);
             this.addEventPayload(unstructured.getPayload(), context);
-        } else if (eClass.equals(TimingWithCategory.class) || eClass.equals(ScreenView.class)) {
+        } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
 
             // These are wrapper classes for Unstructured events; need to create Unstructured
             // events from them and resend.

@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import java.util.HashMap;
 
-public class TimingWithCategory extends AbstractEvent {
+public class Timing extends AbstractEvent {
 
     private final String category;
     private final String variable;
@@ -69,8 +69,8 @@ public class TimingWithCategory extends AbstractEvent {
             return self();
         }
 
-        public TimingWithCategory build() {
-            return new TimingWithCategory(this);
+        public Timing build() {
+            return new Timing(this);
         }
     }
 
@@ -85,7 +85,7 @@ public class TimingWithCategory extends AbstractEvent {
         return new Builder2();
     }
 
-    protected TimingWithCategory(Builder<?> builder) {
+    protected Timing(Builder<?> builder) {
         super(builder);
 
         // Precondition checks
