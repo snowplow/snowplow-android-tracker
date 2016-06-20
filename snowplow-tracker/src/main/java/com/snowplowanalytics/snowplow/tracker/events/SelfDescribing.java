@@ -20,9 +20,9 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 
 /**
- * Constructs an Unstructured event object.
+ * Constructs an SelfDescribing event object.
  */
-public class Unstructured extends AbstractEvent {
+public class SelfDescribing extends AbstractEvent {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -42,8 +42,8 @@ public class Unstructured extends AbstractEvent {
             return self();
         }
 
-        public Unstructured build() {
-            return new Unstructured(this);
+        public SelfDescribing build() {
+            return new SelfDescribing(this);
         }
     }
 
@@ -58,7 +58,7 @@ public class Unstructured extends AbstractEvent {
         return new Builder2();
     }
 
-    protected Unstructured(Builder<?> builder) {
+    protected SelfDescribing(Builder<?> builder) {
         super(builder);
 
         // Precondition checks

@@ -35,7 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
@@ -272,17 +272,17 @@ public class Tracker {
                 item.setTimestamp(ecommerceTransaction.getTimestamp());
                 this.addEventPayload(item.getPayload(), item.getContext());
             }
-        } else if (eClass.equals(Unstructured.class)) {
+        } else if (eClass.equals(SelfDescribing.class)) {
 
-            // Need to set the Base64 rule for Unstructured events
-            Unstructured unstructured = (Unstructured) event;
-            unstructured.setBase64Encode(base64Encoded);
-            this.addEventPayload(unstructured.getPayload(), context);
+            // Need to set the Base64 rule for SelfDescribing events
+            SelfDescribing selfDescribing = (SelfDescribing) event;
+            selfDescribing.setBase64Encode(base64Encoded);
+            this.addEventPayload(selfDescribing.getPayload(), context);
         } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
 
-            // These are wrapper classes for Unstructured events; need to create Unstructured
+            // These are wrapper classes for SelfDescribing events; need to create SelfDescribing
             // events from them and resend.
-            this.track(Unstructured.builder()
+            this.track(SelfDescribing.builder()
                     .eventData((SelfDescribingJson) event.getPayload())
                     .customContext(context)
                     .timestamp(event.getTimestamp())

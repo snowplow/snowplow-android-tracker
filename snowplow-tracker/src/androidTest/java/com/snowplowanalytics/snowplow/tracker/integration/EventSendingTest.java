@@ -28,7 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
-import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
@@ -424,10 +424,10 @@ public class EventSendingTest extends AndroidTestCase {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
-        tracker.track(Unstructured.builder().eventData(test).build());
-        tracker.track(Unstructured.builder().eventData(test).customContext(getCustomContext()).build());
-        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).build());
-        tracker.track(Unstructured.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(SelfDescribing.builder().eventData(test).build());
+        tracker.track(SelfDescribing.builder().eventData(test).customContext(getCustomContext()).build());
+        tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).build());
+        tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackEcommerceEvent(Tracker tracker) throws Exception {
