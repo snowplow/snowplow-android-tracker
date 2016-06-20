@@ -216,8 +216,7 @@ public class Util {
             return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
         }
         catch (Exception e) {
-            Logger.e(TAG, "Exception getting the Advertising ID: %s - Cause: %s",
-                    e.toString(), e.getCause().toString());
+            Logger.e(TAG, "Exception getting the Advertising ID: %s", e.toString());
             return null;
         }
     }
