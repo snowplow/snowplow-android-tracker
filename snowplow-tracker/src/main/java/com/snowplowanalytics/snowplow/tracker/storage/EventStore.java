@@ -34,6 +34,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
  * Helper class for storing, getting and removing
@@ -130,6 +131,26 @@ public class EventStore {
         }
         Logger.d(TAG, "Removed event from database: %s", "" + id);
         return retval == 1;
+    }
+
+    /**
+     * Removes a range of events from the database
+     *
+     * @param ids the ids to remove
+     * @return a boolean of success to remove
+     */
+    public boolean removeEvents(List<Long> ids) {
+        if (ids.size() == 0) {
+            return false;
+        }
+
+        int retval = -1;
+        if (isDatabaseOpen()) {
+            retval = database.delete(EventStoreHelper.TABLE_EVENTS,
+                    EventStoreHelper.COLUMN_ID + " in (" + (Util.joinLongList(ids)) + ")", null);
+        }
+        Logger.d(TAG, "Removed events from database: %s", retval);
+        return retval == ids.size();
     }
 
     /**

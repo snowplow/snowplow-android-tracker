@@ -342,4 +342,30 @@ public class Util {
     public static boolean isTimeInRange(long startTime, long checkTime, long range) {
         return startTime > (checkTime - range);
     }
+
+    /**
+     * Joins a list of Longs into a single string
+     *
+     * @param list the list to join
+     * @return the joined list
+     */
+    public static String joinLongList(List<Long> list) {
+        String s = "";
+
+        for (int i = 0; i < list.size(); i++) {
+            Long longVal = list.get(i);
+            if (longVal != null) {
+                s += Long.toString(list.get(i));
+                if (i < list.size() - 1) {
+                    s += ",";
+                }
+            }
+        }
+
+        if (s.substring(s.length() - 1).equals(",")) {
+            s = s.substring(0, s.length() - 1);
+        }
+
+        return s;
+    }
 }

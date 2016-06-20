@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -370,7 +369,7 @@ public class Emitter {
                         Logger.e(TAG, "Request sending failed but we will retry later.");
                     }
                 }
-                performAsyncEventRemoval(removableEvents);
+                eventStore.removeEvents(removableEvents);
 
                 results = null;
                 removableEvents = null;
@@ -465,49 +464,6 @@ public class Emitter {
     }
 
     /**
-     * Asynchronously removes all the marked
-     * event ids from successfully sent events.
-     *
-     * NOTE: If events fail to be removed they
-     * will be double sent.  At small levels this
-     * should not be an issue as we can de-dupe later.
-     *
-     * @param eventIds the events ids to remove
-     * @return a list of booleans
-     */
-    private LinkedList<Boolean> performAsyncEventRemoval(LinkedList<Long> eventIds) {
-        LinkedList<Boolean> results = new LinkedList<>();
-        LinkedList<Future> futures = new LinkedList<>();
-
-        // Start all requests in the ThreadPool
-        for (Long id : eventIds) {
-            futures.add(Executor.futureCallable(getRemoveCallable(id)));
-        }
-
-        Logger.d(TAG, "Removal Futures: %s", futures.size());
-
-        // Get results of futures
-        for (int i = 0; i < futures.size(); i++) {
-            boolean result = false;
-            try {
-                result = (boolean) futures.get(i).get(5, TimeUnit.SECONDS);
-            } catch (InterruptedException ie) {
-                Logger.e(TAG, "Removal Future was interrupted: %s", ie.getMessage());
-            } catch (ExecutionException ee) {
-                Logger.e(TAG, "Removal Future failed: %s", ee.getMessage());
-            } catch (TimeoutException te) {
-                Logger.e(TAG, "Removal Future had a timeout: %s", te.getMessage());
-            }
-            results.add(result);
-        }
-
-        eventIds = null;
-        futures = null;
-
-        return results;
-    }
-
-    /**
      * Returns a Callable Request Send
      *
      * @param request the request to be
@@ -519,22 +475,6 @@ public class Emitter {
             @Override
             public Integer call() throws Exception {
                 return requestSender(request);
-            }
-        };
-    }
-
-    /**
-     * Returns a Callable Event Removal
-     *
-     * @param eventId the eventId to
-     *                remove
-     * @return the new Callable object
-     */
-    private Callable<Boolean> getRemoveCallable(final Long eventId) {
-        return new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return eventStore.removeEvent(eventId);
             }
         };
     }

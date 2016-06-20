@@ -15,6 +15,8 @@ package com.snowplowanalytics.snowplow.tracker.storage;
 
 import android.test.AndroidTestCase;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -81,6 +83,23 @@ public class EventStoreTest extends AndroidTestCase {
         EventStore eventStore = getEventStore();
         long id = eventStore.insertEvent(getEvent());
         boolean res = eventStore.removeEvent(id);
+
+        assertEquals(0, eventStore.getSize());
+        assertEquals(true, res);
+    }
+
+    public void testRemoveRangeOfEvents() {
+        EventStore eventStore = getEventStore();
+        List<Long> idList = new ArrayList<>();
+
+        idList.add(eventStore.insertEvent(getEvent()));
+        idList.add(eventStore.insertEvent(getEvent()));
+        idList.add(eventStore.insertEvent(getEvent()));
+
+        assertEquals(3, idList.size());
+        assertEquals(3, eventStore.getSize());
+
+        boolean res = eventStore.removeEvents(idList);
 
         assertEquals(0, eventStore.getSize());
         assertEquals(true, res);
