@@ -23,15 +23,12 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +59,7 @@ public class Util {
      * @return a Base64 encoded string
      */
     public static String base64Encode(String string) {
-        return Base64.encodeToString(string.getBytes(), Base64.URL_SAFE);
+        return Base64.encodeToString(string.getBytes(), Base64.NO_WRAP);
     }
 
     /**

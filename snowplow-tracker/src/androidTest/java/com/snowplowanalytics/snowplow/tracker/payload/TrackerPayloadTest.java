@@ -73,12 +73,12 @@ public class TrackerPayloadTest extends AndroidTestCase {
     public void testAddMapBase64Encoded() throws JSONException {
         payload.addMap(abMap(), true, "enc", "no_enc");
 
-        // {"enc":"eyJhIjoiYiJ9\n"}
+        // {"enc":"eyJhIjoiYiJ9"}
         String s = payload.toString();
 
         JSONObject map = new JSONObject(s);
         String value = map.getString("enc");
-        assertEquals("eyJhIjoiYiJ9\n", value);
+        assertEquals("eyJhIjoiYiJ9", value);
         String decoded = new String(Base64.decode(value, Base64.URL_SAFE));
         assertEquals("{\"a\":\"b\"}", decoded);
     }
