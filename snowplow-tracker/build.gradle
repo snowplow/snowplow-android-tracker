@@ -1,4 +1,10 @@
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+jacoco {
+    toolVersion = "0.7.7.201606060606"
+}
 
 android {
     compileSdkVersion 24
@@ -15,6 +21,8 @@ android {
         debug {
             buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
             buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+
+            testCoverageEnabled = true
         }
         release {
             buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
@@ -39,7 +47,7 @@ android {
     }
 }
 
-// generate javadoc
+// Generate Javadoc
 android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         title = "Documentation for snowplow-android-core $version API"
@@ -50,6 +58,10 @@ android.libraryVariants.all { variant ->
         options.links("http://docs.oracle.com/javase/7/docs/api/");
         exclude '**/R.java'
     }
+}
+
+coveralls {
+    jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
 }
 
 dependencies {
