@@ -23,7 +23,6 @@ import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,61 +45,38 @@ public class TrackerEvents {
 
     private static void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").customContext(getCustomContext()).build());
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).customContext(getCustomContext()).build());
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").customContext(getCustomContext()).build());
         tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("test-key-1", "test-value-1");
-        SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
+        attributes.put("targetUrl", "http://a-target-url.com");
+        SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
-        tracker.track(SelfDescribing.builder().eventData(test).customContext(getCustomContext()).build());
         tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).build());
-        tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     private static void trackEcommerceEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).customContext(getCustomContext()).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(item).timestamp((long) 1433791172).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(item).timestamp((long) 1433791172).customContext(getCustomContext()).build());    }
 
-    /**
-     * Returns a custom context.
-     */
-    private static List<SelfDescribingJson> getCustomContext() {
-        List<SelfDescribingJson> contexts = new ArrayList<>();
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put("snowplow", "demo-tracker");
-        SelfDescribingJson json1 = new SelfDescribingJson(
-                "iglu:com.snowplowanalytics.snowplow/demo_android/jsonschema/1-0-0", attributes);
-        contexts.add(json1);
-        return contexts;
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(item).timestamp((long) 1433791172).build());
     }
 }

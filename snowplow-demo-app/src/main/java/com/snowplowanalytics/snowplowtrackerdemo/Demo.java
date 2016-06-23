@@ -24,11 +24,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 
+import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
@@ -41,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("FieldCanBeLocal")
 public class Demo extends Activity {
 
-    private Tracker tracker;
     private Button _startButton;
     private EditText _uriField;
     private RadioGroup _type, _security, _collection;
@@ -51,90 +53,64 @@ public class Demo extends Activity {
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
-    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_classic_demo);
+        setContentView(R.layout.activity_demo);
+
+        // Init Tracker
+        initAndroidTracker();
+
+        _startButton   = (Button)findViewById(R.id.btn_lite_start);
+        _uriField      = (EditText)findViewById(R.id.emitter_uri_field);
+        _type          = (RadioGroup)findViewById(R.id.radio_send_type);
+        _security      = (RadioGroup)findViewById(R.id.radio_send_security);
+        _collection    = (RadioGroup)findViewById(R.id.radio_data_collection);
+        _radioGet      = (RadioButton)findViewById(R.id.radio_get);
+        _radioHttp     = (RadioButton)findViewById(R.id.radio_http);
+        _logOutput     = (TextView)findViewById(R.id.log_output);
+        _eventsCreated = (TextView)findViewById(R.id.created_events);
+        _eventsSent    = (TextView)findViewById(R.id.sent_events);
+        _emitterOnline = (TextView)findViewById(R.id.online_status);
+        _emitterStatus = (TextView)findViewById(R.id.emitter_status);
+        _databaseSize  = (TextView)findViewById(R.id.database_size);
+        _sessionIndex  = (TextView)findViewById(R.id.session_index);
+
+        _logOutput.setMovementMethod(new ScrollingMovementMethod());
+        _logOutput.setText("");
+
+        // Setup Listeners
         setupTrackerListener();
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (tracker != null) {
-            tracker.pauseEventTracking();
-            tracker = null;
-        }
+    protected void onDestroy() {
         DemoUtils.resetExecutor();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (tracker != null) {
-            tracker.getSession().setIsBackground(true);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (tracker != null) {
-            tracker.getSession().setIsBackground(false);
-        }
+        super.onDestroy();
     }
 
     /**
      * Builds and sets up the Tracker listener for the demo.
      */
     private void setupTrackerListener() {
-
-        _startButton = (Button)findViewById(R.id.btn_lite_start);
-        _uriField    = (EditText)findViewById(R.id.emitter_uri_field);
-        _type        = (RadioGroup)findViewById(R.id.radio_send_type);
-        _security    = (RadioGroup)findViewById(R.id.radio_send_security);
-        _collection  = (RadioGroup)findViewById(R.id.radio_data_collection);
-        _radioGet   = (RadioButton)findViewById(R.id.radio_get);
-        _radioHttp  = (RadioButton)findViewById(R.id.radio_http);
-        _logOutput  = (TextView)findViewById(R.id.log_output);
-        _eventsCreated  = (TextView)findViewById(R.id.created_events);
-        _eventsSent     = (TextView)findViewById(R.id.sent_events);
-        _emitterOnline  = (TextView)findViewById(R.id.online_status);
-        _emitterStatus  = (TextView)findViewById(R.id.emitter_status);
-        _databaseSize   = (TextView)findViewById(R.id.database_size);
-        _sessionIndex   = (TextView)findViewById(R.id.session_index);
-
-        context = getApplicationContext();
-
-        _logOutput.setMovementMethod(new ScrollingMovementMethod());
-        _logOutput.setText("");
-
-        tracker = DemoUtils.getAndroidTracker(context, getCallback());
-
-        makePollingUpdater(context);
+        makePollingUpdater(getApplicationContext());
 
         _collection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
-                DemoUtils.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (i == R.id.radio_data_on) {
-                            tracker.resumeEventTracking();
-                        } else if (i == R.id.radio_data_off) {
-                            tracker.pauseEventTracking();
-                        }
-                    }
-                });
+                if (i == R.id.radio_data_on) {
+                    Tracker.instance().resumeEventTracking();
+                } else if (i == R.id.radio_data_off) {
+                    Tracker.instance().pauseEventTracking();
+                }
             }
         });
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                Emitter e = tracker.getEmitter();
+                Emitter e = Tracker.instance().getEmitter();
                 String uri = _uriField.getText().toString();
                 HttpMethod method = _type.getCheckedRadioButtonId() ==
                         _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
@@ -148,36 +124,15 @@ public class Demo extends Activity {
                 }
 
                 if (!uri.equals("")) {
-                    eventsCreated += 28;
+                    eventsCreated += 14;
                     final String made = "Made: " + eventsCreated;
                     _eventsCreated.setText(made);
-                    TrackerEvents.trackAll(tracker);
+                    TrackerEvents.trackAll(Tracker.instance());
                 } else {
                     updateLogger("URI field empty!\n");
                 }
             }
         });
-    }
-
-    /**
-     * Returns the Emitter Request Callback.
-     */
-    private RequestCallback getCallback() {
-        return new RequestCallback() {
-            @Override
-            public void onSuccess(int successCount) {
-                updateLogger("Emitter Send Success:\n " +
-                        "- Events sent: " + successCount + "\n");
-                updateEventsSent(successCount);
-            }
-            @Override
-            public void onFailure(int successCount, int failureCount) {
-                updateLogger("Emitter Send Failure:\n " +
-                        "- Events sent: " + successCount + "\n " +
-                        "- Events failed: " + failureCount + "\n");
-                updateEventsSent(successCount);
-            }
-        };
     }
 
     /**
@@ -209,26 +164,6 @@ public class Demo extends Activity {
                 _eventsSent.setText(sent);
             }
         });
-    }
-
-    /**
-     * Starts a polling updater which will fetch
-     * and update the UI.
-     *
-     * @param context the activity context
-     */
-    private void makePollingUpdater(final Context context) {
-        DemoUtils.scheduleRepeating(new Runnable() {
-            @Override
-            public void run() {
-                boolean isOnline = Util.isOnline(context);
-                Emitter e = tracker.getEmitter();
-                boolean isRunning = e.getEmitterStatus();
-                long dbSize = e.getEventStore().getSize();
-                int sessionIndex = tracker.getSession().getSessionIndex();
-                updateEmitterStats(isOnline, isRunning, dbSize, sessionIndex);
-            }
-        }, 1, 1, TimeUnit.SECONDS);
     }
 
     /**
@@ -272,5 +207,81 @@ public class Demo extends Activity {
                 }
             }
         });
+    }
+
+    /**
+     * Starts a polling updater which will fetch
+     * and update the UI.
+     *
+     * @param context the activity context
+     */
+    private void makePollingUpdater(final Context context) {
+        DemoUtils.scheduleRepeating(new Runnable() {
+            @Override
+            public void run() {
+                boolean isOnline = Util.isOnline(context);
+                Emitter e = Tracker.instance().getEmitter();
+                boolean isRunning = e.getEmitterStatus();
+                long dbSize = e.getEventStore().getSize();
+                int sessionIndex = Tracker.instance().getSession().getSessionIndex();
+                updateEmitterStats(isOnline, isRunning, dbSize, sessionIndex);
+            }
+        }, 1, 1, TimeUnit.SECONDS);
+    }
+
+    // --- Tracker
+
+    private static final String namespace = "SnowplowAndroidTrackerDemo";
+    private static final String appId = "DemoID";
+
+    /**
+     * Builds a Tracker
+     */
+    private void initAndroidTracker() {
+        Tracker.close();
+
+        Emitter emitter = new Emitter.EmitterBuilder("", this.getApplicationContext())
+                .callback(getCallback())
+                .tick(1)
+                .build();
+
+        Subject subject = new Subject.SubjectBuilder()
+                .context(this.getApplicationContext())
+                .build();
+
+        Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
+                .level(LogLevel.DEBUG)
+                .base64(false)
+                .platform(DevicePlatforms.Mobile)
+                .subject(subject)
+                .threadCount(20)
+                .sessionContext(true)
+                .mobileContext(true)
+                .geoLocationContext(true)
+                .applicationCrash(true)
+                .lifecycleEvents(true)
+                .build()
+        ).setLifecycleHandler(this);
+    }
+
+    /**
+     * Returns the Emitter Request Callback.
+     */
+    private RequestCallback getCallback() {
+        return new RequestCallback() {
+            @Override
+            public void onSuccess(int successCount) {
+                updateLogger("Emitter Send Success:\n " +
+                        "- Events sent: " + successCount + "\n");
+                updateEventsSent(successCount);
+            }
+            @Override
+            public void onFailure(int successCount, int failureCount) {
+                updateLogger("Emitter Send Failure:\n " +
+                        "- Events sent: " + successCount + "\n " +
+                        "- Events failed: " + failureCount + "\n");
+                updateEventsSent(successCount);
+            }
+        };
     }
 }
