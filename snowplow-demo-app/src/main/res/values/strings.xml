@@ -3,8 +3,8 @@
 
     <string name="main_demo_header">Android Tracker Demo</string>
     <string name="main_demo_info">
-        To launch the demonstrations simply click one of the below buttons.
-        Each demo will send every combination of event construction available to the tracker to an
+        To launch the demonstration simply click the button below.
+        The demo will send every combination of event construction available to the tracker to an
         endpoint you will enter on the demo page.
     </string>
     <string name="link_header">Useful Links:</string>
@@ -13,12 +13,11 @@
     <string name="link_setup_guide">- Setup Guide</string>
     <string name="link_repo">- Github Repository</string>
 
-    <string name="main_demo_button_rx">RxJava Tracker Demo</string>
-    <string name="main_demo_button_lite">Classic Tracker Demo</string>
+    <string name="main_demo_button">Tracker Demo</string>
 
-    <string name="title_activity_lite_demo">Classic Demo</string>
-    <string name="lite_demo_header">Classic Tracker Demo</string>
-    <string name="lite_demo_info">Enter settings below and then hit start.</string>
+    <string name="title_activity_demo">Tracker Demo</string>
+    <string name="demo_header">Tracker Demo</string>
+    <string name="demo_info">Enter settings below and then hit start.</string>
 
     <string name="emitter_uri_text">Emitter URI:</string>
     <string name="emitter_protocol_text">Protocol:</string>
