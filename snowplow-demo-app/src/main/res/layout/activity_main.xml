@@ -34,7 +34,7 @@
     <Button
         android:id="@+id/btn_lite"
         android:layout_height="wrap_content"
-        android:text="@string/main_demo_button_lite"
+        android:text="@string/main_demo_button"
         android:layout_width="match_parent"
         android:gravity="center"
         android:textSize="16sp"

@@ -48,9 +48,9 @@ public class MainActivity extends Activity {
         _liteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Logger.updateLogLevel(LogLevel.VERBOSE);
                 Intent intent = new Intent(MainActivity.this, Demo.class);
                 startActivity(intent);
-                Logger.updateLogLevel(LogLevel.DEBUG);
             }
         });
 
