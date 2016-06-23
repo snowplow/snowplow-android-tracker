@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/header"
-        android:text="@string/lite_demo_header"
+        android:text="@string/demo_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
@@ -21,7 +21,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView android:text="@string/lite_demo_info"
+    <TextView android:text="@string/demo_info"
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

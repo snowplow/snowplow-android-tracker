@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.snowplowanalytics.snowplowtrackerdemo"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 24
-        versionCode 2
-        versionName "0.2.1"
+        versionCode 3
+        versionName "0.3.0"
     }
 
     buildTypes {
@@ -27,5 +27,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':snowplow-android-tracker')
+    compile 'com.google.android.gms:play-services-analytics:9.0.2'
     compile 'com.android.support:appcompat-v7:24.0.0'
 }
