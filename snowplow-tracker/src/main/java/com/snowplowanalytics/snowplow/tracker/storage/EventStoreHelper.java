@@ -76,8 +76,7 @@ public class EventStoreHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        Logger.d(TAG, "Upgrading database from version " + oldVersion + " to "
-                + newVersion + ". Destroying old data now..");
+        Logger.d(TAG, "Upgrade not implemented, resetting database...");
         database.execSQL(queryDropTable);
         onCreate(database);
     }

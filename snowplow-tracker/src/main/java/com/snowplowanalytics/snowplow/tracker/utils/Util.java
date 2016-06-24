@@ -30,6 +30,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -555,5 +560,51 @@ public class Util {
                                        Class[] cArgs, Object... args) throws Exception {
         Method methodObject = classObject.getMethod(methodName, cArgs);
         return methodObject.invoke(instance, args);
+    }
+
+    /**
+     * Converts an event map to a byte
+     * array for storage.
+     *
+     * @param map the map containing all
+     *            the event parameters
+     * @return the byte array or null
+     */
+    public static byte[] serialize(Map<String, String> map) {
+        byte[] newByteArray = null;
+        try {
+            ByteArrayOutputStream mem_out = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(mem_out);
+            out.writeObject(map);
+            out.close();
+            mem_out.close();
+            newByteArray = mem_out.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newByteArray;
+    }
+
+    /**
+     * Converts a byte array back into an
+     * event map for sending.
+     *
+     * @param bytes the bytes to be converted
+     * @return the Map or null
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> deserializer(byte[] bytes) {
+        Map<String, String> newMap = null;
+        try {
+            ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
+            ObjectInputStream in = new ObjectInputStream(mem_in);
+            Map<String, String> map = (HashMap<String, String>) in.readObject();
+            in.close();
+            mem_in.close();
+            newMap = map;
+        } catch (NullPointerException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        return newMap;
     }
 }
