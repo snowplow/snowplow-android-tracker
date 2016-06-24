@@ -305,30 +305,6 @@ public class Emitter {
         Executor.shutdown();
     }
 
-    // --- Synchronous
-
-    /**
-     * Performs a synchronous sending of a list of
-     * ReadyRequests.
-     *
-     * @param requests the requests to send
-     * @return the request results.
-     */
-    protected LinkedList<RequestResult> performSyncEmit(LinkedList<ReadyRequest> requests) {
-        LinkedList<RequestResult> results = new LinkedList<>();
-        for (ReadyRequest request : requests) {
-            int code = requestSender(request.getRequest());
-            if (request.isOversize()) {
-                results.add(new RequestResult(true, request.getEventIds()));
-            } else {
-                results.add(new RequestResult(isSuccessfulSend(code), request.getEventIds()));
-            }
-        }
-        return results;
-    }
-
-    // -- Asynchronous
-
     /**
      * Attempts to send events in the database to
      * a collector.
@@ -427,7 +403,7 @@ public class Emitter {
      *                 sent
      * @return the results of each request
      */
-    private LinkedList<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
+    protected LinkedList<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
         LinkedList<RequestResult> results = new LinkedList<>();
         LinkedList<Future> futures = new LinkedList<>();
 
