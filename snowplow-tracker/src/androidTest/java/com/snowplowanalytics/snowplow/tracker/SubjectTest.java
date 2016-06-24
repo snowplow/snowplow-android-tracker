@@ -14,8 +14,8 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
@@ -35,24 +35,19 @@ public class SubjectTest extends AndroidTestCase {
 
     // Tests
 
+    public void testSubjectWithNullContext() {
+        Subject subject = new Subject.SubjectBuilder().build();
+        Map<String, String> map = subject.getSubject();
+        assertFalse(map.containsKey(Parameters.RESOLUTION));
+    }
+
     public void testGetSubjectStandardPairs() throws Exception {
         Subject subject = getSubject();
         Map<String, String> standardPairs = subject.getSubject();
-        Map<String, String> mobilePairs = subject.getSubjectMobile();
 
         assertTrue(standardPairs.containsKey("tz"));
         assertTrue(standardPairs.containsKey("lang"));
         assertTrue(standardPairs.containsKey("res"));
-
-        assertTrue(mobilePairs.containsKey("osType"));
-        assertTrue(mobilePairs.containsKey("osVersion"));
-        assertTrue(mobilePairs.containsKey("deviceModel"));
-
-        if(mobilePairs.get("deviceModel").equals("Android SDK built for x86")) {
-            assertTrue(mobilePairs.containsKey("carrier"));
-        } else {
-            Log.i("test", "Skipping carrier key test on live device");
-        }
     }
 
     public void testSetUserId() {

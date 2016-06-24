@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -102,7 +103,6 @@ public class Subject {
      *
      * @param context the android context
      */
-    @TargetApi(19)
     @SuppressWarnings("deprecation")
     public void setDefaultScreenResolution(Context context) {
         WindowManager windowManager =
@@ -110,14 +110,10 @@ public class Subject {
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
 
-        try {
-            Class<?> partypes[] = new Class[1];
-            partypes[0] = Point.class;
-            Display.class.getMethod("getSize", partypes);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             display.getSize(size);
             this.setScreenResolution(size.x, size.y);
-        } catch (NoSuchMethodException e) {
-            Logger.e(TAG, "Display.getSize isn't available on older devices.");
+        } else {
             this.setScreenResolution(display.getWidth(), display.getHeight());
         }
     }

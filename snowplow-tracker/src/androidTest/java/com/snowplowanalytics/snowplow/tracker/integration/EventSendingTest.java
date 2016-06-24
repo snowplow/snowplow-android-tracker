@@ -51,12 +51,17 @@ public class EventSendingTest extends AndroidTestCase {
 
     // Test Setup
 
-    private MockWebServer getMockServer() throws IOException {
+    private MockWebServer getMockServer(int count) throws IOException {
         EventStore eventStore = new EventStore(getContext(), 10);
         eventStore.removeAllEvents();
 
         MockWebServer mockServer = new MockWebServer();
         mockServer.start();
+
+        MockResponse mockResponse = new MockResponse().setResponseCode(200);
+        for (int i = 0; i < count; i++) {
+            mockServer.enqueue(mockResponse);
+        }
 
         return mockServer;
     }
@@ -65,27 +70,11 @@ public class EventSendingTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
-    public void enqueueResponses(MockWebServer mockServer, int count) {
-        MockResponse mockResponse = new MockResponse().setResponseCode(200);
-        for (int i = 0; i < count; i++) {
-            mockServer.enqueue(mockResponse);
-        }
-    }
-
     // Tests
 
     public void testSendGet() throws Exception {
-        MockWebServer mockServer = getMockServer();
-        enqueueResponses(mockServer, 28);
-
-        Emitter emitter = getEmitter(
-                getMockServerURI(mockServer),
-                HttpMethod.GET,
-                BufferOption.Single,
-                RequestSecurity.HTTP
-        );
-        emitter.getEventStore().removeAllEvents();
-        Tracker tracker = getTracker(emitter, getSubject());
+        MockWebServer mockServer = getMockServer(28);
+        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.GET);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -94,41 +83,15 @@ public class EventSendingTest extends AndroidTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        int counter = 0;
-        while (!tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        counter = 0;
-        while (tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        Thread.sleep(500);
-        tracker.pauseEventTracking();
+        waitForTracker(tracker);
 
         checkGetRequest(getRequests(mockServer, 28));
         killMockServer(mockServer);
     }
 
     public void testSendPost() throws Exception {
-        MockWebServer mockServer = getMockServer();
-        enqueueResponses(mockServer, 28);
-
-        Emitter emitter = getEmitter(
-                getMockServerURI(mockServer),
-                HttpMethod.POST,
-                BufferOption.Single,
-                RequestSecurity.HTTP
-        );
-        emitter.getEventStore().removeAllEvents();
-        Tracker tracker = getTracker(emitter, getSubject());
+        MockWebServer mockServer = getMockServer(28);
+        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -137,63 +100,44 @@ public class EventSendingTest extends AndroidTestCase {
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
 
-        int counter = 0;
-        while (!tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        counter = 0;
-        while (tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        Thread.sleep(500);
-        tracker.pauseEventTracking();
+        waitForTracker(tracker);
 
         checkPostRequest(getRequests(mockServer, 28));
         killMockServer(mockServer);
     }
 
-    // Tracker Builder
+    // Helpers
 
-    public Tracker getTracker(Emitter emitter, Subject subject) {
-        return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-                .subject(subject)
-                .base64(false)
-                .level(LogLevel.DEBUG)
-                .build();
-    }
-
-    public Emitter getEmitter(String uri, HttpMethod method, BufferOption option, RequestSecurity security) {
-        return new Emitter
+    public Tracker getTracker(String uri, HttpMethod method) {
+        Emitter emitter = new Emitter
                 .EmitterBuilder(uri, getContext())
-                .option(option)
+                .option(BufferOption.Single)
                 .method(method)
-                .security(security)
+                .security(RequestSecurity.HTTP)
                 .tick(0)
                 .emptyLimit(0)
                 .build();
-    }
+        emitter.getEventStore().removeAllEvents();
 
-    public Subject getSubject() {
-        return new Subject
+        Subject subject = new Subject
                 .SubjectBuilder()
                 .context(getContext())
                 .build();
+
+        Tracker.close();
+        Tracker.init(
+                new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+                    .subject(subject)
+                    .base64(false)
+                    .level(LogLevel.DEBUG)
+                    .sessionContext(true)
+                    .mobileContext(true)
+                    .geoLocationContext(true)
+                    .build()
+        );
+        return Tracker.instance();
     }
 
-    // Helpers
-
-    /**
-     * @param mockServer The mock server
-     * @return the MockServer URI
-     */
     @SuppressLint("DefaultLocale")
     public String getMockServerURI(MockWebServer mockServer) {
         if (mockServer != null) {
@@ -202,13 +146,6 @@ public class EventSendingTest extends AndroidTestCase {
         return null;
     }
 
-    /**
-     * Fetched N amount of requests from the Mock Web Server
-     *
-     * @param count the amount of requests to get
-     * @return the list of requests
-     * @throws Exception
-     */
     public LinkedList<RecordedRequest> getRequests(MockWebServer mockServer, int count) throws Exception {
         LinkedList<RecordedRequest> requests = new LinkedList<>();
         for (int i = 0; i < count; i++) {
@@ -217,14 +154,6 @@ public class EventSendingTest extends AndroidTestCase {
         return requests;
     }
 
-    /**
-     * Takes a query string and returns the name-value
-     * pairs in map form.
-     *
-     * @param query the query string
-     * @return the map of decoded query strings
-     * @throws Exception
-     */
     public Map<String, String> getQueryMap(String query) throws Exception {
         String[] params = query.split("&");
         Map<String, String> map = new HashMap<>();
@@ -234,6 +163,27 @@ public class EventSendingTest extends AndroidTestCase {
             map.put(URLDecoder.decode(name, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
         }
         return map;
+    }
+
+    public void waitForTracker(Tracker tracker) throws Exception {
+        int counter = 0;
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        counter = 0;
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        Thread.sleep(500);
+        tracker.pauseEventTracking();
     }
 
     // Event Validation
@@ -282,7 +232,7 @@ public class EventSendingTest extends AndroidTestCase {
             assertEquals("/com.snowplowanalytics.snowplow/tp2", request.getPath());
             assertEquals("POST", request.getMethod());
 
-            JSONObject body = new JSONObject(request.getUtf8Body());
+            JSONObject body = new JSONObject(request.getBody().readUtf8());
             assertEquals("iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3", body.getString("schema"));
 
             JSONArray data = body.getJSONArray("data");

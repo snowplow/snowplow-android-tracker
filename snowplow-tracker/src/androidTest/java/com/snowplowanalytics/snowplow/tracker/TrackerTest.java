@@ -13,21 +13,30 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
-import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
 public class TrackerTest extends AndroidTestCase {
 
     // Helper Methods
 
     private Tracker getTracker() {
-
-        // Make an emitter
         Emitter emitter = new Emitter
                 .EmitterBuilder("testUrl", getContext())
                 .tick(0)
@@ -39,62 +48,58 @@ public class TrackerTest extends AndroidTestCase {
                 .context(getContext())
                 .build();
 
-        // Make and return the Tracker object
-        return new Tracker
-                .TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-                .subject(subject)
-                .platform(DevicePlatforms.InternetOfThings)
-                .base64(false)
-                .level(LogLevel.DEBUG)
-                .threadCount(20)
-                .sessionCheckInterval(15)
-                .backgroundTimeout(4000)
-                .foregroundTimeout(20000)
-                .timeUnit(TimeUnit.MILLISECONDS)
-                .sessionContext(true)
-                .build();
+        Tracker.close();
+
+        return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+            .subject(subject)
+            .platform(DevicePlatforms.InternetOfThings)
+            .base64(false)
+            .level(LogLevel.VERBOSE)
+            .threadCount(1)
+            .sessionContext(false)
+            .mobileContext(false)
+            .geoLocationContext(false)
+            .foregroundTimeout(5)
+            .backgroundTimeout(5)
+            .sessionCheckInterval(15)
+            .timeUnit(TimeUnit.SECONDS)
+            .build();
     }
 
     // Tests
 
-    public void testNamespaceSet() {
+    public void testTrackerNotInit() {
+        Tracker.close();
+
+        boolean exception = false;
+        try {
+            Tracker.instance();
+        } catch (Exception e) {
+            assertEquals("FATAL: Tracker must be initialized first!", e.getMessage());
+            exception = true;
+        }
+        assertTrue(exception);
+    }
+
+    public void testSetValues() {
         Tracker tracker = getTracker();
         assertEquals("myNamespace", tracker.getNamespace());
-    }
-
-    public void testAppIdSet() {
-        Tracker tracker = getTracker();
         assertEquals("myAppId", tracker.getAppId());
-    }
-
-    public void testDevicePlatformSet() {
-        Tracker tracker = getTracker();
         assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
-    }
-
-    public void testBase64Set() {
-        Tracker tracker = getTracker();
         assertEquals(false, tracker.getBase64Encoded());
+        assertNotNull(tracker.getEmitter());
+        assertNotNull(tracker.getSubject());
+        assertEquals("andr-0.5.4", tracker.getTrackerVersion());
+        assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
+        assertEquals(2, tracker.getThreadCount());
     }
 
-    public void testEmitterSet() {
+    public void testEmitterUpdate() {
         Tracker tracker = getTracker();
         assertNotNull(tracker.getEmitter());
-    }
 
-    public void testSubjectSet() {
-        Tracker tracker = getTracker();
-        assertNotNull(tracker.getSubject());
-    }
-
-    public void testVersionSet() {
-        Tracker tracker = getTracker();
-        assertEquals("andr-0.5.4", tracker.getTrackerVersion());
-    }
-
-    public void testLogLevelSet() {
-        Tracker tracker = getTracker();
-        assertEquals(LogLevel.DEBUG, tracker.getLogLevel());
+        tracker.setEmitter(new Emitter.EmitterBuilder("test", getContext()).build());
+        assertNotNull(tracker.getEmitter());
     }
 
     public void testSubjectUpdate() {
@@ -118,38 +123,137 @@ public class TrackerTest extends AndroidTestCase {
         assertTrue(tracker.getDataCollection());
 
         tracker.pauseEventTracking();
-        assertTrue(!tracker.getDataCollection());
+        assertFalse(tracker.getDataCollection());
+        tracker.pauseEventTracking();
+        assertFalse(tracker.getDataCollection());
 
+        tracker.resumeEventTracking();
+        assertTrue(tracker.getDataCollection());
         tracker.resumeEventTracking();
         assertTrue(tracker.getDataCollection());
     }
 
-    public void testThreadCountSet() {
-        Tracker tracker = getTracker();
-        assertEquals(20, tracker.getThreadCount());
+    public void testTrackWithNoContext() throws Exception {
+        MockWebServer mockWebServer = getMockServer(1);
+
+        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+                .option(BufferOption.Single)
+                .build();
+        emitter.getEventStore().removeAllEvents();
+
+        Tracker.close();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+            .base64(false)
+            .level(LogLevel.VERBOSE)
+            .sessionContext(false)
+            .mobileContext(false)
+            .geoLocationContext(false)
+            .build();
+
+        tracker.track(ScreenView.builder().id("id").build());
+        RecordedRequest req = mockWebServer.takeRequest(20, TimeUnit.SECONDS);
+
+        assertNotNull(req);
+
+        JSONObject payload = new JSONObject(req.getBody().readUtf8());
+        assertEquals(2, payload.length());
+        assertEquals(
+                "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
+                payload.getString("schema")
+        );
+
+        JSONArray data = payload.getJSONArray("data");
+        assertEquals(1, data.length());
+        JSONObject event = data.getJSONObject(0);
+
+        boolean found = true;
+        try {
+            event.getString(Parameters.CONTEXT);
+        } catch (Exception e) {
+            found = false;
+        }
+        assertFalse(found);
+
+        mockWebServer.shutdown();
     }
 
-    public void testTrackerSessionSet() {
-        Tracker tracker = getTracker();
-        Session session = tracker.getSession();
+    public void testTrackWithoutDataCollection() throws Exception {
+        MockWebServer mockWebServer = getMockServer(1);
 
-        assertNotNull(session);
-        assertNotNull(session.getCurrentSessionId());
-        assertNotNull(session.getSessionIndex());
-        assertNotNull(session.getUserId());
-        assertEquals("SQLITE", session.getSessionStorage());
-        assertEquals(4000, session.getBackgroundTimeout());
-        assertEquals(20000, session.getForegroundTimeout());
+        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+                .option(BufferOption.Single)
+                .build();
+        emitter.getEventStore().removeAllEvents();
 
-        Map<String, Object> sessionInfo = session.getSessionContext().getMap();
-        assertTrue(sessionInfo.containsKey("schema"));
-        assertTrue(sessionInfo.containsKey("data"));
+        Tracker.close();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+            .base64(false)
+            .level(LogLevel.VERBOSE)
+            .sessionContext(false)
+            .mobileContext(false)
+            .geoLocationContext(false)
+            .build();
 
-        Map sessionData = session.getSessionValues();
-        assertTrue(sessionData.containsKey(Parameters.SESSION_USER_ID));
-        assertTrue(sessionData.containsKey(Parameters.SESSION_INDEX));
-        assertTrue(sessionData.containsKey(Parameters.SESSION_ID));
-        assertTrue(sessionData.containsKey(Parameters.SESSION_PREVIOUS_ID));
-        assertTrue(sessionData.containsKey(Parameters.SESSION_STORAGE));
+        tracker.pauseEventTracking();
+        tracker.track(ScreenView.builder().id("id").build());
+        RecordedRequest req = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
+
+        assertEquals(0, tracker.getEmitter().getEventStore().getSize());
+        assertNull(req);
+
+        mockWebServer.shutdown();
+    }
+
+    public void testTrackWithSession() throws Exception {
+        MockWebServer mockWebServer = getMockServer(1);
+
+        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+                .option(BufferOption.Single)
+                .build();
+        emitter.getEventStore().removeAllEvents();
+
+        Tracker.close();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+            .base64(false)
+            .level(LogLevel.VERBOSE)
+            .sessionContext(true)
+            .mobileContext(false)
+            .geoLocationContext(false)
+            .foregroundTimeout(5)
+            .backgroundTimeout(5)
+            .sessionCheckInterval(1)
+            .timeUnit(TimeUnit.SECONDS)
+            .build();
+
+        assertNotNull(tracker.getSession());
+        tracker.resumeSessionChecking();
+        Thread.sleep(2000);
+        tracker.pauseSessionChecking();
+
+        mockWebServer.shutdown();
+    }
+
+    // Mock Server
+
+    public MockWebServer getMockServer(int count) throws IOException {
+        EventStore eventStore = new EventStore(getContext(), 10);
+        eventStore.removeAllEvents();
+
+        MockWebServer mockServer = new MockWebServer();
+        mockServer.start();
+
+        MockResponse mockResponse = new MockResponse().setResponseCode(200);
+        for (int i = 0; i < count; i++) {
+            mockServer.enqueue(mockResponse);
+        }
+
+        return mockServer;
+    }
+    @SuppressLint("DefaultLocale")
+    public String getMockServerURI(MockWebServer mockServer) {
+        if (mockServer != null) {
+            return String.format("%s:%d", mockServer.getHostName(), mockServer.getPort());
+        }
+        return null;
     }
 }

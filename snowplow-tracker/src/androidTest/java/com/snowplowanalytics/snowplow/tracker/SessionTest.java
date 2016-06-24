@@ -15,15 +15,98 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class SessionTest extends AndroidTestCase {
 
-    public void testSessionVariables() {
+    public void testSessionInit() {
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
         Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
+        assertEquals("SQLITE", session.getSessionStorage());
+        assertEquals(null, session.getPreviousSessionId());
+        assertNotNull(session.getCurrentSessionId());
+        assertNotNull(session.getUserId());
+        assertEquals(1, session.getSessionIndex());
+        assertEquals(null, session.getFirstId());
+
+        SelfDescribingJson sdj = session.getSessionContext("first-id-1");
+        assertEquals("first-id-1", session.getFirstId());
+        sdj = session.getSessionContext("second-id-2");
+        assertEquals("first-id-1", session.getFirstId());
+
+        assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.getMap().get("schema"));
+    }
+
+    public void testSessionInitWithInvalidFile() {
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
+
+        Map<String, Object> map = new HashMap<>();
+        FileStore.saveMapToFile(TrackerConstants.SNOWPLOW_SESSION_VARS, map, getContext());
+
+        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+
+        assertNotNull(session);
+        assertEquals(600000, session.getForegroundTimeout());
+        assertEquals(300000, session.getBackgroundTimeout());
+        assertEquals("SQLITE", session.getSessionStorage());
+        assertEquals(null, session.getPreviousSessionId());
+        assertNotNull(session.getCurrentSessionId());
+        assertNotNull(session.getUserId());
+        assertEquals(1, session.getSessionIndex());
+        assertEquals(null, session.getFirstId());
+    }
+
+    public void testCheckAndUpdateLogicForExpired() {
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
+        Session session = new Session(0, 0, TimeUnit.SECONDS, getContext());
+
+        String userId = session.getUserId();
+        String currentId = session.getCurrentSessionId();
+
+        assertEquals(1, session.getSessionIndex());
+
+        session.checkAndUpdateSession();
+
+        assertEquals(2, session.getSessionIndex());
+        assertEquals(userId, session.getUserId());
+        assertEquals(currentId, session.getPreviousSessionId());
+    }
+
+    public void testCheckAndUpdateLogicForUnExpired() {
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
+        Session session = new Session(500, 500, TimeUnit.SECONDS, getContext());
+
+        String userId = session.getUserId();
+        String currentId = session.getCurrentSessionId();
+
+        assertEquals(1, session.getSessionIndex());
+
+        session.checkAndUpdateSession();
+
+        assertEquals(1, session.getSessionIndex());
+        assertEquals(userId, session.getUserId());
+        assertEquals(currentId, session.getCurrentSessionId());
+    }
+
+    public void testSetBackgroundState() {
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
+        Session session = new Session(500, 0, TimeUnit.SECONDS, getContext());
+
+        assertEquals(1, session.getSessionIndex());
+        session.checkAndUpdateSession();
+        assertEquals(1, session.getSessionIndex());
+        session.setIsBackground(true);
+        session.checkAndUpdateSession();
+        assertEquals(2, session.getSessionIndex());
     }
 }

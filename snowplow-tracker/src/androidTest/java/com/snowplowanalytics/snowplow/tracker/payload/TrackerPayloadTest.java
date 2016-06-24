@@ -36,6 +36,16 @@ public class TrackerPayloadTest extends AndroidTestCase {
         return map;
     }
 
+    public void testAddNullValue() {
+        payload.add("key", null);
+        assertFalse(payload.getMap().containsKey("key"));
+    }
+
+    public void testAddEmptyValue() {
+        payload.add("key", "");
+        assertFalse(payload.getMap().containsKey("key"));
+    }
+
     public void testAddStringString() throws JSONException {
         payload.add("a", "b");
         JSONObject map = new JSONObject(payload.toString());
@@ -83,4 +93,15 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertEquals("{\"a\":\"b\"}", decoded);
     }
 
+    public void testAddNullValues() {
+        TrackerPayload payload1 = new TrackerPayload();
+        payload1.add("k", null);
+        assertEquals("{}", payload1.toString());
+        payload1.add("k", (Object) null);
+        assertEquals("{}", payload1.toString());
+        payload1.addMap(null);
+        assertEquals("{}", payload1.toString());
+        payload1.addMap(null, false, "co", "cx");
+        assertEquals("{}", payload1.toString());
+    }
 }

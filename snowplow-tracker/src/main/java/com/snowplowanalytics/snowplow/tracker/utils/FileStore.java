@@ -53,7 +53,7 @@ public class FileStore {
             oos.close();
             Logger.d(TAG, " + Successfully saved KV Pairs to: %s", filename);
             return true;
-        } catch(IOException ioe){
+        } catch(NullPointerException | IOException ioe){
             Logger.e(TAG, " + Exception saving vars map: %s", ioe.getMessage());
         }
         return false;

@@ -80,17 +80,6 @@ public abstract class AbstractEvent implements Event {
         }
     }
 
-    private static class Builder2 extends Builder<Builder2> {
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
     protected AbstractEvent(Builder<?> builder) {
 
         // Precondition checks

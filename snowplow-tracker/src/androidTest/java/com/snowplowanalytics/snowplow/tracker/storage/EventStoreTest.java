@@ -13,9 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker.storage;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,16 @@ public class EventStoreTest extends AndroidTestCase {
 
     // Tests
 
+    public void testGetNonExistentEvent() {
+        EventStore eventStore = getEventStore();
+        Map<String, Object> event = eventStore.getEvent(-1);
+        assertNull(event);
+
+        eventStore.close();
+        event = eventStore.getEvent(-1);
+        assertNull(event);
+    }
+
     public void testInsertPayload() {
         EventStore eventStore = getEventStore();
         long id = eventStore.insertEvent(getEvent());
@@ -53,6 +65,9 @@ public class EventStoreTest extends AndroidTestCase {
         assertEquals(id, lastRowId);
         assertEquals(1, eventStore.getSize());
         assertNotNull(event);
+
+        eventStore.close();
+        eventStore.insertEvent(getEvent());
     }
 
     public void testEventStoreQueries() {
@@ -66,7 +81,6 @@ public class EventStoreTest extends AndroidTestCase {
     public void testRemoveAllEvents() {
         EventStore eventStore = getEventStore();
 
-        // Add 6 events
         eventStore.insertEvent(getEvent());
         eventStore.insertEvent(getEvent());
         eventStore.insertEvent(getEvent());
@@ -77,6 +91,10 @@ public class EventStoreTest extends AndroidTestCase {
         assertEquals(6, eventStore.getSize());
         eventStore.removeAllEvents();
         assertEquals(0, eventStore.getSize());
+
+        eventStore.close();
+        boolean res = eventStore.removeAllEvents();
+        assertFalse(res);
     }
 
     public void testRemoveIndividualEvent() {
@@ -86,6 +104,13 @@ public class EventStoreTest extends AndroidTestCase {
 
         assertEquals(0, eventStore.getSize());
         assertEquals(true, res);
+
+        res = eventStore.removeEvent(id);
+        assertEquals(false, res);
+
+        eventStore.close();
+        res = eventStore.removeEvent(id);
+        assertEquals(false, res);
     }
 
     public void testRemoveRangeOfEvents() {
@@ -103,12 +128,30 @@ public class EventStoreTest extends AndroidTestCase {
 
         assertEquals(0, eventStore.getSize());
         assertEquals(true, res);
+
+        res = eventStore.removeEvents(idList);
+        assertEquals(false, res);
+
+        eventStore.close();
+        res = eventStore.removeEvents(idList);
+        assertEquals(false, res);
+
+        res = eventStore.removeEvents(new ArrayList<Long>());
+        assertEquals(false, res);
     }
 
     public void testCloseDatabase() {
         EventStore eventStore = getEventStore();
         assertEquals(true, eventStore.isDatabaseOpen());
+        eventStore.open();
+        assertEquals(true, eventStore.isDatabaseOpen());
         eventStore.close();
         assertEquals(false, eventStore.isDatabaseOpen());
+    }
+
+    public void testUpgrade() {
+        EventStoreHelper helper = EventStoreHelper.getInstance(getContext());
+        SQLiteDatabase database = helper.getWritableDatabase();
+        helper.onUpgrade(database, 1, 2);
     }
 }

@@ -37,6 +37,9 @@ public class FileStoreTest extends AndroidTestCase {
         boolean result = FileStore.saveMapToFile(fileName, map, getContext());
         assertTrue(result);
         cleanup();
+
+        result = FileStore.saveMapToFile(null, null, getContext());
+        assertFalse(result);
     }
 
     public void testGetMapFromFile() {

@@ -33,11 +33,9 @@ public class Executor {
      *
      * @return the executor
      */
-    private static ExecutorService getExecutor() {
-        synchronized (Executor.class) {
-            if (executor == null) {
-                executor = Executors.newScheduledThreadPool(threadCount);
-            }
+    private synchronized static ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newScheduledThreadPool(threadCount);
         }
         return executor;
     }

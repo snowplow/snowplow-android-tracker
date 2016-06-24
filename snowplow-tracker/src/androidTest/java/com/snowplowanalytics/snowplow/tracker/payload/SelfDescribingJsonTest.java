@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SelfDescribingJsonTest extends AndroidTestCase {
 
@@ -34,6 +35,26 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         testList = new ArrayList<>();
     }
 
+    public void testFailures() {
+        boolean exception = false;
+        try {
+            new SelfDescribingJson(null);
+        } catch (Exception e) {
+            assertEquals("schema cannot be null", e.getMessage());
+            exception = true;
+        }
+        assertTrue(exception);
+
+        exception = false;
+        try {
+            new SelfDescribingJson("");
+        } catch (Exception e) {
+            assertEquals("schema cannot be empty.", e.getMessage());
+            exception = true;
+        }
+        assertTrue(exception);
+    }
+
     public void testCreateWithSchemaOnly() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema);
 
@@ -44,7 +65,6 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(testSchema, map.getString("schema"));
         JSONObject d = map.getJSONObject("data");
         assertEquals(0, d.length());
-
     }
 
     public void testCreateWithOurEmptyMap() throws JSONException {
@@ -183,7 +203,6 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(testSchema, innerMap.getString("schema"));
         JSONObject innerData = innerMap.getJSONObject("data");
         assertEquals(0, innerData.length());
-        
     }
 
     public void testCreateWithTrackerPayload() throws JSONException {
@@ -215,6 +234,40 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(testSchema, map.getString("schema"));
         JSONObject innerMap = map.getJSONObject("data");
         assertEquals("b", innerMap.getString("a"));
-        
+    }
+
+    public void testSetNullValues() {
+        SelfDescribingJson json = new SelfDescribingJson(testSchema);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.setData((TrackerPayload) null);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.setData((Object) null);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.setData((SelfDescribingJson) null);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+    }
+
+    public void testGetByteSize() {
+        TrackerPayload payload = new TrackerPayload();
+        testMap.put("a", "b");
+        payload.addMap(testMap);
+        SelfDescribingJson json = new SelfDescribingJson(testSchema);
+        json.setData(payload);
+        assertEquals(45, json.getByteSize());
+    }
+
+    public void testNothingFunctions() {
+        SelfDescribingJson json = new SelfDescribingJson(testSchema);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.add("k", "v");
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.add("k", (Object) null);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("a", "b");
+        json.addMap(m1);
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
+        json.addMap(m1, true, "co", "cx");
+        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
     }
 }
