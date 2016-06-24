@@ -48,10 +48,39 @@ public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
-    private final Context context;
 
-    private static ScheduledExecutorService sessionExecutor;
-    
+    // --- Singleton Access
+
+    private static Tracker spTracker = null;
+    private static ScheduledExecutorService sessionExecutor = null;
+
+    public static Tracker init(Tracker newTracker) {
+        if (spTracker == null) {
+            spTracker = newTracker;
+            spTracker.resumeSessionChecking();
+            spTracker.getEmitter().flush();
+        }
+        return spTracker;
+    }
+
+    public static Tracker instance() {
+        if (spTracker == null) {
+            throw new IllegalStateException("FATAL: Tracker must be initialized first!");
+        }
+        return spTracker;
+    }
+
+    public static void close() {
+        if (spTracker != null) {
+            spTracker.pauseSessionChecking();
+            spTracker.getEmitter().shutdown();
+            spTracker = null;
+        }
+    }
+
+    // --- Builder
+
+    private final Context context;
     private Emitter emitter;
     private Subject subject;
     private Session trackerSession;
@@ -66,7 +95,6 @@ public class Tracker {
     private TimeUnit timeUnit;
     private boolean geoLocationContext;
     private boolean mobileContext;
-
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
@@ -220,7 +248,7 @@ public class Tracker {
          * @return the new Tracker object
          */
         public Tracker build(){
-            return new Tracker(this);
+            return init(new Tracker(this));
         }
     }
 
@@ -230,6 +258,7 @@ public class Tracker {
      * @param builder The builder that constructs a tracker
      */
     private Tracker(TrackerBuilder builder) {
+
         this.context = builder.context;
         this.emitter = builder.emitter;
         this.appId = builder.appId;
@@ -397,6 +426,28 @@ public class Tracker {
     // --- Controls
 
     /**
+     * Starts event collection processes
+     * again.
+     */
+    public void resumeEventTracking() {
+        if (dataCollection.compareAndSet(false, true)) {
+            resumeSessionChecking();
+            getEmitter().flush();
+        }
+    }
+
+    /**
+     * Stops event collection and ends all
+     * concurrent processes.
+     */
+    public void pauseEventTracking() {
+        if (dataCollection.compareAndSet(true, false)) {
+            pauseSessionChecking();
+            getEmitter().shutdown();
+        }
+    }
+
+    /**
      * Starts a polling session checker to
      * run at a defined interval.
      */
@@ -422,28 +473,6 @@ public class Tracker {
             Logger.d(TAG, "Session checking has been paused.");
             sessionExecutor.shutdown();
             sessionExecutor = null;
-        }
-    }
-
-    /**
-     * Stops event collection and ends all
-     * concurrent processes.
-     */
-    public void pauseEventTracking() {
-        if (dataCollection.compareAndSet(true, false)) {
-            pauseSessionChecking();
-            getEmitter().shutdown();
-        }
-    }
-
-    /**
-     * Starts event collection processes
-     * again.
-     */
-    public void resumeEventTracking() {
-        if (dataCollection.compareAndSet(false, true)) {
-            resumeSessionChecking();
-            getEmitter().flush();
         }
     }
 
