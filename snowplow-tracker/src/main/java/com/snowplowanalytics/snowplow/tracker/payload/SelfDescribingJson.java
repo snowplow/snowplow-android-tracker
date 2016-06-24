@@ -127,7 +127,7 @@ public class SelfDescribingJson implements Payload {
      * @return itself
      */
     public SelfDescribingJson setData(SelfDescribingJson selfDescribingJson) {
-        if (payload == null) {
+        if (selfDescribingJson == null) {
             return this;
         }
         payload.put(Parameters.DATA, selfDescribingJson.getMap());
