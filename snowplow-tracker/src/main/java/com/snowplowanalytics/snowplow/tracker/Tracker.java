@@ -278,26 +278,27 @@ public class Tracker {
             @Override
             public void run() {
                 List<SelfDescribingJson> context = event.getContext();
+                String eventId = event.getEventId();
 
                 // Figure out what type of event it is and track it!
                 Class eClass = event.getClass();
                 if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
-                    addEventPayload((TrackerPayload) event.getPayload(), context);
+                    addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
                 } else if (eClass.equals(EcommerceTransaction.class)) {
-                    addEventPayload((TrackerPayload) event.getPayload(), context);
+                    addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
 
                     // Track each item individually
                     EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
                     for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
                         item.setTimestamp(ecommerceTransaction.getTimestamp());
-                        addEventPayload(item.getPayload(), item.getContext());
+                        addEventPayload(item.getPayload(), item.getContext(), item.getEventId());
                     }
                 } else if (eClass.equals(SelfDescribing.class)) {
 
                     // Need to set the Base64 rule for SelfDescribing events
                     SelfDescribing selfDescribing = (SelfDescribing) event;
                     selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
                 } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
                     SelfDescribing selfDescribing = SelfDescribing.builder()
                             .eventData((SelfDescribingJson) event.getPayload())
@@ -308,7 +309,7 @@ public class Tracker {
 
                     // Need to set the Base64 rule for SelfDescribing events
                     selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
                 }
             }
         });
@@ -325,9 +326,11 @@ public class Tracker {
      *
      * @param payload Payload the raw event payload to be
      *                decorated.
+     * @param eventId The event id
      * @param context The raw context list
      */
-    private void addEventPayload(TrackerPayload payload, List<SelfDescribingJson> context) {
+    private void addEventPayload(TrackerPayload payload, List<SelfDescribingJson> context,
+                                 String eventId) {
 
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
@@ -341,7 +344,7 @@ public class Tracker {
         }
 
         // Build the final context and add it
-        SelfDescribingJson envelope = getFinalContext(context);
+        SelfDescribingJson envelope = getFinalContext(context, eventId);
         if (envelope != null) {
             payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                     Parameters.CONTEXT);
@@ -356,14 +359,15 @@ public class Tracker {
      * Builds the final event context.
      *
      * @param contexts the base event context
+     * @param eventId the event id
      * @return the final event context json with
      *         many contexts inside
      */
-    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts) {
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts, String eventId) {
 
         // Add session context
         if (this.sessionContext) {
-            contexts.add(this.trackerSession.getSessionContext());
+            contexts.add(this.trackerSession.getSessionContext(eventId));
         }
 
         // Add Geo-Location Context

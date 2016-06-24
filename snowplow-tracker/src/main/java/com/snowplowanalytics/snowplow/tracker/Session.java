@@ -50,6 +50,7 @@ public class Session {
     private String previousSessionId;
     private int sessionIndex = 0;
     private String sessionStorage = "SQLITE";
+    private String firstId = null;
 
     // Variables to control Session Updates
     private AtomicBoolean isBackground = new AtomicBoolean(false);
@@ -104,9 +105,12 @@ public class Session {
      *
      * @return a SelfDescribingJson containing the session context
      */
-    public SelfDescribingJson getSessionContext() {
+    public synchronized SelfDescribingJson getSessionContext(String firstId) {
         Logger.v(TAG, "Getting session context...");
         updateAccessedTime();
+        if (this.firstId == null) {
+            this.firstId = firstId;
+        }
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, getSessionValues());
     }
 
@@ -156,6 +160,7 @@ public class Session {
         sessionValues.put(Parameters.SESSION_PREVIOUS_ID, this.previousSessionId);
         sessionValues.put(Parameters.SESSION_INDEX, this.sessionIndex);
         sessionValues.put(Parameters.SESSION_STORAGE, this.sessionStorage);
+        sessionValues.put(Parameters.SESSION_FIRST_ID, this.firstId);
         return sessionValues;
     }
 
@@ -241,6 +246,13 @@ public class Session {
      */
     public String getSessionStorage() {
         return this.sessionStorage;
+    }
+
+    /**
+     * @return the first event id
+     */
+    public String getFirstId() {
+        return this.firstId;
     }
 
     /**
