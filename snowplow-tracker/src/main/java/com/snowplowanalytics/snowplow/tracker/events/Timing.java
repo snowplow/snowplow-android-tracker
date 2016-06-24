@@ -112,7 +112,9 @@ public class Timing extends AbstractEvent {
         payload.put(Parameters.UT_CATEGORY, this.category);
         payload.put(Parameters.UT_VARIABLE, this.variable);
         payload.put(Parameters.UT_TIMING, this.timing);
-        payload.put(Parameters.UT_LABEL, this.label);
+        if (this.label != null && !this.label.isEmpty()) {
+            payload.put(Parameters.UT_LABEL, this.label);
+        }
         return payload;
     }
 
