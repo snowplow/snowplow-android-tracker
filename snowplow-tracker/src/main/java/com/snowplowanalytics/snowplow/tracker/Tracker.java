@@ -38,6 +38,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
  * Builds a Tracker object which is used to
@@ -47,6 +48,7 @@ public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
+    private final Context context;
 
     private static ScheduledExecutorService sessionExecutor;
     
@@ -62,6 +64,8 @@ public class Tracker {
     private long sessionCheckInterval;
     private int threadCount;
     private TimeUnit timeUnit;
+    private boolean geoLocationContext;
+    private boolean mobileContext;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -84,6 +88,8 @@ public class Tracker {
         protected long sessionCheckInterval = 15; // Optional - 15 seconds
         protected int threadCount = 10; // Optional
         protected TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
+        protected boolean geoLocationContext = false; // Optional
+        protected boolean mobileContext = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -189,6 +195,24 @@ public class Tracker {
         }
 
         /**
+         * @param geoLocationContext whether to add a geo-location context
+         * @return itself
+         */
+        public TrackerBuilder geoLocationContext(Boolean geoLocationContext) {
+            this.geoLocationContext = geoLocationContext;
+            return this;
+        }
+
+        /**
+         * @param mobileContext whether to add a mobile context
+         * @return itself
+         */
+        public TrackerBuilder mobileContext(Boolean mobileContext) {
+            this.mobileContext = mobileContext;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -206,6 +230,7 @@ public class Tracker {
      * @param builder The builder that constructs a tracker
      */
     private Tracker(TrackerBuilder builder) {
+        this.context = builder.context;
         this.emitter = builder.emitter;
         this.appId = builder.appId;
         this.base64Encoded = builder.base64Encoded;
@@ -217,6 +242,8 @@ public class Tracker {
         this.sessionCheckInterval = builder.sessionCheckInterval;
         this.threadCount = builder.threadCount < 2 ? 2 : builder.threadCount;
         this.timeUnit = builder.timeUnit;
+        this.geoLocationContext = builder.geoLocationContext;
+        this.mobileContext = builder.mobileContext;
 
         // If session context is True
         if (this.sessionContext) {
@@ -237,58 +264,54 @@ public class Tracker {
     // --- Event Tracking Functions
 
     /**
-     * Used for either Tracking a custom TrackerPayload or
-     * for re-sending a failed event.
-     *
-     * @param payload the payload to track
-     */
-    public void track(TrackerPayload payload) {
-        this.emitter.add(payload);
-    }
-
-    /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
      *
      * @param event the event to track
      */
-    public void track(Event event) {
+    public void track(final Event event) {
         if (!dataCollection.get()) {
             return;
         }
 
-        List<SelfDescribingJson> context = event.getContext();
+        Executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<SelfDescribingJson> context = event.getContext();
 
-        // Figure out what type of event it is and track it!
-        Class eClass = event.getClass();
-        if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
-            this.addEventPayload((TrackerPayload) event.getPayload(), context);
-        } else if (eClass.equals(EcommerceTransaction.class)) {
-            this.addEventPayload((TrackerPayload) event.getPayload(), context);
+                // Figure out what type of event it is and track it!
+                Class eClass = event.getClass();
+                if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
+                    addEventPayload((TrackerPayload) event.getPayload(), context);
+                } else if (eClass.equals(EcommerceTransaction.class)) {
+                    addEventPayload((TrackerPayload) event.getPayload(), context);
 
-            // Track each item individually
-            EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-            for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-                item.setTimestamp(ecommerceTransaction.getTimestamp());
-                this.addEventPayload(item.getPayload(), item.getContext());
+                    // Track each item individually
+                    EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
+                    for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
+                        item.setTimestamp(ecommerceTransaction.getTimestamp());
+                        addEventPayload(item.getPayload(), item.getContext());
+                    }
+                } else if (eClass.equals(SelfDescribing.class)) {
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    SelfDescribing selfDescribing = (SelfDescribing) event;
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context);
+                } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .customContext(context)
+                            .timestamp(event.getTimestamp())
+                            .eventId(event.getEventId())
+                            .build();
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context);
+                }
             }
-        } else if (eClass.equals(SelfDescribing.class)) {
-
-            // Need to set the Base64 rule for SelfDescribing events
-            SelfDescribing selfDescribing = (SelfDescribing) event;
-            selfDescribing.setBase64Encode(base64Encoded);
-            this.addEventPayload(selfDescribing.getPayload(), context);
-        } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
-
-            // These are wrapper classes for SelfDescribing events; need to create SelfDescribing
-            // events from them and resend.
-            this.track(SelfDescribing.builder()
-                    .eventData((SelfDescribingJson) event.getPayload())
-                    .customContext(context)
-                    .timestamp(event.getTimestamp())
-                    .eventId(event.getEventId())
-                    .build());
-        }
+        });
     }
 
     // --- Helpers
@@ -307,7 +330,7 @@ public class Tracker {
     private void addEventPayload(TrackerPayload payload, List<SelfDescribingJson> context) {
 
         // Add default parameters to the payload
-        payload.add(Parameters.PLATFORM, this.devicePlatform.toString());
+        payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
         payload.add(Parameters.APPID, this.appId);
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
@@ -332,38 +355,36 @@ public class Tracker {
     /**
      * Builds the final event context.
      *
-     * @param context the base event context
+     * @param contexts the base event context
      * @return the final event context json with
      *         many contexts inside
      */
-    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> context) {
+    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts) {
 
         // Add session context
         if (this.sessionContext) {
-            context.add(this.trackerSession.getSessionContext());
+            contexts.add(this.trackerSession.getSessionContext());
         }
 
-        // Add subject context's
-        if (this.subject != null) {
-            if (!this.subject.getSubjectLocation().isEmpty()) {
-                SelfDescribingJson locationPayload = new SelfDescribingJson(
-                        TrackerConstants.GEOLOCATION_SCHEMA, this.subject.getSubjectLocation());
-                context.add(locationPayload);
-            }
-            if (!this.subject.getSubjectMobile().isEmpty()) {
-                SelfDescribingJson mobilePayload = new SelfDescribingJson(
-                        TrackerConstants.MOBILE_SCHEMA, this.subject.getSubjectMobile());
-                context.add(mobilePayload);
-            }
+        // Add Geo-Location Context
+        if (this.geoLocationContext) {
+            contexts.add(Util.getGeoLocationContext(this.context));
+        }
+
+        // Add Mobile Context
+        if (this.mobileContext) {
+            contexts.add(Util.getMobileContext(this.context));
         }
 
         // If there are contexts to nest
-        if (context.size() == 0) {
+        if (contexts.size() == 0) {
             return null;
         } else {
             List<Map> contextMaps = new LinkedList<>();
-            for (SelfDescribingJson selfDescribingJson : context) {
-                contextMaps.add(selfDescribingJson.getMap());
+            for (SelfDescribingJson selfDescribingJson : contexts) {
+                if (selfDescribingJson != null) {
+                    contextMaps.add(selfDescribingJson.getMap());
+                }
             }
             return new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
         }

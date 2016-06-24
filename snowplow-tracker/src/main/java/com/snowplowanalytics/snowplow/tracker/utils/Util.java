@@ -14,7 +14,6 @@
 package com.snowplowanalytics.snowplow.tracker.utils;
 
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -23,6 +22,10 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +33,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -199,127 +203,6 @@ public class Util {
     }
 
     /**
-     * The function that actually fetches the Advertising ID.
-     * - If called from the UI Thread will throw an Exception
-     *
-     * @param context the android context
-     * @return the advertising id or null
-     */
-    public static String getAdvertisingId(Context context) {
-        try {
-            Object AdvertisingInfoObject = invokeStaticMethod(
-                    "com.google.android.gms.ads.identifier.AdvertisingIdClient",
-                    "getAdvertisingIdInfo", new Class[]{Context.class}, context);
-            return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
-        }
-        catch (Exception e) {
-            Logger.e(TAG, "Exception getting the Advertising ID: %s", e.toString());
-            return null;
-        }
-    }
-
-    /**
-     * Returns the carrier name based
-     * on the android context supplied.
-     *
-     * @param context the android context
-     * @return a carrier name or null
-     */
-    public static String getCarrier(Context context) {
-        TelephonyManager telephonyManager =
-                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-        if (telephonyManager != null) {
-            return telephonyManager.getNetworkOperatorName();
-        }
-        return null;
-    }
-
-    /**
-     * Returns the location of the android
-     * device.
-     *
-     * @param context the android context
-     * @return the phones Location
-     */
-    public static Location getLocation(Context context) {
-        LocationManager locationManager =
-                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-
-        String provider = locationManager.getBestProvider(criteria, true);
-
-        if (provider != null) {
-            try {
-                Location location = locationManager.getLastKnownLocation(provider);
-                Logger.d(TAG, "Location found: %s", location);
-                return location;
-            } catch (SecurityException ex) {
-                Logger.e(TAG, "Failed to retrieve location: %s", ex.toString());
-                return null;
-            }
-        }
-
-        Logger.e(TAG, "Location Manager provider is null.");
-        return null;
-    }
-
-    /**
-     * Invokes a static method within a class
-     * if it can be found on the classpath.
-     *
-     * @param className The full defined classname
-     * @param methodName The name of the method to invoke
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    private static Object invokeStaticMethod(String className, String methodName,
-                                      Class[] cArgs, Object... args) throws Exception {
-        Class classObject = Class.forName(className);
-        return invokeMethod(classObject, methodName, null, cArgs, args);
-    }
-
-    /**
-     * Invokes a method on a static instance
-     * within a class by reflection.
-     *
-     * @param instance The instance to invoke a method on
-     * @param methodName The name of the method to invoke
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    private static Object invokeInstanceMethod(Object instance, String methodName,
-                                        Class[] cArgs, Object... args) throws Exception {
-        Class classObject = instance.getClass();
-        return invokeMethod(classObject, methodName, instance, cArgs, args);
-    }
-
-    /**
-     * Invokes methods of a class via reflection
-     *
-     * @param classObject The class to attempt invocation on
-     * @param methodName The name of the method to invoke
-     * @param instance The object instance to invoke on
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private static Object invokeMethod(Class classObject, String methodName, Object instance,
-                                Class[] cArgs, Object... args) throws Exception {
-        Method methodObject = classObject.getMethod(methodName, cArgs);
-        return methodObject.invoke(instance, args);
-    }
-
-    /**
      * The startTime must be greater than the endTime minus the
      * interval to be within an acceptable range.
      *
@@ -363,5 +246,259 @@ public class Util {
         }
 
         return s;
+    }
+
+    // --- Geo-Location Context
+
+    private static SelfDescribingJson geoLocationContext = null;
+    private static boolean geoLocationContextAttempted = false;
+
+    /**
+     * Returns the Geo-Location Context
+     *
+     * @param context the Android context
+     * @return the geo-location context
+     */
+    public static SelfDescribingJson getGeoLocationContext(Context context) {
+        if (geoLocationContext == null && !geoLocationContextAttempted) {
+            Location location = getLocation(context);
+
+            if (location != null) {
+                Map<String, Object> pairs = new HashMap<>();
+                addToMap(Parameters.LATITUDE, location.getLatitude(), pairs);
+                addToMap(Parameters.LONGITUDE, location.getLongitude(), pairs);
+                addToMap(Parameters.ALTITUDE, location.getAltitude(), pairs);
+                addToMap(Parameters.LATLONG_ACCURACY, location.getAccuracy(), pairs);
+                addToMap(Parameters.SPEED, location.getSpeed(), pairs);
+                addToMap(Parameters.BEARING, location.getBearing(), pairs);
+                addToMap(Parameters.GEO_TIMESTAMP, System.currentTimeMillis(), pairs);
+
+                if (mapHasKeys(pairs, Parameters.LATITUDE, Parameters.LONGITUDE)) {
+                    geoLocationContext = new SelfDescribingJson(
+                            TrackerConstants.GEOLOCATION_SCHEMA, pairs
+                    );
+                }
+                geoLocationContextAttempted = true;
+            }
+        }
+
+        return geoLocationContext;
+    }
+
+    /**
+     * Returns the location of the android
+     * device.
+     *
+     * @param context the android context
+     * @return the phones Location
+     */
+    public static Location getLocation(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!isNetworkEnabled && !isGPSEnabled) {
+            Logger.e(TAG, "Cannot get location, Network and GPS are disabled");
+            return null;
+        } else {
+            Location location = null;
+            try {
+                if (isNetworkEnabled) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    Logger.d(TAG, "Network location found: %s", location);
+                } else if (isGPSEnabled) {
+                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    Logger.d(TAG, "GPS location found: %s", location);
+                }
+            } catch (SecurityException ex) {
+                Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString());
+            }
+            return location;
+        }
+    }
+
+    // --- Mobile Context
+
+    private static SelfDescribingJson mobileContext = null;
+    private static boolean mobileContextAttempted = false;
+
+    /**
+     * Returns the Mobile Context
+     *
+     * @param context the Android context
+     * @return the mobile context
+     */
+    public static SelfDescribingJson getMobileContext(Context context) {
+        if (mobileContext == null && !mobileContextAttempted) {
+            Map<String, Object> pairs = new HashMap<>();
+            addToMap(Parameters.OS_TYPE, getOsType(), pairs);
+            addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
+            addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
+            addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
+            addToMap(Parameters.CARRIER, getCarrier(context), pairs);
+            addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
+
+            if (mapHasKeys(pairs,
+                    Parameters.OS_TYPE,
+                    Parameters.OS_VERSION,
+                    Parameters.DEVICE_MANUFACTURER,
+                    Parameters.DEVICE_MODEL)) {
+                mobileContext = new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
+            }
+            mobileContextAttempted = true;
+        }
+
+        return mobileContext;
+    }
+
+    /**
+     * @return the OS Type
+     */
+    public static String getOsType() {
+        return "android";
+    }
+
+    /**
+     * @return the OS Version
+     */
+    public static String getOsVersion() {
+        return android.os.Build.VERSION.RELEASE;
+    }
+
+    /**
+     * @return the device model
+     */
+    public static String getDeviceModel() {
+        return android.os.Build.MODEL;
+    }
+
+    /**
+     * @return the device vendor
+     */
+    public static String getDeviceVendor() {
+        return android.os.Build.MANUFACTURER;
+    }
+
+    /**
+     * @param context the android context
+     * @return a carrier name or null
+     */
+    public static String getCarrier(Context context) {
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (telephonyManager != null) {
+            return telephonyManager.getNetworkOperatorName();
+        }
+        return null;
+    }
+
+    /**
+     * The function that actually fetches the Advertising ID.
+     * - If called from the UI Thread will throw an Exception
+     *
+     * @param context the android context
+     * @return the advertising id or null
+     */
+    public static String getAndroidIdfa(Context context) {
+        try {
+            Object AdvertisingInfoObject = invokeStaticMethod(
+                    "com.google.android.gms.ads.identifier.AdvertisingIdClient",
+                    "getAdvertisingIdInfo", new Class[]{Context.class}, context);
+            return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
+        }
+        catch (Exception e) {
+            Logger.e(TAG, "Exception getting the Advertising ID: %s", e.toString());
+            return null;
+        }
+    }
+
+    // --- Context Helpers
+
+    /**
+     * Checks if a map contains a range of keys
+     *
+     * @param map the map to check
+     * @param keys the keys to check
+     * @return whether the map contains the keys
+     */
+    public static boolean mapHasKeys(Map<String, Object> map, String... keys) {
+        for (String key : keys) {
+            if (!map.containsKey(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Inserts a value into a map safely.
+     *
+     * NOTE: Avoid putting null or empty values
+     * in the map. If they are strings, avoid
+     * empty strings
+     *
+     * @param key a key value
+     * @param value the value associated with
+     *              the key
+     * @param map the map to insert the pair into
+     */
+    public static void addToMap(String key, Object value, Map<String, Object> map) {
+        if (key != null && value != null && !key.isEmpty() ||
+                (value instanceof String) && !((String) value).isEmpty()) {
+            map.put(key, value);
+        }
+    }
+
+    /**
+     * Invokes a static method within a class
+     * if it can be found on the classpath.
+     *
+     * @param className The full defined classname
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private static Object invokeStaticMethod(String className, String methodName,
+                                             Class[] cArgs, Object... args) throws Exception {
+        Class classObject = Class.forName(className);
+        return invokeMethod(classObject, methodName, null, cArgs, args);
+    }
+
+    /**
+     * Invokes a method on a static instance
+     * within a class by reflection.
+     *
+     * @param instance The instance to invoke a method on
+     * @param methodName The name of the method to invoke
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    private static Object invokeInstanceMethod(Object instance, String methodName,
+                                               Class[] cArgs, Object... args) throws Exception {
+        Class classObject = instance.getClass();
+        return invokeMethod(classObject, methodName, instance, cArgs, args);
+    }
+
+    /**
+     * Invokes methods of a class via reflection
+     *
+     * @param classObject The class to attempt invocation on
+     * @param methodName The name of the method to invoke
+     * @param instance The object instance to invoke on
+     * @param cArgs The args that the method can take
+     * @param args The args to pass to the method on invocation
+     * @return the result of the method invoke
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private static Object invokeMethod(Class classObject, String methodName, Object instance,
+                                       Class[] cArgs, Object... args) throws Exception {
+        Method methodObject = classObject.getMethod(methodName, cArgs);
+        return methodObject.invoke(instance, args);
     }
 }

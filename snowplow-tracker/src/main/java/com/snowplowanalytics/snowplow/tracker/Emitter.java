@@ -35,6 +35,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -492,8 +493,13 @@ public class Emitter {
      */
     private int requestSender(Request request) {
         try {
-            Logger.d(TAG, "Sending request: %s", request);
-            return client.newCall(request).execute().code();
+            Logger.v(TAG, "Sending request: %s", request);
+
+            Response resp = client.newCall(request).execute();
+            int code = resp.code();
+            resp.body().close();
+
+            return code;
         } catch (IOException e) {
             Logger.e(TAG, "Request sending failed: %s", e.toString());
             return -1;

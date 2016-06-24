@@ -16,8 +16,6 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
-import android.location.Location;
-import android.os.Looper;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -29,7 +27,6 @@ import java.util.TimeZone;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
  * Provides Subject information for each
@@ -39,28 +36,6 @@ public class Subject {
 
     private static String TAG = Subject.class.getSimpleName();
     private HashMap<String, String> standardPairs = new HashMap<>();
-    private HashMap<String, Object> geoLocationPairs = new HashMap<>();
-    private HashMap<String, String> mobilePairs = new HashMap<>();
-
-    /**
-     * Creates a Subject which will add extra data to each event.
-     *
-     * @param builder The builder that constructs a subject
-     */
-    private Subject(SubjectBuilder builder) {
-        setDefaultTimezone();
-        setDefaultLanguage();
-        setOsType();
-        setOsVersion();
-        setDeviceModel();
-        setDeviceVendor();
-
-        if (builder.context != null) {
-            setContextualParams(builder.context);
-        }
-
-        Logger.v(TAG, "Subject created successfully.");
-    }
 
     /**
      * Builder for the Subject
@@ -88,51 +63,17 @@ public class Subject {
     }
 
     /**
-     * Sets the contextually based parameters.
+     * Creates a Subject which will add extra data to each event.
      *
-     * @param context the android context
+     * @param builder The builder that constructs a subject
      */
-    public void setContextualParams(Context context) {
-        setAdvertisingID(context);
-        setDefaultScreenResolution(context);
-        setCarrier(context);
-        setLocation(context);
-    }
-
-    /**
-     * Inserts a value into the mobilePairs
-     * subject storage.
-     *
-     * NOTE: Avoid putting null or empty
-     * values in the map
-     *
-     * @param key a key value
-     * @param value the value associated with
-     *              the key
-     */
-    private void addToMobileContext(String key, String value) {
-        if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
-            this.mobilePairs.put(key, value);
+    private Subject(SubjectBuilder builder) {
+        setDefaultTimezone();
+        setDefaultLanguage();
+        if (builder.context != null) {
+            setDefaultScreenResolution(builder.context);
         }
-    }
-
-    /**
-     * Inserts a value into the geoLocation
-     * subject storage.
-     *
-     * NOTE: Avoid putting null or empty values
-     * in the map. If they are strings, avoid
-     * empty strings
-     *
-     * @param key a key value
-     * @param value the value associated with
-     *              the key
-     */
-    private void addToGeoLocationContext(String key, Object value) {
-        if (key != null && value != null && !key.isEmpty() ||
-                (value instanceof String) && !((String) value).isEmpty()) {
-            this.geoLocationPairs.put(key, value);
-        }
+        Logger.v(TAG, "Subject created successfully.");
     }
 
     // Default information setters
@@ -152,61 +93,6 @@ public class Subject {
      */
     private void setDefaultLanguage() {
         this.setLanguage(Locale.getDefault().getDisplayLanguage());
-    }
-
-    /**
-     * Set operating system type.
-     * Defaults too 'android' currently.
-     */
-    private void setOsType() {
-        addToMobileContext(Parameters.OS_TYPE, "android");
-    }
-
-    /**
-     * Sets the operating system version.
-     */
-    private void setOsVersion() {
-        addToMobileContext(Parameters.OS_VERSION, android.os.Build.VERSION.RELEASE);
-    }
-
-    /**
-     * Sets the device model.
-     */
-    private void setDeviceModel() {
-        addToMobileContext(Parameters.DEVICE_MODEL, android.os.Build.MODEL);
-    }
-
-    /**
-     * Sets the device vendor/manufacturer.
-     */
-    private void setDeviceVendor() {
-        addToMobileContext(Parameters.DEVICE_MANUFACTURER, android.os.Build.MANUFACTURER);
-    }
-
-    // Context information setters
-
-    /**
-     * Sets the advertising id of the
-     * device.
-     *
-     * @param context the android context
-     */
-    public void setAdvertisingID(final Context context) {
-        // Checks if the Thread we are on is Main/UI
-        // - If yes runs this function in a new Thread
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            new Thread(new Runnable() {
-                public void run() {
-                    String playAdId = Util.getAdvertisingId(context);
-                    Logger.d(TAG, "Advertising ID: %s", playAdId);
-                    addToMobileContext(Parameters.ANDROID_IDFA, playAdId);
-                }
-            }).start();
-        } else {
-            String playAdId = Util.getAdvertisingId(context);
-            Logger.d(TAG, "Advertising ID: %s", playAdId);
-            addToMobileContext(Parameters.ANDROID_IDFA, playAdId);
-        }
     }
 
     /**
@@ -233,40 +119,6 @@ public class Subject {
         } catch (NoSuchMethodException e) {
             Logger.e(TAG, "Display.getSize isn't available on older devices.");
             this.setScreenResolution(display.getWidth(), display.getHeight());
-        }
-    }
-
-    /**
-     * Sets the location of the android
-     * device.
-     *
-     * @param context the android context
-     */
-    public void setLocation(Context context) {
-        Location location = Util.getLocation(context);
-        if (location == null) {
-            Logger.e(TAG, "Location information not available.");
-        } else {
-            addToGeoLocationContext(Parameters.LATITUDE, location.getLatitude());
-            addToGeoLocationContext(Parameters.LONGITUDE, location.getLongitude());
-            addToGeoLocationContext(Parameters.ALTITUDE, location.getAltitude());
-            addToGeoLocationContext(Parameters.LATLONG_ACCURACY, location.getAccuracy());
-            addToGeoLocationContext(Parameters.SPEED, location.getSpeed());
-            addToGeoLocationContext(Parameters.BEARING, location.getBearing());
-            addToGeoLocationContext(Parameters.GEO_TIMESTAMP, System.currentTimeMillis());
-        }
-    }
-
-    /**
-     * Sets the carrier of the android
-     * device.
-     *
-     * @param context the android context
-     */
-    public void setCarrier(Context context) {
-        String carrier = Util.getCarrier(context);
-        if (carrier != null) {
-            addToMobileContext(Parameters.CARRIER, carrier);
         }
     }
 
@@ -376,22 +228,6 @@ public class Subject {
      */
     public void setDomainUserId(String domainUserId) {
         this.standardPairs.put(Parameters.DOMAIN_UID, domainUserId);
-    }
-
-    // Functions to return individual maps of information
-
-    /**
-     * @return the geolocation subject pairs
-     */
-    public Map<String, Object> getSubjectLocation() {
-        return this.geoLocationPairs;
-    }
-
-    /**
-     * @return the mobile subject pairs
-     */
-    public Map<String, String> getSubjectMobile() {
-        return this.mobilePairs;
     }
 
     /**
