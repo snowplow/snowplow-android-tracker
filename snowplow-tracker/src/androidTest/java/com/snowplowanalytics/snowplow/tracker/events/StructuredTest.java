@@ -43,6 +43,9 @@ public class StructuredTest extends AndroidTestCase {
                 .label("some label")
                 .property("some property")
                 .value(123.56700)
+                .timestamp(123456789)
+                .deviceCreatedTimestamp(987654321)
+                .trueTimestamp(123456789)
                 .build();
 
         data = structured.getPayload().getMap();
@@ -54,6 +57,8 @@ public class StructuredTest extends AndroidTestCase {
         assertEquals("some label", data.get(Parameters.SE_LABEL));
         assertEquals("some property", data.get(Parameters.SE_PROPERTY));
         assertEquals("123.567", data.get(Parameters.SE_VALUE));
+        assertEquals("987654321", data.get(Parameters.DEVICE_TIMESTAMP));
+        assertEquals("123456789", data.get(Parameters.TRUE_TIMESTAMP));
     }
 
     public void testBuilderFailures() {

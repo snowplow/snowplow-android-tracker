@@ -319,7 +319,7 @@ public class Tracker {
                     // Track each item individually
                     EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
                     for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-                        item.setTimestamp(ecommerceTransaction.getTimestamp());
+                        item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
                         addEventPayload(item.getPayload(), item.getContext(), item.getEventId());
                     }
                 } else if (eClass.equals(SelfDescribing.class)) {
@@ -332,7 +332,7 @@ public class Tracker {
                     SelfDescribing selfDescribing = SelfDescribing.builder()
                             .eventData((SelfDescribingJson) event.getPayload())
                             .customContext(context)
-                            .timestamp(event.getTimestamp())
+                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
                             .eventId(event.getEventId())
                             .build();
 

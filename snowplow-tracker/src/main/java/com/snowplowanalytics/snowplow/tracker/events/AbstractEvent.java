@@ -34,14 +34,16 @@ import java.util.List;
 public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> context;
-    protected long timestamp;
     protected final String eventId;
+    protected long deviceCreatedTimestamp;
+    private Long trueTimestamp;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private long timestamp = System.currentTimeMillis();
         private String eventId = Util.getEventId();
+        private long deviceCreatedTimestamp = System.currentTimeMillis();
+        private Long trueTimestamp = null;
 
         protected abstract T self();
 
@@ -57,18 +59,6 @@ public abstract class AbstractEvent implements Event {
         }
 
         /**
-         * A custom event timestamp.
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         */
-        public T timestamp(long timestamp) {
-            this.timestamp = timestamp;
-            return self();
-        }
-
-        /**
          * A custom eventId for the event.
          *
          * @param eventId the eventId
@@ -76,6 +66,43 @@ public abstract class AbstractEvent implements Event {
          */
         public T eventId(String eventId) {
             this.eventId = eventId;
+            return self();
+        }
+
+        /**
+         * A custom event timestamp.
+         *
+         * @param timestamp the event timestamp as
+         *                  unix epoch
+         * @return itself
+         */
+        @Deprecated
+        public T timestamp(long timestamp) {
+            this.deviceCreatedTimestamp = timestamp;
+            return self();
+        }
+
+        /**
+         * A custom event timestamp.
+         *
+         * @param deviceCreatedTimestamp the event timestamp as
+         *                               unix epoch
+         * @return itself
+         */
+        public T deviceCreatedTimestamp(long deviceCreatedTimestamp) {
+            this.deviceCreatedTimestamp = deviceCreatedTimestamp;
+            return self();
+        }
+
+        /**
+         * A custom event timestamp.
+         *
+         * @param trueTimestamp the true event timestamp as
+         *                      unix epoch
+         * @return itself
+         */
+        public T trueTimestamp(long trueTimestamp) {
+            this.trueTimestamp = trueTimestamp;
             return self();
         }
     }
@@ -88,7 +115,8 @@ public abstract class AbstractEvent implements Event {
         Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
 
         this.context = builder.context;
-        this.timestamp = builder.timestamp;
+        this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
+        this.trueTimestamp = builder.trueTimestamp;
         this.eventId = builder.eventId;
     }
 
@@ -104,8 +132,16 @@ public abstract class AbstractEvent implements Event {
      * @return the events timestamp
      */
     @Override
-    public long getTimestamp() {
-        return this.timestamp;
+    public long getDeviceCreatedTimestamp() {
+        return this.deviceCreatedTimestamp;
+    }
+
+    /**
+     * @return the optional true events timestamp
+     */
+    @Override
+    public long getTrueTimestamp() {
+        return this.trueTimestamp;
     }
 
     /**
@@ -130,7 +166,10 @@ public abstract class AbstractEvent implements Event {
      */
     protected TrackerPayload putDefaultParams(TrackerPayload payload) {
         payload.add(Parameters.EID, getEventId());
-        payload.add(Parameters.TIMESTAMP, Long.toString(getTimestamp()));
+        payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
+        if (this.trueTimestamp != null) {
+            payload.add(Parameters.TRUE_TIMESTAMP, Long.toString(getTrueTimestamp()));
+        }
         return payload;
     }
 }

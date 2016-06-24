@@ -32,7 +32,12 @@ public interface Event {
     /**
      * @return the events timestamp
      */
-    long getTimestamp();
+    long getDeviceCreatedTimestamp();
+
+    /**
+     * @return the optional true events timestamp
+     */
+    long getTrueTimestamp();
 
     /**
      * @return the event id

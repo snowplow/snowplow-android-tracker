@@ -193,7 +193,7 @@ public class EmitterTest extends AndroidTestCase {
         JSONObject payload = new JSONObject(req.getBody().readUtf8());
         assertEquals(2, payload.length());
         assertEquals(
-                "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3",
+                "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
                 payload.getString("schema")
         );
 

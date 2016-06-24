@@ -139,10 +139,10 @@ public class EcommerceTransactionItem extends AbstractEvent {
     }
 
     /**
-     * @param timestamp the new timestamp
+     * @param deviceCreatedTimestamp the new timestamp
      */
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setDeviceCreatedTimestamp(long deviceCreatedTimestamp) {
+        this.deviceCreatedTimestamp = deviceCreatedTimestamp;
     }
 
     /**
@@ -154,7 +154,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
     public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_ECOMM_ITEM);
-        payload.add(Parameters.TIMESTAMP, Long.toString(this.timestamp));
+        payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(this.deviceCreatedTimestamp));
         payload.add(Parameters.TI_ITEM_ID, this.itemId);
         payload.add(Parameters.TI_ITEM_SKU, this.sku);
         payload.add(Parameters.TI_ITEM_NAME, this.name);
