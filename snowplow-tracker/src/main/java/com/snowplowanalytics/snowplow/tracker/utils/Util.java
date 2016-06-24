@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -251,7 +252,7 @@ public class Util {
     // --- Geo-Location Context
 
     private static SelfDescribingJson geoLocationContext = null;
-    private static boolean geoLocationContextAttempted = false;
+    private static AtomicBoolean geoLocationContextAttempted = new AtomicBoolean(false);
 
     /**
      * Returns the Geo-Location Context
@@ -259,8 +260,8 @@ public class Util {
      * @param context the Android context
      * @return the geo-location context
      */
-    public static SelfDescribingJson getGeoLocationContext(Context context) {
-        if (geoLocationContext == null && !geoLocationContextAttempted) {
+    public synchronized static SelfDescribingJson getGeoLocationContext(Context context) {
+        if (!geoLocationContextAttempted.getAndSet(true)) {
             Location location = getLocation(context);
 
             if (location != null) {
@@ -278,7 +279,6 @@ public class Util {
                             TrackerConstants.GEOLOCATION_SCHEMA, pairs
                     );
                 }
-                geoLocationContextAttempted = true;
             }
         }
 
@@ -320,7 +320,7 @@ public class Util {
     // --- Mobile Context
 
     private static SelfDescribingJson mobileContext = null;
-    private static boolean mobileContextAttempted = false;
+    private static AtomicBoolean mobileContextAttempted = new AtomicBoolean(false);
 
     /**
      * Returns the Mobile Context
@@ -328,8 +328,8 @@ public class Util {
      * @param context the Android context
      * @return the mobile context
      */
-    public static SelfDescribingJson getMobileContext(Context context) {
-        if (mobileContext == null && !mobileContextAttempted) {
+    public synchronized static SelfDescribingJson getMobileContext(Context context) {
+        if (!mobileContextAttempted.getAndSet(true)) {
             Map<String, Object> pairs = new HashMap<>();
             addToMap(Parameters.OS_TYPE, getOsType(), pairs);
             addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
@@ -338,6 +338,10 @@ public class Util {
             addToMap(Parameters.CARRIER, getCarrier(context), pairs);
             addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
 
+            NetworkInfo networkInfo = getNetworkInfo(context);
+            addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
+            addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
+
             if (mapHasKeys(pairs,
                     Parameters.OS_TYPE,
                     Parameters.OS_VERSION,
@@ -345,7 +349,6 @@ public class Util {
                     Parameters.DEVICE_MODEL)) {
                 mobileContext = new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
             }
-            mobileContextAttempted = true;
         }
 
         return mobileContext;
@@ -413,6 +416,59 @@ public class Util {
         }
     }
 
+    /**
+     * Returns the network type that the device is connected to
+     *
+     * @param networkInfo The NetworkInformation object
+     * @return the type of the network
+     */
+    public static String getNetworkType(NetworkInfo networkInfo) {
+        String networkType = null;
+        if (networkInfo != null) {
+            networkType = networkInfo.getTypeName().toLowerCase();
+        }
+        return networkType;
+    }
+
+    /**
+     * Returns the network technology
+     *
+     * @param networkInfo The NetworkInformation object
+     * @return the technology of the network
+     */
+    public static String getNetworkTechnology(NetworkInfo networkInfo) {
+        String networkTech = null;
+        if (networkInfo != null) {
+            String networkType = networkInfo.getTypeName();
+            if (networkType.equalsIgnoreCase("MOBILE")) {
+                networkTech = networkInfo.getSubtypeName();
+            }
+        }
+        return networkTech;
+    }
+
+    /**
+     * Returns an instance that represents the current network connection
+     *
+     * @param context the android context
+     * @return the representation of the current network connection or null
+     */
+    public static NetworkInfo getNetworkInfo(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo ni = null;
+        try {
+            NetworkInfo maybeNi = cm.getActiveNetworkInfo();
+            if (maybeNi != null && maybeNi.isConnected()) {
+                ni = maybeNi;
+            }
+        } catch (SecurityException e) {
+            Logger.e(TAG, "Security exception getting NetworkInfo: %s", e.toString());
+        }
+        return ni;
+    }
+
     // --- Context Helpers
 
     /**
@@ -444,8 +500,7 @@ public class Util {
      * @param map the map to insert the pair into
      */
     public static void addToMap(String key, Object value, Map<String, Object> map) {
-        if (key != null && value != null && !key.isEmpty() ||
-                (value instanceof String) && !((String) value).isEmpty()) {
+        if (key != null && value != null && !key.isEmpty()) {
             map.put(key, value);
         }
     }

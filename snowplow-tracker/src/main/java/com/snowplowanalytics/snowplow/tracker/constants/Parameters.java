@@ -97,6 +97,8 @@ public class Parameters {
     public static final String DEVICE_MANUFACTURER = "deviceManufacturer";
     public static final String OS_VERSION = "osVersion";
     public static final String OS_TYPE = "osType";
+    public static final String NETWORK_TYPE = "networkType";
+    public static final String NETWORK_TECHNOLOGY = "networkTechnology";
 
     // Geolocation context
     public static final String LATITUDE = "latitude";
