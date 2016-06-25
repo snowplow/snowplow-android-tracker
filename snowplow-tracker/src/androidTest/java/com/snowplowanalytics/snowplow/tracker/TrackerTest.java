@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
 import org.json.JSONArray;
@@ -63,6 +64,7 @@ public class TrackerTest extends AndroidTestCase {
             .backgroundTimeout(5)
             .sessionCheckInterval(15)
             .timeUnit(TimeUnit.SECONDS)
+            .applicationCrash(false)
             .build();
     }
 
@@ -92,6 +94,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals("andr-0.5.4", tracker.getTrackerVersion());
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
+        assertEquals(false, tracker.getApplicationCrash());
     }
 
     public void testEmitterUpdate() {
@@ -231,6 +234,73 @@ public class TrackerTest extends AndroidTestCase {
         tracker.pauseSessionChecking();
 
         mockWebServer.shutdown();
+    }
+
+    public void testTrackUncaughtException() throws InterruptedException {
+        Thread.setDefaultUncaughtExceptionHandler(
+                new TestExceptionHandler("Illegal State Exception has been thrown!")
+        );
+
+        assertEquals(
+                TestExceptionHandler.class,
+                Thread.getDefaultUncaughtExceptionHandler().getClass()
+        );
+
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
+
+        Tracker.close();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .applicationCrash(true)
+                .build();
+
+        assertTrue(tracker.getApplicationCrash());
+        assertEquals(
+                ExceptionHandler.class,
+                Thread.getDefaultUncaughtExceptionHandler().getClass()
+        );
+    }
+
+    public void testExceptionHandler() {
+        TestExceptionHandler handler = new TestExceptionHandler("Illegal State Exception has been thrown!");
+        Thread.setDefaultUncaughtExceptionHandler(handler);
+
+        assertEquals(
+                TestExceptionHandler.class,
+                Thread.getDefaultUncaughtExceptionHandler().getClass()
+        );
+
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
+        Tracker.close();
+        new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .applicationCrash(false)
+                .build();
+
+        ExceptionHandler handler1 = new ExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(handler1);
+
+        assertEquals(
+                ExceptionHandler.class,
+                Thread.getDefaultUncaughtExceptionHandler().getClass()
+        );
+
+        handler1.uncaughtException(Thread.currentThread(), new Throwable("Illegal State Exception has been thrown!"));
+    }
+
+    public static class TestExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+        private final String expectedMessage;
+
+        public TestExceptionHandler(String message) {
+            this.expectedMessage = message;
+        }
+
+        public void uncaughtException(Thread t, Throwable e) {
+            assertEquals(this.expectedMessage, e.getMessage());
+        }
     }
 
     // Mock Server

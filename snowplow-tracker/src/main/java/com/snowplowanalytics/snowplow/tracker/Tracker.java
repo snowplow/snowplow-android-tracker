@@ -29,6 +29,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
@@ -60,12 +61,16 @@ public class Tracker {
             spTracker.resumeSessionChecking();
             spTracker.getEmitter().flush();
         }
-        return spTracker;
+        return instance();
     }
 
     public static Tracker instance() {
         if (spTracker == null) {
             throw new IllegalStateException("FATAL: Tracker must be initialized first!");
+        }
+
+        if (spTracker.getApplicationCrash() && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
+            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         }
         return spTracker;
     }
@@ -95,6 +100,7 @@ public class Tracker {
     private TimeUnit timeUnit;
     private boolean geoLocationContext;
     private boolean mobileContext;
+    private boolean applicationCrash;
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
@@ -118,6 +124,7 @@ public class Tracker {
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
         boolean geoLocationContext = false; // Optional
         boolean mobileContext = false; // Optional
+        boolean applicationCrash = true; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -241,6 +248,16 @@ public class Tracker {
         }
 
         /**
+         * @param applicationCrash whether to automatically track application
+         *                         crashes
+         * @return itself
+         */
+        public TrackerBuilder applicationCrash(Boolean applicationCrash) {
+            this.applicationCrash = applicationCrash;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -273,6 +290,7 @@ public class Tracker {
         this.timeUnit = builder.timeUnit;
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
+        this.applicationCrash = builder.applicationCrash;
 
         // If session context is True
         if (this.sessionContext) {
@@ -579,4 +597,11 @@ public class Tracker {
      * @return the amount of threads to use
      */
     public int getThreadCount() { return this.threadCount; }
+
+    /**
+     * @return whether application crash tracking is on
+     */
+    public boolean getApplicationCrash() {
+        return this.applicationCrash;
+    }
 }

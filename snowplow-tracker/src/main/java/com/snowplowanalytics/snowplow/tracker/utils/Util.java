@@ -35,6 +35,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -606,5 +608,18 @@ public class Util {
             e.printStackTrace();
         }
         return newMap;
+    }
+
+    /**
+     * Converts a StackTrace to a String
+     *
+     * @param e the Throwable to convert
+     * @return the StackTrace as a string
+     */
+    public static String stackTraceToString(Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 }
