@@ -119,4 +119,15 @@ public class Parameters {
     public static final String SESSION_INDEX = "sessionIndex";
     public static final String SESSION_STORAGE = "storageMechanism";
     public static final String SESSION_FIRST_ID = "firstEventId";
+
+    // Application Crash
+    public static final String APP_ERROR_MESSAGE = "message";
+    public static final String APP_ERROR_STACK = "stackTrace";
+    public static final String APP_ERROR_THREAD_NAME = "threadName";
+    public static final String APP_ERROR_THREAD_ID = "threadId";
+    public static final String APP_ERROR_LANG = "programmingLanguage";
+    public static final String APP_ERROR_LINE = "lineNumber";
+    public static final String APP_ERROR_CLASS_NAME = "className";
+    public static final String APP_ERROR_EXCEPTION_NAME = "exceptionName";
+    public static final String APP_ERROR_FATAL = "isFatal";
 }
