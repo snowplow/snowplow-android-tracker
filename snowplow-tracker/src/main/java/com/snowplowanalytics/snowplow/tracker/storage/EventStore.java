@@ -172,7 +172,7 @@ public class EventStore {
      * @return the list of events that satisfied
      * the query
      */
-    public List<Map<String, Object>> queryDatabase(String query, String orderBy) {
+    private List<Map<String, Object>> queryDatabase(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
         if (isDatabaseOpen()) {
             Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,

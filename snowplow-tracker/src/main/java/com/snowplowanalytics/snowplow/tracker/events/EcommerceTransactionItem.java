@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker.events;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
@@ -118,7 +117,7 @@ public class EcommerceTransactionItem extends AbstractEvent {
         return new Builder2();
     }
 
-    protected EcommerceTransactionItem(Builder<?> builder) {
+    private EcommerceTransactionItem(Builder<?> builder) {
         super(builder);
 
         // Precondition checks

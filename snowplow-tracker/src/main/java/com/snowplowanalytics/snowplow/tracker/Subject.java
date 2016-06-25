@@ -13,7 +13,6 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;

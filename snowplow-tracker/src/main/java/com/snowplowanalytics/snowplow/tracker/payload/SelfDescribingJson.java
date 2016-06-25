@@ -28,7 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 public class SelfDescribingJson implements Payload {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
-    private final HashMap<String,Object> payload = new HashMap<String,Object>();
+    private final HashMap<String,Object> payload = new HashMap<>();
     
     /**
      * Builds a SelfDescribingJson object

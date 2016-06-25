@@ -102,22 +102,22 @@ public class Tracker {
      */
     public static class TrackerBuilder {
 
-        protected final Emitter emitter; // Required
-        protected final String namespace; // Required
-        protected final String appId; // Required
-        protected final Context context; // Required
-        protected Subject subject = null; // Optional
-        protected boolean base64Encoded = true; // Optional
-        protected DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
-        protected LogLevel logLevel = LogLevel.OFF; // Optional
-        protected boolean sessionContext = false; // Optional
-        protected long foregroundTimeout = 600; // Optional - 10 minutes
-        protected long backgroundTimeout = 300; // Optional - 5 minutes
-        protected long sessionCheckInterval = 15; // Optional - 15 seconds
-        protected int threadCount = 10; // Optional
-        protected TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
-        protected boolean geoLocationContext = false; // Optional
-        protected boolean mobileContext = false; // Optional
+        final Emitter emitter; // Required
+        final String namespace; // Required
+        final String appId; // Required
+        final Context context; // Required
+        Subject subject = null; // Optional
+        boolean base64Encoded = true; // Optional
+        DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        LogLevel logLevel = LogLevel.OFF; // Optional
+        boolean sessionContext = false; // Optional
+        long foregroundTimeout = 600; // Optional - 10 minutes
+        long backgroundTimeout = 300; // Optional - 5 minutes
+        long sessionCheckInterval = 15; // Optional - 15 seconds
+        int threadCount = 10; // Optional
+        TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
+        boolean geoLocationContext = false; // Optional
+        boolean mobileContext = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent

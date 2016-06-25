@@ -26,7 +26,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 public class TrackerPayload implements Payload {
 
     private final String TAG = TrackerPayload.class.getSimpleName();
-    private final HashMap<String,Object> payload = new HashMap<String,Object>();
+    private final HashMap<String,Object> payload = new HashMap<>();
     
     @Override
     public void add(String key, String value) {

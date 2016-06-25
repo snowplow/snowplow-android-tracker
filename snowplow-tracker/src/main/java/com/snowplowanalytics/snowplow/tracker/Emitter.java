@@ -86,18 +86,18 @@ public class Emitter {
      */
     public static class EmitterBuilder {
 
-        protected final String uri; // Required
-        protected final Context context; // Required
-        protected RequestCallback requestCallback = null; // Optional
-        protected HttpMethod httpMethod = HttpMethod.POST; // Optional
-        protected BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
-        protected RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
-        protected int emitterTick = 5; // Optional
-        protected int sendLimit = 250; // Optional
-        protected int emptyLimit = 5; // Optional
-        protected long byteLimitGet = 40000; // Optional
-        protected long byteLimitPost = 40000; // Optional
-        protected TimeUnit timeUnit = TimeUnit.SECONDS;
+        final String uri; // Required
+        final Context context; // Required
+        RequestCallback requestCallback = null; // Optional
+        HttpMethod httpMethod = HttpMethod.POST; // Optional
+        BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
+        RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        int emitterTick = 5; // Optional
+        int sendLimit = 250; // Optional
+        int emptyLimit = 5; // Optional
+        long byteLimitGet = 40000; // Optional
+        long byteLimitPost = 40000; // Optional
+        TimeUnit timeUnit = TimeUnit.SECONDS;
 
         /**
          * @param uri The uri of the collector
@@ -319,6 +319,7 @@ public class Emitter {
      *   + If there are failures resets running state
      *   + Otherwise will attempt to emit again
      */
+    @SuppressWarnings("all")
     private void attemptEmit() {
         if (Util.isOnline(this.context)) {
             if (eventStore.getSize() > 0) {
@@ -403,6 +404,7 @@ public class Emitter {
      *                 sent
      * @return the results of each request
      */
+    @SuppressWarnings("all")
     protected LinkedList<RequestResult> performAsyncEmit(LinkedList<ReadyRequest> requests) {
         LinkedList<RequestResult> results = new LinkedList<>();
         LinkedList<Future> futures = new LinkedList<>();

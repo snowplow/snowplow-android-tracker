@@ -33,8 +33,8 @@ import java.util.List;
  */
 public abstract class AbstractEvent implements Event {
 
-    protected final List<SelfDescribingJson> context;
-    protected final String eventId;
+    private final List<SelfDescribingJson> context;
+    private final String eventId;
     protected long deviceCreatedTimestamp;
     private Long trueTimestamp;
 
@@ -107,7 +107,7 @@ public abstract class AbstractEvent implements Event {
         }
     }
 
-    protected AbstractEvent(Builder<?> builder) {
+    AbstractEvent(Builder<?> builder) {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.context);
@@ -164,7 +164,7 @@ public abstract class AbstractEvent implements Event {
      * @param payload the payload to add too.
      * @return the TrackerPayload with appended values.
      */
-    protected TrackerPayload putDefaultParams(TrackerPayload payload) {
+    TrackerPayload putDefaultParams(TrackerPayload payload) {
         payload.add(Parameters.EID, getEventId());
         payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
         if (this.trueTimestamp != null) {
