@@ -65,6 +65,7 @@ public class TrackerTest extends AndroidTestCase {
             .sessionCheckInterval(15)
             .timeUnit(TimeUnit.SECONDS)
             .applicationCrash(false)
+            .lifecycleEvents(true)
             .build();
     }
 
@@ -95,6 +96,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
         assertEquals(false, tracker.getApplicationCrash());
+        assertEquals(true, tracker.getLifecycleEvents());
     }
 
     public void testEmitterUpdate() {

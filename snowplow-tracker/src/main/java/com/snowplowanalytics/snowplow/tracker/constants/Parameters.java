@@ -130,4 +130,8 @@ public class Parameters {
     public static final String APP_ERROR_CLASS_NAME = "className";
     public static final String APP_ERROR_EXCEPTION_NAME = "exceptionName";
     public static final String APP_ERROR_FATAL = "isFatal";
+
+    // Application Focus
+    public static final String APP_FOREGROUND_INDEX = "foregroundIndex";
+    public static final String APP_BACKGROUND_INDEX = "backgroundIndex";
 }
