@@ -13,7 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,6 +33,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
+import com.snowplowanalytics.snowplow.tracker.tracker.LifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
@@ -101,6 +105,8 @@ public class Tracker {
     private boolean geoLocationContext;
     private boolean mobileContext;
     private boolean applicationCrash;
+    private boolean lifecycleEvents;
+
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
@@ -125,6 +131,7 @@ public class Tracker {
         boolean geoLocationContext = false; // Optional
         boolean mobileContext = false; // Optional
         boolean applicationCrash = true; // Optional
+        boolean lifecycleEvents = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -258,6 +265,20 @@ public class Tracker {
         }
 
         /**
+         * NOTE: Only available on API 14+ and with the Foreground library
+         * installed.
+         *
+         * @param lifecycleEvents whether to automatically track transition
+         *                        from foreground to background
+         * @return itself
+         */
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        public TrackerBuilder lifecycleEvents(Boolean lifecycleEvents) {
+            this.lifecycleEvents = lifecycleEvents;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -291,6 +312,7 @@ public class Tracker {
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
         this.applicationCrash = builder.applicationCrash;
+        this.lifecycleEvents = builder.lifecycleEvents;
 
         // If session context is True
         if (this.sessionContext) {
@@ -497,6 +519,20 @@ public class Tracker {
     // --- Setters
 
     /**
+     * Sets the LifecycleHandler hooks
+     *
+     * @param activity The application activity
+     */
+    public void setLifecycleHandler(Activity activity) {
+        if ((this.lifecycleEvents || this.sessionContext) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            LifecycleHandler handler = new LifecycleHandler();
+            activity.getApplication().registerActivityLifecycleCallbacks(handler);
+            activity.registerComponentCallbacks(handler);
+        }
+    }
+
+    /**
      * @param subject a valid subject object
      */
     public void setSubject(Subject subject) {
@@ -603,5 +639,12 @@ public class Tracker {
      */
     public boolean getApplicationCrash() {
         return this.applicationCrash;
+    }
+
+    /**
+     * @return whether application lifecycle tracking is on
+     */
+    public boolean getLifecycleEvents() {
+        return this.lifecycleEvents;
     }
 }
