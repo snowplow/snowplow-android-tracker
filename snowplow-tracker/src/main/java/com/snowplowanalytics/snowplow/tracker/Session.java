@@ -124,8 +124,9 @@ public class Session {
 
         long checkTime = System.currentTimeMillis();
         long range;
+        boolean isBackground = this.isBackground.get();
 
-        if (this.isBackground.get()) {
+        if (isBackground) {
             range = this.backgroundTimeout;
         } else {
             range = this.foregroundTimeout;
@@ -134,6 +135,16 @@ public class Session {
         if (!Util.isTimeInRange(this.accessedLast, checkTime, range)) {
             updateSessionInfo();
             updateAccessedTime();
+
+            // If we have timed out in the background self-terminate...
+            if (isBackground) {
+                Logger.d(TAG, "Timeout in background, pausing session checking...");
+                try {
+                    Tracker.instance().pauseSessionChecking();
+                } catch (Exception e) {
+                    Logger.e(TAG, "Could not pause checking as tracker not setup");
+                }
+            }
         }
     }
 
@@ -145,6 +156,18 @@ public class Session {
      */
     public void setIsBackground(boolean isBackground) {
         Logger.d(TAG, "Application is in the background: %s", isBackground);
+
+        // If we are currently in the background and the new state is
+        // foreground restart session checking
+        boolean currentState = this.isBackground.get();
+        if (currentState && !isBackground) {
+            Logger.d(TAG, "Application moved to foreground, starting session checking...");
+            try {
+                Tracker.instance().resumeSessionChecking();
+            } catch (Exception e) {
+                Logger.e(TAG, "Could not resume checking as tracker not setup");
+            }
+        }
         this.isBackground.set(isBackground);
     }
 
