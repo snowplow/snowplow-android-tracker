@@ -26,6 +26,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':snowplow-tracker')
+    compile project(':snowplow-android-tracker')
     compile 'com.android.support:appcompat-v7:24.0.0'
 }
