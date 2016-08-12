@@ -1,2 +1,4 @@
 include ':snowplow-tracker'
 include ':snowplow-demo-app'
+
+project(":snowplow-tracker").name = "snowplow-android-tracker"
