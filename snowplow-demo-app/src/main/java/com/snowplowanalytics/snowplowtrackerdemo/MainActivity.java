@@ -28,39 +28,29 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 /**
  * Main Activity
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends Activity {
 
-    private Button _rxDemoBtn;
-    private Button _rxLiteBtn;
+    private Button _liteBtn;
 
-    private String repo_url = "https://github.com/snowplow/snowplow-android-tracker";
-    private String integration_url = "https://github.com/snowplow/snowplow/wiki/Android-Integration";
-    private String tech_docs_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker";
-    private String setup_guide_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup";
+    private final String repo_url = "https://github.com/snowplow/snowplow-android-tracker";
+    private final String integration_url = "https://github.com/snowplow/snowplow/wiki/Android-Integration";
+    private final String tech_docs_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker";
+    private final String setup_guide_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        _rxDemoBtn = ( Button ) findViewById(R.id.btn_rx);
-        _rxLiteBtn = ( Button ) findViewById(R.id.btn_lite);
+        _liteBtn = ( Button ) findViewById(R.id.btn_lite);
 
-        _rxDemoBtn.setOnClickListener(new View.OnClickListener() {
+        _liteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, RxDemo.class);
+                Logger.updateLogLevel(LogLevel.VERBOSE);
+                Intent intent = new Intent(MainActivity.this, Demo.class);
                 startActivity(intent);
-                Logger.updateLogLevel(LogLevel.DEBUG);
-            }
-        });
-
-        _rxLiteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ClassicDemo.class);
-                startActivity(intent);
-                Logger.updateLogLevel(LogLevel.DEBUG);
             }
         });
 

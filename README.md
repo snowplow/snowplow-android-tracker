@@ -1,6 +1,6 @@
 # Android Analytics for Snowplow
 
-[ ![Build Status] [travis-image] ] [travis] [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
+[![Build Status][travis-image]][travis] [![Coverage Status][coveralls-image]][coveralls] [![Release][release-image]][releases] [![License][license-image]][license]
 
 ## Overview
 
@@ -91,8 +91,11 @@ limitations under the License.
 [travis]: https://travis-ci.org/snowplow/snowplow-android-tracker
 [travis-image]: https://travis-ci.org/snowplow/snowplow-android-tracker.svg?branch=master
 
-[release-image]: http://img.shields.io/badge/release-0.5.4-blue.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-0.6.0-blue.svg?style=flat
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0
+
+[coveralls-image]: https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master
+[coveralls]: https://coveralls.io/github/snowplow/snowplow-android-tracker?branch=master

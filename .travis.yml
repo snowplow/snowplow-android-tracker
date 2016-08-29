@@ -4,16 +4,16 @@ jdk: oraclejdk8
 env:
   matrix:
     - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a ANDROID_TRAVIS=1
+  global:
+    - secure: iXVs65+lPjyTr60MsX9K2WpjJ5ijt4cnBE9PT6ouHSjkZjugotaNoX3nXZev8fKFLsH0JPxpsxBVy66jz6iOddMfLdzSiL2oOeeYNxyNThOdGp9R/JmYtivgrMm6v3e1zzCLvj9onOwBUVdWVLD/BXgYi7wP96rJFENlVjuszys=
+    - secure: BXwZhWDFFXzdaTAPAvMKeOfnLHxkmdXoeMZ/GtVYkT62JxeuiaTW6Z6rT0gZKAEyxmUBxFX1CP+1m1Gi0cWrQHfTBbFDJO7iKu7mG9LcZhQ8Cm657yt2TBc+fnVqbG5OxXWhSBs1lF1gZJ6+ehEIJn3YjP6fDYv0fNnTGpYHCYo=
 
 android:
   components:
     - tools
     - platform-tools
-    - build-tools-21.1.2
-    - android-21
-    - android-20
-    - android-19
-    - addon-google_apis-google-22
+    - build-tools-23.0.3
+    - android-24
     - extra-android-support
     - extra-google-m2repository
     - extra-google-google_play_services
@@ -27,4 +27,11 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew build connectedCheck
+  - ./gradlew createDebugCoverageReport coveralls
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: ./.travis/deploy.sh $TRAVIS_TAG
+  on:
+    tags: true

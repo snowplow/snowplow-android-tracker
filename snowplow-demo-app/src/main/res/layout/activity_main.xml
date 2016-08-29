@@ -32,27 +32,15 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:id="@+id/btn_rx"
-        android:layout_height="wrap_content"
-        android:text="@string/main_demo_button_rx"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_below="@+id/demo_info"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
         android:id="@+id/btn_lite"
         android:layout_height="wrap_content"
-        android:text="@string/main_demo_button_lite"
+        android:text="@string/main_demo_button"
         android:layout_width="match_parent"
         android:gravity="center"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/btn_rx"
+        android:layout_below="@+id/demo_info"
         android:layout_alignParentLeft="true" />
 
     <TextView
