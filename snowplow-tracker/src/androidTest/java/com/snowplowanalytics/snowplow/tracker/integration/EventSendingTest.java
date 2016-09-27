@@ -132,7 +132,7 @@ public class EventSendingTest extends AndroidTestCase {
                     .level(LogLevel.DEBUG)
                     .sessionContext(true)
                     .mobileContext(true)
-                    .geoLocationContext(true)
+                    .geoLocationContext(false)
                     .build()
         );
         return Tracker.instance();
