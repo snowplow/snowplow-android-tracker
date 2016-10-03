@@ -1,3 +1,9 @@
+Version 0.6.1 (2016-10-03)
+--------------------------
+Ensure mobile_context only contains accepted enum values (#232)
+Do not include geolocation permissions in tracker manifest (#229)
+Bump Gradle Version to 2.2.0 (#230)
+
 Version 0.6.0 (2016-08-29)
 --------------------------
 Added network type and technology to mobile context (#180)
