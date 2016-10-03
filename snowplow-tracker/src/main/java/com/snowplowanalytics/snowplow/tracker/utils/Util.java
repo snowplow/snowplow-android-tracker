@@ -432,7 +432,15 @@ public class Util {
     public static String getNetworkType(NetworkInfo networkInfo) {
         String networkType = null;
         if (networkInfo != null) {
-            networkType = networkInfo.getTypeName().toLowerCase();
+            String maybeNetworkType = networkInfo.getTypeName().toLowerCase();
+            switch (maybeNetworkType) {
+                case "mobile":
+                case "wifi":
+                case "offline":
+                    networkType = maybeNetworkType;
+                    break;
+                default: break;
+            }
         }
         return networkType;
     }
