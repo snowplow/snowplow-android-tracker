@@ -54,7 +54,12 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         Logger.d(TAG, "Uncaught exception being tracked...");
 
+        // Ensure message is not-null/empty
         String message = truncateString(e.getMessage(), MAX_MESSAGE_LENGTH);
+        if (message == null || message.isEmpty()) {
+            message = "Android Exception. Null or empty message found";
+        }
+
         String stack = truncateString(Util.stackTraceToString(e), MAX_STACK_LENGTH);
         String threadName = truncateString(t.getName(), MAX_THREAD_NAME_LENGTH);
 
@@ -62,7 +67,13 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         String className = null;
         if (e.getStackTrace().length > 0) {
             StackTraceElement stackElement = e.getStackTrace()[0];
+
+            // Ensure lineNumber is greater than or equal to zero
             lineNumber = stackElement.getLineNumber();
+            if (lineNumber < 0) {
+                lineNumber = null;
+            }
+
             className = truncateString(stackElement.getClassName(), MAX_CLASS_NAME_LENGTH);
         }
 
