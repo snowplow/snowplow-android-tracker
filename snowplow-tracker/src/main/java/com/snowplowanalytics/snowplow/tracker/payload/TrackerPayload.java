@@ -34,7 +34,7 @@ public class TrackerPayload implements Payload {
             Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
             return;
         }
-        Logger.v(TAG, "Adding new kv pair: " + key + "->" + value);
+        Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
         payload.put(key, value);
     }
 
@@ -44,7 +44,7 @@ public class TrackerPayload implements Payload {
             Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
             return;
         }
-        Logger.v(TAG, "Adding new kv pair: " + key + "->" + value);
+        Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
         payload.put(key, value);
     }
 
