@@ -258,38 +258,32 @@ public class Util {
 
     // --- Geo-Location Context
 
-    private static SelfDescribingJson geoLocationContext = null;
-    private static AtomicBoolean geoLocationContextAttempted = new AtomicBoolean(false);
-
     /**
      * Returns the Geo-Location Context
      *
      * @param context the Android context
      * @return the geo-location context
      */
-    public synchronized static SelfDescribingJson getGeoLocationContext(Context context) {
-        if (!geoLocationContextAttempted.getAndSet(true)) {
-            Location location = getLocation(context);
+    public static SelfDescribingJson getGeoLocationContext(Context context) {
+        Location location = getLastKnownLocation(context);
 
-            if (location != null) {
-                Map<String, Object> pairs = new HashMap<>();
-                addToMap(Parameters.LATITUDE, location.getLatitude(), pairs);
-                addToMap(Parameters.LONGITUDE, location.getLongitude(), pairs);
-                addToMap(Parameters.ALTITUDE, location.getAltitude(), pairs);
-                addToMap(Parameters.LATLONG_ACCURACY, location.getAccuracy(), pairs);
-                addToMap(Parameters.SPEED, location.getSpeed(), pairs);
-                addToMap(Parameters.BEARING, location.getBearing(), pairs);
-                addToMap(Parameters.GEO_TIMESTAMP, System.currentTimeMillis(), pairs);
+        if (location != null) {
+            Map<String, Object> pairs = new HashMap<>();
+            addToMap(Parameters.LATITUDE, location.getLatitude(), pairs);
+            addToMap(Parameters.LONGITUDE, location.getLongitude(), pairs);
+            addToMap(Parameters.ALTITUDE, location.getAltitude(), pairs);
+            addToMap(Parameters.LATLONG_ACCURACY, location.getAccuracy(), pairs);
+            addToMap(Parameters.SPEED, location.getSpeed(), pairs);
+            addToMap(Parameters.BEARING, location.getBearing(), pairs);
+            addToMap(Parameters.GEO_TIMESTAMP, System.currentTimeMillis(), pairs);
 
-                if (mapHasKeys(pairs, Parameters.LATITUDE, Parameters.LONGITUDE)) {
-                    geoLocationContext = new SelfDescribingJson(
-                            TrackerConstants.GEOLOCATION_SCHEMA, pairs
-                    );
-                }
+            if (mapHasKeys(pairs, Parameters.LATITUDE, Parameters.LONGITUDE)) {
+                return new SelfDescribingJson(
+                        TrackerConstants.GEOLOCATION_SCHEMA, pairs
+                );
             }
         }
-
-        return geoLocationContext;
+        return null;
     }
 
     /**
@@ -299,29 +293,31 @@ public class Util {
      * @param context the android context
      * @return the phones Location
      */
-    public static Location getLocation(Context context) {
+    public static Location getLastKnownLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        String locationProvider = null;
+        Location location = null;
 
-        if (!isNetworkEnabled && !isGPSEnabled) {
-            Logger.e(TAG, "Cannot get location, Network and GPS are disabled");
-            return null;
-        } else {
-            Location location = null;
-            try {
-                if (isNetworkEnabled) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    Logger.d(TAG, "Network location found: %s", location);
-                } else if (isGPSEnabled) {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    Logger.d(TAG, "GPS location found: %s", location);
+        try {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationProvider = LocationManager.GPS_PROVIDER;
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationProvider = LocationManager.NETWORK_PROVIDER;
+            } else {
+                List<String> locationProviders = locationManager.getProviders(true);
+                if (locationProviders.size() > 0) {
+                    locationProvider = locationProviders.get(0);
                 }
-            } catch (SecurityException ex) {
-                Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString());
             }
-            return location;
+
+            if (locationProvider != null && !locationProvider.equals("")) {
+                location = locationManager.getLastKnownLocation(locationProvider);
+            }
+        } catch (SecurityException ex) {
+            Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString());
         }
+
+        return location;
     }
 
     // --- Mobile Context
