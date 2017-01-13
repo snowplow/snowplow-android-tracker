@@ -326,39 +326,34 @@ public class Util {
 
     // --- Mobile Context
 
-    private static SelfDescribingJson mobileContext = null;
-    private static AtomicBoolean mobileContextAttempted = new AtomicBoolean(false);
-
     /**
      * Returns the Mobile Context
      *
      * @param context the Android context
      * @return the mobile context
      */
-    public synchronized static SelfDescribingJson getMobileContext(Context context) {
-        if (!mobileContextAttempted.getAndSet(true)) {
-            Map<String, Object> pairs = new HashMap<>();
-            addToMap(Parameters.OS_TYPE, getOsType(), pairs);
-            addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
-            addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
-            addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
-            addToMap(Parameters.CARRIER, getCarrier(context), pairs);
-            addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
+    public static SelfDescribingJson getMobileContext(Context context) {
+        Map<String, Object> pairs = new HashMap<>();
+        addToMap(Parameters.OS_TYPE, getOsType(), pairs);
+        addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
+        addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
+        addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
+        addToMap(Parameters.CARRIER, getCarrier(context), pairs);
+        addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
 
-            NetworkInfo networkInfo = getNetworkInfo(context);
-            addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
-            addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
+        NetworkInfo networkInfo = getNetworkInfo(context);
+        addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
+        addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
 
-            if (mapHasKeys(pairs,
-                    Parameters.OS_TYPE,
-                    Parameters.OS_VERSION,
-                    Parameters.DEVICE_MANUFACTURER,
-                    Parameters.DEVICE_MODEL)) {
-                mobileContext = new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
-            }
+        if (mapHasKeys(pairs,
+                Parameters.OS_TYPE,
+                Parameters.OS_VERSION,
+                Parameters.DEVICE_MANUFACTURER,
+                Parameters.DEVICE_MODEL)) {
+            return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
+        } else {
+            return null;
         }
-
-        return mobileContext;
     }
 
     /**
@@ -398,7 +393,10 @@ public class Util {
                 (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
         if (telephonyManager != null) {
-            return telephonyManager.getNetworkOperatorName();
+            String carrierName = telephonyManager.getNetworkOperatorName();
+            if (!carrierName.equals("")) {
+                return carrierName;
+            }
         }
         return null;
     }
@@ -430,13 +428,12 @@ public class Util {
      * @return the type of the network
      */
     public static String getNetworkType(NetworkInfo networkInfo) {
-        String networkType = null;
+        String networkType = "offline";
         if (networkInfo != null) {
             String maybeNetworkType = networkInfo.getTypeName().toLowerCase();
             switch (maybeNetworkType) {
                 case "mobile":
                 case "wifi":
-                case "offline":
                     networkType = maybeNetworkType;
                     break;
                 default: break;
