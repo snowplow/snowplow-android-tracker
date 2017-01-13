@@ -59,7 +59,7 @@ In the Ngrok interface take note of the `tunnel` URL, this is what you will use 
 
 ## Copyright and license
 
-The Snowplow Android Tracker is copyright 2014 Snowplow Analytics Ltd.
+The Snowplow Android Tracker is copyright 2015-2017 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0] [license]** (the "License");
 you may not use this software except in compliance with the License.
