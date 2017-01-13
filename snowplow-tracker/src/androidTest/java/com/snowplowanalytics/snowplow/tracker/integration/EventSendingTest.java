@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2017 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -200,7 +200,7 @@ public class EventSendingTest extends AndroidTestCase {
             assertEquals("mob", query.get("p"));
             assertEquals("myAppId", query.get("aid"));
             assertEquals("myNamespace", query.get("tna"));
-            assertEquals("andr-0.6.1", query.get("tv"));
+            assertEquals("andr-0.6.2", query.get("tv"));
             assertEquals("English", query.get("lang"));
             assertTrue(query.has("dtm"));
             assertTrue(query.has("stm"));
@@ -241,7 +241,7 @@ public class EventSendingTest extends AndroidTestCase {
                 assertEquals("mob", json.getString("p"));
                 assertEquals("myAppId", json.getString("aid"));
                 assertEquals("myNamespace", json.getString("tna"));
-                assertEquals("andr-0.6.1", json.getString("tv"));
+                assertEquals("andr-0.6.2", json.getString("tv"));
                 assertEquals("English", json.getString("lang"));
                 assertTrue(json.has("dtm"));
                 assertTrue(json.has("stm"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2017 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -54,7 +54,12 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         Logger.d(TAG, "Uncaught exception being tracked...");
 
+        // Ensure message is not-null/empty
         String message = truncateString(e.getMessage(), MAX_MESSAGE_LENGTH);
+        if (message == null || message.isEmpty()) {
+            message = "Android Exception. Null or empty message found";
+        }
+
         String stack = truncateString(Util.stackTraceToString(e), MAX_STACK_LENGTH);
         String threadName = truncateString(t.getName(), MAX_THREAD_NAME_LENGTH);
 
@@ -62,7 +67,13 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         String className = null;
         if (e.getStackTrace().length > 0) {
             StackTraceElement stackElement = e.getStackTrace()[0];
+
+            // Ensure lineNumber is greater than or equal to zero
             lineNumber = stackElement.getLineNumber();
+            if (lineNumber < 0) {
+                lineNumber = null;
+            }
+
             className = truncateString(stackElement.getClassName(), MAX_CLASS_NAME_LENGTH);
         }
 

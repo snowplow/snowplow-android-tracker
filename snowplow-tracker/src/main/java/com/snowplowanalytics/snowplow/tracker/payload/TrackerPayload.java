@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2017 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -34,7 +34,7 @@ public class TrackerPayload implements Payload {
             Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
             return;
         }
-        Logger.v(TAG, "Adding new kv pair: " + key + "->" + value);
+        Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
         payload.put(key, value);
     }
 
@@ -44,7 +44,7 @@ public class TrackerPayload implements Payload {
             Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
             return;
         }
-        Logger.v(TAG, "Adding new kv pair: " + key + "->" + value);
+        Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
         payload.put(key, value);
     }
 

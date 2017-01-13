@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2017 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -258,38 +258,32 @@ public class Util {
 
     // --- Geo-Location Context
 
-    private static SelfDescribingJson geoLocationContext = null;
-    private static AtomicBoolean geoLocationContextAttempted = new AtomicBoolean(false);
-
     /**
      * Returns the Geo-Location Context
      *
      * @param context the Android context
      * @return the geo-location context
      */
-    public synchronized static SelfDescribingJson getGeoLocationContext(Context context) {
-        if (!geoLocationContextAttempted.getAndSet(true)) {
-            Location location = getLocation(context);
+    public static SelfDescribingJson getGeoLocationContext(Context context) {
+        Location location = getLastKnownLocation(context);
 
-            if (location != null) {
-                Map<String, Object> pairs = new HashMap<>();
-                addToMap(Parameters.LATITUDE, location.getLatitude(), pairs);
-                addToMap(Parameters.LONGITUDE, location.getLongitude(), pairs);
-                addToMap(Parameters.ALTITUDE, location.getAltitude(), pairs);
-                addToMap(Parameters.LATLONG_ACCURACY, location.getAccuracy(), pairs);
-                addToMap(Parameters.SPEED, location.getSpeed(), pairs);
-                addToMap(Parameters.BEARING, location.getBearing(), pairs);
-                addToMap(Parameters.GEO_TIMESTAMP, System.currentTimeMillis(), pairs);
+        if (location != null) {
+            Map<String, Object> pairs = new HashMap<>();
+            addToMap(Parameters.LATITUDE, location.getLatitude(), pairs);
+            addToMap(Parameters.LONGITUDE, location.getLongitude(), pairs);
+            addToMap(Parameters.ALTITUDE, location.getAltitude(), pairs);
+            addToMap(Parameters.LATLONG_ACCURACY, location.getAccuracy(), pairs);
+            addToMap(Parameters.SPEED, location.getSpeed(), pairs);
+            addToMap(Parameters.BEARING, location.getBearing(), pairs);
+            addToMap(Parameters.GEO_TIMESTAMP, System.currentTimeMillis(), pairs);
 
-                if (mapHasKeys(pairs, Parameters.LATITUDE, Parameters.LONGITUDE)) {
-                    geoLocationContext = new SelfDescribingJson(
-                            TrackerConstants.GEOLOCATION_SCHEMA, pairs
-                    );
-                }
+            if (mapHasKeys(pairs, Parameters.LATITUDE, Parameters.LONGITUDE)) {
+                return new SelfDescribingJson(
+                        TrackerConstants.GEOLOCATION_SCHEMA, pairs
+                );
             }
         }
-
-        return geoLocationContext;
+        return null;
     }
 
     /**
@@ -299,35 +293,34 @@ public class Util {
      * @param context the android context
      * @return the phones Location
      */
-    public static Location getLocation(Context context) {
+    public static Location getLastKnownLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        String locationProvider = null;
+        Location location = null;
 
-        if (!isNetworkEnabled && !isGPSEnabled) {
-            Logger.e(TAG, "Cannot get location, Network and GPS are disabled");
-            return null;
-        } else {
-            Location location = null;
-            try {
-                if (isNetworkEnabled) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    Logger.d(TAG, "Network location found: %s", location);
-                } else if (isGPSEnabled) {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    Logger.d(TAG, "GPS location found: %s", location);
+        try {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationProvider = LocationManager.GPS_PROVIDER;
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationProvider = LocationManager.NETWORK_PROVIDER;
+            } else {
+                List<String> locationProviders = locationManager.getProviders(true);
+                if (locationProviders.size() > 0) {
+                    locationProvider = locationProviders.get(0);
                 }
-            } catch (SecurityException ex) {
-                Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString());
             }
-            return location;
+
+            if (locationProvider != null && !locationProvider.equals("")) {
+                location = locationManager.getLastKnownLocation(locationProvider);
+            }
+        } catch (SecurityException ex) {
+            Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString());
         }
+
+        return location;
     }
 
     // --- Mobile Context
-
-    private static SelfDescribingJson mobileContext = null;
-    private static AtomicBoolean mobileContextAttempted = new AtomicBoolean(false);
 
     /**
      * Returns the Mobile Context
@@ -335,30 +328,28 @@ public class Util {
      * @param context the Android context
      * @return the mobile context
      */
-    public synchronized static SelfDescribingJson getMobileContext(Context context) {
-        if (!mobileContextAttempted.getAndSet(true)) {
-            Map<String, Object> pairs = new HashMap<>();
-            addToMap(Parameters.OS_TYPE, getOsType(), pairs);
-            addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
-            addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
-            addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
-            addToMap(Parameters.CARRIER, getCarrier(context), pairs);
-            addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
+    public static SelfDescribingJson getMobileContext(Context context) {
+        Map<String, Object> pairs = new HashMap<>();
+        addToMap(Parameters.OS_TYPE, getOsType(), pairs);
+        addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
+        addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
+        addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
+        addToMap(Parameters.CARRIER, getCarrier(context), pairs);
+        addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
 
-            NetworkInfo networkInfo = getNetworkInfo(context);
-            addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
-            addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
+        NetworkInfo networkInfo = getNetworkInfo(context);
+        addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
+        addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
 
-            if (mapHasKeys(pairs,
-                    Parameters.OS_TYPE,
-                    Parameters.OS_VERSION,
-                    Parameters.DEVICE_MANUFACTURER,
-                    Parameters.DEVICE_MODEL)) {
-                mobileContext = new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
-            }
+        if (mapHasKeys(pairs,
+                Parameters.OS_TYPE,
+                Parameters.OS_VERSION,
+                Parameters.DEVICE_MANUFACTURER,
+                Parameters.DEVICE_MODEL)) {
+            return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
+        } else {
+            return null;
         }
-
-        return mobileContext;
     }
 
     /**
@@ -398,7 +389,10 @@ public class Util {
                 (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
         if (telephonyManager != null) {
-            return telephonyManager.getNetworkOperatorName();
+            String carrierName = telephonyManager.getNetworkOperatorName();
+            if (!carrierName.equals("")) {
+                return carrierName;
+            }
         }
         return null;
     }
@@ -430,13 +424,12 @@ public class Util {
      * @return the type of the network
      */
     public static String getNetworkType(NetworkInfo networkInfo) {
-        String networkType = null;
+        String networkType = "offline";
         if (networkInfo != null) {
             String maybeNetworkType = networkInfo.getTypeName().toLowerCase();
             switch (maybeNetworkType) {
                 case "mobile":
                 case "wifi":
-                case "offline":
                     networkType = maybeNetworkType;
                     break;
                 default: break;

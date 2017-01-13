@@ -1,3 +1,13 @@
+Version 0.6.2 (2017-01-13)
+--------------------------
+Ensure we do not pass invalid information to application_error event (#237)
+Mobile context: offline events not being recorded as such (#239)
+GeoLocation context: changes in position not being reflected (#240)
+Bump Android Gradle to 2.2.3 (#241)
+Fix logger crashing when a value contains '%' (#238)
+Update copyright to 2015-2017 (#243)
+Ensure vagrant environment can build and test tracker (#227)
+
 Version 0.6.1 (2016-10-03)
 --------------------------
 Ensure mobile_context only contains accepted enum values (#232)
