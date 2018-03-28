@@ -129,6 +129,13 @@ public class Subject {
     }
 
     /**
+     * Sets the subjects userId
+     *
+     * @param userId a user id string
+     */
+    public void identifyUser(String userId) { this.setUserId(userId); }
+
+    /**
      * Sets a custom screen resolution based
      * on user inputted width and height.
      *

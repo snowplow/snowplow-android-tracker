@@ -56,6 +56,12 @@ public class SubjectTest extends AndroidTestCase {
         assertEquals("newUserId", subject.getSubject().get("uid"));
     }
 
+    public void testIdentifyUser() {
+        Subject subject = getSubject();
+        subject.identifyUser("newUserId");
+        assertEquals("newUserId", subject.getSubject().get("uid"));
+    }
+
     public void testSetScreenRes() {
         Subject subject = getSubject();
         subject.setScreenResolution(3000,1000);
