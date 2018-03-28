@@ -4,7 +4,7 @@
 
 ## Overview
 
-Add analytics to your Java software with the **[Snowplow] [snowplow]** event tracker for **[Android] [snowplow]**. See also: **[Snowplow Java Tracker] [snowplow-java-tracker]**.
+Add analytics to your Java software with the **[Snowplow][snowplow]** event tracker for **[Android][snowplow]**. See also: **[Snowplow Java Tracker][snowplow-java-tracker]**.
 
 With this tracker you can collect event data from your Android-based applications, games or frameworks.
 
@@ -12,7 +12,7 @@ With this tracker you can collect event data from your Android-based application
 
 ### Building
 
-Assuming git, **[Vagrant] [vagrant-install]** and **[VirtualBox] [virtualbox-install]** installed:
+Assuming git, **[Vagrant][vagrant-install]** and **[VirtualBox][virtualbox-install]** installed:
 
 ```bash
  host$ git clone https://github.com/snowplow/snowplow-android-tracker.git
@@ -31,7 +31,7 @@ guest$ echo no | android create avd --force -n test -t android-19 --abi default/
 guest$ emulator -avd test -no-skin -no-audio -no-window &
 guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
 guest$ adb shell input keyevent 82 &
-guest$ ./gradlew connectedCheck 
+guest$ ./gradlew connectedCheck
 ```
 
 ### Setting up a testing endpoint
@@ -45,6 +45,7 @@ guest$ ./testing/setup.bash ## Will launch Mountebank and Ngrok in the backgroun
 ```
 
 Then go to any browser in your host machine and type:
+
 - `http://localhost:4040/` - Ngrok Web Interface
 - `http://localhost:2525/` - Mountebank Web Interface
 
@@ -54,8 +55,8 @@ In the Ngrok interface take note of the `tunnel` URL, this is what you will use 
 
 | Technical Docs                  | Setup Guide               | Roadmap                 | Contributing                      |
 |---------------------------------|---------------------------|-------------------------|-----------------------------------|
-| ![i1] [techdocs-image]          | ![i2] [setup-image]       | ![i3] [roadmap-image]   | ![i4] [contributing-image]        |
-| **[Technical Docs] [techdocs]** | **[Setup Guide] [setup]** | **[Roadmap] [roadmap]** | **[Contributing] [contributing]** |
+| ![i1][techdocs-image]          | ![i2][setup-image]       | ![i3][roadmap-image]   | ![i4][contributing-image]        |
+| **[Technical Docs][techdocs]** | **[Setup Guide][setup]** | **[Roadmap][roadmap]** | **[Contributing][contributing]** |
 
 ## Copyright and license
 
