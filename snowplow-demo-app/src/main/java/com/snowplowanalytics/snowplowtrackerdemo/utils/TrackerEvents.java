@@ -14,6 +14,9 @@
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
@@ -41,6 +44,8 @@ public class TrackerEvents {
         trackTimings(tracker);
         trackUnstructuredEvent(tracker);
         trackEcommerceEvent(tracker);
+        trackConsentGranted(tracker);
+        trackConsentWithdrawn(tracker);
     }
 
     private static void trackPageView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
@@ -78,5 +83,54 @@ public class TrackerEvents {
 
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(item).timestamp((long) 1433791172).build());
+    }
+
+    private static void trackConsentGranted(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+        List<ConsentDocument> documents = new LinkedList<>();
+        documents.add(ConsentDocument.builder()
+                .documentDescription("granted context desc 1")
+                .documentId("granted context id 1")
+                .documentName("granted context name 1")
+                .documentVersion("granted context version 1")
+                .build());
+        documents.add(ConsentDocument.builder()
+                .documentDescription("granted context desc 2")
+                .documentId("granted context id 2")
+                .documentName("granted context name 2")
+                .documentVersion("granted context version 2")
+                .build());
+
+        ConsentGranted event = ConsentGranted.builder()
+                .expiry("2018-05-08T18:12:02+00:00")
+                .documentDescription("granted event doc description")
+                .documentId("granted event doc id")
+                .documentName("granted event doc name")
+                .documentVersion("granted event doc version")
+                .consentDocuments(documents)
+                .build();
+    }
+
+    private static void trackConsentWithdrawn(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+        List<ConsentDocument> documents = new LinkedList<>();
+        documents.add(ConsentDocument.builder()
+                .documentDescription("withdrawn context desc 1")
+                .documentId("withdrawn context id 1")
+                .documentName("withdrawn context name 1")
+                .documentVersion("withdrawn context version 1")
+                .build());
+        documents.add(ConsentDocument.builder()
+                .documentDescription("withdrawn context desc 2")
+                .documentId("withdrawn context id 2")
+                .documentName("withdrawn context name 2")
+                .documentVersion("withdrawn context version 2")
+                .build());
+        ConsentWithdrawn event = ConsentWithdrawn.builder()
+                .all(false)
+                .documentDescription("withdrawn event doc description")
+                .documentId("withdrawn event doc  id")
+                .documentName("withdrawn event doc name")
+                .documentVersion("withdrawn event doc version")
+                .consentDocuments(documents)
+                .build();
     }
 }

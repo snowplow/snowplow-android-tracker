@@ -22,6 +22,9 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.PageView;
@@ -82,6 +85,8 @@ public class EventSendingTest extends AndroidTestCase {
         trackTimings(tracker);
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
+        trackConsentGranted(tracker);
+        trackConsentWithdrawn(tracker);
 
         waitForTracker(tracker);
 
@@ -99,6 +104,8 @@ public class EventSendingTest extends AndroidTestCase {
         trackTimings(tracker);
         trackScreenView(tracker);
         trackEcommerceEvent(tracker);
+        trackConsentGranted(tracker);
+        trackConsentWithdrawn(tracker);
 
         waitForTracker(tracker);
 
@@ -319,6 +326,14 @@ public class EventSendingTest extends AndroidTestCase {
         assertEquals("sku-1", json.getString("ti_sk"));
     }
 
+    public void checkConsentGrantedEvent(JSONObject json) throws Exception {
+        assertEquals("gexpiry", json.getString("expiry"));
+    }
+
+    public void checkConsentWithdrawnEvent(JSONObject json) throws Exception {
+        assertEquals(false, json.getBoolean("all"));
+    }
+
     public void checkUnstructuredEvent(JSONObject json) throws Exception {
         System.out.println(json);
 
@@ -335,6 +350,10 @@ public class EventSendingTest extends AndroidTestCase {
             case "iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0" : checkTimings(innerData);
                 break;
             case "iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1" : checkTestEvent(innerData);
+                break;
+            case "iglu:com.snowplowanalytics.snowplow/consent_granted/jsonschema/1-0-0" : checkConsentGrantedEvent(innerData);
+                break;
+            case "iglu:com.snowplowanalytics.snowplow/consent_withdrawn/jsonschema/1-0-0" : checkConsentWithdrawnEvent(innerData);
                 break;
             default : break;
         }
@@ -388,6 +407,48 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).customContext(getCustomContext()).build());
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).deviceCreatedTimestamp((long) 1433791172).build());
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+    }
+
+    public void trackConsentGranted(Tracker tracker) throws Exception {
+        List<ConsentDocument> documents = new LinkedList<>();
+        documents.add(ConsentDocument.builder()
+                .documentDescription("granted context desc 1")
+                .documentId("granted context id 1")
+                .documentName("granted context name 1")
+                .documentVersion("granted context version 1")
+                .build());
+        documents.add(ConsentDocument.builder()
+                .documentDescription("granted context desc 2")
+                .documentId("granted context id 2")
+                .documentName("granted context name 2")
+                .documentVersion("granted context version 2")
+                .build());
+
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).customContext(getCustomContext()).build());
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).build());
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+    }
+
+    public void trackConsentWithdrawn(Tracker tracker) throws Exception {
+        List<ConsentDocument> documents = new LinkedList<>();
+        documents.add(ConsentDocument.builder()
+                .documentDescription("withdrawn context desc 1")
+                .documentId("withdrawn context id 1")
+                .documentName("withdrawn context name 1")
+                .documentVersion("withdrawn context version 1")
+                .build());
+        documents.add(ConsentDocument.builder()
+                .documentDescription("withdrawn context desc 2")
+                .documentId("withdrawn context id 2")
+                .documentName("withdrawn context name 2")
+                .documentVersion("withdrawn context version 2")
+                .build());
+
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).customContext(getCustomContext()).build());
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).build());
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public List<SelfDescribingJson> getCustomContext() {

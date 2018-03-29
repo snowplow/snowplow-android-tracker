@@ -19,6 +19,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,9 @@ import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
@@ -375,6 +379,40 @@ public class Tracker {
                             .customContext(context)
                             .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
                             .eventId(event.getEventId())
+                            .build();
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
+                } else if (eClass.equals(ConsentGranted.class)) {
+                    List<ConsentDocument> documents = ((ConsentGranted) event).getConsentDocuments();
+                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
+                    for (ConsentDocument document : documents) {
+                        sdjDocuments.add(document.getPayload());
+                    }
+                    context.addAll(sdjDocuments);
+
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .customContext(context)
+                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                            .build();
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
+                } else if (eClass.equals(ConsentWithdrawn.class)) {
+                    List<ConsentDocument> documents = ((ConsentWithdrawn) event).getConsentDocuments();
+                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
+                    for (ConsentDocument document : documents) {
+                        sdjDocuments.add(document.getPayload());
+                    }
+                    context.addAll(sdjDocuments);
+
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .customContext(context)
+                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
                             .build();
 
                     // Need to set the Base64 rule for SelfDescribing events

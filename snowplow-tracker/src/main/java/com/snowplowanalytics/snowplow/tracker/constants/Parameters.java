@@ -93,6 +93,18 @@ public class Parameters {
     public static final String UT_TIMING = "timing";
     public static final String UT_LABEL = "label";
 
+    // Consent Granted
+    public static final String CG_EXPIRY = "expiry";
+
+    // Consent Withdrawn
+    public static final String CW_ALL = "all";
+
+    // Consent Document
+    public static final String CD_DESCRIPTION = "description";
+    public static final String CD_VERSION = "version";
+    public static final String CD_NAME = "name";
+    public static final String CD_ID = "id";
+
     // Mobile context
     public static final String ANDROID_IDFA = "androidIdfa";
     public static final String CARRIER = "carrier";
