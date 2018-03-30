@@ -516,6 +516,14 @@ public class Tracker {
         }
     }
 
+    /**
+     * Convenience function for starting a new session.
+     */
+    public void startNewSession() {
+        pauseSessionChecking();
+        resumeSessionChecking();
+    }
+
     // --- Setters
 
     /**
