@@ -145,6 +145,8 @@ public class Session {
                     Logger.e(TAG, "Could not pause checking as tracker not setup");
                 }
             }
+            
+            this.firstId = null;
         }
     }
 
