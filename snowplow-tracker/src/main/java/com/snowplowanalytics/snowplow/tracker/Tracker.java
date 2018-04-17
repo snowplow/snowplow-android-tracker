@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
@@ -529,14 +530,15 @@ public class Tracker {
     /**
      * Sets the LifecycleHandler hooks
      *
-     * @param activity The application activity
+     * @param context The application context
      */
-    public void setLifecycleHandler(Activity activity) {
+    public void setLifecycleHandler(Context context) {
         if ((this.lifecycleEvents || this.sessionContext) &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             LifecycleHandler handler = new LifecycleHandler();
-            activity.getApplication().registerActivityLifecycleCallbacks(handler);
-            activity.registerComponentCallbacks(handler);
+            Application application = (Application)context;
+            application.registerActivityLifecycleCallbacks(handler);
+            application.registerComponentCallbacks(handler);
         }
     }
 
