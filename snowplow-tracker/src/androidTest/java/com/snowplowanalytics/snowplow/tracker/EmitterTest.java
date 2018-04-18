@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
@@ -498,6 +500,7 @@ public class EmitterTest extends AndroidTestCase {
                 .byteLimitGet(20000)
                 .byteLimitPost(25000)
                 .timeUnit(TimeUnit.SECONDS)
+                .tls(EnumSet.of(TLSVersion.TLSv1_2))
                 .build();
     }
 

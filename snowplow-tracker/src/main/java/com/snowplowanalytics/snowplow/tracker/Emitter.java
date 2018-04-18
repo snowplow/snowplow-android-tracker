@@ -23,6 +23,8 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.TLSArguments;
+import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -68,6 +71,7 @@ public class Emitter {
     private HttpMethod httpMethod;
     private BufferOption bufferOption;
     private RequestSecurity requestSecurity;
+    private EnumSet<TLSVersion> tlsVersions;
     private String uri;
     private int emitterTick;
     private int emptyLimit;
@@ -92,6 +96,7 @@ public class Emitter {
         HttpMethod httpMethod = HttpMethod.POST; // Optional
         BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
         RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         int emitterTick = 5; // Optional
         int sendLimit = 250; // Optional
         int emptyLimit = 5; // Optional
@@ -132,6 +137,24 @@ public class Emitter {
          */
         public EmitterBuilder security(RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
+            return this;
+        }
+
+        /**
+         * @param version the TLS version allowed for requests
+         * @return itself
+         */
+        public EmitterBuilder tls(TLSVersion version) {
+            this.tlsVersions = EnumSet.of(version);
+            return this;
+        }
+
+        /**
+         * @param versions the TLS versions allowed for requests
+         * @return itself
+         */
+        public EmitterBuilder tls(EnumSet<TLSVersion> versions) {
+            this.tlsVersions = versions;
             return this;
         }
 
@@ -222,6 +245,7 @@ public class Emitter {
         this.context = builder.context;
         this.bufferOption = builder.bufferOption;
         this.requestSecurity = builder.requestSecurity;
+        this.tlsVersions = builder.tlsVersions;
         this.emitterTick = builder.emitterTick;
         this.emptyLimit = builder.emptyLimit;
         this.sendLimit = builder.sendLimit;
@@ -231,12 +255,15 @@ public class Emitter {
         this.timeUnit = builder.timeUnit;
         this.eventStore = new EventStore(this.context, this.sendLimit);
 
+        TLSArguments tlsArguments = new TLSArguments(this.tlsVersions);
         buildEmitterUri();
 
         client = new OkHttpClient.Builder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(15, TimeUnit.SECONDS)
-                    .build();
+                .sslSocketFactory(tlsArguments.getSslSocketFactory(),
+                        tlsArguments.getTrustManager())
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .build();
 
         Logger.v(TAG, "Emitter created successfully!");
     }
@@ -742,6 +769,13 @@ public class Emitter {
      */
     public RequestSecurity getRequestSecurity() {
         return this.requestSecurity;
+    }
+
+    /**
+     * @return the TLS versions accepted for the emitter
+     */
+    public EnumSet<TLSVersion> getTlsVersions() {
+        return this.tlsVersions;
     }
 
     /**
