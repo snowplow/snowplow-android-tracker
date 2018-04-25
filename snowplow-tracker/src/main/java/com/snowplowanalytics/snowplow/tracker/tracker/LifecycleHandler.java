@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class LifecycleHandler implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
@@ -41,6 +42,22 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
     private static boolean isInBackground = false;
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
     private static AtomicInteger backgroundIndex = new AtomicInteger(0);
+    private static boolean isHandlerPaused = false;
+    private static List<SelfDescribingJson> lifecycleContext = null;
+
+    public LifecycleHandler(List<SelfDescribingJson> context) {
+        lifecycleContext = context;
+    }
+
+    public LifecycleHandler() {}
+
+    public static void pauseHandler() {
+        isHandlerPaused = true;
+    }
+
+    public static void resumeHandler() {
+        isHandlerPaused = false;
+    }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {}
@@ -50,7 +67,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
     @Override
     public void onActivityResumed(Activity activity) {
-        if (isInBackground){
+        if (isInBackground && !isHandlerPaused){
             Logger.d(TAG, "Application is in the foreground");
             isInBackground = false;
 
@@ -110,7 +127,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
     @Override
     public void onTrimMemory(int i) {
-        if (i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+        if (i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN && !isHandlerPaused) {
             Logger.d(TAG, "Application is in the background");
             isInBackground = true;
 

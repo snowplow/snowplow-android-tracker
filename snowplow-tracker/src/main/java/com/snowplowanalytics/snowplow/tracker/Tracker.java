@@ -557,6 +557,14 @@ public class Tracker {
         }
     }
 
+    public void pauseLifecycleHandler() {
+        LifecycleHandler.pauseHandler();
+    }
+
+    public void resumeLifecycleHandler() {
+        LifecycleHandler.resumeHandler();
+    }
+
     /**
      * @param subject a valid subject object
      */
