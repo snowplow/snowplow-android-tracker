@@ -30,6 +30,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,10 +68,18 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
 
-                    tracker.track(SelfDescribing.builder()
-                            .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                            .build()
-                    );
+                    if (lifecycleContext != null) {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
+                                .customContext(lifecycleContext)
+                                .build()
+                        );
+                    } else {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
+                                .build()
+                        );
+                    }
                 }
             } catch (Exception e) {
                 Logger.e(TAG, e.getMessage());
@@ -119,10 +128,18 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
 
-                    tracker.track(SelfDescribing.builder()
-                            .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                            .build()
-                    );
+                    if (lifecycleContext != null) {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                                .customContext(lifecycleContext)
+                                .build()
+                        );
+                    } else {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                                .build()
+                        );
+                    }
                 }
             } catch (Exception e) {
                 Logger.e(TAG, e.getMessage());
