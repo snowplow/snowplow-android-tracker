@@ -1,3 +1,18 @@
+Version 0.7.0 (2018-05-04)
+--------------------------
+Make tracker.setLifecycleHandler take a Context instead of an Activity (#224)
+Add a method to start a new session (#226)
+Add ability to specify TLS protocols to use for emitting events (#245)
+Add identifyUser as alias for setUserId (#254)
+Add trackConsentGranted and trackConsentWithdrawn methods (#255)
+Update README markdown in accordance with CommonMark (#256)
+Reset firstId even if app is in the foreground (#257)
+Fix outdated and broken Travis configuration (#258)
+Unregister LifecycleHandler callbacks on activity destruction (#259)
+Add the ability to suspend and resume a LifecycleHandler (#261)
+Raise minimum supported Android API to level 14 (#262)
+Add support for custom contexts to LifecycleHandler (#263)
+
 Version 0.6.2 (2017-01-13)
 --------------------------
 Ensure we do not pass invalid information to application_error event (#237)
