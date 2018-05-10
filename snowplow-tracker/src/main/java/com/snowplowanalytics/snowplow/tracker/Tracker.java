@@ -15,9 +15,11 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +43,9 @@ import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
@@ -379,6 +384,40 @@ public class Tracker {
                     // Need to set the Base64 rule for SelfDescribing events
                     selfDescribing.setBase64Encode(base64Encoded);
                     addEventPayload(selfDescribing.getPayload(), context, eventId);
+                } else if (eClass.equals(ConsentGranted.class)) {
+                    List<ConsentDocument> documents = ((ConsentGranted) event).getConsentDocuments();
+                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
+                    for (ConsentDocument document : documents) {
+                        sdjDocuments.add(document.getPayload());
+                    }
+                    context.addAll(sdjDocuments);
+
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .customContext(context)
+                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                            .build();
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
+                } else if (eClass.equals(ConsentWithdrawn.class)) {
+                    List<ConsentDocument> documents = ((ConsentWithdrawn) event).getConsentDocuments();
+                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
+                    for (ConsentDocument document : documents) {
+                        sdjDocuments.add(document.getPayload());
+                    }
+                    context.addAll(sdjDocuments);
+
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .customContext(context)
+                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
+                            .build();
+
+                    // Need to set the Base64 rule for SelfDescribing events
+                    selfDescribing.setBase64Encode(base64Encoded);
+                    addEventPayload(selfDescribing.getPayload(), context, eventId);
                 }
             }
         });
@@ -516,20 +555,52 @@ public class Tracker {
         }
     }
 
+    /**
+     * Convenience function for starting a new session.
+     */
+    public void startNewSession() {
+        pauseSessionChecking();
+        resumeSessionChecking();
+    }
+
     // --- Setters
 
     /**
      * Sets the LifecycleHandler hooks
      *
-     * @param activity The application activity
+     * @param context The application context
      */
-    public void setLifecycleHandler(Activity activity) {
+    public void setLifecycleHandler(Context context) {
         if ((this.lifecycleEvents || this.sessionContext) &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             LifecycleHandler handler = new LifecycleHandler();
-            activity.getApplication().registerActivityLifecycleCallbacks(handler);
-            activity.registerComponentCallbacks(handler);
+            Application application = (Application)context;
+            application.registerActivityLifecycleCallbacks(handler);
+            application.registerComponentCallbacks(handler);
         }
+    }
+
+    /**
+     * Sets the LifecycleHandler hooks
+     *
+     * @param context The application context
+     */
+    public void setLifecycleHandler(Context context, List<SelfDescribingJson> customContext) {
+        if ((this.lifecycleEvents || this.sessionContext) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            LifecycleHandler handler = new LifecycleHandler(customContext);
+            Application application = (Application)context;
+            application.registerActivityLifecycleCallbacks(handler);
+            application.registerComponentCallbacks(handler);
+        }
+    }
+
+    public void pauseLifecycleHandler() {
+        LifecycleHandler.pauseHandler();
+    }
+
+    public void resumeLifecycleHandler() {
+        LifecycleHandler.resumeHandler();
     }
 
     /**

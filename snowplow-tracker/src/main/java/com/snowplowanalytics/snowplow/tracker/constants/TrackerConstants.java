@@ -26,6 +26,9 @@ public class TrackerConstants {
     public static final String SCHEMA_UNSTRUCT_EVENT = "iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0";
     public static final String SCHEMA_SCREEN_VIEW = "iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0";
     public static final String SCHEMA_USER_TIMINGS = "iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0";
+    public static final String SCHEMA_CONSENT_GRANTED = "iglu:com.snowplowanalytics.snowplow/consent_granted/jsonschema/1-0-0";
+    public static final String SCHEMA_CONSENT_WITHDRAWN = "iglu:com.snowplowanalytics.snowplow/consent_withdrawn/jsonschema/1-0-0";
+    public static final String SCHEMA_CONSENT_DOCUMENT = "iglu:com.snowplowanalytics.snowplow/consent_document/jsonschema/1-0-0";
     public static final String GEOLOCATION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0";
     public static final String MOBILE_SCHEMA = "iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-1";
     public static final String SESSION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-1";

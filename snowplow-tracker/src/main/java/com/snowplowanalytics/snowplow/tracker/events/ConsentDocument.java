@@ -1,0 +1,127 @@
+package com.snowplowanalytics.snowplow.tracker.events;
+
+/*
+ * Copyright (c) 2015-2018 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+public class ConsentDocument extends AbstractEvent {
+    private final String documentId;
+    private final String documentVersion;
+    private final String documentName;
+    private final String documentDescription;
+
+    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
+
+        private String documentId;
+        private String documentVersion;
+        private String documentName;
+        private String documentDescription;
+
+        /**
+         * @param id ID of the consent document
+         * @return itself
+         */
+        public T documentId(String id) {
+            this.documentId = id;
+            return self();
+        }
+
+        /**
+         * @param version Version of the consent document
+         * @return itself
+         */
+        public T documentVersion(String version) {
+            this.documentVersion = version;
+            return self();
+        }
+
+        /**
+         * @param name Name of the consent document
+         * @return itself
+         */
+        public T documentName(String name) {
+            this.documentName = name;
+            return self();
+        }
+
+        /**
+         * @param description Description of the consent document
+         * @return itself
+         */
+        public T documentDescription(String description) {
+            this.documentDescription = description;
+            return self();
+        }
+
+        public ConsentDocument build() {
+            return new ConsentDocument(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    public static Builder<?> builder() {
+        return new Builder2();
+    }
+
+    protected ConsentDocument(Builder<?> builder) {
+        super(builder);
+
+        // Precondition checks
+
+        Preconditions.checkNotNull(builder.documentId);
+        Preconditions.checkArgument(!builder.documentId.isEmpty(), "Document ID cannot be empty");
+
+        Preconditions.checkNotNull(builder.documentVersion);
+        Preconditions.checkArgument(!builder.documentVersion.isEmpty(), "Document version cannot be empty");
+
+        this.documentId = builder.documentId;
+        this.documentName = builder.documentName;
+        this.documentVersion = builder.documentVersion;
+        this.documentDescription = builder.documentDescription;
+    }
+
+    /**
+     * Returns a TrackerPayload which can be stored into
+     * the local database.
+     *
+     * @return the payload to be sent.
+     */
+    public TrackerPayload getData() {
+        TrackerPayload payload = new TrackerPayload();
+        payload.add(Parameters.CD_ID, this.documentId);
+        payload.add(Parameters.CD_NAME, this.documentName);
+        payload.add(Parameters.CD_DESCRIPTION, this.documentDescription);
+        payload.add(Parameters.CD_VERSION, this.documentVersion);
+        return payload;
+    }
+
+    /**
+     * Return the payload wrapped into a SelfDescribingJson.
+     *
+     * @return the payload as a SelfDescribingJson.
+     */
+    public SelfDescribingJson getPayload() {
+        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONSENT_DOCUMENT, getData());
+    }
+}
