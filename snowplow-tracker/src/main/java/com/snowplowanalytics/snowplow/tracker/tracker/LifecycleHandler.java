@@ -114,10 +114,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {}
 
     @Override
-    public void onActivityDestroyed(Activity activity) {
-        activity.unregisterComponentCallbacks(this);
-        activity.getApplication().unregisterActivityLifecycleCallbacks(this);
-    }
+    public void onActivityDestroyed(Activity activity) {}
 
     @Override
     public void onConfigurationChanged(Configuration configuration) {}
