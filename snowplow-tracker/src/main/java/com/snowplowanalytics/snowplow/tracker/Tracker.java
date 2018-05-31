@@ -595,10 +595,33 @@ public class Tracker {
         }
     }
 
+    /**
+     * Sets the custom context sent whenever LifecycleHandler sends an event.
+     *
+     * @param customContext A list of self-describing JSONs (custom contexts)
+     */
+    public void setLifecycleCustomContext(List<SelfDescribingJson> customContext) {
+        LifecycleHandler.setLifecycleContext(customContext);
+    }
+
+    /**
+     * @return the custom context sent by LifecycleHandler
+     */
+    public List<SelfDescribingJson> getLifecycleCustomContext() {
+        return LifecycleHandler.getLifecycleContext();
+    }
+
+    /**
+     * Prevent the LifecycleHandler from sending events, in order to ignore foreground
+     * and background transitions.
+     */
     public void pauseLifecycleHandler() {
         LifecycleHandler.pauseHandler();
     }
 
+    /**
+     * Allow the LifecycleHandler to send events again.
+     */
     public void resumeLifecycleHandler() {
         LifecycleHandler.resumeHandler();
     }
