@@ -51,6 +51,10 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
     public LifecycleHandler() {}
 
+    public static void setLifecycleContext(List<SelfDescribingJson> context) {
+        lifecycleContext = context;
+    }
+
     public static void pauseHandler() {
         isHandlerPaused = true;
     }
