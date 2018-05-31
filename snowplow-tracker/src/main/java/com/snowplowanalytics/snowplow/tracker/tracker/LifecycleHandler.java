@@ -43,13 +43,21 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
     private static AtomicInteger backgroundIndex = new AtomicInteger(0);
     private static boolean isHandlerPaused = false;
-    private static List<SelfDescribingJson> lifecycleContext = null;
+    private static List<SelfDescribingJson> lifecycleContexts = null;
 
-    public LifecycleHandler(List<SelfDescribingJson> context) {
-        lifecycleContext = context;
+    public LifecycleHandler(List<SelfDescribingJson> contexts) {
+        lifecycleContexts = contexts;
     }
 
     public LifecycleHandler() {}
+
+    public static void setLifecycleContexts(List<SelfDescribingJson> contexts) {
+        lifecycleContexts = contexts;
+    }
+
+    public static List<SelfDescribingJson> getLifecycleContexts() {
+        return lifecycleContexts;
+    }
 
     public static void pauseHandler() {
         isHandlerPaused = true;
@@ -85,10 +93,10 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
 
-                    if (lifecycleContext != null) {
+                    if (lifecycleContexts != null) {
                         tracker.track(SelfDescribing.builder()
                                 .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                                .customContext(lifecycleContext)
+                                .customContext(lifecycleContexts)
                                 .build()
                         );
                     } else {
@@ -142,10 +150,10 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
 
-                    if (lifecycleContext != null) {
+                    if (lifecycleContexts != null) {
                         tracker.track(SelfDescribing.builder()
                                 .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                                .customContext(lifecycleContext)
+                                .customContext(lifecycleContexts)
                                 .build()
                         );
                     } else {
