@@ -1,3 +1,8 @@
+Version 0.8.0 (2018-06-20)
+--------------------------
+Fix LifecycleHandler callbacks being unregistered on activity destruction (#266)
+Add ability to change custom context sent by LifecycleHandler (#267)
+
 Version 0.7.0 (2018-05-10)
 --------------------------
 Make tracker.setLifecycleHandler take a Context instead of an Activity (#224)
