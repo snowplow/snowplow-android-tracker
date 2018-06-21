@@ -585,20 +585,43 @@ public class Tracker {
      *
      * @param context The application context
      */
-    public void setLifecycleHandler(Context context, List<SelfDescribingJson> customContext) {
+    public void setLifecycleHandler(Context context, List<SelfDescribingJson> customContexts) {
         if ((this.lifecycleEvents || this.sessionContext) &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            LifecycleHandler handler = new LifecycleHandler(customContext);
+            LifecycleHandler handler = new LifecycleHandler(customContexts);
             Application application = (Application)context;
             application.registerActivityLifecycleCallbacks(handler);
             application.registerComponentCallbacks(handler);
         }
     }
 
+    /**
+     * Sets the custom contexts sent whenever LifecycleHandler sends an event.
+     *
+     * @param customContexts A list of self-describing JSONs (custom contexts)
+     */
+    public void setLifecycleCustomContexts(List<SelfDescribingJson> customContexts) {
+        LifecycleHandler.setLifecycleContexts(customContexts);
+    }
+
+    /**
+     * @return the custom contexts sent by LifecycleHandler
+     */
+    public List<SelfDescribingJson> getLifecycleCustomContexts() {
+        return LifecycleHandler.getLifecycleContexts();
+    }
+
+    /**
+     * Prevent the LifecycleHandler from sending events, in order to ignore foreground
+     * and background transitions.
+     */
     public void pauseLifecycleHandler() {
         LifecycleHandler.pauseHandler();
     }
 
+    /**
+     * Allow the LifecycleHandler to send events again.
+     */
     public void resumeLifecycleHandler() {
         LifecycleHandler.resumeHandler();
     }
