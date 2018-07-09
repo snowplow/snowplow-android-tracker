@@ -103,6 +103,7 @@ public class Emitter {
         long byteLimitGet = 40000; // Optional
         long byteLimitPost = 40000; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
+        OkHttpClient client = null; //Optional
 
         /**
          * @param uri The uri of the collector
@@ -225,6 +226,17 @@ public class Emitter {
         }
 
         /**
+         * @param client An OkHttp client that will be used in the emitter, you can provide your
+         *               own if you want to share your Singleton client's interceptors, connection pool etc..
+         *               ,otherwise a new one is created.
+         * @return itself
+         */
+        public EmitterBuilder client(OkHttpClient client) {
+            this.client = client;
+            return this;
+        }
+
+        /**
          * Creates a new Emitter
          *
          * @return a new Emitter object
@@ -258,12 +270,19 @@ public class Emitter {
         TLSArguments tlsArguments = new TLSArguments(this.tlsVersions);
         buildEmitterUri();
 
-        client = new OkHttpClient.Builder()
-                .sslSocketFactory(tlsArguments.getSslSocketFactory(),
-                        tlsArguments.getTrustManager())
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .build();
+        final OkHttpClient.Builder clientBuilder;
+        if (builder.client == null) {
+            clientBuilder = new OkHttpClient.Builder();
+        }
+        else {
+            clientBuilder = builder.client.newBuilder();
+        }
+
+        client = clientBuilder.sslSocketFactory(tlsArguments.getSslSocketFactory(),
+                                                tlsArguments.getTrustManager())
+                              .connectTimeout(15, TimeUnit.SECONDS)
+                              .readTimeout(15, TimeUnit.SECONDS)
+                              .build();
 
         Logger.v(TAG, "Emitter created successfully!");
     }
