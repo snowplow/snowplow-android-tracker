@@ -40,9 +40,10 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
     private static final String TAG = LifecycleHandler.class.getSimpleName();
     private static boolean isInBackground = false;
+    private static boolean isHandlerPaused = false;
+    private static boolean isMultipleActivities = false;
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
     private static AtomicInteger backgroundIndex = new AtomicInteger(0);
-    private static boolean isHandlerPaused = false;
     private static List<SelfDescribingJson> lifecycleContexts = null;
 
     public LifecycleHandler(List<SelfDescribingJson> contexts) {
@@ -67,6 +68,10 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
         isHandlerPaused = false;
     }
 
+    public static void setLifecycleMultipleActivities(boolean multipleActivities) {
+        isMultipleActivities = multipleActivities;
+    }
+
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {}
 
@@ -81,8 +86,6 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
             try {
                 Tracker tracker = Tracker.instance();
-                int index = foregroundIndex.addAndGet(1);
-
                 // Update Session
                 if (tracker.getSession() != null) {
                     tracker.getSession().setIsBackground(false);
@@ -90,6 +93,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
                 // Send Foreground Event
                 if (tracker.getLifecycleEvents()) {
+                    int index = foregroundIndex.addAndGet(1);
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
 
@@ -113,7 +117,42 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {}
+    public void onActivityPaused(Activity activity) {
+        if (isMultipleActivities && !isHandlerPaused) {
+            Logger.d(TAG, "Application is in the background");
+            isInBackground = true;
+
+            try {
+                Tracker tracker = Tracker.instance();
+                // Update Session
+                if (tracker.getSession() != null) {
+                    tracker.getSession().setIsBackground(true);
+                }
+
+                // Send Background Event
+                if (tracker.getLifecycleEvents()) {
+                    int index = backgroundIndex.addAndGet(1);
+                    Map<String, Object> data = new HashMap<>();
+                    Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
+
+                    if (lifecycleContexts != null) {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                                .customContext(lifecycleContexts)
+                                .build()
+                        );
+                    } else {
+                        tracker.track(SelfDescribing.builder()
+                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                                .build()
+                        );
+                    }
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e.getMessage());
+            }
+        }
+    }
 
     @Override
     public void onActivityStopped(Activity activity) {}
@@ -132,7 +171,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
 
     @Override
     public void onTrimMemory(int i) {
-        if (i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN && !isHandlerPaused) {
+        if (i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN && !isMultipleActivities && !isHandlerPaused) {
             Logger.d(TAG, "Application is in the background");
             isInBackground = true;
 

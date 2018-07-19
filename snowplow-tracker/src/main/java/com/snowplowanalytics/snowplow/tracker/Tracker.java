@@ -596,6 +596,16 @@ public class Tracker {
     }
 
     /**
+     * Sets the LifecycleHandler to operate in a different mode to handle
+     * multiple activity applications.
+     *
+     * @param multipleActivities True if lifecycle involves multiple activities
+     */
+    public void setLifecycleMultipleActivities(boolean multipleActivities) {
+        LifecycleHandler.setLifecycleMultipleActivities(multipleActivities);
+    }
+
+    /**
      * Sets the custom contexts sent whenever LifecycleHandler sends an event.
      *
      * @param customContexts A list of self-describing JSONs (custom contexts)
