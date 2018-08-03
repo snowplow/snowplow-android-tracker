@@ -54,6 +54,7 @@ public class Session {
 
     // Variables to control Session Updates
     private AtomicBoolean isBackground = new AtomicBoolean(false);
+    private AtomicBoolean isSuspended = new AtomicBoolean(false);
     private long accessedLast;
     private long foregroundTimeout;
     private long backgroundTimeout;
@@ -125,6 +126,13 @@ public class Session {
         long checkTime = System.currentTimeMillis();
         long range;
         boolean isBackground = this.isBackground.get();
+        boolean isSuspended = this.isSuspended.get();
+
+        // don't update the session if it's suspended
+        if (isSuspended) {
+            updateAccessedTime();
+            return;
+        }
 
         if (isBackground) {
             range = this.backgroundTimeout;
@@ -171,6 +179,19 @@ public class Session {
             }
         }
         this.isBackground.set(isBackground);
+    }
+
+    /**
+     * Changes the truth of isSuspended
+     *
+     * @param isSuspended whether the session tracking is suspended,
+     *                    i.e. calls to update session are ignored,
+     *                    but access time is changed to current time.
+     *
+     */
+    public void setIsSuspended(boolean isSuspended) {
+        Logger.d(TAG, "Session is suspended: %s", isSuspended);
+        this.isSuspended.set(isSuspended);
     }
 
     /**
