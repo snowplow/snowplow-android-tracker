@@ -1,3 +1,21 @@
+Version 1.0.0 (2019-01-23)
+--------------------------
+Output maximum logging detail in demo app (#279)
+Perform blocking operations in the background (#159)
+Enforce strict mode for demo app (#278)
+Bump versions in build.gradle for demo app (#284)
+Bump Android Gradle to 3.2.1 (#280)
+Bump versions of build tools in Travis (#283)
+Add option for callbacks on session transitions (#281)
+Add setter for session context boolean (#282)
+Use ProcessLifecycleOwner to detect foreground and background (#272)
+Update to Android Target API level 26 (#273)
+Add ability to momentarily suspend session checking (#271)
+Add ability to share an OkHttpClient instance with Emitter (#269)
+Add Futures for loading of Emitter and Session (#285)
+Update to Android Target API level 28 (#287)
+Fix Travis license issue (#288)
+
 Version 0.8.0 (2018-06-20)
 --------------------------
 Fix LifecycleHandler callbacks being unregistered on activity destruction (#266)
