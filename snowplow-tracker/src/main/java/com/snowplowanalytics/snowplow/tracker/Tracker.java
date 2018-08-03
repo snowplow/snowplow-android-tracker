@@ -556,6 +556,17 @@ public class Tracker {
     }
 
     /**
+     * Polling will continue, but only accessedLast time will be updated.
+     * Effectively persists session, call the method with false to end suspension.
+     */
+    public void suspendSessionChecking(boolean isSuspended) {
+        if (sessionExecutor != null && this.trackerSession != null) {
+            final Session session = this.trackerSession;
+            session.setIsSuspended(isSuspended);
+        }
+    }
+
+    /**
      * Convenience function for starting a new session.
      */
     public void startNewSession() {
