@@ -14,12 +14,11 @@
 package com.snowplowanalytics.snowplow.tracker.tracker;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Application;
-import android.content.ComponentCallbacks2;
-import android.content.res.Configuration;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
+import android.arch.lifecycle.Lifecycle;
 import android.os.Build;
-import android.os.Bundle;
+
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -33,11 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class LifecycleHandler implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
-
+public class LifecycleHandler implements LifecycleObserver {
     private static final String TAG = LifecycleHandler.class.getSimpleName();
     private static boolean isInBackground = false;
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
@@ -67,14 +64,8 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
         isHandlerPaused = false;
     }
 
-    @Override
-    public void onActivityCreated(Activity activity, Bundle bundle) {}
-
-    @Override
-    public void onActivityStarted(Activity activity) {}
-
-    @Override
-    public void onActivityResumed(Activity activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public static void onEnterForeground() {
         if (isInBackground && !isHandlerPaused){
             Logger.d(TAG, "Application is in the foreground");
             isInBackground = false;
@@ -112,27 +103,9 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks,
         }
     }
 
-    @Override
-    public void onActivityPaused(Activity activity) {}
-
-    @Override
-    public void onActivityStopped(Activity activity) {}
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {}
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {}
-
-    @Override
-    public void onConfigurationChanged(Configuration configuration) {}
-
-    @Override
-    public void onLowMemory() {}
-
-    @Override
-    public void onTrimMemory(int i) {
-        if (i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN && !isHandlerPaused) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public static void onEnterBackground() {
+        if (!isHandlerPaused) {
             Logger.d(TAG, "Application is in the background");
             isInBackground = true;
 

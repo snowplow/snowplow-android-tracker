@@ -130,6 +130,7 @@ public class Session {
 
         // don't update the session if it's suspended
         if (isSuspended) {
+            Logger.d(TAG, "Only updating accessed time.");
             updateAccessedTime();
             return;
         }
