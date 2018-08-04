@@ -12,6 +12,10 @@ jacoco {
     toolVersion = "0.7.7.201606060606"
 }
 
+project.ext {
+    archLifecycleVersion = "1.1.1"
+}
+
 android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
@@ -55,6 +59,7 @@ android {
 }
 
 dependencies {
+    implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.4.1'
     androidTestImplementation 'com.google.android.gms:play-services-analytics:16.0.1'

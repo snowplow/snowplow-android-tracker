@@ -18,6 +18,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.arch.lifecycle.ProcessLifecycleOwner;
+import android.arch.lifecycle.LifecycleOwner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -329,6 +331,13 @@ public class Tracker {
             );
         }
 
+        // If lifecycleEvents is True
+        if ((this.lifecycleEvents || this.sessionContext) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            LifecycleHandler handler = new LifecycleHandler();
+            ProcessLifecycleOwner.get().getLifecycle().addObserver(handler);
+        }
+
         Executor.setThreadCount(this.threadCount);
 
         Logger.updateLogLevel(builder.logLevel);
@@ -575,36 +584,6 @@ public class Tracker {
     }
 
     // --- Setters
-
-    /**
-     * Sets the LifecycleHandler hooks
-     *
-     * @param context The application context
-     */
-    public void setLifecycleHandler(Context context) {
-        if ((this.lifecycleEvents || this.sessionContext) &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            LifecycleHandler handler = new LifecycleHandler();
-            Application application = (Application)context;
-            application.registerActivityLifecycleCallbacks(handler);
-            application.registerComponentCallbacks(handler);
-        }
-    }
-
-    /**
-     * Sets the LifecycleHandler hooks
-     *
-     * @param context The application context
-     */
-    public void setLifecycleHandler(Context context, List<SelfDescribingJson> customContexts) {
-        if ((this.lifecycleEvents || this.sessionContext) &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            LifecycleHandler handler = new LifecycleHandler(customContexts);
-            Application application = (Application)context;
-            application.registerActivityLifecycleCallbacks(handler);
-            application.registerComponentCallbacks(handler);
-        }
-    }
 
     /**
      * Sets the custom contexts sent whenever LifecycleHandler sends an event.
