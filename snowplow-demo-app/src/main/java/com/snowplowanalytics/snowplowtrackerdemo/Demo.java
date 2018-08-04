@@ -23,6 +23,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
+import android.support.customtabs.CustomTabsIntent;
+import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Subject;
@@ -44,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("FieldCanBeLocal")
 public class Demo extends Activity {
 
-    private Button _startButton;
+    private Button _startButton, _tabButton;
     private EditText _uriField;
     private RadioGroup _type, _security, _collection;
     private RadioButton _radioGet, _radioHttp;
@@ -53,6 +55,7 @@ public class Demo extends Activity {
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
+    private boolean pausedSession = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,7 @@ public class Demo extends Activity {
         initAndroidTracker();
 
         _startButton   = (Button)findViewById(R.id.btn_lite_start);
+        _tabButton     = (Button)findViewById(R.id.btn_lite_tab);
         _uriField      = (EditText)findViewById(R.id.emitter_uri_field);
         _type          = (RadioGroup)findViewById(R.id.radio_send_type);
         _security      = (RadioGroup)findViewById(R.id.radio_send_security);
@@ -82,12 +86,38 @@ public class Demo extends Activity {
 
         // Setup Listeners
         setupTrackerListener();
+        setupTabListener();
     }
 
     @Override
     protected void onDestroy() {
         DemoUtils.resetExecutor();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (pausedSession) {
+            Tracker.instance().suspendSessionChecking(false);
+        }
+    }
+
+    /**
+     * Setups listener for tabs.
+     */
+    private void setupTabListener() {
+        _tabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pausedSession = true;
+                Tracker.instance().suspendSessionChecking(true);
+                String url = "https://snowplowanalytics.com/";
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(Demo.this, Uri.parse(url));
+            }
+        });
     }
 
     /**
@@ -260,8 +290,10 @@ public class Demo extends Activity {
                 .geoLocationContext(true)
                 .applicationCrash(true)
                 .lifecycleEvents(true)
+                .foregroundTimeout(60)
+                .backgroundTimeout(30)
                 .build()
-        ).setLifecycleHandler(this);
+        );
     }
 
     /**

@@ -41,6 +41,7 @@
 
     <string name="emitter_uri_hint">Enter endpoint here…</string>
     <string name="start">Start!</string>
+    <string name="tab">Chrome Tab</string>
 
     <string name="running_1">Running.  </string>
     <string name="running_2">Running . </string>
