@@ -100,6 +100,7 @@ public class Demo extends Activity {
         super.onResume();
         if (pausedSession) {
             Tracker.instance().suspendSessionChecking(false);
+            pausedSession = false;
         }
     }
 
