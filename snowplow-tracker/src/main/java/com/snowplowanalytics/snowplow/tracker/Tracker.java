@@ -107,6 +107,7 @@ public class Tracker {
     private LogLevel level;
     private boolean sessionContext;
     private long sessionCheckInterval;
+    private Runnable[] sessionCallbacks;
     private int threadCount;
     private TimeUnit timeUnit;
     private boolean geoLocationContext;
@@ -133,6 +134,7 @@ public class Tracker {
         long foregroundTimeout = 600; // Optional - 10 minutes
         long backgroundTimeout = 300; // Optional - 5 minutes
         long sessionCheckInterval = 15; // Optional - 15 seconds
+        Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
         int threadCount = 10; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
         boolean geoLocationContext = false; // Optional
@@ -226,6 +228,25 @@ public class Tracker {
         }
 
         /**
+         * @param foregroundTransitionCallback Called when session transitions to foreground
+         * @param backgroundTransitionCallback Called when session transitions to background
+         * @param foregroundTimeoutCallback Called when foregrounded session times-out
+         * @param backgroundTimeoutCallback Called when backgrounded session times-out
+         * @return itself
+         */
+        public TrackerBuilder sessionCallbacks(Runnable foregroundTransitionCallback,
+                                               Runnable backgroundTransitionCallback,
+                                               Runnable foregroundTimeoutCallback,
+                                               Runnable backgroundTimeoutCallback)
+        {
+            this.sessionCallbacks = new Runnable[]{
+                    foregroundTransitionCallback, backgroundTransitionCallback,
+                    foregroundTimeoutCallback, backgroundTimeoutCallback
+            };
+            return this;
+        }
+
+        /**
          * @param threadCount the amount of threads to use for concurrency
          * @return itself
          */
@@ -314,6 +335,7 @@ public class Tracker {
         this.level = builder.logLevel;
         this.sessionContext = builder.sessionContext;
         this.sessionCheckInterval = builder.sessionCheckInterval;
+        this.sessionCallbacks = builder.sessionCallbacks;
         this.threadCount = builder.threadCount < 2 ? 2 : builder.threadCount;
         this.timeUnit = builder.timeUnit;
         this.geoLocationContext = builder.geoLocationContext;
@@ -323,12 +345,26 @@ public class Tracker {
 
         // If session context is True
         if (this.sessionContext) {
-            this.trackerSession = new Session(
-                builder.foregroundTimeout,
-                builder.backgroundTimeout,
-                builder.timeUnit,
-                builder.context
-            );
+            if (sessionCallbacks.length == 4) {
+                this.trackerSession = new Session(
+                        builder.foregroundTimeout,
+                        builder.backgroundTimeout,
+                        builder.timeUnit,
+                        builder.context,
+                        builder.sessionCallbacks[0],
+                        builder.sessionCallbacks[1],
+                        builder.sessionCallbacks[2],
+                        builder.sessionCallbacks[3]
+                );
+            } else {
+                this.trackerSession = new Session(
+                        builder.foregroundTimeout,
+                        builder.backgroundTimeout,
+                        builder.timeUnit,
+                        builder.context
+                );
+            }
+
         }
 
         // If lifecycleEvents is True
@@ -614,6 +650,14 @@ public class Tracker {
      */
     public void resumeLifecycleHandler() {
         LifecycleHandler.resumeHandler();
+    }
+
+    /**
+     * Set the callbacks run on session lifecycle events (foreground, background, timeouts).
+     * @param callbacks
+     */
+    public void setSessionCallbacks(Runnable[] callbacks) {
+        this.getSession().setCallbacks(callbacks);
     }
 
     /**
