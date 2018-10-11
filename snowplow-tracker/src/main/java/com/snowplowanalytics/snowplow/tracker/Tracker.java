@@ -635,6 +635,12 @@ public class Tracker {
     }
 
     /**
+     * Whether the session context should be sent with events
+     * @param shouldSend
+     */
+    public void setSessionContext(boolean shouldSend) { this.sessionContext = shouldSend; }
+
+    /**
      * @param platform a valid DevicePlatforms object
      */
     public void setPlatform(DevicePlatforms platform) {
