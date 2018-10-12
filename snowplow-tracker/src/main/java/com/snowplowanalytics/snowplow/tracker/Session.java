@@ -61,10 +61,10 @@ public class Session {
     private Context context;
 
     // Transition callbacks
-    private Runnable backgroundTimeoutCallback = null;
-    private Runnable foregroundTimeoutCallback = null;
-    private Runnable backgroundTransitionCallback = null;
     private Runnable foregroundTransitionCallback = null;
+    private Runnable backgroundTransitionCallback = null;
+    private Runnable foregroundTimeoutCallback = null;
+    private Runnable backgroundTimeoutCallback = null;
 
     /**
      * Creates a new Session object which will
@@ -134,6 +134,16 @@ public class Session {
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, getSessionValues());
     }
 
+    private void executeEventCallback(Runnable callback) {
+        if (callback != null) {
+            try {
+                Executor.execute(callback);
+            } catch (Exception e) {
+                Logger.e(TAG, "Session event callback failed");
+            }
+        }
+    }
+
     /**
      * Checks the current Session accessedTime and
      * determines whether the session id should be
@@ -168,18 +178,14 @@ public class Session {
             if (isBackground) {
                 Logger.d(TAG, "Timeout in background, pausing session checking...");
                 try {
-                    if(this.backgroundTimeoutCallback != null) {
-                        Executor.execute(this.backgroundTimeoutCallback);
-                    }
+                    this.executeEventCallback(this.backgroundTimeoutCallback);
                     Tracker.instance().pauseSessionChecking();
                 } catch (Exception e) {
                     Logger.e(TAG, "Could not pause checking as tracker not setup");
                 }
             } else {
                 try {
-                    if(this.foregroundTimeoutCallback != null) {
-                        Executor.execute(this.foregroundTimeoutCallback);
-                    }
+                    this.executeEventCallback(this.foregroundTimeoutCallback);
                 } catch (Exception e) {
                     Logger.e(TAG, "Could not execute foreground timeout callback");
                 }
@@ -204,9 +210,7 @@ public class Session {
         if (currentState && !isBackground) {
             Logger.d(TAG, "Application moved to foreground, starting session checking...");
             try {
-                if (this.foregroundTransitionCallback != null) {
-                    Executor.execute(this.foregroundTransitionCallback);
-                }
+                this.executeEventCallback(this.foregroundTransitionCallback);
                 Tracker.instance().resumeSessionChecking();
             } catch (Exception e) {
                 Logger.e(TAG, "Could not resume checking as tracker not setup");
@@ -216,9 +220,7 @@ public class Session {
         if (!currentState && isBackground) {
             Logger.d(TAG, "Application moved to background");
             try {
-                if (this.backgroundTransitionCallback != null){
-                    Executor.execute(this.backgroundTransitionCallback);
-                }
+                this.executeEventCallback(this.backgroundTransitionCallback);
             } catch (Exception e) {
                 Logger.e(TAG, "Could not execute background transition callback");
             }
@@ -302,6 +304,18 @@ public class Session {
      */
     private void updateAccessedTime() {
         this.accessedLast = System.currentTimeMillis();
+    }
+
+    /**
+     * Set session callbacks
+     */
+    public void setCallbacks(Runnable[] callbacks) {
+        if (callbacks.length == 4) {
+            this.foregroundTransitionCallback = callbacks[0];
+            this.backgroundTransitionCallback = callbacks[1];
+            this.foregroundTimeoutCallback = callbacks[2];
+            this.backgroundTimeoutCallback = callbacks[3];
+        }
     }
 
     /**
