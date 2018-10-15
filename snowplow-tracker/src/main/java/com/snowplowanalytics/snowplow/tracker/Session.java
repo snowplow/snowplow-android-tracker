@@ -137,7 +137,7 @@ public class Session {
     private void executeEventCallback(Runnable callback) {
         if (callback != null) {
             try {
-                Executor.execute(callback);
+                callback.run();
             } catch (Exception e) {
                 Logger.e(TAG, "Session event callback failed");
             }
@@ -171,6 +171,12 @@ public class Session {
         }
 
         if (!Util.isTimeInRange(this.accessedLast, checkTime, range)) {
+            if (isBackground) { // timed out in background
+                this.executeEventCallback(this.backgroundTimeoutCallback);
+            } else { // timed out in foreground
+                this.executeEventCallback(this.foregroundTimeoutCallback);
+            }
+
             updateSessionInfo();
             updateAccessedTime();
 
@@ -178,16 +184,9 @@ public class Session {
             if (isBackground) {
                 Logger.d(TAG, "Timeout in background, pausing session checking...");
                 try {
-                    this.executeEventCallback(this.backgroundTimeoutCallback);
                     Tracker.instance().pauseSessionChecking();
                 } catch (Exception e) {
                     Logger.e(TAG, "Could not pause checking as tracker not setup");
-                }
-            } else {
-                try {
-                    this.executeEventCallback(this.foregroundTimeoutCallback);
-                } catch (Exception e) {
-                    Logger.e(TAG, "Could not execute foreground timeout callback");
                 }
             }
             
@@ -209,8 +208,8 @@ public class Session {
         boolean currentState = this.isBackground.get();
         if (currentState && !isBackground) {
             Logger.d(TAG, "Application moved to foreground, starting session checking...");
+            this.executeEventCallback(this.foregroundTransitionCallback);
             try {
-                this.executeEventCallback(this.foregroundTransitionCallback);
                 Tracker.instance().resumeSessionChecking();
             } catch (Exception e) {
                 Logger.e(TAG, "Could not resume checking as tracker not setup");
@@ -219,11 +218,7 @@ public class Session {
 
         if (!currentState && isBackground) {
             Logger.d(TAG, "Application moved to background");
-            try {
-                this.executeEventCallback(this.backgroundTransitionCallback);
-            } catch (Exception e) {
-                Logger.e(TAG, "Could not execute background transition callback");
-            }
+            this.executeEventCallback(this.backgroundTransitionCallback);
         }
 
         this.isBackground.set(isBackground);
