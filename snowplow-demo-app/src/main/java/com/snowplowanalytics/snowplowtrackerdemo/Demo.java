@@ -285,7 +285,7 @@ public class Demo extends Activity {
                 .build();
 
         Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
-                .level(LogLevel.DEBUG)
+                .level(LogLevel.VERBOSE)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
