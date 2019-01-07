@@ -51,6 +51,7 @@ public class Session {
     private int sessionIndex = 0;
     private String sessionStorage = "SQLITE";
     private String firstId = null;
+    private AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
 
     // Variables to control Session Updates
     private AtomicBoolean isBackground = new AtomicBoolean(false);
@@ -83,23 +84,32 @@ public class Session {
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         this.context = context;
-        Map sessionInfo = getSessionFromFile();
-        if (sessionInfo == null) {
-            this.userId = Util.getEventId();
-        } else {
-            try {
-                String uid = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
-                String sid = sessionInfo.get(Parameters.SESSION_ID).toString();
-                int si = (int) sessionInfo.get(Parameters.SESSION_INDEX);
 
-                this.userId = uid;
-                this.sessionIndex = si;
-                this.currentSessionId = sid;
-            } catch (Exception e){
-                Logger.e(TAG, "Exception occurred retrieving session info from file: %s", e.getMessage());
-                this.userId = Util.getEventId();
+        Runnable loadSessionFromFile = new Runnable() {
+            @Override
+            public void run() {
+                Map sessionInfo = getSessionFromFile();
+                if (sessionInfo == null) {
+                    userId = Util.getEventId();
+                } else {
+                    try {
+                        String uid = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
+                        String sid = sessionInfo.get(Parameters.SESSION_ID).toString();
+                        int si = (int) sessionInfo.get(Parameters.SESSION_INDEX);
+
+                        userId = uid;
+                        sessionIndex = si;
+                        currentSessionId = sid;
+                    } catch (Exception e){
+                        Logger.e(TAG, "Exception occurred retrieving session info from file: %s", e.getMessage());
+                        userId = Util.getEventId();
+                    }
+                }
+                hasLoadedFromFile.set(true);
             }
-        }
+        };
+
+        new Thread(loadSessionFromFile).start();
 
         updateSessionInfo();
         updateAccessedTime();
@@ -156,6 +166,12 @@ public class Session {
         long range;
         boolean isBackground = this.isBackground.get();
         boolean isSuspended = this.isSuspended.get();
+
+        // if session hasn't loaded don't update
+        if (!hasLoadedFromFile.get()) {
+            Logger.d(TAG, "Session hasn't loaded from file yet.");
+            return;
+        }
 
         // don't update the session if it's suspended
         if (isSuspended) {
@@ -258,6 +274,11 @@ public class Session {
      * and the session index.
      */
     private void updateSessionInfo() {
+        // if session hasn't loaded don't update
+        if (!hasLoadedFromFile.get()) {
+            Logger.d(TAG, "Session hasn't loaded from file yet.");
+            return;
+        }
         this.previousSessionId = this.currentSessionId;
         this.currentSessionId = Util.getEventId();
         this.sessionIndex++;
@@ -267,7 +288,14 @@ public class Session {
         Logger.d(TAG, " + Previous Session ID: %s", this.previousSessionId);
         Logger.d(TAG, " + Session Index: %s", this.sessionIndex);
 
-        saveSessionToFile();
+        Runnable saveSession = new Runnable() {
+            @Override
+            public void run() {
+                saveSessionToFile();
+            }
+        };
+
+        new Thread(saveSession).start();
     }
 
     /**
@@ -368,5 +396,12 @@ public class Session {
      */
     public long getBackgroundTimeout() {
         return this.backgroundTimeout;
+    }
+
+    /**
+     * @return loaded status
+     */
+    public boolean getHasLoadedFromFile() {
+        return this.hasLoadedFromFile.get();
     }
 }

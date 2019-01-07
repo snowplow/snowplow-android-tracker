@@ -370,11 +370,14 @@ public class Tracker {
         // If lifecycleEvents is True
         if ((this.lifecycleEvents || this.sessionContext) &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            LifecycleHandler handler = new LifecycleHandler();
-            ProcessLifecycleOwner.get().getLifecycle().addObserver(handler);
+            // oddly adding this observer loads a file - needs to be called off main thread
+            Executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleHandler());
+                }
+            });
         }
-
-        Executor.setThreadCount(this.threadCount);
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
@@ -519,7 +522,7 @@ public class Tracker {
     private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts, String eventId) {
 
         // Add session context
-        if (this.sessionContext) {
+        if (this.sessionContext && this.trackerSession.getHasLoadedFromFile()) {
             contexts.add(this.trackerSession.getSessionContext(eventId));
         }
 
