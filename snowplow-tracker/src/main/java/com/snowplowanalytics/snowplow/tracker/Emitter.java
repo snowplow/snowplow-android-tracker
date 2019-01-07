@@ -253,7 +253,13 @@ public class Emitter {
         this.byteLimitPost = builder.byteLimitPost;
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
-        this.eventStore = new EventStore(this.context, this.sendLimit);
+        this.eventStore = null;
+        Executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                eventStore = new EventStore(context, sendLimit);
+            }
+        });
 
         TLSArguments tlsArguments = new TLSArguments(this.tlsVersions);
         buildEmitterUri();
@@ -298,15 +304,19 @@ public class Emitter {
      *                to be added.
      */
     public void add(final Payload payload) {
-        Executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                eventStore.add(payload);
-                if (isRunning.compareAndSet(false, true)) {
-                    attemptEmit();
+        if (eventStore != null) {
+            Executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    eventStore.add(payload);
+                    if (isRunning.compareAndSet(false, true)) {
+                        attemptEmit();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Logger.d(TAG, "Event store not instantiated.");
+        }
     }
 
     /**
@@ -348,77 +358,81 @@ public class Emitter {
      */
     @SuppressWarnings("all")
     private void attemptEmit() {
-        if (Util.isOnline(this.context)) {
-            if (eventStore.getSize() > 0) {
-                emptyCount = 0;
+        if (eventStore != null) {
+            if (Util.isOnline(this.context)) {
+                if (eventStore.getSize() > 0) {
+                    emptyCount = 0;
 
-                EmittableEvents events = eventStore.getEmittableEvents();
-                LinkedList<ReadyRequest> requests = buildRequests(events);
-                LinkedList<RequestResult> results = performAsyncEmit(requests);
+                    EmittableEvents events = eventStore.getEmittableEvents();
+                    LinkedList<ReadyRequest> requests = buildRequests(events);
+                    LinkedList<RequestResult> results = performAsyncEmit(requests);
 
-                events = null;
-                requests = null;
+                    events = null;
+                    requests = null;
 
-                Logger.v(TAG, "Processing emitter results.");
+                    Logger.v(TAG, "Processing emitter results.");
 
-                int successCount = 0;
-                int failureCount = 0;
-                LinkedList<Long> removableEvents = new LinkedList<>();
+                    int successCount = 0;
+                    int failureCount = 0;
+                    LinkedList<Long> removableEvents = new LinkedList<>();
 
-                for (RequestResult res : results) {
-                    if (res.getSuccess()) {
-                        for (final Long eventId : res.getEventIds()) {
-                            removableEvents.add(eventId);
+                    for (RequestResult res : results) {
+                        if (res.getSuccess()) {
+                            for (final Long eventId : res.getEventIds()) {
+                                removableEvents.add(eventId);
+                            }
+                            successCount += res.getEventIds().size();
+                        } else {
+                            failureCount += res.getEventIds().size();
+                            Logger.e(TAG, "Request sending failed but we will retry later.");
                         }
-                        successCount += res.getEventIds().size();
+                    }
+                    eventStore.removeEvents(removableEvents);
+
+                    results = null;
+                    removableEvents = null;
+
+                    Logger.d(TAG, "Success Count: %s", successCount);
+                    Logger.d(TAG, "Failure Count: %s", failureCount);
+
+                    if (requestCallback != null) {
+                        if (failureCount != 0) {
+                            requestCallback.onFailure(successCount, failureCount);
+                        } else {
+                            requestCallback.onSuccess(successCount);
+                        }
+                    }
+
+                    if (failureCount > 0 && successCount == 0) {
+                        if (Util.isOnline(this.context)) {
+                            Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
+                        }
+                        Logger.e(TAG, "Emitter loop stopping: failures.");
+                        isRunning.compareAndSet(true, false);
                     } else {
-                        failureCount += res.getEventIds().size();
-                        Logger.e(TAG, "Request sending failed but we will retry later.");
+                        attemptEmit();
                     }
-                }
-                eventStore.removeEvents(removableEvents);
-
-                results = null;
-                removableEvents = null;
-
-                Logger.d(TAG, "Success Count: %s", successCount);
-                Logger.d(TAG, "Failure Count: %s", failureCount);
-
-                if (requestCallback != null) {
-                    if (failureCount != 0) {
-                        requestCallback.onFailure(successCount, failureCount);
-                    } else {
-                        requestCallback.onSuccess(successCount);
-                    }
-                }
-
-                if (failureCount > 0 && successCount == 0) {
-                    if (Util.isOnline(this.context)) {
-                        Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
-                    }
-                    Logger.e(TAG, "Emitter loop stopping: failures.");
-                    isRunning.compareAndSet(true, false);
                 } else {
-                    attemptEmit();
+                    if (emptyCount >= this.emptyLimit) {
+                        Logger.e(TAG, "Emitter loop stopping: empty limit reached.");
+                        isRunning.compareAndSet(true, false);
+                    } else {
+                        emptyCount++;
+                        Logger.e(TAG, "Emitter database empty: " + emptyCount);
+                        try {
+                            this.timeUnit.sleep(this.emitterTick);
+                        } catch (InterruptedException e) {
+                            Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
+                        }
+                        attemptEmit();
+                    }
                 }
             } else {
-                if (emptyCount >= this.emptyLimit) {
-                    Logger.e(TAG, "Emitter loop stopping: empty limit reached.");
-                    isRunning.compareAndSet(true, false);
-                } else {
-                    emptyCount++;
-                    Logger.e(TAG, "Emitter database empty: " + emptyCount);
-                    try {
-                        this.timeUnit.sleep(this.emitterTick);
-                    } catch (InterruptedException e) {
-                        Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
-                    }
-                    attemptEmit();
-                }
+                Logger.e(TAG, "Emitter loop stopping: emitter offline.");
+                isRunning.compareAndSet(true, false);
             }
         } else {
-            Logger.e(TAG, "Emitter loop stopping: emitter offline.");
-            isRunning.compareAndSet(true, false);
+            Logger.d(TAG, "Event store not instantiated.");
         }
     }
 
