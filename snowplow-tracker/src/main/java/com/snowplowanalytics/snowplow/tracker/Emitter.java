@@ -81,6 +81,7 @@ public class Emitter {
     private TimeUnit timeUnit;
 
     private EventStore eventStore;
+    private Future eventStoreFuture;
     private int emptyCount;
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
@@ -266,10 +267,11 @@ public class Emitter {
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
         this.eventStore = null;
-        Executor.execute(new Runnable() {
+        this.eventStoreFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
-            public void run() {
+            public Void call() {
                 eventStore = new EventStore(context, sendLimit);
+                return null;
             }
         });
 
@@ -770,6 +772,24 @@ public class Emitter {
     }
 
     /**
+     * Waits for the event store to load.
+     * @return boolean whether event store has successfully loaded
+     */
+    public boolean waitForEventStore() {
+        Future eventStoreFuture = this.getEventStoreFuture();
+        try {
+            eventStoreFuture.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException ie) {
+            Logger.e(TAG, "Event store loading was interrupted: %s", ie.getMessage());
+        } catch (ExecutionException ee) {
+            Logger.e(TAG, "Event store loading failed: %s", ee.getMessage());
+        } catch (TimeoutException te) {
+            Logger.e(TAG, "Event store loading timedout: %s", te.getMessage());
+        }
+        return eventStoreFuture.isDone();
+    }
+
+    /**
      * @return the emitter uri
      */
     public String getEmitterUri() {
@@ -846,4 +866,9 @@ public class Emitter {
     public long getByteLimitPost() {
         return this.byteLimitPost;
     }
+
+    /**
+     * @return future for event store loading
+     */
+    public Future getEventStoreFuture() { return this.eventStoreFuture; }
 }
