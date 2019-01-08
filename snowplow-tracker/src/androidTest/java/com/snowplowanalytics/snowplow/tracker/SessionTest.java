@@ -28,6 +28,7 @@ public class SessionTest extends AndroidTestCase {
     public void testSessionInit() {
         FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
         Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
@@ -54,6 +55,7 @@ public class SessionTest extends AndroidTestCase {
         FileStore.saveMapToFile(TrackerConstants.SNOWPLOW_SESSION_VARS, map, getContext());
 
         Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
@@ -69,6 +71,7 @@ public class SessionTest extends AndroidTestCase {
     public void testCheckAndUpdateLogicForExpired() {
         FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
         Session session = new Session(0, 0, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
 
         String userId = session.getUserId();
         String currentId = session.getCurrentSessionId();
@@ -85,6 +88,7 @@ public class SessionTest extends AndroidTestCase {
     public void testCheckAndUpdateLogicForUnExpired() {
         FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
         Session session = new Session(500, 500, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
 
         String userId = session.getUserId();
         String currentId = session.getCurrentSessionId();
@@ -101,6 +105,7 @@ public class SessionTest extends AndroidTestCase {
     public void testSetBackgroundState() {
         FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
         Session session = new Session(500, 0, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
 
         assertEquals(1, session.getSessionIndex());
         session.checkAndUpdateSession();

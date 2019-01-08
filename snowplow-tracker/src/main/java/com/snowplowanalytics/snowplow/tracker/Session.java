@@ -17,6 +17,7 @@ import android.content.Context;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
@@ -24,7 +25,11 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -52,6 +57,7 @@ public class Session {
     private String sessionStorage = "SQLITE";
     private String firstId = null;
     private AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
+    private Future loadFromFileFuture;
 
     // Variables to control Session Updates
     private AtomicBoolean isBackground = new AtomicBoolean(false);
@@ -85,9 +91,9 @@ public class Session {
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         this.context = context;
 
-        Runnable loadSessionFromFile = new Runnable() {
+        this.loadFromFileFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
-            public void run() {
+            public Void call() {
                 Map sessionInfo = getSessionFromFile();
                 if (sessionInfo == null) {
                     userId = Util.getEventId();
@@ -106,13 +112,11 @@ public class Session {
                     }
                 }
                 hasLoadedFromFile.set(true);
+                updateSessionInfo();
+                updateAccessedTime();
+                return null;
             }
-        };
-
-        new Thread(loadSessionFromFile).start();
-
-        updateSessionInfo();
-        updateAccessedTime();
+        });
 
         Logger.v(TAG, "Tracker Session Object created.");
     }
@@ -274,11 +278,6 @@ public class Session {
      * and the session index.
      */
     private void updateSessionInfo() {
-        // if session hasn't loaded don't update
-        if (!hasLoadedFromFile.get()) {
-            Logger.d(TAG, "Session hasn't loaded from file yet.");
-            return;
-        }
         this.previousSessionId = this.currentSessionId;
         this.currentSessionId = Util.getEventId();
         this.sessionIndex++;
@@ -288,14 +287,12 @@ public class Session {
         Logger.d(TAG, " + Previous Session ID: %s", this.previousSessionId);
         Logger.d(TAG, " + Session Index: %s", this.sessionIndex);
 
-        Runnable saveSession = new Runnable() {
+        Executor.execute(new Runnable() {
             @Override
             public void run() {
                 saveSessionToFile();
             }
-        };
-
-        new Thread(saveSession).start();
+        });
     }
 
     /**
@@ -339,6 +336,24 @@ public class Session {
             this.foregroundTimeoutCallback = callbacks[2];
             this.backgroundTimeoutCallback = callbacks[3];
         }
+    }
+
+    /**
+     * Waits for the event store to load.
+     * @return boolean whether event store has successfully loaded
+     */
+    public boolean waitForSessionFileLoad() {
+        Future fileFuture = this.getLoadFromFileFuture();
+        try {
+            fileFuture.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException ie) {
+            Logger.e(TAG, "Session file loading was interrupted: %s", ie.getMessage());
+        } catch (ExecutionException ee) {
+            Logger.e(TAG, "Session file loading failed: %s", ee.getMessage());
+        } catch (TimeoutException te) {
+            Logger.e(TAG, "Session file loading timedout: %s", te.getMessage());
+        }
+        return fileFuture.isDone();
     }
 
     /**
@@ -404,4 +419,9 @@ public class Session {
     public boolean getHasLoadedFromFile() {
         return this.hasLoadedFromFile.get();
     }
+
+    /**
+     * @return future for session file loading
+     */
+    public Future getLoadFromFileFuture() { return this.loadFromFileFuture; }
 }

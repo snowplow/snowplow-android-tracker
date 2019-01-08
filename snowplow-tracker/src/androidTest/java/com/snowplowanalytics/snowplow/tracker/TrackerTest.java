@@ -144,6 +144,7 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
+        emitter.waitForEventStore();
         emitter.getEventStore().removeAllEvents();
 
         Tracker.close();
@@ -188,6 +189,7 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
+        emitter.waitForEventStore();
         emitter.getEventStore().removeAllEvents();
 
         Tracker.close();
@@ -215,6 +217,7 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
+        emitter.waitForEventStore();
         emitter.getEventStore().removeAllEvents();
 
         Tracker.close();
