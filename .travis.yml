@@ -29,6 +29,8 @@ android:
   
   licenses:
     - ".+"
+  before_install:
+    - yes | sdkmanager "platforms;android-28"
 
 before_script:
   - echo "y" | android update sdk -a --no-ui --filter android-28
