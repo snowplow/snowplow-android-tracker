@@ -53,10 +53,12 @@ In the Ngrok interface take note of the `tunnel` URL, this is what you will use 
 
 ## Find out more
 
-| Technical Docs                 | Setup Guide              | Roadmap                | Contributing                     |
+| Technical Docs                 | Quick Start              | Roadmap                | Contributing                     |
 |:-------------------------------|:-------------------------|:-----------------------|:---------------------------------|
-| ![i1][techdocs-image]          | ![i2][setup-image]       | ![i3][roadmap-image]   | ![i4][contributing-image]        |
-| **[Technical Docs][techdocs]** | **[Setup Guide][setup]** | **[Roadmap][roadmap]** | **[Contributing][contributing]** |
+| ![i1][techdocs-image]          | ![i2][quick-start-image]       | ![i3][roadmap-image]   | ![i4][contributing-image]        |
+| **[Technical Docs][techdocs]** | **[Quick Start][setup]** | **[Roadmap][roadmap]** | **[Contributing][contributing]** |
+
+Older documentation can be found [here][techdocs-old].
 
 ## Copyright and license
 
@@ -80,12 +82,13 @@ limitations under the License.
 [virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
 
 [techdocs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
-[setup-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
+[quick-start-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
-[setup]: https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup
+[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.0.0/
+[techdocs-old]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
+[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.0.0/android-tracker/#quick-start
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
 
