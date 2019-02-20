@@ -1,3 +1,9 @@
+Version 1.0.1 (2019-02-20)
+--------------------------
+Update documentation link in README.md (#291)
+Add script for generating API Reference (#293)
+Bump Gradle to 4.10 (#292)
+
 Version 1.0.0 (2019-01-23)
 --------------------------
 Output maximum logging detail in demo app (#279)
