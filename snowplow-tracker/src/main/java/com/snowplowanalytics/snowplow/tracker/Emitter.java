@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSArguments;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
+import com.snowplowanalytics.snowplow.tracker.interceptors.GzipInterceptor;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -79,6 +80,7 @@ public class Emitter {
     private long byteLimitGet;
     private long byteLimitPost;
     private TimeUnit timeUnit;
+    private boolean gzipCompressionEnabled;
 
     private EventStore eventStore;
     private Future eventStoreFuture;
@@ -104,6 +106,7 @@ public class Emitter {
         long byteLimitGet = 40000; // Optional
         long byteLimitPost = 40000; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
+        private boolean gzipCompressionEnabled = false;
         OkHttpClient client = null; //Optional
 
         /**
@@ -227,6 +230,15 @@ public class Emitter {
         }
 
         /**
+         * @param gzipCompressionEnabled Gzip compression for requests
+         * @return itself
+         */
+        public EmitterBuilder setGzipCompressionEnabled(boolean gzipCompressionEnabled) {
+            this.gzipCompressionEnabled = gzipCompressionEnabled;
+            return this;
+        }
+
+        /**
          * @param client An OkHttp client that will be used in the emitter, you can provide your
          *               own if you want to share your Singleton client's interceptors, connection pool etc..
          *               ,otherwise a new one is created.
@@ -266,6 +278,7 @@ public class Emitter {
         this.byteLimitPost = builder.byteLimitPost;
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
+        this.gzipCompressionEnabled = builder.gzipCompressionEnabled;
         this.eventStore = null;
         this.eventStoreFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
@@ -285,7 +298,9 @@ public class Emitter {
         else {
             clientBuilder = builder.client.newBuilder();
         }
-
+        if (gzipCompressionEnabled){
+            clientBuilder.addInterceptor(new GzipInterceptor());
+        }
         client = clientBuilder.sslSocketFactory(tlsArguments.getSslSocketFactory(),
                                                 tlsArguments.getTrustManager())
                               .connectTimeout(15, TimeUnit.SECONDS)
