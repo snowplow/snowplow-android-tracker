@@ -78,6 +78,7 @@ public class Emitter {
     private int sendLimit;
     private long byteLimitGet;
     private long byteLimitPost;
+    private int emitTimeout;
     private TimeUnit timeUnit;
 
     private EventStore eventStore;
@@ -103,6 +104,7 @@ public class Emitter {
         int emptyLimit = 5; // Optional
         long byteLimitGet = 40000; // Optional
         long byteLimitPost = 40000; // Optional
+        private int emitTimeout = 5; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
         OkHttpClient client = null; //Optional
 
@@ -218,6 +220,16 @@ public class Emitter {
         }
 
         /**
+         * @param emitTimeout The maximum timeout for emitting events. If emit time exceeds this value
+         *                    TimeOutException will be thrown
+         * @return itself
+         */
+        public EmitterBuilder emitTimeout(int emitTimeout){
+            this.emitTimeout = emitTimeout;
+            return this;
+        }
+
+        /**
          * @param timeUnit a valid TimeUnit
          * @return itself
          */
@@ -264,6 +276,7 @@ public class Emitter {
         this.sendLimit = builder.sendLimit;
         this.byteLimitGet = builder.byteLimitGet;
         this.byteLimitPost = builder.byteLimitPost;
+        this.emitTimeout = builder.emitTimeout;
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
         this.eventStore = null;
@@ -479,12 +492,12 @@ public class Emitter {
         Logger.d(TAG, "Request Futures: %s", futures.size());
 
         // Get results of futures
-        // - Wait up to 5 seconds for the request
+        // - Wait up to emitTimeout seconds for the request
         for (int i = 0; i < futures.size(); i++) {
             int code = -1;
 
             try {
-                code = (int) futures.get(i).get(5, TimeUnit.SECONDS);
+                code = (int) futures.get(i).get(emitTimeout, TimeUnit.SECONDS);
             } catch (InterruptedException ie) {
                 Logger.e(TAG, "Request Future was interrupted: %s", ie.getMessage());
             } catch (ExecutionException ee) {
