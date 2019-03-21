@@ -86,6 +86,11 @@ public class Parameters {
     // Screen View
     public static final String SV_ID = "id";
     public static final String SV_NAME = "name";
+    public static final String SV_TYPE = "type";
+    public static final String SV_PREVIOUS_NAME = "previousName";
+    public static final String SV_PREVIOUS_ID = "previousId";
+    public static final String SV_PREVIOUS_TYPE = "previousType";
+    public static final String SV_TRANSITION_TYPE = "transitionType";
 
     // User Timing
     public static final String UT_CATEGORY = "category";
@@ -131,6 +136,13 @@ public class Parameters {
     public static final String SESSION_INDEX = "sessionIndex";
     public static final String SESSION_STORAGE = "storageMechanism";
     public static final String SESSION_FIRST_ID = "firstEventId";
+
+    // Screen Context
+    public static final String SCREEN_NAME = "name";
+    public static final String SCREEN_ID = "id";
+    public static final String SCREEN_TYPE = "type";
+    public static final String SCREEN_FRAGMENT = "fragment";
+    public static final String SCREEN_ACTIVITY = "activity";
 
     // Application Crash
     public static final String APP_ERROR_MESSAGE = "message";

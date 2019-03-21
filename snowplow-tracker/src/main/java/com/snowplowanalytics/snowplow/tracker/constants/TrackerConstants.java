@@ -24,7 +24,7 @@ public class TrackerConstants {
     public static final String SCHEMA_PAYLOAD_DATA = "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4";
     public static final String SCHEMA_CONTEXTS = "iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1";
     public static final String SCHEMA_UNSTRUCT_EVENT = "iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0";
-    public static final String SCHEMA_SCREEN_VIEW = "iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0";
+    public static final String SCHEMA_SCREEN_VIEW = "iglu:com.snowplowanalytics.mobile/screen_view/jsonschema/1-0-0";
     public static final String SCHEMA_USER_TIMINGS = "iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0";
     public static final String SCHEMA_CONSENT_GRANTED = "iglu:com.snowplowanalytics.snowplow/consent_granted/jsonschema/1-0-0";
     public static final String SCHEMA_CONSENT_WITHDRAWN = "iglu:com.snowplowanalytics.snowplow/consent_withdrawn/jsonschema/1-0-0";
@@ -35,6 +35,7 @@ public class TrackerConstants {
     public static final String APPLICATION_ERROR_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-0";
     public static final String APPLICATION_FOREGOUND_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_foreground/jsonschema/1-0-0";
     public static final String APPLICATION_BACKGROUND_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_background/jsonschema/1-0-0";
+    public static final String SCHEMA_SCREEN = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-0-0";
 
     public static final String POST_CONTENT_TYPE = "application/json; charset=utf-8";
 

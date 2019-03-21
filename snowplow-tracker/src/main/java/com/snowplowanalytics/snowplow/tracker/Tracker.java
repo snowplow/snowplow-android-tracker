@@ -19,9 +19,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
-import android.arch.lifecycle.LifecycleOwner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +34,10 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
-import com.snowplowanalytics.snowplow.tracker.tracker.LifecycleHandler;
+import com.snowplowanalytics.snowplow.tracker.tracker.ProcessObserver;
+import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
@@ -71,6 +71,7 @@ public class Tracker {
             spTracker = newTracker;
             spTracker.resumeSessionChecking();
             spTracker.getEmitter().flush();
+            spTracker.initializeScreenviewTracking();
         }
         return instance();
     }
@@ -114,6 +115,11 @@ public class Tracker {
     private boolean mobileContext;
     private boolean applicationCrash;
     private boolean lifecycleEvents;
+    private boolean screenviewEvents;
+    private boolean screenContext;
+    private boolean activityTracking;
+    private boolean onlyTrackLabelledScreens;
+    private ScreenState screenState;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -141,6 +147,10 @@ public class Tracker {
         boolean mobileContext = false; // Optional
         boolean applicationCrash = true; // Optional
         boolean lifecycleEvents = false; // Optional
+        boolean screenviewEvents = false; // Optional
+        boolean screenContext = false; // Optional
+        boolean activityTracking = false; // Optional
+        boolean onlyTrackLabelledScreens = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -307,6 +317,37 @@ public class Tracker {
         }
 
         /**
+         * @param screenContext whether to send a screen context (info pertaining
+         *                      to current screen) with every event
+         * @return itself
+         */
+        public TrackerBuilder screenContext(Boolean screenContext) {
+            this.screenContext = screenContext;
+            return this;
+        }
+
+        /**
+         * @param screenviewEvents whether to auto-track screenviews
+         * @return itself
+         */
+        public TrackerBuilder screenviewEvents(Boolean screenviewEvents) {
+            this.activityTracking = true;
+            return this;
+        }
+
+        /**
+         * @param activities whether to auto-track screenviews (onStart of activities)
+         * @param onlyTrackLabelledScreens track only activities or fragments that have a Snowplow tag
+         * @return itself
+         */
+        public TrackerBuilder screenviewEvents(Boolean activities,
+                                               Boolean onlyTrackLabelledScreens) {
+            this.activityTracking = activities;
+            this.onlyTrackLabelledScreens = onlyTrackLabelledScreens;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -342,6 +383,10 @@ public class Tracker {
         this.mobileContext = builder.mobileContext;
         this.applicationCrash = builder.applicationCrash;
         this.lifecycleEvents = builder.lifecycleEvents;
+        this.screenviewEvents = builder.screenviewEvents;
+        this.activityTracking = builder.activityTracking;
+        this.onlyTrackLabelledScreens = builder.onlyTrackLabelledScreens;
+        this.screenState = new ScreenState();
 
         // If session context is True
         if (this.sessionContext) {
@@ -374,13 +419,22 @@ public class Tracker {
             Executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleHandler());
+                    ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
                 }
             });
         }
 
         Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
+    }
+
+    // --- Private init functions
+    private void initializeScreenviewTracking() {
+        if (this.activityTracking) {
+            ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
+            Application application = (Application) context.getApplicationContext();
+            application.registerActivityLifecycleCallbacks(handler);
+        }
     }
 
     // --- Event Tracking Functions
@@ -536,6 +590,10 @@ public class Tracker {
             contexts.add(Util.getMobileContext(this.context));
         }
 
+        if (this.screenContext) {
+            contexts.add(screenState.getCurrentScreen(true));
+        }
+
         // If there are contexts to nest
         if (contexts.size() == 0) {
             return null;
@@ -623,45 +681,6 @@ public class Tracker {
     }
 
     // --- Setters
-
-    /**
-     * Sets the custom contexts sent whenever LifecycleHandler sends an event.
-     *
-     * @param customContexts A list of self-describing JSONs (custom contexts)
-     */
-    public void setLifecycleCustomContexts(List<SelfDescribingJson> customContexts) {
-        LifecycleHandler.setLifecycleContexts(customContexts);
-    }
-
-    /**
-     * @return the custom contexts sent by LifecycleHandler
-     */
-    public List<SelfDescribingJson> getLifecycleCustomContexts() {
-        return LifecycleHandler.getLifecycleContexts();
-    }
-
-    /**
-     * Prevent the LifecycleHandler from sending events, in order to ignore foreground
-     * and background transitions.
-     */
-    public void pauseLifecycleHandler() {
-        LifecycleHandler.pauseHandler();
-    }
-
-    /**
-     * Allow the LifecycleHandler to send events again.
-     */
-    public void resumeLifecycleHandler() {
-        LifecycleHandler.resumeHandler();
-    }
-
-    /**
-     * Set the callbacks run on session lifecycle events (foreground, background, timeouts).
-     * @param callbacks
-     */
-    public void setSessionCallbacks(Runnable[] callbacks) {
-        this.getSession().setCallbacks(callbacks);
-    }
 
     /**
      * @param subject a valid subject object
@@ -783,5 +802,50 @@ public class Tracker {
      */
     public boolean getLifecycleEvents() {
         return this.lifecycleEvents;
+    }
+
+    /**
+     * @return whether application lifecycle tracking is on
+     */
+    public boolean getActivityTracking() {
+        return this.activityTracking;
+    }
+
+    /**
+     * @return whether application lifecycle tracking is on
+     */
+    public boolean getOnlyTrackLabelledScreens() {
+        return this.onlyTrackLabelledScreens;
+    }
+
+    /**
+     * @return screen state from tracker
+     */
+    public ScreenState getScreenState() {
+        return this.screenState;
+    }
+
+    /**
+     * Track a screen with a screen state (many options)
+     */
+    public void trackScreen(ScreenState screenState) {
+        this.screenState = screenState;
+        SelfDescribingJson data = screenState.getScreenViewEventJson();
+        track(SelfDescribing.builder()
+                .eventData(data)
+                .build()
+        );
+    }
+
+    /**
+     * Track a screen only by name
+     */
+    public void trackScreen(String name) {
+        screenState.newScreenState(name, null, null);
+        SelfDescribingJson data = screenState.getScreenViewEventJson();
+        track(SelfDescribing.builder()
+                .eventData(data)
+                .build()
+        );
     }
 }
