@@ -34,19 +34,19 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class LifecycleHandler implements LifecycleObserver {
-    private static final String TAG = LifecycleHandler.class.getSimpleName();
+public class ProcessObserver implements LifecycleObserver {
+    private static final String TAG = ProcessObserver.class.getSimpleName();
     private static boolean isInBackground = false;
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
     private static AtomicInteger backgroundIndex = new AtomicInteger(0);
     private static boolean isHandlerPaused = false;
     private static List<SelfDescribingJson> lifecycleContexts = null;
 
-    public LifecycleHandler(List<SelfDescribingJson> contexts) {
+    public ProcessObserver(List<SelfDescribingJson> contexts) {
         lifecycleContexts = contexts;
     }
 
-    public LifecycleHandler() {}
+    public ProcessObserver() {}
 
     public static void setLifecycleContexts(List<SelfDescribingJson> contexts) {
         lifecycleContexts = contexts;

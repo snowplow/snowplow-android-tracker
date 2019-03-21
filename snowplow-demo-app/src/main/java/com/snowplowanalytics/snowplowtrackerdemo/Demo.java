@@ -297,6 +297,8 @@ public class Demo extends Activity {
                 .lifecycleEvents(true)
                 .foregroundTimeout(60)
                 .backgroundTimeout(30)
+                .screenviewEvents(true)
+                .screenContext(true)
                 .build()
         );
     }
