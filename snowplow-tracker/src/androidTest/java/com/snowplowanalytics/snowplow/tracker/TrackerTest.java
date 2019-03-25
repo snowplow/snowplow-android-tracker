@@ -67,6 +67,7 @@ public class TrackerTest extends AndroidTestCase {
             .applicationCrash(false)
             .lifecycleEvents(true)
             .installTracking(true)
+            .applicationContext(true)
             .build();
     }
 
@@ -99,6 +100,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(false, tracker.getApplicationCrash());
         assertEquals(true, tracker.getLifecycleEvents());
         assertEquals(true, tracker.getInstallTracking());
+        assertEquals(true, tracker.getApplicationContext());
     }
 
     public void testEmitterUpdate() {

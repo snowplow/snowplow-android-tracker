@@ -147,6 +147,10 @@ public class Parameters {
     public static final String SCREEN_FRAGMENT = "fragment";
     public static final String SCREEN_ACTIVITY = "activity";
 
+    // Application Context
+    public static final String APP_VERSION = "version";
+    public static final String APP_BUILD = "build";
+
     // Application Crash
     public static final String APP_ERROR_MESSAGE = "message";
     public static final String APP_ERROR_STACK = "stackTrace";
