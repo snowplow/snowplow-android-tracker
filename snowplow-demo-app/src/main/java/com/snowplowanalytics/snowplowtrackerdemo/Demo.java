@@ -300,6 +300,7 @@ public class Demo extends Activity {
                 .screenviewEvents(true)
                 .screenContext(true)
                 .installTracking(true)
+                .applicationContext(true)
                 .build()
         );
     }

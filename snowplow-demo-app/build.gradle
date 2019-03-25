@@ -14,6 +14,7 @@ android {
         targetSdkVersion 28
         versionCode 3
         versionName "0.3.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -34,4 +35,8 @@ dependencies {
     implementation project(':snowplow-android-tracker')
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
+    // test
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
 }

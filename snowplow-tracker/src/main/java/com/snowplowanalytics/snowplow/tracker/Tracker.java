@@ -121,6 +121,7 @@ public class Tracker {
     private boolean installTracking;
     private boolean activityTracking;
     private boolean onlyTrackLabelledScreens;
+    private boolean applicationContext;
     private ScreenState screenState;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
@@ -154,6 +155,7 @@ public class Tracker {
         boolean activityTracking = false; // Optional
         boolean onlyTrackLabelledScreens = false; // Optional
         boolean installTracking = false; // Optional
+        boolean applicationContext = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -166,6 +168,15 @@ public class Tracker {
             this.namespace = namespace;
             this.appId = appId;
             this.context = context;
+        }
+
+        /**
+         * @param isEnabled Whether application contexts are sent with all events
+         * @return itself
+         */
+        public TrackerBuilder applicationContext(boolean isEnabled) {
+            this.applicationContext = isEnabled;
+            return this;
         }
 
         /**
@@ -401,6 +412,7 @@ public class Tracker {
         this.screenState = new ScreenState();
         this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
+        this.applicationContext = builder.applicationContext;
 
         if (this.installTracking) {
             this.installTracker = new InstallTracker(this.context);
@@ -610,8 +622,14 @@ public class Tracker {
             contexts.add(Util.getMobileContext(this.context));
         }
 
+        // Add screen context
         if (this.screenContext) {
             contexts.add(screenState.getCurrentScreen(true));
+        }
+
+        // Add application context
+        if (this.applicationContext) {
+            contexts.add(InstallTracker.getApplicationContext(this.context));
         }
 
         // If there are contexts to nest
@@ -781,6 +799,13 @@ public class Tracker {
      * @return the install tracking setting of the tracker
      */
     public boolean getInstallTracking() { return this.installTracking; }
+
+    /**
+     * @return the application context setting of the tracker
+     */
+    public boolean getApplicationContext() {
+        return this.applicationContext;
+    }
 
     /**
      * @return the trackers device platform
