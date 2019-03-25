@@ -122,6 +122,7 @@ public class Tracker {
     private boolean installTracking;
     private boolean activityTracking;
     private boolean onlyTrackLabelledScreens;
+    private boolean applicationContext;
     private ScreenState screenState;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
@@ -154,7 +155,8 @@ public class Tracker {
         boolean screenContext = false; // Optional
         boolean activityTracking = false; // Optional
         boolean onlyTrackLabelledScreens = false; // Optional
-        boolean installTracking = true;
+        boolean installTracking = true; // Optional
+        boolean applicationContext = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -167,6 +169,15 @@ public class Tracker {
             this.namespace = namespace;
             this.appId = appId;
             this.context = context;
+        }
+
+        /**
+         * @param isEnabled Whether application contexts are sent with all events
+         * @return itself
+         */
+        public TrackerBuilder applicationContext(boolean isEnabled) {
+            this.applicationContext = isEnabled;
+            return this;
         }
 
         /**
@@ -400,6 +411,7 @@ public class Tracker {
         this.activityTracking = builder.activityTracking;
         this.onlyTrackLabelledScreens = builder.onlyTrackLabelledScreens;
         this.screenState = new ScreenState();
+        this.applicationContext = builder.applicationContext;
 
         // If install tracking is enabled, check for file and send event with the install tracker
         if (this.installTracking) {
@@ -610,8 +622,14 @@ public class Tracker {
             contexts.add(Util.getMobileContext(this.context));
         }
 
+        // Add screen context
         if (this.screenContext) {
             contexts.add(screenState.getCurrentScreen(true));
+        }
+
+        // Add application context
+        if (this.applicationContext) {
+            contexts.add(InstallTracker.getApplicationContext(this.context));
         }
 
         // If there are contexts to nest

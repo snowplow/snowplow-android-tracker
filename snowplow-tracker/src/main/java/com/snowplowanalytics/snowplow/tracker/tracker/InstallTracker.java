@@ -1,6 +1,9 @@
 package com.snowplowanalytics.snowplow.tracker.tracker;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
 import com.snowplowanalytics.snowplow.tracker.Executor;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
@@ -18,6 +21,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
 
 public class InstallTracker {
     /**
@@ -84,5 +89,29 @@ public class InstallTracker {
             Logger.e(TAG, "Install file loading timed out: %s", te.getMessage());
         }
         return infoFuture.isDone();
+    }
+
+    static public SelfDescribingJson getApplicationContext(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String versionName = pInfo.versionName;
+            String versionCode = "";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                versionCode = String.valueOf(pInfo.getLongVersionCode());
+            } else {
+                versionCode = String.valueOf(pInfo.versionCode);
+            }
+            if (versionName != null) {
+                Map<String, Object> pairs = new HashMap<>();
+                addToMap(Parameters.APP_VERSION, versionName, pairs);
+                addToMap(Parameters.APP_BUILD, versionCode, pairs);
+                return new SelfDescribingJson(
+                        TrackerConstants.SCHEMA_APPLICATION, pairs
+                );
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.e(TAG, "Failed to find application context: %s", e.getMessage());
+        }
+        return null;
     }
 }
