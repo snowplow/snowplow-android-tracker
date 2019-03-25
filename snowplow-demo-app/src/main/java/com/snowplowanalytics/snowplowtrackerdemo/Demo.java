@@ -299,6 +299,7 @@ public class Demo extends Activity {
                 .backgroundTimeout(30)
                 .screenviewEvents(true)
                 .screenContext(true)
+                .installTracking(true)
                 .build()
         );
     }

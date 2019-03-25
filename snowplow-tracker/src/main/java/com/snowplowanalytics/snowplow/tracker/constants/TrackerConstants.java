@@ -36,6 +36,7 @@ public class TrackerConstants {
     public static final String APPLICATION_FOREGOUND_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_foreground/jsonschema/1-0-0";
     public static final String APPLICATION_BACKGROUND_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_background/jsonschema/1-0-0";
     public static final String SCHEMA_SCREEN = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-0-0";
+    public static final String SCHEMA_APPLICATION_INSTALL = "iglu:com.snowplowanalytics.mobile/application_install/jsonschema/1-0-0";
 
     public static final String POST_CONTENT_TYPE = "application/json; charset=utf-8";
 
@@ -46,4 +47,7 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM_ITEM = "ti";
 
     public static final String SNOWPLOW_SESSION_VARS = "snowplow_session_vars";
+
+    public static final String INSTALLED_BEFORE = "installed_before";
+    public static final String INSTALL_TIMESTAMP = "install_timestamp";
 }
