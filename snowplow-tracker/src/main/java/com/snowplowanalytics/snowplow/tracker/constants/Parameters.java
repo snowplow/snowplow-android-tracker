@@ -137,6 +137,9 @@ public class Parameters {
     public static final String SESSION_STORAGE = "storageMechanism";
     public static final String SESSION_FIRST_ID = "firstEventId";
 
+    // Install Context
+    public static final String INSTALL_STATUS = "isNewInstall";
+
     // Screen Context
     public static final String SCREEN_NAME = "name";
     public static final String SCREEN_ID = "id";

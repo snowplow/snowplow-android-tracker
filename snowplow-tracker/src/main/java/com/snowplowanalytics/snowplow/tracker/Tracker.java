@@ -14,7 +14,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
@@ -36,6 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
+import com.snowplowanalytics.snowplow.tracker.tracker.InstallTracker;
 import com.snowplowanalytics.snowplow.tracker.tracker.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
@@ -117,6 +117,9 @@ public class Tracker {
     private boolean lifecycleEvents;
     private boolean screenviewEvents;
     private boolean screenContext;
+    private boolean installEvent;
+    private InstallTracker installTracker;
+    private boolean installTracking;
     private boolean activityTracking;
     private boolean onlyTrackLabelledScreens;
     private ScreenState screenState;
@@ -151,6 +154,7 @@ public class Tracker {
         boolean screenContext = false; // Optional
         boolean activityTracking = false; // Optional
         boolean onlyTrackLabelledScreens = false; // Optional
+        boolean installTracking = false; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -163,6 +167,15 @@ public class Tracker {
             this.namespace = namespace;
             this.appId = appId;
             this.context = context;
+        }
+
+        /**
+         * @param willTrack Whether install events will be tracked
+         * @return itself
+         */
+        public TrackerBuilder installTracking(boolean willTrack) {
+            this.installTracking = willTrack;
+            return this;
         }
 
         /**
@@ -388,8 +401,16 @@ public class Tracker {
         this.onlyTrackLabelledScreens = builder.onlyTrackLabelledScreens;
         this.screenState = new ScreenState();
         this.screenContext = builder.screenContext;
+        this.installTracking = builder.installTracking;
 
-        // If session context is True
+        // If install tracking is enabled, check for file and send event with the install tracker
+        if (this.installTracking) {
+            this.installTracker = new InstallTracker(this.context);
+        } else {
+            this.installTracker = null;
+        }
+
+        // When session context is enabled
         if (this.sessionContext) {
             if (sessionCallbacks.length == 4) {
                 this.trackerSession = new Session(
@@ -757,6 +778,11 @@ public class Tracker {
     public boolean getBase64Encoded() {
         return this.base64Encoded;
     }
+
+    /**
+     * @return the install tracking setting of the tracker
+     */
+    public boolean getInstallTracking() { return this.installTracking; }
 
     /**
      * @return the trackers device platform
