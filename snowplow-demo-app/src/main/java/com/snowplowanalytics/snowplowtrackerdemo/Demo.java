@@ -298,6 +298,7 @@ public class Demo extends Activity {
                 .foregroundTimeout(60)
                 .backgroundTimeout(30)
                 .screenviewEvents(true)
+                .applicationContext(true)
                 .build()
         );
     }

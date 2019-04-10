@@ -796,6 +796,13 @@ public class Tracker {
     }
 
     /**
+     * @return the application context setting of the tracker
+     */
+    public boolean getApplicationContext() {
+        return this.applicationContext;
+    }
+
+    /**
      * @return the trackers device platform
      */
     public DevicePlatforms getPlatform() {
