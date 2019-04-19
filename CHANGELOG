@@ -1,3 +1,10 @@
+Version 1.1.0 (2019-04-22)
+--------------------------
+Add instrumented tests to debug coverage (#302)
+Add support for application contexts (#162)
+Add a basic application install event (#299)
+Update screenview events with auto-tracking and add screen contexts (#298)
+
 Version 1.0.1 (2019-02-20)
 --------------------------
 Update documentation link in README.md (#291)
