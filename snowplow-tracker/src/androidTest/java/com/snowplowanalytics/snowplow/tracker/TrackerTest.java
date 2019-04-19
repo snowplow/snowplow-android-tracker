@@ -94,7 +94,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(false, tracker.getBase64Encoded());
         assertNotNull(tracker.getEmitter());
         assertNotNull(tracker.getSubject());
-        assertEquals("andr-1.0.1", tracker.getTrackerVersion());
+        assertEquals("andr-1.1.0", tracker.getTrackerVersion());
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
         assertEquals(false, tracker.getApplicationCrash());
