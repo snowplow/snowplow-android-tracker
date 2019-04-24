@@ -403,7 +403,6 @@ public class Tracker {
         this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
 
-        // If install tracking is enabled, check for file and send event with the install tracker
         if (this.installTracking) {
             this.installTracker = new InstallTracker(this.context);
         } else {
