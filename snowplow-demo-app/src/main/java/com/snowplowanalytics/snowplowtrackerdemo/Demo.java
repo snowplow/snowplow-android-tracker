@@ -29,11 +29,16 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Subject;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.RuleSet;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.RuleSetProvider;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.tracker.InstallTracker;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
@@ -300,9 +305,33 @@ public class Demo extends Activity {
                 .screenviewEvents(true)
                 .screenContext(true)
                 .installTracking(true)
-                .applicationContext(true)
+                .applicationContext(false) // we'll send it as a global context
                 .build()
         );
+
+//        GlobalContext appContext = new ContextGenerator() {
+//            @Override
+//            public SelfDescribingJson generate(TrackerPayload payload, String eventType, String eventSchema) {
+//                return InstallTracker.getApplicationContext(Demo.this);
+//            }
+//        };
+
+//        GlobalContext appContext = new FilterProvider(
+//                new ContextFilter() {
+//                    @Override
+//                    public boolean filter(TrackerPayload payload) {
+//                        return true;
+//                    }
+//                },
+//                InstallTracker.getApplicationContext(Demo.this)
+//        );
+
+        GlobalContext appContext = new RuleSetProvider(
+                new RuleSet("iglu:com.snowplowanalytics.*/*/jsonschema/*-*-*", null),
+                InstallTracker.getApplicationContext(Demo.this)
+        );
+
+        Tracker.instance().addGlobalContext(appContext);
     }
 
     /**

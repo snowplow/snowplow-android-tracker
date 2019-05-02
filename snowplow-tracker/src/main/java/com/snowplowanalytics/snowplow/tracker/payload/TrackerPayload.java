@@ -76,7 +76,7 @@ public class TrackerPayload implements Payload {
         }
     }
 
-    public Map getMap() {
+    public HashMap<String,Object> getMap() {
         return payload;
     }
 

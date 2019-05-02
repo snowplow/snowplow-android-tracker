@@ -19,6 +19,7 @@ import android.content.Context;
 import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextGenerator;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -51,6 +55,7 @@ import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+
 
 /**
  * Builds a Tracker object which is used to
@@ -584,9 +589,8 @@ public class Tracker {
         if (this.subject != null) {
             payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
         }
-
         // Build the final context and add it
-        SelfDescribingJson envelope = getFinalContext(context, eventId);
+        SelfDescribingJson envelope = getFinalContext(payload, context, eventId);
         if (envelope != null) {
             payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
                     Parameters.CONTEXT);
@@ -600,12 +604,14 @@ public class Tracker {
     /**
      * Builds the final event context.
      *
+     * @param payload the tracker payload to be used to evaluate global contexts
      * @param contexts the base event context
      * @param eventId the event id
      * @return the final event context json with
      *         many contexts inside
      */
-    private SelfDescribingJson getFinalContext(List<SelfDescribingJson> contexts, String eventId) {
+    private SelfDescribingJson getFinalContext(TrackerPayload payload,
+                                               List<SelfDescribingJson> contexts, String eventId) {
 
         // Add session context
         if (this.sessionContext && this.trackerSession.getHasLoadedFromFile()) {
@@ -630,6 +636,11 @@ public class Tracker {
         // Add application context
         if (this.applicationContext) {
             contexts.add(InstallTracker.getApplicationContext(this.context));
+        }
+
+        // Add global contexts
+        if (!globalContexts.isEmpty()) {
+            contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
         }
 
         // If there are contexts to nest
@@ -898,4 +909,31 @@ public class Tracker {
                 .build()
         );
     }
+
+    // global contexts
+    private ArrayList<GlobalContext> globalContexts = new ArrayList<>();
+
+    public void clearGlobalContexts() {
+        globalContexts.clear();
+    }
+
+    public void addGlobalContext(GlobalContext context) {
+        globalContexts.add(context);
+    }
+
+    public void addGlobalContexts(List<GlobalContext> contexts) {
+        for (GlobalContext context : contexts) {
+            addGlobalContext(context);
+        }
+    }
+
+    public ArrayList<GlobalContext> getGlobalContexts() {
+        return globalContexts;
+    }
+
+    public void setGlobalContexts(List<GlobalContext> contexts) {
+        clearGlobalContexts();
+        addGlobalContexts(contexts);
+    }
+
 }

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextPrimitive;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
@@ -25,7 +26,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
  * Returns a SelfDescribingJson object which will contain
  * both the Schema and Data.
  */
-public class SelfDescribingJson implements Payload {
+public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final HashMap<String,Object> payload = new HashMap<>();
