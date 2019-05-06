@@ -36,14 +36,15 @@ before_script:
   - echo "y" | android update sdk -a --no-ui --filter android-28
   - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-28
   - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
-  - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
+  - emulator -avd test -no-audio -no-window -gpu swiftshader &
   - chmod +x ./ci/wait_for_emulator
   - ./ci/wait_for_emulator
   - adb shell input keyevent 82 &
 
 script:
   - ./gradlew createDebugCoverageReport coveralls
+  - ./gradlew snowplow-demo-app:assemble
 
 deploy:
   skip_cleanup: true

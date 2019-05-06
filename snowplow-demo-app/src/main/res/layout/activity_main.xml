@@ -33,15 +33,15 @@
 
     <Button
         android:id="@+id/btn_lite"
-        android:layout_height="wrap_content"
-        android:text="@string/main_demo_button"
         android:layout_width="match_parent"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/demo_info"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:text="@string/main_demo_button"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"

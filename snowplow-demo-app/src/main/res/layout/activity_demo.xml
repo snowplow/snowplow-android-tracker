@@ -105,6 +105,7 @@
                 android:text="@string/radio_get" />
 
             <RadioButton
+                android:id="@+id/radio_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_post" />
@@ -132,6 +133,7 @@
                 android:text="@string/radio_http" />
 
             <RadioButton
+                android:id="@+id/radio_https"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_https" />
