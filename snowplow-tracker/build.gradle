@@ -64,6 +64,8 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.cedarsoftware:java-util:1.34.0'
+    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'
     androidTestImplementation 'com.google.android.gms:play-services-analytics:16.0.1'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'
 }

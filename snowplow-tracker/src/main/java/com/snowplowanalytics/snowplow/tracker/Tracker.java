@@ -21,6 +21,7 @@ import android.arch.lifecycle.ProcessLifecycleOwner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import com.cedarsoftware.util.DeepEquals;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextGenerator;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
@@ -936,4 +937,17 @@ public class Tracker {
         addGlobalContexts(contexts);
     }
 
+    public void removeGlobalContexts(List<GlobalContext> contexts) {
+        ArrayList<GlobalContext> copyContexts = new ArrayList<>(globalContexts);
+        for (GlobalContext context: globalContexts) {
+            Iterator itr = copyContexts.iterator();
+            while (itr.hasNext()) {
+                GlobalContext copyContext = (GlobalContext) itr.next();
+                if (DeepEquals.deepEquals(context, copyContext)) {
+                    itr.remove();
+                }
+            }
+        }
+        setGlobalContexts(copyContexts);
+    }
 }

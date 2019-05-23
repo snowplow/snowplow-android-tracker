@@ -2,13 +2,13 @@ package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
 import android.test.AndroidTestCase;
 
+import com.cedarsoftware.util.DeepEquals;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
@@ -222,5 +222,27 @@ public class GlobalContextTest extends AndroidTestCase {
         payload2.add(Parameters.UNSTRUCTURED_ENCODED, encodedPayload);
 
         assertEquals(GlobalContextUtils.getSchema(payload2), "iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1");
+    }
+
+    public void testRemoveGlobalContexts() {
+        TrackerPayload payload1 = new TrackerPayload();
+        payload1.add("payloadKey", "value1");
+        TrackerPayload payload2 = new TrackerPayload();
+        payload2.add("payloadKey", "value1");
+        SelfDescribingJson sdj =
+                new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0",
+                        new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", payload1));
+        SelfDescribingJson sdj2 =
+                new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0",
+                        new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", payload2));
+
+        assertTrue(DeepEquals.deepEquals(sdj, sdj2));
+
+        GlobalContext test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-1");
+        GlobalContext test2 = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-1-1");
+        GlobalContext test3 = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow//mobile_context/jsonschema/1-1-1");
+
+        assertTrue(DeepEquals.deepEquals(test, mobileContext));
+        assertFalse(DeepEquals.deepEquals(test2, mobileContext));
     }
 }
