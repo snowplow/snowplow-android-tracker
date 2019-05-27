@@ -454,6 +454,7 @@ public class Emitter {
             }
         } else {
             Logger.d(TAG, "Event store not instantiated.");
+            isRunning.compareAndSet(true, false);
         }
     }
 
