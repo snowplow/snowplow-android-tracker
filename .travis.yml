@@ -1,12 +1,18 @@
-sudo: required
+# use the Travis Container-Based Infrastructure
+sudo: false
+
 language: android
 jdk: oraclejdk8
 
+cache: false
+dist: trusty
+
 env:
   global:
-    - EMULATOR_API=22
+    - EMULATOR_API=24
     - ANDROID_API=28
     - ANDROID_BUILD_TOOLS=28.0.3
+    - ADB_INSTALL_TIMEOUT=20
     - ANDROID_TRAVIS=1
     - secure: iXVs65+lPjyTr60MsX9K2WpjJ5ijt4cnBE9PT6ouHSjkZjugotaNoX3nXZev8fKFLsH0JPxpsxBVy66jz6iOddMfLdzSiL2oOeeYNxyNThOdGp9R/JmYtivgrMm6v3e1zzCLvj9onOwBUVdWVLD/BXgYi7wP96rJFENlVjuszys=
     - secure: BXwZhWDFFXzdaTAPAvMKeOfnLHxkmdXoeMZ/GtVYkT62JxeuiaTW6Z6rT0gZKAEyxmUBxFX1CP+1m1Gi0cWrQHfTBbFDJO7iKu7mG9LcZhQ8Cm657yt2TBc+fnVqbG5OxXWhSBs1lF1gZJ6+ehEIJn3YjP6fDYv0fNnTGpYHCYo=
@@ -26,23 +32,39 @@ android:
     - addon-google_apis-google-$ANDROID_API # google play services
     - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API
     - sys-img-armeabi-v7a-android-$EMULATOR_API # the fix!
-  
-  licenses:
-    - ".+"
-  before_install:
-    - yes | sdkmanager "platforms;android-28"
+
+licenses:
+  - android-sdk-license-.+
+  - '.+'
+
+before_install: echo 'count=0' > /home/travis/.android/repositories.cfg
+
+install:
+  - sdkmanager --list --verbose || true
+  - yes | sdkmanager "tools"
+  - yes | sdkmanager "platform-tools"
+  - yes | sdkmanager "build-tools;"$ANDROID_BUILD_TOOLS
+  - yes | sdkmanager "platforms;android-"$ANDROID_API
+  - yes | sdkmanager "emulator"
+  - yes | sdkmanager "extras;android;m2repository"
+  - yes | sdkmanager "extras;google;m2repository"
+  - yes | sdkmanager --update
+  - yes | sdkmanager --licenses
+  - sdkmanager --list --verbose || true
 
 before_script:
-  - echo "y" | android update sdk -a --no-ui --filter android-28
-  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-28
-  - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
-  - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - chmod +x ./ci/wait_for_emulator
-  - ./ci/wait_for_emulator
+  - export PATH="$ANDROID_HOME/emulator:$PATH"
+  - sdkmanager "system-images;android-"$EMULATOR_API";default;armeabi-v7a"
+  - echo no | avdmanager -v create avd -f -n test -k "system-images;android-"$EMULATOR_API";default;armeabi-v7a"
+  - avdmanager list
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
 script:
+  # travis builds timeout after 10 min of not seeing any output, hence the below work-around
+  # default travis_wait method doesn't show output until command finishes while this way allows us to see it
+  - (while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &)
   - ./gradlew createDebugCoverageReport coveralls
 
 deploy:

@@ -1,3 +1,10 @@
+Version 1.2.0 (2019-07-01)
+--------------------------
+Add ability to customize timeout for Emitter (#311)
+Set emitter status when event store not instantiated (#306)
+Update Travis setup (#309)
+Add support for global contexts (#307)
+
 Version 1.1.0 (2019-05-06)
 --------------------------
 Add instrumented tests to debug coverage (#302)

@@ -11,19 +11,9 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
 /**
- * RequestSecurity is used to set the protocol used for sending Requests.
- * Either HTTP or HTTPS.
+ * ConditionalContextProvider is either FilterProvider or RuleSetProvider
  */
-public enum RequestSecurity {
-    /**
-     * Events are sent without security.
-     */
-    HTTP,
-    /**
-     * Events are sent with added security.
-     */
-    HTTPS,
-}
+public interface ConditionalContextProvider extends GlobalContext {}

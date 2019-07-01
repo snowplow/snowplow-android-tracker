@@ -11,19 +11,18 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker.contexts.global;
+
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * RequestSecurity is used to set the protocol used for sending Requests.
- * Either HTTP or HTTPS.
+ * ContextGenerator represents a callback which generates an SDJ
  */
-public enum RequestSecurity {
+public interface ContextGenerator extends ContextPrimitive {
+
     /**
-     * Events are sent without security.
+     * A callback function to be executed depending on event payload, event type and schema
      */
-    HTTP,
-    /**
-     * Events are sent with added security.
-     */
-    HTTPS,
+    SelfDescribingJson generate(TrackerPayload payload, String eventType, String eventSchema);
 }

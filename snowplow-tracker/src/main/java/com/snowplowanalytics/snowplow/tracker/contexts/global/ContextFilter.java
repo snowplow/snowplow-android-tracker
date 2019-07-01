@@ -11,19 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.emitter;
+package com.snowplowanalytics.snowplow.tracker.contexts.global;
+
+import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 /**
- * RequestSecurity is used to set the protocol used for sending Requests.
- * Either HTTP or HTTPS.
+ * ContextFilter represents a callback checking an event payload on a user-provided
+ * condition to decide whether a context or a set of contexts should be attached to
+ * the event or not
  */
-public enum RequestSecurity {
-    /**
-     * Events are sent without security.
-     */
-    HTTP,
-    /**
-     * Events are sent with added security.
-     */
-    HTTPS,
+public interface ContextFilter {
+
+    boolean filter(TrackerPayload payload, String eventType, String eventSchema);
 }

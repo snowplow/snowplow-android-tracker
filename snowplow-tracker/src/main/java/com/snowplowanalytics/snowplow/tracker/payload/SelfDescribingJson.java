@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextPrimitive;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
@@ -25,11 +26,12 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
  * Returns a SelfDescribingJson object which will contain
  * both the Schema and Data.
  */
-public class SelfDescribingJson implements Payload {
+public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final HashMap<String,Object> payload = new HashMap<>();
-    
+    private String tag = "";
+
     /**
      * Builds a SelfDescribingJson object
      *
@@ -41,12 +43,28 @@ public class SelfDescribingJson implements Payload {
 
     /**
      * Builds a SelfDescribingJson object
+     */
+    public SelfDescribingJson(String tag, String schema) {
+        this(tag, schema, new HashMap<>());
+    }
+
+    /**
+     * Builds a SelfDescribingJson object
      *
      * @param schema the schema string
      * @param data to nest into the object
      *        as a TrackerPayload
      */
     public SelfDescribingJson(String schema, TrackerPayload data) {
+        setSchema(schema);
+        setData(data);
+    }
+
+    /**
+     * Builds a SelfDescribingJson object
+     */
+    public SelfDescribingJson(String tag, String schema, TrackerPayload data) {
+        setTag(tag);
         setSchema(schema);
         setData(data);
     }
@@ -65,12 +83,30 @@ public class SelfDescribingJson implements Payload {
 
     /**
      * Builds a SelfDescribingJson object
+     */
+    public SelfDescribingJson(String tag, String schema, SelfDescribingJson data) {
+        setTag(tag);
+        setSchema(schema);
+        setData(data);
+    }
+
+    /**
+     * Builds a SelfDescribingJson object
      *
      * @param schema the schema string
      * @param data to nest into the object
      *        as a POJO
      */
     public SelfDescribingJson(String schema, Object data) {
+        setSchema(schema);
+        setData(data);
+    }
+
+    /**
+     * Builds a SelfDescribingJson object
+     */
+    public SelfDescribingJson(String tag, String schema, Object data) {
+        setTag(tag);
         setSchema(schema);
         setData(data);
     }
@@ -86,6 +122,16 @@ public class SelfDescribingJson implements Payload {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
         payload.put(Parameters.SCHEMA, schema);
+        return this;
+    }
+
+    /**
+     * Sets the tag for the SelfDescribingJson
+     * @param tag The identification string for the SelfDescribingJson
+     */
+    public SelfDescribingJson setTag(String tag) {
+        Preconditions.checkNotNull(tag, "tag cannot be null");
+        this.tag = tag;
         return this;
     }
 
@@ -185,5 +231,10 @@ public class SelfDescribingJson implements Payload {
 
     public long getByteSize() {
         return Util.getUTF8Length(toString());
+    }
+
+    @Override
+    public String tag() {
+        return this.tag;
     }
 }
