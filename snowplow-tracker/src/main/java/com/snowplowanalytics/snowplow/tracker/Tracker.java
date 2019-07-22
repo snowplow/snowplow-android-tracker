@@ -15,26 +15,26 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.TargetApi;
 import android.app.Application;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.os.Build;
-import android.arch.lifecycle.ProcessLifecycleOwner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
+import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
+import com.snowplowanalytics.snowplow.tracker.events.PageView;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
@@ -42,18 +42,18 @@ import com.snowplowanalytics.snowplow.tracker.tracker.InstallTracker;
 import com.snowplowanalytics.snowplow.tracker.tracker.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
-import com.snowplowanalytics.snowplow.tracker.events.PageView;
-import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -162,10 +162,10 @@ public class Tracker {
         boolean applicationContext = false; // Optional
 
         /**
-         * @param emitter Emitter to which events will be sent
+         * @param emitter   Emitter to which events will be sent
          * @param namespace Identifier for the Tracker instance
-         * @param appId Application ID
-         * @param context The Android application context
+         * @param appId     Application ID
+         * @param context   The Android application context
          */
         public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
             this.emitter = emitter;
@@ -267,15 +267,14 @@ public class Tracker {
         /**
          * @param foregroundTransitionCallback Called when session transitions to foreground
          * @param backgroundTransitionCallback Called when session transitions to background
-         * @param foregroundTimeoutCallback Called when foregrounded session times-out
-         * @param backgroundTimeoutCallback Called when backgrounded session times-out
+         * @param foregroundTimeoutCallback    Called when foregrounded session times-out
+         * @param backgroundTimeoutCallback    Called when backgrounded session times-out
          * @return itself
          */
         public TrackerBuilder sessionCallbacks(Runnable foregroundTransitionCallback,
                                                Runnable backgroundTransitionCallback,
                                                Runnable foregroundTimeoutCallback,
-                                               Runnable backgroundTimeoutCallback)
-        {
+                                               Runnable backgroundTimeoutCallback) {
             this.sessionCallbacks = new Runnable[]{
                     foregroundTransitionCallback, backgroundTransitionCallback,
                     foregroundTimeoutCallback, backgroundTimeoutCallback
@@ -363,7 +362,7 @@ public class Tracker {
         }
 
         /**
-         * @param activities whether to auto-track screenviews (onStart of activities)
+         * @param activities               whether to auto-track screenviews (onStart of activities)
          * @param onlyTrackLabelledScreens track only activities or fragments that have a Snowplow tag
          * @return itself
          */
@@ -381,7 +380,7 @@ public class Tracker {
          *
          * @return the new Tracker object
          */
-        public Tracker build(){
+        public Tracker build() {
             return init(new Tracker(this));
         }
     }
@@ -501,7 +500,7 @@ public class Tracker {
 
                     // Track each item individually
                     EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-                    for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
+                    for (EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
                         item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
                         addEventPayload(item.getPayload(), item.getContext(), item.getEventId());
                     }
@@ -586,7 +585,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
+            payload.addMap(new HashMap<String, Object>(this.subject.getSubject()));
         }
         // Build the final context and add it
         SelfDescribingJson envelope = getFinalContext(payload, context, eventId);
@@ -603,11 +602,11 @@ public class Tracker {
     /**
      * Builds the final event context.
      *
-     * @param payload the tracker payload to be used to evaluate global contexts
+     * @param payload  the tracker payload to be used to evaluate global contexts
      * @param contexts the base event context
-     * @param eventId the event id
+     * @param eventId  the event id
      * @return the final event context json with
-     *         many contexts inside
+     * many contexts inside
      */
     private SelfDescribingJson getFinalContext(TrackerPayload payload,
                                                List<SelfDescribingJson> contexts, String eventId) {
@@ -639,7 +638,7 @@ public class Tracker {
 
         // Add global contexts
         if (!globalContexts.isEmpty()) {
-            contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
+            contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, getGlobalContexts()));
         }
 
         // If there are contexts to nest
@@ -750,9 +749,12 @@ public class Tracker {
 
     /**
      * Whether the session context should be sent with events
+     *
      * @param shouldSend
      */
-    public void setSessionContext(boolean shouldSend) { this.sessionContext = shouldSend; }
+    public void setSessionContext(boolean shouldSend) {
+        this.sessionContext = shouldSend;
+    }
 
     /**
      * @param platform a valid DevicePlatforms object
@@ -808,7 +810,9 @@ public class Tracker {
     /**
      * @return the install tracking setting of the tracker
      */
-    public boolean getInstallTracking() { return this.installTracking; }
+    public boolean getInstallTracking() {
+        return this.installTracking;
+    }
 
     /**
      * @return the application context setting of the tracker
@@ -848,7 +852,9 @@ public class Tracker {
     /**
      * @return the amount of threads to use
      */
-    public int getThreadCount() { return this.threadCount; }
+    public int getThreadCount() {
+        return this.threadCount;
+    }
 
     /**
      * @return whether application crash tracking is on
@@ -910,14 +916,14 @@ public class Tracker {
     }
 
     // global contexts
-    private ArrayList<GlobalContext> globalContexts = new ArrayList<>();
+    private Map<String, GlobalContext> globalContexts = new HashMap<>();
 
     public void clearGlobalContexts() {
         globalContexts.clear();
     }
 
     public void addGlobalContext(GlobalContext context) {
-        globalContexts.add(context);
+        globalContexts.put(context.tag(), context);
     }
 
     public void addGlobalContexts(List<GlobalContext> contexts) {
@@ -926,13 +932,15 @@ public class Tracker {
         }
     }
 
-    public ArrayList<GlobalContext> getGlobalContexts() {
-        return globalContexts;
+    public Collection<GlobalContext> getGlobalContexts() {
+        return globalContexts.values();
     }
 
     public void setGlobalContexts(List<GlobalContext> contexts) {
         clearGlobalContexts();
-        addGlobalContexts(contexts);
+        for (GlobalContext context : contexts) {
+            addGlobalContext(context);
+        }
     }
 
     public void removeGlobalContexts(List<String> tags) {

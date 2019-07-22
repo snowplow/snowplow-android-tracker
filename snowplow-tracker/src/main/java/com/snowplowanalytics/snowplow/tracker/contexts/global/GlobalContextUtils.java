@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +40,7 @@ public class GlobalContextUtils {
      * @return An ArrayList of SDJs representing global contexts ready to be appended to the event's contexts
      */
     public static synchronized ArrayList<SelfDescribingJson>
-    evalGlobalContexts(TrackerPayload payload, ArrayList<GlobalContext> globalContexts) {
+    evalGlobalContexts(TrackerPayload payload, Collection<GlobalContext> globalContexts) {
 
         ArrayList<SelfDescribingJson> computedGlobalContexts = new ArrayList<>();
 
@@ -245,8 +246,7 @@ public class GlobalContextUtils {
     }
 
     public static synchronized void removeContext(String tag) {
-        ArrayList<GlobalContext> globalContexts = Tracker.instance().getGlobalContexts();
-        Iterator<GlobalContext> it = globalContexts.iterator();
+        Iterator<GlobalContext> it =  Tracker.instance().getGlobalContexts().iterator();
 
         while(it.hasNext()){
             GlobalContext globalContext = it.next();
