@@ -360,7 +360,7 @@ public class Tracker {
          * @return itself
          */
         public TrackerBuilder screenviewEvents(Boolean screenviewEvents) {
-            this.activityTracking = true;
+            this.activityTracking = screenviewEvents;
             return this;
         }
 

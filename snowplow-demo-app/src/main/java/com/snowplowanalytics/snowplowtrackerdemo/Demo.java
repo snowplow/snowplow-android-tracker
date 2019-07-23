@@ -17,6 +17,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
@@ -26,6 +29,8 @@ import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 import android.support.customtabs.CustomTabsIntent;
 import android.net.Uri;
+
+import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Subject;
@@ -39,6 +44,7 @@ import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoIdlingResource;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
@@ -63,6 +69,9 @@ public class Demo extends Activity {
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
+
+    @Nullable
+    private DemoIdlingResource demoIdlingResource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +160,6 @@ public class Demo extends Activity {
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 Emitter e = Tracker.instance().getEmitter();
                 String uri = _uriField.getText().toString();
                 HttpMethod method = _type.getCheckedRadioButtonId() ==
@@ -169,6 +177,9 @@ public class Demo extends Activity {
                     eventsCreated += 14;
                     final String made = "Made: " + eventsCreated;
                     _eventsCreated.setText(made);
+                    if (demoIdlingResource != null) {
+                        demoIdlingResource.setIdleState(false);
+                    }
                     TrackerEvents.trackAll(Tracker.instance());
                 } else {
                     updateLogger("URI field empty!\n");
@@ -246,6 +257,9 @@ public class Demo extends Activity {
                     }
                 } else {
                     _startButton.setText(R.string.start);
+                    if (demoIdlingResource != null) {
+                        demoIdlingResource.setIdleState(true);
+                    }
                 }
             }
         });
@@ -336,5 +350,14 @@ public class Demo extends Activity {
                 updateEventsSent(successCount);
             }
         };
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (demoIdlingResource == null) {
+            demoIdlingResource = new DemoIdlingResource();
+        }
+        return demoIdlingResource;
     }
 }

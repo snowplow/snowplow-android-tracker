@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Utility Class used to send all
@@ -59,8 +60,8 @@ public class TrackerEvents {
     }
 
     private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").timestamp((long) 1433791172).build());
+        tracker.track(ScreenView.builder().name("screenName").id(UUID.randomUUID().toString()).build());
+        tracker.track(ScreenView.builder().name("screenName").id(UUID.randomUUID().toString()).timestamp((long) 1433791172).build());
     }
 
     private static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {

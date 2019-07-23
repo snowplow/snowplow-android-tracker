@@ -15,8 +15,7 @@
         android:textColor="@android:color/white"
         android:textStyle="bold"
         android:background="#0099cc"
-        android:gravity="center"
-        />
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/demo_info"
@@ -33,15 +32,15 @@
 
     <Button
         android:id="@+id/btn_lite"
-        android:layout_height="wrap_content"
-        android:text="@string/main_demo_button"
         android:layout_width="match_parent"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/demo_info"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:text="@string/main_demo_button"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,6 +51,8 @@
         android:textColor="@android:color/black"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:layout_below="@+id/link_repo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -62,6 +63,8 @@
         android:text="@string/link_integration"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:id="@+id/link_integration"
@@ -75,6 +78,8 @@
         android:text="@string/link_setup_guide"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:id="@+id/link_setup_guide"
@@ -88,6 +93,8 @@
         android:text="@string/link_repo"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:id="@+id/link_repo"
@@ -101,6 +108,8 @@
         android:text="@string/link_header"
         android:paddingTop="15dp"
         android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:paddingBottom="5dp"
         android:textSize="18sp"
         android:textStyle="bold"
