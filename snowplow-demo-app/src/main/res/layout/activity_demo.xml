@@ -66,7 +66,10 @@
             android:hint="@string/emitter_uri_hint"
             android:inputType="textUri"
             android:paddingLeft="5dp"
-            android:textSize="13sp" />
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textSize="13sp"
+            android:layout_marginStart="8dp" />
 
     </LinearLayout>
 
@@ -95,7 +98,8 @@
                 android:layout_marginLeft="5dp"
                 android:text="@string/emitter_type_text"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_marginStart="5dp" />
 
             <RadioButton
                 android:id="@+id/radio_get"
@@ -105,6 +109,7 @@
                 android:text="@string/radio_get" />
 
             <RadioButton
+                android:id="@+id/radio_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_post" />
@@ -122,7 +127,8 @@
                 android:layout_marginLeft="5dp"
                 android:text="@string/emitter_protocol_text"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_marginStart="5dp" />
 
             <RadioButton
                 android:id="@+id/radio_http"
@@ -132,6 +138,7 @@
                 android:text="@string/radio_http" />
 
             <RadioButton
+                android:id="@+id/radio_https"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_https" />
@@ -149,7 +156,8 @@
                 android:layout_marginLeft="5dp"
                 android:text="@string/data_collection_text"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_marginStart="5dp" />
 
             <RadioButton
                 android:id="@+id/radio_data_on"
@@ -202,6 +210,8 @@
             android:gravity="bottom"
             android:maxLines="200"
             android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:paddingTop="5dp"
             android:scrollbars="vertical"
             android:textColor="@android:color/white" />
@@ -211,14 +221,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/log_output"
+            android:layout_toEndOf="@+id/log_output"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/emitter_statistics"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
@@ -228,12 +239,9 @@
                 android:id="@+id/created_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_alignTop="@+id/log_output"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/created_events"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -242,13 +250,9 @@
                 android:id="@+id/sent_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_below="@+id/created_events"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
-                android:autoText="true"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/sent_events"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -257,13 +261,9 @@
                 android:id="@+id/online_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_below="@+id/sent_events"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
-                android:autoText="true"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/online_status"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -272,13 +272,9 @@
                 android:id="@+id/emitter_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_below="@+id/online_status"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
-                android:autoText="true"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/emitter_status"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -287,13 +283,9 @@
                 android:id="@+id/database_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_below="@+id/emitter_status"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
-                android:autoText="true"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/database_size"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -302,13 +294,9 @@
                 android:id="@+id/session_index"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="false"
-                android:layout_below="@+id/database_size"
-                android:layout_toEndOf="@+id/log_output"
-                android:layout_toRightOf="@+id/log_output"
-                android:autoText="true"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="@string/session_index"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
@@ -323,14 +311,13 @@
         android:layout_alignStart="@+id/header"
         android:layout_below="@+id/radio_groups"
         android:layout_centerVertical="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_alignLeft="@+id/header">
 
         <Button
             android:id="@+id/btn_lite_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/start"

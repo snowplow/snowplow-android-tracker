@@ -72,7 +72,7 @@ android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         title = "Documentation for snowplow-android-core $version API"
         description "Generates Javadoc for $variant.name."
-        source = variant.javaCompiler.source
+        source = variant.getJavaCompileProvider().get().source
         ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
         doFirst { classpath = files(variant.javaCompiler.classpath.files) + files(ext.androidJar) }
         options.links("http://docs.oracle.com/javase/7/docs/api/");

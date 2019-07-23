@@ -16,6 +16,7 @@ env:
     - ANDROID_TRAVIS=1
     - secure: iXVs65+lPjyTr60MsX9K2WpjJ5ijt4cnBE9PT6ouHSjkZjugotaNoX3nXZev8fKFLsH0JPxpsxBVy66jz6iOddMfLdzSiL2oOeeYNxyNThOdGp9R/JmYtivgrMm6v3e1zzCLvj9onOwBUVdWVLD/BXgYi7wP96rJFENlVjuszys=
     - secure: BXwZhWDFFXzdaTAPAvMKeOfnLHxkmdXoeMZ/GtVYkT62JxeuiaTW6Z6rT0gZKAEyxmUBxFX1CP+1m1Gi0cWrQHfTBbFDJO7iKu7mG9LcZhQ8Cm657yt2TBc+fnVqbG5OxXWhSBs1lF1gZJ6+ehEIJn3YjP6fDYv0fNnTGpYHCYo=
+    - secure: G4ylgymVEE7+/bPwWvI7fT56tiBEtDqP9UYkdrvpNdzNAJq2/A60MIgh9c25JtJVIbDfZccZeJfX8eCviid4mg1hwNiVUmpODbwuLCjTEEuEmL4T7JXJKfhyc7jRcwO4i+iMf2lJyxhuxrYUXLnoe1Ih4XKGGk8RNZtO22ko0qQ=
 
 android:
   components:
@@ -25,16 +26,21 @@ licenses:
   - android-sdk-license-.+
   - '.+'
 
-before_install: echo 'count=0' > /home/travis/.android/repositories.cfg
+before_install:
+  - echo 'count=0' > /home/travis/.android/repositories.cfg
 
 install:
   - yes | sdkmanager "tools"
+#  - docker pull snowplow/snowplow-micro:0.1.0
+#  - wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+#  - unzip ./ngrok-stable-linux-amd64.zip
 
 before_script:
   - export PATH="$ANDROID_HOME/emulator:$PATH"
+  - export MICRO_SUBDOMAIN=$RANDOM$RANDOM
   - sdkmanager "system-images;android-"$EMULATOR_API";default;armeabi-v7a"
   - echo no | avdmanager -v create avd -f -n test -k "system-images;android-"$EMULATOR_API";default;armeabi-v7a"
-  - avdmanager list
+  - avdmanager list avd
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
@@ -43,6 +49,10 @@ script:
   # travis builds timeout after 10 min of not seeing any output, hence the below work-around
   # default travis_wait method doesn't show output until command finishes while this way allows us to see it
   - (while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &)
+#  - docker run -d --mount type=bind,source=$TRAVIS_BUILD_DIR/micro_config,destination=/config -p 9090:9090 snowplow/snowplow-micro:0.1.0 --collector-config /config/micro.conf --iglu /config/iglu.json
+#  - docker ps -a
+#  - echo $MICRO_SUBDOMAIN
+#  - ./ngrok http -authtoken $NGROK_AUTH -subdomain $MICRO_SUBDOMAIN -log=stdout 9090 > /dev/null &
   - ./gradlew createDebugCoverageReport coveralls
 
 deploy:
@@ -51,3 +61,8 @@ deploy:
   script: ./.travis/deploy.sh $TRAVIS_TAG
   on:
     tags: true
+
+addons:
+  apt:
+    packages:
+      - docker-ce
