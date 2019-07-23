@@ -18,7 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.MOBILE_SCHEMA;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_APPLICATION;
 import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_APPLICATION_INSTALL;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SESSION_SCHEMA;
 
 public class GlobalContextTest extends AndroidTestCase {
 
@@ -91,7 +94,10 @@ public class GlobalContextTest extends AndroidTestCase {
     }
 
     public void testClearGlobalContexts() {
-        tracker.addGlobalContexts(Arrays.asList(mobileContext, appContext));
+        HashMap<String, GlobalContext> map = new HashMap<>();
+        map.put(MOBILE_SCHEMA, mobileContext);
+        map.put(SCHEMA_APPLICATION, appContext);
+        tracker.addGlobalContexts(map);
         assertEquals(tracker.getGlobalContexts().size(), 2);
         tracker.clearGlobalContexts();
         assertEquals(tracker.getGlobalContexts().size(), 0);
@@ -238,8 +244,8 @@ public class GlobalContextTest extends AndroidTestCase {
     }
 
     public void testRemoveContext() {
-
         tracker.addGlobalContext(
+                MOBILE_SCHEMA,
                 new RuleSetProvider(
                         "ruleSetExample",
                         new RuleSet("iglu:com.snowplowanalytics.*/*/jsonschema/*-*-*", null),
@@ -249,10 +255,11 @@ public class GlobalContextTest extends AndroidTestCase {
 
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
+        String testSDJKey = "sdjExample";
         SelfDescribingJson testSDJ = new SelfDescribingJson("sdjExample", "iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
-        tracker.addGlobalContext(testSDJ);
+        tracker.addGlobalContext(testSDJKey, testSDJ);
 
-        tracker.addGlobalContext(
+        tracker.addGlobalContext(SCHEMA_APPLICATION_INSTALL,
                 new ContextGenerator() {
                     @Override
                     public SelfDescribingJson generate(TrackerPayload payload, String eventType, String eventSchema) {
@@ -268,11 +275,11 @@ public class GlobalContextTest extends AndroidTestCase {
 
         assertEquals(tracker.getGlobalContexts().size(), 3);
 
-        tracker.removeGlobalContext("ruleSetExample");
+        tracker.removeGlobalContext(MOBILE_SCHEMA);
 
         assertEquals(tracker.getGlobalContexts().size(), 2);
 
-        tracker.removeGlobalContexts(Arrays.asList("testCtx", "sdjExample"));
+        tracker.removeGlobalContexts(Arrays.asList(testSDJKey, SCHEMA_APPLICATION_INSTALL));
 
         assertEquals(tracker.getGlobalContexts().size(), 0);
     }

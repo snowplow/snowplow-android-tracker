@@ -55,6 +55,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.GEOLOCATION_SCHEMA;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.MOBILE_SCHEMA;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_APPLICATION;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_SCREEN;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SESSION_SCHEMA;
+
 
 /**
  * Builds a Tracker object which is used to
@@ -613,27 +619,27 @@ public class Tracker {
 
         // Add session context
         if (this.sessionContext && this.trackerSession.getHasLoadedFromFile()) {
-            addGlobalContext(this.trackerSession.getSessionContext(eventId));
+            addGlobalContext(SESSION_SCHEMA, this.trackerSession.getSessionContext(eventId));
         }
 
         // Add Geo-Location Context
         if (this.geoLocationContext) {
-            addGlobalContext(Util.getGeoLocationContext(this.context));
+            addGlobalContext(GEOLOCATION_SCHEMA, Util.getGeoLocationContext(this.context));
         }
 
         // Add Mobile Context
         if (this.mobileContext) {
-            addGlobalContext(Util.getMobileContext(this.context));
+            addGlobalContext(MOBILE_SCHEMA, Util.getMobileContext(this.context));
         }
 
         // Add screen context
         if (this.screenContext) {
-            addGlobalContext(screenState.getCurrentScreen(true));
+            addGlobalContext(SCHEMA_SCREEN, screenState.getCurrentScreen(true));
         }
 
         // Add application context
         if (this.applicationContext) {
-            addGlobalContext(InstallTracker.getApplicationContext(this.context));
+            addGlobalContext(SCHEMA_APPLICATION, InstallTracker.getApplicationContext(this.context));
         }
 
         // Add global contexts
@@ -922,13 +928,13 @@ public class Tracker {
         globalContexts.clear();
     }
 
-    public void addGlobalContext(GlobalContext context) {
-        globalContexts.put(context.tag(), context);
+    public void addGlobalContext(String key, GlobalContext context) {
+        globalContexts.put(key, context);
     }
 
-    public void addGlobalContexts(List<GlobalContext> contexts) {
-        for (GlobalContext context : contexts) {
-            addGlobalContext(context);
+    public void addGlobalContexts(Map<String, GlobalContext> contexts) {
+        for (String key : contexts.keySet()) {
+            addGlobalContext(key, contexts.get(key));
         }
     }
 
@@ -936,18 +942,16 @@ public class Tracker {
         return globalContexts.values();
     }
 
-    public void setGlobalContexts(List<GlobalContext> contexts) {
+    public void setGlobalContexts(Map<String, GlobalContext> contexts) {
         clearGlobalContexts();
-        for (GlobalContext context : contexts) {
-            addGlobalContext(context);
-        }
+        addGlobalContexts(contexts);
     }
 
-    public void removeGlobalContexts(List<String> tags) {
-        GlobalContextUtils.removeContexts(tags);
+    public void removeGlobalContexts(List<String> keys) {
+        GlobalContextUtils.removeContexts(keys);
     }
 
-    public void removeGlobalContext(String tag) {
-        GlobalContextUtils.removeContext(tag);
+    public void removeGlobalContext(String key) {
+        GlobalContextUtils.removeContext(key);
     }
 }

@@ -246,14 +246,7 @@ public class GlobalContextUtils {
     }
 
     public static synchronized void removeContext(String tag) {
-        Iterator<GlobalContext> it =  Tracker.instance().getGlobalContexts().iterator();
-
-        while(it.hasNext()){
-            GlobalContext globalContext = it.next();
-            if (globalContext.tag().equals(tag)) {
-                it.remove();
-            }
-        }
+        Tracker.instance().getGlobalContexts().remove(tag);
     }
 
     public static synchronized void removeContexts(List<String> tags) {
