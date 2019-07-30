@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
 import android.util.Base64;
 
-import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -26,7 +25,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -38,8 +36,8 @@ public class GlobalContextUtils {
      * Re-evaluates global contexts for the provided payload
      * @return An ArrayList of SDJs representing global contexts ready to be appended to the event's contexts
      */
-    public static synchronized ArrayList<SelfDescribingJson>
-    evalGlobalContexts(TrackerPayload payload, ArrayList<GlobalContext> globalContexts) {
+    public static ArrayList<SelfDescribingJson>
+    evalGlobalContexts(TrackerPayload payload, List<GlobalContext> globalContexts) {
 
         ArrayList<SelfDescribingJson> computedGlobalContexts = new ArrayList<>();
 
@@ -241,24 +239,6 @@ public class GlobalContextUtils {
             }
         } catch (Exception e) {
             return "";
-        }
-    }
-
-    public static synchronized void removeContext(String tag) {
-        ArrayList<GlobalContext> globalContexts = Tracker.instance().getGlobalContexts();
-        Iterator<GlobalContext> it = globalContexts.iterator();
-
-        while(it.hasNext()){
-            GlobalContext globalContext = it.next();
-            if (globalContext.tag().equals(tag)) {
-                it.remove();
-            }
-        }
-    }
-
-    public static synchronized void removeContexts(List<String> tags) {
-        for (String tag: tags) {
-            removeContext(tag);
         }
     }
 }

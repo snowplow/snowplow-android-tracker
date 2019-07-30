@@ -29,17 +29,24 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Subject;
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
+import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
 
 /**
  * Classic Demo Activity.
@@ -300,9 +307,14 @@ public class Demo extends Activity {
                 .screenviewEvents(true)
                 .screenContext(true)
                 .installTracking(true)
-                .applicationContext(true)
+                .applicationContext(false)
                 .build()
         );
+
+        Map<String, Object> pairs = new HashMap<>();
+        addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
+        addToMap(Parameters.APP_BUILD, "3", pairs);
+        Tracker.instance().addGlobalContext(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs));
     }
 
     /**
