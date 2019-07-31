@@ -20,7 +20,9 @@ import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -614,32 +616,34 @@ public class Tracker {
 
         // Add session context
         if (this.sessionContext && this.trackerSession.getHasLoadedFromFile()) {
-            addGlobalContext(this.trackerSession.getSessionContext(eventId));
+            contexts.add(this.trackerSession.getSessionContext(eventId));
         }
 
         // Add Geo-Location Context
         if (this.geoLocationContext) {
-            addGlobalContext(Util.getGeoLocationContext(this.context));
+            contexts.add(Util.getGeoLocationContext(this.context));
         }
 
         // Add Mobile Context
         if (this.mobileContext) {
-            addGlobalContext(Util.getMobileContext(this.context));
+            contexts.add(Util.getMobileContext(this.context));
         }
 
         // Add screen context
         if (this.screenContext) {
-            addGlobalContext(screenState.getCurrentScreen(true));
+            contexts.add(screenState.getCurrentScreen(true));
         }
 
         // Add application context
         if (this.applicationContext) {
-            addGlobalContext(InstallTracker.getApplicationContext(this.context));
+            contexts.add(InstallTracker.getApplicationContext(this.context));
         }
 
         // Add global contexts
-        if (!globalContexts.isEmpty()) {
-            contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
+        synchronized (globalContexts) {
+            if (!globalContexts.isEmpty()) {
+                contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
+            }
         }
 
         // If there are contexts to nest
@@ -910,7 +914,7 @@ public class Tracker {
     }
 
     // global contexts
-    private ArrayList<GlobalContext> globalContexts = new ArrayList<>();
+    private final List<GlobalContext> globalContexts = Collections.synchronizedList(new ArrayList<GlobalContext>());
 
     public void clearGlobalContexts() {
         globalContexts.clear();
@@ -927,7 +931,7 @@ public class Tracker {
     }
 
     public ArrayList<GlobalContext> getGlobalContexts() {
-        return globalContexts;
+        return new ArrayList<>(globalContexts);
     }
 
     public void setGlobalContexts(List<GlobalContext> contexts) {
@@ -936,10 +940,21 @@ public class Tracker {
     }
 
     public void removeGlobalContexts(List<String> tags) {
-        GlobalContextUtils.removeContexts(tags);
+        for (String tag: tags) {
+            removeGlobalContext(tag);
+        }
     }
 
     public void removeGlobalContext(String tag) {
-        GlobalContextUtils.removeContext(tag);
+        synchronized (globalContexts) {
+            Iterator<GlobalContext> it = globalContexts.iterator();
+
+            while(it.hasNext()){
+                GlobalContext globalContext = it.next();
+                if (globalContext.tag().equals(tag)) {
+                    it.remove();
+                }
+            }
+        }
     }
 }

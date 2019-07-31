@@ -1,3 +1,7 @@
+Version 1.2.1 (2019-07-31)
+--------------------------
+Fix sending duplicate contexts (#314)
+
 Version 1.2.0 (2019-07-01)
 --------------------------
 Add ability to customize timeout for Emitter (#311)
