@@ -402,14 +402,19 @@ public class Util {
      * - If called from the UI Thread will throw an Exception
      *
      * @param context the android context
-     * @return the advertising id or null
+     * @return an empty string if limited tracking is on otherwise the advertising id or null
      */
     public static String getAndroidIdfa(Context context) {
         try {
-            Object AdvertisingInfoObject = invokeStaticMethod(
+            Object advertisingInfoObject = invokeStaticMethod(
                     "com.google.android.gms.ads.identifier.AdvertisingIdClient",
                     "getAdvertisingIdInfo", new Class[]{Context.class}, context);
-            return (String) invokeInstanceMethod(AdvertisingInfoObject, "getId", null);
+            Boolean limitedTracking = (Boolean) invokeInstanceMethod(advertisingInfoObject,
+                    "isLimitAdTrackingEnabled", null);
+            if (limitedTracking) {
+                return "";
+            }
+            return (String) invokeInstanceMethod(advertisingInfoObject, "getId", null);
         }
         catch (Exception e) {
             Logger.e(TAG, "Exception getting the Advertising ID: %s", e.toString());
