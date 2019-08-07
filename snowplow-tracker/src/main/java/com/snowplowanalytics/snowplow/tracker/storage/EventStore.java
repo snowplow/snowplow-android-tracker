@@ -175,20 +175,27 @@ public class EventStore {
     private List<Map<String, Object>> queryDatabase(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
         if (isDatabaseOpen()) {
-            Cursor cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query,
-                    null, null, null, orderBy);
 
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                Map<String, Object> eventMetadata = new HashMap<>();
-                eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
-                eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
-                        Util.deserializer(cursor.getBlob(1)));
-                eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED, cursor.getString(2));
-                cursor.moveToNext();
-                res.add(eventMetadata);
+            Cursor cursor = null;
+
+            try {
+                cursor = database.query(EventStoreHelper.TABLE_EVENTS, allColumns, query, null, null, null, orderBy);
+
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    Map<String, Object> eventMetadata = new HashMap<>();
+                    eventMetadata.put(EventStoreHelper.METADATA_ID, cursor.getLong(0));
+                    eventMetadata.put(EventStoreHelper.METADATA_EVENT_DATA,
+                            Util.deserializer(cursor.getBlob(1)));
+                    eventMetadata.put(EventStoreHelper.METADATA_DATE_CREATED, cursor.getString(2));
+                    cursor.moveToNext();
+                    res.add(eventMetadata);
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
-            cursor.close();
         }
         return res;
     }
