@@ -40,11 +40,12 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_APPLICATION;
+import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_GDPR;
 import static com.snowplowanalytics.snowplowtrackerdemo.BuildConfig.MICRO_ENDPOINT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Ignore("Automation isn't completed yet, see #328 at github repo.")
+@Ignore("Automation isn't completed yet, comment this line when it is run locally, see #328 at github repo.")
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -152,6 +153,15 @@ public class UITest {
                     String version = data.get("version").getAsString();
                     assertEquals(build, "3");
                     assertEquals(version, "0.3.0");
+                } else if (schema.equals(SCHEMA_GDPR)) {
+                    String documentDescription = data.get("documentDescription").getAsString();
+                    String basisForProcessing = data.get("basisForProcessing").getAsString();
+                    String documentId = data.get("documentId").getAsString();
+                    String documentVersion = data.get("documentVersion").getAsString();
+                    assertEquals(documentDescription, "this is a demo document description");
+                    assertEquals(basisForProcessing, "consent");
+                    assertEquals(documentId, "someId");
+                    assertEquals(documentVersion, "0.1.0");
                 }
             }
         }

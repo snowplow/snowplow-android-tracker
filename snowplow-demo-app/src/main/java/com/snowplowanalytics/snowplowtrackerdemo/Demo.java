@@ -315,6 +315,7 @@ public class Demo extends Activity {
         addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
         addToMap(Parameters.APP_BUILD, "3", pairs);
         Tracker.instance().addGlobalContext(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs));
+        Tracker.instance().enableGDPRContext(Util.BASIS.CONSENT, "someId", "0.1.0", "this is a demo document description");
     }
 
     /**

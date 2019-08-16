@@ -39,13 +39,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -480,6 +480,26 @@ public class Util {
             Logger.e(TAG, "Security exception getting NetworkInfo: %s", e.toString());
         }
         return ni;
+    }
+
+    // gdpr context
+
+    public enum BASIS {
+        CONSENT,
+        CONTRACT,
+        LEGAL_OBLIGATION,
+        VITAL_INTERESTS,
+        PUBLIC_TASK,
+        LEGITIMATE_INTERESTS
+    }
+
+    public static SelfDescribingJson getGDPRContext(String basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+        Map<String, Object> gdprPairs = new HashMap<>();
+        gdprPairs.put("basisForProcessing", basisForProcessing);
+        gdprPairs.put("documentId", documentId);
+        gdprPairs.put("documentVersion", documentVersion);
+        gdprPairs.put("documentDescription", documentDescription);
+        return new SelfDescribingJson(TrackerConstants.SCHEMA_GDPR, gdprPairs);
     }
 
     // --- Context Helpers

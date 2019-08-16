@@ -20,6 +20,7 @@ import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,6 +57,7 @@ import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.utils.Util.BASIS;
 
 
 /**
@@ -639,6 +641,11 @@ public class Tracker {
             contexts.add(InstallTracker.getApplicationContext(this.context));
         }
 
+        // Add gdpr context
+        if (this.gdprContext) {
+            contexts.add(Util.getGDPRContext(this.basisForProcessing, this.documentId, this.documentVersion, this.documentDescription));
+        }
+
         // Add global contexts
         synchronized (globalContexts) {
             if (!globalContexts.isEmpty()) {
@@ -956,5 +963,28 @@ public class Tracker {
                 }
             }
         }
+    }
+
+    // gdpr context
+    private boolean gdprContext = false;
+    private String basisForProcessing;
+    private String documentId;
+    private String documentVersion;
+    private String documentDescription;
+
+    /**
+     * Enables gdpr context to be sent with every event
+     */
+    public void enableGDPRContext(BASIS basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+        String basis = basisForProcessing.toString().toLowerCase();
+        this.basisForProcessing = basis;
+        this.documentId = documentId;
+        this.documentVersion = documentVersion;
+        this.documentDescription = documentDescription;
+        this.gdprContext = true;
+    }
+
+    public void disableGDPRContext() {
+        this.gdprContext = false;
     }
 }
