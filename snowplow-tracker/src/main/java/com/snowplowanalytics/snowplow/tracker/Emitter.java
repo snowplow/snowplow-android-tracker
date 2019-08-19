@@ -80,6 +80,7 @@ public class Emitter {
     private long byteLimitPost;
     private int emitTimeout;
     private TimeUnit timeUnit;
+    private String customPostPath;
 
     private EventStore eventStore;
     private Future eventStoreFuture;
@@ -107,6 +108,7 @@ public class Emitter {
         private int emitTimeout = 5; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
         OkHttpClient client = null; //Optional
+        String customPostPath = null; //Optional
 
         /**
          * @param uri The uri of the collector
@@ -250,6 +252,15 @@ public class Emitter {
         }
 
         /**
+         * @param customPostPath A custom path that is used on the endpoint to send requests.
+         * @return itself
+         */
+        public EmitterBuilder customPostPath(String customPostPath) {
+            this.customPostPath = customPostPath;
+            return this;
+        }
+
+        /**
          * Creates a new Emitter
          *
          * @return a new Emitter object
@@ -280,6 +291,7 @@ public class Emitter {
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
         this.eventStore = null;
+        this.customPostPath = builder.customPostPath;
         this.eventStoreFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
             public Void call() {
@@ -322,8 +334,13 @@ public class Emitter {
             uriBuilder.appendPath("i");
         }
         else {
-            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
+            if (this.customPostPath != null) {
+                uriBuilder.appendEncodedPath(this.customPostPath);
+            }
+            else {
+                uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
                     TrackerConstants.PROTOCOL_VERSION);
+            }
         }
     }
 
@@ -879,6 +896,13 @@ public class Emitter {
      */
     public long getByteLimitPost() {
         return this.byteLimitPost;
+    }
+
+    /**
+     * @return the customPath
+     */
+    public String getCustomPath() {
+        return this.customPostPath;
     }
 
     /**

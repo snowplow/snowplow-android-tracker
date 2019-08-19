@@ -173,6 +173,23 @@ public class EmitterTest extends AndroidTestCase {
 
         emitter.shutdown();
 
+        Emitter customPathEmitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
+                .option(BufferOption.Single)
+                .method(HttpMethod.POST)
+                .security(RequestSecurity.HTTP)
+                .tick(250)
+                .emptyLimit(5)
+                .sendLimit(200)
+                .byteLimitGet(20000)
+                .byteLimitPost(25000)
+                .timeUnit(TimeUnit.MILLISECONDS)
+                .customPostPath("com.acme.company/tpx")
+                .build();
+        assertEquals("com.acme.company/tpx", customPathEmitter.getCustomPath());
+        assertEquals("http://" + getMockServerURI(mockServer) + "/com.acme.company/tpx", customPathEmitter.getEmitterUri());
+
+        customPathEmitter.shutdown();
+
         mockServer.shutdown();
     }
 
@@ -201,12 +218,12 @@ public class EmitterTest extends AndroidTestCase {
 
         return payload;
     }
-   
+
     public void testEmitSingleGetEvent() throws InterruptedException, IOException {
         MockWebServer mockServer = getMockServer();
         EmittableEvents emittableEvents = getEmittableEvents(mockServer, 1);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-       
+
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
         assertEquals(1, result.size());
         assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
