@@ -1,3 +1,12 @@
+Version 1.3.0 (2019-08-19)
+--------------------------
+Add support for GDPR context (#312)
+Fix database cursor usage (#330)
+Comply with isLimitAdTrackingEnabled (#329)
+Integrate Snowplow Micro (#318)
+Trim travis setup (#324)
+Remove vagrant setup (#317)
+
 Version 1.2.1 (2019-07-31)
 --------------------------
 Fix sending duplicate contexts (#314)

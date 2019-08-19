@@ -4,52 +4,47 @@
 
 ## Overview
 
-Add analytics to your Java software with the **[Snowplow][snowplow]** event tracker for **[Android][snowplow]**. See also: **[Snowplow Java Tracker][snowplow-java-tracker]**.
+Add analytics to your Java software with the **[Snowplow][snowplow]** event tracker for **[Android][android]**. See also: **[Snowplow Java Tracker][snowplow-java-tracker]**.
 
-With this tracker you can collect event data from your Android-based applications, games or frameworks.
+With this tracker you can collect event data from your Android applications, games or frameworks.
 
 ## Quickstart
 
 ### Building
 
-Assuming git, **[Vagrant][vagrant-install]** and **[VirtualBox][virtualbox-install]** installed:
+Assuming git is installed, clone the project.
 
 ```bash
- host$ git clone https://github.com/snowplow/snowplow-android-tracker.git
- host$ cd snowplow-android-tracker
- host$ vagrant up && vagrant ssh
-guest$ cd /vagrant
-guest$ ./gradlew clean build
+$ git clone https://github.com/snowplow/snowplow-android-tracker.git
 ```
+
+Then open the project in Android Studio and finish the setup.
 
 ### Testing
 
-Continuing from the instructions above:
+1. Tests require a device, whether emulator-based or a real one.
+
+2. We need to run [Snowplow Micro][micro] before running trackers' tests. Micro will provide an endpoint that our tests will interact with.
+
+3. Assuming Micro is running on `localhost:9090`, we need to make this endpoint publicly available. An option could be using an ssh-based service, `serveo`. Feel free to use any other tool serving the same purpose, like `ngrok`. The following is an example for `serveo`.
 
 ```bash
-guest$ echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
-guest$ emulator -avd test -no-skin -no-audio -no-window &
-guest$ ./ci/wait_for_emulator ## Note: This line can take quite a few minutes to execute
-guest$ adb shell input keyevent 82 &
-guest$ ./gradlew connectedCheck
+ssh -R 80:localhost:9090 serveo.net
+```
+which should print something similar to
+```
+Forwarding HTTP traffic from https://micro.serveo.net
 ```
 
-### Setting up a testing endpoint
-
-You can now also setup a testing endpoint to send events to a local server using the combination of Ngrok and Mountebank.
-
-```bash
-guest$ cd /vagrant
-guest$ chmod +x ./testing/setup.bash
-guest$ ./testing/setup.bash ## Will launch Mountebank and Ngrok in the background
+4. Copy the url without the scheme, `micro.serveo.net` in the example above, and insert a line to `local.properties` file as following:
+```
+microSubdomain=micro.serveo.net
 ```
 
-Then go to any browser in your host machine and type:
-
-- `http://localhost:4040/` - Ngrok Web Interface
-- `http://localhost:2525/` - Mountebank Web Interface
-
-In the Ngrok interface take note of the `tunnel` URL, this is what you will use to send events.
+5. Use Android Studio's capabilities to run tests or use `gradlew` CLI tool. e.g. At the root of the repository, run
+```
+./gradlew connectedCheck
+```
 
 ## Find out more
 
@@ -62,7 +57,7 @@ Older documentation can be found [here][techdocs-old].
 
 ## Copyright and license
 
-The Snowplow Android Tracker is copyright 2015-2018 Snowplow Analytics Ltd.
+The Snowplow Android Tracker is copyright 2015-2019 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
@@ -78,24 +73,23 @@ limitations under the License.
 [snowplow]: http://snowplowanalytics.com
 [snowplow-java-tracker]: https://github.com/snowplow/snowplow-java-tracker
 
-[vagrant-install]: http://docs.vagrantup.com/v2/installation/index.html
-[virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
+[micro]: https://github.com/snowplow-incubator/snowplow-micro
 
 [techdocs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
 [quick-start-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.0.0/
+[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.2.1/
 [techdocs-old]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
-[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.0.0/android-tracker/#quick-start
+[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.2.1/android-tracker/#quick-start
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
 
 [travis]: https://travis-ci.org/snowplow/snowplow-android-tracker
 [travis-image]: https://travis-ci.org/snowplow/snowplow-android-tracker.svg?branch=master
 
-[release-image]: http://img.shields.io/badge/release-1.2.1-blue.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-1.3.0-blue.svg?style=flat
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
