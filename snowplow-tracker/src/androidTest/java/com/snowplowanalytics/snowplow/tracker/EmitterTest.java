@@ -185,7 +185,7 @@ public class EmitterTest extends AndroidTestCase {
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .customPostPath("com.acme.company/tpx")
                 .build();
-        assertEquals("com.acme.company/tpx", customPathEmitter.getCustomPath());
+        assertEquals("com.acme.company/tpx", customPathEmitter.getCustomPostPath());
         assertEquals("http://" + getMockServerURI(mockServer) + "/com.acme.company/tpx", customPathEmitter.getEmitterUri());
 
         customPathEmitter.shutdown();
