@@ -899,7 +899,7 @@ public class Emitter {
     }
 
     /**
-     * @return the customPath
+     * @return the customPostPath
      */
     public String getCustomPostPath() {
         return this.customPostPath;
