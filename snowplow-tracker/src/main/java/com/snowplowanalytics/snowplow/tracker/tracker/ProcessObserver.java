@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();
-    private static boolean isInBackground = false;
+    private static boolean isInBackground = true;
     private static AtomicInteger foregroundIndex = new AtomicInteger(0);
     private static AtomicInteger backgroundIndex = new AtomicInteger(0);
     private static boolean isHandlerPaused = false;
