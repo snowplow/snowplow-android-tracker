@@ -26,6 +26,7 @@ public class ScreenState {
 
     public ScreenState() {
         this.generateNewId();
+        this.name = this.getAutomaticName();
     }
 
     public ScreenState(String name, String type, String transitionType) {
