@@ -80,16 +80,16 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.1/
+[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.2/
 [techdocs-old]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
-[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.1/android-tracker/#quick-start
+[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.2/android-tracker/#quick-start
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
 
 [travis]: https://travis-ci.org/snowplow/snowplow-android-tracker
 [travis-image]: https://travis-ci.org/snowplow/snowplow-android-tracker.svg?branch=master
 
-[release-image]: http://img.shields.io/badge/release-1.3.1-blue.svg?style=flat
+[release-image]: http://img.shields.io/badge/release-1.3.2-blue.svg?style=flat
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
