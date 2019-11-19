@@ -18,6 +18,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -453,8 +454,10 @@ public class Tracker {
         // If lifecycleEvents is True
         if ((this.lifecycleEvents || this.sessionContext) &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            // oddly adding this observer loads a file - needs to be called off main thread
-            Executor.execute(new Runnable() {
+
+            // addObserver must execute on the mainThread
+            Handler mainHandler = new Handler(context.getMainLooper());
+            mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
