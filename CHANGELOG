@@ -1,3 +1,7 @@
+Version 1.3.3 (2019-11-26)
+--------------------------
+Fix crash when lifecycleEvents is enabled on Tracker initialisation (#339)
+
 Version 1.3.2 (2019-10-15)
 --------------------------
 Fix ScreenState incompatibility with Screen schema (#336)
