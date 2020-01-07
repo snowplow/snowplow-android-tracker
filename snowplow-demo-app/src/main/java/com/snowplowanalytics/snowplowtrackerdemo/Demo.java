@@ -42,6 +42,7 @@ import androidx.preference.PreferenceManager;
 import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.ErrorLogging;
 import com.snowplowanalytics.snowplow.tracker.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -77,6 +78,8 @@ public class Demo extends Activity {
     private RadioButton _radioGet, _radioHttp;
     private TextView _logOutput, _eventsCreated, _eventsSent, _emitterOnline, _emitterStatus,
             _databaseSize, _sessionIndex;
+
+    private ErrorLogging errorLogger;
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
@@ -356,6 +359,8 @@ public class Demo extends Activity {
     private void initAndroidTracker() {
         Tracker.close();
 
+        errorLogger = new ErrorLogger();
+
         Emitter emitter = new Emitter.EmitterBuilder("", this.getApplicationContext())
                 .callback(getCallback())
                 .tick(1)
@@ -366,6 +371,7 @@ public class Demo extends Activity {
                 .build();
 
         Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
+                .errorLogger(errorLogger)
                 .level(LogLevel.VERBOSE)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)

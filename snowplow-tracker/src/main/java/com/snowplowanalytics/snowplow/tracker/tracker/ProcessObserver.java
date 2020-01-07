@@ -98,7 +98,7 @@ public class ProcessObserver implements LifecycleObserver {
                     }
                 }
             } catch (Exception e) {
-                Logger.e(TAG, e.getMessage());
+                Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
             }
         }
     }
@@ -137,7 +137,7 @@ public class ProcessObserver implements LifecycleObserver {
                     }
                 }
             } catch (Exception e) {
-                Logger.e(TAG, e.getMessage());
+                Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);
             }
         }
     }

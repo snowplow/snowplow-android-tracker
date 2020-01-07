@@ -248,7 +248,7 @@ public class Session {
             try {
                 Tracker.instance().resumeSessionChecking();
             } catch (Exception e) {
-                Logger.e(TAG, "Could not resume checking as tracker not setup");
+                Logger.e(TAG, "Could not resume checking as tracker not setup. Exception: %s", e);
             }
         }
 
