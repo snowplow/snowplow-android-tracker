@@ -134,7 +134,7 @@ public class Session {
                             currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
                             sessionIndex = (int)sessionInfo.get(Parameters.SESSION_INDEX);
                         } catch (Exception e) {
-                            Logger.e(TAG, String.format("Exception occurred retrieving session info from file: %s", e));
+                            Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e));
                             userId = Util.getUUIDString();
                         }
                     } else {
@@ -358,11 +358,11 @@ public class Session {
         try {
             fileFuture.get(5, TimeUnit.SECONDS);
         } catch (InterruptedException ie) {
-            Logger.e(TAG, "Session file loading was interrupted: %s", ie.getMessage());
+            Logger.track(TAG, "Session file loading was interrupted: %s", ie.getMessage());
         } catch (ExecutionException ee) {
-            Logger.e(TAG, "Session file loading failed: %s", ee.getMessage());
+            Logger.track(TAG, "Session file loading failed: %s", ee.getMessage());
         } catch (TimeoutException te) {
-            Logger.e(TAG, "Session file loading timedout: %s", te.getMessage());
+            Logger.track(TAG, "Session file loading timedout: %s", te.getMessage());
         }
         return fileFuture.isDone();
     }

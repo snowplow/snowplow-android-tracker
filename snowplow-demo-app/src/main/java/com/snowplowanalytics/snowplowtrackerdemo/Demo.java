@@ -54,6 +54,7 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoIdlingResource;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
@@ -78,8 +79,6 @@ public class Demo extends Activity {
     private RadioButton _radioGet, _radioHttp;
     private TextView _logOutput, _eventsCreated, _eventsSent, _emitterOnline, _emitterStatus,
             _databaseSize, _sessionIndex;
-
-    private ErrorLogging errorLogger;
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
@@ -359,8 +358,6 @@ public class Demo extends Activity {
     private void initAndroidTracker() {
         Tracker.close();
 
-        errorLogger = new ErrorLogger();
-
         Emitter emitter = new Emitter.EmitterBuilder("", this.getApplicationContext())
                 .callback(getCallback())
                 .tick(1)
@@ -371,7 +368,6 @@ public class Demo extends Activity {
                 .build();
 
         Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
-                .errorLogger(errorLogger)
                 .level(LogLevel.VERBOSE)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
@@ -381,6 +377,7 @@ public class Demo extends Activity {
                 .mobileContext(true)
                 .geoLocationContext(true)
                 .applicationCrash(true)
+                .trackerDiagnostic(true)
                 .lifecycleEvents(true)
                 .foregroundTimeout(60)
                 .backgroundTimeout(30)

@@ -7,7 +7,8 @@ public interface ErrorLogging {
      * already handled by the tracker.
      * @param source Where the error has been generated.
      * @param errorMessage A message to describe the error.
+     * @param throwable A throwable that caused the error.
      */
-    void log(String source, String errorMessage);
+    void log(String source, String errorMessage, Throwable throwable);
 
 }

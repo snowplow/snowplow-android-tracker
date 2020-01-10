@@ -29,6 +29,31 @@ public class Logger {
     private static int level = 0;
 
     /**
+     * Diagnostic Logging
+     *
+     * @param tag the log tag
+     * @param msg the log message
+     * @param args extra arguments to be formatted
+     */
+    public static void track(String tag, String msg, Object... args) {
+        Logger.e(tag, msg, args);
+        if (errorLogger != null) {
+            try {
+                Throwable throwable = null;
+                for (Object arg : args) {
+                    if (Throwable.class.isInstance(arg)) {
+                        throwable = (Throwable) arg;
+                        break;
+                    }
+                }
+                errorLogger.log(tag, getMessage(msg, args), throwable);
+            } catch (Exception e) {
+                Logger.v(TAG, "Error logger can't report the error: " + e);
+            }
+        }
+    }
+
+    /**
      * Error Level Logging
      *
      * @param tag the log tag
@@ -36,13 +61,6 @@ public class Logger {
      * @param args extra arguments to be formatted
      */
     public static void e(String tag, String msg, Object... args) {
-        if (errorLogger != null) {
-            try {
-                errorLogger.log(tag, getMessage(msg, args));
-            } catch (Exception e) {
-                Logger.v(TAG, "Error logger can't report the error: " + e);
-            }
-        }
         if (level >= 1) {
             Log.e(getTag(tag), getMessage(msg, args));
         }

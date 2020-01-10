@@ -37,7 +37,9 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
+import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
@@ -64,7 +66,7 @@ import com.snowplowanalytics.snowplow.tracker.Gdpr.Basis;
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
  */
-public class Tracker {
+public class Tracker implements ErrorLogging {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
@@ -122,6 +124,7 @@ public class Tracker {
     private boolean geoLocationContext;
     private boolean mobileContext;
     private boolean applicationCrash;
+    private boolean trackerDiagnostic;
     private boolean lifecycleEvents;
     private boolean screenviewEvents;
     private boolean screenContext;
@@ -132,8 +135,6 @@ public class Tracker {
     private boolean applicationContext;
     private Gdpr gdpr;
     private ScreenState screenState;
-
-    private ErrorLogging errorLogger;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -160,6 +161,7 @@ public class Tracker {
         boolean geoLocationContext = false; // Optional
         boolean mobileContext = false; // Optional
         boolean applicationCrash = true; // Optional
+        boolean trackerDiagnostic = false; // Optional
         boolean lifecycleEvents = false; // Optional
         boolean screenviewEvents = false; // Optional
         boolean screenContext = false; // Optional
@@ -168,8 +170,6 @@ public class Tracker {
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
         Gdpr gdpr = null; // Optional
-
-        ErrorLogging errorLogger = null;
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -356,6 +356,15 @@ public class Tracker {
         }
 
         /**
+         * @param trackerDiagnostic whether to automatically track error within the tracker.
+         * @return itself
+         */
+        public TrackerBuilder trackerDiagnostic(Boolean trackerDiagnostic) {
+            this.trackerDiagnostic = trackerDiagnostic;
+            return this;
+        }
+
+        /**
          * @apiNote It needs the Foreground library installed.
          *
          * @param lifecycleEvents whether to automatically track transition
@@ -399,15 +408,6 @@ public class Tracker {
         }
 
         /**
-         * @param errorLogger The delegate used to report tracker's errors.
-         * @return itself
-         */
-        public TrackerBuilder errorLogger(ErrorLogging errorLogger) {
-            this.errorLogger = errorLogger;
-            return this;
-        }
-
-        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -441,6 +441,7 @@ public class Tracker {
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
         this.applicationCrash = builder.applicationCrash;
+        this.trackerDiagnostic = builder.trackerDiagnostic;
         this.lifecycleEvents = builder.lifecycleEvents;
         this.screenviewEvents = builder.screenviewEvents;
         this.activityTracking = builder.activityTracking;
@@ -450,14 +451,15 @@ public class Tracker {
         this.installTracking = builder.installTracking;
         this.applicationContext = builder.applicationContext;
         this.gdpr = builder.gdpr;
-        this.errorLogger = builder.errorLogger;
         this.level = builder.logLevel;
 
-        if (errorLogger != null && level == LogLevel.OFF) {
-            level = LogLevel.ERROR;
+        if (trackerDiagnostic) {
+            if (level == LogLevel.OFF) {
+                level = LogLevel.ERROR;
+            }
+            Logger.setErrorLogger(this);
+            Logger.updateLogLevel(level);
         }
-        Logger.setErrorLogger(errorLogger);
-        Logger.updateLogLevel(level);
 
         if (this.installTracking) {
             this.installTracker = new InstallTracker(this.context);
@@ -500,6 +502,17 @@ public class Tracker {
         Logger.v(TAG, "Tracker created successfully.");
     }
 
+    // --- ErrorLogging Interface
+    @Override
+    public void log(String source, String errorMessage, Throwable throwable) {
+        this.track(TrackerError.builder()
+                .source(source)
+                .message(errorMessage)
+                .throwable(throwable)
+                .build()
+        );
+    }
+
     // --- Private init functions
     private void initializeScreenviewTracking() {
         if (this.activityTracking) {
@@ -535,7 +548,12 @@ public class Tracker {
 
                 // Figure out what type of event it is and track it!
                 Class eClass = event.getClass();
-                if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
+                if (eClass.equals(TrackerError.class)) {
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .build();
+                    addServiceEventPayload(selfDescribing.getPayload(), context, eventId);
+                } else if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
                     addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
                 } else if (eClass.equals(EcommerceTransaction.class)) {
                     addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
@@ -604,6 +622,40 @@ public class Tracker {
 
     // --- Helpers
 
+    private void addServiceEventPayload(Payload payload, List<SelfDescribingJson> contexts, String eventId) {
+        // Add default parameters to the payload
+        payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
+        payload.add(Parameters.APPID, this.appId);
+        payload.add(Parameters.NAMESPACE, this.namespace);
+        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
+
+        // Add Mobile Context
+        if (this.mobileContext) {
+            contexts.add(Util.getMobileContext(this.context));
+        }
+
+        // Add application context
+        if (this.applicationContext) {
+            contexts.add(InstallTracker.getApplicationContext(this.context));
+        }
+
+        // If there are contexts to nest
+        if (contexts.size() > 0) {
+            List<Map> contextMaps = new LinkedList<>();
+            for (SelfDescribingJson selfDescribingJson : contexts) {
+                if (selfDescribingJson != null) {
+                    contextMaps.add(selfDescribingJson.getMap());
+                }
+            }
+            SelfDescribingJson envelope = new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
+            payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
+                    Parameters.CONTEXT);
+        }
+
+        // Add this payload to the emitter
+        this.emitter.add(payload);
+    }
+
     /**
      * Builds and adds a finalized payload by adding in extra
      * information to the payload:
@@ -659,12 +711,12 @@ public class Tracker {
                 synchronized (trackerSession) {
                     SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
                     if (sessionContextJson == null) {
-                        Logger.e(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
+                        Logger.track(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
                     }
                     contexts.add(sessionContextJson);
                 }
             } else {
-                Logger.e(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
+                Logger.track(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
             }
         }
 
@@ -753,7 +805,7 @@ public class Tracker {
                     try {
                         session.checkAndUpdateSession();
                     } catch (Exception e) {
-                        Logger.e(TAG, "Method checkAndUpdateSession raised an exception: %s", e);
+                        Logger.track(TAG, "Method checkAndUpdateSession raised an exception: %s", e);
                     }
                 }
             }, this.sessionCheckInterval, this.sessionCheckInterval, this.timeUnit);
