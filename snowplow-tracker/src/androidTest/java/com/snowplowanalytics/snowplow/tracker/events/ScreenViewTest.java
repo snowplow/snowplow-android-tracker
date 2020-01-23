@@ -17,7 +17,10 @@ import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 
+import org.junit.internal.runners.statements.Fail;
+
 import java.util.Map;
+import java.util.UUID;
 
 public class ScreenViewTest extends AndroidTestCase {
 
@@ -30,38 +33,37 @@ public class ScreenViewTest extends AndroidTestCase {
 
         assertNotNull(data);
         assertEquals("name", data.get(Parameters.SV_NAME));
-        assertFalse(data.containsKey(Parameters.SV_ID));
+        assertTrue(data.containsKey(Parameters.SV_ID));
 
+        String id = UUID.randomUUID().toString();
         screenView = ScreenView.builder()
-                .id("id")
+                .id(id)
                 .build();
 
         data = screenView.getData().getMap();
 
         assertNotNull(data);
-        assertEquals("id", data.get(Parameters.SV_ID));
+        assertEquals(id, data.get(Parameters.SV_ID));
         assertFalse(data.containsKey(Parameters.SV_NAME));
 
         screenView = ScreenView.builder()
                 .name("name")
-                .id("id")
+                .id(id)
                 .build();
 
         data = screenView.getData().getMap();
 
         assertNotNull(data);
         assertEquals("name", data.get(Parameters.SV_NAME));
-        assertEquals("id", data.get(Parameters.SV_ID));
+        assertEquals(id, data.get(Parameters.SV_ID));
     }
 
     public void testBuilderFailures() {
-        boolean exception = false;
         try {
-            ScreenView.builder().build();
+            ScreenView.builder().id("id").build();
+            fail();
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
-            exception = true;
         }
-        assertTrue(exception);
     }
 }

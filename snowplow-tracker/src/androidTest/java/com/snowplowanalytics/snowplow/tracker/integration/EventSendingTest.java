@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -385,10 +386,11 @@ public class EventSendingTest extends AndroidTestCase {
     }
 
     public void trackScreenView(Tracker tracker) throws Exception {
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").customContext(getCustomContext()).build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(ScreenView.builder().name("screenName").id("screenId").deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        String id = UUID.randomUUID().toString();
+        tracker.track(ScreenView.builder().name("screenName").build());
+        tracker.track(ScreenView.builder().name("screenName").customContext(getCustomContext()).build());
+        tracker.track(ScreenView.builder().name("screenName").id(id).deviceCreatedTimestamp((long) 1433791172).build());
+        tracker.track(ScreenView.builder().name("screenName").id(id).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
     }
 
     public void trackTimings(Tracker tracker) throws Exception {

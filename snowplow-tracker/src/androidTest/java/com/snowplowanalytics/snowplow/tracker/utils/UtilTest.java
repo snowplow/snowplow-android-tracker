@@ -5,7 +5,6 @@ import android.test.AndroidTestCase;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,7 @@ public class UtilTest extends AndroidTestCase {
     }
 
     public void testGetEventId() {
-        String eid = Util.getEventId();
+        String eid = Util.getUUIDString();
         assertNotNull(eid);
         assertTrue(eid.matches("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"));
     }
