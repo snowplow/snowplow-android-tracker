@@ -10,7 +10,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 public class TrackerError extends AbstractEvent {
     private static final int MAX_MESSAGE_LENGTH = 2048;
-    private static final int MAX_STACK_LENGTH = 8096;
+    private static final int MAX_STACK_LENGTH = 8192;
     private static final int MAX_EXCEPTION_NAME_LENGTH = 1024;
 
     private final String source;
@@ -67,7 +67,7 @@ public class TrackerError extends AbstractEvent {
 
     @Override
     public Payload getPayload() {
-        return new SelfDescribingJson(TrackerConstants.APPLICATION_ERROR_SCHEMA, getData());
+        return new SelfDescribingJson(TrackerConstants.SCHEMA_DIAGNOSTIC_ERROR, getData());
     }
 
     private TrackerPayload getData() {
@@ -77,18 +77,15 @@ public class TrackerError extends AbstractEvent {
         }
 
         TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.APP_ERROR_MESSAGE, msg);
-        payload.add(Parameters.APP_ERROR_CLASS_NAME, source);
-        payload.add(Parameters.APP_ERROR_LANG, "JAVA");
-        payload.add(Parameters.APP_ERROR_FATAL, false);
+        payload.add(Parameters.DIAGNOSTIC_ERROR_MESSAGE, msg);
+        payload.add(Parameters.DIAGNOSTIC_ERROR_CLASS_NAME, source);
 
         if (throwable != null) {
             String stack = truncate(Util.stackTraceToString(throwable), MAX_STACK_LENGTH);
             String throwableName = truncate(throwable.getClass().getName(), MAX_EXCEPTION_NAME_LENGTH);
-            payload.add(Parameters.APP_ERROR_STACK, stack);
-            payload.add(Parameters.APP_ERROR_EXCEPTION_NAME, throwableName);
+            payload.add(Parameters.DIAGNOSTIC_ERROR_STACK, stack);
+            payload.add(Parameters.DIAGNOSTIC_ERROR_EXCEPTION_NAME, throwableName);
         }
-
         return payload;
     }
 

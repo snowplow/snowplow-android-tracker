@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.utils;
 
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.tracker.ErrorLogging;
+import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 
 /**
  * Custom logger class to easily manage debug mode and appending
@@ -25,7 +25,7 @@ import com.snowplowanalytics.snowplow.tracker.ErrorLogging;
 public class Logger {
 
     private static String TAG = Logger.class.getSimpleName();
-    private static ErrorLogging errorLogger;
+    private static DiagnosticLogger errorLogger;
     private static int level = 0;
 
     /**
@@ -137,7 +137,7 @@ public class Logger {
      *
      * @param errorLogger The error logger delegate in the app.
      */
-    public static void setErrorLogger(ErrorLogging errorLogger) {
+    public static void setErrorLogger(DiagnosticLogger errorLogger) {
         Logger.errorLogger = errorLogger;
     }
 }

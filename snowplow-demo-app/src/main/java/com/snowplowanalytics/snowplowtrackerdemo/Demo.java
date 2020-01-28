@@ -42,7 +42,6 @@ import androidx.preference.PreferenceManager;
 import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.ErrorLogging;
 import com.snowplowanalytics.snowplow.tracker.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;

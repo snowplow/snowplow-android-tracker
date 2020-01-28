@@ -66,7 +66,7 @@ import com.snowplowanalytics.snowplow.tracker.Gdpr.Basis;
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
  */
-public class Tracker implements ErrorLogging {
+public class Tracker implements DiagnosticLogger {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
@@ -502,7 +502,8 @@ public class Tracker implements ErrorLogging {
         Logger.v(TAG, "Tracker created successfully.");
     }
 
-    // --- ErrorLogging Interface
+    // --- Diagnostic
+
     @Override
     public void log(String source, String errorMessage, Throwable throwable) {
         this.track(TrackerError.builder()
@@ -514,6 +515,7 @@ public class Tracker implements ErrorLogging {
     }
 
     // --- Private init functions
+
     private void initializeScreenviewTracking() {
         if (this.activityTracking) {
             ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
@@ -552,7 +554,7 @@ public class Tracker implements ErrorLogging {
                     SelfDescribing selfDescribing = SelfDescribing.builder()
                             .eventData((SelfDescribingJson) event.getPayload())
                             .build();
-                    addServiceEventPayload(selfDescribing.getPayload(), context, eventId);
+                    addServiceEventPayload(selfDescribing.getPayload(), context);
                 } else if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
                     addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
                 } else if (eClass.equals(EcommerceTransaction.class)) {
@@ -622,12 +624,28 @@ public class Tracker implements ErrorLogging {
 
     // --- Helpers
 
-    private void addServiceEventPayload(Payload payload, List<SelfDescribingJson> contexts, String eventId) {
+    /**
+     * Builds and adds a finalized payload of a service event
+     * by adding in extra information to the payload:
+     * - The event contexts (limited to identify the device and app)
+     * - The Tracker Subject
+     * - The Tracker parameters
+     *
+     * @param payload Payload the raw event payload to be
+     *                decorated.
+     * @param contexts The raw context list
+     */
+    private void addServiceEventPayload(Payload payload, List<SelfDescribingJson> contexts) {
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
         payload.add(Parameters.APPID, this.appId);
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
+
+        // If there is a subject present for the Tracker add it
+        if (this.subject != null) {
+            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
+        }
 
         // Add Mobile Context
         if (this.mobileContext) {

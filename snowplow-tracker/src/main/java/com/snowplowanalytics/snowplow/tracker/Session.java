@@ -134,7 +134,7 @@ public class Session {
                             currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
                             sessionIndex = (int)sessionInfo.get(Parameters.SESSION_INDEX);
                         } catch (Exception e) {
-                            Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e));
+                            Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
                             userId = Util.getUUIDString();
                         }
                     } else {
