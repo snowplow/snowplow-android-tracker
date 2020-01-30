@@ -13,32 +13,31 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SessionTest extends AndroidTestCase {
 
     public void testSessionInit() {
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
-        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
+        Session session = getSession(600, 300);
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
         assertEquals("SQLITE", session.getSessionStorage());
-        assertEquals(null, session.getPreviousSessionId());
+        assertNull(session.getPreviousSessionId());
         assertNotNull(session.getCurrentSessionId());
         assertNotNull(session.getUserId());
         assertEquals(1, session.getSessionIndex());
-        assertEquals(null, session.getFirstId());
+        assertNull(session.getFirstId());
 
         SelfDescribingJson sdj = session.getSessionContext("first-id-1");
         assertEquals("first-id-1", session.getFirstId());
@@ -48,30 +47,9 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.getMap().get("schema"));
     }
 
-    public void testSessionInitWithInvalidFile() {
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
-
-        Map<String, Object> map = new HashMap<>();
-        FileStore.saveMapToFile(TrackerConstants.SNOWPLOW_SESSION_VARS, map, getContext());
-
-        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
-
-        assertNotNull(session);
-        assertEquals(600000, session.getForegroundTimeout());
-        assertEquals(300000, session.getBackgroundTimeout());
-        assertEquals("SQLITE", session.getSessionStorage());
-        assertEquals(null, session.getPreviousSessionId());
-        assertNotNull(session.getCurrentSessionId());
-        assertNotNull(session.getUserId());
-        assertEquals(1, session.getSessionIndex());
-        assertEquals(null, session.getFirstId());
-    }
 
     public void testCheckAndUpdateLogicForExpired() {
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
-        Session session = new Session(0, 0, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
+        Session session = getSession(0, 0);
 
         String userId = session.getUserId();
         String currentId = session.getCurrentSessionId();
@@ -86,9 +64,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     public void testCheckAndUpdateLogicForUnExpired() {
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
-        Session session = new Session(500, 500, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
+        Session session = getSession(500, 500);
 
         String userId = session.getUserId();
         String currentId = session.getCurrentSessionId();
@@ -103,9 +79,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     public void testSetBackgroundState() {
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, getContext());
-        Session session = new Session(500, 0, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
+        Session session = getSession(500, 0);
 
         assertEquals(1, session.getSessionIndex());
         session.checkAndUpdateSession();
@@ -113,5 +87,35 @@ public class SessionTest extends AndroidTestCase {
         session.setIsBackground(true);
         session.checkAndUpdateSession();
         assertEquals(2, session.getSessionIndex());
+    }
+
+    public void testSessionInitWithIncompletePersistedData() {
+        SharedPreferences prefs = getContext().getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        prefs.edit().putString(Parameters.SESSION_USER_ID, UUID.randomUUID().toString()).apply();
+
+        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
+
+        assertNotNull(session);
+        assertEquals(600000, session.getForegroundTimeout());
+        assertEquals(300000, session.getBackgroundTimeout());
+        assertEquals("SQLITE", session.getSessionStorage());
+        assertNull(session.getPreviousSessionId());
+        assertNotNull(session.getCurrentSessionId());
+        assertNotNull(session.getUserId());
+        assertEquals(1, session.getSessionIndex());
+        assertNull(session.getFirstId());
+    }
+
+
+    private Session getSession(long foregroundTimeout, long backgroundTimeout) {
+        getContext().getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply();
+        Session session = new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, getContext());
+        session.waitForSessionFileLoad();
+        return session;
     }
 }
