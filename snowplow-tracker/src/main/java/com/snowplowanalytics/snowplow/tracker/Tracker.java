@@ -429,26 +429,20 @@ public class Tracker {
 
         // When session context is enabled
         if (this.sessionContext) {
+            Runnable[] callbacks = {null, null, null, null};
             if (sessionCallbacks.length == 4) {
-                this.trackerSession = new Session(
-                        builder.foregroundTimeout,
-                        builder.backgroundTimeout,
-                        builder.timeUnit,
-                        builder.context,
-                        builder.sessionCallbacks[0],
-                        builder.sessionCallbacks[1],
-                        builder.sessionCallbacks[2],
-                        builder.sessionCallbacks[3]
-                );
-            } else {
-                this.trackerSession = new Session(
-                        builder.foregroundTimeout,
-                        builder.backgroundTimeout,
-                        builder.timeUnit,
-                        builder.context
-                );
+                callbacks = sessionCallbacks;
             }
-
+            this.trackerSession = Session.getInstance(
+                    builder.foregroundTimeout,
+                    builder.backgroundTimeout,
+                    builder.timeUnit,
+                    builder.context,
+                    callbacks[0],
+                    callbacks[1],
+                    callbacks[2],
+                    callbacks[3]
+            );
         }
 
         // If lifecycleEvents is True

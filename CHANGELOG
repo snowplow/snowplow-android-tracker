@@ -1,3 +1,7 @@
+Version 1.3.4 (2020-01-30)
+-------------------------
+Session userId renewed for the same user (#345)
+
 Version 1.3.3 (2019-11-26)
 --------------------------
 Fix crash when lifecycleEvents is enabled on Tracker initialisation (#339)
