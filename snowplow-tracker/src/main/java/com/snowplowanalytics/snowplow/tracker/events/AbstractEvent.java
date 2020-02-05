@@ -41,7 +41,7 @@ public abstract class AbstractEvent implements Event {
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> context = new LinkedList<>();
-        private String eventId = Util.getEventId();
+        private String eventId = Util.getUUIDString();
         private long deviceCreatedTimestamp = System.currentTimeMillis();
         private Long trueTimestamp = null;
 

@@ -21,6 +21,7 @@ import android.os.Bundle;
 
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -61,15 +62,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     public void onActivityResumed(Activity activity) {
         Logger.d(TAG, "Auto screenview occurred - activity has resumed");
         try {
-            Tracker tracker = Tracker.instance();
-            ScreenState screenState = tracker.getScreenState();
-            screenState.updateWithActivity(activity);
-            SelfDescribingJson data = screenState.getScreenViewEventJson();
-            tracker.track(SelfDescribing.builder()
-                    .eventData(data)
-                    .customContext(contexts)
-                    .build()
-            );
+            ScreenView event = ScreenView.buildWithActivity(activity);
+            Tracker.instance().track(event);
         } catch (Exception e) {
             Logger.e(TAG, e.getMessage());
         }

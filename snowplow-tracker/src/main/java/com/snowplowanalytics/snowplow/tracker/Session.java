@@ -123,7 +123,7 @@ public class Session {
             @Override
             public Void call() {
                 if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
-                    userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getEventId());
+                    userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
                     currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
                     sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
                 } else {
@@ -135,10 +135,10 @@ public class Session {
                             sessionIndex = (int)sessionInfo.get(Parameters.SESSION_INDEX);
                         } catch (Exception e) {
                             Logger.e(TAG, String.format("Exception occurred retrieving session info from file: %s", e));
-                            userId = Util.getEventId();
+                            userId = Util.getUUIDString();
                         }
                     } else {
-                        userId = Util.getEventId();
+                        userId = Util.getUUIDString();
                     }
                 }
                 updateSessionInfo();
@@ -295,7 +295,7 @@ public class Session {
      */
     private synchronized void updateSessionInfo() {
         this.previousSessionId = this.currentSessionId;
-        this.currentSessionId = Util.getEventId();
+        this.currentSessionId = Util.getUUIDString();
         this.sessionIndex++;
 
         Logger.d(TAG, "Session information is updated:");
