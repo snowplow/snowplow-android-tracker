@@ -1,15 +1,11 @@
 package com.snowplowanalytics.snowplow.tracker.tracker;
 
-import android.app.Activity;
-import android.app.Fragment;
-
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
-import java.lang.reflect.Field;
-import java.util.UUID;
 
 public class ScreenState {
     private String name;
@@ -25,138 +21,39 @@ public class ScreenState {
     private String activityTag;
 
     public ScreenState() {
-        this.generateNewId();
-        this.name = this.getAutomaticName();
+        id = Util.getUUIDString();
+        name = "Unknown";
     }
 
-    public ScreenState(String name, String type, String transitionType) {
-        this();
-        this.name = name;
-        this.type = type;
-        this.transitionType = transitionType;
-    }
-
-    public ScreenState(String name, String type, String transitionType,
-                       ScreenState previousState) {
-        this(name, type, transitionType);
-        this.previousId = previousState.id;
-        this.previousName = previousState.name;
-        this.previousType = previousState.type;
-    }
-
+    @Deprecated
     public void newScreenState(String name, String type, String transitionType) {
+        updateScreenState(Util.getUUIDString(), name, type, transitionType);
+    }
+
+    public synchronized void updateScreenState(String id, String name, String type, String transitionType) {
         this.populatePreviousFields();
         this.name = name;
         this.type = type;
         this.transitionType = transitionType;
-        this.generateNewId();
-    }
-
-    public static String getSnowplowScreenId(Activity activity) {
-        try {
-            Field field = activity.getClass().getField("snowplowScreenId");
-            Object reflectedValue = field.get(activity);
-            if (reflectedValue instanceof String) {
-                return (String)reflectedValue;
-            }
-        } catch (Exception e) {
-            // log here
+        if (id != null) {
+            this.id = id;
+        } else {
+            this.id = Util.getUUIDString();
         }
-        return null;
     }
 
-    public void generateNewId() {
-        this.id = UUID.randomUUID().toString();
-    }
-
-    public void updateWithActivity(Activity activity) {
-        this.activityClassName = activity.getLocalClassName();
-        this.activityTag = getSnowplowScreenId(activity);
-        this.fragmentTag = null;
-        this.fragmentClassName = null;
-        this.generateNewId();
-        // shift current fields to previous
-        this.populatePreviousFields();
-        // now fill current fields with new values
-        this.name = getAutomaticName();
-        this.type = getAutomaticType();
-        this.transitionType = null;
-    }
-
-    public void updateWithFragment(Fragment fragment) {
-        this.fragmentClassName = fragment.getClass().getSimpleName();
-        this.fragmentTag = fragment.getTag();
-        this.generateNewId();
-        // shift current fields to previous
-        this.populatePreviousFields();
-        // now fill current fields with new values
-        this.name = getAutomaticName();
-        this.type = getAutomaticType();
-        this.transitionType = null;
+    public synchronized void updateScreenState(String id, String name, String type, String transitionType, String fragmentClassName, String fragmentTag, String activityClassName, String activityTag) {
+        this.updateScreenState(id, name, type, transitionType);
+        this.fragmentClassName = fragmentClassName;
+        this.fragmentTag = fragmentTag;
+        this.activityClassName = activityClassName;
+        this.activityTag = activityTag;
     }
 
     public void populatePreviousFields() {
         this.previousName = this.name;
         this.previousType = this.type;
         this.previousId = this.id;
-    }
-
-    public String getAutomaticName() {
-        String activity = getActivityField();
-        String fragment = getFragmentField();
-        if (activity != null) {
-            return activity;
-        }
-        if (fragment != null) {
-            return fragment;
-        }
-        return "Unknown";
-    }
-
-    public String getAutomaticType() {
-        if (this.fragmentClassName != null) {
-            if (this.fragmentClassName.length() > 0) {
-                return this.fragmentClassName;
-            }
-        }
-        if (this.activityClassName != null) {
-            if (this.activityClassName.length() > 0) {
-                return this.activityClassName;
-            }
-        }
-        return null;
-    }
-
-    public String getActivityField() {
-        if (this.activityClassName != null) {
-            if (this.activityClassName.length() > 0){
-                return activityClassName;
-            }
-        }
-        if (this.activityTag != null) {
-            if (this.activityTag.length() > 0) {
-                return activityTag;
-            }
-        }
-        return null;
-    }
-
-    public String getFragmentField() {
-        if (this.fragmentClassName != null) {
-            if (this.fragmentClassName.length() > 0) {
-                return fragmentClassName;
-            }
-        }
-        if (this.fragmentTag != null) {
-            if (this.fragmentTag.length() > 0) {
-                return fragmentTag;
-            }
-        }
-        return null;
-    }
-
-    public boolean isValid() {
-        return (name != null) && (id != null);
     }
 
     public SelfDescribingJson getCurrentScreen(Boolean debug) {
@@ -166,14 +63,15 @@ public class ScreenState {
         contextPayload.add(Parameters.SCREEN_NAME, this.name);
         contextPayload.add(Parameters.SCREEN_TYPE, this.type);
         if (debug) {
-            contextPayload.add(Parameters.SCREEN_FRAGMENT, this.getFragmentField());
-            contextPayload.add(Parameters.SCREEN_ACTIVITY, this.getActivityField());
+            contextPayload.add(Parameters.SCREEN_FRAGMENT, getValidName(fragmentClassName, fragmentTag));
+            contextPayload.add(Parameters.SCREEN_ACTIVITY, getValidName(activityClassName, activityTag));
         }
         return new SelfDescribingJson(
                 TrackerConstants.SCHEMA_SCREEN,
                 contextPayload);
     }
 
+    @Deprecated
     public SelfDescribingJson getPreviousScreen(Boolean debug) {
         // not sure when this is useful (but make sure fragment/activity
         // isn't updated to current screen before calling this method)
@@ -181,15 +79,12 @@ public class ScreenState {
         contextPayload.add(Parameters.SCREEN_ID, this.previousId);
         contextPayload.add(Parameters.SCREEN_NAME, this.previousName);
         contextPayload.add(Parameters.SCREEN_TYPE, this.previousType);
-        if (debug) {
-            contextPayload.add(Parameters.SCREEN_FRAGMENT, this.getFragmentField());
-            contextPayload.add(Parameters.SCREEN_ACTIVITY, this.getActivityField());
-        }
         return new SelfDescribingJson(
                 TrackerConstants.SCHEMA_SCREEN,
                 contextPayload);
     }
 
+    @Deprecated
     public SelfDescribingJson getScreenViewEventJson() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.SV_NAME, this.name);
@@ -201,4 +96,17 @@ public class ScreenState {
         payload.add(Parameters.SV_TRANSITION_TYPE, this.transitionType);
         return new SelfDescribingJson(TrackerConstants.SCHEMA_SCREEN_VIEW, payload);
     }
+
+    // Private methods
+
+    private String getValidName(String s1, String s2) {
+        if (s1 != null && s1.length() > 0) {
+            return s1;
+        }
+        if (s2 != null && s2.length() > 0) {
+            return s2;
+        }
+        return null;
+    }
+
 }

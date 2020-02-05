@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -80,8 +79,33 @@ public class Util {
      *
      * @return a UUID string
      */
-    public static String getEventId() {
+    public static String getUUIDString() {
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Check the passed string is a UUID code.
+     *
+     * @param uuid a UUID code string.
+     * @return true if it's a UUID code.
+     */
+    public static boolean isUUIDString(String uuid) {
+        try {
+            return UUID.fromString(uuid) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Generates a random UUID for
+     * each event.
+     *
+     * @deprecated  Use `getUUIDString` instead.
+     */
+    @Deprecated
+    public static String getEventId() {
+        return getUUIDString();
     }
 
     /**

@@ -21,12 +21,15 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
+import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -152,14 +155,15 @@ public class TrackerTest extends AndroidTestCase {
 
         Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .sessionContext(false)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .build();
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(false)
+                .mobileContext(false)
+                .screenContext(false)
+                .geoLocationContext(false)
+                .build();
 
-        tracker.track(ScreenView.builder().id("id").build());
+        tracker.track(ScreenView.builder().build());
         RecordedRequest req = mockWebServer.takeRequest(20, TimeUnit.SECONDS);
 
         assertNotNull(req);
@@ -205,7 +209,7 @@ public class TrackerTest extends AndroidTestCase {
             .build();
 
         tracker.pauseEventTracking();
-        tracker.track(ScreenView.builder().id("id").build());
+        tracker.track(ScreenView.builder().build());
         RecordedRequest req = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
 
         assertEquals(0, tracker.getEmitter().getEventStore().getSize());
@@ -242,6 +246,43 @@ public class TrackerTest extends AndroidTestCase {
         tracker.pauseSessionChecking();
 
         mockWebServer.shutdown();
+    }
+
+    public void testTrackScreenView() throws Exception {
+        Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
+                .option(BufferOption.Single)
+                .build();
+
+        Tracker.close();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(false)
+                .mobileContext(false)
+                .geoLocationContext(false)
+                .screenContext(true)
+                .foregroundTimeout(5)
+                .backgroundTimeout(5)
+                .sessionCheckInterval(1)
+                .timeUnit(TimeUnit.SECONDS)
+                .build();
+
+        ScreenState screenState = tracker.getScreenState();
+        assertNotNull(screenState);
+
+        Map<String, Object> screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
+        Map<String, Object> screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        assertEquals("Unknown", screenStateMap.get(Parameters.SCREEN_NAME));
+
+        ScreenView screenView = ScreenView.builder().name("screen1").build();
+        String screenId = (String)screenView.getData().getMap().get("id");
+
+        tracker.track(screenView);
+
+        screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
+        screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        assertEquals("screen1", screenStateMap.get(Parameters.SCREEN_NAME));
+        assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
     }
 
     public void testTrackUncaughtException() throws InterruptedException {

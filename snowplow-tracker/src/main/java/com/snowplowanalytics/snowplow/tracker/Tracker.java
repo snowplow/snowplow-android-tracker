@@ -485,6 +485,11 @@ public class Tracker {
             return;
         }
 
+        if (ScreenView.class.isInstance(event) && screenState != null) {
+            ScreenView screenView = (ScreenView) event;
+            screenView.updateScreenState(screenState);
+        }
+
         Executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -888,7 +893,9 @@ public class Tracker {
 
     /**
      * Track a screen with a screen state (many options)
+     * @deprecated Use track(Event) method passing a ScreenView event.
      */
+    @Deprecated
     public void trackScreen(ScreenState screenState) {
         this.screenState = screenState;
         SelfDescribingJson data = screenState.getScreenViewEventJson();
@@ -900,9 +907,11 @@ public class Tracker {
 
     /**
      * Track a screen only by name
+     * @deprecated Use track(Event) method passing a ScreenView event.
      */
+    @Deprecated
     public void trackScreen(String name) {
-        screenState.newScreenState(name, null, null);
+        screenState.updateScreenState(null, name, null, null);
         SelfDescribingJson data = screenState.getScreenViewEventJson();
         track(SelfDescribing.builder()
                 .eventData(data)
