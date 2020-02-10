@@ -30,78 +30,74 @@ public class TrackerPayloadTest extends AndroidTestCase {
         payload = new TrackerPayload();
     }
 
-    public HashMap<String,String> abMap() {
-        HashMap<String,String> map = new HashMap<String,String>();
-        map.put("a", "b");
+    public HashMap<String,Object> createTestMap() {
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("a", "string");
+        map.put("b", "");
+        map.put("c", null);
         return map;
     }
 
-    public void testAddNullValue() {
-        payload.add("key", null);
-        assertFalse(payload.getMap().containsKey("key"));
+    public void testAddKeyWhenValue() {
+        payload.add("a", "string");
+        assertEquals("string", payload.getMap().get("a"));
+        payload.add("a", 123);
+        assertEquals(123, payload.getMap().get("a"));
     }
 
-    public void testAddEmptyValue() {
-        payload.add("key", "");
-        assertFalse(payload.getMap().containsKey("key"));
+    public void testNotAddKeyWhenNullOrEmptyValue() {
+        payload.add("a", null);
+        assertFalse(payload.getMap().containsKey("a"));
+        payload.add("a", "");
+        assertFalse(payload.getMap().containsKey("a"));
     }
 
-    public void testAddStringString() throws JSONException {
-        payload.add("a", "b");
-        JSONObject map = new JSONObject(payload.toString());
-        assertEquals("b", map.getString("a"));
-    }
-
-    public void testAddStringObject() throws JSONException {
-        payload.add("a", abMap());
-        JSONObject map = new JSONObject(payload.toString());
-        JSONObject innerMap = map.getJSONObject("a");
-        assertEquals("b", innerMap.getString("a"));
+    public void testRemoveKeyWhenNullOrEmptyValue() {
+        payload.add("a", "string");
+        payload.add("a", "");
+        assertFalse(payload.getMap().containsKey("a"));
+        payload.add("a", 123);
+        payload.add("a", null);
+        assertFalse(payload.getMap().containsKey("a"));
     }
     
-    public void testAddMap() throws JSONException {
-        Map<String,Object> testMap = new HashMap<String,Object>(abMap());
+    public void testAddMapWithoutNullValueEntries() {
+        Map<String,Object> testMap = new HashMap<String,Object>(createTestMap());
         payload.addMap(testMap);
-        
-        // {"a":"b"}
-        String s = payload.toString();
-        
-        JSONObject map = new JSONObject(s);
-        assertEquals("b", map.getString("a"));
+        assertEquals("string", payload.getMap().get("a"));
+        assertEquals("", payload.getMap().get("b"));
+        assertFalse(payload.getMap().containsKey("c"));
     }
-    
+
+    public void testDontCrashWhenAddNullMap() {
+        payload.addMap(null);
+        assertTrue(payload.getMap().isEmpty());
+        payload.addMap(null, true, "a", "b");
+        assertTrue(payload.getMap().isEmpty());
+    }
+
     public void testAddSimpleMapBase64NoEncode() throws JSONException {
-        payload.addMap(abMap(), false, "enc", "no_enc");
-
-        // {"no_enc":"{\"a\":\"b\"}"}
-        String s = payload.toString();
-
-        JSONObject map = new JSONObject(s);
-        assertEquals("{\"a\":\"b\"}", map.getString("no_enc"));
+        payload.addMap(createTestMap(), false, "enc", "no_enc");
+        assertEquals("{\"a\":\"string\",\"b\":\"\",\"c\":null}", payload.getMap().get("no_enc"));
+        assertFalse(payload.getMap().containsKey("enc"));
     }
 
     public void testAddMapBase64Encoded() throws JSONException {
-        payload.addMap(abMap(), true, "enc", "no_enc");
-
-        // {"enc":"eyJhIjoiYiJ9"}
-        String s = payload.toString();
-
-        JSONObject map = new JSONObject(s);
-        String value = map.getString("enc");
-        assertEquals("eyJhIjoiYiJ9", value);
-        String decoded = new String(Base64.decode(value, Base64.URL_SAFE));
-        assertEquals("{\"a\":\"b\"}", decoded);
+        payload.addMap(createTestMap(), true, "enc", "no_enc");
+        assertEquals("eyJhIjoic3RyaW5nIiwiYiI6IiIsImMiOm51bGx9", payload.getMap().get("enc"));
+        assertFalse(payload.getMap().containsKey("no_enc"));
     }
 
-    public void testAddNullValues() {
-        TrackerPayload payload1 = new TrackerPayload();
-        payload1.add("k", null);
-        assertEquals("{}", payload1.toString());
-        payload1.add("k", (Object) null);
-        assertEquals("{}", payload1.toString());
-        payload1.addMap(null);
-        assertEquals("{}", payload1.toString());
-        payload1.addMap(null, false, "co", "cx");
-        assertEquals("{}", payload1.toString());
+    public void testSimplePayloadToString() throws JSONException {
+        payload.add("a", "string");
+        JSONObject map = new JSONObject(payload.toString());
+        assertEquals("string", map.getString("a"));
+    }
+
+    public void testComplexPayloadToString() throws JSONException {
+        payload.add("a", createTestMap());
+        JSONObject map = new JSONObject(payload.toString());
+        JSONObject innerMap = map.getJSONObject("a");
+        assertEquals("string", innerMap.getString("a"));
     }
 }
