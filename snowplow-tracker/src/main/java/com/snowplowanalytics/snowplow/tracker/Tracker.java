@@ -19,6 +19,7 @@ import android.content.Context;
 import android.os.Build;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +58,7 @@ import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.Gdpr.Basis;
 
 
 /**
@@ -129,6 +131,7 @@ public class Tracker {
     private boolean activityTracking;
     private boolean onlyTrackLabelledScreens;
     private boolean applicationContext;
+    private Gdpr gdpr;
     private ScreenState screenState;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
@@ -163,6 +166,7 @@ public class Tracker {
         boolean onlyTrackLabelledScreens = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
+        Gdpr gdpr = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -183,6 +187,19 @@ public class Tracker {
          */
         public TrackerBuilder applicationContext(boolean isEnabled) {
             this.applicationContext = isEnabled;
+            return this;
+        }
+
+        /**
+         * Enables GDPR context to be sent with every event.
+         * @param basisForProcessing GDPR Basis for processing
+         * @param documentId ID of a GDPR basis document
+         * @param documentVersion Version of the document
+         * @param documentDescription Description of the document
+         * @return itself
+         */
+        public TrackerBuilder gdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+            this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
             return this;
         }
 
@@ -420,6 +437,7 @@ public class Tracker {
         this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
         this.applicationContext = builder.applicationContext;
+        this.gdpr = builder.gdpr;
 
         if (this.installTracking) {
             this.installTracker = new InstallTracker(this.context);
@@ -641,6 +659,11 @@ public class Tracker {
             contexts.add(InstallTracker.getApplicationContext(this.context));
         }
 
+        // Add gdpr context
+        if (gdpr != null) {
+            contexts.add(gdpr.getContext());
+        }
+
         // Add global contexts
         synchronized (globalContexts) {
             if (!globalContexts.isEmpty()) {
@@ -732,6 +755,26 @@ public class Tracker {
     public void startNewSession() {
         pauseSessionChecking();
         resumeSessionChecking();
+    }
+
+    // --- GDPR context
+
+    /**
+     * Enables GDPR context to be sent with every event.
+     * @param basisForProcessing GDPR Basis for processing
+     * @param documentId ID of a GDPR basis document
+     * @param documentVersion Version of the document
+     * @param documentDescription Description of the document
+     */
+    public void enableGdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+        this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
+    }
+
+    /**
+     * Disable GDPR context.
+     */
+    public synchronized void disableGdprContext() {
+        this.gdpr = null;
     }
 
     // --- Setters
@@ -919,7 +962,8 @@ public class Tracker {
         );
     }
 
-    // global contexts
+    // --- Global contexts
+
     private final List<GlobalContext> globalContexts = Collections.synchronizedList(new ArrayList<GlobalContext>());
 
     public void clearGlobalContexts() {
