@@ -80,6 +80,7 @@ public class Emitter {
     private long byteLimitPost;
     private int emitTimeout;
     private TimeUnit timeUnit;
+    private String customPostPath;
 
     private EventStore eventStore;
     private Future eventStoreFuture;
@@ -107,6 +108,7 @@ public class Emitter {
         private int emitTimeout = 5; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
         OkHttpClient client = null; //Optional
+        String customPostPath = null; //Optional
 
         /**
          * @param uri The uri of the collector
@@ -250,6 +252,15 @@ public class Emitter {
         }
 
         /**
+         * @param customPostPath A custom path that is used on the endpoint to send requests.
+         * @return itself
+         */
+        public EmitterBuilder customPostPath(String customPostPath) {
+            this.customPostPath = customPostPath;
+            return this;
+        }
+
+        /**
          * Creates a new Emitter
          *
          * @return a new Emitter object
@@ -280,6 +291,7 @@ public class Emitter {
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
         this.eventStore = null;
+        this.customPostPath = builder.customPostPath;
         this.eventStoreFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
             public Void call() {
@@ -294,8 +306,7 @@ public class Emitter {
         final OkHttpClient.Builder clientBuilder;
         if (builder.client == null) {
             clientBuilder = new OkHttpClient.Builder();
-        }
-        else {
+        } else {
             clientBuilder = builder.client.newBuilder();
         }
 
@@ -314,16 +325,17 @@ public class Emitter {
     private void buildEmitterUri() {
         if (this.requestSecurity == RequestSecurity.HTTP) {
             this.uriBuilder = Uri.parse("http://" + this.uri).buildUpon();
-        }
-        else {
+        } else {
             this.uriBuilder = Uri.parse("https://" + this.uri).buildUpon();
         }
+
         if (this.httpMethod == HttpMethod.GET) {
             uriBuilder.appendPath("i");
-        }
-        else {
+        } else if (this.customPostPath == null) {
             uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
                     TrackerConstants.PROTOCOL_VERSION);
+        } else {
+            uriBuilder.appendEncodedPath(this.customPostPath);
         }
     }
 
@@ -623,8 +635,7 @@ public class Emitter {
                         postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
                         totalByteSize = payloadByteSize;
-                    }
-                    else {
+                    } else {
                         totalByteSize += payloadByteSize;
                         postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
@@ -879,6 +890,13 @@ public class Emitter {
      */
     public long getByteLimitPost() {
         return this.byteLimitPost;
+    }
+
+    /**
+     * @return the customPostPath
+     */
+    public String getCustomPostPath() {
+        return this.customPostPath;
     }
 
     /**
