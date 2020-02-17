@@ -33,6 +33,7 @@ import android.net.Uri;
 import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -329,6 +330,7 @@ public class Demo extends Activity {
         addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
         addToMap(Parameters.APP_BUILD, "3", pairs);
         Tracker.instance().addGlobalContext(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs));
+        Tracker.instance().enableGdprContext(Gdpr.Basis.CONSENT, "someId", "0.1.0", "this is a demo document description");
     }
 
     /**

@@ -38,6 +38,7 @@ public class TrackerConstants {
     public static final String SCHEMA_SCREEN = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-0-0";
     public static final String SCHEMA_APPLICATION_INSTALL = "iglu:com.snowplowanalytics.mobile/application_install/jsonschema/1-0-0";
     public static final String SCHEMA_APPLICATION = "iglu:com.snowplowanalytics.mobile/application/jsonschema/1-0-0";
+    public static final String SCHEMA_GDPR = "iglu:com.snowplowanalytics.snowplow/gdpr/jsonschema/1-0-0";
 
     public static final String POST_CONTENT_TYPE = "application/json; charset=utf-8";
 
