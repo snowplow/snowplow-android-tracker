@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
