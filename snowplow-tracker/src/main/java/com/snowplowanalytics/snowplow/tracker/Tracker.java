@@ -17,9 +17,9 @@ import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import android.arch.lifecycle.ProcessLifecycleOwner;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -322,6 +322,9 @@ public class Tracker {
         }
 
         /**
+         * @apiNote Requires Location permissions accordingly to the requirements of the various
+         * Android versions. Otherwise the whole context is skipped.
+         *
          * @param geoLocationContext whether to add a geo-location context
          * @return itself
          */
@@ -350,14 +353,12 @@ public class Tracker {
         }
 
         /**
-         * NOTE: Only available on API 14+ and with the Foreground library
-         * installed.
+         * @apiNote It needs the Foreground library installed.
          *
          * @param lifecycleEvents whether to automatically track transition
          *                        from foreground to background
          * @return itself
          */
-        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         public TrackerBuilder lifecycleEvents(Boolean lifecycleEvents) {
             this.lifecycleEvents = lifecycleEvents;
             return this;

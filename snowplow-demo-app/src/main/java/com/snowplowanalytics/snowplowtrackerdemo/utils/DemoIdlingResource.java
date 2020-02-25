@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import androidx.test.espresso.IdlingResource;
 

@@ -13,13 +13,19 @@
 
 package com.snowplowanalytics.snowplowtrackerdemo;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
@@ -27,9 +33,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
-import android.support.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.CustomTabsIntent;
 import android.net.Uri;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
@@ -52,6 +61,7 @@ import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
 
@@ -70,6 +80,9 @@ public class Demo extends Activity {
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
+
+    private Consumer<Boolean> callbackIsPermissionGranted;
+    private final static int APP_PERMISSION_REQUEST_LOCATION = 1;
 
     @Nullable
     private DemoIdlingResource demoIdlingResource;
@@ -108,6 +121,10 @@ public class Demo extends Activity {
 
         _logOutput.setMovementMethod(new ScrollingMovementMethod());
         _logOutput.setText("");
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String uri = sharedPreferences.getString("uri", "");
+        _uriField.setText(uri);
 
         // Setup Listeners
         setupTrackerListener();
@@ -161,32 +178,74 @@ public class Demo extends Activity {
 
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Emitter e = Tracker.instance().getEmitter();
-                String uri = _uriField.getText().toString();
-                HttpMethod method = _type.getCheckedRadioButtonId() ==
-                        _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
-                RequestSecurity security = _security.getCheckedRadioButtonId() ==
-                        _radioHttp.getId() ? RequestSecurity.HTTP : RequestSecurity.HTTPS;
-
-                if (!e.getEmitterStatus()) {
-                    e.setEmitterUri(uri);
-                    e.setRequestSecurity(security);
-                    e.setHttpMethod(method);
+                if (Build.VERSION.SDK_INT < 24) {
+                    setupAndTrackDemoEvents();
                 }
-
-                if (!uri.equals("")) {
-                    eventsCreated += 14;
-                    final String made = "Made: " + eventsCreated;
-                    _eventsCreated.setText(made);
-                    if (demoIdlingResource != null) {
-                        demoIdlingResource.setIdleState(false);
+                requestPermissions((isGranted) -> {
+                    if (isGranted) {
+                        setupAndTrackDemoEvents();
                     }
-                    TrackerEvents.trackAll(Tracker.instance());
-                } else {
-                    updateLogger("URI field empty!\n");
-                }
+                });
             }
         });
+    }
+
+    private void setupAndTrackDemoEvents() {
+        Emitter e = Tracker.instance().getEmitter();
+        String uri = _uriField.getText().toString();
+
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+        editor.putString("uri", uri).apply();
+
+        HttpMethod method = _type.getCheckedRadioButtonId() ==
+                _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
+        RequestSecurity security = _security.getCheckedRadioButtonId() ==
+                _radioHttp.getId() ? RequestSecurity.HTTP : RequestSecurity.HTTPS;
+
+        if (!e.getEmitterStatus()) {
+            e.setEmitterUri(uri);
+            e.setRequestSecurity(security);
+            e.setHttpMethod(method);
+        }
+
+        if (!uri.equals("")) {
+            eventsCreated += 14;
+            final String made = "Made: " + eventsCreated;
+            _eventsCreated.setText(made);
+            if (demoIdlingResource != null) {
+                demoIdlingResource.setIdleState(false);
+            }
+            TrackerEvents.trackAll(Tracker.instance());
+        } else {
+            updateLogger("URI field empty!\n");
+        }
+    }
+
+    @TargetApi(24)
+    private void requestPermissions(@NonNull Consumer<Boolean> callbackIsGranted) {
+        callbackIsPermissionGranted = callbackIsGranted;
+        int permissionState = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+            callbackIsGranted.accept(true);
+            return;
+        }
+        final String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+        ActivityCompat.requestPermissions(this, permissions, APP_PERMISSION_REQUEST_LOCATION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (Build.VERSION.SDK_INT < 24) {
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == APP_PERMISSION_REQUEST_LOCATION
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            callbackIsPermissionGranted.accept(true);
+            return;
+        }
+        callbackIsPermissionGranted.accept(false);
     }
 
     /**

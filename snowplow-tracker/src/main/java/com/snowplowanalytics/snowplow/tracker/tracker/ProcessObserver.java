@@ -14,9 +14,9 @@
 package com.snowplowanalytics.snowplow.tracker.tracker;
 
 import android.annotation.TargetApi;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
-import android.arch.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
 
