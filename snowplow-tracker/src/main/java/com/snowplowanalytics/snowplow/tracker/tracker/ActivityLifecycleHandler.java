@@ -65,7 +65,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             ScreenView event = ScreenView.buildWithActivity(activity);
             Tracker.instance().track(event);
         } catch (Exception e) {
-            Logger.e(TAG, e.getMessage());
+            Logger.e(TAG, "Method onActivityResumed raised an exception: %s", e);
         }
     }
 

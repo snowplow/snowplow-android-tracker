@@ -36,7 +36,6 @@ import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -133,7 +132,7 @@ public class EventSendingTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        emitter.waitForEventStore();
+        assertTrue(emitter.waitForEventStore());
         emitter.getEventStore().removeAllEvents();
 
         Subject subject = new Subject

@@ -53,6 +53,7 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoIdlingResource;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
@@ -375,6 +376,7 @@ public class Demo extends Activity {
                 .mobileContext(true)
                 .geoLocationContext(true)
                 .applicationCrash(true)
+                .trackerDiagnostic(true)
                 .lifecycleEvents(true)
                 .foregroundTimeout(60)
                 .backgroundTimeout(30)
