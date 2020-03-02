@@ -132,7 +132,7 @@ public class EventSendingTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        emitter.waitForEventStore();
+        assertTrue(emitter.waitForEventStore());
         emitter.getEventStore().removeAllEvents();
 
         Subject subject = new Subject

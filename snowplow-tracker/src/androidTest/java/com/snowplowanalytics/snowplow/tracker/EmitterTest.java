@@ -144,6 +144,8 @@ public class EmitterTest extends AndroidTestCase {
                 .byteLimitPost(25000)
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .build();
+        emitter.waitForEventStore();
+        emitter.getEventStore().removeAllEvents();
 
         assertFalse(emitter.getEmitterStatus());
         assertEquals(BufferOption.Single, emitter.getBufferOption());
