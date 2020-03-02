@@ -15,7 +15,7 @@ buildscript {
 
 subprojects {
     group = 'com.snowplowanalytics'
-    version = '1.4.0-M1'
+    version = '1.4.0'
     repositories {
         google()
         maven {
