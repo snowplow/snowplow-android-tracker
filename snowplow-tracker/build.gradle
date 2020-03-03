@@ -3,6 +3,8 @@ plugins {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.dcendents.android-maven'
@@ -13,7 +15,7 @@ jacoco {
 }
 
 project.ext {
-    archLifecycleVersion = "1.1.1"
+    archLifecycleVersion = "2.2.0"
 }
 
 android {
@@ -58,14 +60,29 @@ android {
         disable 'InvalidPackage'
         abortOnError false
     }
+
+    sourceSets {
+        androidTest.manifest.srcFile "src/androidTest/AndroidManifest.xml"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // test
     androidTestImplementation 'com.google.android.gms:play-services-analytics:16.0.1'
-    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.14.6'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 }
 
 android.libraryVariants.all { variant ->
@@ -140,3 +157,8 @@ bintray {
         version.name = "$project.version"
     }
 }
+
+repositories {
+    mavenCentral()
+}
+

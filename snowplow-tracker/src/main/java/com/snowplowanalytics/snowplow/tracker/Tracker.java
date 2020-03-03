@@ -13,12 +13,12 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import android.arch.lifecycle.ProcessLifecycleOwner;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,9 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
+import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
+import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
@@ -57,13 +59,14 @@ import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.Gdpr.Basis;
 
 
 /**
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
  */
-public class Tracker {
+public class Tracker implements DiagnosticLogger {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
@@ -121,6 +124,7 @@ public class Tracker {
     private boolean geoLocationContext;
     private boolean mobileContext;
     private boolean applicationCrash;
+    private boolean trackerDiagnostic;
     private boolean lifecycleEvents;
     private boolean screenviewEvents;
     private boolean screenContext;
@@ -129,6 +133,7 @@ public class Tracker {
     private boolean activityTracking;
     private boolean onlyTrackLabelledScreens;
     private boolean applicationContext;
+    private Gdpr gdpr;
     private ScreenState screenState;
 
     private AtomicBoolean dataCollection = new AtomicBoolean(true);
@@ -156,6 +161,7 @@ public class Tracker {
         boolean geoLocationContext = false; // Optional
         boolean mobileContext = false; // Optional
         boolean applicationCrash = true; // Optional
+        boolean trackerDiagnostic = false; // Optional
         boolean lifecycleEvents = false; // Optional
         boolean screenviewEvents = false; // Optional
         boolean screenContext = false; // Optional
@@ -163,6 +169,7 @@ public class Tracker {
         boolean onlyTrackLabelledScreens = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
+        Gdpr gdpr = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -183,6 +190,19 @@ public class Tracker {
          */
         public TrackerBuilder applicationContext(boolean isEnabled) {
             this.applicationContext = isEnabled;
+            return this;
+        }
+
+        /**
+         * Enables GDPR context to be sent with every event.
+         * @param basisForProcessing GDPR Basis for processing
+         * @param documentId ID of a GDPR basis document
+         * @param documentVersion Version of the document
+         * @param documentDescription Description of the document
+         * @return itself
+         */
+        public TrackerBuilder gdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+            this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
             return this;
         }
 
@@ -305,6 +325,9 @@ public class Tracker {
         }
 
         /**
+         * @apiNote Requires Location permissions accordingly to the requirements of the various
+         * Android versions. Otherwise the whole context is skipped.
+         *
          * @param geoLocationContext whether to add a geo-location context
          * @return itself
          */
@@ -333,14 +356,21 @@ public class Tracker {
         }
 
         /**
-         * NOTE: Only available on API 14+ and with the Foreground library
-         * installed.
+         * @param trackerDiagnostic whether to automatically track error within the tracker.
+         * @return itself
+         */
+        public TrackerBuilder trackerDiagnostic(Boolean trackerDiagnostic) {
+            this.trackerDiagnostic = trackerDiagnostic;
+            return this;
+        }
+
+        /**
+         * @apiNote It needs the Foreground library installed.
          *
          * @param lifecycleEvents whether to automatically track transition
          *                        from foreground to background
          * @return itself
          */
-        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         public TrackerBuilder lifecycleEvents(Boolean lifecycleEvents) {
             this.lifecycleEvents = lifecycleEvents;
             return this;
@@ -403,7 +433,6 @@ public class Tracker {
         this.namespace = builder.namespace;
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
-        this.level = builder.logLevel;
         this.sessionContext = builder.sessionContext;
         this.sessionCheckInterval = builder.sessionCheckInterval;
         this.sessionCallbacks = builder.sessionCallbacks;
@@ -412,6 +441,7 @@ public class Tracker {
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
         this.applicationCrash = builder.applicationCrash;
+        this.trackerDiagnostic = builder.trackerDiagnostic;
         this.lifecycleEvents = builder.lifecycleEvents;
         this.screenviewEvents = builder.screenviewEvents;
         this.activityTracking = builder.activityTracking;
@@ -420,6 +450,16 @@ public class Tracker {
         this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
         this.applicationContext = builder.applicationContext;
+        this.gdpr = builder.gdpr;
+        this.level = builder.logLevel;
+
+        if (trackerDiagnostic) {
+            if (level == LogLevel.OFF) {
+                level = LogLevel.ERROR;
+            }
+            Logger.setErrorLogger(this);
+            Logger.updateLogLevel(level);
+        }
 
         if (this.installTracking) {
             this.installTracker = new InstallTracker(this.context);
@@ -459,11 +499,23 @@ public class Tracker {
             });
         }
 
-        Logger.updateLogLevel(builder.logLevel);
         Logger.v(TAG, "Tracker created successfully.");
     }
 
+    // --- Diagnostic
+
+    @Override
+    public void log(String source, String errorMessage, Throwable throwable) {
+        this.track(TrackerError.builder()
+                .source(source)
+                .message(errorMessage)
+                .throwable(throwable)
+                .build()
+        );
+    }
+
     // --- Private init functions
+
     private void initializeScreenviewTracking() {
         if (this.activityTracking) {
             ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
@@ -498,7 +550,12 @@ public class Tracker {
 
                 // Figure out what type of event it is and track it!
                 Class eClass = event.getClass();
-                if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
+                if (eClass.equals(TrackerError.class)) {
+                    SelfDescribing selfDescribing = SelfDescribing.builder()
+                            .eventData((SelfDescribingJson) event.getPayload())
+                            .build();
+                    addServiceEventPayload(selfDescribing.getPayload(), context);
+                } else if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
                     addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
                 } else if (eClass.equals(EcommerceTransaction.class)) {
                     addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
@@ -568,6 +625,56 @@ public class Tracker {
     // --- Helpers
 
     /**
+     * Builds and adds a finalized payload of a service event
+     * by adding in extra information to the payload:
+     * - The event contexts (limited to identify the device and app)
+     * - The Tracker Subject
+     * - The Tracker parameters
+     *
+     * @param payload Payload the raw event payload to be
+     *                decorated.
+     * @param contexts The raw context list
+     */
+    private void addServiceEventPayload(Payload payload, List<SelfDescribingJson> contexts) {
+        // Add default parameters to the payload
+        payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
+        payload.add(Parameters.APPID, this.appId);
+        payload.add(Parameters.NAMESPACE, this.namespace);
+        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
+
+        // If there is a subject present for the Tracker add it
+        if (this.subject != null) {
+            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
+        }
+
+        // Add Mobile Context
+        if (this.mobileContext) {
+            contexts.add(Util.getMobileContext(this.context));
+        }
+
+        // Add application context
+        if (this.applicationContext) {
+            contexts.add(InstallTracker.getApplicationContext(this.context));
+        }
+
+        // If there are contexts to nest
+        if (contexts.size() > 0) {
+            List<Map> contextMaps = new LinkedList<>();
+            for (SelfDescribingJson selfDescribingJson : contexts) {
+                if (selfDescribingJson != null) {
+                    contextMaps.add(selfDescribingJson.getMap());
+                }
+            }
+            SelfDescribingJson envelope = new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
+            payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
+                    Parameters.CONTEXT);
+        }
+
+        // Add this payload to the emitter
+        this.emitter.add(payload);
+    }
+
+    /**
      * Builds and adds a finalized payload by adding in extra
      * information to the payload:
      * - The event contexts
@@ -617,8 +724,18 @@ public class Tracker {
                                                List<SelfDescribingJson> contexts, String eventId) {
 
         // Add session context
-        if (this.sessionContext && this.trackerSession.getHasLoadedFromFile()) {
-            contexts.add(this.trackerSession.getSessionContext(eventId));
+        if (sessionContext) {
+            if (trackerSession.getHasLoadedFromFile()) {
+                synchronized (trackerSession) {
+                    SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
+                    if (sessionContextJson == null) {
+                        Logger.track(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
+                    }
+                    contexts.add(sessionContextJson);
+                }
+            } else {
+                Logger.track(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
+            }
         }
 
         // Add Geo-Location Context
@@ -639,6 +756,11 @@ public class Tracker {
         // Add application context
         if (this.applicationContext) {
             contexts.add(InstallTracker.getApplicationContext(this.context));
+        }
+
+        // Add gdpr context
+        if (gdpr != null) {
+            contexts.add(gdpr.getContext());
         }
 
         // Add global contexts
@@ -698,7 +820,11 @@ public class Tracker {
             sessionExecutor.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    session.checkAndUpdateSession();
+                    try {
+                        session.checkAndUpdateSession();
+                    } catch (Exception e) {
+                        Logger.track(TAG, "Method checkAndUpdateSession raised an exception: %s", e);
+                    }
                 }
             }, this.sessionCheckInterval, this.sessionCheckInterval, this.timeUnit);
         }
@@ -732,6 +858,26 @@ public class Tracker {
     public void startNewSession() {
         pauseSessionChecking();
         resumeSessionChecking();
+    }
+
+    // --- GDPR context
+
+    /**
+     * Enables GDPR context to be sent with every event.
+     * @param basisForProcessing GDPR Basis for processing
+     * @param documentId ID of a GDPR basis document
+     * @param documentVersion Version of the document
+     * @param documentDescription Description of the document
+     */
+    public void enableGdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+        this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
+    }
+
+    /**
+     * Disable GDPR context.
+     */
+    public synchronized void disableGdprContext() {
+        this.gdpr = null;
     }
 
     // --- Setters
@@ -919,7 +1065,8 @@ public class Tracker {
         );
     }
 
-    // global contexts
+    // --- Global contexts
+
     private final List<GlobalContext> globalContexts = Collections.synchronizedList(new ArrayList<GlobalContext>());
 
     public void clearGlobalContexts() {

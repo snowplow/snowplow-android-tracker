@@ -60,8 +60,8 @@ public class TrackerEvents {
     }
 
     private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(ScreenView.builder().name("screenName").id(UUID.randomUUID().toString()).build());
-        tracker.track(ScreenView.builder().name("screenName").id(UUID.randomUUID().toString()).timestamp((long) 1433791172).build());
+        tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
+        tracker.track(ScreenView.builder().name("screenName2").id(UUID.randomUUID().toString()).timestamp((long) 1433791172).build());
     }
 
     private static void trackTimings(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {

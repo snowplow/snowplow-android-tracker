@@ -162,4 +162,10 @@ public class Parameters {
     // Application Focus
     public static final String APP_FOREGROUND_INDEX = "foregroundIndex";
     public static final String APP_BACKGROUND_INDEX = "backgroundIndex";
+
+    // Tracker Diagnostic
+    public static final String DIAGNOSTIC_ERROR_MESSAGE = "message";
+    public static final String DIAGNOSTIC_ERROR_STACK = "stackTrace";
+    public static final String DIAGNOSTIC_ERROR_CLASS_NAME = "className";
+    public static final String DIAGNOSTIC_ERROR_EXCEPTION_NAME = "exceptionName";
 }

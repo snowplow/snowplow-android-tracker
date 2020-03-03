@@ -31,7 +31,8 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(String key, String value) {
         if (value == null || value.isEmpty()) {
-            Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
+            Logger.v(TAG, "The keys value is empty, removing the key: %s", key);
+            payload.remove(key);
             return;
         }
         Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
@@ -41,7 +42,8 @@ public class TrackerPayload implements Payload {
     @Override
     public void add(String key, Object value) {
         if (value == null) {
-            Logger.v(TAG, "The keys value is empty, returning without adding key: %s", key);
+            Logger.v(TAG, "The value is empty, removing the key: %s", key);
+            payload.remove(key);
             return;
         }
         Logger.v(TAG, "Adding new kv pair: " + key + "->%s", value);
@@ -55,12 +57,15 @@ public class TrackerPayload implements Payload {
             return;
         }
         Logger.v(TAG, "Adding new map: %s", map);
-        payload.putAll(map);
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            add(key, value);
+        }
     }
 
     @Override
     public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
-        // Return if we don't have a map
         if (map == null) {
             Logger.v(TAG, "Map passed in is null, returning nothing.");
             return;

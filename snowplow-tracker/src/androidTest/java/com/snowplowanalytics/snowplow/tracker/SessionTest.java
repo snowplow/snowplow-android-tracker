@@ -15,16 +15,38 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SessionTest extends AndroidTestCase {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        Context context = getContext();
+        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, context);
+        if (Build.VERSION.SDK_INT >= 24) {
+            context.deleteSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS);
+        } else {
+            SharedPreferences.Editor editor =
+                    context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE).edit();
+            editor.remove(Parameters.SESSION_USER_ID);
+            editor.remove(Parameters.SESSION_ID);
+            editor.remove(Parameters.SESSION_PREVIOUS_ID);
+            editor.remove(Parameters.SESSION_INDEX);
+            editor.remove(Parameters.SESSION_FIRST_ID);
+            editor.remove(Parameters.SESSION_STORAGE);
+            editor.apply();
+        }
+    }
 
     public void testSessionInit() {
         Session session = getSession(600, 300);
@@ -49,6 +71,8 @@ public class SessionTest extends AndroidTestCase {
 
 
     public void testCheckAndUpdateLogicForExpired() {
+
+
         Session session = getSession(0, 0);
 
         String userId = session.getUserId();

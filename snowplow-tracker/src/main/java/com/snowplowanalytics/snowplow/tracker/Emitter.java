@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
+
+import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -60,6 +63,7 @@ public class Emitter {
 
     private static final int POST_WRAPPER_BYTES = 88; // "schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3","data":[]
     private static final int POST_STM_BYTES = 22;     // "stm":"1443452851000",
+    private static final String DEFAULT_USER_AGENT = String.format("snowplow/%s android/%s", BuildConfig.TRACKER_LABEL, Build.VERSION.RELEASE);
 
     private final String TAG = Emitter.class.getSimpleName();
     private final OkHttpClient client;
@@ -80,6 +84,7 @@ public class Emitter {
     private long byteLimitPost;
     private int emitTimeout;
     private TimeUnit timeUnit;
+    private String customPostPath;
 
     private EventStore eventStore;
     private Future eventStoreFuture;
@@ -107,6 +112,7 @@ public class Emitter {
         private int emitTimeout = 5; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS;
         OkHttpClient client = null; //Optional
+        String customPostPath = null; //Optional
 
         /**
          * @param uri The uri of the collector
@@ -250,6 +256,15 @@ public class Emitter {
         }
 
         /**
+         * @param customPostPath A custom path that is used on the endpoint to send requests.
+         * @return itself
+         */
+        public EmitterBuilder customPostPath(String customPostPath) {
+            this.customPostPath = customPostPath;
+            return this;
+        }
+
+        /**
          * Creates a new Emitter
          *
          * @return a new Emitter object
@@ -280,6 +295,7 @@ public class Emitter {
         this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
         this.eventStore = null;
+        this.customPostPath = builder.customPostPath;
         this.eventStoreFuture = Executor.futureCallable(new Callable<Void>() {
             @Override
             public Void call() {
@@ -294,8 +310,7 @@ public class Emitter {
         final OkHttpClient.Builder clientBuilder;
         if (builder.client == null) {
             clientBuilder = new OkHttpClient.Builder();
-        }
-        else {
+        } else {
             clientBuilder = builder.client.newBuilder();
         }
 
@@ -314,16 +329,17 @@ public class Emitter {
     private void buildEmitterUri() {
         if (this.requestSecurity == RequestSecurity.HTTP) {
             this.uriBuilder = Uri.parse("http://" + this.uri).buildUpon();
-        }
-        else {
+        } else {
             this.uriBuilder = Uri.parse("https://" + this.uri).buildUpon();
         }
+
         if (this.httpMethod == HttpMethod.GET) {
             uriBuilder.appendPath("i");
-        }
-        else {
+        } else if (this.customPostPath == null) {
             uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
                     TrackerConstants.PROTOCOL_VERSION);
+        } else {
+            uriBuilder.appendEncodedPath(this.customPostPath);
         }
     }
 
@@ -623,8 +639,7 @@ public class Emitter {
                         postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
                         totalByteSize = payloadByteSize;
-                    }
-                    else {
+                    } else {
                         totalByteSize += payloadByteSize;
                         postPayloadMaps.add(payload);
                         reqEventIds.add(eventIds.get(j));
@@ -665,10 +680,13 @@ public class Emitter {
             uriBuilder.appendQueryParameter(key, value);
         }
 
+        String userAgent = getUserAgent(payload, DEFAULT_USER_AGENT);
+
         // Build the request
         String reqUrl = uriBuilder.build().toString();
         return new Request.Builder()
                 .url(reqUrl)
+                .header("User-Agent", userAgent)
                 .get()
                 .build();
     }
@@ -683,7 +701,9 @@ public class Emitter {
     private Request requestBuilderPost(ArrayList<Payload> payloads) {
         ArrayList<Map> finalPayloads = new ArrayList<>();
         String stm = Util.getTimestamp();
+        String userAgent = DEFAULT_USER_AGENT;
         for (Payload payload : payloads) {
+            userAgent = getUserAgent(payload, userAgent);
             addStmToEvent(payload, stm);
             finalPayloads.add(payload.getMap());
         }
@@ -694,6 +714,7 @@ public class Emitter {
         RequestBody reqBody = RequestBody.create(JSON, postPayload.toString());
         return new Request.Builder()
                 .url(reqUrl)
+                .header("User-Agent", userAgent)
                 .post(reqBody)
                 .build();
     }
@@ -708,6 +729,21 @@ public class Emitter {
     private void addStmToEvent(Payload payload, String timestamp) {
         payload.add(Parameters.SENT_TIMESTAMP,
                 timestamp.equals("") ? Util.getTimestamp() : timestamp);
+    }
+
+    /**
+     * Get the User-Agent string for the request's header.
+     *
+     * @param payload The payload where to get the `ua` parameter.
+     * @param defaultUserAgent Default User-Agent to set if the payload
+     *                         doesn't have any `ua` parameter.
+     * @return User-Agent string from subject settings or the default one.
+     */
+    @NonNull
+    private String getUserAgent(@NonNull Payload payload, @NonNull String defaultUserAgent) {
+        HashMap hashMap = (HashMap) payload.getMap();
+        String userAgent = (String) hashMap.get(Parameters.USERAGENT);
+        return userAgent != null ? userAgent : defaultUserAgent;
     }
 
     // Setters, Getters and Checkers
@@ -879,6 +915,13 @@ public class Emitter {
      */
     public long getByteLimitPost() {
         return this.byteLimitPost;
+    }
+
+    /**
+     * @return the customPostPath
+     */
+    public String getCustomPostPath() {
+        return this.customPostPath;
     }
 
     /**

@@ -319,10 +319,10 @@ public class Util {
      */
     public static Location getLastKnownLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        String locationProvider = null;
         Location location = null;
 
         try {
+            String locationProvider = null;
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationProvider = LocationManager.GPS_PROVIDER;
             } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {

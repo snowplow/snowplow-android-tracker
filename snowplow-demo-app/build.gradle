@@ -1,17 +1,17 @@
 apply plugin: 'com.android.application'
 
 project.ext {
-    archLifecycleVersion = "1.1.1"
+    archLifecycleVersion = "2.2.0"
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId "com.snowplowanalytics.snowplowtrackerdemo"
-        minSdkVersion 15
-        targetSdkVersion 28
+        minSdkVersion 16
+        targetSdkVersion 29
         versionCode 3
         versionName "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -45,18 +45,24 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     lintOptions {
         abortOnError false
     }
 }
 
 dependencies {
-    implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':snowplow-android-tracker')
-    implementation 'com.android.support:customtabs:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation "androidx.browser:browser:1.2.0"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "androidx.preference:preference:1.1.0"
+    implementation 'com.squareup.okhttp3:okhttp:3.14.6'
     implementation 'com.google.code.gson:gson:2.8.5'
     // test
     androidTestImplementation 'androidx.test:runner:1.2.0'

@@ -145,12 +145,15 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithNoContext() throws Exception {
+        Executor.setThreadCount(10);
+        Executor.shutdown();
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
-        emitter.waitForEventStore();
+        assertTrue(emitter.waitForEventStore());
         emitter.getEventStore().removeAllEvents();
 
         Tracker.close();
