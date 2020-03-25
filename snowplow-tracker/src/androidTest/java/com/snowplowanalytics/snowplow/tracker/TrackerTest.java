@@ -277,15 +277,26 @@ public class TrackerTest extends AndroidTestCase {
         Map<String, Object> screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("Unknown", screenStateMap.get(Parameters.SCREEN_NAME));
 
+        // Send screenView
         ScreenView screenView = ScreenView.builder().name("screen1").build();
         String screenId = (String)screenView.getData().getMap().get("id");
-
         tracker.track(screenView);
 
         screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
         screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("screen1", screenStateMap.get(Parameters.SCREEN_NAME));
         assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
+
+        // Send another screenView
+        screenView = ScreenView.builder().name("screen2").build();
+        String screenId1 = (String)screenView.getData().getMap().get("id");
+        tracker.track(screenView);
+
+        Map<String, Object> payload = (Map<String, Object>)screenView.getPayload().getMap().get("data");
+        assertEquals("screen2", payload.get(Parameters.SCREEN_NAME));
+        assertEquals(screenId1, payload.get(Parameters.SCREEN_ID));
+        assertEquals("screen1", payload.get(Parameters.SV_PREVIOUS_NAME));
+        assertEquals(screenId, payload.get(Parameters.SV_PREVIOUS_ID));
     }
 
     public void testTrackUncaughtException() throws InterruptedException {
