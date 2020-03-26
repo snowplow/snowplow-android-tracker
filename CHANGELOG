@@ -1,3 +1,9 @@
+Version 1.4.1 (2020-03-27)
+--------------------------
+Fix flaky tests (#365)
+ScreenView do not include previous screen state (#363)
+Bump target Android API to 29 (#357)
+
 Version 1.4.0 (2020-03-02)
 --------------------------
 Add tracker's error reporting (#343)
