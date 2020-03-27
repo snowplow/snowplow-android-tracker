@@ -6,7 +6,6 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
-
 public class ScreenState {
     private String name;
     private String type;
@@ -23,6 +22,18 @@ public class ScreenState {
     public ScreenState() {
         id = Util.getUUIDString();
         name = "Unknown";
+    }
+
+    public String getPreviousId() {
+        return previousId;
+    }
+
+    public String getPreviousName() {
+        return previousName;
+    }
+
+    public String getPreviousType() {
+        return previousType;
     }
 
     @Deprecated
@@ -108,5 +119,4 @@ public class ScreenState {
         }
         return null;
     }
-
 }

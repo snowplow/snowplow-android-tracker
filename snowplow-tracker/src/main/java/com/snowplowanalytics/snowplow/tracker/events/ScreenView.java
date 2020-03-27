@@ -211,11 +211,18 @@ public class ScreenView extends AbstractEvent {
     /**
      * Update the passed screen state with the data related to
      * the current ScreenView event.
+     * @apiNote ScreenState updates back the previous screen fields
+     * in the ScreenView event (if `previousId` not already set).
      * @param screenState The screen state to update.
      */
-    public void updateScreenState(ScreenState screenState) {
+    public synchronized void updateScreenState(ScreenState screenState) {
         if (screenState == null) return;
         screenState.updateScreenState(id, name, type, transitionType, fragmentClassName, fragmentTag, activityClassName, activityTag);
+        if (previousId == null) {
+            previousId = screenState.getPreviousId();
+            previousName = screenState.getPreviousName();
+            previousType = screenState.getPreviousType();
+        }
     }
 
     /**
