@@ -155,10 +155,12 @@ public class EventStore {
      */
     public boolean removeAllEvents() {
         int retval = -1;
+        Logger.d(TAG, "Removing all events from database.");
         if (isDatabaseOpen()) {
             retval = database.delete(EventStoreHelper.TABLE_EVENTS, null, null);
+        } else {
+            Logger.e(TAG, "Database is not open.");
         }
-        Logger.d(TAG, "Removing all events from database.");
         return retval == 0;
     }
 

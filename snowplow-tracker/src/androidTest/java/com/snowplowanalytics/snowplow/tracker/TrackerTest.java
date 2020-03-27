@@ -154,7 +154,8 @@ public class TrackerTest extends AndroidTestCase {
                 .option(BufferOption.Single)
                 .build();
         assertTrue(emitter.waitForEventStore());
-        emitter.getEventStore().removeAllEvents();
+        boolean isEventStoreClean = emitter.getEventStore().removeAllEvents();
+        assertTrue(isEventStoreClean);
 
         Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())

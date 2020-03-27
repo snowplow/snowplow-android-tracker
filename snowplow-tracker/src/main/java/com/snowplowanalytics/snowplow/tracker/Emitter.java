@@ -828,7 +828,7 @@ public class Emitter {
     public boolean waitForEventStore() {
         Future eventStoreFuture = this.getEventStoreFuture();
         try {
-            eventStoreFuture.get(5, TimeUnit.SECONDS);
+            eventStoreFuture.get(30, TimeUnit.SECONDS);
         } catch (InterruptedException ie) {
             Logger.e(TAG, "Event store loading was interrupted: %s", ie.getMessage());
         } catch (ExecutionException ee) {
