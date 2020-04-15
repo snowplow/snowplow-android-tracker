@@ -80,9 +80,9 @@ limitations under the License.
 [roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[techdocs]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.0/
+[techdocs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/
 [techdocs-old]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
-[setup]: http://docs.snowplowanalytics.com/open-source/snowplow/trackers/android-tracker/1.3.0/android-tracker/#quick-start
+[setup]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/#quick-start
 [roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
 [contributing]: https://github.com/snowplow/snowplow/wiki/Contributing
 
