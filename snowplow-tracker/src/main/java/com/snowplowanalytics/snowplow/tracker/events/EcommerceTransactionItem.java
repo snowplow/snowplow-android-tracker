@@ -13,12 +13,17 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class EcommerceTransactionItem extends AbstractEvent {
+import java.util.HashMap;
+import java.util.Map;
+
+public class EcommerceTransactionItem extends AbstractPrimitive {
 
     private final String itemId;
     private final String sku;
@@ -138,29 +143,31 @@ public class EcommerceTransactionItem extends AbstractEvent {
     }
 
     /**
+     * @deprecated As of release 1.4.2, it will be removed in version 2.0.0.
+     *
      * @param deviceCreatedTimestamp the new timestamp
      */
+    @Deprecated
     public void setDeviceCreatedTimestamp(long deviceCreatedTimestamp) {
         this.deviceCreatedTimestamp = deviceCreatedTimestamp;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_ECOMM_ITEM);
-        payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(this.deviceCreatedTimestamp));
-        payload.add(Parameters.TI_ITEM_ID, this.itemId);
-        payload.add(Parameters.TI_ITEM_SKU, this.sku);
-        payload.add(Parameters.TI_ITEM_NAME, this.name);
-        payload.add(Parameters.TI_ITEM_CATEGORY, this.category);
-        payload.add(Parameters.TI_ITEM_PRICE, Double.toString(this.price));
-        payload.add(Parameters.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
-        payload.add(Parameters.TI_ITEM_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        HashMap<String, Object> payload = new HashMap<>();
+        payload.put(Parameters.DEVICE_TIMESTAMP, Long.toString(this.deviceCreatedTimestamp)); // TODO: to remove on v.2.0
+        payload.put(Parameters.TI_ITEM_ID, this.itemId);
+        payload.put(Parameters.TI_ITEM_SKU, this.sku);
+        payload.put(Parameters.TI_ITEM_NAME, this.name);
+        payload.put(Parameters.TI_ITEM_CATEGORY, this.category);
+        payload.put(Parameters.TI_ITEM_PRICE, Double.toString(this.price));
+        payload.put(Parameters.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
+        payload.put(Parameters.TI_ITEM_CURRENCY, this.currency);
+        return payload;
+    }
+
+    @Override
+    public @NonNull String getName() {
+        return TrackerConstants.EVENT_ECOMM_ITEM;
     }
 }

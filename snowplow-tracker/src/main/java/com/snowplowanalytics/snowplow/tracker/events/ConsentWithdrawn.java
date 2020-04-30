@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -21,8 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class ConsentWithdrawn extends AbstractEvent {
+public class ConsentWithdrawn extends AbstractSelfDescribing {
     private final boolean all;
     private final String documentId;
     private final String documentVersion;
@@ -139,8 +143,12 @@ public class ConsentWithdrawn extends AbstractEvent {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @deprecated As of release 1.4.2, it will be removed in version 2.0.0.
+     * replaced by {@link #getDataPayload()}.
+     *
      * @return the payload to be sent.
      */
+    @Deprecated
     public TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.CW_ALL, this.all);
@@ -152,16 +160,26 @@ public class ConsentWithdrawn extends AbstractEvent {
      *
      * @return the consent documents
      */
-    public List<ConsentDocument> getConsentDocuments() {
+    public @NonNull List<ConsentDocument> getConsentDocuments() {
         return this.consentDocuments;
     }
 
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONSENT_WITHDRAWN, getData());
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData().getMap();
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_CONSENT_WITHDRAWN;
+    }
+
+    @Override
+    public void beginProcessing(Tracker tracker) {
+        List<SelfDescribingJson> contexts = getContexts();
+        for (ConsentDocument document : consentDocuments) {
+            SelfDescribingJson context = new SelfDescribingJson(document.getSchema(), document.getDataPayload());
+            contexts.add(context);
+        }
     }
 }

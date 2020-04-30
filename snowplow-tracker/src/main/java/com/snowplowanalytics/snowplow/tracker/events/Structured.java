@@ -13,15 +13,20 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Constructs a Structured event object.
  */
-public class Structured extends AbstractEvent {
+public class Structured extends AbstractPrimitive {
 
     private final String category;
     private final String action;
@@ -114,21 +119,22 @@ public class Structured extends AbstractEvent {
         this.value = builder.value;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_STRUCTURED);
-        payload.add(Parameters.SE_CATEGORY, this.category);
-        payload.add(Parameters.SE_ACTION, this.action);
-        payload.add(Parameters.SE_LABEL, this.label);
-        payload.add(Parameters.SE_PROPERTY, this.property);
-        payload.add(Parameters.SE_VALUE,
+    @NonNull
+    @Override
+    public Map<String, Object> getDataPayload() {
+        HashMap<String, Object> payload = new HashMap<>(6);
+        payload.put(Parameters.SE_CATEGORY, this.category);
+        payload.put(Parameters.SE_ACTION, this.action);
+        payload.put(Parameters.SE_LABEL, this.label);
+        payload.put(Parameters.SE_PROPERTY, this.property);
+        payload.put(Parameters.SE_VALUE,
                 this.value != null ? Double.toString(this.value) : null);
-        return putDefaultParams(payload);
+        return payload;
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return TrackerConstants.EVENT_STRUCTURED;
     }
 }

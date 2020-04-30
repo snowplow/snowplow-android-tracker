@@ -13,16 +13,20 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 
+import java.util.Map;
+
 /**
  * Constructs an SelfDescribing event object.
  */
-public class SelfDescribing extends AbstractEvent {
+public class SelfDescribing extends AbstractPrimitive {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -74,12 +78,7 @@ public class SelfDescribing extends AbstractEvent {
         this.base64Encode = base64Encode;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
+    @Override
     public TrackerPayload getPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
@@ -88,5 +87,15 @@ public class SelfDescribing extends AbstractEvent {
         payload.addMap(envelope.getMap(), this.base64Encode,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
         return putDefaultParams(payload);
+    }
+
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return this.eventData.getMap();
+    }
+
+    @Override
+    public @NonNull String getName() {
+        return TrackerConstants.SCHEMA_UNSTRUCT_EVENT;
     }
 }

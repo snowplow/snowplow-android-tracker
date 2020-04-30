@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -8,7 +10,9 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
-public class TrackerError extends AbstractEvent {
+import java.util.Map;
+
+public class TrackerError extends AbstractSelfDescribing {
     private static final int MAX_MESSAGE_LENGTH = 2048;
     private static final int MAX_STACK_LENGTH = 8192;
     private static final int MAX_EXCEPTION_NAME_LENGTH = 1024;
@@ -66,11 +70,16 @@ public class TrackerError extends AbstractEvent {
     }
 
     @Override
-    public Payload getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_DIAGNOSTIC_ERROR, getData());
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData().getMap();
     }
 
-    private TrackerPayload getData() {
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_DIAGNOSTIC_ERROR;
+    }
+
+    private @NonNull TrackerPayload getData() {
         String msg = truncate(message, MAX_MESSAGE_LENGTH);
         if (msg == null || msg.isEmpty()) {
             msg = "Empty message found";
