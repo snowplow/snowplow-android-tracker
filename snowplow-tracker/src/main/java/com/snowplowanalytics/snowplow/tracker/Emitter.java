@@ -17,7 +17,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;

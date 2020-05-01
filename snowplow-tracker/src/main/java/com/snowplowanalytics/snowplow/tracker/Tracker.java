@@ -16,9 +16,9 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import androidx.lifecycle.ProcessLifecycleOwner;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;

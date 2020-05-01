@@ -15,10 +15,12 @@ package com.snowplowanalytics.snowplow.tracker.payload;
 
 import android.test.AndroidTestCase;
 import android.util.Base64;
+import android.util.JsonReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,14 +80,31 @@ public class TrackerPayloadTest extends AndroidTestCase {
 
     public void testAddSimpleMapBase64NoEncode() throws JSONException {
         payload.addMap(createTestMap(), false, "enc", "no_enc");
-        assertEquals("{\"a\":\"string\",\"b\":\"\",\"c\":null}", payload.getMap().get("no_enc"));
-        assertFalse(payload.getMap().containsKey("enc"));
+        Map<String, Object> map = payload.getMap();
+        assertFalse(map.containsKey("enc"));
+        assertTrue(map.containsKey("no_enc"));
+        JSONObject json = new JSONObject((String) map.get("no_enc"));
+        assertEquals("string", json.getString("a"));
+        assertEquals("", json.getString("b"));
+        assertEquals(JSONObject.NULL, json.get("c"));
     }
 
     public void testAddMapBase64Encoded() throws JSONException {
         payload.addMap(createTestMap(), true, "enc", "no_enc");
-        assertEquals("eyJhIjoic3RyaW5nIiwiYiI6IiIsImMiOm51bGx9", payload.getMap().get("enc"));
-        assertFalse(payload.getMap().containsKey("no_enc"));
+        Map<String, Object> map = payload.getMap();
+        assertFalse(map.containsKey("no_enc"));
+        String base64Json = (String) payload.getMap().get("enc");
+        String jsonString = "";
+        try {
+            jsonString = new String(Base64.decode(base64Json, Base64.DEFAULT), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            fail("UnsupportedEncodingException");
+        }
+        JSONObject json = new JSONObject(jsonString);
+        assertEquals("string", json.getString("a"));
+        assertEquals("", json.getString("b"));
+        assertEquals(JSONObject.NULL, json.get("c"));
     }
 
     public void testSimplePayloadToString() throws JSONException {
