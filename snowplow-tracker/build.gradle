@@ -11,7 +11,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.github.kt3k.coveralls'
 
 jacoco {
-    toolVersion = "0.7.7.201606060606"
+    toolVersion = "0.8.5"
 }
 
 project.ext {
@@ -68,6 +68,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    // This enables long timeouts required on slow environments
+    adbOptions {
+        timeOutInMs 10 * 60 * 1000  // Set the timeout to 10 minutes
+        installOptions "-d","-t"
     }
 }
 
