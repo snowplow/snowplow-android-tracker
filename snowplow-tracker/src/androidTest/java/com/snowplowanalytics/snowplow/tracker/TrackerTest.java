@@ -15,11 +15,11 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -38,21 +38,40 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 public class TrackerTest extends AndroidTestCase {
 
-    // Helper Methods
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        try {
+            Tracker tracker = Tracker.instance();
+            Emitter emitter = tracker.getEmitter();
+            emitter.shutdown(30);
+            tracker.close();
+            emitter.waitForEventStore();
+            boolean isClean = emitter.getEventStore().removeAllEvents();
+            Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
+            Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
+        } catch(IllegalStateException e) {
+            Log.i("TrackerTest", "Tracker already closed.");
+        }
+    }
 
+    // Helper Methods
     private Tracker getTracker() {
+        return getTracker(false);
+    }
+
+    private Tracker getTracker(boolean installTracking) {
         Emitter emitter = new Emitter
                 .EmitterBuilder("testUrl", getContext())
                 .tick(0)
                 .emptyLimit(0)
                 .build();
+        emitter.waitForEventStore();
 
         Subject subject = new Subject
                 .SubjectBuilder()
                 .context(getContext())
                 .build();
-
-        Tracker.close();
 
         return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .subject(subject)
@@ -69,7 +88,7 @@ public class TrackerTest extends AndroidTestCase {
             .timeUnit(TimeUnit.SECONDS)
             .applicationCrash(false)
             .lifecycleEvents(true)
-            .installTracking(true)
+            .installTracking(installTracking)
             .applicationContext(true)
             .build();
     }
@@ -77,8 +96,6 @@ public class TrackerTest extends AndroidTestCase {
     // Tests
 
     public void testTrackerNotInit() {
-        Tracker.close();
-
         boolean exception = false;
         try {
             Tracker.instance();
@@ -90,7 +107,7 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testSetValues() {
-        Tracker tracker = getTracker();
+        Tracker tracker = getTracker(true);
         assertEquals("myNamespace", tracker.getNamespace());
         assertEquals("myAppId", tracker.getAppId());
         assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
@@ -145,20 +162,23 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithNoContext() throws Exception {
-        Executor.setThreadCount(10);
+        Executor.setThreadCount(30);
         Executor.shutdown();
 
         MockWebServer mockWebServer = getMockServer(1);
 
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
-                .option(BufferOption.Single)
-                .build();
-        assertTrue(emitter.waitForEventStore());
-        boolean isEventStoreClean = emitter.getEventStore().removeAllEvents();
-        assertTrue(isEventStoreClean);
+        Emitter emitter = null;
+        try {
+            emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+                    .option(BufferOption.Single)
+                    .build();
+            emitter.waitForEventStore();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Exception on Emitter creation");
+        }
 
-        Tracker.close();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
@@ -167,10 +187,13 @@ public class TrackerTest extends AndroidTestCase {
                 .geoLocationContext(false)
                 .build();
 
+        Log.i("testTrackWithNoContext", "Send ScreenView event");
         tracker.track(ScreenView.builder().build());
-        RecordedRequest req = mockWebServer.takeRequest(20, TimeUnit.SECONDS);
-
+        Log.i("testTrackWithNoContext", "allEvents: \n" + tracker.getEmitter().getEventStore().getAllEvents());
+        RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
         assertNotNull(req);
+        int reqCount = mockWebServer.getRequestCount();
+        assertEquals(1, reqCount);
 
         JSONObject payload = new JSONObject(req.getBody().readUtf8());
         assertEquals(2, payload.length());
@@ -185,7 +208,9 @@ public class TrackerTest extends AndroidTestCase {
 
         boolean found = true;
         try {
-            event.getString(Parameters.CONTEXT);
+            String co = event.getString(Parameters.CONTEXT);
+            Log.e("testTrackWithNoContext", "Unexpected event: " + event.toString());
+            fail(co);
         } catch (Exception e) {
             found = false;
         }
@@ -201,9 +226,7 @@ public class TrackerTest extends AndroidTestCase {
                 .option(BufferOption.Single)
                 .build();
         emitter.waitForEventStore();
-        emitter.getEventStore().removeAllEvents();
 
-        Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .base64(false)
             .level(LogLevel.VERBOSE)
@@ -229,9 +252,7 @@ public class TrackerTest extends AndroidTestCase {
                 .option(BufferOption.Single)
                 .build();
         emitter.waitForEventStore();
-        emitter.getEventStore().removeAllEvents();
 
-        Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .base64(false)
             .level(LogLevel.VERBOSE)
@@ -256,8 +277,8 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
                 .option(BufferOption.Single)
                 .build();
+        emitter.waitForEventStore();
 
-        Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
@@ -311,8 +332,8 @@ public class TrackerTest extends AndroidTestCase {
         );
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
+        emitter.waitForEventStore();
 
-        Tracker.close();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
@@ -336,12 +357,12 @@ public class TrackerTest extends AndroidTestCase {
         );
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
-        Tracker.close();
         new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .applicationCrash(false)
                 .build();
+        emitter.waitForEventStore();
 
         ExceptionHandler handler1 = new ExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(handler1);
@@ -370,19 +391,15 @@ public class TrackerTest extends AndroidTestCase {
     // Mock Server
 
     public MockWebServer getMockServer(int count) throws IOException {
-        EventStore eventStore = new EventStore(getContext(), 10);
-        eventStore.removeAllEvents();
-
         MockWebServer mockServer = new MockWebServer();
         mockServer.start();
-
         MockResponse mockResponse = new MockResponse().setResponseCode(200);
         for (int i = 0; i < count; i++) {
             mockServer.enqueue(mockResponse);
         }
-
         return mockServer;
     }
+
     @SuppressLint("DefaultLocale")
     public String getMockServerURI(MockWebServer mockServer) {
         if (mockServer != null) {

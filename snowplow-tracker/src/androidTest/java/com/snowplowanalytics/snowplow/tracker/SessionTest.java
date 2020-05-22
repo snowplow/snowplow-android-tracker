@@ -44,7 +44,7 @@ public class SessionTest extends AndroidTestCase {
             editor.remove(Parameters.SESSION_INDEX);
             editor.remove(Parameters.SESSION_FIRST_ID);
             editor.remove(Parameters.SESSION_STORAGE);
-            editor.apply();
+            editor.commit();
         }
     }
 
@@ -115,12 +115,12 @@ public class SessionTest extends AndroidTestCase {
 
     public void testSessionInitWithIncompletePersistedData() {
         SharedPreferences prefs = getContext().getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-        prefs.edit().clear().apply();
-        prefs.edit().putString(Parameters.SESSION_USER_ID, UUID.randomUUID().toString()).apply();
+        prefs.edit().clear().commit();
+        prefs.edit().putString(Parameters.SESSION_USER_ID, UUID.randomUUID().toString()).commit();
 
         Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
 
+        assertTrue(session.waitForSessionFileLoad());
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
@@ -137,7 +137,7 @@ public class SessionTest extends AndroidTestCase {
         getContext().getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE)
                 .edit()
                 .clear()
-                .apply();
+                .commit();
         Session session = new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, getContext());
         session.waitForSessionFileLoad();
         return session;

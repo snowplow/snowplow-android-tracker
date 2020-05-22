@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -387,9 +388,29 @@ public class Emitter {
      * Resets the `isRunning` truth to false and shutdown.
      */
     public void shutdown() {
+        shutdown(0);
+    }
+
+    /**
+     * Resets the `isRunning` truth to false and shutdown.
+     *
+     * @param timeout the amount of seconds to wait for the termination of the running threads.
+     */
+    boolean shutdown(long timeout) {
         Logger.d(TAG, "Shutting down emitter.");
         isRunning.compareAndSet(true, false);
-        Executor.shutdown();
+        ExecutorService es = Executor.shutdown();
+        if (es == null || timeout <= 0) {
+            return true;
+        }
+        try {
+            boolean isTerminated = es.awaitTermination(timeout, TimeUnit.SECONDS);
+            Logger.d(TAG, "Executor is terminated: " + isTerminated);
+            return isTerminated;
+        } catch (InterruptedException e) {
+            Logger.e(TAG, "Executor termination is interrupted: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -828,7 +849,7 @@ public class Emitter {
     public boolean waitForEventStore() {
         Future eventStoreFuture = this.getEventStoreFuture();
         try {
-            eventStoreFuture.get(30, TimeUnit.SECONDS);
+            eventStoreFuture.get(60, TimeUnit.SECONDS);
         } catch (InterruptedException ie) {
             Logger.e(TAG, "Event store loading was interrupted: %s", ie.getMessage());
         } catch (ExecutionException ee) {
