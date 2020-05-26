@@ -508,12 +508,7 @@ public class Tracker implements DiagnosticLogger {
 
     @Override
     public void log(String source, String errorMessage, Throwable throwable) {
-        this.track(TrackerError.builder()
-                .source(source)
-                .message(errorMessage)
-                .throwable(throwable)
-                .build()
-        );
+        this.track(new TrackerError(source, errorMessage, throwable));
     }
 
     // --- Private init functions

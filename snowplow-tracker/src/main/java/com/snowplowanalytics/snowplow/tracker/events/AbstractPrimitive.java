@@ -11,6 +11,8 @@ public abstract class AbstractPrimitive extends AbstractEvent {
         super(builder);
     }
 
+    protected AbstractPrimitive() { super(); }
+
     /**
      * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0.
      * replaceable by use of {@link #getDataPayload()} and {@link #getName()}.

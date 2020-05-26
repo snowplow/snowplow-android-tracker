@@ -134,6 +134,17 @@ public abstract class AbstractEvent implements Event {
         }
     }
 
+    private static class Builder2 extends Builder<Builder2> {
+        @Override
+        protected Builder2 self() {
+            return this;
+        }
+    }
+
+    protected AbstractEvent() {
+        this(new Builder2());
+    }
+
     AbstractEvent(Builder<?> builder) {
 
         // Precondition checks
