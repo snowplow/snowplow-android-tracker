@@ -1,3 +1,12 @@
+
+Version 1.4.2 (2020-05-28)
+--------------------------
+Move from Travis CI to GitHub Actions (#375) 
+Fix race condition on tests (#376)
+Fix crash caused by InstallTracker component (#377)
+Version 1.4.1 uses AndroidX instead of Support library (#373)
+Fix broken links to documentation (#368)
+
 Version 1.4.1 (2020-03-27)
 --------------------------
 Fix flaky tests (#365)
