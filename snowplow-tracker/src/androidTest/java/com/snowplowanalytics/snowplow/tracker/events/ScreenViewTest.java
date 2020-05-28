@@ -17,8 +17,6 @@ import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 
-import org.junit.internal.runners.statements.Fail;
-
 import java.util.Map;
 import java.util.UUID;
 

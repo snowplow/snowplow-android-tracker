@@ -2,7 +2,6 @@ package com.snowplowanalytics.snowplow.tracker.events;
 
 import android.support.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
 public abstract class AbstractSelfDescribing extends AbstractEvent {
