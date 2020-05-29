@@ -2,7 +2,7 @@
 
 tag_version=$1
 
-cd $TRAVIS_BUILD_DIR
+cd $GITHUB_WORKSPACE
 pwd
 
 project_version=`cat VERSION`

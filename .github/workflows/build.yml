@@ -56,6 +56,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build
+        run: ./gradlew assembleRelease
+
       - name: Get version (git tag)
         id: get_version
         run: |
