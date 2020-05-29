@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Static Class which holds the logic for controlling
@@ -64,11 +65,14 @@ public class Executor {
      * Shuts the executor service down and resets
      * the executor to a null state.
      */
-    public static void shutdown() {
+    public static ExecutorService shutdown() {
         if (executor != null) {
             executor.shutdown();
+            ExecutorService es = executor;
             executor = null;
+            return es;
         }
+        return null;
     }
 
     /**

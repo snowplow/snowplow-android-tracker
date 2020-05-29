@@ -57,7 +57,6 @@ public class UtilTest extends AndroidTestCase {
         assertTrue(sdjData.containsKey(Parameters.DEVICE_MODEL));
         assertTrue(sdjData.containsKey(Parameters.DEVICE_MANUFACTURER));
         assertTrue(sdjData.containsKey(Parameters.CARRIER));
-        assertTrue(sdjData.containsKey(Parameters.NETWORK_TECHNOLOGY));
         assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE));
     }
 

@@ -88,7 +88,11 @@ public class InstallTracker {
         SelfDescribing event = SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL))
                 .build();
-        Tracker.instance().track(event);
+        try {
+            Tracker.instance().track(event);
+        } catch(IllegalStateException e) {
+            Logger.e(TAG, "Failed to send install event as Tracker is not instanced: %s", e.getMessage());
+        }
     }
 
     private void sendInstallEvent(long installTimestamp) {
@@ -96,7 +100,11 @@ public class InstallTracker {
                 .eventData(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL))
                 .deviceCreatedTimestamp(installTimestamp)
                 .build();
-        Tracker.instance().track(event);
+        try {
+            Tracker.instance().track(event);
+        } catch(IllegalStateException e) {
+            Logger.e(TAG, "Failed to send install event as Tracker is not instanced: %s", e.getMessage());
+        }
     }
 
     static public SelfDescribingJson getApplicationContext(Context context) {

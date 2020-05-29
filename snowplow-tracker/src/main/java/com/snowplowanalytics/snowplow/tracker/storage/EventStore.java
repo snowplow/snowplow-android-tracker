@@ -161,7 +161,7 @@ public class EventStore {
         } else {
             Logger.e(TAG, "Database is not open.");
         }
-        return retval == 0;
+        return retval >= 0;
     }
 
     /**

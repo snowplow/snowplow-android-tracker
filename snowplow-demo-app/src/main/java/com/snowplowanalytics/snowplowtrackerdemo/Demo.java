@@ -22,10 +22,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
@@ -33,13 +34,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
-import androidx.browser.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsIntent;
 import android.net.Uri;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
-import androidx.test.espresso.IdlingResource;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Gdpr;
@@ -53,9 +49,7 @@ import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
-import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoIdlingResource;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
@@ -84,9 +78,6 @@ public class Demo extends Activity {
 
     private Consumer<Boolean> callbackIsPermissionGranted;
     private final static int APP_PERMISSION_REQUEST_LOCATION = 1;
-
-    @Nullable
-    private DemoIdlingResource demoIdlingResource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,9 +204,6 @@ public class Demo extends Activity {
             eventsCreated += 14;
             final String made = "Made: " + eventsCreated;
             _eventsCreated.setText(made);
-            if (demoIdlingResource != null) {
-                demoIdlingResource.setIdleState(false);
-            }
             TrackerEvents.trackAll(Tracker.instance());
         } else {
             updateLogger("URI field empty!\n");
@@ -318,9 +306,6 @@ public class Demo extends Activity {
                     }
                 } else {
                     _startButton.setText(R.string.start);
-                    if (demoIdlingResource != null) {
-                        demoIdlingResource.setIdleState(true);
-                    }
                 }
             }
         });
@@ -413,14 +398,5 @@ public class Demo extends Activity {
                 updateEventsSent(successCount);
             }
         };
-    }
-
-    @VisibleForTesting
-    @NonNull
-    public IdlingResource getIdlingResource() {
-        if (demoIdlingResource == null) {
-            demoIdlingResource = new DemoIdlingResource();
-        }
-        return demoIdlingResource;
     }
 }

@@ -364,7 +364,7 @@ public class Session {
         } catch (TimeoutException te) {
             Logger.track(TAG, "Session file loading timedout: %s", te.getMessage());
         }
-        return fileFuture.isDone();
+        return this.hasLoadedFromFile.get();
     }
 
     /**
