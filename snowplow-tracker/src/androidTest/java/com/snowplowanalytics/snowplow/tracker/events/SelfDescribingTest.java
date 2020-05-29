@@ -29,7 +29,7 @@ public class SelfDescribingTest extends AndroidTestCase {
                 .eventData(sdj)
                 .build();
 
-        Map data = pageView.getPayload().getMap();
+        Map data = pageView.getTrackerPayload().getMap();
 
         assertNotNull(data);
         assertEquals("ue", data.get(Parameters.EVENT));
@@ -37,7 +37,7 @@ public class SelfDescribingTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.UNSTRUCTURED_ENCODED));
 
         pageView.setBase64Encode(true);
-        data = pageView.getPayload().getMap();
+        data = pageView.getTrackerPayload().getMap();
 
         assertNotNull(data);
         assertEquals("ue", data.get(Parameters.EVENT));

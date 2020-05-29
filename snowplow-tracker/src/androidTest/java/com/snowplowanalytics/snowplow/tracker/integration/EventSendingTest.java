@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.integration;
 
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
@@ -52,8 +53,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class EventSendingTest extends AndroidTestCase {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        try {
+            Tracker tracker = Tracker.instance();
+            Emitter emitter = tracker.getEmitter();
+            tracker.close();
+            emitter.waitForEventStore();
+            boolean isClean = emitter.getEventStore().removeAllEvents();
+            Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
+            Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
+        } catch(IllegalStateException e) {
+            Log.i("TrackerTest", "Tracker already closed.");
+        }
+    }
 
     // Test Setup
 
@@ -161,7 +179,11 @@ public class EventSendingTest extends AndroidTestCase {
     public LinkedList<RecordedRequest> getRequests(MockWebServer mockServer, int count) throws Exception {
         LinkedList<RecordedRequest> requests = new LinkedList<>();
         for (int i = 0; i < count; i++) {
-            requests.add(mockServer.takeRequest());
+            RecordedRequest request = mockServer.takeRequest(60, TimeUnit.SECONDS);
+            if (request == null) {
+                fail("MockWebServer didn't receive events.");
+            }
+            requests.add(request);
         }
         return requests;
     }
@@ -368,31 +390,31 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void trackPageView(Tracker tracker) throws Exception {
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").customContext(getCustomContext()).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(getCustomContext()).build());
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackStructuredEvent(Tracker tracker) throws Exception {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).customContext(getCustomContext()).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).contexts(getCustomContext()).build());
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackScreenView(Tracker tracker) throws Exception {
         String id = UUID.randomUUID().toString();
         tracker.track(ScreenView.builder().name("screenName").build());
-        tracker.track(ScreenView.builder().name("screenName").customContext(getCustomContext()).build());
+        tracker.track(ScreenView.builder().name("screenName").contexts(getCustomContext()).build());
         tracker.track(ScreenView.builder().name("screenName").id(id).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(ScreenView.builder().name("screenName").id(id).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(ScreenView.builder().name("screenName").id(id).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackTimings(Tracker tracker) throws Exception {
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").contexts(getCustomContext()).build());
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackUnstructuredEvent(Tracker tracker) throws Exception {
@@ -400,9 +422,9 @@ public class EventSendingTest extends AndroidTestCase {
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
-        tracker.track(SelfDescribing.builder().eventData(test).customContext(getCustomContext()).build());
+        tracker.track(SelfDescribing.builder().eventData(test).contexts(getCustomContext()).build());
         tracker.track(SelfDescribing.builder().eventData(test).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(SelfDescribing.builder().eventData(test).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(SelfDescribing.builder().eventData(test).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackEcommerceEvent(Tracker tracker) throws Exception {
@@ -410,9 +432,9 @@ public class EventSendingTest extends AndroidTestCase {
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).customContext(getCustomContext()).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).contexts(getCustomContext()).build());
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackConsentGranted(Tracker tracker) throws Exception {
@@ -431,9 +453,9 @@ public class EventSendingTest extends AndroidTestCase {
                 .build());
 
         tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
-        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).customContext(getCustomContext()).build());
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).contexts(getCustomContext()).build());
         tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public void trackConsentWithdrawn(Tracker tracker) throws Exception {
@@ -452,9 +474,9 @@ public class EventSendingTest extends AndroidTestCase {
                 .build());
 
         tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
-        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).customContext(getCustomContext()).build());
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).contexts(getCustomContext()).build());
         tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).build());
-        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).customContext(getCustomContext()).build());
+        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).deviceCreatedTimestamp((long) 1433791172).contexts(getCustomContext()).build());
     }
 
     public List<SelfDescribingJson> getCustomContext() {
