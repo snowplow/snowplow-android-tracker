@@ -553,7 +553,7 @@ public class Tracker implements DiagnosticLogger {
     }
 
     private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {
-        Payload payload = new TrackerPayload();
+        TrackerPayload payload = new TrackerPayload();
         addBasicPropertiesToPayload(payload, event);
         if (event.isPrimitive) {
             addPrimitivePropertiesToPayload(payload, event);
@@ -562,13 +562,13 @@ public class Tracker implements DiagnosticLogger {
         }
         List<SelfDescribingJson> contexts = event.contexts;
         addBasicContextsToContexts(contexts, event);
-        addGlobalContextsToContexts(contexts, event);
+        addGlobalContextsToContexts(contexts, payload);
         wrapContextsToPayload(payload, contexts);
         return payload;
     }
 
     private void addBasicPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
-        payload.add(Parameters.EID, event.eventId);
+        payload.add(Parameters.EID, event.eventId.toString());
         payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(event.timestamp));
         if (event.trueTimestamp != null) {
             payload.add(Parameters.TRUE_TIMESTAMP, event.trueTimestamp.toString());
@@ -590,6 +590,10 @@ public class Tracker implements DiagnosticLogger {
     private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
         SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
+        HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
+        unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
+        unstructuredEventPayload.put(Parameters.DATA, data.getMap());
+        payload.addMap(unstructuredEventPayload, base64Encoded, Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
     }
 
     private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
@@ -633,17 +637,12 @@ public class Tracker implements DiagnosticLogger {
         }
     }
 
-    private void addGlobalContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
-        /*
-        TODO: GlobalContexts should use InspectableEvent
-         */
-        /*
+    private void addGlobalContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerPayload payload) {
         synchronized (globalContexts) {
             if (!globalContexts.isEmpty()) {
-                contexts.addAll(GlobalContextUtils.evalGlobalContexts(event, globalContexts));
+                contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
             }
         }
-         */
     }
 
     private void wrapContextsToPayload(@NonNull Payload payload, @NonNull List<SelfDescribingJson> contexts) {

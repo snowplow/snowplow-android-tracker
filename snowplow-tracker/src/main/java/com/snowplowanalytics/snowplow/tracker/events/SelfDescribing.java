@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Constructs an SelfDescribing event object.
  */
-public class SelfDescribing extends AbstractPrimitive {
+public class SelfDescribing extends AbstractSelfDescribing {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -78,8 +78,12 @@ public class SelfDescribing extends AbstractPrimitive {
         this.base64Encode = base64Encode;
     }
 
-    @Override
-    public TrackerPayload getPayload() {
+    /**
+     * This replace the `getPayload()` returning a TrackerPayload.
+     * Do not use in production code as it's an internal deprecated method.
+     */
+    @Deprecated
+    public TrackerPayload getTrackerPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
                 TrackerConstants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
@@ -89,13 +93,28 @@ public class SelfDescribing extends AbstractPrimitive {
         return putDefaultParams(payload);
     }
 
+    /**
+     * This method is for internal use and deprecated.
+     * Do not use in production code. In case it has been already used, you can replace it with
+     * `getTrackerPayload`.
+     */
     @Override
-    public @NonNull Map<String, Object> getDataPayload() {
-        return this.eventData.getMap();
+    @Deprecated
+    public SelfDescribingJson getPayload() {
+        return super.getPayload();
     }
 
     @Override
-    public @NonNull String getName() {
-        return TrackerConstants.SCHEMA_UNSTRUCT_EVENT;
+    public @NonNull Map<String, Object> getDataPayload() {
+        try {
+            return (Map<String, Object>) this.eventData.getMap().get(Parameters.DATA);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return (String) eventData.getMap().get(Parameters.SCHEMA);
     }
 }
