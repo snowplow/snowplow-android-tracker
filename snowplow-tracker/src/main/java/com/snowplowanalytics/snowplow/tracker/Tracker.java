@@ -531,23 +531,16 @@ public class Tracker implements DiagnosticLogger {
             screenView.updateScreenState(screenState);
         }
 
-        TrackerEvent trackerEvent;
-        if (event instanceof AbstractPrimitive) {
-            trackerEvent = TrackerEvent.createWithPrimitive((AbstractPrimitive) event);
-        } else {
-            trackerEvent = TrackerEvent.createWithSelfDescribing((AbstractSelfDescribing) event);
-        }
-
-        Executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                processEvent(trackerEvent);
-            }
+        Executor.execute(() -> {
+            event.beginProcessing(this);
+            processEvent(event);
+            event.endProcessing(this);
         });
     }
 
-    private void processEvent(@NonNull TrackerEvent event) {
-        Payload payload = payloadWithEvent(event);
+    private void processEvent(@NonNull Event event) {
+        TrackerEvent trackerEvent = new TrackerEvent(event);
+        Payload payload = payloadWithEvent(trackerEvent);
         Logger.v(TAG, "Adding new payload to event storage: %s", payload);
         this.emitter.add(payload);
     }
