@@ -13,7 +13,7 @@ public abstract class AbstractSelfDescribing extends AbstractEvent {
     protected AbstractSelfDescribing() { super(); }
 
     /**
-     * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      * replaceable by use of {@link #getDataPayload()} and {@link #getSchema()}.
      *
      * @return the event payload

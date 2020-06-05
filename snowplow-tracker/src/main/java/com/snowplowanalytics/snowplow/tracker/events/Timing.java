@@ -107,7 +107,7 @@ public class Timing extends AbstractSelfDescribing {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
-     * @deprecated As of release 1.4.2, it will be removed in version 2.0.0.
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
      * replaced by {@link #getDataPayload()}.
      *
      * @return the payload to be sent.

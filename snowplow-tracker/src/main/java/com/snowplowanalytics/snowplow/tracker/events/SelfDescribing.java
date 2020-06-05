@@ -79,7 +79,9 @@ public class SelfDescribing extends AbstractSelfDescribing {
     }
 
     /**
-     * This replace the `getPayload()` returning a TrackerPayload.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     *
+     * This replace the {@link #getPayload()} returning a TrackerPayload.
      * Do not use in production code as it's an internal deprecated method.
      */
     @Deprecated
@@ -94,9 +96,10 @@ public class SelfDescribing extends AbstractSelfDescribing {
     }
 
     /**
-     * This method is for internal use and deprecated.
-     * Do not use in production code. In case it has been already used, you can replace it with
-     * `getTrackerPayload`.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     *
+     * This method is for internal use and deprecated. Do not use in production code.
+     * In case it has been already used, it's replaceable by use of {@link #getTrackerPayload()}.
      */
     @Override
     @Deprecated

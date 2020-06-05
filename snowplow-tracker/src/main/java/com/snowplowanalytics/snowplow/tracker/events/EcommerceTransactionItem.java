@@ -142,7 +142,7 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
     }
 
     /**
-     * @deprecated As of release 1.4.2, it will be removed in version 2.0.0.
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
      *
      * @param deviceCreatedTimestamp the new timestamp
      */

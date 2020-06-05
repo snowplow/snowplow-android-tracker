@@ -52,7 +52,7 @@ public abstract class AbstractEvent implements Event {
         /**
          * Adds a list of custom contexts.
          *
-         * @deprecated As of release 1.4.2, replaced by {@link #contexts}
+         * @deprecated As of release 1.5.0, replaced by {@link #contexts}
          *
          * @param contexts the list of contexts
          * @return itself
@@ -76,7 +76,7 @@ public abstract class AbstractEvent implements Event {
         /**
          * A custom eventId for the event.
          *
-         * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0.
+         * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
          * The eventId can be specified only by the tracker.
          *
          * @param eventId the eventId
@@ -106,7 +106,7 @@ public abstract class AbstractEvent implements Event {
         /**
          * A custom event timestamp.
          *
-         * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0.
+         * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
          *
          * @param deviceCreatedTimestamp the event timestamp as
          *                               unix epoch
@@ -156,7 +156,7 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @deprecated As of release 1.4.2, replaced by {@link #getContexts()}
+     * @deprecated As of release 1.5.0, replaced by {@link #getContexts()}
      *
      * @return the events custom context
      */
@@ -201,7 +201,7 @@ public abstract class AbstractEvent implements Event {
     /**
      * Adds the default parameters to a TrackerPayload object.
      *
-     * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0
      *
      * @param payload the payload to add too.
      * @return the TrackerPayload with appended values.

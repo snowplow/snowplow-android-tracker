@@ -29,7 +29,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 public interface Event {
 
     /**
-     * @deprecated As of release 1.4.2, replaced by {@link #getContexts()}
+     * @deprecated As of release 1.5.0, replaced by {@link #getContexts()}
      *
      * @return the event custom contexts
      */
@@ -58,7 +58,7 @@ public interface Event {
     @NonNull String getEventId();
 
     /**
-     * @deprecated As of release 1.4.2, it will be removed in the version 2.0.0.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      * replaceable by use of {@link #getDataPayload()} without information about
      * schema or event name.
      *
