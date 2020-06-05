@@ -57,7 +57,7 @@ Older documentation can be found [here][techdocs-old].
 
 ## Copyright and license
 
-The Snowplow Android Tracker is copyright 2015-2019 Snowplow Analytics Ltd.
+The Snowplow Android Tracker is copyright 2015-2020 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
