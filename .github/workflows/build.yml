@@ -31,7 +31,7 @@ jobs:
           script: |
             adb logcat -c
             adb logcat > logcat.log &
-            ./gradlew createDebugCoverageReport coveralls
+            ./gradlew createDebugCoverageReport
         env:
           API_LEVEL: ${{ matrix.api-level }}
 
@@ -41,6 +41,12 @@ jobs:
         with: 
           name: logcat-${{ matrix.api-level }}
           path: logcat.log
+
+      - name: Load code coverage report
+        if: success() && matrix.api-level == '24'
+        env: 
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: ./gradlew coveralls
 
   deploy:
     needs: test
