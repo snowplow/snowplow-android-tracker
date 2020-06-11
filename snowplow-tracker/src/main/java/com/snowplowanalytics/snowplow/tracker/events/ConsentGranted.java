@@ -172,10 +172,9 @@ public class ConsentGranted extends AbstractSelfDescribing {
 
     @Override
     public void beginProcessing(Tracker tracker) {
-        List<SelfDescribingJson> contexts = getContexts();
         for (ConsentDocument document : consentDocuments) {
             SelfDescribingJson context = new SelfDescribingJson(document.getSchema(), document.getDataPayload());
-            contexts.add(context);
+            customContexts.add(context);
         }
     }
 }

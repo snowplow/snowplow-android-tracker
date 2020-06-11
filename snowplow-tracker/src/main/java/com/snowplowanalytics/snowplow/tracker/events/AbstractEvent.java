@@ -35,7 +35,7 @@ import java.util.List;
  */
 public abstract class AbstractEvent implements Event {
 
-    private final List<SelfDescribingJson> customContexts;
+    protected final List<SelfDescribingJson> customContexts;
     private final String eventId;
     protected long deviceCreatedTimestamp;
     private Long trueTimestamp;
@@ -158,7 +158,7 @@ public abstract class AbstractEvent implements Event {
     /**
      * @deprecated As of release 1.5.0, replaced by {@link #getContexts()}
      *
-     * @return the events custom context
+     * @return the event custom context
      */
     @Override
     @Deprecated
@@ -167,7 +167,7 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @return the events custom context
+     * @return the event custom context
      */
     @Override
     public @NonNull List<SelfDescribingJson> getContexts() {
