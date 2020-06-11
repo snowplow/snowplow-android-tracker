@@ -36,7 +36,6 @@ class TrackerEvent {
     boolean isService;
 
     TrackerEvent(Event event) {
-        super();
         eventId = UUID.fromString(event.getEventId());
         contexts = event.getContexts();
         timestamp = event.getDeviceCreatedTimestamp();
