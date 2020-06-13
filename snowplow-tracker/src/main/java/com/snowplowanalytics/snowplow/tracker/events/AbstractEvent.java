@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Base AbstractEvent class which contains common
@@ -36,16 +37,16 @@ import java.util.List;
 public abstract class AbstractEvent implements Event {
 
     protected final List<SelfDescribingJson> customContexts;
-    private final String eventId;
-    protected long deviceCreatedTimestamp;
+    private String eventId;
+    protected Long deviceCreatedTimestamp;
     private Long trueTimestamp;
 
     public static abstract class Builder<T extends Builder<T>> {
 
         private List<SelfDescribingJson> customContexts = new LinkedList<>();
-        private String eventId = Util.getUUIDString();
-        private long deviceCreatedTimestamp = System.currentTimeMillis();
-        private Long trueTimestamp = null;
+        private String eventId;
+        private Long deviceCreatedTimestamp;
+        private Long trueTimestamp;
 
         protected abstract T self();
 
@@ -146,13 +147,19 @@ public abstract class AbstractEvent implements Event {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.customContexts);
-        Preconditions.checkNotNull(builder.eventId);
-        Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
+        if (builder.eventId != null) {
+            Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
+            try {
+                UUID.fromString(builder.eventId);
+            } catch(IllegalArgumentException e) {
+                Preconditions.fail("eventId has to be a valid UUID");
+            }
+            eventId = builder.eventId;
+        }
 
         this.customContexts = builder.customContexts;
         this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
         this.trueTimestamp = builder.trueTimestamp;
-        this.eventId = builder.eventId;
     }
 
     /**
@@ -175,11 +182,30 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
-     * @return the events timestamp
+     * Get the timestamp of the event.
+     * @apiNote If the timestamp is not set, it sets one as a side effect.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * @return the event timestamp
      */
     @Override
+    @Deprecated
     public long getDeviceCreatedTimestamp() {
-        return this.deviceCreatedTimestamp;
+        if (deviceCreatedTimestamp == null) {
+            deviceCreatedTimestamp = System.currentTimeMillis();
+        }
+        return deviceCreatedTimestamp;
+    }
+
+    /**
+     * Get the actual timestamp of the event.
+     * @apiNote It doesn't have the side effect of {@link #getDeviceCreatedTimestamp()}.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * @return the event timestamp
+     */
+    @Override
+    @Deprecated
+    public Long getActualDeviceCreatedTimestamp() {
+        return deviceCreatedTimestamp;
     }
 
     /**
@@ -191,11 +217,30 @@ public abstract class AbstractEvent implements Event {
     }
 
     /**
+     * Get the event id of the event.
+     * @apiNote If the eventId is not set, it sets one as a side effect.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      * @return the event id
      */
     @Override
+    @Deprecated
     public @NonNull String getEventId() {
-        return this.eventId;
+        if (eventId == null) {
+            eventId = Util.getUUIDString();
+        }
+        return eventId;
+    }
+
+    /**
+     * Get the actual event id of the event.
+     * @apiNote It doesn't have the side effect of {@link #getEventId()}.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * @return the event id if it exist.
+     */
+    @Override
+    @Deprecated
+    public String getActualEventId() {
+        return eventId;
     }
 
     /**

@@ -225,7 +225,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
     public void endProcessing(Tracker tracker) {
         // Track each item individually
         for(EcommerceTransactionItem item : items) {
-            item.setDeviceCreatedTimestamp(deviceCreatedTimestamp);
+            item.setDeviceCreatedTimestamp(getDeviceCreatedTimestamp());
             tracker.track(item);
         }
     }
