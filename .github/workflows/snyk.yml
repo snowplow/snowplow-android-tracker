@@ -18,7 +18,7 @@ jobs:
       uses: snyk/actions/gradle@master
       with:
         command: monitor
-        args: --all-sub-projects --configuration-matching='debugAndroidTestRuntimeClasspath'
+        args: --all-sub-projects --configuration-matching='releaseRuntimeClasspath'
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         COMMAND: cd snowplow-android-tracker
