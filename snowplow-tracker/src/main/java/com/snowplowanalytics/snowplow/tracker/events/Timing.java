@@ -13,13 +13,15 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import java.util.HashMap;
+import java.util.Map;
 
-public class Timing extends AbstractEvent {
+public class Timing extends AbstractSelfDescribing {
 
     private final String category;
     private final String variable;
@@ -105,8 +107,12 @@ public class Timing extends AbstractEvent {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
+     * replaced by {@link #getDataPayload()}.
+     *
      * @return the payload to be sent.
      */
+    @Deprecated
     public HashMap<String,Object> getData() {
         HashMap<String,Object> payload = new HashMap<>();
         payload.put(Parameters.UT_CATEGORY, this.category);
@@ -118,12 +124,13 @@ public class Timing extends AbstractEvent {
         return payload;
     }
 
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_USER_TIMINGS, getData());
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData();
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_USER_TIMINGS;
     }
 }

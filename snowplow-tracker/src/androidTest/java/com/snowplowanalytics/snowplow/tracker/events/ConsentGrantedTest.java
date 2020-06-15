@@ -17,11 +17,9 @@ import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 public class ConsentGrantedTest extends AndroidTestCase {
 

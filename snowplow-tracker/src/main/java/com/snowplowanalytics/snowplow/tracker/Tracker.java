@@ -36,9 +36,10 @@ import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
+import com.snowplowanalytics.snowplow.tracker.events.AbstractPrimitive;
+import com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
-import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
@@ -47,15 +48,8 @@ import com.snowplowanalytics.snowplow.tracker.tracker.InstallTracker;
 import com.snowplowanalytics.snowplow.tracker.tracker.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
-import com.snowplowanalytics.snowplow.tracker.events.PageView;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
@@ -436,7 +430,7 @@ public class Tracker implements DiagnosticLogger {
         this.sessionContext = builder.sessionContext;
         this.sessionCheckInterval = builder.sessionCheckInterval;
         this.sessionCallbacks = builder.sessionCallbacks;
-        this.threadCount = builder.threadCount < 2 ? 2 : builder.threadCount;
+        this.threadCount = Math.max(builder.threadCount, 2);
         this.timeUnit = builder.timeUnit;
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
@@ -506,12 +500,7 @@ public class Tracker implements DiagnosticLogger {
 
     @Override
     public void log(String source, String errorMessage, Throwable throwable) {
-        this.track(TrackerError.builder()
-                .source(source)
-                .message(errorMessage)
-                .throwable(throwable)
-                .build()
-        );
+        this.track(new TrackerError(source, errorMessage, throwable));
     }
 
     // --- Private init functions
@@ -537,89 +526,133 @@ public class Tracker implements DiagnosticLogger {
             return;
         }
 
-        if (ScreenView.class.isInstance(event) && screenState != null) {
+        if (event instanceof ScreenView && screenState != null) {
             ScreenView screenView = (ScreenView) event;
             screenView.updateScreenState(screenState);
         }
 
-        Executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<SelfDescribingJson> context = event.getContext();
-                String eventId = event.getEventId();
-
-                // Figure out what type of event it is and track it!
-                Class eClass = event.getClass();
-                if (eClass.equals(TrackerError.class)) {
-                    SelfDescribing selfDescribing = SelfDescribing.builder()
-                            .eventData((SelfDescribingJson) event.getPayload())
-                            .build();
-                    addServiceEventPayload(selfDescribing.getPayload(), context);
-                } else if (eClass.equals(PageView.class) || eClass.equals(Structured.class)) {
-                    addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
-                } else if (eClass.equals(EcommerceTransaction.class)) {
-                    addEventPayload((TrackerPayload) event.getPayload(), context, eventId);
-
-                    // Track each item individually
-                    EcommerceTransaction ecommerceTransaction = (EcommerceTransaction) event;
-                    for(EcommerceTransactionItem item : ecommerceTransaction.getItems()) {
-                        item.setDeviceCreatedTimestamp(ecommerceTransaction.getDeviceCreatedTimestamp());
-                        addEventPayload(item.getPayload(), item.getContext(), item.getEventId());
-                    }
-                } else if (eClass.equals(SelfDescribing.class)) {
-
-                    // Need to set the Base64 rule for SelfDescribing events
-                    SelfDescribing selfDescribing = (SelfDescribing) event;
-                    selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context, eventId);
-                } else if (eClass.equals(Timing.class) || eClass.equals(ScreenView.class)) {
-                    SelfDescribing selfDescribing = SelfDescribing.builder()
-                            .eventData((SelfDescribingJson) event.getPayload())
-                            .customContext(context)
-                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
-                            .eventId(event.getEventId())
-                            .build();
-
-                    // Need to set the Base64 rule for SelfDescribing events
-                    selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context, eventId);
-                } else if (eClass.equals(ConsentGranted.class)) {
-                    List<ConsentDocument> documents = ((ConsentGranted) event).getConsentDocuments();
-                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
-                    for (ConsentDocument document : documents) {
-                        sdjDocuments.add(document.getPayload());
-                    }
-                    context.addAll(sdjDocuments);
-
-                    SelfDescribing selfDescribing = SelfDescribing.builder()
-                            .eventData((SelfDescribingJson) event.getPayload())
-                            .customContext(context)
-                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
-                            .build();
-
-                    // Need to set the Base64 rule for SelfDescribing events
-                    selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context, eventId);
-                } else if (eClass.equals(ConsentWithdrawn.class)) {
-                    List<ConsentDocument> documents = ((ConsentWithdrawn) event).getConsentDocuments();
-                    List<SelfDescribingJson> sdjDocuments = new LinkedList<>();
-                    for (ConsentDocument document : documents) {
-                        sdjDocuments.add(document.getPayload());
-                    }
-                    context.addAll(sdjDocuments);
-
-                    SelfDescribing selfDescribing = SelfDescribing.builder()
-                            .eventData((SelfDescribingJson) event.getPayload())
-                            .customContext(context)
-                            .deviceCreatedTimestamp(event.getDeviceCreatedTimestamp())
-                            .build();
-
-                    // Need to set the Base64 rule for SelfDescribing events
-                    selfDescribing.setBase64Encode(base64Encoded);
-                    addEventPayload(selfDescribing.getPayload(), context, eventId);
-                }
-            }
+        Executor.execute(() -> {
+            event.beginProcessing(this);
+            processEvent(event);
+            event.endProcessing(this);
         });
+    }
+
+    private void processEvent(@NonNull Event event) {
+        TrackerEvent trackerEvent = new TrackerEvent(event);
+        Payload payload = payloadWithEvent(trackerEvent);
+        Logger.v(TAG, "Adding new payload to event storage: %s", payload);
+        this.emitter.add(payload);
+    }
+
+    private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {
+        TrackerPayload payload = new TrackerPayload();
+        addBasicPropertiesToPayload(payload, event);
+        if (event.isPrimitive) {
+            addPrimitivePropertiesToPayload(payload, event);
+        } else {
+            addSelfDescribingPropertiesToPayload(payload, event);
+        }
+        List<SelfDescribingJson> contexts = event.contexts;
+        addBasicContextsToContexts(contexts, event);
+        addGlobalContextsToContexts(contexts, payload);
+        wrapContextsToPayload(payload, contexts);
+        return payload;
+    }
+
+    private void addBasicPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
+        payload.add(Parameters.EID, event.eventId.toString());
+        payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(event.timestamp));
+        if (event.trueTimestamp != null) {
+            payload.add(Parameters.TRUE_TIMESTAMP, event.trueTimestamp.toString());
+        }
+        payload.add(Parameters.APPID, this.appId);
+        payload.add(Parameters.NAMESPACE, this.namespace);
+        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
+        if (this.subject != null) {
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
+        }
+        payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
+    }
+
+    private void addPrimitivePropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
+        payload.add(Parameters.EVENT, event.eventName);
+        payload.addMap(event.payload);
+    }
+
+    private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
+        payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
+        SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
+        HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
+        unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
+        unstructuredEventPayload.put(Parameters.DATA, data.getMap());
+        payload.addMap(unstructuredEventPayload, base64Encoded, Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
+    }
+
+    private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
+        if (applicationContext) {
+            contexts.add(InstallTracker.getApplicationContext(this.context));
+        }
+
+        if (mobileContext) {
+            contexts.add(Util.getMobileContext(this.context));
+        }
+
+        if (event.isService) {
+            return;
+        }
+
+        if (sessionContext) {
+            String eventId = event.eventId.toString();
+            if (trackerSession.getHasLoadedFromFile()) {
+                synchronized (trackerSession) {
+                    SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
+                    if (sessionContextJson == null) {
+                        Logger.track(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
+                    }
+                    contexts.add(sessionContextJson);
+                }
+            } else {
+                Logger.track(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
+            }
+        }
+
+        if (geoLocationContext) {
+            contexts.add(Util.getGeoLocationContext(this.context));
+        }
+
+        if (screenContext) {
+            contexts.add(screenState.getCurrentScreen(true));
+        }
+
+        if (gdpr != null) {
+            contexts.add(gdpr.getContext());
+        }
+    }
+
+    private void addGlobalContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerPayload payload) {
+        synchronized (globalContexts) {
+            if (!globalContexts.isEmpty()) {
+                contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
+            }
+        }
+    }
+
+    private void wrapContextsToPayload(@NonNull Payload payload, @NonNull List<SelfDescribingJson> contexts) {
+        if (contexts.isEmpty()) {
+            return;
+        }
+        List<Map> data = new LinkedList<>();
+        for (SelfDescribingJson context : contexts) {
+            if (context != null) {
+                data.add(context.getMap());
+            }
+        }
+        SelfDescribingJson finalContext = new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data);
+        if (finalContext == null) {
+            return;
+        }
+        payload.addMap(finalContext.getMap(), base64Encoded, Parameters.CONTEXT_ENCODED, Parameters.CONTEXT);
     }
 
     // --- Helpers
@@ -644,7 +677,7 @@ public class Tracker implements DiagnosticLogger {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject()));
         }
 
         // Add Mobile Context
@@ -672,116 +705,6 @@ public class Tracker implements DiagnosticLogger {
 
         // Add this payload to the emitter
         this.emitter.add(payload);
-    }
-
-    /**
-     * Builds and adds a finalized payload by adding in extra
-     * information to the payload:
-     * - The event contexts
-     * - The Tracker Subject
-     * - The Tracker parameters
-     *
-     * @param payload Payload the raw event payload to be
-     *                decorated.
-     * @param eventId The event id
-     * @param context The raw context list
-     */
-    private void addEventPayload(TrackerPayload payload, List<SelfDescribingJson> context,
-                                 String eventId) {
-
-        // Add default parameters to the payload
-        payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
-        payload.add(Parameters.APPID, this.appId);
-        payload.add(Parameters.NAMESPACE, this.namespace);
-        payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
-
-        // If there is a subject present for the Tracker add it
-        if (this.subject != null) {
-            payload.addMap(new HashMap<String,Object>(this.subject.getSubject()));
-        }
-        // Build the final context and add it
-        SelfDescribingJson envelope = getFinalContext(payload, context, eventId);
-        if (envelope != null) {
-            payload.addMap(envelope.getMap(), this.base64Encoded, Parameters.CONTEXT_ENCODED,
-                    Parameters.CONTEXT);
-        }
-
-        // Add this payload to the emitter
-        Logger.v(TAG, "Adding new payload to event storage: %s", payload);
-        this.emitter.add(payload);
-    }
-
-    /**
-     * Builds the final event context.
-     *
-     * @param payload the tracker payload to be used to evaluate global contexts
-     * @param contexts the base event context
-     * @param eventId the event id
-     * @return the final event context json with
-     *         many contexts inside
-     */
-    private SelfDescribingJson getFinalContext(TrackerPayload payload,
-                                               List<SelfDescribingJson> contexts, String eventId) {
-
-        // Add session context
-        if (sessionContext) {
-            if (trackerSession.getHasLoadedFromFile()) {
-                synchronized (trackerSession) {
-                    SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
-                    if (sessionContextJson == null) {
-                        Logger.track(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
-                    }
-                    contexts.add(sessionContextJson);
-                }
-            } else {
-                Logger.track(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
-            }
-        }
-
-        // Add Geo-Location Context
-        if (this.geoLocationContext) {
-            contexts.add(Util.getGeoLocationContext(this.context));
-        }
-
-        // Add Mobile Context
-        if (this.mobileContext) {
-            contexts.add(Util.getMobileContext(this.context));
-        }
-
-        // Add screen context
-        if (this.screenContext) {
-            contexts.add(screenState.getCurrentScreen(true));
-        }
-
-        // Add application context
-        if (this.applicationContext) {
-            contexts.add(InstallTracker.getApplicationContext(this.context));
-        }
-
-        // Add gdpr context
-        if (gdpr != null) {
-            contexts.add(gdpr.getContext());
-        }
-
-        // Add global contexts
-        synchronized (globalContexts) {
-            if (!globalContexts.isEmpty()) {
-                contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
-            }
-        }
-
-        // If there are contexts to nest
-        if (contexts.size() == 0) {
-            return null;
-        } else {
-            List<Map> contextMaps = new LinkedList<>();
-            for (SelfDescribingJson selfDescribingJson : contexts) {
-                if (selfDescribingJson != null) {
-                    contextMaps.add(selfDescribingJson.getMap());
-                }
-            }
-            return new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps);
-        }
     }
 
     // --- Controls

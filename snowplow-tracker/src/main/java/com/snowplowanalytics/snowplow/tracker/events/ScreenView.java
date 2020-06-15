@@ -16,18 +16,20 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import android.app.Activity;
 import android.app.Fragment;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
-public class ScreenView extends AbstractEvent {
+public class ScreenView extends AbstractSelfDescribing {
 
     private final static String TAG = ScreenView.class.getSimpleName();
 
@@ -229,8 +231,12 @@ public class ScreenView extends AbstractEvent {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
+     * replaced by {@link #getDataPayload()}.
+     *
      * @return the payload to be sent.
      */
+    @Deprecated
     public TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.SV_NAME, this.name);
@@ -243,13 +249,14 @@ public class ScreenView extends AbstractEvent {
         return payload;
     }
 
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_SCREEN_VIEW, getData());
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData().getMap();
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_SCREEN_VIEW;
     }
 
     private static String getSnowplowScreenId(Activity activity) {
