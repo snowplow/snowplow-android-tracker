@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,11 +44,53 @@ public class Executor {
 
     /**
      * Sends a runnable to the executor service.
+     * Errors are logged but not tracked with the diagnostic feature.
      *
+     * @param tag string indicating the source of the runnable for logging purposes in case of
+     *            exceptions raised by the runnable
      * @param runnable the runnable to be queued
      */
-    public static void execute(Runnable runnable) {
-        getExecutor().execute(runnable);
+    public static void execute(String tag, Runnable runnable) {
+        execute(false, tag, runnable);
+    }
+
+    /**
+     * Sends a runnable to the executor service.
+     *
+     * @param reportsOnDiagnostic weather or not the error has to be tracked with diagnostic feature
+     * @param tag string indicating the source of the runnable for logging purposes in case of
+     *            exceptions raised by the runnable
+     * @param runnable the runnable to be queued
+     */
+    public static void execute(boolean reportsOnDiagnostic, String tag, Runnable runnable) {
+        execute(runnable, t -> {
+            if (reportsOnDiagnostic) {
+                Logger.track(tag, t.getLocalizedMessage(), t);
+            } else {
+                Logger.e(tag, t.getLocalizedMessage(), t);
+            }
+        });
+    }
+
+    /**
+     * Sends a runnable to the executor service.
+     *
+     * @param runnable the runnable to be queued
+     * @param exceptionHandler the handler of exception raised by the runnable
+     */
+    public static void execute(Runnable runnable, ExceptionHandler exceptionHandler) {
+        ExecutorService executor = getExecutor();
+        executor.execute(() -> {
+            try {
+                if (runnable != null) {
+                    runnable.run();
+                }
+            } catch (Throwable t) {
+                if (exceptionHandler != null) {
+                    exceptionHandler.handle(t);
+                }
+            }
+        });
     }
 
     /**
@@ -86,5 +130,13 @@ public class Executor {
      */
     public static void setThreadCount(final int count) {
         threadCount = count;
+    }
+
+    /**
+     * Handle exceptions raised by a Runnable
+     */
+    @FunctionalInterface
+    public interface ExceptionHandler {
+        void handle(Throwable t);
     }
 }
