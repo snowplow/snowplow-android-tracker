@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+    - '*.*.*'
+
+jobs:
+  deploy:    
+    runs-on: macos-latest
+
+    env:
+      BINTRAY_SNOWPLOW_MAVEN_USER: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_USER }}
+      BINTRAY_SNOWPLOW_MAVEN_API_KEY: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_API_KEY }}
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build
+        run: ./gradlew assembleRelease
+
+      - name: Get version (git tag)
+        id: get_version
+        run: |
+          echo ${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Publish
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: ./.scripts/deploy.sh $VERSION
