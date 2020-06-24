@@ -43,9 +43,22 @@ public interface Event {
     @NonNull List<SelfDescribingJson> getContexts();
 
     /**
+     * Get the timestamp of the event.
+     * @apiNote If the timestamp is not set, it sets one as a side effect.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      * @return the event timestamp
      */
+    @Deprecated
     long getDeviceCreatedTimestamp();
+
+    /**
+     * Get the actual timestamp of the event.
+     * @apiNote It doesn't have the side effect of {@link #getDeviceCreatedTimestamp()}.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * @return the event timestamp
+     */
+    @Deprecated
+    Long getActualDeviceCreatedTimestamp();
 
     /**
      * @return the optional true events timestamp
@@ -53,9 +66,22 @@ public interface Event {
     Long getTrueTimestamp();
 
     /**
+     * Get the event id of the event.
+     * @apiNote If the eventId is not set, it sets one as a side effect.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      * @return the event id
      */
+    @Deprecated
     @NonNull String getEventId();
+
+    /**
+     * Get the actual event id of the event.
+     * @apiNote It doesn't have the side effect of {@link #getEventId()}.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * @return the event id if it exist.
+     */
+    @Deprecated
+    String getActualEventId();
 
     /**
      * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.

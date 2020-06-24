@@ -154,7 +154,9 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String, Object> payload = new HashMap<>();
-        payload.put(Parameters.DEVICE_TIMESTAMP, Long.toString(this.deviceCreatedTimestamp)); // TODO: to remove on v.2.0
+        if (deviceCreatedTimestamp != null) {
+            payload.put(Parameters.DEVICE_TIMESTAMP, Long.toString(deviceCreatedTimestamp)); // TODO: to remove on v.2.0
+        }
         payload.put(Parameters.TI_ITEM_ID, this.itemId);
         payload.put(Parameters.TI_ITEM_SKU, this.sku);
         payload.put(Parameters.TI_ITEM_NAME, this.name);

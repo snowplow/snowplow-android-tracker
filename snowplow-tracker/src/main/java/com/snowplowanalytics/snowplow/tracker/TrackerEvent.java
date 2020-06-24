@@ -18,6 +18,7 @@ import com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,14 @@ class TrackerEvent {
     boolean isService;
 
     TrackerEvent(Event event) {
-        eventId = UUID.fromString(event.getEventId());
+        String userEventId = event.getActualEventId();
+        String newEventId = userEventId != null ? userEventId : Util.getUUIDString();
+        eventId = UUID.fromString(newEventId);
+
+        Long userTimestamp = event.getActualDeviceCreatedTimestamp();
+        timestamp = userTimestamp != null ? userTimestamp : System.currentTimeMillis();
+
         contexts = event.getContexts();
-        timestamp = event.getDeviceCreatedTimestamp();
         trueTimestamp = event.getTrueTimestamp();
         payload = event.getDataPayload();
 

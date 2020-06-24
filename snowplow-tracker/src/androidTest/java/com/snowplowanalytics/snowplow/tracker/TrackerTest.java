@@ -20,6 +20,7 @@ import android.util.Log;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Map;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -159,6 +161,17 @@ public class TrackerTest extends AndroidTestCase {
         assertTrue(tracker.getDataCollection());
         tracker.resumeEventTracking();
         assertTrue(tracker.getDataCollection());
+    }
+
+    public void testTrackEventMultipleTimes() {
+        Timing event = Timing.builder()
+                .category("category")
+                .variable("variable")
+                .timing(100)
+                .build();
+        UUID id1 = new TrackerEvent(event).eventId;
+        UUID id2 = new TrackerEvent(event).eventId;
+        assertFalse(id1.equals(id2));
     }
 
     public void testTrackWithNoContext() throws Exception {
