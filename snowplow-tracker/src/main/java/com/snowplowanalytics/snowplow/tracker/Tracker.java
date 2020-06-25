@@ -531,7 +531,8 @@ public class Tracker implements DiagnosticLogger {
             screenView.updateScreenState(screenState);
         }
 
-        Executor.execute(() -> {
+        boolean reportsOnDiagnostic = !(event instanceof TrackerError);
+        Executor.execute(reportsOnDiagnostic, TAG, () -> {
             event.beginProcessing(this);
             processEvent(event);
             event.endProcessing(this);
