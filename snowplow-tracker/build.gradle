@@ -3,8 +3,6 @@ plugins {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.dcendents.android-maven'
@@ -82,7 +80,6 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.4.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     // test
     androidTestImplementation 'com.google.android.gms:play-services-analytics:16.0.1'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'

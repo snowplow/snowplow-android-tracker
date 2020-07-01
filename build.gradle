@@ -12,7 +12,6 @@ buildscript {
         classpath 'com.android.tools.build:gradle:4.0.0'
         classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
