@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.events.AbstractPrimitive;
 import com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
@@ -20,6 +22,8 @@ import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +40,7 @@ class TrackerEvent {
     boolean isPrimitive;
     boolean isService;
 
-    TrackerEvent(Event event) {
+    TrackerEvent(@NonNull Event event) {
         String userEventId = event.getActualEventId();
         String newEventId = userEventId != null ? userEventId : Util.getUUIDString();
         eventId = UUID.fromString(newEventId);
@@ -44,9 +48,9 @@ class TrackerEvent {
         Long userTimestamp = event.getActualDeviceCreatedTimestamp();
         timestamp = userTimestamp != null ? userTimestamp : System.currentTimeMillis();
 
-        contexts = event.getContexts();
+        contexts = new ArrayList<>(event.getContexts());
         trueTimestamp = event.getTrueTimestamp();
-        payload = event.getDataPayload();
+        payload = new HashMap<>(event.getDataPayload());
 
         isService = event instanceof TrackerError;
         if (event instanceof AbstractPrimitive) {
