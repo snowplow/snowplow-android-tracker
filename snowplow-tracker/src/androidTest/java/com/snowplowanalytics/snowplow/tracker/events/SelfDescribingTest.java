@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -29,7 +29,7 @@ public class SelfDescribingTest extends AndroidTestCase {
                 .eventData(sdj)
                 .build();
 
-        Map data = pageView.getPayload().getMap();
+        Map data = pageView.getTrackerPayload().getMap();
 
         assertNotNull(data);
         assertEquals("ue", data.get(Parameters.EVENT));
@@ -37,7 +37,7 @@ public class SelfDescribingTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.UNSTRUCTURED_ENCODED));
 
         pageView.setBase64Encode(true);
-        data = pageView.getPayload().getMap();
+        data = pageView.getTrackerPayload().getMap();
 
         assertNotNull(data);
         assertEquals("ue", data.get(Parameters.EVENT));

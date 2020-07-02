@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -355,19 +355,16 @@ public class Emitter {
      *                to be added.
      */
     public void add(final Payload payload) {
-        if (eventStore != null) {
-            Executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    eventStore.add(payload);
-                    if (isRunning.compareAndSet(false, true)) {
-                        attemptEmit();
-                    }
-                }
-            });
-        } else {
+        if (eventStore == null) {
             Logger.d(TAG, "Event store not instantiated.");
+            return;
         }
+        Executor.execute(TAG, () -> {
+            eventStore.add(payload);
+            if (isRunning.compareAndSet(false, true)) {
+                attemptEmit();
+            }
+        });
     }
 
     /**
@@ -375,11 +372,9 @@ public class Emitter {
      * is not currently running.
      */
     public void flush() {
-        Executor.execute(new Runnable() {
-            public void run() {
-                if (isRunning.compareAndSet(false, true)) {
-                    attemptEmit();
-                }
+        Executor.execute(TAG, () -> {
+            if (isRunning.compareAndSet(false, true)) {
+                attemptEmit();
             }
         });
     }

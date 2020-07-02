@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -21,8 +24,9 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class ConsentGranted extends AbstractEvent {
+public class ConsentGranted extends AbstractSelfDescribing {
 
     private final String expiry;
     private final List<ConsentDocument> consentDocuments;
@@ -132,32 +136,45 @@ public class ConsentGranted extends AbstractEvent {
     }
 
     /**
+     * Returns a list of consent documents associated with the event.
+     *
+     * @return the consent documents
+     */
+    public @NonNull List<ConsentDocument> getConsentDocuments() {
+        return this.consentDocuments;
+    }
+
+    /**
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
+     * replaced by {@link #getDataPayload()}.
+     *
      * @return the payload to be sent.
      */
-    public TrackerPayload getData() {
+    @Deprecated
+    public @NonNull TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.CG_EXPIRY, this.expiry);
         return payload;
     }
 
-    /**
-     * Returns a list of consent documents associated with the event.
-     *
-     * @return the consent documents
-     */
-    public List<ConsentDocument> getConsentDocuments() {
-        return this.consentDocuments;
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData().getMap();
     }
 
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONSENT_GRANTED, getData());
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_CONSENT_GRANTED;
+    }
+
+    @Override
+    public void beginProcessing(Tracker tracker) {
+        for (ConsentDocument document : consentDocuments) {
+            SelfDescribingJson context = new SelfDescribingJson(document.getSchema(), document.getDataPayload());
+            customContexts.add(context);
+        }
     }
 }

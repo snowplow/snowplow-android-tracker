@@ -1,7 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,13 +13,16 @@ package com.snowplowanalytics.snowplow.tracker.events;
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-public class ConsentDocument extends AbstractEvent {
+import java.util.Map;
+
+public class ConsentDocument extends AbstractSelfDescribing {
     private final String documentId;
     private final String documentVersion;
     private final String documentName;
@@ -105,9 +108,13 @@ public class ConsentDocument extends AbstractEvent {
      * Returns a TrackerPayload which can be stored into
      * the local database.
      *
+     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
+     * replaced by {@link #getDataPayload()}.
+     *
      * @return the payload to be sent.
      */
-    public TrackerPayload getData() {
+    @Deprecated
+    public @NonNull TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.CD_ID, this.documentId);
         payload.add(Parameters.CD_NAME, this.documentName);
@@ -116,12 +123,13 @@ public class ConsentDocument extends AbstractEvent {
         return payload;
     }
 
-    /**
-     * Return the payload wrapped into a SelfDescribingJson.
-     *
-     * @return the payload as a SelfDescribingJson.
-     */
-    public SelfDescribingJson getPayload() {
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_CONSENT_DOCUMENT, getData());
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return getData().getMap();
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return TrackerConstants.SCHEMA_CONSENT_DOCUMENT;
     }
 }

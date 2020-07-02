@@ -1,0 +1,24 @@
+
+name: Snyk
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: snowplow-android-tracker
+      
+    - name: Run Snyk to check for vulnerabilities in tracker
+      uses: snyk/actions/gradle@master
+      with:
+        command: monitor
+        args: --all-sub-projects --configuration-matching='releaseRuntimeClasspath'
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        COMMAND: cd snowplow-android-tracker

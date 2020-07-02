@@ -1,0 +1,36 @@
+name: Documentation
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get version
+        id: get_version
+        run: |
+          echo $(cat VERSION)
+          echo ::set-output name=VERSION::$(cat VERSION)
+
+      - name: Update Doxyfile version
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: sed -i -e "s|SNOWPLOW_TRACKER_VERSION|${VERSION}|g" ./.doxygen/Doxyfile
+
+      - name: Doxygen
+        uses: mattnotmitt/doxygen-action@v1
+        with:
+          working-directory: '.doxygen'
+          doxyfile-path: './Doxyfile'
+    
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./.doxygen/html

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,15 +13,19 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Constructs a PageView event object.
  */
-public class PageView extends AbstractEvent {
+public class PageView extends AbstractPrimitive {
 
     private final String pageUrl;
     private final String pageTitle;
@@ -88,18 +92,17 @@ public class PageView extends AbstractEvent {
         this.referrer = builder.referrer;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_PAGE_VIEW);
-        payload.add(Parameters.PAGE_URL, this.pageUrl);
-        payload.add(Parameters.PAGE_TITLE, this.pageTitle);
-        payload.add(Parameters.PAGE_REFR, this.referrer);
-        return putDefaultParams(payload);
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        HashMap<String, Object> payload = new HashMap<>();
+        payload.put(Parameters.PAGE_URL, this.pageUrl);
+        payload.put(Parameters.PAGE_TITLE, this.pageTitle);
+        payload.put(Parameters.PAGE_REFR, this.referrer);
+        return payload;
+    }
+
+    @Override
+    public @NonNull String getName() {
+        return TrackerConstants.EVENT_PAGE_VIEW;
     }
 }

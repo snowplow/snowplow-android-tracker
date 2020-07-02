@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,16 +13,20 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class EcommerceTransaction extends AbstractEvent {
+public class EcommerceTransaction extends AbstractPrimitive {
 
     private final String orderId;
     private final Double totalValue;
@@ -186,27 +190,26 @@ public class EcommerceTransaction extends AbstractEvent {
         this.items = builder.items;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @return the payload to be sent.
-     */
-    public TrackerPayload getPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_ECOMM);
-        payload.add(Parameters.TR_ID, this.orderId);
-        payload.add(Parameters.TR_TOTAL, Double.toString(this.totalValue));
-        payload.add(Parameters.TR_AFFILIATION, this.affiliation);
-        payload.add(Parameters.TR_TAX,
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        HashMap<String, Object> payload = new HashMap<>(9);
+        payload.put(Parameters.TR_ID, this.orderId);
+        payload.put(Parameters.TR_TOTAL, Double.toString(this.totalValue));
+        payload.put(Parameters.TR_AFFILIATION, this.affiliation);
+        payload.put(Parameters.TR_TAX,
                 this.taxValue != null ? Double.toString(this.taxValue) : null);
-        payload.add(Parameters.TR_SHIPPING,
+        payload.put(Parameters.TR_SHIPPING,
                 this.shipping != null ? Double.toString(this.shipping) : null);
-        payload.add(Parameters.TR_CITY, this.city);
-        payload.add(Parameters.TR_STATE, this.state);
-        payload.add(Parameters.TR_COUNTRY, this.country);
-        payload.add(Parameters.TR_CURRENCY, this.currency);
-        return putDefaultParams(payload);
+        payload.put(Parameters.TR_CITY, this.city);
+        payload.put(Parameters.TR_STATE, this.state);
+        payload.put(Parameters.TR_COUNTRY, this.country);
+        payload.put(Parameters.TR_CURRENCY, this.currency);
+        return payload;
+    }
+
+    @Override
+    public @NonNull String getName() {
+        return TrackerConstants.EVENT_ECOMM;
     }
 
     /**
@@ -216,5 +219,14 @@ public class EcommerceTransaction extends AbstractEvent {
      */
     public List<EcommerceTransactionItem> getItems() {
         return this.items;
+    }
+
+    @Override
+    public void endProcessing(Tracker tracker) {
+        // Track each item individually
+        for(EcommerceTransactionItem item : items) {
+            item.setDeviceCreatedTimestamp(getDeviceCreatedTimestamp());
+            tracker.track(item);
+        }
     }
 }

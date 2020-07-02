@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -303,18 +303,15 @@ public class Session {
         Logger.d(TAG, " + Previous Session ID: %s", this.previousSessionId);
         Logger.d(TAG, " + Session Index: %s", this.sessionIndex);
 
-        Executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(Parameters.SESSION_USER_ID, userId);
-                editor.putString(Parameters.SESSION_ID, currentSessionId);
-                editor.putString(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
-                editor.putInt(Parameters.SESSION_INDEX, sessionIndex);
-                editor.putString(Parameters.SESSION_FIRST_ID, firstId);
-                editor.putString(Parameters.SESSION_STORAGE, sessionStorage);
-                editor.apply();
-            }
+        Executor.execute(true, TAG, () -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(Parameters.SESSION_USER_ID, userId);
+            editor.putString(Parameters.SESSION_ID, currentSessionId);
+            editor.putString(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
+            editor.putInt(Parameters.SESSION_INDEX, sessionIndex);
+            editor.putString(Parameters.SESSION_FIRST_ID, firstId);
+            editor.putString(Parameters.SESSION_STORAGE, sessionStorage);
+            editor.apply();
         });
     }
 

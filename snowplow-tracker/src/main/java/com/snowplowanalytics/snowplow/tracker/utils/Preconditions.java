@@ -122,6 +122,17 @@ public final class Preconditions {
     }
 
     /**
+     * Force a failure in the precondition check.
+     *
+     * @param errorMessage the exception message to use; will be converted to a
+     *     string using {@link String#valueOf(Object)}
+     * @throws IllegalArgumentException
+     */
+    public static void fail(Object errorMessage) {
+        throw new IllegalArgumentException(String.valueOf(errorMessage));
+    }
+
+    /**
      * Ensures that an object reference passed as a parameter to the calling method is not null.
      *
      * @param reference an object reference

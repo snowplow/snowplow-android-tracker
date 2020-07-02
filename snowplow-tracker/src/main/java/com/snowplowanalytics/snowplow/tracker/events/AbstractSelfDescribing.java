@@ -11,18 +11,34 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.contexts.global;
+package com.snowplowanalytics.snowplow.tracker.events;
+
+import android.support.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
-/**
- * ContextGenerator represents a callback which generates an SDJ
- */
-public interface ContextGenerator extends ContextPrimitive {
+public abstract class AbstractSelfDescribing extends AbstractEvent {
+
+    AbstractSelfDescribing(Builder<?> builder) {
+        super(builder);
+    }
+
+    protected AbstractSelfDescribing() { super(); }
 
     /**
-     * A callback function to be executed depending on event payload, event type and schema
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     * replaceable by use of {@link #getDataPayload()} and {@link #getSchema()}.
+     *
+     * @return the event payload
      */
-    SelfDescribingJson generate(TrackerPayload payload, String eventType, String eventSchema);
+    @Override
+    @Deprecated
+    public @NonNull SelfDescribingJson getPayload() {
+        return new SelfDescribingJson(getSchema(), getDataPayload());
+    }
+
+    /**
+     * @return The schema of the event.
+     */
+    public abstract @NonNull String getSchema();
 }

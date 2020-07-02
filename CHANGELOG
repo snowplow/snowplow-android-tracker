@@ -1,4 +1,19 @@
 
+Version 1.5.0 (2020-07-02)
+--------------------------
+Deprecate onlyTrackLabelledScreens option (#401)
+Fix importing of kotlin on gradle (#396)
+Fix duplication of contexts when the event is used multiple times (#397)
+Background threads don't report exceptions (#394)
+CI script improvements (#387) 
+Renew event ID when event object is reused (#390)
+Add snyk monitoring to repository (#388)
+Events processing refactoring (#381)
+Bump Gradle to 6.1.1 (#386)
+Add code coverage setting on build script (#385)
+Update all copyright notices to 2020 (#383)
+Switch README badge to use Github Actions for build information (#380)
+
 Version 1.4.2 (2020-05-28)
 --------------------------
 Move from Travis CI to GitHub Actions (#375) 

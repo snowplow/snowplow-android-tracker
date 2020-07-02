@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,16 +13,20 @@
 
 package com.snowplowanalytics.snowplow.tracker.events;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
 
+import java.util.Map;
+
 /**
  * Constructs an SelfDescribing event object.
  */
-public class SelfDescribing extends AbstractEvent {
+public class SelfDescribing extends AbstractSelfDescribing {
 
     private final SelfDescribingJson eventData;
     private boolean base64Encode;
@@ -75,12 +79,13 @@ public class SelfDescribing extends AbstractEvent {
     }
 
     /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
      *
-     * @return the payload to be sent.
+     * This replace the {@link #getPayload()} returning a TrackerPayload.
+     * Do not use in production code as it's an internal deprecated method.
      */
-    public TrackerPayload getPayload() {
+    @Deprecated
+    public TrackerPayload getTrackerPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
                 TrackerConstants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
@@ -88,5 +93,31 @@ public class SelfDescribing extends AbstractEvent {
         payload.addMap(envelope.getMap(), this.base64Encode,
                 Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
         return putDefaultParams(payload);
+    }
+
+    /**
+     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
+     *
+     * This method is for internal use and deprecated. Do not use in production code.
+     * In case it has been already used, it's replaceable by use of {@link #getTrackerPayload()}.
+     */
+    @Override
+    @Deprecated
+    public SelfDescribingJson getPayload() {
+        return super.getPayload();
+    }
+
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        try {
+            return (Map<String, Object>) this.eventData.getMap().get(Parameters.DATA);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return (String) eventData.getMap().get(Parameters.SCHEMA);
     }
 }

@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+    - '*.*.*'
+
+jobs:
+  deploy:    
+    runs-on: macos-latest
+
+    env:
+      BINTRAY_SNOWPLOW_MAVEN_USER: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_USER }}
+      BINTRAY_SNOWPLOW_MAVEN_API_KEY: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_API_KEY }}
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build
+        run: ./gradlew assembleRelease
+
+      - name: Get tag and tracker version information
+        id: version
+        run: |
+          echo ::set-output name=TAG_VERSION::${GITHUB_REF#refs/*/}
+          echo "##[set-output name=TRACKER_VERSION;]$(cat VERSION)"
+    
+      - name: Fail if version mismatch
+        if: ${{ steps.version.outputs.TAG_VERSION != steps.version.outputs.TRACKER_VERSION }}
+        run: |
+          echo "Tag version (${{ steps.version.outputs.TAG_VERSION }}) doesn't match version in project (${{ steps.version.outputs.TRACKER_VERSION }})"
+          exit 1
+      
+      - name: Publish
+        run: ./gradlew bintrayUpload
