@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">1.4.2</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -104,10 +104,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aef0e36a5977d81cb2792cae591d98383"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0bf97f2c06fa9ad9c085ec601743b0a"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#ab0bf97f2c06fa9ad9c085ec601743b0a">getDeviceCreatedTimestamp</a> ()</td></tr>
 <tr class="separator:ab0bf97f2c06fa9ad9c085ec601743b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ba54fb546f97f47374613cb340efa55"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a3ba54fb546f97f47374613cb340efa55">getActualDeviceCreatedTimestamp</a> ()</td></tr>
+<tr class="separator:a3ba54fb546f97f47374613cb340efa55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a88ca89576c474473c5f30afe61fd41"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a1a88ca89576c474473c5f30afe61fd41">getTrueTimestamp</a> ()</td></tr>
 <tr class="separator:a1a88ca89576c474473c5f30afe61fd41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0de656031d8217a8ac4dba2ced25391c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a0de656031d8217a8ac4dba2ced25391c">getEventId</a> ()</td></tr>
 <tr class="separator:a0de656031d8217a8ac4dba2ced25391c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b673aeba91d9b4b65f99f838eb038bb"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a7b673aeba91d9b4b65f99f838eb038bb">getActualEventId</a> ()</td></tr>
+<tr class="separator:a7b673aeba91d9b4b65f99f838eb038bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53b408912036f4ff39246984acc36640"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload_1_1_payload.html">Payload</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a53b408912036f4ff39246984acc36640">getPayload</a> ()</td></tr>
 <tr class="separator:a53b408912036f4ff39246984acc36640"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f9cfab110e0914c4126ee07dec50446"><td class="memItemLeft" align="right" valign="top">Map&lt; String, Object &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a5f9cfab110e0914c4126ee07dec50446">getDataPayload</a> ()</td></tr>
@@ -162,7 +166,49 @@ Public Member Functions</h2></td></tr>
 <p>Hook method called just after the event processing in order to execute special operations.</p>
 <p>@apiNote Internal use only - Don't use in production, it can change without notice. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_ecommerce_transaction.html#a6bd21b098f9ade1bd83557dd122d83fa">com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#aa0cbd1f8ff4952a15da204999c8e8c52">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#aa0cbd1f8ff4952a15da204999c8e8c52">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_ecommerce_transaction.html#a6bd21b098f9ade1bd83557dd122d83fa">com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction</a>.</p>
+
+</div>
+</div>
+<a id="a3ba54fb546f97f47374613cb340efa55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ba54fb546f97f47374613cb340efa55">&#9670;&nbsp;</a></span>getActualDeviceCreatedTimestamp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Long com.snowplowanalytics.snowplow.tracker.events.Event.getActualDeviceCreatedTimestamp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the actual timestamp of the event. @apiNote It doesn't have the side effect of <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#ab0bf97f2c06fa9ad9c085ec601743b0a">getDeviceCreatedTimestamp()</a>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000019">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the event timestamp </dd></dl>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#a1273270b85a80c19207b87f3676fb8ce">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
+
+</div>
+</div>
+<a id="a7b673aeba91d9b4b65f99f838eb038bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b673aeba91d9b4b65f99f838eb038bb">&#9670;&nbsp;</a></span>getActualEventId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String com.snowplowanalytics.snowplow.tracker.events.Event.getActualEventId </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the actual event id of the event. @apiNote It doesn't have the side effect of <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a0de656031d8217a8ac4dba2ced25391c">getEventId()</a>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the event id if it exist. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#a6adfdcb4e3f293cf9e7995914371aaa4">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
 
 </div>
 </div>
@@ -180,7 +226,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000013">Deprecated:</a></b></dt><dd>As of release 1.5.0, replaced by <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#aef0e36a5977d81cb2792cae591d98383">getContexts()</a></dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000017">Deprecated:</a></b></dt><dd>As of release 1.5.0, replaced by <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#aef0e36a5977d81cb2792cae591d98383">getContexts()</a></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the event custom contexts </dd></dl>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#a3315094faf355ae1c4709102c8a43480">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
@@ -241,6 +287,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Get the timestamp of the event. @apiNote If the timestamp is not set, it sets one as a side effect. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000018">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the event timestamp </dd></dl>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#a54b9598b05c7eeec0c3f200b5f9aa718">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
@@ -261,6 +308,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Get the event id of the event. @apiNote If the eventId is not set, it sets one as a side effect. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the event id </dd></dl>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_event.html#a3698e2cc7554c45908a97aeb470eebeb">com.snowplowanalytics.snowplow.tracker.events.AbstractEvent</a>.</p>
@@ -281,7 +329,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000014">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. replaceable by use of <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a5f9cfab110e0914c4126ee07dec50446">getDataPayload()</a> without information about schema or event name.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>As of release 1.5.0, it will be removed in the version 2.0.0. replaceable by use of <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html#a5f9cfab110e0914c4126ee07dec50446">getDataPayload()</a> without information about schema or event name.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the event payload </dd></dl>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_self_describing.html#ac8b9a2994df357099f3eb6df09f92b5c">com.snowplowanalytics.snowplow.tracker.events.SelfDescribing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_primitive.html#a2ec64f1d9879da7de7438703f4407e2b">com.snowplowanalytics.snowplow.tracker.events.AbstractPrimitive</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_self_describing.html#a8d48c22e045941a8938baec6ebb9e628">com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing</a>.</p>

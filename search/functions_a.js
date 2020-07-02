@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['maphaskeys_844',['mapHasKeys',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html#a57c231e3d4e66dc74032fe3fa88bda00',1,'com::snowplowanalytics::snowplow::tracker::utils::Util']]],
-  ['maptojsonobject_845',['mapToJSONObject',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html#a61da097b774865574e903ee4b95011b8',1,'com::snowplowanalytics::snowplow::tracker::utils::Util']]]
+  ['log_850',['log',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_diagnostic_logger.html#addeb3c0446e1aefc76f89f7692d23938',1,'com.snowplowanalytics.snowplow.tracker.DiagnosticLogger.log()'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_tracker.html#a224d23f547f06cf1c6286593381a6ef2',1,'com.snowplowanalytics.snowplow.tracker.Tracker.log()']]],
+  ['loglevel_851',['LogLevel',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_log_level.html#a0e220e956232e25e1caec406a31b4c2e',1,'com::snowplowanalytics::snowplow::tracker::utils::LogLevel']]]
 ];

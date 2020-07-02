@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['waitforeventstore_940',['waitForEventStore',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_emitter.html#af110b7f85a23b0c9afa46b62f9fa180c',1,'com::snowplowanalytics::snowplow::tracker::Emitter']]],
-  ['waitforsessionfileload_941',['waitForSessionFileLoad',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_session.html#af6b44cfd14176ea03680a22e73e3deaa',1,'com::snowplowanalytics::snowplow::tracker::Session']]]
+  ['v_947',['v',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_logger.html#a1e31b64fa92ccaeece2ef16a706fb78e',1,'com::snowplowanalytics::snowplow::tracker::utils::Logger']]]
 ];

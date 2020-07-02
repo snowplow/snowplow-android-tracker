@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">1.4.2</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -85,47 +85,60 @@ $(function() {
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">package </span>com.snowplowanalytics.snowplow.tracker;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_primitive.html">AbstractPrimitive</a>;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_self_describing.html">AbstractSelfDescribing</a>;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html">Event</a>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_tracker_error.html">TrackerError</a>;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload.html">payload</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload_1_1_self_describing_json.html">SelfDescribingJson</a>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">import</span> java.util.List;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">import</span> java.util.Map;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">import</span> java.util.UUID;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>TrackerEvent {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    Map&lt;String, Object&gt; payload;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    String schema;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    String eventName;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    UUID eventId;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">long</span> timestamp;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    Long trueTimestamp;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    List&lt;SelfDescribingJson&gt; contexts;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">boolean</span> isPrimitive;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">boolean</span> isService;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    TrackerEvent(Event event) {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        eventId = UUID.fromString(event.getEventId());</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        contexts = <span class="keyword">event</span>.getContexts();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        timestamp = <span class="keyword">event</span>.getDeviceCreatedTimestamp();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        trueTimestamp = <span class="keyword">event</span>.getTrueTimestamp();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        payload = <span class="keyword">event</span>.getDataPayload();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        isService = <span class="keyword">event</span> instanceof TrackerError;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">if</span> (event instanceof AbstractPrimitive) {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            eventName = ((AbstractPrimitive) event).getName();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            isPrimitive = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            schema = ((AbstractSelfDescribing) event).getSchema();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            isPrimitive = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">import</span> android.support.annotation.NonNull;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_primitive.html">AbstractPrimitive</a>;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_self_describing.html">AbstractSelfDescribing</a>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html">Event</a>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">events</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_tracker_error.html">TrackerError</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload.html">payload</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload_1_1_self_describing_json.html">SelfDescribingJson</a>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">import</span> <a class="code" href="namespacecom.html">com</a>.<a class="code" href="namespacecom_1_1snowplowanalytics.html">snowplowanalytics</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">snowplow</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html">tracker</a>.<a class="code" href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils.html">utils</a>.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html">Util</a>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">import</span> java.util.ArrayList;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">import</span> java.util.HashMap;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">import</span> java.util.List;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">import</span> java.util.Map;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">import</span> java.util.UUID;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>TrackerEvent {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    Map&lt;String, Object&gt; payload;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    String schema;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    String eventName;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    UUID eventId;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">long</span> timestamp;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    Long trueTimestamp;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    List&lt;SelfDescribingJson&gt; contexts;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">boolean</span> isPrimitive;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">boolean</span> isService;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    TrackerEvent(@NonNull Event event) {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        String userEventId = <span class="keyword">event</span>.getActualEventId();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        String newEventId = userEventId != <span class="keyword">null</span> ? userEventId : Util.<a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html#a6144801ea976343acbb8d7c02c00e27b">getUUIDString</a>();</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        eventId = UUID.fromString(newEventId);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        Long userTimestamp = <span class="keyword">event</span>.getActualDeviceCreatedTimestamp();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        timestamp = userTimestamp != <span class="keyword">null</span> ? userTimestamp : System.currentTimeMillis();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        contexts = <span class="keyword">new</span> ArrayList&lt;&gt;(event.getContexts());</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        trueTimestamp = <span class="keyword">event</span>.getTrueTimestamp();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        payload = <span class="keyword">new</span> HashMap&lt;&gt;(event.getDataPayload());</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        isService = <span class="keyword">event</span> instanceof TrackerError;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">if</span> (event instanceof AbstractPrimitive) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            eventName = ((AbstractPrimitive) event).getName();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            isPrimitive = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            schema = ((AbstractSelfDescribing) event).getSchema();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            isPrimitive = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_event.html">com.snowplowanalytics.snowplow.tracker.events.Event</a></div><div class="ttdef"><b>Definition:</b> <a href="_event_8java_source.html#l00029">Event.java:29</a></div></div>
+<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html">com.snowplowanalytics.snowplow.tracker.utils.Util</a></div><div class="ttdef"><b>Definition:</b> <a href="_util_8java_source.html#l00052">Util.java:52</a></div></div>
+<div class="ttc" id="anamespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_html"><div class="ttname"><a href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils.html">com.snowplowanalytics.snowplow.tracker.utils</a></div><div class="ttdef"><b>Definition:</b> <a href="_file_store_8java_source.html#l00015">FileStore.java:15</a></div></div>
+<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util_html_a6144801ea976343acbb8d7c02c00e27b"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_util.html#a6144801ea976343acbb8d7c02c00e27b">com.snowplowanalytics.snowplow.tracker.utils.Util.getUUIDString</a></div><div class="ttdeci">static String getUUIDString()</div><div class="ttdef"><b>Definition:</b> <a href="_util_8java_source.html#l00082">Util.java:82</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_self_describing_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_1_1_abstract_self_describing.html">com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_self_describing_8java_source.html#l00020">AbstractSelfDescribing.java:20</a></div></div>
 <div class="ttc" id="anamespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events_html"><div class="ttname"><a href="namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html">com.snowplowanalytics.snowplow.tracker.events</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_event_8java_source.html#l00014">AbstractEvent.java:14</a></div></div>
 <div class="ttc" id="anamespacecom_1_1snowplowanalytics_1_1snowplow_html"><div class="ttname"><a href="namespacecom_1_1snowplowanalytics_1_1snowplow.html">com.snowplowanalytics.snowplow</a></div></div>
