@@ -125,7 +125,6 @@ public class Tracker implements DiagnosticLogger {
     private InstallTracker installTracker;
     private boolean installTracking;
     private boolean activityTracking;
-    private boolean onlyTrackLabelledScreens;
     private boolean applicationContext;
     private Gdpr gdpr;
     private ScreenState screenState;
@@ -160,7 +159,6 @@ public class Tracker implements DiagnosticLogger {
         boolean screenviewEvents = false; // Optional
         boolean screenContext = false; // Optional
         boolean activityTracking = false; // Optional
-        boolean onlyTrackLabelledScreens = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
         Gdpr gdpr = null; // Optional
@@ -392,13 +390,13 @@ public class Tracker implements DiagnosticLogger {
         /**
          * @param activities whether to auto-track screenviews (onStart of activities)
          * @param onlyTrackLabelledScreens track only activities or fragments that have a Snowplow tag
+         * @deprecated onlyTrackLabelledScreens can't filter the activities. Use {@link #screenviewEvents} instead.
          * @return itself
          */
+        @Deprecated
         public TrackerBuilder screenviewEvents(Boolean activities,
                                                Boolean onlyTrackLabelledScreens) {
-            this.activityTracking = activities;
-            this.onlyTrackLabelledScreens = onlyTrackLabelledScreens;
-            return this;
+            return screenviewEvents(activities);
         }
 
         /**
@@ -439,7 +437,6 @@ public class Tracker implements DiagnosticLogger {
         this.lifecycleEvents = builder.lifecycleEvents;
         this.screenviewEvents = builder.screenviewEvents;
         this.activityTracking = builder.activityTracking;
-        this.onlyTrackLabelledScreens = builder.onlyTrackLabelledScreens;
         this.screenState = new ScreenState();
         this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
@@ -949,9 +946,11 @@ public class Tracker implements DiagnosticLogger {
 
     /**
      * @return whether application lifecycle tracking is on
+     * @deprecated onlyTrackLabelledScreens is always set to false.
      */
+    @Deprecated
     public boolean getOnlyTrackLabelledScreens() {
-        return this.onlyTrackLabelledScreens;
+        return false;
     }
 
     /**
