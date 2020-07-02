@@ -9,16 +9,18 @@ jobs:
   security:
     runs-on: ubuntu-latest
 
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
     steps:
-    - uses: actions/checkout@v2
-      with:
-        path: snowplow-android-tracker
-      
-    - name: Run Snyk to check for vulnerabilities in tracker
-      uses: snyk/actions/gradle@master
-      with:
-        command: monitor
-        args: --all-sub-projects --configuration-matching='releaseRuntimeClasspath'
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        COMMAND: cd snowplow-android-tracker
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Install Snyk
+        run: sudo npm install -g snyk
+
+      - name: Run Snyk to check for vulnerabilities in tracker
+        run: snyk monitor --all-sub-projects --configuration-matching='releaseRuntimeClasspath'
