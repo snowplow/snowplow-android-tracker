@@ -66,10 +66,10 @@ $(function() {
 <div class="title">Android Analytics for Snowplow </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__github_workspace_README"></a> <a href="https://github.com/snowplow/snowplow-android-tracker/actions"><img src="https://github.com/snowplow/snowplow-android-tracker/workflows/build/badge.svg?branch=master" alt="Build Status" style="pointer-events: none;" class="inline"/></a> <a href="https://coveralls.io/github/snowplow/snowplow-android-tracker?branch=master"><img src="https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master" alt="Coverage Status" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/snowplow/snowplow-android-tracker/releases"><img src="http://img.shields.io/badge/release-1.4.2-blue.svg?style=flat" alt="Release" style="pointer-events: none;" class="inline"/></a> <a href="http://www.apache.org/licenses/LICENSE-2.0"><img src="http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat" alt="License" style="pointer-events: none;" class="inline"/></a></p>
+<div class="textblock"><p><a class="anchor" id="md__github_workspace_README"></a> <a href="https://github.com/snowplow/snowplow/wiki/Tracker-Maintenance-Classification">![actively-maintained]</a> <a href="https://github.com/snowplow/snowplow-android-tracker/actions"><img src="https://github.com/snowplow/snowplow-android-tracker/workflows/build/badge.svg?branch=master" alt="Build Status" style="pointer-events: none;" class="inline"/></a> <a href="https://coveralls.io/github/snowplow/snowplow-android-tracker?branch=master"><img src="https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master" alt="Coverage Status" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/snowplow/snowplow-android-tracker/releases"><img src="https://img.shields.io/badge/release-1.4.2-blue.svg?style=flat" alt="Release" style="pointer-events: none;" class="inline"/></a> <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache--2-blue.svg?style=flat" alt="License" style="pointer-events: none;" class="inline"/></a></p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Overview</h1>
-<p>Add analytics to your Java software with the <b><a href="http://snowplowanalytics.com">Snowplow</a></b> event tracker for <b><a href="http://www.android.com/">Android</a></b>. See also: <b><a href="https://github.com/snowplow/snowplow-java-tracker">Snowplow Java Tracker</a></b>.</p>
+<p>Add analytics to your Java software with the <b><a href="https://snowplowanalytics.com">Snowplow</a></b> event tracker for <b><a href="https://www.android.com/">Android</a></b>. See also: <b><a href="https://github.com/snowplow/snowplow-java-tracker">Snowplow Java Tracker</a></b>.</p>
 <p>With this tracker you can collect event data from your Android applications, games or frameworks.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Quickstart</h1>
@@ -86,14 +86,17 @@ Testing</h2>
 <li>Assuming Micro is running on <code>localhost:9090</code>, we need to make this endpoint publicly available. An option could be using an ssh-based service, <code>serveo</code>. Feel free to use any other tool serving the same purpose, like <code>ngrok</code>. The following is an example for <code>serveo</code>.</li>
 </ol>
 <div class="fragment"><div class="line">ssh -R 80:localhost:9090 serveo.net</div>
-</div><!-- fragment --><p>which should print something similar to </p><div class="fragment"><div class="line">Forwarding HTTP traffic from https://micro.serveo.net</div>
+</div><!-- fragment --><p>which should print something similar to</p>
+<div class="fragment"><div class="line">Forwarding HTTP traffic from https://micro.serveo.net</div>
 </div><!-- fragment --><ol type="1">
-<li>Copy the url without the scheme, <code>micro.serveo.net</code> in the example above, and insert a line to <code>local.properties</code> file as following: <div class="fragment"><div class="line">microSubdomain=micro.serveo.net</div>
-</div><!-- fragment --></li>
-<li>Use Android Studio's capabilities to run tests or use <code>gradlew</code> CLI tool. e.g. At the root of the repository, run <div class="fragment"><div class="line">./gradlew connectedCheck</div>
-</div><!-- fragment --></li>
+<li>Copy the url without the scheme, <code>micro.serveo.net</code> in the example above, and insert a line to <code>local.properties</code> file as following:</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<div class="fragment"><div class="line">microSubdomain=micro.serveo.net</div>
+</div><!-- fragment --><ol type="1">
+<li>Use Android Studio's capabilities to run tests or use <code>gradlew</code> CLI tool. e.g. At the root of the repository, run</li>
+</ol>
+<div class="fragment"><div class="line">./gradlew connectedCheck</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
 Find out more</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -101,13 +104,13 @@ Find out more</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><img src="https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png" alt="i1" class="inline"/> </td><td class="markdownTableBodyLeft"><img src="https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png" alt="i2" class="inline"/> </td><td class="markdownTableBodyLeft"><img src="https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png" alt="i3" class="inline"/> </td><td class="markdownTableBodyLeft"><img src="https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png" alt="i4" class="inline"/>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><b><a href="https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/">Technical Docs</a></b> </td><td class="markdownTableBodyLeft"><b><a href="https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/#quick-start">Quick Start</a></b> </td><td class="markdownTableBodyLeft"><b><a href="https://github.com/snowplow/snowplow/wiki/Product-roadmap">Roadmap</a></b> </td><td class="markdownTableBodyLeft"><b><a href="https://github.com/snowplow/snowplow/wiki/Contributing">Contributing</a></b>  </td></tr>
+<td class="markdownTableBodyLeft"><b><a href="https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/">Technical Docs</a></b> </td><td class="markdownTableBodyLeft"><b><a href="https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/#quick-start">Quick Start</a></b> </td><td class="markdownTableBodyLeft"><b><a href="https://github.com/snowplow/snowplow/wiki/Product-roadmap">Roadmap</a></b> </td><td class="markdownTableBodyLeft"><b>Contributing</b>  </td></tr>
 </table>
 <p>Older documentation can be found <a href="https://github.com/snowplow/snowplow/wiki/Android-Tracker">here</a>.</p>
 <h1><a class="anchor" id="autotoc_md6"></a>
 Copyright and license</h1>
 <p>The Snowplow Android Tracker is copyright 2015-2020 Snowplow Analytics Ltd.</p>
-<p>Licensed under the <b><a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></b> (the "License"); you may not use this software except in compliance with the License.</p>
+<p>Licensed under the <b><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></b> (the "License"); you may not use this software except in compliance with the License.</p>
 <p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
