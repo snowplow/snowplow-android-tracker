@@ -27,6 +27,7 @@ import android.support.annotation.NonNull;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
@@ -39,6 +40,7 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Gdpr;
+import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -64,7 +66,7 @@ import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
  * Classic Demo Activity.
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class Demo extends Activity {
+public class Demo extends Activity implements LoggerDelegate {
 
     private Button _startButton, _tabButton;
     private EditText _uriField;
@@ -353,6 +355,7 @@ public class Demo extends Activity {
 
         Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
                 .level(LogLevel.VERBOSE)
+                .loggerDelegate(this)
                 .base64(false)
                 .platform(DevicePlatforms.Mobile)
                 .subject(subject)
@@ -398,5 +401,22 @@ public class Demo extends Activity {
                 updateEventsSent(successCount);
             }
         };
+    }
+
+    /// - Implements LoggerDelegate
+
+    @Override
+    public void error(String tag, String msg) {
+        Log.e("[" + tag + "]", msg);
+    }
+
+    @Override
+    public void debug(String tag, String msg) {
+        Log.d("[" + tag + "]", msg);
+    }
+
+    @Override
+    public void verbose(String tag, String msg) {
+        Log.v("[" + tag + "]", msg);
     }
 }
