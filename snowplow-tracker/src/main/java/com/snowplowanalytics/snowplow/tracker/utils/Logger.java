@@ -27,7 +27,7 @@ public class Logger {
 
     private static String TAG = Logger.class.getSimpleName();
     private static DiagnosticLogger errorLogger;
-    private static LoggerDelegate delegate;
+    private static LoggerDelegate delegate = new DefaultLoggerDelegate();
     private static int level = 0;
 
     /**
@@ -54,7 +54,11 @@ public class Logger {
      * @param delegate The app logger delegate.
      */
     public static void setDelegate(LoggerDelegate delegate) {
-        Logger.delegate = delegate;
+        if (delegate != null) {
+            Logger.delegate = delegate;
+        } else {
+            Logger.delegate = new DefaultLoggerDelegate();
+        }
     }
 
     // -- Log methods
@@ -95,11 +99,7 @@ public class Logger {
         if (level >= 1) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
-            if (delegate != null) {
-                delegate.error(source, message);
-            } else {
-                Log.e(source, message);
-            }
+            delegate.error(source, message);
         }
     }
 
@@ -114,11 +114,7 @@ public class Logger {
         if (level >= 2) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
-            if (delegate != null) {
-                delegate.debug(source, message);
-            } else {
-                Log.d(source, message);
-            }
+            delegate.debug(source, message);
         }
     }
 
@@ -133,11 +129,7 @@ public class Logger {
         if (level >= 3) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
-            if (delegate != null) {
-                delegate.verbose(source, message);
-            } else {
-                Log.v(source, message);
-            }
+            delegate.verbose(source, message);
         }
     }
 
@@ -172,4 +164,24 @@ public class Logger {
         return Thread.currentThread().getName();
     }
 
+}
+
+/**
+ * Default internal logger delegate
+ */
+class DefaultLoggerDelegate implements LoggerDelegate {
+    @Override
+    public void error(String tag, String msg) {
+        Log.e(tag, msg);
+    }
+
+    @Override
+    public void debug(String tag, String msg) {
+        Log.d(tag, msg);
+    }
+
+    @Override
+    public void verbose(String tag, String msg) {
+        Log.v(tag, msg);
+    }
 }
