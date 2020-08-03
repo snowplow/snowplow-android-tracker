@@ -17,6 +17,7 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
@@ -26,7 +27,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
+
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EmitterTest extends AndroidTestCase {
@@ -223,7 +225,7 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testEmitSingleGetEvent() throws InterruptedException, IOException {
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 1);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 1);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
@@ -238,7 +240,7 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testEmitTwoGetEvents() throws InterruptedException, IOException {
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 2);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
@@ -257,7 +259,7 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testEmitSinglePostEvent() throws InterruptedException, IOException, JSONException {
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 1);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 1);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
@@ -278,7 +280,7 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testEmitTwoEventsPostAsGroup() throws InterruptedException, IOException, JSONException {
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 2);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
@@ -303,7 +305,7 @@ public class EmitterTest extends AndroidTestCase {
 
     public void testEmitTwoEventsPostAsSingles() throws InterruptedException, IOException, JSONException {
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 2);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
         Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.Single, RequestSecurity.HTTP);
 
         LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
@@ -337,7 +339,7 @@ public class EmitterTest extends AndroidTestCase {
         Executor.shutdown();
 
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getBadEmittableEvents(mockServer, 10);
+        List<EmitterEvent> emittableEvents = getBadEmittableEvents(mockServer, 10);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
                 .option(BufferOption.Single)
@@ -471,7 +473,7 @@ public class EmitterTest extends AndroidTestCase {
         Executor.shutdown();
 
         MockWebServer mockServer = getMockServer();
-        EmittableEvents emittableEvents = getEmittableEvents(mockServer, 10);
+        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 10);
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
                 .option(BufferOption.Single)
                 .method(HttpMethod.GET)
@@ -548,33 +550,25 @@ public class EmitterTest extends AndroidTestCase {
         return null;
     }
 
-    public EmittableEvents getEmittableEvents(MockWebServer mockServer, int count) {
-        ArrayList<Payload> events = new ArrayList<>();
-        LinkedList<Long> eventIds = new LinkedList<>();
+    public List<EmitterEvent> getEmittableEvents(MockWebServer mockServer, int count) {
+        ArrayList<EmitterEvent> events = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             TrackerPayload payload = new TrackerPayload();
             payload.add("a", String.valueOf(i));
-
-            events.add(payload);
-            eventIds.add((long) i);
-
+            events.add(new EmitterEvent(payload, i));
             mockServer.enqueue(new MockResponse());
         }
-        return new EmittableEvents(events, eventIds);
+        return events;
     }
 
-    public EmittableEvents getBadEmittableEvents(MockWebServer mockServer, int count) {
-        ArrayList<Payload> events = new ArrayList<>();
-        LinkedList<Long> eventIds = new LinkedList<>();
+    public List<EmitterEvent>  getBadEmittableEvents(MockWebServer mockServer, int count) {
+        ArrayList<EmitterEvent> events = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             TrackerPayload payload = new TrackerPayload();
             payload.add("a", String.valueOf(i));
-
-            events.add(payload);
-            eventIds.add((long) i);
-
+            events.add(new EmitterEvent(payload, i));
             mockServer.enqueue(new MockResponse().setResponseCode(400));
         }
-        return new EmittableEvents(events, eventIds);
+        return events;
     }
 }

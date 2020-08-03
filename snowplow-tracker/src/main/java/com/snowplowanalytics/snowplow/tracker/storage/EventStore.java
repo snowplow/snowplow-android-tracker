@@ -25,10 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.emitter.EmittableEvents;
 import com.snowplowanalytics.snowplow.tracker.utils.Util;
 
 /**
@@ -231,10 +231,9 @@ public class EventStore {
      * eventIds and event payloads.
      */
     @SuppressWarnings("unchecked")
-    public EmittableEvents getEmittableEvents() {
+    public List<EmitterEvent> getEmittableEvents() {
 
-        LinkedList<Long> eventIds = new LinkedList<>();
-        ArrayList<Payload> events = new ArrayList<>();
+        ArrayList<EmitterEvent> events = new ArrayList<>();
 
         // FIFO Pattern for sending events
         for (Map<String, Object> eventMetadata : getDescEventsInRange(this.sendLimit)) {
@@ -245,14 +244,12 @@ public class EventStore {
                     eventMetadata.get(EventStoreHelper.METADATA_EVENT_DATA);
             payload.addMap(eventData);
 
-            // Store the eventId
+            // Create EmitterEvent
             Long eventId = (Long) eventMetadata.get(EventStoreHelper.METADATA_ID);
-            eventIds.add(eventId);
-
-            // Add the payload to the list
-            events.add(payload);
+            EmitterEvent event = new EmitterEvent(payload, eventId.longValue());
+            events.add(event);
         }
-        return new EmittableEvents(events, eventIds);
+        return events;
     }
 
     /**
