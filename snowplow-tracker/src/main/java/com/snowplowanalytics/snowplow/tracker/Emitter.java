@@ -541,10 +541,12 @@ public class Emitter {
                 Logger.e(TAG, "Request Future had a timeout: %s", te.getMessage());
             }
 
+            LinkedList<Long> eventIds = requests.get(i).getEventIds();
             if (requests.get(i).isOversize()) {
-                results.add(new RequestResult(true, requests.get(i).getEventIds()));
+                Logger.track(TAG, "Request is oversized for event IDs: %s", eventIds.toString());
+                results.add(new RequestResult(true, eventIds));
             } else {
-                results.add(new RequestResult(isSuccessfulSend(code), requests.get(i).getEventIds()));
+                results.add(new RequestResult(isSuccessfulSend(code), eventIds));
             }
         }
 
