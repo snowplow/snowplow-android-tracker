@@ -9,7 +9,7 @@ public class EmitterEvent {
     public final Payload payload;
     public final long eventId;
 
-    public EmitterEvent(@NonNull Payload payload, @NonNull long eventId) {
+    public EmitterEvent(@NonNull Payload payload, long eventId) {
         this.payload = payload;
         this.eventId = eventId;
     }

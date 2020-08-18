@@ -13,174 +13,214 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.annotation.SuppressLint;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.ReadyRequest;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
+import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
+import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-
-import junit.framework.Assert;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.DefaultGroup;
+import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.HeavyGroup;
+import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.Single;
+import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
+import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
+import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTP;
+import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTPS;
 
 public class EmitterTest extends AndroidTestCase {
 
     // Builder Tests
 
     public void testHttpMethodSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        Assert.assertEquals(HttpMethod.GET, emitter.getHttpMethod());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .method(GET)
+                .build();
+        assertEquals(GET, emitter.getHttpMethod());
 
-        emitter = getEmitter("com.acme", HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        Assert.assertEquals(HttpMethod.POST, emitter.getHttpMethod());
+        emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .method(POST)
+                .build();
+        assertEquals(POST, emitter.getHttpMethod());
     }
 
     public void testBufferOptionSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(BufferOption.Single, emitter.getBufferOption());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .option(Single)
+                .build();
+        assertEquals(Single, emitter.getBufferOption());
 
-        emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        Assert.assertEquals(BufferOption.DefaultGroup, emitter.getBufferOption());
+        emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .option(DefaultGroup)
+                .build();
+        assertEquals(DefaultGroup, emitter.getBufferOption());
 
-        emitter.setBufferOption(BufferOption.HeavyGroup);
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
+        emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .option(HeavyGroup)
+                .build();
+        assertEquals(HeavyGroup, emitter.getBufferOption());
     }
 
     public void testCallbackSet() {
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).callback(new RequestCallback() {
             @Override
-            public void onSuccess(int successCount) {}
+            public void onSuccess(int successCount) {
+            }
+
             @Override
-            public void onFailure(int successCount, int failureCount) {}
+            public void onFailure(int successCount, int failureCount) {
+            }
         }).build();
 
         assertNotNull(emitter.getRequestCallback());
     }
 
-    public void testUriSet() throws IOException {
-        MockWebServer mockServer = getMockServer();
-        String uri = getMockServerURI(mockServer);
+    public void testUriSet() {
+        String uri = "com.acme";
 
-        Emitter emitter = getEmitter(uri, HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals("http://" + getMockServerURI(mockServer) + "/i", emitter.getEmitterUri());
+        Emitter emitter = new Emitter.EmitterBuilder(uri, getContext())
+                .method(GET)
+                .security(HTTP)
+                .option(Single)
+                .build();
+        assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
 
-        emitter = getEmitter(uri, HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-        Assert.assertEquals("http://" + getMockServerURI(mockServer) + "/com.snowplowanalytics.snowplow/tp2",
+        emitter = new Emitter.EmitterBuilder(uri, getContext())
+                .method(POST)
+                .security(HTTP)
+                .option(DefaultGroup)
+                .build();
+        assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
 
-        emitter = getEmitter(uri, HttpMethod.GET, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        Assert.assertEquals("https://" + getMockServerURI(mockServer) + "/i", emitter.getEmitterUri());
+        emitter = new Emitter.EmitterBuilder(uri, getContext())
+                .method(GET)
+                .security(HTTPS)
+                .option(DefaultGroup)
+                .build();
+        assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
 
-        emitter = getEmitter(uri, HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        Assert.assertEquals("https://" + getMockServerURI(mockServer) + "/com.snowplowanalytics.snowplow/tp2",
-                emitter.getEmitterUri());
-
-        mockServer.shutdown();
+        emitter = new Emitter.EmitterBuilder(uri, getContext())
+                .method(POST)
+                .security(HTTPS)
+                .option(DefaultGroup)
+                .build();
+        assertEquals("https://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
     }
 
     public void testSecuritySet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(RequestSecurity.HTTP, emitter.getRequestSecurity());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .security(HTTP)
+                .build();
+        assertEquals(HTTP, emitter.getRequestSecurity());
 
-        emitter = getEmitter("com.acme", HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTPS);
-        Assert.assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
+        emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .security(HTTPS)
+                .build();
+        assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
     }
 
     public void testTickSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(0, emitter.getEmitterTick());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .tick(0)
+                .build();
+        assertEquals(0, emitter.getEmitterTick());
     }
 
     public void testEmptyLimitSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(0, emitter.getEmptyLimit());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .emptyLimit(0)
+                .build();
+        assertEquals(0, emitter.getEmptyLimit());
     }
 
     public void testSendLimitSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(200, emitter.getSendLimit());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .sendLimit(200)
+                .build();
+        assertEquals(200, emitter.getSendLimit());
     }
 
     public void testByteLimitGetSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(20000, emitter.getByteLimitGet());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .byteLimitGet(20000)
+                .build();
+        assertEquals(20000, emitter.getByteLimitGet());
     }
 
     public void testByteLimitPostSet() {
-        Emitter emitter = getEmitter("com.acme", HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-        Assert.assertEquals(25000, emitter.getByteLimitPost());
+        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext())
+                .byteLimitPost(25000)
+                .build();
+        assertEquals(25000, emitter.getByteLimitPost());
     }
 
-    public void testUpdatingEmitterSettings() throws InterruptedException, IOException, JSONException {
-        MockWebServer mockServer = getMockServer();
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.POST)
-                .security(RequestSecurity.HTTP)
+    public void testUpdatingEmitterSettings() throws InterruptedException {
+        String uri = "snowplowanalytics.com";
+        Emitter emitter = new Emitter.EmitterBuilder(uri, getContext())
+                .option(Single)
+                .method(POST)
+                .security(HTTP)
                 .tick(250)
                 .emptyLimit(5)
                 .sendLimit(200)
                 .byteLimitGet(20000)
                 .byteLimitPost(25000)
                 .timeUnit(TimeUnit.MILLISECONDS)
+                .eventStore(new MockEventStore())
                 .build();
-        emitter.waitForEventStore();
-        emitter.getEventStore().removeAllEvents();
 
         assertFalse(emitter.getEmitterStatus());
-        assertEquals(BufferOption.Single, emitter.getBufferOption());
-        assertEquals("http://" + getMockServerURI(mockServer) + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
-        emitter.setHttpMethod(HttpMethod.GET);
-        assertEquals("http://" + getMockServerURI(mockServer) + "/i", emitter.getEmitterUri());
+        assertEquals(Single, emitter.getBufferOption());
+        assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
+        emitter.setHttpMethod(GET);
+        assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
         emitter.setRequestSecurity(RequestSecurity.HTTPS);
-        assertEquals("https://" + getMockServerURI(mockServer) + "/i", emitter.getEmitterUri());
+        assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com.acme");
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setBufferOption(BufferOption.HeavyGroup);
-        assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
+        emitter.setBufferOption(HeavyGroup);
+        assertEquals(HeavyGroup, emitter.getBufferOption());
 
         emitter.flush();
         emitter.flush();
         Thread.sleep(500);
 
         assertTrue(emitter.getEmitterStatus());
-        emitter.setHttpMethod(HttpMethod.POST);
+        emitter.setHttpMethod(POST);
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setRequestSecurity(RequestSecurity.HTTP);
+        emitter.setRequestSecurity(HTTP);
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com/foo");
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setBufferOption(BufferOption.DefaultGroup);
-        assertEquals(BufferOption.HeavyGroup, emitter.getBufferOption());
+        emitter.setBufferOption(DefaultGroup);
+        assertEquals(HeavyGroup, emitter.getBufferOption());
 
         emitter.shutdown();
 
-        Emitter customPathEmitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.POST)
-                .security(RequestSecurity.HTTP)
+        Emitter customPathEmitter = new Emitter.EmitterBuilder(uri, getContext())
+                .option(Single)
+                .method(POST)
+                .security(HTTP)
                 .tick(250)
                 .emptyLimit(5)
                 .sendLimit(200)
@@ -188,333 +228,210 @@ public class EmitterTest extends AndroidTestCase {
                 .byteLimitPost(25000)
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .customPostPath("com.acme.company/tpx")
+                .eventStore(new MockEventStore())
                 .build();
         assertEquals("com.acme.company/tpx", customPathEmitter.getCustomPostPath());
-        assertEquals("http://" + getMockServerURI(mockServer) + "/com.acme.company/tpx", customPathEmitter.getEmitterUri());
+        assertEquals("http://" + uri + "/com.acme.company/tpx", customPathEmitter.getEmitterUri());
 
         customPathEmitter.shutdown();
-
-        mockServer.shutdown();
     }
 
     // Emitting Tests
 
-    private void assertGETRequest(RecordedRequest req) {
-        assertNotNull(req);
-        assertEquals("GET", req.getMethod());
-        assertEquals("Keep-Alive", req.getHeader("Connection"));
-        assertEquals("/i?", req.getPath().substring(0, 3));
-    }
+    public void testEmitEventWithBrokenNetworkConnectionDoesntFreezeEmitterStatus() throws InterruptedException {
+        NetworkConnection networkConnection = new BrokenNetworkConnection();
+        Emitter emitter = getEmitter(networkConnection, Single);
 
-    private JSONObject assertPOSTRequest(RecordedRequest req) throws JSONException {
-        assertNotNull(req);
-        assertEquals("POST", req.getMethod());
-        assertEquals("application/json; charset=utf-8", req.getHeader("Content-Type"));
-        assertEquals("Keep-Alive", req.getHeader("Connection"));
-        assertEquals("/com.snowplowanalytics.snowplow/tp2", req.getPath());
+        emitter.add(generatePayloads(1).get(0));
 
-        JSONObject payload = new JSONObject(req.getBody().readUtf8());
-        assertEquals(2, payload.length());
-        assertEquals(
-                "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
-                payload.getString("schema")
-        );
-
-        return payload;
-    }
-
-    public void testEmitSingleGetEvent() throws InterruptedException, IOException {
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 1);
-        Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-
-        LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        assertEquals(1, result.size());
-        assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
-
-        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        assertGETRequest(req);
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitTwoGetEvents() throws InterruptedException, IOException {
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
-        Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.GET, BufferOption.Single, RequestSecurity.HTTP);
-
-        LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        assertEquals(2, result.size());
-        assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
-        assertEquals(1, result.get(1).getEventIds().getFirst().intValue());
-
-        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        assertGETRequest(req);
-
-        req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        assertGETRequest(req);
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitSinglePostEvent() throws InterruptedException, IOException, JSONException {
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 1);
-        Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-
-        LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        assertEquals(1, result.size());
-        assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
-
-        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        JSONObject payload = assertPOSTRequest(req);
-
-        JSONArray data = payload.getJSONArray("data");
-        assertEquals(1, data.length());
-        JSONObject event = data.getJSONObject(0);
-        assertEquals(2, event.length());
-        assertEquals(0, event.getInt("a"));
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitTwoEventsPostAsGroup() throws InterruptedException, IOException, JSONException {
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
-        Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.DefaultGroup, RequestSecurity.HTTP);
-
-        LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        assertEquals(1, result.size());
-        assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
-        assertEquals(1, result.getFirst().getEventIds().get(1).intValue());
-
-        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        JSONObject payload = assertPOSTRequest(req);
-
-        JSONArray data = payload.getJSONArray("data");
-        assertEquals(2, data.length());
-        JSONObject event1 = data.getJSONObject(0);
-        assertEquals(2, event1.length());
-        assertEquals(0, event1.getInt("a"));
-        JSONObject event2 = data.getJSONObject(1);
-        assertEquals(2, event2.length());
-        assertEquals(1, event2.getInt("a"));
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitTwoEventsPostAsSingles() throws InterruptedException, IOException, JSONException {
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 2);
-        Emitter emitter = getEmitter(getMockServerURI(mockServer), HttpMethod.POST, BufferOption.Single, RequestSecurity.HTTP);
-
-        LinkedList<RequestResult> result = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        assertEquals(2, result.size());
-        assertEquals(0, result.getFirst().getEventIds().getFirst().intValue());
-        assertEquals(1, result.get(1).getEventIds().getFirst().intValue());
-
-        // Process first request
-        RecordedRequest req = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        JSONObject payload = assertPOSTRequest(req);
-
-        JSONArray data1 = payload.getJSONArray("data");
-        assertEquals(1, data1.length());
-        JSONObject event1 = data1.getJSONObject(0);
-        assertEquals(2, event1.length());
-
-        // Process second request
-        RecordedRequest req2 = mockServer.takeRequest(2, TimeUnit.SECONDS);
-        JSONObject payload2 = assertPOSTRequest(req2);
-
-        JSONArray data2 = payload2.getJSONArray("data");
-        assertEquals(1, data2.length());
-        JSONObject event2 = data2.getJSONObject(0);
-        assertEquals(2, event2.length());
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitOversizeEvent() throws InterruptedException, IOException, JSONException {
-        Executor.setThreadCount(10);
-        Executor.shutdown();
-
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getBadEmittableEvents(mockServer, 10);
-
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .tick(0)
-                .callback(getCallback())
-                .emptyLimit(0)
-                .sendLimit(10)
-                .byteLimitGet(5)
-                .build();
-
-        LinkedList<RequestResult> results = emitter.performAsyncEmit(emitter.buildRequests(emittableEvents));
-        for (RequestResult res : results) {
-            assertTrue(res.getSuccess());
-        }
-
-        mockServer.shutdown();
-    }
-
-    public void testEmitOnlyFailingEvents() throws InterruptedException, IOException, JSONException {
-        Executor.setThreadCount(10);
-        Executor.shutdown();
-
-        MockWebServer mockServer = getMockServer();
-        getBadEmittableEvents(mockServer, 10);
-
-        new EventStore(getContext(), 5).removeAllEvents();
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .tick(1)
-                .callback(getCallback())
-                .emptyLimit(5)
-                .sendLimit(10)
-                .build();
-
-        TrackerPayload payload = new TrackerPayload();
-        payload.add("key", "value");
-        payload.add("e", "pv");
-
-        for (int i = 0; i < 10; i++) {
-            emitter.add(payload);
-        }
         Thread.sleep(1000);
 
-        for (int i = 0; i < 10; i++) {
-            mockServer.takeRequest(20, TimeUnit.SECONDS);
-        }
+        assertFalse(emitter.getEmitterStatus());
 
-        emitter.getEventStore().removeAllEvents();
-        emitter.shutdown();
-
-        mockServer.shutdown();
+        emitter.flush();
     }
 
-    public void testEmitOnlySuccessEvents() throws InterruptedException, IOException, JSONException {
-        Executor.setThreadCount(10);
-        Executor.shutdown();
+    public void testEmitSingleGetEventWithSuccess() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,true);
+        Emitter emitter = getEmitter(networkConnection, Single);
 
-        MockWebServer mockServer = getMockServer();
-        getEmittableEvents(mockServer, 10);
+        emitter.add(generatePayloads(1).get(0));
 
-        new EventStore(getContext(), 5).removeAllEvents();
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .tick(1)
-                .callback(getCallback())
-                .emptyLimit(5)
-                .sendLimit(10)
-                .build();
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
 
-        TrackerPayload payload = new TrackerPayload();
-        payload.add("key", "value");
-        payload.add("e", "pv");
+        assertEquals(1, networkConnection.previousResults.size());
+        assertEquals(1, networkConnection.previousResults.get(0).size());
+        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertEquals(0, emitter.getEventStore().getSize());
 
-        for (int i = 0; i < 10; i++) {
+        emitter.flush();
+    }
+
+    public void testEmitSingleGetEventWithNoSuccess() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,false);
+        Emitter emitter = getEmitter(networkConnection, Single);
+
+        emitter.add(generatePayloads(1).get(0));
+
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(1, networkConnection.previousResults.size());
+        assertEquals(1, networkConnection.previousResults.get(0).size());
+        assertFalse(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertEquals(1, emitter.getEventStore().getSize());
+
+        emitter.flush();
+    }
+
+    public void testEmitTwoGetEventsWithSuccess() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,true);
+        Emitter emitter = getEmitter(networkConnection, Single);
+
+        for (Payload payload : generatePayloads(2)) {
             emitter.add(payload);
         }
-        Thread.sleep(1000);
 
-        for (int i = 0; i < 10; i++) {
-            mockServer.takeRequest(20, TimeUnit.SECONDS);
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 2 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
         }
 
-        emitter.getEventStore().removeAllEvents();
-        emitter.shutdown();
+        assertEquals(0, emitter.getEventStore().getSize());
+        int totEvents = 0;
+        for (List<RequestResult> results : networkConnection.previousResults) {
+            for (RequestResult result : results) {
+                assertTrue(result.getSuccess());
+                totEvents += result.getEventIds().size();
+            }
+        }
+        assertEquals(2, totEvents);
 
-        mockServer.shutdown();
+        emitter.flush();
     }
 
-    public void testEmitMixedEvents() throws InterruptedException, IOException, JSONException {
-        Executor.setThreadCount(10);
-        Executor.shutdown();
+    public void testEmitTwoGetEventsWithNoSuccess() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,false);
+        Emitter emitter = getEmitter(networkConnection, Single);
 
-        MockWebServer mockServer = getMockServer();
-        getEmittableEvents(mockServer, 5);
-        getBadEmittableEvents(mockServer, 5);
-
-        new EventStore(getContext(), 5).removeAllEvents();
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .tick(1)
-                .callback(getCallback())
-                .emptyLimit(5)
-                .sendLimit(10)
-                .build();
-
-        TrackerPayload payload = new TrackerPayload();
-        payload.add("key", "value");
-        payload.add("e", "pv");
-
-        for (int i = 0; i < 10; i++) {
+        for (Payload payload : generatePayloads(2)) {
             emitter.add(payload);
         }
-        Thread.sleep(1000);
 
-        for (int i = 0; i < 10; i++) {
-            mockServer.takeRequest(20, TimeUnit.SECONDS);
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 2 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
         }
 
-        emitter.getEventStore().removeAllEvents();
-        emitter.shutdown();
+        assertEquals(2, emitter.getEventStore().getSize());
+        for (List<RequestResult> results : networkConnection.previousResults) {
+            for (RequestResult result : results) {
+                assertFalse(result.getSuccess());
+            }
+        }
+        // Can't check the total number of events sent as the Emitter stops to send if a request fails.
 
-        mockServer.shutdown();
+        emitter.flush();
     }
 
-    public void testBuildingOversizeEvents() throws InterruptedException, IOException, JSONException {
-        Executor.setThreadCount(10);
-        Executor.shutdown();
+    public void testEmitSinglePostEventWithSuccess() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, true);
+        Emitter emitter = getEmitter(networkConnection, Single);
+        emitter.add(generatePayloads(1).get(0));
 
-        MockWebServer mockServer = getMockServer();
-        List<EmitterEvent> emittableEvents = getEmittableEvents(mockServer, 10);
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .tick(0)
-                .callback(getCallback())
-                .emptyLimit(0)
-                .sendLimit(10)
-                .byteLimitGet(5)
+        for (int i = 0; i < 10 && networkConnection.sendingCount() < 1; i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(1, networkConnection.previousResults.size());
+        assertEquals(1, networkConnection.previousResults.get(0).size());
+        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertEquals(0, emitter.getEventStore().getSize());
+
+        emitter.flush();
+    }
+
+    public void testEmitEventsPostAsGroup() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, false);
+        Emitter emitter = getEmitter(networkConnection, DefaultGroup);
+
+        List<Payload> payloads = generatePayloads(15);
+        for (int i = 0; i < 14; i++) {
+            emitter.add(payloads.get(i));
+        }
+
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(14, emitter.getEventStore().getSize());
+        networkConnection.successfulConnection = true;
+        int prevSendingCount = networkConnection.sendingCount();
+        emitter.add(payloads.get(14));
+
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() - prevSendingCount < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(0, emitter.getEventStore().getSize());
+        int totEvents = 0;
+        boolean areGrouped = false;
+        List<List<RequestResult>> prevResults = networkConnection.previousResults.subList(prevSendingCount, networkConnection.previousResults.size());
+        for (List<RequestResult> results : prevResults) {
+            for (RequestResult result : results) {
+                assertTrue(result.getSuccess());
+                int ids = result.getEventIds().size();
+                totEvents += ids;
+                areGrouped = areGrouped || ids > 1;
+            }
+        }
+        assertEquals(15, totEvents);
+        assertTrue(areGrouped);
+
+        emitter.flush();
+    }
+
+    public void testEmitOversizeEventsPostAsGroup() throws InterruptedException {
+        Logger.updateLogLevel(LogLevel.VERBOSE);
+
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, false);
+        Emitter emitter = getEmitterBuilder(networkConnection, DefaultGroup)
                 .byteLimitPost(5)
                 .build();
 
-        LinkedList<ReadyRequest> requests = emitter.buildRequests(emittableEvents);
-        assertEquals(10, requests.size());
+        List<Payload> payloads = generatePayloads(15);
+        for (int i = 0; i < 14; i++) {
+            emitter.add(payloads.get(i));
+        }
 
-        emitter.setHttpMethod(HttpMethod.POST);
-        requests = emitter.buildRequests(emittableEvents);
-        assertEquals(10, requests.size());
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
 
-        emitter = new Emitter.EmitterBuilder(getMockServerURI(mockServer), getContext())
-                .option(BufferOption.HeavyGroup)
-                .method(HttpMethod.POST)
-                .tick(0)
-                .emptyLimit(0)
-                .sendLimit(10)
-                .byteLimitGet(5)
-                .byteLimitPost(500)
-                .build();
+        assertEquals(0, emitter.getEventStore().getSize());
+        networkConnection.successfulConnection = true;
+        emitter.add(payloads.get(14));
 
-        requests = emitter.buildRequests(emittableEvents);
-        assertEquals(2, requests.size());
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 2 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
 
-        mockServer.shutdown();
+        assertEquals(0, emitter.getEventStore().getSize());
+
+        emitter.flush();
     }
 
     // Emitter Builder
 
-    public Emitter getEmitter(String uri, HttpMethod method, BufferOption option, RequestSecurity security) {
-        return new Emitter.EmitterBuilder(uri, getContext())
+    public Emitter getEmitter(NetworkConnection networkConnection, BufferOption option) {
+        return getEmitterBuilder(networkConnection, option).build();
+    }
+
+    public Emitter.EmitterBuilder getEmitterBuilder(NetworkConnection networkConnection, BufferOption option) {
+        return new Emitter.EmitterBuilder("com.acme", getContext())
+                .networkConnection(networkConnection)
                 .option(option)
-                .method(method)
-                .security(security)
                 .tick(0)
                 .emptyLimit(0)
                 .sendLimit(200)
@@ -522,53 +439,138 @@ public class EmitterTest extends AndroidTestCase {
                 .byteLimitPost(25000)
                 .timeUnit(TimeUnit.SECONDS)
                 .tls(EnumSet.of(TLSVersion.TLSv1_2))
-                .build();
+                .eventStore(new MockEventStore());
     }
 
-    public RequestCallback getCallback() {
-        return new RequestCallback() {
-            @Override
-            public void onSuccess(int successCount) {}
-            @Override
-            public void onFailure(int successCount, int failureCount) {}
-        };
-    }
+    // Service methods
 
-    // Mock Server
-
-    public MockWebServer getMockServer() throws IOException {
-        MockWebServer mockServer = new MockWebServer();
-        mockServer.start();
-        return mockServer;
-    }
-
-    @SuppressLint("DefaultLocale")
-    public String getMockServerURI(MockWebServer mockServer) {
-        if (mockServer != null) {
-            return String.format("%s:%d", mockServer.getHostName(), mockServer.getPort());
-        }
-        return null;
-    }
-
-    public List<EmitterEvent> getEmittableEvents(MockWebServer mockServer, int count) {
-        ArrayList<EmitterEvent> events = new ArrayList<>();
+    public List<Payload> generatePayloads(int count) {
+        ArrayList<Payload> payloads = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             TrackerPayload payload = new TrackerPayload();
             payload.add("a", String.valueOf(i));
-            events.add(new EmitterEvent(payload, i));
-            mockServer.enqueue(new MockResponse());
+            payloads.add(payload);
         }
-        return events;
+        return payloads;
+    }
+}
+
+// Mock classes
+
+class BrokenNetworkConnection implements NetworkConnection {
+
+    @NonNull
+    @Override
+    public List<RequestResult> sendRequests(@NonNull List<Request> requests) {
+        throw new UnsupportedOperationException("Broken NetworkConnection");
     }
 
-    public List<EmitterEvent>  getBadEmittableEvents(MockWebServer mockServer, int count) {
-        ArrayList<EmitterEvent> events = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            TrackerPayload payload = new TrackerPayload();
-            payload.add("a", String.valueOf(i));
-            events.add(new EmitterEvent(payload, i));
-            mockServer.enqueue(new MockResponse().setResponseCode(400));
+    @NonNull
+    @Override
+    public HttpMethod getHttpMethod() {
+        throw new UnsupportedOperationException("Broken NetworkConnection");
+    }
+
+    @NonNull
+    @Override
+    public Uri getUri() {
+        throw new UnsupportedOperationException("Broken NetworkConnection");
+    }
+}
+
+class MockNetworkConnection implements NetworkConnection {
+    public boolean successfulConnection;
+    public HttpMethod httpMethod;
+
+    public final List<List<RequestResult>> previousResults = new ArrayList<>();
+
+    public MockNetworkConnection(HttpMethod httpMethod, boolean successfulConnection) {
+        this.httpMethod = httpMethod;
+        this.successfulConnection = successfulConnection;
+    }
+
+    public int sendingCount() {
+        return previousResults.size();
+    }
+
+    @NonNull
+    @Override
+    public List<RequestResult> sendRequests(@NonNull List<Request> requests) {
+        List<RequestResult> requestResults = new ArrayList<>(requests.size());
+        for (Request request : requests) {
+            boolean isSuccessful = request.oversize || successfulConnection;
+            RequestResult result = new RequestResult(isSuccessful, request.emitterEventIds);
+            requestResults.add(result);
         }
-        return events;
+        previousResults.add(requestResults);
+        return requestResults;
+    }
+
+    @NonNull
+    @Override
+    public HttpMethod getHttpMethod() {
+        return httpMethod;
+    }
+
+    @NonNull
+    @Override
+    public Uri getUri() {
+        return Uri.parse("http://fake-url.com");
+    }
+}
+
+class MockEventStore implements EventStore {
+    private HashMap<Long, Payload> db = new HashMap<>();
+    private long lastInsertedRow = -1;
+
+    @Override
+    public void add(Payload payload) {
+        synchronized (this) {
+            lastInsertedRow++;
+            db.put(lastInsertedRow, payload);
+        }
+    }
+
+    @Override
+    public boolean removeEvent(long id) {
+        synchronized (this) {
+            return db.remove(id) != null;
+        }
+    }
+
+    @Override
+    public boolean removeEvents(List<Long> ids) {
+        boolean result = true;
+        for (long id : ids) {
+            boolean removed = removeEvent(id);
+            result = result && removed;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean removeAllEvents() {
+        synchronized (this) {
+            db = new HashMap<>();
+            lastInsertedRow = 0;
+        }
+        return true;
+    }
+
+    @Override
+    public long getSize() {
+        return db.size();
+    }
+
+    @Override
+    public List<EmitterEvent> getEmittableEvents() {
+        synchronized (this) {
+            List<EmitterEvent> events = new ArrayList<>();
+            for (Map.Entry<Long, Payload> entry : db.entrySet()) {
+                EmitterEvent event = new EmitterEvent(entry.getValue(), entry.getKey());
+                events.add(event);
+            }
+            return events;
+        }
     }
 }

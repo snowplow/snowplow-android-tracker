@@ -35,6 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.storage.DefaultEventStore;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
@@ -64,7 +65,6 @@ public class EventSendingTest extends AndroidTestCase {
             Tracker tracker = Tracker.instance();
             Emitter emitter = tracker.getEmitter();
             tracker.close();
-            emitter.waitForEventStore();
             boolean isClean = emitter.getEventStore().removeAllEvents();
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
             Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
@@ -76,7 +76,7 @@ public class EventSendingTest extends AndroidTestCase {
     // Test Setup
 
     private MockWebServer getMockServer(int count) throws IOException {
-        EventStore eventStore = new EventStore(getContext(), 10);
+        EventStore eventStore = new DefaultEventStore(getContext(), 10);
         eventStore.removeAllEvents();
 
         MockWebServer mockServer = new MockWebServer();
@@ -146,7 +146,6 @@ public class EventSendingTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        assertTrue(emitter.waitForEventStore());
         emitter.getEventStore().removeAllEvents();
 
         Subject subject = new Subject
