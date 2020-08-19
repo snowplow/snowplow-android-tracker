@@ -500,6 +500,7 @@ class MockNetworkConnection implements NetworkConnection {
         for (Request request : requests) {
             boolean isSuccessful = request.oversize || successfulConnection;
             RequestResult result = new RequestResult(isSuccessful, request.emitterEventIds);
+            Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, new Boolean(isSuccessful).toString());
             requestResults.add(result);
         }
         previousResults.add(requestResults);
@@ -527,6 +528,7 @@ class MockEventStore implements EventStore {
     public void add(Payload payload) {
         synchronized (this) {
             lastInsertedRow++;
+            Logger.v("MockEventStore", "Add %s", payload);
             db.put(lastInsertedRow, payload);
         }
     }
@@ -534,6 +536,7 @@ class MockEventStore implements EventStore {
     @Override
     public boolean removeEvent(long id) {
         synchronized (this) {
+            Logger.v("MockEventStore", "Remove %s", id);
             return db.remove(id) != null;
         }
     }
@@ -551,6 +554,7 @@ class MockEventStore implements EventStore {
     @Override
     public boolean removeAllEvents() {
         synchronized (this) {
+            Logger.v("MockEventStore", "Remove all");
             db = new HashMap<>();
             lastInsertedRow = 0;
         }
@@ -570,6 +574,7 @@ class MockEventStore implements EventStore {
                 EmitterEvent event = new EmitterEvent(entry.getValue(), entry.getKey());
                 events.add(event);
             }
+            Logger.v("MockEventStore", "getEmittableEvents: %s", events);
             return events;
         }
     }

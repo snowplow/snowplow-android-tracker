@@ -13,4 +13,12 @@ public class EmitterEvent {
         this.payload = payload;
         this.eventId = eventId;
     }
+
+    @Override
+    public String toString() {
+        return "EmitterEvent{" +
+                "payload=" + payload +
+                ", eventId=" + eventId +
+                '}';
+    }
 }
