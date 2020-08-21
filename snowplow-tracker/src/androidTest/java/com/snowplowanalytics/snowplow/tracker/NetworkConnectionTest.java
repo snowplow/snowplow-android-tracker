@@ -3,9 +3,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -32,8 +30,8 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testGetRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
-        DefaultNetworkConnection connection =
-                new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(getMockServerURI(mockServer))
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
                         .security(HTTP)
                         .method(GET)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
@@ -60,8 +58,8 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testGetRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
-        DefaultNetworkConnection connection =
-                new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(getMockServerURI(mockServer))
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
                         .security(HTTP)
                         .method(GET)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
@@ -86,8 +84,8 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testPostRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
-        DefaultNetworkConnection connection =
-                new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(getMockServerURI(mockServer))
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
                         .security(HTTP)
                         .method(POST)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
@@ -118,8 +116,8 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testPostRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
-        DefaultNetworkConnection connection =
-                new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(getMockServerURI(mockServer))
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
                         .security(HTTP)
                         .method(POST)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))

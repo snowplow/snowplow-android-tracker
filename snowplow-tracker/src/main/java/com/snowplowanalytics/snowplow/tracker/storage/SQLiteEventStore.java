@@ -18,6 +18,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +43,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.Util;
  * temporary list meanwhile the database is not
  * yet ready.
  */
-public class DefaultEventStore implements EventStore {
-    private final static String TAG = DefaultEventStore.class.getSimpleName();
+public class SQLiteEventStore implements EventStore {
+    private final static String TAG = SQLiteEventStore.class.getSimpleName();
 
     private final List<Payload> payloadWaitingList = new ArrayList<>();
 
@@ -56,17 +57,12 @@ public class DefaultEventStore implements EventStore {
     };
     private long lastInsertedRowId = -1;
 
-    private int sendLimit;
-
     /**
      * Creates a new Event Store
      *
      * @param context The android context object
-     * @param sendLimit The maximum amount of events that can be sent
-     *                  concurrently
      */
-    public DefaultEventStore(Context context, int sendLimit) {
-        this.sendLimit = sendLimit;
+    public SQLiteEventStore(Context context) {
         Executor.futureCallable((Callable<Void>) () -> {
             dbHelper = EventStoreHelper.getInstance(context);
             open();
@@ -222,9 +218,9 @@ public class DefaultEventStore implements EventStore {
         return lastInsertedRowId;
     }
 
+    @NonNull
     @Override
-    @SuppressWarnings("unchecked")
-    public List<EmitterEvent> getEmittableEvents() {
+    public List<EmitterEvent> getEmittableEvents(int queryLimit) {
         if (!isDatabaseOpen()) {
             return Collections.emptyList();
         }
@@ -233,7 +229,7 @@ public class DefaultEventStore implements EventStore {
         ArrayList<EmitterEvent> events = new ArrayList<>();
 
         // FIFO Pattern for sending events
-        for (Map<String, Object> eventMetadata : getDescEventsInRange(this.sendLimit)) {
+        for (Map<String, Object> eventMetadata : getDescEventsInRange(queryLimit)) {
 
             // Create a TrackerPayload for each event
             TrackerPayload payload = new TrackerPayload();

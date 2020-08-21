@@ -566,15 +566,21 @@ class MockEventStore implements EventStore {
         return db.size();
     }
 
+    @NonNull
     @Override
-    public List<EmitterEvent> getEmittableEvents() {
+    public List<EmitterEvent> getEmittableEvents(int queryLimit) {
         synchronized (this) {
+            List<Long> eventIds = new ArrayList<>();
             List<EmitterEvent> events = new ArrayList<>();
             for (Map.Entry<Long, Payload> entry : db.entrySet()) {
                 EmitterEvent event = new EmitterEvent(entry.getValue(), entry.getKey());
+                eventIds.add(event.eventId);
                 events.add(event);
             }
-            Logger.v("MockEventStore", "getEmittableEvents: %s", events);
+            if (queryLimit < events.size()) {
+                events = events.subList(0, queryLimit);
+            }
+            Logger.v("MockEventStore", "getEmittableEvents: %s", eventIds);
             return events;
         }
     }

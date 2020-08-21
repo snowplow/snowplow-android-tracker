@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker.storage;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 
@@ -15,7 +17,7 @@ public interface EventStore {
      * Adds an event to the store.
      * @param payload the payload to be added
      */
-    void add(Payload payload);
+    void add(@NonNull Payload payload);
 
     /**
      * Removes an event from the store.
@@ -29,7 +31,7 @@ public interface EventStore {
      * @param ids the events' identifiers in the store.
      * @return a boolean of success to remove.
      */
-    boolean removeEvents(List<Long> ids);
+    boolean removeEvents(@NonNull List<Long> ids);
 
     /**
      * Empties the store of all the events.
@@ -49,5 +51,5 @@ public interface EventStore {
      * @return EmittableEvent objects containing
      * eventIds and event payloads.
      */
-    List<EmitterEvent> getEmittableEvents();
+    @NonNull List<EmitterEvent> getEmittableEvents(int queryLimit);
 }

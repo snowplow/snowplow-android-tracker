@@ -79,10 +79,10 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     // test
     androidTestImplementation 'com.google.android.gms:play-services-analytics:16.0.1'
-    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.4.1'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.12.12'
 }
 
 android.libraryVariants.all { variant ->

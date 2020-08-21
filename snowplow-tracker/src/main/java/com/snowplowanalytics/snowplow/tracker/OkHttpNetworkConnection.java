@@ -37,8 +37,8 @@ import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTT
  * Components in charge to send events to the collector.
  * It uses OkHttp as Http client.
  */
-public class DefaultNetworkConnection implements NetworkConnection {
-    private final String TAG = DefaultNetworkConnection.class.getSimpleName();
+public class OkHttpNetworkConnection implements NetworkConnection {
+    private final String TAG = OkHttpNetworkConnection.class.getSimpleName();
 
     private static final String DEFAULT_USER_AGENT = String.format("snowplow/%s android/%s", BuildConfig.TRACKER_LABEL, Build.VERSION.RELEASE);
     private final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
@@ -53,9 +53,9 @@ public class DefaultNetworkConnection implements NetworkConnection {
     private Uri.Builder uriBuilder;
 
     /**
-     * Builder for the DefaultNetworkConnection.
+     * Builder for the OkHttpNetworkConnection.
      */
-    public static class DefaultNetworkConnectionBuilder {
+    public static class OkHttpNetworkConnectionBuilder {
         final String uri; // Required
         HttpMethod httpMethod = POST; // Optional
         RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
@@ -67,7 +67,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
         /**
          * @param uri The uri of the collector
          */
-        public DefaultNetworkConnectionBuilder(String uri) {
+        public OkHttpNetworkConnectionBuilder(String uri) {
             this.uri = uri;
         }
 
@@ -75,7 +75,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder method(HttpMethod httpMethod) {
+        public OkHttpNetworkConnectionBuilder method(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
@@ -84,7 +84,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          * @param requestSecurity the security chosen for requests
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder security(RequestSecurity requestSecurity) {
+        public OkHttpNetworkConnectionBuilder security(RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
             return this;
         }
@@ -93,7 +93,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          * @param version the TLS version allowed for requests
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder tls(TLSVersion version) {
+        public OkHttpNetworkConnectionBuilder tls(TLSVersion version) {
             this.tlsVersions = EnumSet.of(version);
             return this;
         }
@@ -102,7 +102,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder tls(EnumSet<TLSVersion> versions) {
+        public OkHttpNetworkConnectionBuilder tls(EnumSet<TLSVersion> versions) {
             this.tlsVersions = versions;
             return this;
         }
@@ -112,7 +112,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          *                    TimeOutException will be thrown
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder emitTimeout(int emitTimeout){
+        public OkHttpNetworkConnectionBuilder emitTimeout(int emitTimeout){
             this.emitTimeout = emitTimeout;
             return this;
         }
@@ -123,7 +123,7 @@ public class DefaultNetworkConnection implements NetworkConnection {
          *               ,otherwise a new one is created.
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder client(OkHttpClient client) {
+        public OkHttpNetworkConnectionBuilder client(OkHttpClient client) {
             this.client = client;
             return this;
         }
@@ -132,22 +132,22 @@ public class DefaultNetworkConnection implements NetworkConnection {
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
-        public DefaultNetworkConnection.DefaultNetworkConnectionBuilder customPostPath(String customPostPath) {
+        public OkHttpNetworkConnectionBuilder customPostPath(String customPostPath) {
             this.customPostPath = customPostPath;
             return this;
         }
 
         /**
-         * Creates a new DefaultNetworkConnection
+         * Creates a new OkHttpNetworkConnection
          *
-         * @return a new DefaultNetworkConnection object
+         * @return a new OkHttpNetworkConnection object
          */
-        public DefaultNetworkConnection build() {
-            return new DefaultNetworkConnection(this);
+        public OkHttpNetworkConnection build() {
+            return new OkHttpNetworkConnection(this);
         }
     }
 
-    private DefaultNetworkConnection(DefaultNetworkConnectionBuilder builder) {
+    private OkHttpNetworkConnection(OkHttpNetworkConnectionBuilder builder) {
         this.uri = builder.uri;
         this.protocol = builder.requestSecurity;
         this.httpMethod = builder.httpMethod;

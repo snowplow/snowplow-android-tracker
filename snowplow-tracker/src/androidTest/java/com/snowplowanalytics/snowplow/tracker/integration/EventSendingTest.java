@@ -35,7 +35,7 @@ import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.events.Timing;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.storage.DefaultEventStore;
+import com.snowplowanalytics.snowplow.tracker.storage.SQLiteEventStore;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
@@ -76,7 +76,7 @@ public class EventSendingTest extends AndroidTestCase {
     // Test Setup
 
     private MockWebServer getMockServer(int count) throws IOException {
-        EventStore eventStore = new DefaultEventStore(getContext(), 10);
+        EventStore eventStore = new SQLiteEventStore(getContext());
         eventStore.removeAllEvents();
 
         MockWebServer mockServer = new MockWebServer();

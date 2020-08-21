@@ -26,7 +26,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.storage.DefaultEventStore;
+import com.snowplowanalytics.snowplow.tracker.storage.SQLiteEventStore;
 import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
@@ -303,13 +303,13 @@ public class Emitter {
         this.client = builder.client;
 
         if (builder.eventStore == null) {
-            eventStore = new DefaultEventStore(context, sendLimit);
+            eventStore = new SQLiteEventStore(context);
         } else {
             this.eventStore = builder.eventStore;
         }
 
         if (builder.networkConnection == null) {
-            this.networkConnection = new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(builder.uri)
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(builder.uri)
                     .security(builder.requestSecurity)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
@@ -433,7 +433,7 @@ public class Emitter {
         }
         emptyCount = 0;
 
-        List<EmitterEvent> events = eventStore.getEmittableEvents();
+        List<EmitterEvent> events = eventStore.getEmittableEvents(sendLimit);
         List<Request> requests = buildRequests(events);
         List<RequestResult> results = networkConnection.sendRequests(requests);
 
@@ -620,6 +620,14 @@ public class Emitter {
     }
 
     /**
+     * Sets the maximum amount of events to grab for an emit attempt.
+     * @param sendLimit The maximum possible amount of events.
+     */
+    public void setSendLimit(int sendLimit) {
+        this.sendLimit = sendLimit;
+    }
+
+    /**
      * Sets the HttpMethod for the Emitter
      *
      * @param method the HttpMethod
@@ -627,7 +635,7 @@ public class Emitter {
     public void setHttpMethod(HttpMethod method) {
         if (!isRunning.get()) {
             this.httpMethod = method;
-            this.networkConnection = new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(uri)
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
@@ -646,7 +654,7 @@ public class Emitter {
     public void setRequestSecurity(RequestSecurity security) {
         if (!isRunning.get()) {
             this.requestSecurity = security;
-            this.networkConnection = new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(uri)
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
@@ -665,7 +673,7 @@ public class Emitter {
     public void setEmitterUri(String uri) {
         if (!isRunning.get()) {
             this.uri = uri;
-            this.networkConnection = new DefaultNetworkConnection.DefaultNetworkConnectionBuilder(uri)
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
