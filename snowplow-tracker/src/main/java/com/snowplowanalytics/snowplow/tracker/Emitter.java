@@ -515,7 +515,7 @@ public class Emitter {
                         requests.add(request);
 
                     } else if (isOversize(payload, postPayloadMaps)) {
-                        Request request = new Request(postPayloadMaps, reqEventIds, false);
+                        Request request = new Request(postPayloadMaps, reqEventIds);
                         requests.add(request);
 
                         // Clear collections and build a new POST
@@ -534,7 +534,7 @@ public class Emitter {
 
                 // Check if all payloads have been processed
                 if (!postPayloadMaps.isEmpty()) {
-                    Request request = new Request(postPayloadMaps, reqEventIds, false);
+                    Request request = new Request(postPayloadMaps, reqEventIds);
                     requests.add(request);
                 }
             }
@@ -558,7 +558,7 @@ public class Emitter {
      * @return weather the payload bundle exceeds the maximum size allowed.
      */
     private boolean isOversize(@NonNull Payload payload, @NonNull List<Payload> previousPaylods) {
-        long byteLimit = httpMethod == GET ? byteLimitGet : byteLimitPost;
+        long byteLimit = networkConnection.getHttpMethod() == GET ? byteLimitGet : byteLimitPost;
         return isOversize(payload, byteLimit, previousPaylods);
     }
 

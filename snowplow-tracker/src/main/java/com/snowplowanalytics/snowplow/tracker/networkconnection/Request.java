@@ -50,9 +50,8 @@ public class Request {
      * Create a request object.
      * @param payloads to send to the collector as a payload bundle.
      * @param emitterEventIds as reference of the events to send.
-     * @param oversize indicates if the payload bundle exceeded the maximum size allowed.
      */
-    public Request(List<Payload> payloads, List<Long> emitterEventIds, boolean oversize) {
+    public Request(List<Payload> payloads, List<Long> emitterEventIds) {
         String tempUserAgent = null;
         ArrayList<Map> payloadData = new ArrayList<>();
         for (Payload payload : payloads) {
@@ -61,7 +60,7 @@ public class Request {
         }
         this.payload = new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData);
         this.emitterEventIds = emitterEventIds;
-        this.oversize = oversize;
+        this.oversize = false;
         customUserAgent = tempUserAgent;
     }
 

@@ -573,7 +573,9 @@ class MockEventStore implements EventStore {
             List<Long> eventIds = new ArrayList<>();
             List<EmitterEvent> events = new ArrayList<>();
             for (Map.Entry<Long, Payload> entry : db.entrySet()) {
-                EmitterEvent event = new EmitterEvent(entry.getValue(), entry.getKey());
+                Payload payloadCopy = new TrackerPayload();
+                payloadCopy.addMap(entry.getValue().getMap());
+                EmitterEvent event = new EmitterEvent(payloadCopy, entry.getKey());
                 eventIds.add(event.eventId);
                 events.add(event);
             }
