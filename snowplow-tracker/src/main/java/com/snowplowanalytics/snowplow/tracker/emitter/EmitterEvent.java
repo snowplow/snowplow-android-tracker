@@ -13,36 +13,17 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
+import android.support.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+public class EmitterEvent {
 
-/**
- * An object containing currently Pending
- * events and their associated eventIds.
- */
-public class EmittableEvents {
+    public final Payload payload;
+    public final long eventId;
 
-    private final ArrayList<Payload> events;
-    private final LinkedList<Long> eventIds;
-
-    public EmittableEvents(ArrayList<Payload> events, LinkedList<Long> eventIds) {
-        this.events = events;
-        this.eventIds = eventIds;
-    }
-
-    /**
-     * @return the objects ArrayList of payloads
-     */
-    public ArrayList<Payload> getEvents() {
-        return this.events;
-    }
-
-    /**
-     * @return the object LinkedList of event ids
-     */
-    public LinkedList<Long> getEventIds() {
-        return this.eventIds;
+    public EmitterEvent(@NonNull Payload payload, long eventId) {
+        this.payload = payload;
+        this.eventId = eventId;
     }
 }

@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Stores the result of a Request Attempt
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 public class RequestResult {
 
     private final boolean success;
-    private final LinkedList<Long> eventIds;
+    private final List<Long> eventIds;
 
     /**
      * Builds a result from a request attempt.
@@ -29,7 +29,7 @@ public class RequestResult {
      * @param success if the event returned a 200
      * @param eventIds a list of event ids involved in the sending
      */
-    public RequestResult(boolean success, LinkedList<Long> eventIds) {
+    public RequestResult(boolean success, List<Long> eventIds) {
         this.success = success;
         this.eventIds = eventIds;
     }
@@ -44,7 +44,7 @@ public class RequestResult {
     /**
      * @return the requests LinkedList of eventIds
      */
-    public LinkedList<Long> getEventIds() {
+    public List<Long> getEventIds() {
         return this.eventIds;
     }
 }

@@ -48,7 +48,6 @@ public class TrackerTest extends AndroidTestCase {
             Emitter emitter = tracker.getEmitter();
             emitter.shutdown(30);
             tracker.close();
-            emitter.waitForEventStore();
             boolean isClean = emitter.getEventStore().removeAllEvents();
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
             Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
@@ -68,7 +67,6 @@ public class TrackerTest extends AndroidTestCase {
                 .tick(0)
                 .emptyLimit(0)
                 .build();
-        emitter.waitForEventStore();
 
         Subject subject = new Subject
                 .SubjectBuilder()
@@ -185,7 +183,6 @@ public class TrackerTest extends AndroidTestCase {
             emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                     .option(BufferOption.Single)
                     .build();
-            emitter.waitForEventStore();
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception on Emitter creation");
@@ -202,7 +199,6 @@ public class TrackerTest extends AndroidTestCase {
 
         Log.i("testTrackWithNoContext", "Send ScreenView event");
         tracker.track(ScreenView.builder().build());
-        Log.i("testTrackWithNoContext", "allEvents: \n" + tracker.getEmitter().getEventStore().getAllEvents());
         RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
         assertNotNull(req);
         int reqCount = mockWebServer.getRequestCount();
@@ -238,7 +234,6 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
-        emitter.waitForEventStore();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .base64(false)
@@ -264,7 +259,6 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
-        emitter.waitForEventStore();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .base64(false)
@@ -290,7 +284,6 @@ public class TrackerTest extends AndroidTestCase {
         Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
                 .option(BufferOption.Single)
                 .build();
-        emitter.waitForEventStore();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
                 .base64(false)
@@ -345,7 +338,6 @@ public class TrackerTest extends AndroidTestCase {
         );
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
-        emitter.waitForEventStore();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
                 .base64(false)
@@ -375,7 +367,6 @@ public class TrackerTest extends AndroidTestCase {
                 .level(LogLevel.VERBOSE)
                 .applicationCrash(false)
                 .build();
-        emitter.waitForEventStore();
 
         ExceptionHandler handler1 = new ExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(handler1);
