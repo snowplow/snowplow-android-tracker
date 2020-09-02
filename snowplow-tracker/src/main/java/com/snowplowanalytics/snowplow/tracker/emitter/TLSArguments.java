@@ -28,7 +28,7 @@ import javax.net.ssl.X509TrustManager;
 public class TLSArguments {
     private X509TrustManager trustManager = null;
     private SSLSocketFactory sslSocketFactory = null;
-    private EnumSet<TLSVersion> tlsVersions = null;
+    private EnumSet<TLSVersion> tlsVersions;
 
     /**
      * Builds an object to store arguments to pass to TLS connection configuration.
@@ -56,8 +56,6 @@ public class TLSArguments {
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
-        this.trustManager = trustManager;
-        this.sslSocketFactory = sslSocketFactory;
     }
 
     /**

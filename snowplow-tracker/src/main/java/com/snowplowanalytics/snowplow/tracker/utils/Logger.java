@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.utils;
 import android.util.Log;
 
 import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
+import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 
 /**
  * Custom logger class to easily manage debug mode and appending
@@ -26,7 +27,41 @@ public class Logger {
 
     private static String TAG = Logger.class.getSimpleName();
     private static DiagnosticLogger errorLogger;
+    private static LoggerDelegate delegate = new DefaultLoggerDelegate();
     private static int level = 0;
+
+    /**
+     * Updates the logging level.
+     *
+     * @param newLevel The new log-level to use
+     */
+    public static void updateLogLevel(LogLevel newLevel) {
+        level = newLevel.getLevel();
+    }
+
+    /**
+     * Set the error logger used to track internal errors.
+     *
+     * @param errorLogger The error logger delegate in the app.
+     */
+    public static void setErrorLogger(DiagnosticLogger errorLogger) {
+        Logger.errorLogger = errorLogger;
+    }
+
+    /**
+     * Set the logger delegate that receive logs from the tracker.
+     *
+     * @param delegate The app logger delegate.
+     */
+    public static void setDelegate(LoggerDelegate delegate) {
+        if (delegate != null) {
+            Logger.delegate = delegate;
+        } else {
+            Logger.delegate = new DefaultLoggerDelegate();
+        }
+    }
+
+    // -- Log methods
 
     /**
      * Diagnostic Logging
@@ -62,7 +97,9 @@ public class Logger {
      */
     public static void e(String tag, String msg, Object... args) {
         if (level >= 1) {
-            Log.e(getTag(tag), getMessage(msg, args));
+            String source = getTag(tag);
+            String message = getMessage(msg, args);
+            delegate.error(source, message);
         }
     }
 
@@ -75,7 +112,9 @@ public class Logger {
      */
     public static void d(String tag, String msg, Object... args) {
         if (level >= 2) {
-            Log.d(getTag(tag), getMessage(msg, args));
+            String source = getTag(tag);
+            String message = getMessage(msg, args);
+            delegate.debug(source, message);
         }
     }
 
@@ -88,7 +127,9 @@ public class Logger {
      */
     public static void v(String tag, String msg, Object... args) {
         if (level >= 3) {
-            Log.v(getTag(tag), getMessage(msg, args));
+            String source = getTag(tag);
+            String message = getMessage(msg, args);
+            delegate.verbose(source, message);
         }
     }
 
@@ -123,21 +164,24 @@ public class Logger {
         return Thread.currentThread().getName();
     }
 
-    /**
-     * Updates the logging level.
-     *
-     * @param newLevel The new log-level to use
-     */
-    public static void updateLogLevel(LogLevel newLevel) {
-        level = newLevel.getLevel();
+}
+
+/**
+ * Default internal logger delegate
+ */
+class DefaultLoggerDelegate implements LoggerDelegate {
+    @Override
+    public void error(String tag, String msg) {
+        Log.e(tag, msg);
     }
 
-    /**
-     * Set the error logger used to track internal errors.
-     *
-     * @param errorLogger The error logger delegate in the app.
-     */
-    public static void setErrorLogger(DiagnosticLogger errorLogger) {
-        Logger.errorLogger = errorLogger;
+    @Override
+    public void debug(String tag, String msg) {
+        Log.d(tag, msg);
+    }
+
+    @Override
+    public void verbose(String tag, String msg) {
+        Log.v(tag, msg);
     }
 }

@@ -36,8 +36,6 @@ import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
-import com.snowplowanalytics.snowplow.tracker.events.AbstractPrimitive;
-import com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.events.Event;
 import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -240,6 +238,15 @@ public class Tracker implements DiagnosticLogger {
          */
         public TrackerBuilder level(LogLevel log) {
             this.logLevel = log;
+            return this;
+        }
+
+        /**
+         * @param delegate The logger delegate that receive logs from the tracker.
+         * @return itself
+         */
+        public TrackerBuilder loggerDelegate(LoggerDelegate delegate) {
+            Logger.setDelegate(delegate);
             return this;
         }
 

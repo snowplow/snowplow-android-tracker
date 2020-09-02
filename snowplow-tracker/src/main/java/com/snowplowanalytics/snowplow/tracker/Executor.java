@@ -16,9 +16,11 @@ package com.snowplowanalytics.snowplow.tracker;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Static Class which holds the logic for controlling
@@ -80,17 +82,23 @@ public class Executor {
      */
     public static void execute(Runnable runnable, ExceptionHandler exceptionHandler) {
         ExecutorService executor = getExecutor();
-        executor.execute(() -> {
-            try {
-                if (runnable != null) {
-                    runnable.run();
+        try {
+            executor.execute(() -> {
+                try {
+                    if (runnable != null) {
+                        runnable.run();
+                    }
+                } catch (Throwable t) {
+                    if (exceptionHandler != null) {
+                        exceptionHandler.handle(t);
+                    }
                 }
-            } catch (Throwable t) {
-                if (exceptionHandler != null) {
-                    exceptionHandler.handle(t);
-                }
+            });
+        } catch (Exception e) {
+            if (exceptionHandler != null) {
+                exceptionHandler.handle(e);
             }
-        });
+        }
     }
 
     /**

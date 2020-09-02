@@ -25,28 +25,80 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 
 public class EventStoreTest extends AndroidTestCase {
 
-    // Helper Methods
+    static int QUERY_LIMIT = 150;
 
-    private EventStore getEventStore() {
-        EventStore eventStore = new EventStore(getContext(), 250);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // Clean SQLite database
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        waitUntilDatabaseOpen(eventStore);
         eventStore.removeAllEvents();
-        return eventStore;
+        eventStore.close();
     }
 
-    private SelfDescribingJson getEvent() {
-        TrackerPayload trackerPayload = new TrackerPayload();
-        trackerPayload.add("someKey", "someValue");
-        trackerPayload.add("anotherKey", "anotherValue");
+    public void testAddEventOnEmptyStore() throws InterruptedException {
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
 
-        return new SelfDescribingJson(
-                "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
-                trackerPayload);
+        eventStore.add(getEvent());
+        assertFalse(eventStore.isDatabaseOpen());
+        assertEquals(0, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+
+        waitUntilDatabaseOpen(eventStore);
+
+        assertTrue(eventStore.isDatabaseOpen());
+        assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());
     }
 
-    // Tests
+    public void testAddEventOnNotEmptyStore() throws InterruptedException {
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
 
-    public void testGetNonExistentEvent() {
-        EventStore eventStore = getEventStore();
+        // fill eventStore with 1 event
+        eventStore.add(getEvent());
+        waitUntilDatabaseOpen(eventStore);
+        assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+        eventStore.close();
+
+        // add new event
+        eventStore = new SQLiteEventStore(getContext());
+        eventStore.add(getEvent());
+        assertFalse(eventStore.isDatabaseOpen());
+        assertEquals(0, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+
+        waitUntilDatabaseOpen(eventStore);
+
+        assertTrue(eventStore.isDatabaseOpen());
+        assertEquals(2, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+    }
+
+    public void testRemoveEventsOnNotEmptyStore() throws InterruptedException {
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+
+        // fill eventStore with 1 event
+        eventStore.add(getEvent());
+        waitUntilDatabaseOpen(eventStore);
+        assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+        eventStore.close();
+
+        // add new event and remove when database closed
+        eventStore = new SQLiteEventStore(getContext());
+        eventStore.add(getEvent());
+        assertEquals(1, eventStore.getSize());
+        eventStore.removeAllEvents();
+        assertEquals(0, eventStore.getSize());
+        assertFalse(eventStore.isDatabaseOpen());
+
+        waitUntilDatabaseOpen(eventStore);
+
+        assertTrue(eventStore.isDatabaseOpen());
+        assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());
+    }
+
+    // Tests with database already open
+
+    public void testGetNonExistentEvent() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
+
         Map<String, Object> event = eventStore.getEvent(-1);
         assertNull(event);
 
@@ -55,8 +107,9 @@ public class EventStoreTest extends AndroidTestCase {
         assertNull(event);
     }
 
-    public void testInsertPayload() {
-        EventStore eventStore = getEventStore();
+    public void testInsertPayload() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
+
         long id = eventStore.insertEvent(getEvent());
         long lastRowId = eventStore.getLastInsertedRowId();
         Map<String, Object> event = eventStore.getEvent(id);
@@ -69,51 +122,41 @@ public class EventStoreTest extends AndroidTestCase {
         eventStore.insertEvent(getEvent());
     }
 
-    public void testEventStoreQueries() {
-        EventStore eventStore = getEventStore();
-        eventStore.insertEvent(getEvent());
+    public void testRemoveAllEvents() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
 
-        assertEquals(1, eventStore.getAllEvents().size());
-        assertEquals(1, eventStore.getDescEventsInRange(1).size());
-    }
-
-    public void testRemoveAllEvents() {
-        EventStore eventStore = getEventStore();
-
-        eventStore.insertEvent(getEvent());
-        eventStore.insertEvent(getEvent());
-        eventStore.insertEvent(getEvent());
-        eventStore.insertEvent(getEvent());
-        eventStore.insertEvent(getEvent());
-        eventStore.insertEvent(getEvent());
+        eventStore.add(getEvent());
+        eventStore.add(getEvent());
+        eventStore.add(getEvent());
+        eventStore.add(getEvent());
+        eventStore.add(getEvent());
+        eventStore.add(getEvent());
 
         assertEquals(6, eventStore.getSize());
         eventStore.removeAllEvents();
         assertEquals(0, eventStore.getSize());
-
-        eventStore.close();
-        boolean res = eventStore.removeAllEvents();
-        assertFalse(res);
     }
 
-    public void testRemoveIndividualEvent() {
-        EventStore eventStore = getEventStore();
+    public void testRemoveIndividualEvent() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
+
         long id = eventStore.insertEvent(getEvent());
         boolean res = eventStore.removeEvent(id);
 
         assertEquals(0, eventStore.getSize());
-        assertEquals(true, res);
+        assertTrue(res);
 
         res = eventStore.removeEvent(id);
-        assertEquals(false, res);
+        assertFalse(res);
 
         eventStore.close();
         res = eventStore.removeEvent(id);
-        assertEquals(false, res);
+        assertFalse(res);
     }
 
-    public void testRemoveRangeOfEvents() {
-        EventStore eventStore = getEventStore();
+    public void testRemoveRangeOfEvents() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
+
         List<Long> idList = new ArrayList<>();
 
         idList.add(eventStore.insertEvent(getEvent()));
@@ -139,18 +182,42 @@ public class EventStoreTest extends AndroidTestCase {
         assertEquals(false, res);
     }
 
-    public void testCloseDatabase() {
-        EventStore eventStore = getEventStore();
-        assertEquals(true, eventStore.isDatabaseOpen());
-        eventStore.open();
-        assertEquals(true, eventStore.isDatabaseOpen());
+    public void testCloseDatabase() throws InterruptedException {
+        SQLiteEventStore eventStore = getEventStore();
+
+        assertTrue(eventStore.isDatabaseOpen());
         eventStore.close();
-        assertEquals(false, eventStore.isDatabaseOpen());
+        assertFalse(eventStore.isDatabaseOpen());
     }
 
     public void testUpgrade() {
         EventStoreHelper helper = EventStoreHelper.getInstance(getContext());
         SQLiteDatabase database = helper.getWritableDatabase();
         helper.onUpgrade(database, 1, 2);
+    }
+
+    // Helper Methods
+
+    private SQLiteEventStore getEventStore() throws InterruptedException {
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        waitUntilDatabaseOpen(eventStore);
+        eventStore.removeAllEvents();
+        return eventStore;
+    }
+
+    private SelfDescribingJson getEvent() {
+        TrackerPayload trackerPayload = new TrackerPayload();
+        trackerPayload.add("someKey", "someValue");
+        trackerPayload.add("anotherKey", "anotherValue");
+
+        return new SelfDescribingJson(
+                "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
+                trackerPayload);
+    }
+
+    private void waitUntilDatabaseOpen(SQLiteEventStore eventStore) throws InterruptedException {
+        while (!eventStore.isDatabaseOpen()) {
+            Thread.sleep(300);
+        }
     }
 }
