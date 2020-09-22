@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -66,7 +64,6 @@ public class Tracker implements DiagnosticLogger {
     // --- Singleton Access
 
     private static Tracker spTracker = null;
-    private static ScheduledExecutorService sessionExecutor = null;
 
     public static Tracker init(Tracker newTracker) {
         if (spTracker == null) {
@@ -109,7 +106,6 @@ public class Tracker implements DiagnosticLogger {
     private DevicePlatforms devicePlatform;
     private LogLevel level;
     private boolean sessionContext;
-    private long sessionCheckInterval;
     private Runnable[] sessionCallbacks;
     private int threadCount;
     private TimeUnit timeUnit;
@@ -145,7 +141,6 @@ public class Tracker implements DiagnosticLogger {
         boolean sessionContext = false; // Optional
         long foregroundTimeout = 600; // Optional - 10 minutes
         long backgroundTimeout = 300; // Optional - 5 minutes
-        long sessionCheckInterval = 15; // Optional - 15 seconds
         Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
         int threadCount = 10; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
@@ -280,9 +275,10 @@ public class Tracker implements DiagnosticLogger {
         /**
          * @param sessionCheckInterval The session check interval
          * @return itself
+         * @deprecated No longer needed as the session is checked for each event. It will be removed in the version 2.0.
          */
+        @Deprecated
         public TrackerBuilder sessionCheckInterval(long sessionCheckInterval) {
-            this.sessionCheckInterval = sessionCheckInterval;
             return this;
         }
 
@@ -433,7 +429,6 @@ public class Tracker implements DiagnosticLogger {
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
         this.sessionContext = builder.sessionContext;
-        this.sessionCheckInterval = builder.sessionCheckInterval;
         this.sessionCallbacks = builder.sessionCallbacks;
         this.threadCount = Math.max(builder.threadCount, 2);
         this.timeUnit = builder.timeUnit;
@@ -737,55 +732,44 @@ public class Tracker implements DiagnosticLogger {
     }
 
     /**
-     * Starts a polling session checker to
-     * run at a defined interval.
+     * Starts session checking.
      */
     public void resumeSessionChecking() {
-        if (sessionExecutor == null && this.sessionContext) {
+        Session trackerSession = this.trackerSession;
+        if (trackerSession != null) {
+            trackerSession.setIsSuspended(false);
             Logger.d(TAG, "Session checking has been resumed.");
-            final Session session = this.trackerSession;
-            sessionExecutor = Executors.newSingleThreadScheduledExecutor();
-            sessionExecutor.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        session.checkAndUpdateSession();
-                    } catch (Exception e) {
-                        Logger.track(TAG, "Method checkAndUpdateSession raised an exception: %s", e);
-                    }
-                }
-            }, this.sessionCheckInterval, this.sessionCheckInterval, this.timeUnit);
         }
     }
 
     /**
-     * Ends the polling session checker.
+     * Ends session checking.
      */
     public void pauseSessionChecking() {
-        if (sessionExecutor != null) {
+        Session trackerSession = this.trackerSession;
+        if (trackerSession != null) {
+            trackerSession.setIsSuspended(true);
             Logger.d(TAG, "Session checking has been paused.");
-            sessionExecutor.shutdown();
-            sessionExecutor = null;
         }
     }
 
     /**
-     * Polling will continue, but only accessedLast time will be updated.
-     * Effectively persists session, call the method with false to end suspension.
+     * Effectively persists session also in case it expires, call the method with false to end suspension.
+     * @apiNote It can cause sessions that should be expired but still active. This way to use the session
+     * can be confusing and error prone. It will be removed in the version 2.0.
+     * @deprecated Not needed as it breaks the session concept causing weird data.
+     * Use `pauseSessionChecking` and `resumeSessionChecking` only instead.
      */
+    @Deprecated
     public void suspendSessionChecking(boolean isSuspended) {
-        if (sessionExecutor != null && this.trackerSession != null) {
-            final Session session = this.trackerSession;
-            session.setIsSuspended(isSuspended);
-        }
+        trackerSession.isSessionUpdateEnabled = !isSuspended;
     }
 
     /**
      * Convenience function for starting a new session.
      */
     public void startNewSession() {
-        pauseSessionChecking();
-        resumeSessionChecking();
+        trackerSession.startNewSession();
     }
 
     // --- GDPR context

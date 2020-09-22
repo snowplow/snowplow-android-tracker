@@ -500,7 +500,7 @@ class MockNetworkConnection implements NetworkConnection {
         for (Request request : requests) {
             boolean isSuccessful = request.oversize || successfulConnection;
             RequestResult result = new RequestResult(isSuccessful, request.emitterEventIds);
-            Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, new Boolean(isSuccessful).toString());
+            Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, Boolean.valueOf(isSuccessful).toString());
             requestResults.add(result);
         }
         previousResults.add(requestResults);
