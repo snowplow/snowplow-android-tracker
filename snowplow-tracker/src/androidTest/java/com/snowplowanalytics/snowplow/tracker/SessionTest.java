@@ -55,7 +55,7 @@ public class SessionTest extends AndroidTestCase {
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
-        assertEquals("SQLITE", session.getSessionStorage());
+        assertEquals("LOCAL_STORAGE", session.getSessionStorage());
         assertNull(session.getPreviousSessionId());
         assertNotNull(session.getUserId());
         assertNull(session.getFirstId());
@@ -232,7 +232,7 @@ public class SessionTest extends AndroidTestCase {
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
-        assertEquals("SQLITE", session.getSessionStorage());
+        assertEquals("LOCAL_STORAGE", session.getSessionStorage());
         assertNull(session.getPreviousSessionId());
         assertNotNull(session.getUserId());
         assertNull(session.getFirstId());

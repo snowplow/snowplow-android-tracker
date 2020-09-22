@@ -63,7 +63,7 @@ public class Session {
     private String currentSessionId = null;
     private String previousSessionId;
     private int sessionIndex = 0;
-    private String sessionStorage = "SQLITE";
+    private String sessionStorage = "LOCAL_STORAGE";
     private String firstId = null;
     private AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
     private Future loadFromFileFuture;
