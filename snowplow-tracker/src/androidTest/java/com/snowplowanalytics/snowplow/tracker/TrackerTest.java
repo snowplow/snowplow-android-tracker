@@ -84,7 +84,6 @@ public class TrackerTest extends AndroidTestCase {
             .geoLocationContext(false)
             .foregroundTimeout(5)
             .backgroundTimeout(5)
-            .sessionCheckInterval(15)
             .timeUnit(TimeUnit.SECONDS)
             .applicationCrash(false)
             .lifecycleEvents(true)
