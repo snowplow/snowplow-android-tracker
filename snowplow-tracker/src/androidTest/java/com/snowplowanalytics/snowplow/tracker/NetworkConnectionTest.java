@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -154,6 +158,42 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    public void testCustomClientIsUsed() throws IOException, InterruptedException {
+        AtomicBoolean hasClientBeenUsed = new AtomicBoolean(false);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        hasClientBeenUsed.set(true);
+                        return chain.proceed(chain.request());
+                    }
+                })
+                .build();
+
+        MockWebServer mockServer = getMockServer(200);
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                        .security(HTTP)
+                        .method(GET)
+                        .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
+                        .emitTimeout(10)
+                        .client(client)
+                        .build();
+
+        Payload payload = new TrackerPayload();
+        payload.add("key", "value");
+        Request request = new Request(payload, 1);
+        List<Request> requests = new ArrayList<>(1);
+        requests.add(request);
+
+        List<RequestResult> results = connection.sendRequests(requests);
+        RecordedRequest req = mockServer.takeRequest(60, TimeUnit.SECONDS);
+        assertNotNull(req);
+        assertTrue(hasClientBeenUsed.get());
+
+        mockServer.shutdown();
+    }
+    
     // Service methods
 
     private void assertGETRequest(RecordedRequest req) {
