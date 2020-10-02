@@ -158,10 +158,10 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         buildUri();
 
         final OkHttpClient.Builder clientBuilder;
-        if (client == null) {
+        if (builder.client == null) {
             clientBuilder = new OkHttpClient.Builder();
         } else {
-            clientBuilder = client.newBuilder();
+            clientBuilder = builder.client.newBuilder();
         }
 
         this.client = clientBuilder.sslSocketFactory(tlsArguments.getSslSocketFactory(),

@@ -1,4 +1,8 @@
 
+Version 1.7.1 (2020-10-02)
+--------------------------
+Cannot provide OkHttp client when setting up Emitter (#414)
+
 Version 1.7.0 (2020-09-23)
 --------------------------
 Session storageMechanism is marked SQLITE but it's not (#347)
