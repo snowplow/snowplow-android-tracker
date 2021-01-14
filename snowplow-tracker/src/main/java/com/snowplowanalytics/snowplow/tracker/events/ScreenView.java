@@ -16,7 +16,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
 import android.app.Activity;
 import android.app.Fragment;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;

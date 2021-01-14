@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
 

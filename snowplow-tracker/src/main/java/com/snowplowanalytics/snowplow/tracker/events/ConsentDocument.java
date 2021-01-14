@@ -13,7 +13,7 @@ package com.snowplowanalytics.snowplow.tracker.events;
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;

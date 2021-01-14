@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 // Java
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.List;
 import java.util.Map;

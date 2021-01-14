@@ -14,7 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
@@ -34,7 +34,6 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
