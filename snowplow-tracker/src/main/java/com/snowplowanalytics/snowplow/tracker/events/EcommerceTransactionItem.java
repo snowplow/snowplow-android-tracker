@@ -46,7 +46,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param itemId Item ID
          * @return itself
          */
-        public T itemId(String itemId) {
+        @NonNull
+        public T itemId(@NonNull String itemId) {
             this.itemId = itemId;
             return self();
         }
@@ -55,7 +56,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param sku Item SKU
          * @return itself
          */
-        public T sku(String sku) {
+        @NonNull
+        public T sku(@NonNull String sku) {
             this.sku = sku;
             return self();
         }
@@ -64,7 +66,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param price Item price
          * @return itself
          */
-        public T price(Double price) {
+        @NonNull
+        public T price(@NonNull Double price) {
             this.price = price;
             return self();
         }
@@ -73,7 +76,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param quantity Item quantity
          * @return itself
          */
-        public T quantity(Integer quantity) {
+        @NonNull
+        public T quantity(@NonNull Integer quantity) {
             this.quantity = quantity;
             return self();
         }
@@ -82,7 +86,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param name Item name
          * @return itself
          */
-        public T name(String name) {
+        @NonNull
+        public T name(@NonNull String name) {
             this.name = name;
             return self();
         }
@@ -91,7 +96,8 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param category Item category
          * @return itself
          */
-        public T category(String category) {
+        @NonNull
+        public T category(@NonNull String category) {
             this.category = category;
             return self();
         }
@@ -100,11 +106,13 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
          * @param currency The currency the price is expressed in
          * @return itself
          */
-        public T currency(String currency) {
+        @NonNull
+        public T currency(@NonNull String currency) {
             this.currency = currency;
             return self();
         }
 
+        @NonNull
         public EcommerceTransactionItem build() {
             return new EcommerceTransactionItem(this);
         }
@@ -121,7 +129,7 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
         return new Builder2();
     }
 
-    private EcommerceTransactionItem(Builder<?> builder) {
+    private EcommerceTransactionItem(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks

@@ -16,6 +16,8 @@ package com.snowplowanalytics.snowplow.tracker.utils;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -67,13 +69,14 @@ public class FileStore {
      * @param context The android context object
      * @return the map of vars or null
      */
-    public static Map getMapFromFile(String filename, Context context) {
+    @Nullable
+    public static Map<String, Object> getMapFromFile(String filename, Context context) {
         FileInputStream fis;
         try {
             Logger.d(TAG, "Attempting to retrieve map from: %s", filename);
             fis = context.openFileInput(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            Map varsMap = (HashMap) ois.readObject();
+            Map<String, Object> varsMap = (HashMap<String, Object>) ois.readObject();
             ois.close();
             Logger.d(TAG, " + Retrieved map from file: %s", varsMap);
             return varsMap;

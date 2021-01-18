@@ -47,6 +47,7 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param all Whether to withdraw consent for all consent documents
          * @return itself
          */
+        @NonNull
         public T all(boolean all) {
             this.all = all;
             return self();
@@ -56,7 +57,8 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param id ID of the consent document
          * @return itself
          */
-        public T documentId(String id) {
+        @NonNull
+        public T documentId(@NonNull String id) {
             this.documentId = id;
             return self();
         }
@@ -65,7 +67,8 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param version Version of the consent document
          * @return itself
          */
-        public T documentVersion(String version) {
+        @NonNull
+        public T documentVersion(@NonNull String version) {
             this.documentVersion = version;
             return self();
         }
@@ -74,7 +77,8 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param name Name of the consent document
          * @return itself
          */
-        public T documentName(String name) {
+        @NonNull
+        public T documentName(@NonNull String name) {
             this.documentName = name;
             return self();
         }
@@ -83,7 +87,8 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param description Description of the consent document
          * @return itself
          */
-        public T documentDescription(String description) {
+        @NonNull
+        public T documentDescription(@NonNull String description) {
             this.documentDescription = description;
             return self();
         }
@@ -92,7 +97,8 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
          * @param documents Consent documents attached to consent withdrawn event
          * @return itself
          */
-        public T consentDocuments(List<ConsentDocument> documents) {
+        @NonNull
+        public T consentDocuments(@NonNull List<ConsentDocument> documents) {
             this.consentDocuments = documents;
             return self();
         }
@@ -113,7 +119,7 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
         return new Builder2();
     }
 
-    protected ConsentWithdrawn(Builder<?> builder) {
+    protected ConsentWithdrawn(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks
@@ -149,6 +155,7 @@ public class ConsentWithdrawn extends AbstractSelfDescribing {
      * @return the payload to be sent.
      */
     @Deprecated
+    @NonNull
     public TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.CW_ALL, this.all);

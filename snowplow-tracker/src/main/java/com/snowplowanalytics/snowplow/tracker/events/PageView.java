@@ -41,7 +41,8 @@ public class PageView extends AbstractPrimitive {
          * @param pageUrl URL of the viewed page
          * @return itself
          */
-        public T pageUrl(String pageUrl) {
+        @NonNull
+        public T pageUrl(@NonNull String pageUrl) {
             this.pageUrl = pageUrl;
             return self();
         }
@@ -50,7 +51,8 @@ public class PageView extends AbstractPrimitive {
          * @param pageTitle Title of the viewed page
          * @return itself
          */
-        public T pageTitle(String pageTitle) {
+        @NonNull
+        public T pageTitle(@NonNull String pageTitle) {
             this.pageTitle = pageTitle;
             return self();
         }
@@ -59,7 +61,8 @@ public class PageView extends AbstractPrimitive {
          * @param referrer Referrer of the page
          * @return itself
          */
-        public T referrer(String referrer) {
+        @NonNull
+        public T referrer(@NonNull String referrer) {
             this.referrer = referrer;
             return self();
         }
@@ -80,7 +83,7 @@ public class PageView extends AbstractPrimitive {
         return new Builder2();
     }
 
-    protected PageView(Builder<?> builder) {
+    protected PageView(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks

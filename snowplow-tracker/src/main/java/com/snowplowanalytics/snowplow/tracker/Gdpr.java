@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -25,7 +26,7 @@ public class Gdpr {
     final String documentVersion;
     final String documentDescription;
 
-    Gdpr(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+    Gdpr(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         Preconditions.checkArgument(basisForProcessing != null, "GDPR basisForProcessiong can't be null.");
         this.basisForProcessing = basisForProcessing;
         this.documentId = documentId;

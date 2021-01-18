@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
@@ -81,30 +82,30 @@ public class Emitter {
      * Builder for the Emitter.
      */
     public static class EmitterBuilder {
-        final String uri; // Required
-        final Context context; // Required
-        RequestCallback requestCallback = null; // Optional
-        HttpMethod httpMethod = POST; // Optional
-        BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
-        RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
-        EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
+        final @Nullable String uri; // Required
+        final @NonNull Context context; // Required
+        @Nullable RequestCallback requestCallback = null; // Optional
+        @NonNull HttpMethod httpMethod = POST; // Optional
+        @NonNull BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
+        @NonNull RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        @NonNull EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         int emitterTick = 5; // Optional
         int sendLimit = 250; // Optional
         int emptyLimit = 5; // Optional
         long byteLimitGet = 40000; // Optional
         long byteLimitPost = 40000; // Optional
         private int emitTimeout = 5; // Optional
-        TimeUnit timeUnit = TimeUnit.SECONDS;
-        OkHttpClient client = null; //Optional
-        String customPostPath = null; //Optional
-        NetworkConnection networkConnection = null; // Optional
-        EventStore eventStore = null; // Optional
+        @NonNull TimeUnit timeUnit = TimeUnit.SECONDS;
+        @Nullable OkHttpClient client = null; //Optional
+        @Nullable String customPostPath = null; //Optional
+        @Nullable NetworkConnection networkConnection = null; // Optional
+        @Nullable EventStore eventStore = null; // Optional
 
         /**
          * @param uri The uri of the collector
          * @param context the android context
          */
-        public EmitterBuilder(String uri, Context context) {
+        public EmitterBuilder(@Nullable String uri, @NonNull Context context) {
             this.uri = uri;
             this.context = context;
         }
@@ -113,7 +114,8 @@ public class Emitter {
          * @param networkConnection The component in charge for sending events to the collector.
          * @return itself
          */
-        public EmitterBuilder networkConnection(NetworkConnection networkConnection) {
+        @NonNull
+        public EmitterBuilder networkConnection(@Nullable NetworkConnection networkConnection) {
             this.networkConnection = networkConnection;
             return this;
         }
@@ -122,7 +124,8 @@ public class Emitter {
          * @param eventStore The component in charge for persisting events before sending.
          * @return itself
          */
-        public EmitterBuilder eventStore(EventStore eventStore) {
+        @NonNull
+        public EmitterBuilder eventStore(@Nullable EventStore eventStore) {
             this.eventStore = eventStore;
             return this;
         }
@@ -131,7 +134,8 @@ public class Emitter {
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
-        public EmitterBuilder method(HttpMethod httpMethod) {
+        @NonNull
+        public EmitterBuilder method(@Nullable HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
@@ -140,7 +144,8 @@ public class Emitter {
          * @param option the buffer option for the emitter
          * @return itself
          */
-        public EmitterBuilder option(BufferOption option) {
+        @NonNull
+        public EmitterBuilder option(@Nullable BufferOption option) {
             this.bufferOption = option;
             return this;
         }
@@ -149,7 +154,8 @@ public class Emitter {
          * @param requestSecurity the security chosen for requests
          * @return itself
          */
-        public EmitterBuilder security(RequestSecurity requestSecurity) {
+        @NonNull
+        public EmitterBuilder security(@Nullable RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
             return this;
         }
@@ -158,7 +164,8 @@ public class Emitter {
          * @param version the TLS version allowed for requests
          * @return itself
          */
-        public EmitterBuilder tls(TLSVersion version) {
+        @NonNull
+        public EmitterBuilder tls(@Nullable TLSVersion version) {
             this.tlsVersions = EnumSet.of(version);
             return this;
         }
@@ -167,7 +174,8 @@ public class Emitter {
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
-        public EmitterBuilder tls(EnumSet<TLSVersion> versions) {
+        @NonNull
+        public EmitterBuilder tls(@Nullable EnumSet<TLSVersion> versions) {
             this.tlsVersions = versions;
             return this;
         }
@@ -176,7 +184,8 @@ public class Emitter {
          * @param requestCallback Request callback function
          * @return itself
          */
-        public EmitterBuilder callback(RequestCallback requestCallback) {
+        @NonNull
+        public EmitterBuilder callback(@Nullable RequestCallback requestCallback) {
             this.requestCallback = requestCallback;
             return this;
         }
@@ -185,6 +194,7 @@ public class Emitter {
          * @param emitterTick The tick count between emitter attempts
          * @return itself
          */
+        @NonNull
         public EmitterBuilder tick(int emitterTick) {
             this.emitterTick = emitterTick;
             return this;
@@ -194,6 +204,7 @@ public class Emitter {
          * @param sendLimit The maximum amount of events to grab for an emit attempt
          * @return itself
          */
+        @NonNull
         public EmitterBuilder sendLimit(int sendLimit) {
             this.sendLimit = sendLimit;
             return this;
@@ -204,6 +215,7 @@ public class Emitter {
          *                   due to the database being empty.
          * @return itself
          */
+        @NonNull
         public EmitterBuilder emptyLimit(int emptyLimit) {
             this.emptyLimit = emptyLimit;
             return this;
@@ -214,6 +226,7 @@ public class Emitter {
          *                     in a GET request.
          * @return itself
          */
+        @NonNull
         public EmitterBuilder byteLimitGet(long byteLimitGet) {
             this.byteLimitGet = byteLimitGet;
             return this;
@@ -224,6 +237,7 @@ public class Emitter {
          *                      in a POST request.
          * @return itself
          */
+        @NonNull
         public EmitterBuilder byteLimitPost(long byteLimitPost) {
             this.byteLimitPost = byteLimitPost;
             return this;
@@ -234,7 +248,8 @@ public class Emitter {
          *                    TimeOutException will be thrown
          * @return itself
          */
-        public EmitterBuilder emitTimeout(int emitTimeout){
+        @NonNull
+        public EmitterBuilder emitTimeout(int emitTimeout) {
             this.emitTimeout = emitTimeout;
             return this;
         }
@@ -243,7 +258,8 @@ public class Emitter {
          * @param timeUnit a valid TimeUnit
          * @return itself
          */
-        public EmitterBuilder timeUnit(TimeUnit timeUnit) {
+        @NonNull
+        public EmitterBuilder timeUnit(@Nullable TimeUnit timeUnit) {
             this.timeUnit = timeUnit;
             return this;
         }
@@ -254,7 +270,8 @@ public class Emitter {
          *               ,otherwise a new one is created.
          * @return itself
          */
-        public EmitterBuilder client(OkHttpClient client) {
+        @NonNull
+        public EmitterBuilder client(@Nullable OkHttpClient client) {
             this.client = client;
             return this;
         }
@@ -263,7 +280,8 @@ public class Emitter {
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
-        public EmitterBuilder customPostPath(String customPostPath) {
+        @NonNull
+        public EmitterBuilder customPostPath(@Nullable String customPostPath) {
             this.customPostPath = customPostPath;
             return this;
         }
@@ -273,6 +291,7 @@ public class Emitter {
          *
          * @return a new Emitter object
          */
+        @NonNull
         public Emitter build() {
             return new Emitter(this);
         }
@@ -283,7 +302,7 @@ public class Emitter {
      *
      * @param builder The builder that constructs an emitter
      */
-    private Emitter(EmitterBuilder builder) {
+    private Emitter(@NonNull EmitterBuilder builder) {
         this.httpMethod = builder.httpMethod;
         this.requestCallback = builder.requestCallback;
         this.context = builder.context;
@@ -334,7 +353,7 @@ public class Emitter {
      * @param payload the event payload
      *                to be added.
      */
-    public void add(final Payload payload) {
+    public void add(final @NonNull Payload payload) {
         Executor.execute(TAG, () -> {
             eventStore.add(payload);
             if (isRunning.compareAndSet(false, true)) {
@@ -486,7 +505,8 @@ public class Emitter {
      *               from the database.
      * @return a list of ready to send requests
      */
-    protected List<Request> buildRequests(List<EmitterEvent> events) {
+    @NonNull
+    protected List<Request> buildRequests(@NonNull List<EmitterEvent> events) {
         List<Request> requests = new ArrayList<>();
         String sendingTime = Util.getTimestamp();
         HttpMethod httpMethod = networkConnection.getHttpMethod();
@@ -596,6 +616,7 @@ public class Emitter {
     /**
      * @return the emitter event store object
      */
+    @Nullable
     public EventStore getEventStore() {
         return this.eventStore;
     }
@@ -613,7 +634,7 @@ public class Emitter {
      *
      * @param option Set the BufferOption enum to Instant send events upon creation.
      */
-    public void setBufferOption(BufferOption option) {
+    public void setBufferOption(@NonNull BufferOption option) {
         if (!isRunning.get()) {
             this.bufferOption = option;
         }
@@ -632,7 +653,7 @@ public class Emitter {
      *
      * @param method the HttpMethod
      */
-    public void setHttpMethod(HttpMethod method) {
+    public void setHttpMethod(@NonNull HttpMethod method) {
         if (!isRunning.get()) {
             this.httpMethod = method;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
@@ -651,7 +672,7 @@ public class Emitter {
      *
      * @param security the RequestSecurity
      */
-    public void setRequestSecurity(RequestSecurity security) {
+    public void setRequestSecurity(@NonNull RequestSecurity security) {
         if (!isRunning.get()) {
             this.requestSecurity = security;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
@@ -670,7 +691,7 @@ public class Emitter {
      *
      * @param uri new Emitter URI
      */
-    public void setEmitterUri(String uri) {
+    public void setEmitterUri(@NonNull String uri) {
         if (!isRunning.get()) {
             this.uri = uri;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
@@ -687,6 +708,7 @@ public class Emitter {
     /**
      * @return the emitter uri
      */
+    @NonNull
     public String getEmitterUri() {
         return networkConnection.getUri().toString();
     }
@@ -694,6 +716,7 @@ public class Emitter {
     /**
      * @return the request callback method
      */
+    @Nullable
     public RequestCallback getRequestCallback() {
         return this.requestCallback;
     }
@@ -701,6 +724,7 @@ public class Emitter {
     /**
      * @return the Emitters request method
      */
+    @NonNull
     public HttpMethod getHttpMethod() {
         return this.httpMethod;
     }
@@ -708,6 +732,7 @@ public class Emitter {
     /**
      * @return the buffer option selected for the emitter
      */
+    @NonNull
     public BufferOption getBufferOption() {
         return this.bufferOption;
     }
@@ -715,6 +740,7 @@ public class Emitter {
     /**
      * @return the request security selected for the emitter
      */
+    @NonNull
     public RequestSecurity getRequestSecurity() {
         return this.requestSecurity;
     }
@@ -722,6 +748,7 @@ public class Emitter {
     /**
      * @return the TLS versions accepted for the emitter
      */
+    @NonNull
     public EnumSet<TLSVersion> getTlsVersions() {
         return this.tlsVersions;
     }

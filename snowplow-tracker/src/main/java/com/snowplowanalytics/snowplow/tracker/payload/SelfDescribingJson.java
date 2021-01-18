@@ -13,8 +13,12 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextPrimitive;
@@ -37,14 +41,14 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      *
      * @param schema the schema string
      */
-    public SelfDescribingJson(String schema) {
+    public SelfDescribingJson(@NonNull String schema) {
         this(schema, new HashMap<>());
     }
 
     /**
      * Builds a SelfDescribingJson object
      */
-    public SelfDescribingJson(String tag, String schema) {
+    public SelfDescribingJson(@NonNull String tag, @NonNull String schema) {
         this(tag, schema, new HashMap<>());
     }
 
@@ -55,7 +59,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param data to nest into the object
      *        as a TrackerPayload
      */
-    public SelfDescribingJson(String schema, TrackerPayload data) {
+    public SelfDescribingJson(@NonNull String schema, @NonNull TrackerPayload data) {
         setSchema(schema);
         setData(data);
     }
@@ -63,7 +67,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
     /**
      * Builds a SelfDescribingJson object
      */
-    public SelfDescribingJson(String tag, String schema, TrackerPayload data) {
+    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull TrackerPayload data) {
         setTag(tag);
         setSchema(schema);
         setData(data);
@@ -76,7 +80,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param data to nest into the object
      *        as a SelfDescribingJson
      */
-    public SelfDescribingJson(String schema, SelfDescribingJson data) {
+    public SelfDescribingJson(@NonNull String schema, @NonNull SelfDescribingJson data) {
         setSchema(schema);
         setData(data);
     }
@@ -84,7 +88,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
     /**
      * Builds a SelfDescribingJson object
      */
-    public SelfDescribingJson(String tag, String schema, SelfDescribingJson data) {
+    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull SelfDescribingJson data) {
         setTag(tag);
         setSchema(schema);
         setData(data);
@@ -97,7 +101,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param data to nest into the object
      *        as a POJO
      */
-    public SelfDescribingJson(String schema, Object data) {
+    public SelfDescribingJson(@NonNull String schema, @NonNull Object data) {
         setSchema(schema);
         setData(data);
     }
@@ -105,7 +109,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
     /**
      * Builds a SelfDescribingJson object
      */
-    public SelfDescribingJson(String tag, String schema, Object data) {
+    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull Object data) {
         setTag(tag);
         setSchema(schema);
         setData(data);
@@ -118,7 +122,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @return itself if it passes precondition
      *         checks
      */
-    public SelfDescribingJson setSchema(String schema) {
+    @NonNull
+    public SelfDescribingJson setSchema(@NonNull String schema) {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
         payload.put(Parameters.SCHEMA, schema);
@@ -129,7 +134,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * Sets the tag for the SelfDescribingJson
      * @param tag The identification string for the SelfDescribingJson
      */
-    public SelfDescribingJson setTag(String tag) {
+    @NonNull
+    public SelfDescribingJson setTag(@NonNull String tag) {
         Preconditions.checkNotNull(tag, "tag cannot be null");
         this.tag = tag;
         return this;
@@ -142,7 +148,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param trackerPayload the data to be added to the SelfDescribingJson
      * @return itself
      */
-    public SelfDescribingJson setData(TrackerPayload trackerPayload) {
+    @NonNull
+    public SelfDescribingJson setData(@Nullable TrackerPayload trackerPayload) {
         if (trackerPayload == null) {
             return this;
         }
@@ -157,7 +164,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param data the data to be added to the SelfDescribingJson
      * @return itself
      */
-    public SelfDescribingJson setData(Object data) {
+    @NonNull
+    public SelfDescribingJson setData(@Nullable Object data) {
         if (data == null) {
             return this;
         }
@@ -172,7 +180,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
      * @param selfDescribingJson the payload to add to the SelfDescribingJson
      * @return itself
      */
-    public SelfDescribingJson setData(SelfDescribingJson selfDescribingJson) {
+    @NonNull
+    public SelfDescribingJson setData(@Nullable SelfDescribingJson selfDescribingJson) {
         if (selfDescribingJson == null) {
             return this;
         }
@@ -182,7 +191,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     @Deprecated
     @Override
-    public void add(String key, String value) {
+    public void add(@NonNull String key, @Nullable String value) {
         /*
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
@@ -192,7 +201,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     @Deprecated
     @Override
-    public void add(String key, Object value) {
+    public void add(@NonNull String key, @Nullable Object value) {
         /*
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
@@ -202,7 +211,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     @Deprecated
     @Override
-    public void addMap(Map<String, Object> map) {
+    public void addMap(@NonNull Map<String, Object> map) {
         /*
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
@@ -212,8 +221,8 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
 
     @Deprecated
     @Override
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded,
-                       String type_no_encoded) {
+    public void addMap(@NonNull Map map, @NonNull Boolean base64_encoded, @Nullable String type_encoded,
+                       @Nullable String type_no_encoded) {
         /*
          * We intentionally do nothing because we do not want our SchemaPayload
          * to do anything except accept a 'data' and 'schema'
@@ -221,10 +230,12 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
         Logger.v(TAG, "Payload: addMap(Map, Boolean, String, String) method called - Doing nothing.");
     }
 
+    @NonNull
     public Map<String, Object> getMap() {
         return payload;
     }
 
+    @NonNull
     public String toString() {
         return Util.mapToJSONObject(payload).toString();
     }

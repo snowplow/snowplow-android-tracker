@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
+import androidx.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
@@ -38,7 +40,7 @@ import java.util.UUID;
  */
 public class TrackerEvents {
 
-    public static void trackAll(Tracker tracker) {
+    public static void trackAll(@NonNull Tracker tracker) {
         trackPageView(tracker);
         trackStructuredEvent(tracker);
         trackScreenView(tracker);

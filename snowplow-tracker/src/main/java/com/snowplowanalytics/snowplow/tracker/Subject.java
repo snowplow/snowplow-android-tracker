@@ -19,6 +19,8 @@ import android.os.Build;
 import android.view.Display;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,8 +36,8 @@ import com.snowplowanalytics.snowplow.tracker.utils.Logger;
  */
 public class Subject {
 
-    private static String TAG = Subject.class.getSimpleName();
-    private HashMap<String, String> standardPairs = new HashMap<>();
+    private static final String TAG = Subject.class.getSimpleName();
+    private final HashMap<String, String> standardPairs = new HashMap<>();
 
     /**
      * Builder for the Subject
@@ -47,7 +49,8 @@ public class Subject {
          * @param context The android context to pass to the subject
          * @return itself
          */
-        public SubjectBuilder context(Context context) {
+        @NonNull
+        public SubjectBuilder context(@NonNull Context context) {
             this.context = context;
             return this;
         }
@@ -57,6 +60,7 @@ public class Subject {
          *
          * @return a new Subject object
          */
+        @NonNull
         public Subject build() {
             return new Subject(this);
         }
@@ -67,7 +71,7 @@ public class Subject {
      *
      * @param builder The builder that constructs a subject
      */
-    private Subject(SubjectBuilder builder) {
+    private Subject(@NonNull SubjectBuilder builder) {
         setDefaultTimezone();
         setDefaultLanguage();
         if (builder.context != null) {
@@ -103,7 +107,7 @@ public class Subject {
      * @param context the android context
      */
     @SuppressWarnings("deprecation")
-    public void setDefaultScreenResolution(Context context) {
+    public void setDefaultScreenResolution(@NonNull Context context) {
         WindowManager windowManager =
                 (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
@@ -124,7 +128,7 @@ public class Subject {
      *
      * @param userId a user id string
      */
-    public void setUserId(String userId) {
+    public void setUserId(@NonNull String userId) {
         this.standardPairs.put(Parameters.UID, userId);
     }
 
@@ -133,7 +137,7 @@ public class Subject {
      *
      * @param userId a user id string
      */
-    public void identifyUser(String userId) { this.setUserId(userId); }
+    public void identifyUser(@NonNull String userId) { this.setUserId(userId); }
 
     /**
      * Sets a custom screen resolution based
@@ -178,7 +182,7 @@ public class Subject {
      *
      * @param timezone a valid timezone
      */
-    public void setTimezone(String timezone) {
+    public void setTimezone(@NonNull String timezone) {
         this.standardPairs.put(Parameters.TIMEZONE, timezone);
     }
 
@@ -188,7 +192,7 @@ public class Subject {
      *
      * @param language language setting
      */
-    public void setLanguage(String language) {
+    public void setLanguage(@NonNull String language) {
         this.standardPairs.put(Parameters.LANGUAGE, language);
     }
 
@@ -198,7 +202,7 @@ public class Subject {
      *
      * @param ipAddress an ip address
      */
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(@NonNull String ipAddress) {
         this.standardPairs.put(Parameters.IP_ADDRESS, ipAddress);
     }
 
@@ -208,7 +212,7 @@ public class Subject {
      *
      * @param useragent a useragent
      */
-    public void setUseragent(String useragent) {
+    public void setUseragent(@NonNull String useragent) {
         this.standardPairs.put(Parameters.USERAGENT, useragent);
     }
 
@@ -218,7 +222,7 @@ public class Subject {
      *
      * @param networkUserId a network user id
      */
-    public void setNetworkUserId(String networkUserId) {
+    public void setNetworkUserId(@NonNull String networkUserId) {
         this.standardPairs.put(Parameters.NETWORK_UID, networkUserId);
     }
 
@@ -228,13 +232,14 @@ public class Subject {
      *
      * @param domainUserId a domain user id
      */
-    public void setDomainUserId(String domainUserId) {
+    public void setDomainUserId(@NonNull String domainUserId) {
         this.standardPairs.put(Parameters.DOMAIN_UID, domainUserId);
     }
 
     /**
      * @return the standard subject pairs
      */
+    @NonNull
     public Map<String, String> getSubject() {
         return this.standardPairs;
     }

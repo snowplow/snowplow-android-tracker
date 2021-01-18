@@ -524,7 +524,7 @@ class MockEventStore implements EventStore {
     private long lastInsertedRow = -1;
 
     @Override
-    public void add(Payload payload) {
+    public void add(@NonNull Payload payload) {
         synchronized (this) {
             lastInsertedRow++;
             Logger.v("MockEventStore", "Add %s", payload);
@@ -541,7 +541,7 @@ class MockEventStore implements EventStore {
     }
 
     @Override
-    public boolean removeEvents(List<Long> ids) {
+    public boolean removeEvents(@NonNull List<Long> ids) {
         boolean result = true;
         for (long id : ids) {
             boolean removed = removeEvent(id);

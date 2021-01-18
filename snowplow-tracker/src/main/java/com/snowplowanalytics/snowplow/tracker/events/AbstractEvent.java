@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
@@ -59,7 +60,8 @@ public abstract class AbstractEvent implements Event {
          * @return itself
          */
         @Deprecated
-        public T customContext(List<SelfDescribingJson> contexts) {
+        @NonNull
+        public T customContext(@NonNull List<SelfDescribingJson> contexts) {
             return contexts(contexts);
         }
 
@@ -69,7 +71,8 @@ public abstract class AbstractEvent implements Event {
          * @param contexts the list of contexts
          * @return itself
          */
-        public T contexts(List<SelfDescribingJson> contexts) {
+        @NonNull
+        public T contexts(@NonNull List<SelfDescribingJson> contexts) {
             this.customContexts = contexts;
             return self();
         }
@@ -84,7 +87,8 @@ public abstract class AbstractEvent implements Event {
          * @return itself
          */
         @Deprecated
-        public T eventId(String eventId) {
+        @NonNull
+        public T eventId(@NonNull String eventId) {
             this.eventId = eventId;
             return self();
         }
@@ -99,6 +103,7 @@ public abstract class AbstractEvent implements Event {
          * @return itself
          */
         @Deprecated
+        @NonNull
         public T timestamp(long timestamp) {
             this.deviceCreatedTimestamp = timestamp;
             return self();
@@ -114,6 +119,7 @@ public abstract class AbstractEvent implements Event {
          * @return itself
          */
         @Deprecated
+        @NonNull
         public T deviceCreatedTimestamp(long deviceCreatedTimestamp) {
             this.deviceCreatedTimestamp = deviceCreatedTimestamp;
             return self();
@@ -126,6 +132,7 @@ public abstract class AbstractEvent implements Event {
          *                      unix epoch
          * @return itself
          */
+        @NonNull
         public T trueTimestamp(long trueTimestamp) {
             this.trueTimestamp = trueTimestamp;
             return self();
@@ -204,6 +211,7 @@ public abstract class AbstractEvent implements Event {
      */
     @Override
     @Deprecated
+    @Nullable
     public Long getActualDeviceCreatedTimestamp() {
         return deviceCreatedTimestamp;
     }
@@ -212,6 +220,7 @@ public abstract class AbstractEvent implements Event {
      * @return the optional true events timestamp
      */
     @Override
+    @Nullable
     public Long getTrueTimestamp() {
         return this.trueTimestamp;
     }
@@ -224,7 +233,8 @@ public abstract class AbstractEvent implements Event {
      */
     @Override
     @Deprecated
-    public @NonNull String getEventId() {
+    @NonNull
+    public String getEventId() {
         if (eventId == null) {
             eventId = Util.getUUIDString();
         }
@@ -239,6 +249,7 @@ public abstract class AbstractEvent implements Event {
      */
     @Override
     @Deprecated
+    @NonNull
     public String getActualEventId() {
         return eventId;
     }
@@ -252,7 +263,8 @@ public abstract class AbstractEvent implements Event {
      * @return the TrackerPayload with appended values.
      */
     @Deprecated
-    @NonNull TrackerPayload putDefaultParams(@NonNull TrackerPayload payload) {
+    @NonNull
+    TrackerPayload putDefaultParams(@NonNull TrackerPayload payload) {
         payload.add(Parameters.EID, getEventId());
         payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
         if (this.trueTimestamp != null) {

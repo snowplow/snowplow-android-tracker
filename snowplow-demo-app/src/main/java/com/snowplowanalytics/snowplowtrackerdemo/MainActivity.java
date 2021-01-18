@@ -22,6 +22,8 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
@@ -39,7 +41,7 @@ public class MainActivity extends Activity {
     private final String setup_guide_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

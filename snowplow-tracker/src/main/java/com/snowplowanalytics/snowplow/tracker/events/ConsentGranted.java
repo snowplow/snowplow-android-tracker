@@ -44,7 +44,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param expiry Whether to withdraw consent for all consent documents
          * @return itself
          */
-        public T expiry(String expiry) {
+        @NonNull
+        public T expiry(@NonNull String expiry) {
             this.expiry = expiry;
             return self();
         }
@@ -53,7 +54,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param id ID of the consent document
          * @return itself
          */
-        public T documentId(String id) {
+        @NonNull
+        public T documentId(@NonNull String id) {
             this.documentId = id;
             return self();
         }
@@ -62,7 +64,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param version Version of the consent document
          * @return itself
          */
-        public T documentVersion(String version) {
+        @NonNull
+        public T documentVersion(@NonNull String version) {
             this.documentVersion = version;
             return self();
         }
@@ -71,7 +74,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param name Name of the consent document
          * @return itself
          */
-        public T documentName(String name) {
+        @NonNull
+        public T documentName(@NonNull String name) {
             this.documentName = name;
             return self();
         }
@@ -80,7 +84,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param description Description of the consent document
          * @return itself
          */
-        public T documentDescription(String description) {
+        @NonNull
+        public T documentDescription(@NonNull String description) {
             this.documentDescription = description;
             return self();
         }
@@ -89,7 +94,8 @@ public class ConsentGranted extends AbstractSelfDescribing {
          * @param documents Consent documents attached to consent granted event
          * @return itself
          */
-        public T consentDocuments(List<ConsentDocument> documents) {
+        @NonNull
+        public T consentDocuments(@NonNull List<ConsentDocument> documents) {
             this.consentDocuments.addAll(documents);
             return self();
         }
@@ -110,7 +116,7 @@ public class ConsentGranted extends AbstractSelfDescribing {
         return new Builder2();
     }
 
-    protected ConsentGranted(Builder<?> builder) {
+    protected ConsentGranted(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks

@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
 import java.util.concurrent.Callable;
@@ -108,7 +110,7 @@ public class Executor {
      * @param callable the callable to be queued
      * @return the future object to be queried
      */
-    public static Future futureCallable(Callable callable) {
+    public static Future<?> futureCallable(Callable<?> callable) {
         return getExecutor().submit(callable);
     }
 
@@ -116,6 +118,7 @@ public class Executor {
      * Shuts the executor service down and resets
      * the executor to a null state.
      */
+    @Nullable
     public static ExecutorService shutdown() {
         if (executor != null) {
             executor.shutdown();

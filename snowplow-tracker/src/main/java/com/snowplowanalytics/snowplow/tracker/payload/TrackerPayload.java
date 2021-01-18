@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +32,7 @@ public class TrackerPayload implements Payload {
     private final HashMap<String,Object> payload = new HashMap<>();
     
     @Override
-    public void add(String key, String value) {
+    public void add(@NonNull String key, @Nullable String value) {
         if (value == null || value.isEmpty()) {
             Logger.v(TAG, "The keys value is empty, removing the key: %s", key);
             payload.remove(key);
@@ -40,7 +43,7 @@ public class TrackerPayload implements Payload {
     }
 
     @Override
-    public void add(String key, Object value) {
+    public void add(@NonNull String key, @Nullable Object value) {
         if (value == null) {
             Logger.v(TAG, "The value is empty, removing the key: %s", key);
             payload.remove(key);
@@ -51,7 +54,7 @@ public class TrackerPayload implements Payload {
     }
 
     @Override
-    public void addMap(Map<String, Object> map) {
+    public void addMap(@NonNull Map<String, Object> map) {
         if (map == null) {
             Logger.v(TAG, "Map passed in is null, returning without adding map.");
             return;
@@ -65,7 +68,7 @@ public class TrackerPayload implements Payload {
     }
 
     @Override
-    public void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded) {
+    public void addMap(@NonNull Map map, @NonNull Boolean base64_encoded, @Nullable String type_encoded, @Nullable String type_no_encoded) {
         if (map == null) {
             Logger.v(TAG, "Map passed in is null, returning nothing.");
             return;
@@ -81,10 +84,12 @@ public class TrackerPayload implements Payload {
         }
     }
 
+    @NonNull
     public HashMap<String,Object> getMap() {
         return payload;
     }
 
+    @NonNull
     public String toString() {
         return Util.mapToJSONObject(payload).toString();
     }

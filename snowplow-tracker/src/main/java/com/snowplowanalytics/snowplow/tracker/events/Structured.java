@@ -45,7 +45,8 @@ public class Structured extends AbstractPrimitive {
          * @param category Category of the event
          * @return itself
          */
-        public T category(String category) {
+        @NonNull
+        public T category(@NonNull String category) {
             this.category = category;
             return self();
         }
@@ -54,7 +55,8 @@ public class Structured extends AbstractPrimitive {
          * @param action The event itself
          * @return itself
          */
-        public T action(String action) {
+        @NonNull
+        public T action(@NonNull String action) {
             this.action = action;
             return self();
         }
@@ -63,7 +65,8 @@ public class Structured extends AbstractPrimitive {
          * @param label Refer to the object the action is performed on
          * @return itself
          */
-        public T label(String label) {
+        @NonNull
+        public T label(@NonNull String label) {
             this.label = label;
             return self();
         }
@@ -72,7 +75,8 @@ public class Structured extends AbstractPrimitive {
          * @param property Property associated with either the action or the object
          * @return itself
          */
-        public T property(String property) {
+        @NonNull
+        public T property(@NonNull String property) {
             this.property = property;
             return self();
         }
@@ -81,11 +85,13 @@ public class Structured extends AbstractPrimitive {
          * @param value A value associated with the user action
          * @return itself
          */
-        public T value(Double value) {
+        @NonNull
+        public T value(@NonNull Double value) {
             this.value = value;
             return self();
         }
 
+        @NonNull
         public Structured build() {
             return new Structured(this);
         }
@@ -102,7 +108,7 @@ public class Structured extends AbstractPrimitive {
         return new Builder2();
     }
 
-    protected Structured(Builder<?> builder) {
+    protected Structured(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks

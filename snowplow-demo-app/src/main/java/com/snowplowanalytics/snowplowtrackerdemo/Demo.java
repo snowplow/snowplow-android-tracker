@@ -25,6 +25,7 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
@@ -82,7 +83,7 @@ public class Demo extends Activity implements LoggerDelegate {
     private final static int APP_PERMISSION_REQUEST_LOCATION = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectAll()
@@ -406,17 +407,17 @@ public class Demo extends Activity implements LoggerDelegate {
     /// - Implements LoggerDelegate
 
     @Override
-    public void error(String tag, String msg) {
+    public void error(@NonNull String tag, @Nullable String msg) {
         Log.e("[" + tag + "]", msg);
     }
 
     @Override
-    public void debug(String tag, String msg) {
+    public void debug(@Nullable String tag, @Nullable String msg) {
         Log.d("[" + tag + "]", msg);
     }
 
     @Override
-    public void verbose(String tag, String msg) {
+    public void verbose(@Nullable String tag, @Nullable String msg) {
         Log.v("[" + tag + "]", msg);
     }
 }

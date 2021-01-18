@@ -22,6 +22,9 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -59,6 +62,7 @@ public class Util {
      *
      * @return the system time as a string
      */
+    @NonNull
     public static String getTimestamp() {
         return Long.toString(System.currentTimeMillis());
     }
@@ -69,7 +73,8 @@ public class Util {
      * @param string the string too encode
      * @return a Base64 encoded string
      */
-    public static String base64Encode(String string) {
+    @NonNull
+    public static String base64Encode(@NonNull String string) {
         return Base64.encodeToString(string.getBytes(), Base64.NO_WRAP);
     }
 
@@ -79,6 +84,7 @@ public class Util {
      *
      * @return a UUID string
      */
+    @NonNull
     public static String getUUIDString() {
         return UUID.randomUUID().toString();
     }
@@ -89,7 +95,7 @@ public class Util {
      * @param uuid a UUID code string.
      * @return true if it's a UUID code.
      */
-    public static boolean isUUIDString(String uuid) {
+    public static boolean isUUIDString(@NonNull String uuid) {
         try {
             return UUID.fromString(uuid) != null;
         } catch (Exception e) {
@@ -103,6 +109,7 @@ public class Util {
      *
      * @deprecated  Use `getUUIDString` instead.
      */
+    @NonNull
     @Deprecated
     public static String getEventId() {
         return getUUIDString();
@@ -114,8 +121,9 @@ public class Util {
      *  @param map The map to convert
      *  @return The JSONObject
      */
+    @NonNull
     @SuppressWarnings("unchecked")
-    public static JSONObject mapToJSONObject(Map map) {
+    public static JSONObject mapToJSONObject(@NonNull Map map) {
         Logger.v(TAG, "Converting a map to a JSONObject: %s", map);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return new JSONObject(map);
@@ -187,7 +195,7 @@ public class Util {
      * @param s the String to process
      * @return number Length of s in bytes when UTF-8 encoded
      */
-    public static long getUTF8Length(String s) {
+    public static long getUTF8Length(@NonNull String s) {
         long len = 0;
         for (int i = 0; i < s.length(); i++) {
             char code = s.charAt(i);
@@ -216,7 +224,7 @@ public class Util {
      * @param context the android context
      * @return whether the tracker is online
      */
-    public static boolean isOnline(Context context) {
+    public static boolean isOnline(@NonNull Context context) {
 
         Logger.v(TAG, "Checking tracker internet connectivity.");
 
@@ -260,7 +268,8 @@ public class Util {
      * @param list the list to join
      * @return the joined list
      */
-    public static String joinLongList(List<Long> list) {
+    @NonNull
+    public static String joinLongList(@NonNull List<Long> list) {
         String s = "";
 
         for (int i = 0; i < list.size(); i++) {
@@ -288,7 +297,8 @@ public class Util {
      * @param context the Android context
      * @return the geo-location context
      */
-    public static SelfDescribingJson getGeoLocationContext(Context context) {
+    @Nullable
+    public static SelfDescribingJson getGeoLocationContext(@NonNull Context context) {
         Location location = getLastKnownLocation(context);
 
         if (location != null) {
@@ -317,7 +327,8 @@ public class Util {
      * @param context the android context
      * @return the phones Location
      */
-    public static Location getLastKnownLocation(Context context) {
+    @Nullable
+    public static Location getLastKnownLocation(@NonNull Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
 
@@ -352,7 +363,8 @@ public class Util {
      * @param context the Android context
      * @return the mobile context
      */
-    public static SelfDescribingJson getMobileContext(Context context) {
+    @Nullable
+    public static SelfDescribingJson getMobileContext(@NonNull Context context) {
         Map<String, Object> pairs = new HashMap<>();
         addToMap(Parameters.OS_TYPE, getOsType(), pairs);
         addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
@@ -379,6 +391,7 @@ public class Util {
     /**
      * @return the OS Type
      */
+    @NonNull
     public static String getOsType() {
         return "android";
     }
@@ -386,6 +399,7 @@ public class Util {
     /**
      * @return the OS Version
      */
+    @NonNull
     public static String getOsVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
@@ -393,6 +407,7 @@ public class Util {
     /**
      * @return the device model
      */
+    @NonNull
     public static String getDeviceModel() {
         return android.os.Build.MODEL;
     }
@@ -400,6 +415,7 @@ public class Util {
     /**
      * @return the device vendor
      */
+    @NonNull
     public static String getDeviceVendor() {
         return android.os.Build.MANUFACTURER;
     }
@@ -408,7 +424,8 @@ public class Util {
      * @param context the android context
      * @return a carrier name or null
      */
-    public static String getCarrier(Context context) {
+    @Nullable
+    public static String getCarrier(@NonNull Context context) {
         TelephonyManager telephonyManager =
                 (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -428,7 +445,8 @@ public class Util {
      * @param context the android context
      * @return an empty string if limited tracking is on otherwise the advertising id or null
      */
-    public static String getAndroidIdfa(Context context) {
+    @Nullable
+    public static String getAndroidIdfa(@NonNull Context context) {
         try {
             Object advertisingInfoObject = invokeStaticMethod(
                     "com.google.android.gms.ads.identifier.AdvertisingIdClient",
@@ -452,7 +470,8 @@ public class Util {
      * @param networkInfo The NetworkInformation object
      * @return the type of the network
      */
-    public static String getNetworkType(NetworkInfo networkInfo) {
+    @NonNull
+    public static String getNetworkType(@Nullable NetworkInfo networkInfo) {
         String networkType = "offline";
         if (networkInfo != null) {
             String maybeNetworkType = networkInfo.getTypeName().toLowerCase();
@@ -473,7 +492,8 @@ public class Util {
      * @param networkInfo The NetworkInformation object
      * @return the technology of the network
      */
-    public static String getNetworkTechnology(NetworkInfo networkInfo) {
+    @Nullable
+    public static String getNetworkTechnology(@Nullable NetworkInfo networkInfo) {
         String networkTech = null;
         if (networkInfo != null) {
             String networkType = networkInfo.getTypeName();
@@ -490,7 +510,8 @@ public class Util {
      * @param context the android context
      * @return the representation of the current network connection or null
      */
-    public static NetworkInfo getNetworkInfo(Context context) {
+    @Nullable
+    public static NetworkInfo getNetworkInfo(@NonNull Context context) {
         ConnectivityManager cm = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -515,7 +536,7 @@ public class Util {
      * @param keys the keys to check
      * @return whether the map contains the keys
      */
-    public static boolean mapHasKeys(Map<String, Object> map, String... keys) {
+    public static boolean mapHasKeys(@NonNull Map<String, Object> map, @NonNull String... keys) {
         for (String key : keys) {
             if (!map.containsKey(key)) {
                 return false;
@@ -536,7 +557,7 @@ public class Util {
      *              the key
      * @param map the map to insert the pair into
      */
-    public static void addToMap(String key, Object value, Map<String, Object> map) {
+    public static void addToMap(@NonNull String key, @NonNull Object value, @NonNull Map<String, Object> map) {
         if (key != null && value != null && !key.isEmpty()) {
             map.put(key, value);
         }
@@ -602,7 +623,8 @@ public class Util {
      *            the event parameters
      * @return the byte array or null
      */
-    public static byte[] serialize(Map<String, String> map) {
+    @Nullable
+    public static byte[] serialize(@NonNull Map<String, String> map) {
         byte[] newByteArray = null;
         try {
             ByteArrayOutputStream mem_out = new ByteArrayOutputStream();
@@ -624,8 +646,9 @@ public class Util {
      * @param bytes the bytes to be converted
      * @return the Map or null
      */
+    @Nullable
     @SuppressWarnings("unchecked")
-    public static Map<String, String> deserializer(byte[] bytes) {
+    public static Map<String, String> deserializer(@NonNull byte[] bytes) {
         Map<String, String> newMap = null;
         try {
             ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
@@ -646,7 +669,8 @@ public class Util {
      * @param e the Throwable to convert
      * @return the StackTrace as a string
      */
-    public static String stackTraceToString(Throwable e) {
+    @NonNull
+    public static String stackTraceToString(@NonNull Throwable e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);

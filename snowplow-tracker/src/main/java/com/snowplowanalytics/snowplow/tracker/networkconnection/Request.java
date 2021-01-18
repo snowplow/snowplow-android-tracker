@@ -40,7 +40,7 @@ public class Request {
      * @param payload to send to the collector.
      * @param id as reference of the event to send.
      */
-    public Request(Payload payload, long id) {
+    public Request(@NonNull Payload payload, long id) {
         this(payload, id, false);
     }
 
@@ -50,7 +50,7 @@ public class Request {
      * @param id as reference of the event to send.
      * @param oversize indicates if the payload exceeded the maximum size allowed.
      */
-    public Request(Payload payload, long id, boolean oversize) {
+    public Request(@NonNull Payload payload, long id, boolean oversize) {
         List<Long> ids = new ArrayList<>();
         ids.add(id);
         emitterEventIds = ids;
@@ -64,7 +64,7 @@ public class Request {
      * @param payloads to send to the collector as a payload bundle.
      * @param emitterEventIds as reference of the events to send.
      */
-    public Request(List<Payload> payloads, List<Long> emitterEventIds) {
+    public Request(@NonNull List<Payload> payloads, @NonNull List<Long> emitterEventIds) {
         String tempUserAgent = null;
         ArrayList<Map> payloadData = new ArrayList<>();
         for (Payload payload : payloads) {
@@ -83,6 +83,7 @@ public class Request {
      * @param payload The payload where to get the `ua` parameter.
      * @return User-Agent string from subject settings or the default one.
      */
+    @NonNull
     private String getUserAgent(@NonNull Payload payload) {
         HashMap hashMap = (HashMap) payload.getMap();
         return (String) hashMap.get(Parameters.USERAGENT);

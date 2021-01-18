@@ -72,7 +72,7 @@ public class SQLiteEventStore implements EventStore {
     }
 
     @Override
-    public void add(Payload payload) {
+    public void add(@NonNull Payload payload) {
         if (!isDatabaseOpen()) {
             synchronized (this) {
                 payloadWaitingList.add(payload);
@@ -133,7 +133,7 @@ public class SQLiteEventStore implements EventStore {
     }
 
     @Override
-    public boolean removeEvents(List<Long> ids) {
+    public boolean removeEvents(@NonNull List<Long> ids) {
         if (ids.size() == 0) {
             return false;
         }

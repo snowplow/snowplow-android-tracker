@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.tracker.payload;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.Map;
 
 /**
@@ -31,7 +34,7 @@ public interface Payload {
      * @param key The parameter key
      * @param value The parameter value as a String
      */
-    void add(String key, String value);
+    void add(@NonNull String key, @Nullable String value);
 
     /**
      * Add a basic parameter.
@@ -39,7 +42,7 @@ public interface Payload {
      * @param key The parameter key
      * @param value The parameter value
      */
-    void add(String key, Object value);
+    void add(@NonNull String key, @Nullable Object value);
 
     /**
      * Add all the mappings from the specified map. The effect is the equivalent to that of calling
@@ -47,24 +50,24 @@ public interface Payload {
      *
      * @param map Mappings to be stored in this map
      */
-    void addMap(Map<String, Object> map);
+    void addMap(@NonNull Map<String, Object> map);
 
     /**
      * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
      * two keys provided.
-     *
-     * @param map Mapping to be stored
+     *  @param map Mapping to be stored
      * @param base64_encoded The option you choose to encode the data
      * @param type_encoded The key that would be set if the encoding option was set to true
      * @param type_no_encoded They key that would be set if the encoding option was set to false
      */
-    void addMap(Map map, Boolean base64_encoded, String type_encoded, String type_no_encoded);
+    void addMap(@NonNull Map map, @NonNull Boolean base64_encoded, @Nullable String type_encoded, @Nullable String type_no_encoded);
 
     /**
      * Returns the Payload as a HashMap.
      *
      * @return A HashMap
      */
+    @NonNull
     Map getMap();
 
     /**
@@ -73,6 +76,7 @@ public interface Payload {
      *
      * @return A string value of the Payload.
      */
+    @NonNull
     String toString();
 
     /**

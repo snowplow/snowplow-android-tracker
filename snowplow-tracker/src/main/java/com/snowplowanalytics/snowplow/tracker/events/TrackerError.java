@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.tracker.events;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -22,7 +23,7 @@ public class TrackerError extends AbstractSelfDescribing {
         this(source, message, null);
     }
 
-    public TrackerError(@NonNull String source, @NonNull String message, Throwable throwable) {
+    public TrackerError(@NonNull String source, @NonNull String message, @Nullable Throwable throwable) {
         super();
         this.source = source;
         this.message = message;

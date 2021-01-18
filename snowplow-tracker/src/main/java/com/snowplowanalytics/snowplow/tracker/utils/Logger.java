@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.tracker.utils;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 
@@ -25,7 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
  */
 public class Logger {
 
-    private static String TAG = Logger.class.getSimpleName();
+    private static final String TAG = Logger.class.getSimpleName();
     private static DiagnosticLogger errorLogger;
     private static LoggerDelegate delegate = new DefaultLoggerDelegate();
     private static int level = 0;
@@ -35,7 +38,7 @@ public class Logger {
      *
      * @param newLevel The new log-level to use
      */
-    public static void updateLogLevel(LogLevel newLevel) {
+    public static void updateLogLevel(@NonNull LogLevel newLevel) {
         level = newLevel.getLevel();
     }
 
@@ -44,7 +47,7 @@ public class Logger {
      *
      * @param errorLogger The error logger delegate in the app.
      */
-    public static void setErrorLogger(DiagnosticLogger errorLogger) {
+    public static void setErrorLogger(@NonNull DiagnosticLogger errorLogger) {
         Logger.errorLogger = errorLogger;
     }
 
@@ -53,12 +56,17 @@ public class Logger {
      *
      * @param delegate The app logger delegate.
      */
-    public static void setDelegate(LoggerDelegate delegate) {
+    public static void setDelegate(@Nullable LoggerDelegate delegate) {
         if (delegate != null) {
             Logger.delegate = delegate;
         } else {
             Logger.delegate = new DefaultLoggerDelegate();
         }
+    }
+
+    @Nullable
+    public static LoggerDelegate getDelegate() {
+        return delegate;
     }
 
     // -- Log methods
@@ -70,7 +78,7 @@ public class Logger {
      * @param msg the log message
      * @param args extra arguments to be formatted
      */
-    public static void track(String tag, String msg, Object... args) {
+    public static void track(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
         Logger.e(tag, msg, args);
         if (errorLogger != null) {
             try {
@@ -95,7 +103,7 @@ public class Logger {
      * @param msg the log message
      * @param args extra arguments to be formatted
      */
-    public static void e(String tag, String msg, Object... args) {
+    public static void e(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
         if (level >= 1) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
@@ -110,7 +118,7 @@ public class Logger {
      * @param msg the log message
      * @param args extra arguments to be formatted
      */
-    public static void d(String tag, String msg, Object... args) {
+    public static void d(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
         if (level >= 2) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
@@ -125,7 +133,7 @@ public class Logger {
      * @param msg the log message
      * @param args extra arguments to be formatted
      */
-    public static void v(String tag, String msg, Object... args) {
+    public static void v(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
         if (level >= 3) {
             String source = getTag(tag);
             String message = getMessage(msg, args);
@@ -140,7 +148,8 @@ public class Logger {
      * @param args Any extra args to log
      * @return the formatted message
      */
-    private static String getMessage(String msg, Object... args) {
+    @NonNull
+    private static String getMessage(@NonNull String msg, @Nullable Object... args) {
         return getThread() + "|" + String.format(msg, args);
     }
 
@@ -150,7 +159,8 @@ public class Logger {
      * @param tag the tag to be appended to
      * @return the appended tag
      */
-    private static String getTag(String tag) {
+    @NonNull
+    private static String getTag(@NonNull String tag) {
         return "SnowplowTracker->" + tag;
     }
 
@@ -160,6 +170,7 @@ public class Logger {
      *
      * @return the threads name
      */
+    @NonNull
     private static String getThread() {
         return Thread.currentThread().getName();
     }

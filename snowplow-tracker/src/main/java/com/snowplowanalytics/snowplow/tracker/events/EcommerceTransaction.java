@@ -56,7 +56,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param orderId ID of the eCommerce transaction
          * @return itself
          */
-        public T orderId(String orderId) {
+        @NonNull
+        public T orderId(@NonNull String orderId) {
             this.orderId = orderId;
             return self();
         }
@@ -65,7 +66,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param totalValue Total transaction value
          * @return itself
          */
-        public T totalValue(Double totalValue) {
+        @NonNull
+        public T totalValue(@NonNull Double totalValue) {
             this.totalValue = totalValue;
             return self();
         }
@@ -74,7 +76,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param affiliation Transaction affiliation
          * @return itself
          */
-        public T affiliation(String affiliation) {
+        @NonNull
+        public T affiliation(@NonNull String affiliation) {
             this.affiliation = affiliation;
             return self();
         }
@@ -83,7 +86,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param taxValue Transaction tax value
          * @return itself
          */
-        public T taxValue(Double taxValue) {
+        @NonNull
+        public T taxValue(@NonNull Double taxValue) {
             this.taxValue = taxValue;
             return self();
         }
@@ -92,7 +96,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param shipping Delivery cost charged
          * @return itself
          */
-        public T shipping(Double shipping) {
+        @NonNull
+        public T shipping(@NonNull Double shipping) {
             this.shipping = shipping;
             return self();
         }
@@ -101,7 +106,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param city Delivery address city
          * @return itself
          */
-        public T city(String city) {
+        @NonNull
+        public T city(@NonNull String city) {
             this.city = city;
             return self();
         }
@@ -110,7 +116,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param state Delivery address state
          * @return itself
          */
-        public T state(String state) {
+        @NonNull
+        public T state(@NonNull String state) {
             this.state = state;
             return self();
         }
@@ -119,7 +126,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param country Delivery address country
          * @return itself
          */
-        public T country(String country) {
+        @NonNull
+        public T country(@NonNull String country) {
             this.country = country;
             return self();
         }
@@ -128,7 +136,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param currency The currency the price is expressed in
          * @return itself
          */
-        public T currency(String currency) {
+        @NonNull
+        public T currency(@NonNull String currency) {
             this.currency = currency;
             return self();
         }
@@ -137,7 +146,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param items The items in the transaction
          * @return itself
          */
-        public T items(List<EcommerceTransactionItem> items) {
+        @NonNull
+        public T items(@NonNull List<EcommerceTransactionItem> items) {
             this.items = items;
             return self();
         }
@@ -146,6 +156,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @param itemArgs The items as a varargs argument
          * @return itself
          */
+        @NonNull
         public T items(EcommerceTransactionItem... itemArgs) {
             List<EcommerceTransactionItem> items = new ArrayList<>();
             Collections.addAll(items, itemArgs);
@@ -153,6 +164,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
             return self();
         }
 
+        @NonNull
         public EcommerceTransaction build() {
             return new EcommerceTransaction(this);
         }
@@ -169,7 +181,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
         return new Builder2();
     }
 
-    protected EcommerceTransaction(Builder<?> builder) {
+    protected EcommerceTransaction(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks

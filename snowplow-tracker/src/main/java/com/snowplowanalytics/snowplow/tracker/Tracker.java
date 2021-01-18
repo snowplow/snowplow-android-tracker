@@ -16,10 +16,14 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,9 +67,9 @@ public class Tracker implements DiagnosticLogger {
 
     // --- Singleton Access
 
-    private static Tracker spTracker = null;
+    private static @Nullable Tracker spTracker = null;
 
-    public static Tracker init(Tracker newTracker) {
+    public static @NonNull Tracker init(@NonNull Tracker newTracker) {
         if (spTracker == null) {
             spTracker = newTracker;
             spTracker.resumeSessionChecking();
@@ -75,7 +79,7 @@ public class Tracker implements DiagnosticLogger {
         return instance();
     }
 
-    public static Tracker instance() {
+    public static @NonNull Tracker instance() {
         if (spTracker == null) {
             throw new IllegalStateException("FATAL: Tracker must be initialized first!");
         }
@@ -130,18 +134,18 @@ public class Tracker implements DiagnosticLogger {
      */
     public static class TrackerBuilder {
 
-        final Emitter emitter; // Required
-        final String namespace; // Required
-        final String appId; // Required
-        final Context context; // Required
-        Subject subject = null; // Optional
+        final @NonNull Emitter emitter; // Required
+        final @NonNull String namespace; // Required
+        final @NonNull String appId; // Required
+        final @NonNull Context context; // Required
+        @Nullable Subject subject = null; // Optional
         boolean base64Encoded = true; // Optional
-        DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        @Nullable DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
         LogLevel logLevel = LogLevel.OFF; // Optional
         boolean sessionContext = false; // Optional
         long foregroundTimeout = 600; // Optional - 10 minutes
         long backgroundTimeout = 300; // Optional - 5 minutes
-        Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
+        @NonNull Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
         int threadCount = 10; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
         boolean geoLocationContext = false; // Optional
@@ -154,7 +158,7 @@ public class Tracker implements DiagnosticLogger {
         boolean activityTracking = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
-        Gdpr gdpr = null; // Optional
+        @Nullable Gdpr gdpr = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -162,7 +166,7 @@ public class Tracker implements DiagnosticLogger {
          * @param appId Application ID
          * @param context The Android application context
          */
-        public TrackerBuilder(Emitter emitter, String namespace, String appId, Context context) {
+        public TrackerBuilder(@NonNull Emitter emitter, @NonNull String namespace, @NonNull String appId, @NonNull Context context) {
             this.emitter = emitter;
             this.namespace = namespace;
             this.appId = appId;
@@ -173,6 +177,7 @@ public class Tracker implements DiagnosticLogger {
          * @param isEnabled Whether application contexts are sent with all events
          * @return itself
          */
+        @NonNull
         public TrackerBuilder applicationContext(boolean isEnabled) {
             this.applicationContext = isEnabled;
             return this;
@@ -186,7 +191,8 @@ public class Tracker implements DiagnosticLogger {
          * @param documentDescription Description of the document
          * @return itself
          */
-        public TrackerBuilder gdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+        @NonNull
+        public TrackerBuilder gdprContext(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
             this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
             return this;
         }
@@ -195,6 +201,7 @@ public class Tracker implements DiagnosticLogger {
          * @param willTrack Whether install events will be tracked
          * @return itself
          */
+        @NonNull
         public TrackerBuilder installTracking(boolean willTrack) {
             this.installTracking = willTrack;
             return this;
@@ -204,7 +211,8 @@ public class Tracker implements DiagnosticLogger {
          * @param subject Subject to be tracked
          * @return itself
          */
-        public TrackerBuilder subject(Subject subject) {
+        @NonNull
+        public TrackerBuilder subject(@Nullable Subject subject) {
             this.subject = subject;
             return this;
         }
@@ -213,7 +221,8 @@ public class Tracker implements DiagnosticLogger {
          * @param base64 Whether JSONs in the payload should be base-64 encoded
          * @return itself
          */
-        public TrackerBuilder base64(Boolean base64) {
+        @NonNull
+        public TrackerBuilder base64(@Nullable Boolean base64) {
             this.base64Encoded = base64;
             return this;
         }
@@ -222,7 +231,8 @@ public class Tracker implements DiagnosticLogger {
          * @param platform The device platform the tracker is running on
          * @return itself
          */
-        public TrackerBuilder platform(DevicePlatforms platform) {
+        @NonNull
+        public TrackerBuilder platform(@Nullable DevicePlatforms platform) {
             this.devicePlatform = platform;
             return this;
         }
@@ -231,7 +241,8 @@ public class Tracker implements DiagnosticLogger {
          * @param log The log level for the Tracker class
          * @return itself
          */
-        public TrackerBuilder level(LogLevel log) {
+        @NonNull
+        public TrackerBuilder level(@Nullable LogLevel log) {
             this.logLevel = log;
             return this;
         }
@@ -240,7 +251,8 @@ public class Tracker implements DiagnosticLogger {
          * @param delegate The logger delegate that receive logs from the tracker.
          * @return itself
          */
-        public TrackerBuilder loggerDelegate(LoggerDelegate delegate) {
+        @NonNull
+        public TrackerBuilder loggerDelegate(@Nullable LoggerDelegate delegate) {
             Logger.setDelegate(delegate);
             return this;
         }
@@ -249,6 +261,7 @@ public class Tracker implements DiagnosticLogger {
          * @param sessionContext whether to add a session context
          * @return itself
          */
+        @NonNull
         public TrackerBuilder sessionContext(boolean sessionContext) {
             this.sessionContext = sessionContext;
             return this;
@@ -258,6 +271,7 @@ public class Tracker implements DiagnosticLogger {
          * @param timeout The session foreground timeout
          * @return itself
          */
+        @NonNull
         public TrackerBuilder foregroundTimeout(long timeout) {
             this.foregroundTimeout = timeout;
             return this;
@@ -267,6 +281,7 @@ public class Tracker implements DiagnosticLogger {
          * @param timeout The session background timeout
          * @return itself
          */
+        @NonNull
         public TrackerBuilder backgroundTimeout(long timeout) {
             this.backgroundTimeout = timeout;
             return this;
@@ -277,6 +292,7 @@ public class Tracker implements DiagnosticLogger {
          * @return itself
          * @deprecated No longer needed as the session is checked for each event. It will be removed in the version 2.0.
          */
+        @NonNull
         @Deprecated
         public TrackerBuilder sessionCheckInterval(long sessionCheckInterval) {
             return this;
@@ -289,10 +305,11 @@ public class Tracker implements DiagnosticLogger {
          * @param backgroundTimeoutCallback Called when backgrounded session times-out
          * @return itself
          */
-        public TrackerBuilder sessionCallbacks(Runnable foregroundTransitionCallback,
-                                               Runnable backgroundTransitionCallback,
-                                               Runnable foregroundTimeoutCallback,
-                                               Runnable backgroundTimeoutCallback)
+        @NonNull
+        public TrackerBuilder sessionCallbacks(@NonNull Runnable foregroundTransitionCallback,
+                                               @NonNull Runnable backgroundTransitionCallback,
+                                               @NonNull Runnable foregroundTimeoutCallback,
+                                               @NonNull Runnable backgroundTimeoutCallback)
         {
             this.sessionCallbacks = new Runnable[]{
                     foregroundTransitionCallback, backgroundTransitionCallback,
@@ -305,6 +322,7 @@ public class Tracker implements DiagnosticLogger {
          * @param threadCount the amount of threads to use for concurrency
          * @return itself
          */
+        @NonNull
         public TrackerBuilder threadCount(int threadCount) {
             this.threadCount = threadCount;
             return this;
@@ -314,6 +332,7 @@ public class Tracker implements DiagnosticLogger {
          * @param timeUnit a valid TimeUnit
          * @return itself
          */
+        @NonNull
         public TrackerBuilder timeUnit(TimeUnit timeUnit) {
             this.timeUnit = timeUnit;
             return this;
@@ -326,7 +345,8 @@ public class Tracker implements DiagnosticLogger {
          * @param geoLocationContext whether to add a geo-location context
          * @return itself
          */
-        public TrackerBuilder geoLocationContext(Boolean geoLocationContext) {
+        @NonNull
+        public TrackerBuilder geoLocationContext(@NonNull Boolean geoLocationContext) {
             this.geoLocationContext = geoLocationContext;
             return this;
         }
@@ -335,7 +355,8 @@ public class Tracker implements DiagnosticLogger {
          * @param mobileContext whether to add a mobile context
          * @return itself
          */
-        public TrackerBuilder mobileContext(Boolean mobileContext) {
+        @NonNull
+        public TrackerBuilder mobileContext(@NonNull Boolean mobileContext) {
             this.mobileContext = mobileContext;
             return this;
         }
@@ -345,7 +366,8 @@ public class Tracker implements DiagnosticLogger {
          *                         crashes
          * @return itself
          */
-        public TrackerBuilder applicationCrash(Boolean applicationCrash) {
+        @NonNull
+        public TrackerBuilder applicationCrash(@NonNull Boolean applicationCrash) {
             this.applicationCrash = applicationCrash;
             return this;
         }
@@ -354,7 +376,8 @@ public class Tracker implements DiagnosticLogger {
          * @param trackerDiagnostic whether to automatically track error within the tracker.
          * @return itself
          */
-        public TrackerBuilder trackerDiagnostic(Boolean trackerDiagnostic) {
+        @NonNull
+        public TrackerBuilder trackerDiagnostic(@NonNull Boolean trackerDiagnostic) {
             this.trackerDiagnostic = trackerDiagnostic;
             return this;
         }
@@ -366,7 +389,8 @@ public class Tracker implements DiagnosticLogger {
          *                        from foreground to background
          * @return itself
          */
-        public TrackerBuilder lifecycleEvents(Boolean lifecycleEvents) {
+        @NonNull
+        public TrackerBuilder lifecycleEvents(@NonNull Boolean lifecycleEvents) {
             this.lifecycleEvents = lifecycleEvents;
             return this;
         }
@@ -376,7 +400,8 @@ public class Tracker implements DiagnosticLogger {
          *                      to current screen) with every event
          * @return itself
          */
-        public TrackerBuilder screenContext(Boolean screenContext) {
+        @NonNull
+        public TrackerBuilder screenContext(@NonNull Boolean screenContext) {
             this.screenContext = screenContext;
             return this;
         }
@@ -385,7 +410,8 @@ public class Tracker implements DiagnosticLogger {
          * @param screenviewEvents whether to auto-track screenviews
          * @return itself
          */
-        public TrackerBuilder screenviewEvents(Boolean screenviewEvents) {
+        @NonNull
+        public TrackerBuilder screenviewEvents(@NonNull Boolean screenviewEvents) {
             this.activityTracking = screenviewEvents;
             return this;
         }
@@ -396,9 +422,10 @@ public class Tracker implements DiagnosticLogger {
          * @deprecated onlyTrackLabelledScreens can't filter the activities. Use {@link #screenviewEvents} instead.
          * @return itself
          */
+        @NonNull
         @Deprecated
-        public TrackerBuilder screenviewEvents(Boolean activities,
-                                               Boolean onlyTrackLabelledScreens) {
+        public TrackerBuilder screenviewEvents(@NonNull Boolean activities,
+                                               @NonNull Boolean onlyTrackLabelledScreens) {
             return screenviewEvents(activities);
         }
 
@@ -409,6 +436,7 @@ public class Tracker implements DiagnosticLogger {
          *
          * @return the new Tracker object
          */
+        @NonNull
         public Tracker build(){
             return init(new Tracker(this));
         }
@@ -419,7 +447,7 @@ public class Tracker implements DiagnosticLogger {
      *
      * @param builder The builder that constructs a tracker
      */
-    private Tracker(TrackerBuilder builder) {
+    private Tracker(@NonNull TrackerBuilder builder) {
 
         this.context = builder.context;
         this.emitter = builder.emitter;
@@ -479,8 +507,7 @@ public class Tracker implements DiagnosticLogger {
         }
 
         // If lifecycleEvents is True
-        if ((this.lifecycleEvents || this.sessionContext) &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (this.lifecycleEvents || this.sessionContext) {
 
             // addObserver must execute on the mainThread
             Handler mainHandler = new Handler(context.getMainLooper());
@@ -498,7 +525,7 @@ public class Tracker implements DiagnosticLogger {
     // --- Diagnostic
 
     @Override
-    public void log(String source, String errorMessage, Throwable throwable) {
+    public void log(@NonNull String source, @NonNull String errorMessage, @Nullable Throwable throwable) {
         this.track(new TrackerError(source, errorMessage, throwable));
     }
 
@@ -520,7 +547,7 @@ public class Tracker implements DiagnosticLogger {
      *
      * @param event the event to track
      */
-    public void track(final Event event) {
+    public void track(final @NonNull Event event) {
         if (!dataCollection.get()) {
             return;
         }
@@ -668,7 +695,7 @@ public class Tracker implements DiagnosticLogger {
      *                decorated.
      * @param contexts The raw context list
      */
-    private void addServiceEventPayload(Payload payload, List<SelfDescribingJson> contexts) {
+    private void addServiceEventPayload(@NonNull Payload payload, @NonNull List<SelfDescribingJson> contexts) {
         // Add default parameters to the payload
         payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
         payload.add(Parameters.APPID, this.appId);
@@ -781,7 +808,7 @@ public class Tracker implements DiagnosticLogger {
      * @param documentVersion Version of the document
      * @param documentDescription Description of the document
      */
-    public void enableGdprContext(@NonNull Basis basisForProcessing, String documentId, String documentVersion, String documentDescription) {
+    public void enableGdprContext(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
     }
 
@@ -797,14 +824,14 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @param subject a valid subject object
      */
-    public void setSubject(Subject subject) {
+    public void setSubject(@Nullable Subject subject) {
         this.subject = subject;
     }
 
     /**
      * @param emitter a valid emitter object
      */
-    public void setEmitter(Emitter emitter) {
+    public void setEmitter(@NonNull Emitter emitter) {
         // Need to shutdown prior emitter before updating
         getEmitter().shutdown();
 
@@ -821,7 +848,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @param platform a valid DevicePlatforms object
      */
-    public void setPlatform(DevicePlatforms platform) {
+    public void setPlatform(@NonNull DevicePlatforms platform) {
         this.devicePlatform = platform;
     }
 
@@ -830,6 +857,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the tracker version that was set
      */
+    @NonNull
     public String getTrackerVersion() {
         return this.trackerVersion;
     }
@@ -837,6 +865,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers subject object
      */
+    @Nullable
     public Subject getSubject() {
         return this.subject;
     }
@@ -844,6 +873,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the emitter associated with the tracker
      */
+    @NonNull
     public Emitter getEmitter() {
         return this.emitter;
     }
@@ -851,6 +881,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers namespace
      */
+    @NonNull
     public String getNamespace() {
         return this.namespace;
     }
@@ -858,6 +889,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers set Application ID
      */
+    @NonNull
     public String getAppId() {
         return this.appId;
     }
@@ -884,6 +916,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers device platform
      */
+    @NonNull
     public DevicePlatforms getPlatform() {
         return this.devicePlatform;
     }
@@ -898,6 +931,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers session object
      */
+    @Nullable
     public Session getSession() {
         return this.trackerSession;
     }
@@ -947,6 +981,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return screen state from tracker
      */
+    @Nullable
     public ScreenState getScreenState() {
         return this.screenState;
     }
@@ -956,7 +991,7 @@ public class Tracker implements DiagnosticLogger {
      * @deprecated Use track(Event) method passing a ScreenView event.
      */
     @Deprecated
-    public void trackScreen(ScreenState screenState) {
+    public void trackScreen(@NonNull ScreenState screenState) {
         this.screenState = screenState;
         SelfDescribingJson data = screenState.getScreenViewEventJson();
         track(SelfDescribing.builder()
@@ -987,32 +1022,33 @@ public class Tracker implements DiagnosticLogger {
         globalContexts.clear();
     }
 
-    public void addGlobalContext(GlobalContext context) {
+    public void addGlobalContext(@NonNull GlobalContext context) {
         globalContexts.add(context);
     }
 
-    public void addGlobalContexts(List<GlobalContext> contexts) {
+    public void addGlobalContexts(@NonNull List<GlobalContext> contexts) {
         for (GlobalContext context : contexts) {
             addGlobalContext(context);
         }
     }
 
+    @NonNull
     public ArrayList<GlobalContext> getGlobalContexts() {
         return new ArrayList<>(globalContexts);
     }
 
-    public void setGlobalContexts(List<GlobalContext> contexts) {
+    public void setGlobalContexts(@NonNull List<GlobalContext> contexts) {
         clearGlobalContexts();
         addGlobalContexts(contexts);
     }
 
-    public void removeGlobalContexts(List<String> tags) {
+    public void removeGlobalContexts(@NonNull List<String> tags) {
         for (String tag: tags) {
             removeGlobalContext(tag);
         }
     }
 
-    public void removeGlobalContext(String tag) {
+    public void removeGlobalContext(@NonNull String tag) {
         synchronized (globalContexts) {
             Iterator<GlobalContext> it = globalContexts.iterator();
 

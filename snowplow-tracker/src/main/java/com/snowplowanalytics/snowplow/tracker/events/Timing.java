@@ -39,7 +39,8 @@ public class Timing extends AbstractSelfDescribing {
          * @param category The category of the timed event
          * @return itself
          */
-        public T category(String category) {
+        @NonNull
+        public T category(@NonNull String category) {
             this.category = category;
             return self();
         }
@@ -48,7 +49,8 @@ public class Timing extends AbstractSelfDescribing {
          * @param variable Identify the timing being recorded
          * @return itself
          */
-        public T variable(String variable) {
+        @NonNull
+        public T variable(@NonNull String variable) {
             this.variable = variable;
             return self();
         }
@@ -57,7 +59,8 @@ public class Timing extends AbstractSelfDescribing {
          * @param timing The number of milliseconds in elapsed time to report
          * @return itself
          */
-        public T timing(Integer timing) {
+        @NonNull
+        public T timing(@NonNull Integer timing) {
             this.timing = timing;
             return self();
         }
@@ -66,11 +69,13 @@ public class Timing extends AbstractSelfDescribing {
          * @param label Optional description of this timing
          * @return itself
          */
-        public T label(String label) {
+        @NonNull
+        public T label(@NonNull String label) {
             this.label = label;
             return self();
         }
 
+        @NonNull
         public Timing build() {
             return new Timing(this);
         }
@@ -87,7 +92,7 @@ public class Timing extends AbstractSelfDescribing {
         return new Builder2();
     }
 
-    protected Timing(Builder<?> builder) {
+    protected Timing(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks
@@ -113,6 +118,7 @@ public class Timing extends AbstractSelfDescribing {
      * @return the payload to be sent.
      */
     @Deprecated
+    @NonNull
     public HashMap<String,Object> getData() {
         HashMap<String,Object> payload = new HashMap<>();
         payload.put(Parameters.UT_CATEGORY, this.category);

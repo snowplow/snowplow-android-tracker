@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.tracker;
 
+import androidx.annotation.NonNull;
+
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -51,7 +53,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param t The thread that crashed
      * @param e The throwable
      */
-    public void uncaughtException(Thread t, Throwable e) {
+    public void uncaughtException(@NonNull Thread t, Throwable e) {
         Logger.d(TAG, "Uncaught exception being tracked...");
 
         // Ensure message is not-null/empty

@@ -41,11 +41,13 @@ public class SelfDescribing extends AbstractSelfDescribing {
          *                  A "schema" field identifying the schema against which the data is validated
          * @return itself
          */
-        public T eventData(SelfDescribingJson eventData) {
+        @NonNull
+        public T eventData(@NonNull SelfDescribingJson eventData) {
             this.eventData = eventData;
             return self();
         }
 
+        @NonNull
         public SelfDescribing build() {
             return new SelfDescribing(this);
         }
@@ -62,7 +64,7 @@ public class SelfDescribing extends AbstractSelfDescribing {
         return new Builder2();
     }
 
-    protected SelfDescribing(Builder<?> builder) {
+    protected SelfDescribing(@NonNull Builder<?> builder) {
         super(builder);
 
         // Precondition checks
@@ -85,6 +87,7 @@ public class SelfDescribing extends AbstractSelfDescribing {
      * Do not use in production code as it's an internal deprecated method.
      */
     @Deprecated
+    @NonNull
     public TrackerPayload getTrackerPayload() {
         TrackerPayload payload = new TrackerPayload();
         SelfDescribingJson envelope = new SelfDescribingJson(
@@ -103,6 +106,7 @@ public class SelfDescribing extends AbstractSelfDescribing {
      */
     @Override
     @Deprecated
+    @NonNull
     public SelfDescribingJson getPayload() {
         return super.getPayload();
     }

@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.app.Fragment;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
@@ -63,7 +64,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param name The name of the screen view event
          * @return itself
          */
-        public T name(String name) {
+        @NonNull
+        public T name(@NonNull String name) {
             this.name = name;
             return self();
         }
@@ -72,7 +74,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param id Screen view ID
          * @return itself
          */
-        public T id(String id) {
+        @NonNull
+        public T id(@NonNull String id) {
             this.id = id;
             return self();
         }
@@ -81,7 +84,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param type The type of the screen view event
          * @return itself
          */
-        public T type(String type) {
+        @NonNull
+        public T type(@NonNull String type) {
             this.type = type;
             return self();
         }
@@ -90,7 +94,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param name The name from the previous screen view event
          * @return itself
          */
-        public T previousName(String name) {
+        @NonNull
+        public T previousName(@NonNull String name) {
             this.previousName = name;
             return self();
         }
@@ -99,7 +104,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param type The type from the previous screen view event
          * @return itself
          */
-        public T previousType(String type) {
+        @NonNull
+        public T previousType(@NonNull String type) {
             this.previousType = type;
             return self();
         }
@@ -108,7 +114,8 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param id The id from the previous screen view event
          * @return itself
          */
-        public T previousId(String id) {
+        @NonNull
+        public T previousId(@Nullable String id) {
             this.previousId = id;
             return self();
         }
@@ -117,31 +124,37 @@ public class ScreenView extends AbstractSelfDescribing {
          * @param transitionType The transition type of the screen view event
          * @return itself
          */
-        public T transitionType(String transitionType) {
+        @NonNull
+        public T transitionType(@Nullable String transitionType) {
             this.transitionType = transitionType;
             return self();
         }
 
-        public T fragmentClassName(String fragmentClassName) {
+        @NonNull
+        public T fragmentClassName(@Nullable String fragmentClassName) {
             this.fragmentClassName = fragmentClassName;
             return self();
         }
 
-        public T fragmentTag(String fragmentTag) {
+        @NonNull
+        public T fragmentTag(@Nullable String fragmentTag) {
             this.fragmentTag = fragmentTag;
             return self();
         }
 
-        public T activityClassName(String activityClassName) {
+        @NonNull
+        public T activityClassName(@Nullable String activityClassName) {
             this.activityClassName = activityClassName;
             return self();
         }
 
-        public T activityTag(String activityTag) {
+        @NonNull
+        public T activityTag(@Nullable String activityTag) {
             this.activityTag = activityTag;
             return self();
         }
 
+        @NonNull
         public ScreenView build() {
             return new ScreenView(this);
         }
@@ -158,7 +171,8 @@ public class ScreenView extends AbstractSelfDescribing {
         return new Builder2();
     }
 
-    public static ScreenView buildWithActivity(Activity activity) {
+    @NonNull
+    public static ScreenView buildWithActivity(@NonNull Activity activity) {
         String activityClassName = activity.getLocalClassName();
         String activityTag = getSnowplowScreenId(activity);
         String name = getValidName(activityClassName, activityTag);
@@ -173,7 +187,8 @@ public class ScreenView extends AbstractSelfDescribing {
                 .build();
     }
 
-    public static ScreenView buildWithFragment(Fragment fragment) {
+    @NonNull
+    public static ScreenView buildWithFragment(@NonNull Fragment fragment) {
         String fragmentClassName = fragment.getClass().getSimpleName();
         String fragmentTag = fragment.getTag();
         String name = getValidName(fragmentClassName, fragmentTag);
@@ -188,7 +203,7 @@ public class ScreenView extends AbstractSelfDescribing {
                 .build();
     }
 
-    protected ScreenView(Builder<?> builder) {
+    protected ScreenView(@NonNull Builder<?> builder) {
         super(builder);
 
         if (builder.id != null) {
@@ -217,8 +232,7 @@ public class ScreenView extends AbstractSelfDescribing {
      * in the ScreenView event (if `previousId` not already set).
      * @param screenState The screen state to update.
      */
-    public synchronized void updateScreenState(ScreenState screenState) {
-        if (screenState == null) return;
+    public synchronized void updateScreenState(@NonNull ScreenState screenState) {
         screenState.updateScreenState(id, name, type, transitionType, fragmentClassName, fragmentTag, activityClassName, activityTag);
         if (previousId == null) {
             previousId = screenState.getPreviousId();
@@ -237,6 +251,7 @@ public class ScreenView extends AbstractSelfDescribing {
      * @return the payload to be sent.
      */
     @Deprecated
+    @NonNull
     public TrackerPayload getData() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.SV_NAME, this.name);
@@ -259,6 +274,7 @@ public class ScreenView extends AbstractSelfDescribing {
         return TrackerConstants.SCHEMA_SCREEN_VIEW;
     }
 
+    @Nullable
     private static String getSnowplowScreenId(Activity activity) {
         Class<? extends Activity> activityClass = activity.getClass();
         try {
@@ -277,7 +293,8 @@ public class ScreenView extends AbstractSelfDescribing {
         return null;
     }
 
-    private static String getValidName(String s1, String s2) {
+    @NonNull
+    private static String getValidName(@Nullable String s1, @Nullable String s2) {
         if (s1 != null && s1.length() > 0) {
             return s1;
         }

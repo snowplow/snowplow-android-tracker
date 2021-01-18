@@ -16,6 +16,9 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -47,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Session {
 
-    private static String TAG = Session.class.getSimpleName();
+    private static final String TAG = Session.class.getSimpleName();
 
     // Package Variables
 
@@ -63,13 +66,13 @@ public class Session {
     private String currentSessionId = null;
     private String previousSessionId;
     private int sessionIndex = 0;
-    private String sessionStorage = "LOCAL_STORAGE";
+    private final String sessionStorage = "LOCAL_STORAGE";
     private String firstId = null;
-    private AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
+    private final AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
     private Future loadFromFileFuture;
 
     // Variables to control Session Updates
-    private AtomicBoolean isBackground = new AtomicBoolean(false);
+    private final AtomicBoolean isBackground = new AtomicBoolean(false);
     private long lastSessionCheck;
     private boolean isNewSession;
     private boolean isSessionCheckerEnabled;
@@ -106,12 +109,13 @@ public class Session {
      * @param foregroundTimeoutCallback called on foreground timeout.
      * @param backgroundTimeoutCallback called on background timeout.
      */
+    @NonNull
     public synchronized static Session getInstance(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit,
-                                            Context context,
-                                            Runnable foregroundTransitionCallback,
-                                            Runnable backgroundTransitionCallback,
-                                            Runnable foregroundTimeoutCallback,
-                                            Runnable backgroundTimeoutCallback)
+                                                   @NonNull Context context,
+                                                   @Nullable Runnable foregroundTransitionCallback,
+                                                   @Nullable Runnable backgroundTransitionCallback,
+                                                   @Nullable Runnable foregroundTimeoutCallback,
+                                                   @Nullable Runnable backgroundTimeoutCallback)
     {
         if (singleton == null) {
             singleton = new Session(foregroundTimeout, backgroundTimeout, timeUnit, context);
@@ -123,40 +127,37 @@ public class Session {
         return singleton;
     }
 
-    Session(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit, Context context) {
+    Session(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit, @NonNull Context context) {
         this.context = context;
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         isSessionCheckerEnabled = true;
         isNewSession = true;
 
-        this.loadFromFileFuture = Executor.futureCallable(new Callable<Void>() {
-            @Override
-            public Void call() {
-                sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-                if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
-                    userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
-                    currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
-                    sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
-                } else {
-                    Map sessionInfo = getSessionFromFile();
-                    if (sessionInfo != null) {
-                        try {
-                            userId = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
-                            currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
-                            sessionIndex = (int)sessionInfo.get(Parameters.SESSION_INDEX);
-                        } catch (Exception e) {
-                            Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
-                            userId = Util.getUUIDString();
-                        }
-                    } else {
+        this.loadFromFileFuture = Executor.futureCallable((Callable<Void>) () -> {
+            sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+            if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+                userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
+                currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
+                sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
+            } else {
+                Map<String, Object> sessionInfo = getSessionFromFile();
+                if (sessionInfo != null) {
+                    try {
+                        userId = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
+                        currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
+                        sessionIndex = (int)sessionInfo.get(Parameters.SESSION_INDEX);
+                    } catch (Exception e) {
+                        Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
                         userId = Util.getUUIDString();
                     }
+                } else {
+                    userId = Util.getUUIDString();
                 }
-                lastSessionCheck = System.currentTimeMillis();
-                hasLoadedFromFile.set(true);
-                return null;
             }
+            lastSessionCheck = System.currentTimeMillis();
+            hasLoadedFromFile.set(true);
+            return null;
         });
         Logger.v(TAG, "Tracker Session Object created.");
     }
@@ -166,7 +167,8 @@ public class Session {
      *
      * @return a SelfDescribingJson containing the session context
      */
-    public synchronized SelfDescribingJson getSessionContext(String eventId) {
+    @NonNull
+    public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId) {
         Logger.v(TAG, "Getting session context...");
         if (!hasLoadedFromFile.get() && !waitForSessionFileLoad()) {
             hasLoadedFromFile.set(true);
@@ -287,7 +289,8 @@ public class Session {
      *
      * @return a map containing all session values
      */
-    public Map getSessionValues() {
+    @NonNull
+    public Map<String, Object> getSessionValues() {
         Map<String, Object> sessionValues = new HashMap<>();
         sessionValues.put(Parameters.SESSION_USER_ID,this.userId);
         sessionValues.put(Parameters.SESSION_ID, this.currentSessionId);
@@ -303,7 +306,8 @@ public class Session {
      *
      * @return a map or null.
      */
-    private Map getSessionFromFile() {
+    @Nullable
+    private Map<String, Object> getSessionFromFile() {
         return FileStore.getMapFromFile(
                 TrackerConstants.SNOWPLOW_SESSION_VARS,
                 context);
@@ -312,7 +316,7 @@ public class Session {
     /**
      * Set session callbacks
      */
-    public void setCallbacks(Runnable[] callbacks) {
+    public void setCallbacks(@NonNull Runnable[] callbacks) {
         if (callbacks.length == 4) {
             this.foregroundTransitionCallback = callbacks[0];
             this.backgroundTransitionCallback = callbacks[1];
@@ -349,6 +353,7 @@ public class Session {
     /**
      * @return the user id
      */
+    @NonNull
     public String getUserId() {
         return this.userId;
     }
@@ -356,6 +361,7 @@ public class Session {
     /**
      * @return the current session id
      */
+    @NonNull
     public String getCurrentSessionId() {
         return this.currentSessionId;
     }
@@ -364,6 +370,7 @@ public class Session {
      * @return the previous session id or an
      *         empty String
      */
+    @Nullable
     public String getPreviousSessionId() {
         return this.previousSessionId;
     }
@@ -371,6 +378,7 @@ public class Session {
     /**
      * @return the session storage type
      */
+    @NonNull
     public String getSessionStorage() {
         return this.sessionStorage;
     }
@@ -378,6 +386,7 @@ public class Session {
     /**
      * @return the first event id
      */
+    @NonNull
     public String getFirstId() {
         return this.firstId;
     }
@@ -406,6 +415,7 @@ public class Session {
     /**
      * @return future for session file loading
      */
+    @NonNull
     public Future getLoadFromFileFuture() {
         return this.loadFromFileFuture;
     }

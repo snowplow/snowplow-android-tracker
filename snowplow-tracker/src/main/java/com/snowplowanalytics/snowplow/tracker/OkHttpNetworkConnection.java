@@ -3,6 +3,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
@@ -67,7 +68,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         /**
          * @param uri The uri of the collector
          */
-        public OkHttpNetworkConnectionBuilder(String uri) {
+        public OkHttpNetworkConnectionBuilder(@NonNull String uri) {
             this.uri = uri;
         }
 
@@ -75,7 +76,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder method(HttpMethod httpMethod) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder method(@NonNull HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
@@ -84,7 +86,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          * @param requestSecurity the security chosen for requests
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder security(RequestSecurity requestSecurity) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder security(@NonNull RequestSecurity requestSecurity) {
             this.requestSecurity = requestSecurity;
             return this;
         }
@@ -93,7 +96,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          * @param version the TLS version allowed for requests
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder tls(TLSVersion version) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder tls(@NonNull TLSVersion version) {
             this.tlsVersions = EnumSet.of(version);
             return this;
         }
@@ -102,7 +106,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder tls(EnumSet<TLSVersion> versions) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder tls(@NonNull EnumSet<TLSVersion> versions) {
             this.tlsVersions = versions;
             return this;
         }
@@ -112,6 +117,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          *                    TimeOutException will be thrown
          * @return itself
          */
+        @NonNull
         public OkHttpNetworkConnectionBuilder emitTimeout(int emitTimeout){
             this.emitTimeout = emitTimeout;
             return this;
@@ -123,7 +129,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          *               ,otherwise a new one is created.
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder client(OkHttpClient client) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder client(@Nullable OkHttpClient client) {
             this.client = client;
             return this;
         }
@@ -132,7 +139,8 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
-        public OkHttpNetworkConnectionBuilder customPostPath(String customPostPath) {
+        @NonNull
+        public OkHttpNetworkConnectionBuilder customPostPath(@Nullable String customPostPath) {
             this.customPostPath = customPostPath;
             return this;
         }
@@ -142,6 +150,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
          *
          * @return a new OkHttpNetworkConnection object
          */
+        @NonNull
         public OkHttpNetworkConnection build() {
             return new OkHttpNetworkConnection(this);
         }
