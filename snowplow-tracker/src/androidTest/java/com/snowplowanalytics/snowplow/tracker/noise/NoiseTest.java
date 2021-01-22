@@ -21,7 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -35,7 +35,7 @@ public class NoiseTest extends AndroidTestCase {
     public void testEnum() {
         NoiseTest.superficialEnumCodeCoverage(BufferOption.class);
         NoiseTest.superficialEnumCodeCoverage(HttpMethod.class);
-        NoiseTest.superficialEnumCodeCoverage(RequestSecurity.class);
+        NoiseTest.superficialEnumCodeCoverage(Protocol.class);
         NoiseTest.superficialEnumCodeCoverage(LogLevel.class);
         NoiseTest.superficialEnumCodeCoverage(DevicePlatforms.class);
     }

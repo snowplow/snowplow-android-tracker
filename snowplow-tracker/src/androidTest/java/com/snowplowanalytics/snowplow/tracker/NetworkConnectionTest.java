@@ -41,7 +41,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTP;
+import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTP;
 
 public class NetworkConnectionTest extends AndroidTestCase {
 

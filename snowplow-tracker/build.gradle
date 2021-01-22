@@ -27,6 +27,8 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "$project.version"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -81,6 +83,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     // test
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'com.google.android.gms:play-services-analytics:17.0.0'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.12.12'
 }

@@ -14,10 +14,10 @@
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
 /**
- * RequestSecurity is used to set the protocol used for sending Requests.
+ * Protocol is used to set the protocol used for sending Requests.
  * Either HTTP or HTTPS.
  */
-public enum RequestSecurity {
+public enum Protocol {
     /**
      * Events are sent without security.
      */

@@ -23,7 +23,7 @@ import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -59,7 +59,7 @@ public class Emitter {
     private RequestCallback requestCallback;
     private HttpMethod httpMethod;
     private BufferOption bufferOption;
-    private RequestSecurity requestSecurity;
+    private Protocol requestSecurity;
     private EnumSet<TLSVersion> tlsVersions;
     private String uri;
     private int emitterTick;
@@ -87,7 +87,8 @@ public class Emitter {
         @Nullable RequestCallback requestCallback = null; // Optional
         @NonNull HttpMethod httpMethod = POST; // Optional
         @NonNull BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
-        @NonNull RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        @NonNull
+        Protocol requestSecurity = Protocol.HTTP; // Optional
         @NonNull EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         int emitterTick = 5; // Optional
         int sendLimit = 250; // Optional
@@ -151,12 +152,12 @@ public class Emitter {
         }
 
         /**
-         * @param requestSecurity the security chosen for requests
+         * @param protocol the security chosen for requests
          * @return itself
          */
         @NonNull
-        public EmitterBuilder security(@Nullable RequestSecurity requestSecurity) {
-            this.requestSecurity = requestSecurity;
+        public EmitterBuilder security(@Nullable Protocol protocol) {
+            this.requestSecurity = protocol;
             return this;
         }
 
@@ -668,11 +669,11 @@ public class Emitter {
     }
 
     /**
-     * Sets the RequestSecurity for the Emitter
+     * Sets the Protocol for the Emitter
      *
-     * @param security the RequestSecurity
+     * @param security the Protocol
      */
-    public void setRequestSecurity(@NonNull RequestSecurity security) {
+    public void setRequestSecurity(@NonNull Protocol security) {
         if (!isRunning.get()) {
             this.requestSecurity = security;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
@@ -741,7 +742,7 @@ public class Emitter {
      * @return the request security selected for the emitter
      */
     @NonNull
-    public RequestSecurity getRequestSecurity() {
+    public Protocol getRequestSecurity() {
         return this.requestSecurity;
     }
 

@@ -20,8 +20,8 @@ import android.test.AndroidTestCase;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
 import com.snowplowanalytics.snowplow.tracker.payload.Payload;
@@ -43,8 +43,8 @@ import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.HeavyG
 import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.Single;
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTP;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTPS;
+import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTP;
+import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTPS;
 
 public class EmitterTest extends AndroidTestCase {
 
@@ -135,7 +135,7 @@ public class EmitterTest extends AndroidTestCase {
         emitter = new Emitter.EmitterBuilder("com.acme", getContext())
                 .security(HTTPS)
                 .build();
-        assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
+        assertEquals(Protocol.HTTPS, emitter.getRequestSecurity());
     }
 
     public void testTickSet() {
@@ -193,7 +193,7 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setHttpMethod(GET);
         assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
-        emitter.setRequestSecurity(RequestSecurity.HTTPS);
+        emitter.setRequestSecurity(Protocol.HTTPS);
         assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com.acme");
         assertEquals("https://com.acme/i", emitter.getEmitterUri());

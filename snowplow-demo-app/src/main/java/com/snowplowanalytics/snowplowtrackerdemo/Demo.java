@@ -47,7 +47,7 @@ import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
@@ -194,8 +194,8 @@ public class Demo extends Activity implements LoggerDelegate {
 
         HttpMethod method = _type.getCheckedRadioButtonId() ==
                 _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
-        RequestSecurity security = _security.getCheckedRadioButtonId() ==
-                _radioHttp.getId() ? RequestSecurity.HTTP : RequestSecurity.HTTPS;
+        Protocol security = _security.getCheckedRadioButtonId() ==
+                _radioHttp.getId() ? Protocol.HTTP : Protocol.HTTPS;
 
         if (!e.getEmitterStatus()) {
             e.setEmitterUri(uri);

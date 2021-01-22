@@ -7,8 +7,8 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSArguments;
 import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
@@ -32,7 +32,7 @@ import okhttp3.Response;
 
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTP;
+import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTP;
 
 /**
  * Components in charge to send events to the collector.
@@ -45,7 +45,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     private final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
 
     private final String uri;
-    private final RequestSecurity protocol;
+    private final Protocol protocol;
     private final HttpMethod httpMethod;
     private final int emitTimeout;
     private final String customPostPath;
@@ -59,7 +59,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     public static class OkHttpNetworkConnectionBuilder {
         final String uri; // Required
         HttpMethod httpMethod = POST; // Optional
-        RequestSecurity requestSecurity = RequestSecurity.HTTP; // Optional
+        Protocol protocol = Protocol.HTTP; // Optional
         EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         private int emitTimeout = 5; // Optional
         OkHttpClient client = null; //Optional
@@ -83,12 +83,12 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         }
 
         /**
-         * @param requestSecurity the security chosen for requests
+         * @param protocol the security chosen for requests
          * @return itself
          */
         @NonNull
-        public OkHttpNetworkConnectionBuilder security(@NonNull RequestSecurity requestSecurity) {
-            this.requestSecurity = requestSecurity;
+        public OkHttpNetworkConnectionBuilder security(@NonNull Protocol protocol) {
+            this.protocol = protocol;
             return this;
         }
 
@@ -158,7 +158,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
 
     private OkHttpNetworkConnection(OkHttpNetworkConnectionBuilder builder) {
         this.uri = builder.uri;
-        this.protocol = builder.requestSecurity;
+        this.protocol = builder.protocol;
         this.httpMethod = builder.httpMethod;
         this.emitTimeout = builder.emitTimeout;
         this.customPostPath = builder.customPostPath;

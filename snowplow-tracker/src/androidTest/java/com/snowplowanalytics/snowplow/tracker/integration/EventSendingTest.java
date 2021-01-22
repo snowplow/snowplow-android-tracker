@@ -23,7 +23,7 @@ import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
 import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
 import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
@@ -141,7 +141,7 @@ public class EventSendingTest extends AndroidTestCase {
                 .EmitterBuilder(uri, getContext())
                 .option(BufferOption.Single)
                 .method(method)
-                .security(RequestSecurity.HTTP)
+                .security(Protocol.HTTP)
                 .tick(0)
                 .emptyLimit(0)
                 .build();
