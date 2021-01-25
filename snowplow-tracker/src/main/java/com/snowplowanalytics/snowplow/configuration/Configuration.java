@@ -1,4 +1,10 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-public class Configuration {
+import androidx.annotation.NonNull;
+
+public interface Configuration {
+
+    @NonNull
+    public Configuration copy();
+
 }

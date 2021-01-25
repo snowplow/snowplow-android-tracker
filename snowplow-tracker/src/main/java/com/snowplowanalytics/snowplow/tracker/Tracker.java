@@ -333,7 +333,7 @@ public class Tracker implements DiagnosticLogger {
          * @return itself
          */
         @NonNull
-        public TrackerBuilder timeUnit(TimeUnit timeUnit) {
+        public TrackerBuilder timeUnit(@Nullable TimeUnit timeUnit) {
             this.timeUnit = timeUnit;
             return this;
         }

@@ -5,11 +5,18 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
+import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
+import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public class TrackerConfiguration {
+public class TrackerConfiguration implements Configuration {
 
     @NonNull
     public String namespace;
@@ -158,5 +165,30 @@ public class TrackerConfiguration {
     public TrackerConfiguration diagnosticAutotracking(boolean diagnosticAutotracking) {
         this.diagnosticAutotracking = diagnosticAutotracking;
         return this;
+    }
+
+    // Copyable
+
+    @NonNull
+    @Override
+    public Configuration copy() {
+        TrackerConfiguration copy = new TrackerConfiguration(namespace, appId);
+        copy.devicePlatform = devicePlatform;
+        copy.base64encoding = base64encoding;
+
+        copy.logLevel = logLevel;
+        copy.loggerDelegate = loggerDelegate;
+
+        copy.sessionContext = sessionContext;
+        copy.applicationContext = applicationContext;
+        copy.platformContext = platformContext;
+        copy.geoLocationContext = geoLocationContext;
+        copy.screenContext = screenContext;
+        copy.screenViewAutotracking = screenViewAutotracking;
+        copy.lifecycleAutotracking = lifecycleAutotracking;
+        copy.installAutotracking = installAutotracking;
+        copy. exceptionAutotracking = exceptionAutotracking;
+        copy. diagnosticAutotracking = diagnosticAutotracking;
+        return copy;
     }
 }

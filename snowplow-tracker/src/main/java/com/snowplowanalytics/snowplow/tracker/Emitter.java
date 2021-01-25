@@ -87,8 +87,7 @@ public class Emitter {
         @Nullable RequestCallback requestCallback = null; // Optional
         @NonNull HttpMethod httpMethod = POST; // Optional
         @NonNull BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
-        @NonNull
-        Protocol requestSecurity = Protocol.HTTP; // Optional
+        @NonNull Protocol requestSecurity = Protocol.HTTP; // Optional
         @NonNull EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         int emitterTick = 5; // Optional
         int sendLimit = 250; // Optional
@@ -96,6 +95,7 @@ public class Emitter {
         long byteLimitGet = 40000; // Optional
         long byteLimitPost = 40000; // Optional
         private int emitTimeout = 5; // Optional
+        int threadPoolSize = 2; // Optional
         @NonNull TimeUnit timeUnit = TimeUnit.SECONDS;
         @Nullable OkHttpClient client = null; //Optional
         @Nullable String customPostPath = null; //Optional
@@ -288,6 +288,16 @@ public class Emitter {
         }
 
         /**
+         * @param threadPoolSize The number of threads available for the tracker's operations.
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder threadPoolSize(int threadPoolSize) {
+            this.threadPoolSize = threadPoolSize;
+            return this;
+        }
+
+        /**
          * Creates a new Emitter
          *
          * @return a new Emitter object
@@ -339,6 +349,10 @@ public class Emitter {
                     .build();
         } else {
             this.networkConnection = builder.networkConnection;
+        }
+
+        if (builder.threadPoolSize > 2) {
+            Executor.setThreadCount(builder.threadPoolSize);
         }
 
         Logger.v(TAG, "Emitter created successfully!");

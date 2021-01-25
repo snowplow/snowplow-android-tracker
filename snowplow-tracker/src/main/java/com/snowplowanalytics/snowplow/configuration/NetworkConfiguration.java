@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.configuration;
 
+import android.net.Network;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,9 +9,14 @@ import com.snowplowanalytics.snowplow.tracker.NetworkConnection;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public class NetworkConfiguration {
+public class NetworkConfiguration implements Configuration {
 
     @Nullable
     private String endpoint;
@@ -78,5 +85,24 @@ public class NetworkConfiguration {
     public NetworkConfiguration timeout (@NonNull Integer timeout) {
         this.timeout = timeout;
         return this;
+    }
+
+    // Copyable
+
+    @NonNull
+    @Override
+    public Configuration copy() {
+        NetworkConfiguration copy;
+        if (networkConnection != null) {
+            copy = new NetworkConfiguration(networkConnection);
+        } else {
+            Objects.requireNonNull(endpoint);
+            Objects.requireNonNull(protocol);
+            Objects.requireNonNull(method);
+            copy = new NetworkConfiguration(endpoint, protocol, method);
+        }
+        copy.customPostPath = customPostPath;
+        copy.timeout = timeout;
+        return copy;
     }
 }

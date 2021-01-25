@@ -20,6 +20,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
 
@@ -44,6 +46,7 @@ public class Subject {
      */
     public static class SubjectBuilder {
         private Context context = null; // Optional
+        private SubjectConfiguration subjectConfiguration = null; // Optional
 
         /**
          * @param context The android context to pass to the subject
@@ -52,6 +55,16 @@ public class Subject {
         @NonNull
         public SubjectBuilder context(@NonNull Context context) {
             this.context = context;
+            return this;
+        }
+
+        /**
+         * @param subjectConfiguration The subjectConfiguration to configure the subject
+         * @return itself
+         */
+        @NonNull
+        public SubjectBuilder subjectConfiguration(@Nullable SubjectConfiguration subjectConfiguration) {
+            this.subjectConfiguration = subjectConfiguration;
             return this;
         }
 
@@ -76,6 +89,23 @@ public class Subject {
         setDefaultLanguage();
         if (builder.context != null) {
             setDefaultScreenResolution(builder.context);
+        }
+        SubjectConfiguration config = builder.subjectConfiguration;
+        if (config != null) {
+            if (config.userId != null) setUserId(config.userId);
+            if (config.networkUserId != null) setNetworkUserId(config.networkUserId);
+            if (config.domainUserId != null) setDomainUserId(config.domainUserId);
+            if (config.useragent != null) setUseragent(config.useragent);
+            if (config.ipAddress != null) setIpAddress(config.ipAddress);
+            if (config.timezone != null) setTimezone(config.timezone);
+            if (config.language != null) setLanguage(config.language);
+            if (config.screenResolution != null) {
+                setScreenResolution(config.screenResolution.getWidth(), config.screenResolution.getHeight());
+            }
+            if (config.screenViewPort != null) {
+                setViewPort(config.screenViewPort.getWidth(), config.screenViewPort.getHeight());
+            }
+            if (config.colorDepth != null) setColorDepth(config.colorDepth);
         }
         Logger.v(TAG, "Subject created successfully.");
     }
@@ -113,12 +143,8 @@ public class Subject {
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            display.getSize(size);
-            this.setScreenResolution(size.x, size.y);
-        } else {
-            this.setScreenResolution(display.getWidth(), display.getHeight());
-        }
+        display.getSize(size);
+        this.setScreenResolution(size.x, size.y);
     }
 
     // Public Subject information setters
