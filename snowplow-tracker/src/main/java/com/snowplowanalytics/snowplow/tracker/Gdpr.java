@@ -26,7 +26,7 @@ public class Gdpr {
     final String documentVersion;
     final String documentDescription;
 
-    Gdpr(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
+    public Gdpr(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         Preconditions.checkArgument(basisForProcessing != null, "GDPR basisForProcessiong can't be null.");
         this.basisForProcessing = basisForProcessing;
         this.documentId = documentId;
@@ -35,7 +35,7 @@ public class Gdpr {
     }
 
     @NonNull
-    SelfDescribingJson getContext() {
+    public SelfDescribingJson getContext() {
         Map<String, Object> map = new HashMap<>();
         map.put("basisForProcessing", basisForProcessing.toString().toLowerCase());
         map.put("documentId", documentId);

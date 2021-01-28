@@ -6,8 +6,9 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 
@@ -30,11 +31,10 @@ public class ConfigurationTest {
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
         trackerConfiguration.platformContext = true;
-        Tracker tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration);
+        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration);
 
         assertNotNull(tracker);
-        assertNotNull(tracker.getEmitter());
-        URI uri = URI.create(tracker.getEmitter().getEmitterUri());
+        URI uri = URI.create(tracker.getNetwork().getEndpoint());
         assertNotNull(uri);
         String host = uri.getHost();
         String scheme = uri.getScheme();

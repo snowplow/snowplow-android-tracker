@@ -192,6 +192,7 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(Single, emitter.getBufferOption());
         assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setHttpMethod(GET);
+        String ur = emitter.getEmitterUri();
         assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
         emitter.setRequestSecurity(Protocol.HTTPS);
         assertEquals("https://" + uri + "/i", emitter.getEmitterUri());

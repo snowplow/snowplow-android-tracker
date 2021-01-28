@@ -11,19 +11,16 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Build;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +31,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.tracker.BuildConfig;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
+import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.tracker.Executor;
+import com.snowplowanalytics.snowplow.tracker.Gdpr;
+import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
+import com.snowplowanalytics.snowplow.internal.session.Session;
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
@@ -45,7 +51,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.tracker.tracker.ActivityLifecycleHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
 import com.snowplowanalytics.snowplow.tracker.tracker.InstallTracker;
-import com.snowplowanalytics.snowplow.tracker.tracker.ProcessObserver;
+import com.snowplowanalytics.snowplow.internal.session.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
@@ -100,34 +106,35 @@ public class Tracker implements DiagnosticLogger {
 
     // --- Builder
 
-    private final Context context;
-    private Emitter emitter;
-    private Subject subject;
-    private Session trackerSession;
-    private String namespace;
-    private String appId;
-    private boolean base64Encoded;
-    private DevicePlatforms devicePlatform;
-    private LogLevel level;
-    private boolean sessionContext;
-    private Runnable[] sessionCallbacks;
-    private int threadCount;
-    private TimeUnit timeUnit;
-    private boolean geoLocationContext;
-    private boolean mobileContext;
-    private boolean applicationCrash;
-    private boolean trackerDiagnostic;
-    private boolean lifecycleEvents;
-    private boolean screenviewEvents;
-    private boolean screenContext;
-    private InstallTracker installTracker;
-    private boolean installTracking;
-    private boolean activityTracking;
-    private boolean applicationContext;
+    final Context context;
+    Emitter emitter;
+    Subject subject;
+    Session trackerSession;
+    String namespace;
+    String appId;
+    boolean base64Encoded;
+    DevicePlatforms devicePlatform;
+    LogLevel level;
+    boolean sessionContext;
+    Runnable[] sessionCallbacks;
+    int threadCount;
+    TimeUnit timeUnit;
+    boolean geoLocationContext;
+    boolean mobileContext;
+    boolean applicationCrash;
+    boolean trackerDiagnostic;
+    boolean lifecycleEvents;
+    boolean screenviewEvents;
+    boolean screenContext;
+    boolean installTracking;
+    boolean activityTracking;
+    boolean applicationContext;
+
     private Gdpr gdpr;
     private ScreenState screenState;
+    private InstallTracker installTracker;
 
-    private AtomicBoolean dataCollection = new AtomicBoolean(true);
+    AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
      * Builder for the Tracker
@@ -924,6 +931,7 @@ public class Tracker implements DiagnosticLogger {
     /**
      * @return the trackers logging level
      */
+    @NonNull
     public LogLevel getLogLevel() {
         return this.level;
     }
@@ -1005,7 +1013,7 @@ public class Tracker implements DiagnosticLogger {
      * @deprecated Use track(Event) method passing a ScreenView event.
      */
     @Deprecated
-    public void trackScreen(String name) {
+    public void trackScreen(@NonNull String name) {
         screenState.updateScreenState(null, name, null, null);
         SelfDescribingJson data = screenState.getScreenViewEventJson();
         track(SelfDescribing.builder()

@@ -72,6 +72,7 @@ public class Emitter {
     private String customPostPath;
     private OkHttpClient client;
 
+    private boolean isCustomNetworkConnection;
     private NetworkConnection networkConnection;
     private EventStore eventStore;
     private int emptyCount;
@@ -339,6 +340,7 @@ public class Emitter {
         }
 
         if (builder.networkConnection == null) {
+            isCustomNetworkConnection = false;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(builder.uri)
                     .security(builder.requestSecurity)
                     .method(builder.httpMethod)
@@ -348,6 +350,7 @@ public class Emitter {
                     .client(builder.client)
                     .build();
         } else {
+            isCustomNetworkConnection = true;
             this.networkConnection = builder.networkConnection;
         }
 
@@ -411,7 +414,7 @@ public class Emitter {
      *
      * @param timeout the amount of seconds to wait for the termination of the running threads.
      */
-    boolean shutdown(long timeout) {
+    public boolean shutdown(long timeout) {
         Logger.d(TAG, "Shutting down emitter.");
         isRunning.compareAndSet(true, false);
         ExecutorService es = Executor.shutdown();
@@ -669,7 +672,7 @@ public class Emitter {
      * @param method the HttpMethod
      */
     public void setHttpMethod(@NonNull HttpMethod method) {
-        if (!isRunning.get()) {
+        if (!isCustomNetworkConnection && !isRunning.get()) {
             this.httpMethod = method;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
@@ -688,7 +691,7 @@ public class Emitter {
      * @param security the Protocol
      */
     public void setRequestSecurity(@NonNull Protocol security) {
-        if (!isRunning.get()) {
+        if (!isCustomNetworkConnection && !isRunning.get()) {
             this.requestSecurity = security;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
@@ -707,8 +710,46 @@ public class Emitter {
      * @param uri new Emitter URI
      */
     public void setEmitterUri(@NonNull String uri) {
-        if (!isRunning.get()) {
+        if (!isCustomNetworkConnection && !isRunning.get()) {
             this.uri = uri;
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+                    .security(requestSecurity)
+                    .method(httpMethod)
+                    .tls(tlsVersions)
+                    .emitTimeout(emitTimeout)
+                    .customPostPath(customPostPath)
+                    .client(client)
+                    .build();
+        }
+    }
+
+    /**
+     * Updates the custom Post path for the Emitter
+     *
+     * @param customPostPath new Emitter custom Post path
+     */
+    public void setCustomPostPath(@Nullable String customPostPath) {
+        if (!isCustomNetworkConnection && !isRunning.get()) {
+            this.customPostPath = customPostPath;
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+                    .security(requestSecurity)
+                    .method(httpMethod)
+                    .tls(tlsVersions)
+                    .emitTimeout(emitTimeout)
+                    .customPostPath(customPostPath)
+                    .client(client)
+                    .build();
+        }
+    }
+
+    /**
+     * Updates the timeout for the Emitter
+     *
+     * @param emitTimeout new Emitter timeout
+     */
+    public void setEmitTimeout(int emitTimeout) {
+        if (!isCustomNetworkConnection && !isRunning.get()) {
+            this.emitTimeout = emitTimeout;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .security(requestSecurity)
                     .method(httpMethod)
@@ -807,7 +848,23 @@ public class Emitter {
     /**
      * @return the customPostPath
      */
+    @Nullable
     public String getCustomPostPath() {
         return this.customPostPath;
+    }
+
+    /**
+     * @return the emitTimeout
+     */
+    public int getEmitTimeout() {
+        return this.emitTimeout;
+    }
+
+    /**
+     * @return the NetworkConnection if it exists
+     */
+    @Nullable
+    public NetworkConnection getNetworkConnection() {
+        return this.networkConnection;
     }
 }

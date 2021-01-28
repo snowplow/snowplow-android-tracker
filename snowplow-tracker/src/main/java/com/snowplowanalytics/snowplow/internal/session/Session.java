@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.internal.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +19,8 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.tracker.Executor;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.utils.Logger;
@@ -59,13 +61,15 @@ public class Session {
      * alive even when it's expired.
      */
     @Deprecated
-    boolean isSessionUpdateEnabled = true;
+    public boolean isSessionUpdateEnabled = true;
 
     // Session Variables
     private String userId;
     private String currentSessionId = null;
     private String previousSessionId;
     private int sessionIndex = 0;
+    private int backgroundIndex = 0;
+    private int foregroundIndex = 0;
     private final String sessionStorage = "LOCAL_STORAGE";
     private String firstId = null;
     private final AtomicBoolean hasLoadedFromFile = new AtomicBoolean(false);
@@ -110,7 +114,7 @@ public class Session {
      * @param backgroundTimeoutCallback called on background timeout.
      */
     @NonNull
-    public synchronized static Session getInstance(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit,
+    public synchronized static Session getInstance(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit,
                                                    @NonNull Context context,
                                                    @Nullable Runnable foregroundTransitionCallback,
                                                    @Nullable Runnable backgroundTransitionCallback,
@@ -127,7 +131,7 @@ public class Session {
         return singleton;
     }
 
-    Session(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit, @NonNull Context context) {
+    public Session(long foregroundTimeout, long backgroundTimeout, TimeUnit timeUnit, @NonNull Context context) {
         this.context = context;
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
@@ -237,7 +241,7 @@ public class Session {
         });
     }
 
-    void startNewSession() {
+    public void startNewSession() {
         isNewSession = true;
     }
 
@@ -271,6 +275,10 @@ public class Session {
         this.isBackground.set(isBackground);
     }
 
+    public boolean isBackground() {
+        return isBackground.get();
+    }
+
     /**
      * Changes the truth of isSuspended
      *
@@ -282,6 +290,22 @@ public class Session {
     public void setIsSuspended(boolean isSuspended) {
         Logger.d(TAG, "Session is suspended: %s", isSuspended);
         isSessionCheckerEnabled = !isSuspended;
+    }
+
+    void setBackgroundIndex(int backgroundIndex) {
+        this.backgroundIndex = backgroundIndex;
+    }
+
+    int getBackgroundIndex() {
+        return backgroundIndex;
+    }
+
+    void setForegroundIndex(int foregroundIndex) {
+        this.foregroundIndex = foregroundIndex;
+    }
+
+    int getForegroundIndex() {
+        return foregroundIndex;
     }
 
     /**
@@ -392,10 +416,24 @@ public class Session {
     }
 
     /**
+     * Set foreground timeout
+     */
+    public void setForegroundTimeout(long foregroundTimeout) {
+        this.foregroundTimeout = foregroundTimeout;
+    }
+
+    /**
      * @return the foreground session timeout
      */
     public long getForegroundTimeout() {
         return this.foregroundTimeout;
+    }
+
+    /**
+     * Set background timeout
+     */
+    public void setBackgroundTimeout(long backgroundTimeout) {
+        this.backgroundTimeout = backgroundTimeout;
     }
 
     /**

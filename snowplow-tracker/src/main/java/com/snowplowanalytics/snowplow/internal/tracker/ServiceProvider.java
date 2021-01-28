@@ -13,12 +13,11 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.tracker.Emitter;
 import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
-import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,8 @@ public class ServiceProvider {
     private Emitter emitter;
     @Nullable
     private Subject subject;
+    @Nullable
+    private TrackerController trackerController;
 
     // Constructors
 
@@ -88,31 +89,31 @@ public class ServiceProvider {
     // Setup
 
     @NonNull
-    public static Tracker setup(@NonNull Context context, @NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
+    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
         NetworkConfiguration networkConfiguration = new NetworkConfiguration(endpoint, protocol, method);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration(namespace, appId);
         return setup(context, networkConfiguration, trackerConfiguration);
     }
 
     @NonNull
-    public static Tracker setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration) {
+    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration) {
         return setup(context, networkConfiguration, trackerConfiguration, new ArrayList<>());
     }
 
     @NonNull
-    public static Tracker setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
+    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
         ServiceProvider serviceProvider = new ServiceProvider(context, networkConfiguration, trackerConfiguration, configurations);
-        return serviceProvider.getTracker();
+        return serviceProvider.getTrackerController();
     }
 
     // Getters
 
     @NonNull
-    private Tracker getTracker() {
-        if (tracker == null) {
-            tracker = makeTracker();
+    private Subject getSubject() {
+        if (subject == null) {
+            subject = makeSubject();
         }
-        return tracker;
+        return subject;
     }
 
     @NonNull
@@ -124,11 +125,19 @@ public class ServiceProvider {
     }
 
     @NonNull
-    private Subject getSubject() {
-        if (subject == null) {
-            subject = makeSubject();
+    private Tracker getTracker() {
+        if (tracker == null) {
+            tracker = makeTracker();
         }
-        return subject;
+        return tracker;
+    }
+
+    @NonNull
+    public TrackerController getTrackerController() {
+        if (trackerController == null) {
+            trackerController = makeTrackerController();
+        }
+        return trackerController;
     }
 
     // Factories
@@ -172,6 +181,7 @@ public class ServiceProvider {
                 .platform(trackerConfiguration.devicePlatform)
                 .sessionContext(trackerConfiguration.sessionContext)
                 .applicationContext(trackerConfiguration.applicationContext)
+                .mobileContext(trackerConfiguration.platformContext)
                 .screenContext(trackerConfiguration.screenContext)
                 .screenviewEvents(trackerConfiguration.screenViewAutotracking)
                 .lifecycleEvents(trackerConfiguration.lifecycleAutotracking)
@@ -195,4 +205,8 @@ public class ServiceProvider {
         return builder.build();
     }
 
+    @NonNull
+    private TrackerControllerImpl makeTrackerController() {
+        return new TrackerControllerImpl(getTracker());
+    }
 }

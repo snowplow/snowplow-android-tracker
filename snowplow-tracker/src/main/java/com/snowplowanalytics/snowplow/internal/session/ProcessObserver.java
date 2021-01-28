@@ -11,16 +11,18 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.tracker;
+package com.snowplowanalytics.snowplow.internal.session;
 
 import android.annotation.TargetApi;
+
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
 
-import com.snowplowanalytics.snowplow.tracker.Tracker;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
@@ -37,21 +39,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();
     private static boolean isInBackground = true;
-    private static AtomicInteger foregroundIndex = new AtomicInteger(0);
-    private static AtomicInteger backgroundIndex = new AtomicInteger(0);
+    private static final AtomicInteger foregroundIndex = new AtomicInteger(0);
+    private static final AtomicInteger backgroundIndex = new AtomicInteger(0);
     private static boolean isHandlerPaused = false;
     private static List<SelfDescribingJson> lifecycleContexts = null;
 
-    public ProcessObserver(List<SelfDescribingJson> contexts) {
+    public ProcessObserver(@Nullable List<SelfDescribingJson> contexts) {
         lifecycleContexts = contexts;
     }
 
     public ProcessObserver() {}
 
-    public static void setLifecycleContexts(List<SelfDescribingJson> contexts) {
+    public static void setLifecycleContexts(@Nullable List<SelfDescribingJson> contexts) {
         lifecycleContexts = contexts;
     }
 
+    @Nullable
     public static List<SelfDescribingJson> getLifecycleContexts() {
         return lifecycleContexts;
     }
@@ -75,8 +78,10 @@ public class ProcessObserver implements LifecycleObserver {
                 int index = foregroundIndex.addAndGet(1);
 
                 // Update Session
-                if (tracker.getSession() != null) {
-                    tracker.getSession().setIsBackground(false);
+                Session session = tracker.getSession();
+                if (session != null) {
+                    session.setIsBackground(false);
+                    session.setForegroundIndex(index);
                 }
 
                 // Send Foreground Event
@@ -114,8 +119,10 @@ public class ProcessObserver implements LifecycleObserver {
                 int index = backgroundIndex.addAndGet(1);
 
                 // Update Session
-                if (tracker.getSession() != null) {
-                    tracker.getSession().setIsBackground(true);
+                Session session = tracker.getSession();
+                if (session != null) {
+                    session.setIsBackground(true);
+                    session.setBackgroundIndex(index);
                 }
 
                 // Send Background Event

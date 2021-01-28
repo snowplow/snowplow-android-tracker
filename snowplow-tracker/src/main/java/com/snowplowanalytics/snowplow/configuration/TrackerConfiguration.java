@@ -3,20 +3,14 @@ package com.snowplowanalytics.snowplow.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
 import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
-public class TrackerConfiguration implements Configuration {
+public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
 
     @NonNull
     public String namespace;
@@ -42,6 +36,173 @@ public class TrackerConfiguration implements Configuration {
     public boolean installAutotracking;
     public boolean exceptionAutotracking;
     public boolean diagnosticAutotracking;
+
+    // Getters and Setters
+
+    @Override
+    @NonNull
+    public String getNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public void setNamespace(@NonNull String namespace) {
+        this.namespace = namespace;
+    }
+
+    @Override
+    @NonNull
+    public String getAppId() {
+        return appId;
+    }
+
+    @Override
+    public void setAppId(@NonNull String appId) {
+        this.appId = appId;
+    }
+
+    @Override
+    @NonNull
+    public DevicePlatforms getDevicePlatform() {
+        return devicePlatform;
+    }
+
+    @Override
+    public void setDevicePlatform(@NonNull DevicePlatforms devicePlatform) {
+        this.devicePlatform = devicePlatform;
+    }
+
+    @Override
+    public boolean isBase64encoding() {
+        return base64encoding;
+    }
+
+    @Override
+    public void setBase64encoding(boolean base64encoding) {
+        this.base64encoding = base64encoding;
+    }
+
+    @Override
+    @NonNull
+    public LogLevel getLogLevel() {
+        return logLevel;
+    }
+
+    @Override
+    public void setLogLevel(@NonNull LogLevel logLevel) {
+        this.logLevel = logLevel;
+    }
+
+    @Override
+    @Nullable
+    public LoggerDelegate getLoggerDelegate() {
+        return loggerDelegate;
+    }
+
+    @Override
+    public void setLoggerDelegate(@Nullable LoggerDelegate loggerDelegate) {
+        this.loggerDelegate = loggerDelegate;
+    }
+
+    @Override
+    public boolean isApplicationContext() {
+        return applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(boolean applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public boolean isPlatformContext() {
+        return platformContext;
+    }
+
+    @Override
+    public void setPlatformContext(boolean platformContext) {
+        this.platformContext = platformContext;
+    }
+
+    @Override
+    public boolean isGeoLocationContext() {
+        return geoLocationContext;
+    }
+
+    @Override
+    public void setGeoLocationContext(boolean geoLocationContext) {
+        this.geoLocationContext = geoLocationContext;
+    }
+
+    @Override
+    public boolean isSessionContext() {
+        return sessionContext;
+    }
+
+    @Override
+    public void setSessionContext(boolean sessionContext) {
+        this.sessionContext = sessionContext;
+    }
+
+    @Override
+    public boolean isScreenContext() {
+        return screenContext;
+    }
+
+    @Override
+    public void setScreenContext(boolean screenContext) {
+        this.screenContext = screenContext;
+    }
+
+    @Override
+    public boolean isScreenViewAutotracking() {
+        return screenViewAutotracking;
+    }
+
+    @Override
+    public void setScreenViewAutotracking(boolean screenViewAutotracking) {
+        this.screenViewAutotracking = screenViewAutotracking;
+    }
+
+    @Override
+    public boolean isLifecycleAutotracking() {
+        return lifecycleAutotracking;
+    }
+
+    @Override
+    public void setLifecycleAutotracking(boolean lifecycleAutotracking) {
+        this.lifecycleAutotracking = lifecycleAutotracking;
+    }
+
+    @Override
+    public boolean isInstallAutotracking() {
+        return installAutotracking;
+    }
+
+    @Override
+    public void setInstallAutotracking(boolean installAutotracking) {
+        this.installAutotracking = installAutotracking;
+    }
+
+    @Override
+    public boolean isExceptionAutotracking() {
+        return exceptionAutotracking;
+    }
+
+    @Override
+    public void setExceptionAutotracking(boolean exceptionAutotracking) {
+        this.exceptionAutotracking = exceptionAutotracking;
+    }
+
+    @Override
+    public boolean isDiagnosticAutotracking() {
+        return diagnosticAutotracking;
+    }
+
+    @Override
+    public void setDiagnosticAutotracking(boolean diagnosticAutotracking) {
+        this.diagnosticAutotracking = diagnosticAutotracking;
+    }
 
     // Constructors
 
