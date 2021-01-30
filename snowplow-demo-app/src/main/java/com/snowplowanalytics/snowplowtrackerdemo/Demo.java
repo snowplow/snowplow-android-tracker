@@ -42,17 +42,17 @@ import android.net.Uri;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
+import com.snowplowanalytics.snowplow.internal.tracker.Subject;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
+import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 
 /**
  * Classic Demo Activity.

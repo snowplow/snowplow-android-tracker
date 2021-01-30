@@ -16,17 +16,17 @@ package com.snowplowanalytics.snowplowtrackerdemo.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentDocument;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentGranted;
-import com.snowplowanalytics.snowplow.tracker.events.ConsentWithdrawn;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransaction;
-import com.snowplowanalytics.snowplow.tracker.events.EcommerceTransactionItem;
-import com.snowplowanalytics.snowplow.tracker.events.PageView;
-import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
-import com.snowplowanalytics.snowplow.tracker.events.Structured;
-import com.snowplowanalytics.snowplow.tracker.events.Timing;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.event.ConsentDocument;
+import com.snowplowanalytics.snowplow.event.ConsentGranted;
+import com.snowplowanalytics.snowplow.event.ConsentWithdrawn;
+import com.snowplowanalytics.snowplow.event.EcommerceTransaction;
+import com.snowplowanalytics.snowplow.event.EcommerceTransactionItem;
+import com.snowplowanalytics.snowplow.event.PageView;
+import com.snowplowanalytics.snowplow.event.ScreenView;
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.event.Timing;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import java.util.HashMap;
 import java.util.LinkedList;

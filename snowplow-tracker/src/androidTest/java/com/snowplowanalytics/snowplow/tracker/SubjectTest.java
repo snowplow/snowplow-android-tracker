@@ -15,9 +15,9 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.tracker.Subject;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.Map;
 

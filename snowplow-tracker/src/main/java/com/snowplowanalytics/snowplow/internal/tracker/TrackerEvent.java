@@ -15,12 +15,12 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.tracker.events.AbstractPrimitive;
-import com.snowplowanalytics.snowplow.tracker.events.AbstractSelfDescribing;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
-import com.snowplowanalytics.snowplow.tracker.events.TrackerError;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.event.AbstractPrimitive;
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
+import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.event.TrackerError;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

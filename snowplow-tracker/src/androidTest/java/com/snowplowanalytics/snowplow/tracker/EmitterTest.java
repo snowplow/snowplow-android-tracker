@@ -17,19 +17,20 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
-import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.network.NetworkConnection;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterEvent;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+import com.snowplowanalytics.snowplow.network.Request;
+import com.snowplowanalytics.snowplow.payload.Payload;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.network.RequestResult;
+import com.snowplowanalytics.snowplow.emitter.EventStore;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -38,13 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.DefaultGroup;
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.HeavyGroup;
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.Single;
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTP;
-import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTPS;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.DefaultGroup;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.HeavyGroup;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.Single;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
+import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
+import static com.snowplowanalytics.snowplow.network.Protocol.HTTPS;
 
 public class EmitterTest extends AndroidTestCase {
 

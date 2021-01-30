@@ -3,17 +3,18 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.internal.network.NetworkControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.NetworkConnection;
-import com.snowplowanalytics.snowplow.tracker.OkHttpNetworkConnection;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.network.NetworkConnection;
+import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
+import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 public class TrackerControllerImpl implements TrackerController {
 
@@ -21,6 +22,8 @@ public class TrackerControllerImpl implements TrackerController {
     private NetworkControllerImpl network;
     @NonNull
     private SessionControllerImpl session;
+    @NonNull
+    private EmitterControllerImpl emitter;
 
     @NonNull
     private final Tracker tracker;
@@ -28,13 +31,13 @@ public class TrackerControllerImpl implements TrackerController {
     // Constructors
 
     public TrackerControllerImpl(@NonNull Tracker tracker) {
-        Emitter emitter = tracker.emitter;
         this.tracker = tracker;
         session = new SessionControllerImpl(tracker);
+        emitter = new EmitterControllerImpl(tracker.emitter);
         // TODO: Add other controllers
-        NetworkConnection networkConnection = emitter.getNetworkConnection();
+        NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
         if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
-            network = new NetworkControllerImpl(emitter);
+            network = new NetworkControllerImpl(tracker.emitter);
         }
     }
 
@@ -50,6 +53,12 @@ public class TrackerControllerImpl implements TrackerController {
     @Nullable
     public SessionControllerImpl getSession() {
         return session.isEnabled() ? session : null;
+    }
+
+    @Override
+    @NonNull
+    public EmitterControllerImpl getEmitter() {
+        return emitter;
     }
 
     // Control methods

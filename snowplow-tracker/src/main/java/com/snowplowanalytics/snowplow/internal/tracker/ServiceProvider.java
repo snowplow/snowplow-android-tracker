@@ -14,10 +14,9 @@ import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,10 +19,10 @@ import android.os.Build;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.internal.session.Session;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.session.FileStore;
 
 import java.util.Map;
 import java.util.UUID;

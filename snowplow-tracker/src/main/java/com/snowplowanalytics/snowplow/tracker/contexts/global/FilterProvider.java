@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
-import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
+import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -3,14 +3,14 @@ package com.snowplowanalytics.snowplow.tracker.contexts.global;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.Subject;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants.SCHEMA_APPLICATION_INSTALL;
+import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.SCHEMA_APPLICATION_INSTALL;
 
 public class GlobalContextTest extends AndroidTestCase {
 

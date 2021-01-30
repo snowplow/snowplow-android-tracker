@@ -8,9 +8,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

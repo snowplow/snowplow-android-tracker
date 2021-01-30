@@ -13,8 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 /**
  * ContextGenerator represents a callback which generates an SDJ

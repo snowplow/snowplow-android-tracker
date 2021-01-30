@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
-import com.snowplowanalytics.snowplow.tracker.events.Event;
+import com.snowplowanalytics.snowplow.event.Event;
 
 public interface TrackerController extends TrackerConfigurationInterface {
 
@@ -16,6 +16,8 @@ public interface TrackerController extends TrackerConfigurationInterface {
     NetworkController getNetwork();
     @Nullable
     SessionController getSession();
+    @NonNull
+    EmitterController getEmitter();
 
     void track(@NonNull Event event);
     void pause();

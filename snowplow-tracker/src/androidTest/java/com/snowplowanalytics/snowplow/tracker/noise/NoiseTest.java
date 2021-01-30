@@ -16,17 +16,17 @@ package com.snowplowanalytics.snowplow.tracker.noise;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Executor;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
-import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
-import com.snowplowanalytics.snowplow.tracker.utils.Preconditions;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.internal.emitter.Executor;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.internal.session.FileStore;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.lang.reflect.Constructor;
 

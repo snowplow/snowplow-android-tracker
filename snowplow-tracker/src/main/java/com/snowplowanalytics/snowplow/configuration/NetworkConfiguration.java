@@ -1,19 +1,12 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.net.Network;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.NetworkConnection;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.Protocol;
+import com.snowplowanalytics.snowplow.network.NetworkConnection;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class NetworkConfiguration implements Configuration {

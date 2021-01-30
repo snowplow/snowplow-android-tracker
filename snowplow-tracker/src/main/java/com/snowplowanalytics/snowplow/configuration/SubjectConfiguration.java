@@ -3,12 +3,7 @@ package com.snowplowanalytics.snowplow.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
 import com.snowplowanalytics.snowplow.util.Size;
-
-import java.util.Objects;
 
 public class SubjectConfiguration implements Configuration {
 

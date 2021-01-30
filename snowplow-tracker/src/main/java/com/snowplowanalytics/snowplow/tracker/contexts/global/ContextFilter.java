@@ -13,7 +13,7 @@
 
 package com.snowplowanalytics.snowplow.tracker.contexts.global;
 
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 /**
  * ContextFilter represents a callback checking an event payload on a user-provided

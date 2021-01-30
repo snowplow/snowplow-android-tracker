@@ -16,11 +16,12 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
-import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
+import com.snowplowanalytics.snowplow.network.RequestResult;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+import com.snowplowanalytics.snowplow.network.Request;
+import com.snowplowanalytics.snowplow.payload.Payload;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,9 +40,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.Protocol.HTTP;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
+import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
 
 public class NetworkConnectionTest extends AndroidTestCase {
 

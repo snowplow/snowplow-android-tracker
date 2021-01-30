@@ -3,18 +3,18 @@ package com.snowplowanalytics.snowplow.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.emitter.EventStore;
 
-public class EmitterConfiguration implements Configuration {
+public class EmitterConfiguration implements Configuration, com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface {
 
     @NonNull
     public BufferOption bufferOption;
     public int emitRange;
     public int threadPoolSize;
-    public int byteLimitGet;
-    public int byteLimitPost;
+    public long byteLimitGet;
+    public long byteLimitPost;
 
     @Nullable
     public RequestCallback requestCallback;
@@ -31,6 +31,70 @@ public class EmitterConfiguration implements Configuration {
         byteLimitGet = 40000;
         byteLimitPost = 40000;
     }
+
+    // Getters and Setters
+
+    @Override
+    @NonNull
+    public BufferOption getBufferOption() {
+        return bufferOption;
+    }
+
+    @Override
+    public void setBufferOption(@NonNull BufferOption bufferOption) {
+        this.bufferOption = bufferOption;
+    }
+
+    @Override
+    public int getEmitRange() {
+        return emitRange;
+    }
+
+    @Override
+    public void setEmitRange(int emitRange) {
+        this.emitRange = emitRange;
+    }
+
+    @Override
+    public int getThreadPoolSize() {
+        return threadPoolSize;
+    }
+
+    public void setThreadPoolSize(int threadPoolSize) {
+        this.threadPoolSize = threadPoolSize;
+    }
+
+    @Override
+    public long getByteLimitGet() {
+        return byteLimitGet;
+    }
+
+    @Override
+    public void setByteLimitGet(long byteLimitGet) {
+        this.byteLimitGet = byteLimitGet;
+    }
+
+    @Override
+    public long getByteLimitPost() {
+        return byteLimitPost;
+    }
+
+    @Override
+    public void setByteLimitPost(long byteLimitPost) {
+        this.byteLimitPost = byteLimitPost;
+    }
+
+    @Override
+    @Nullable
+    public RequestCallback getRequestCallback() {
+        return requestCallback;
+    }
+
+    @Override
+    public void setRequestCallback(@Nullable RequestCallback requestCallback) {
+        this.requestCallback = requestCallback;
+    }
+
 
     // Builders
 

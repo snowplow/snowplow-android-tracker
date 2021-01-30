@@ -17,19 +17,14 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.tracker.TrackerEvent;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.Executor;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.events.Timing;
-import com.snowplowanalytics.snowplow.tracker.tracker.ExceptionHandler;
-import com.snowplowanalytics.snowplow.tracker.tracker.ScreenState;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.emitter.Executor;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.event.ScreenView;
+import com.snowplowanalytics.snowplow.event.Timing;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

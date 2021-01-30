@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import java.util.Objects;
 

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.concurrent.TimeUnit;
