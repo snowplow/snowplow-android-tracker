@@ -40,7 +40,7 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;

@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
+import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -21,9 +23,11 @@ public class TrackerControllerImpl implements TrackerController {
     @Nullable
     private NetworkControllerImpl network;
     @NonNull
-    private SessionControllerImpl session;
+    private final SessionControllerImpl session;
     @NonNull
-    private EmitterControllerImpl emitter;
+    private final EmitterControllerImpl emitter;
+    @NonNull
+    private final GdprControllerImpl gdpr;
 
     @NonNull
     private final Tracker tracker;
@@ -34,6 +38,7 @@ public class TrackerControllerImpl implements TrackerController {
         this.tracker = tracker;
         session = new SessionControllerImpl(tracker);
         emitter = new EmitterControllerImpl(tracker.emitter);
+        gdpr = new GdprControllerImpl(tracker);
         // TODO: Add other controllers
         NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
         if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
@@ -59,6 +64,12 @@ public class TrackerControllerImpl implements TrackerController {
     @NonNull
     public EmitterControllerImpl getEmitter() {
         return emitter;
+    }
+
+    @Override
+    @NonNull
+    public GdprController getGdpr() {
+        return gdpr;
     }
 
     // Control methods

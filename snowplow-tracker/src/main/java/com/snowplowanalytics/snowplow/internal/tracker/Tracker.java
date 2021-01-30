@@ -36,7 +36,7 @@ import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
-import com.snowplowanalytics.snowplow.tracker.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -53,7 +53,7 @@ import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.Gdpr.Basis;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr.Basis;
 
 
 /**
@@ -818,6 +818,11 @@ public class Tracker implements DiagnosticLogger {
      */
     public synchronized void disableGdprContext() {
         this.gdpr = null;
+    }
+
+    @Nullable
+    public Gdpr getGdprContext() {
+        return gdpr;
     }
 
     // --- Setters

@@ -1,10 +1,12 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
 
-public class GdprConfiguration implements Configuration {
+public class GdprConfiguration implements Configuration, GdprConfigurationInterface {
 
     @NonNull
     public final Gdpr.Basis basisForProcessing;
@@ -26,6 +28,32 @@ public class GdprConfiguration implements Configuration {
         this.documentId = documentId;
         this.documentVersion = documentVersion;
         this.documentDescription = documentDescription;
+    }
+
+    // Getters
+
+    @Override
+    @NonNull
+    public Gdpr.Basis getBasisForProcessing() {
+        return basisForProcessing;
+    }
+
+    @Override
+    @NonNull
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    @Override
+    @NonNull
+    public String getDocumentVersion() {
+        return documentVersion;
+    }
+
+    @Override
+    @NonNull
+    public String getDocumentDescription() {
+        return documentDescription;
     }
 
     // Copyable

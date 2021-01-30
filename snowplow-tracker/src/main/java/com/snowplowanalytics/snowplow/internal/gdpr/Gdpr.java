@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.tracker;
+package com.snowplowanalytics.snowplow.internal.gdpr;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

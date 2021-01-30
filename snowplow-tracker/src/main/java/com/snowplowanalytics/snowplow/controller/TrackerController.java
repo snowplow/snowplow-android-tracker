@@ -18,6 +18,8 @@ public interface TrackerController extends TrackerConfigurationInterface {
     SessionController getSession();
     @NonNull
     EmitterController getEmitter();
+    @NonNull
+    GdprController getGdpr();
 
     void track(@NonNull Event event);
     void pause();
