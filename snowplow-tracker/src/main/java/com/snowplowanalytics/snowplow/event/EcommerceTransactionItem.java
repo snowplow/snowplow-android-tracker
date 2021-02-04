@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -24,13 +25,20 @@ import java.util.Map;
 
 public class EcommerceTransactionItem extends AbstractPrimitive {
 
-    private final String itemId;
-    private final String sku;
-    private final Double price;
-    private final Integer quantity;
-    private final String name;
-    private final String category;
-    private final String currency;
+    @Nullable
+    private String orderId;
+    @NonNull
+    public final String sku;
+    @NonNull
+    public final Double price;
+    @NonNull
+    public final Integer quantity;
+    @Nullable
+    public String name;
+    @Nullable
+    public String category;
+    @Nullable
+    public String currency;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -119,12 +127,14 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -133,14 +143,12 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
         super(builder);
 
         // Precondition checks
-        Preconditions.checkNotNull(builder.itemId);
         Preconditions.checkNotNull(builder.sku);
         Preconditions.checkNotNull(builder.price);
         Preconditions.checkNotNull(builder.quantity);
-        Preconditions.checkArgument(!builder.itemId.isEmpty(), "itemId cannot be empty");
         Preconditions.checkArgument(!builder.sku.isEmpty(), "sku cannot be empty");
 
-        this.itemId = builder.itemId;
+        this.orderId = builder.itemId;
         this.sku = builder.sku;
         this.price = builder.price;
         this.quantity = builder.quantity;
@@ -149,29 +157,52 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
         this.currency = builder.currency;
     }
 
-    /**
-     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
-     *
-     * @param deviceCreatedTimestamp the new timestamp
-     */
-    @Deprecated
-    public void setDeviceCreatedTimestamp(long deviceCreatedTimestamp) {
-        this.deviceCreatedTimestamp = deviceCreatedTimestamp;
+    public EcommerceTransactionItem(@NonNull String sku, double price, int quantity) {
+        Preconditions.checkNotNull(sku);
+        Preconditions.checkArgument(!sku.isEmpty(), "sku cannot be empty");
+        this.sku = sku;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    // Builder methods
+
+    @NonNull
+    public EcommerceTransactionItem name(@Nullable String name) {
+        this.name = name;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransactionItem category(@Nullable String category) {
+        this.category = category;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransactionItem currency(@Nullable String currency) {
+        this.currency = currency;
+        return this;
+    }
+
+    // Public methods
+
+    public void setOrderId(@NonNull String orderId) {
+        Preconditions.checkNotNull(orderId);
+        Preconditions.checkArgument(!orderId.isEmpty(), "orderId cannot be empty");
+        this.orderId = orderId;
     }
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String, Object> payload = new HashMap<>();
-        if (deviceCreatedTimestamp != null) {
-            payload.put(Parameters.DEVICE_TIMESTAMP, Long.toString(deviceCreatedTimestamp)); // TODO: to remove on v.2.0
-        }
-        payload.put(Parameters.TI_ITEM_ID, this.itemId);
-        payload.put(Parameters.TI_ITEM_SKU, this.sku);
-        payload.put(Parameters.TI_ITEM_NAME, this.name);
-        payload.put(Parameters.TI_ITEM_CATEGORY, this.category);
-        payload.put(Parameters.TI_ITEM_PRICE, Double.toString(this.price));
-        payload.put(Parameters.TI_ITEM_QUANTITY, Integer.toString(this.quantity));
-        payload.put(Parameters.TI_ITEM_CURRENCY, this.currency);
+        if (orderId != null) payload.put(Parameters.TI_ITEM_ID, orderId);
+        payload.put(Parameters.TI_ITEM_SKU, sku);
+        payload.put(Parameters.TI_ITEM_PRICE, Double.toString(price));
+        payload.put(Parameters.TI_ITEM_QUANTITY, Integer.toString(quantity));
+        if (name != null) payload.put(Parameters.TI_ITEM_NAME, name);
+        if (category != null) payload.put(Parameters.TI_ITEM_CATEGORY, category);
+        if (currency != null) payload.put(Parameters.TI_ITEM_CURRENCY, currency);
         return payload;
     }
 

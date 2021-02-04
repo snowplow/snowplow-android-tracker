@@ -22,6 +22,7 @@ import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
 
+import com.snowplowanalytics.snowplow.event.Unstructured;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -88,19 +89,9 @@ public class ProcessObserver implements LifecycleObserver {
                 if (tracker.getLifecycleEvents()) {
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
-
-                    if (lifecycleContexts != null) {
-                        tracker.track(SelfDescribing.builder()
-                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                                .customContext(lifecycleContexts)
-                                .build()
-                        );
-                    } else {
-                        tracker.track(SelfDescribing.builder()
-                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                                .build()
-                        );
-                    }
+                    tracker.track(new Unstructured(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
+                            .contexts(lifecycleContexts)
+                    );
                 }
             } catch (Exception e) {
                 Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
@@ -129,19 +120,9 @@ public class ProcessObserver implements LifecycleObserver {
                 if (tracker.getLifecycleEvents()) {
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
-
-                    if (lifecycleContexts != null) {
-                        tracker.track(SelfDescribing.builder()
-                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                                .customContext(lifecycleContexts)
-                                .build()
-                        );
-                    } else {
-                        tracker.track(SelfDescribing.builder()
-                                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                                .build()
-                        );
-                    }
+                    tracker.track(new Unstructured(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                            .contexts(lifecycleContexts)
+                    );
                 }
             } catch (Exception e) {
                 Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);

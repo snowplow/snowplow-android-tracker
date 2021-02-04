@@ -17,6 +17,8 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
@@ -27,6 +29,7 @@ import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -172,6 +175,58 @@ public class TrackerTest extends AndroidTestCase {
         assertFalse(id1.equals(id2));
     }
 
+    public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
+        MockWebServer mockWebServer = getMockServer(1);
+
+        Emitter emitter = null;
+        try {
+            emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+                    .option(BufferOption.Single)
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Exception on Emitter creation");
+        }
+
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(false)
+                .mobileContext(false)
+                .screenContext(false)
+                .geoLocationContext(false)
+                .build();
+
+        Log.i("testTrackSelfDescribingEvent", "Send SelfDescribing event");
+
+        SelfDescribingJson sdj = new SelfDescribingJson("iglu:foo/bar/jsonschema/1-0-0");
+
+        SelfDescribing sdEvent = SelfDescribing.builder()
+                .eventData(sdj)
+                .build();
+
+        tracker.track(sdEvent);
+        RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
+        assertNotNull(req);
+        int reqCount = mockWebServer.getRequestCount();
+        assertEquals(1, reqCount);
+
+        JSONObject payload = new JSONObject(req.getBody().readUtf8());
+        assertEquals(2, payload.length());
+        assertEquals(
+                "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
+                payload.getString("schema")
+        );
+        JSONArray data = payload.getJSONArray("data");
+        assertEquals(1, data.length());
+        JSONObject event = data.getJSONObject(0);
+
+        assertEquals("ue", event.getString(Parameters.EVENT));
+        assertFalse(event.has(Parameters.UNSTRUCTURED_ENCODED));
+
+        mockWebServer.shutdown();
+    }
+
     public void testTrackWithNoContext() throws Exception {
         Executor.setThreadCount(30);
         Executor.shutdown();
@@ -307,7 +362,7 @@ public class TrackerTest extends AndroidTestCase {
 
         // Send screenView
         ScreenView screenView = ScreenView.builder().name("screen1").build();
-        String screenId = (String)screenView.getData().getMap().get("id");
+        String screenId = (String)screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
         screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
@@ -317,10 +372,10 @@ public class TrackerTest extends AndroidTestCase {
 
         // Send another screenView
         screenView = ScreenView.builder().name("screen2").build();
-        String screenId1 = (String)screenView.getData().getMap().get("id");
+        String screenId1 = (String)screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
-        Map<String, Object> payload = (Map<String, Object>)screenView.getPayload().getMap().get("data");
+        Map<String, Object> payload = (Map<String, Object>)screenView.getDataPayload();
         assertEquals("screen2", payload.get(Parameters.SCREEN_NAME));
         assertEquals(screenId1, payload.get(Parameters.SCREEN_ID));
         assertEquals("screen1", payload.get(Parameters.SV_PREVIOUS_NAME));

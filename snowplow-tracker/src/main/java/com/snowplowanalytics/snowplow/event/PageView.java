@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -27,9 +28,12 @@ import java.util.Map;
  */
 public class PageView extends AbstractPrimitive {
 
+    @NonNull
     private final String pageUrl;
-    private final String pageTitle;
-    private final String referrer;
+    @Nullable
+    private String pageTitle;
+    @Nullable
+    private String referrer;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -67,18 +71,21 @@ public class PageView extends AbstractPrimitive {
             return self();
         }
 
+        @NonNull
         public PageView build() {
             return new PageView(this);
         }
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -95,12 +102,34 @@ public class PageView extends AbstractPrimitive {
         this.referrer = builder.referrer;
     }
 
+    public PageView(@NonNull String pageUrl) {
+        Preconditions.checkNotNull(pageUrl);
+        Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
+        this.pageUrl = pageUrl;
+    }
+
+    // Builder methods
+
+    @NonNull
+    public PageView pageTitle(@Nullable String pageTitle) {
+        this.pageTitle = pageTitle;
+        return this;
+    }
+
+    @NonNull
+    public PageView referrer(@Nullable String referrer) {
+        this.referrer = referrer;
+        return this;
+    }
+
+    // Public methods
+
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String, Object> payload = new HashMap<>();
-        payload.put(Parameters.PAGE_URL, this.pageUrl);
-        payload.put(Parameters.PAGE_TITLE, this.pageTitle);
-        payload.put(Parameters.PAGE_REFR, this.referrer);
+        if (pageUrl != null) payload.put(Parameters.PAGE_URL, pageUrl);
+        if (pageTitle != null) payload.put(Parameters.PAGE_TITLE, pageTitle);
+        if (referrer != null) payload.put(Parameters.PAGE_REFR, referrer);
         return payload;
     }
 

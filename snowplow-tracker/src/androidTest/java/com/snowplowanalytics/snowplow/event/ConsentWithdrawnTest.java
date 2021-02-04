@@ -32,7 +32,7 @@ public class ConsentWithdrawnTest extends AndroidTestCase {
                 .all(false)
                 .build();
 
-        Map data = event.getData().getMap();
+        Map data = event.getDataPayload();
 
         assertNotNull(data);
         assertEquals(false, data.get(Parameters.CW_ALL));
@@ -60,7 +60,7 @@ public class ConsentWithdrawnTest extends AndroidTestCase {
                 .consentDocuments(documents)
                 .build();
 
-        data = event.getData().getMap();
+        data = event.getDataPayload();
 
         assertNotNull(data);
         assertEquals(false, data.get(Parameters.CW_ALL));

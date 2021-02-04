@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -23,10 +24,14 @@ import java.util.Map;
 
 public class Timing extends AbstractSelfDescribing {
 
-    private final String category;
-    private final String variable;
-    private final Integer timing;
-    private final String label;
+    @NonNull
+    public final String category;
+    @NonNull
+    public final String variable;
+    @NonNull
+    public final Integer timing;
+    @Nullable
+    public String label;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -82,12 +87,14 @@ public class Timing extends AbstractSelfDescribing {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -108,18 +115,29 @@ public class Timing extends AbstractSelfDescribing {
         this.timing = builder.timing;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
-     * replaced by {@link #getDataPayload()}.
-     *
-     * @return the payload to be sent.
-     */
-    @Deprecated
+    public Timing(@NonNull String category, @NonNull String variable, @NonNull Integer timing) {
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(timing);
+        Preconditions.checkNotNull(variable);
+        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!variable.isEmpty(), "variable cannot be empty");
+        this.category = category;
+        this.variable = variable;
+        this.timing = timing;
+    }
+
+    // Builder methods
+
     @NonNull
-    public HashMap<String,Object> getData() {
+    public Timing label(@Nullable String label) {
+        this.label = label;
+        return this;
+    }
+
+    // Public methods
+
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
         payload.put(Parameters.UT_CATEGORY, this.category);
         payload.put(Parameters.UT_VARIABLE, this.variable);
@@ -128,11 +146,6 @@ public class Timing extends AbstractSelfDescribing {
             payload.put(Parameters.UT_LABEL, this.label);
         }
         return payload;
-    }
-
-    @Override
-    public @NonNull Map<String, Object> getDataPayload() {
-        return getData();
     }
 
     @Override

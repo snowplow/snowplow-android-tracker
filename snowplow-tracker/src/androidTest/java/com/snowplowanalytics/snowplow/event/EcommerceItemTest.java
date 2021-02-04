@@ -29,10 +29,10 @@ public class EcommerceItemTest extends AndroidTestCase {
                 .quantity(1)
                 .build();
 
-        Map data = ecommerceTransactionItem.getPayload().getMap();
+        assertEquals("ti", ecommerceTransactionItem.getName());
+        Map data = ecommerceTransactionItem.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("ti", data.get(Parameters.EVENT));
         assertEquals("some item id", data.get(Parameters.TI_ITEM_ID));
         assertEquals("some sku", data.get(Parameters.TI_ITEM_SKU));
         assertEquals("123.456", data.get(Parameters.TI_ITEM_PRICE));
@@ -51,10 +51,9 @@ public class EcommerceItemTest extends AndroidTestCase {
                 .currency("EUR")
                 .build();
 
-        data = ecommerceTransactionItem.getPayload().getMap();
+        data = ecommerceTransactionItem.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("ti", data.get(Parameters.EVENT));
         assertEquals("some item id", data.get(Parameters.TI_ITEM_ID));
         assertEquals("some sku", data.get(Parameters.TI_ITEM_SKU));
         assertEquals("123.456", data.get(Parameters.TI_ITEM_PRICE));
@@ -98,16 +97,6 @@ public class EcommerceItemTest extends AndroidTestCase {
                     .build();
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            EcommerceTransactionItem.builder().itemId("").sku("some sku").price(123.456)
-                    .quantity(1).build();
-        } catch (Exception e) {
-            assertEquals("itemId cannot be empty", e.getMessage());
             exception = true;
         }
         assertTrue(exception);

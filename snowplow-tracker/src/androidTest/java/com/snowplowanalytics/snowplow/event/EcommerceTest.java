@@ -29,10 +29,10 @@ public class EcommerceTest extends AndroidTestCase {
                 .items(new ArrayList<EcommerceTransactionItem>())
                 .build();
 
-        Map data = ecommerceTransaction.getPayload().getMap();
+        assertEquals("tr", ecommerceTransaction.getName());
+        Map data = ecommerceTransaction.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("tr", data.get(Parameters.EVENT));
         assertEquals("some order id", data.get(Parameters.TR_ID));
         assertEquals("123.456", data.get(Parameters.TR_TOTAL));
         assertFalse(data.containsKey(Parameters.TR_AFFILIATION));
@@ -63,10 +63,9 @@ public class EcommerceTest extends AndroidTestCase {
                 .items(ecommerceTransactionItem)
                 .build();
 
-        data = ecommerceTransaction.getPayload().getMap();
+        data = ecommerceTransaction.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("tr", data.get(Parameters.EVENT));
         assertEquals("some order id", data.get(Parameters.TR_ID));
         assertEquals("123.456", data.get(Parameters.TR_TOTAL));
         assertEquals("some affiliate", data.get(Parameters.TR_AFFILIATION));

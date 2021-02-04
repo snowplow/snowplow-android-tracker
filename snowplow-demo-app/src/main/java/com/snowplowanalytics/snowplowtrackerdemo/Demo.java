@@ -204,7 +204,7 @@ public class Demo extends Activity implements LoggerDelegate {
         }
 
         if (!uri.equals("")) {
-            eventsCreated += 14;
+            eventsCreated += 9;
             final String made = "Made: " + eventsCreated;
             _eventsCreated.setText(made);
             TrackerEvents.trackAll(Tracker.instance());

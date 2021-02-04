@@ -32,7 +32,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
                 .expiry("expiration")
                 .build();
 
-        Map<String, Object> data = event.getData().getMap();
+        Map<String, Object> data = event.getDataPayload();
 
         assertNotNull(data);
         assertEquals("expiration", data.get(Parameters.CG_EXPIRY));
@@ -60,7 +60,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
                 .consentDocuments(documents)
                 .build();
 
-        data = event.getData().getMap();
+        data = event.getDataPayload();
 
         assertNotNull(data);
         assertEquals("expiration", data.get(Parameters.CG_EXPIRY));

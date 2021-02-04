@@ -29,7 +29,7 @@ public class TimingTest extends AndroidTestCase {
                 .label("some label")
                 .build();
 
-        Map<String, Object> data = timing.getData();
+        Map<String, Object> data = timing.getDataPayload();
 
         assertNotNull(data);
         assertEquals("some category", data.get(Parameters.UT_CATEGORY));
@@ -43,7 +43,7 @@ public class TimingTest extends AndroidTestCase {
                 .variable("some var")
                 .build();
 
-        data = timing.getData();
+        data = timing.getDataPayload();
 
         assertNotNull(data);
         assertEquals("some category", data.get(Parameters.UT_CATEGORY));
@@ -58,7 +58,7 @@ public class TimingTest extends AndroidTestCase {
                 .label("")
                 .build();
 
-        data = timing.getData();
+        data = timing.getDataPayload();
 
         assertNotNull(data);
         assertEquals("some category", data.get(Parameters.UT_CATEGORY));
@@ -73,7 +73,7 @@ public class TimingTest extends AndroidTestCase {
                 .label(null)
                 .build();
 
-        data = timing.getData();
+        data = timing.getDataPayload();
 
         assertNotNull(data);
         assertEquals("some category", data.get(Parameters.UT_CATEGORY));

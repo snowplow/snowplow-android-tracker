@@ -53,22 +53,18 @@ public class TrackerEvents {
 
     private static void trackPageView(Tracker tracker) {
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").timestamp((long) 1433791172).build());
     }
 
     private static void trackStructuredEvent(Tracker tracker) {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
     }
 
     private static void trackScreenView(Tracker tracker) {
         tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
-        tracker.track(ScreenView.builder().name("screenName2").id(UUID.randomUUID().toString()).timestamp((long) 1433791172).build());
     }
 
     private static void trackTimings(Tracker tracker) {
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").timestamp((long) 1433791172).build());
     }
 
     private static void trackUnstructuredEvent(Tracker tracker) {
@@ -76,7 +72,6 @@ public class TrackerEvents {
         attributes.put("targetUrl", "http://a-target-url.com");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
-        tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).build());
     }
 
     private static void trackEcommerceEvent(Tracker tracker) {
@@ -85,7 +80,6 @@ public class TrackerEvents {
         items.add(item);
 
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(item).timestamp((long) 1433791172).build());
     }
 
     private static void trackConsentGranted(Tracker tracker) {
@@ -111,6 +105,7 @@ public class TrackerEvents {
                 .documentVersion("granted event doc version")
                 .consentDocuments(documents)
                 .build();
+        tracker.track(event);
     }
 
     private static void trackConsentWithdrawn(Tracker tracker) {
@@ -135,5 +130,6 @@ public class TrackerEvents {
                 .documentVersion("withdrawn event doc version")
                 .consentDocuments(documents)
                 .build();
+        tracker.track(event);
     }
 }

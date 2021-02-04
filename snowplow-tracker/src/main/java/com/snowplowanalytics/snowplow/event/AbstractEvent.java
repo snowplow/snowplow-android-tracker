@@ -37,33 +37,17 @@ import java.util.UUID;
  */
 public abstract class AbstractEvent implements Event {
 
-    protected final List<SelfDescribingJson> customContexts;
-    private String eventId;
-    protected Long deviceCreatedTimestamp;
-    private Long trueTimestamp;
+    public final List<SelfDescribingJson> customContexts;
+    @Nullable
+    public Long trueTimestamp;
 
     public static abstract class Builder<T extends Builder<T>> {
 
-        private List<SelfDescribingJson> customContexts = new LinkedList<>();
-        private String eventId;
-        private Long deviceCreatedTimestamp;
+        private final List<SelfDescribingJson> customContexts = new LinkedList<>();
         private Long trueTimestamp;
 
-        protected abstract T self();
-
-        /**
-         * Adds a list of custom contexts.
-         *
-         * @deprecated As of release 1.5.0, replaced by {@link #contexts}
-         *
-         * @param contexts the list of contexts
-         * @return itself
-         */
-        @Deprecated
         @NonNull
-        public T customContext(@NonNull List<SelfDescribingJson> contexts) {
-            return contexts(contexts);
-        }
+        protected abstract T self();
 
         /**
          * Adds a list of custom contexts.
@@ -73,55 +57,7 @@ public abstract class AbstractEvent implements Event {
          */
         @NonNull
         public T contexts(@NonNull List<SelfDescribingJson> contexts) {
-            this.customContexts = contexts;
-            return self();
-        }
-
-        /**
-         * A custom eventId for the event.
-         *
-         * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-         * The eventId can be specified only by the tracker.
-         *
-         * @param eventId the eventId
-         * @return itself
-         */
-        @Deprecated
-        @NonNull
-        public T eventId(@NonNull String eventId) {
-            this.eventId = eventId;
-            return self();
-        }
-
-        /**
-         * A custom event timestamp.
-         *
-         * @deprecated As of release 1.0.0, replaced by {@link #trueTimestamp(long trueTimestamp)}
-         *
-         * @param timestamp the event timestamp as
-         *                  unix epoch
-         * @return itself
-         */
-        @Deprecated
-        @NonNull
-        public T timestamp(long timestamp) {
-            this.deviceCreatedTimestamp = timestamp;
-            return self();
-        }
-
-        /**
-         * A custom event timestamp.
-         *
-         * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-         *
-         * @param deviceCreatedTimestamp the event timestamp as
-         *                               unix epoch
-         * @return itself
-         */
-        @Deprecated
-        @NonNull
-        public T deviceCreatedTimestamp(long deviceCreatedTimestamp) {
-            this.deviceCreatedTimestamp = deviceCreatedTimestamp;
+            customContexts.addAll(contexts);
             return self();
         }
 
@@ -140,6 +76,7 @@ public abstract class AbstractEvent implements Event {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
@@ -154,31 +91,26 @@ public abstract class AbstractEvent implements Event {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.customContexts);
-        if (builder.eventId != null) {
-            Preconditions.checkArgument(!builder.eventId.isEmpty(), "eventId cannot be empty");
-            try {
-                UUID.fromString(builder.eventId);
-            } catch(IllegalArgumentException e) {
-                Preconditions.fail("eventId has to be a valid UUID");
-            }
-            eventId = builder.eventId;
-        }
 
         this.customContexts = builder.customContexts;
-        this.deviceCreatedTimestamp = builder.deviceCreatedTimestamp;
         this.trueTimestamp = builder.trueTimestamp;
     }
 
-    /**
-     * @deprecated As of release 1.5.0, replaced by {@link #getContexts()}
-     *
-     * @return the event custom context
-     */
-    @Override
-    @Deprecated
-    public @NonNull List<SelfDescribingJson> getContext() {
-        return getContexts();
+    // Builder methods
+
+    @NonNull
+    public AbstractEvent contexts(@Nullable List<SelfDescribingJson> contexts) {
+        if (contexts != null) customContexts.addAll(contexts);
+        return this;
     }
+
+    @NonNull
+    public AbstractEvent trueTimestamp(@Nullable Long trueTimestamp) {
+        this.trueTimestamp = trueTimestamp;
+        return this;
+    }
+
+    // Public methods
 
     /**
      * @return the event custom context
@@ -186,34 +118,6 @@ public abstract class AbstractEvent implements Event {
     @Override
     public @NonNull List<SelfDescribingJson> getContexts() {
         return new ArrayList<>(this.customContexts);
-    }
-
-    /**
-     * Get the timestamp of the event.
-     * @apiNote If the timestamp is not set, it sets one as a side effect.
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     * @return the event timestamp
-     */
-    @Override
-    @Deprecated
-    public long getDeviceCreatedTimestamp() {
-        if (deviceCreatedTimestamp == null) {
-            deviceCreatedTimestamp = System.currentTimeMillis();
-        }
-        return deviceCreatedTimestamp;
-    }
-
-    /**
-     * Get the actual timestamp of the event.
-     * @apiNote It doesn't have the side effect of {@link #getDeviceCreatedTimestamp()}.
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     * @return the event timestamp
-     */
-    @Override
-    @Deprecated
-    @Nullable
-    public Long getActualDeviceCreatedTimestamp() {
-        return deviceCreatedTimestamp;
     }
 
     /**
@@ -225,57 +129,9 @@ public abstract class AbstractEvent implements Event {
         return this.trueTimestamp;
     }
 
-    /**
-     * Get the event id of the event.
-     * @apiNote If the eventId is not set, it sets one as a side effect.
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     * @return the event id
-     */
     @Override
-    @Deprecated
-    @NonNull
-    public String getEventId() {
-        if (eventId == null) {
-            eventId = Util.getUUIDString();
-        }
-        return eventId;
-    }
-
-    /**
-     * Get the actual event id of the event.
-     * @apiNote It doesn't have the side effect of {@link #getEventId()}.
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     * @return the event id if it exist.
-     */
-    @Override
-    @Deprecated
-    @NonNull
-    public String getActualEventId() {
-        return eventId;
-    }
-
-    /**
-     * Adds the default parameters to a TrackerPayload object.
-     *
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0
-     *
-     * @param payload the payload to add too.
-     * @return the TrackerPayload with appended values.
-     */
-    @Deprecated
-    @NonNull
-    TrackerPayload putDefaultParams(@NonNull TrackerPayload payload) {
-        payload.add(Parameters.EID, getEventId());
-        payload.add(Parameters.DEVICE_TIMESTAMP, Long.toString(getDeviceCreatedTimestamp()));
-        if (this.trueTimestamp != null) {
-            payload.add(Parameters.TRUE_TIMESTAMP, Long.toString(getTrueTimestamp()));
-        }
-        return payload;
-    }
+    public void beginProcessing(@NonNull Tracker tracker) {}
 
     @Override
-    public void beginProcessing(Tracker tracker) {}
-
-    @Override
-    public void endProcessing(Tracker tracker) {}
+    public void endProcessing(@NonNull Tracker tracker) {}
 }

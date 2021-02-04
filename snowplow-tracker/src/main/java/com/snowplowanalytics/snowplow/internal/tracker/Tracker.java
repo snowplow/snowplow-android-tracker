@@ -993,34 +993,6 @@ public class Tracker implements DiagnosticLogger {
         return this.screenState;
     }
 
-    /**
-     * Track a screen with a screen state (many options)
-     * @deprecated Use track(Event) method passing a ScreenView event.
-     */
-    @Deprecated
-    public void trackScreen(@NonNull ScreenState screenState) {
-        this.screenState = screenState;
-        SelfDescribingJson data = screenState.getScreenViewEventJson();
-        track(SelfDescribing.builder()
-                .eventData(data)
-                .build()
-        );
-    }
-
-    /**
-     * Track a screen only by name
-     * @deprecated Use track(Event) method passing a ScreenView event.
-     */
-    @Deprecated
-    public void trackScreen(@NonNull String name) {
-        screenState.updateScreenState(null, name, null, null);
-        SelfDescribingJson data = screenState.getScreenViewEventJson();
-        track(SelfDescribing.builder()
-                .eventData(data)
-                .build()
-        );
-    }
-
     // --- Global contexts
 
     private final List<GlobalContext> globalContexts = Collections.synchronizedList(new ArrayList<GlobalContext>());

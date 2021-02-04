@@ -26,10 +26,10 @@ public class PageViewTest extends AndroidTestCase {
                 .pageUrl("http://com.acme/foo/bar")
                 .build();
 
-        Map data = pageView.getPayload().getMap();
+        assertEquals("pv", pageView.getName());
 
+        Map data = pageView.getDataPayload();
         assertNotNull(data);
-        assertEquals("pv", data.get(Parameters.EVENT));
         assertEquals("http://com.acme/foo/bar", data.get(Parameters.PAGE_URL));
         assertFalse(data.containsKey(Parameters.PAGE_TITLE));
         assertFalse(data.containsKey(Parameters.PAGE_REFR));
@@ -40,10 +40,9 @@ public class PageViewTest extends AndroidTestCase {
                 .referrer("http://refr.com")
                 .build();
 
-        data = pageView.getPayload().getMap();
+        data = pageView.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("pv", data.get(Parameters.EVENT));
         assertEquals("http://com.acme/foo/bar", data.get(Parameters.PAGE_URL));
         assertEquals("Page Title", data.get(Parameters.PAGE_TITLE));
         assertEquals("http://refr.com", data.get(Parameters.PAGE_REFR));

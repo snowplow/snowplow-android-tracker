@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -28,16 +29,26 @@ import java.util.Map;
 
 public class EcommerceTransaction extends AbstractPrimitive {
 
-    private final String orderId;
-    private final Double totalValue;
-    private final String affiliation;
-    private final Double taxValue;
-    private final Double shipping;
-    private final String city;
-    private final String state;
-    private final String country;
-    private final String currency;
-    private final List<EcommerceTransactionItem> items;
+    @NonNull
+    public final String orderId;
+    @NonNull
+    public final Double totalValue;
+    @NonNull
+    public final List<EcommerceTransactionItem> items;
+    @Nullable
+    public String affiliation;
+    @Nullable
+    public Double taxValue;
+    @Nullable
+    public Double shipping;
+    @Nullable
+    public String city;
+    @Nullable
+    public String state;
+    @Nullable
+    public String country;
+    @Nullable
+    public String currency;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -157,7 +168,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
          * @return itself
          */
         @NonNull
-        public T items(EcommerceTransactionItem... itemArgs) {
+        public T items(@NonNull EcommerceTransactionItem... itemArgs) {
             List<EcommerceTransactionItem> items = new ArrayList<>();
             Collections.addAll(items, itemArgs);
             this.items = items;
@@ -171,12 +182,14 @@ public class EcommerceTransaction extends AbstractPrimitive {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -186,9 +199,9 @@ public class EcommerceTransaction extends AbstractPrimitive {
 
         // Precondition checks
         Preconditions.checkNotNull(builder.orderId);
+        Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
         Preconditions.checkNotNull(builder.totalValue);
         Preconditions.checkNotNull(builder.items);
-        Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
 
         this.orderId = builder.orderId;
         this.totalValue = builder.totalValue;
@@ -202,20 +215,75 @@ public class EcommerceTransaction extends AbstractPrimitive {
         this.items = builder.items;
     }
 
+    public EcommerceTransaction(@NonNull String orderId, @NonNull Double totalValue, @NonNull List<EcommerceTransactionItem> items) {
+        Preconditions.checkNotNull(orderId);
+        Preconditions.checkArgument(!orderId.isEmpty(), "orderId cannot be empty");
+        Preconditions.checkNotNull(totalValue);
+        Preconditions.checkNotNull(items);
+        this.orderId = orderId;
+        this.totalValue = totalValue;
+        this.items = new ArrayList<>(items);
+    }
+
+    // Builder methods
+
+    @NonNull
+    public EcommerceTransaction affiliation(@Nullable String affiliation) {
+        this.affiliation = affiliation;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction taxValue(@Nullable Double taxValue) {
+        this.taxValue = taxValue;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction shipping(@Nullable Double shipping) {
+        this.shipping = shipping;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction city(@Nullable String city) {
+        this.city = city;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction state(@Nullable String state) {
+        this.state = state;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction country(@Nullable String country) {
+        this.country = country;
+        return this;
+    }
+
+    @NonNull
+    public EcommerceTransaction currency(@Nullable String currency) {
+        this.currency = currency;
+        return this;
+    }
+
+
+    // Public methods
+
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String, Object> payload = new HashMap<>(9);
-        payload.put(Parameters.TR_ID, this.orderId);
-        payload.put(Parameters.TR_TOTAL, Double.toString(this.totalValue));
-        payload.put(Parameters.TR_AFFILIATION, this.affiliation);
-        payload.put(Parameters.TR_TAX,
-                this.taxValue != null ? Double.toString(this.taxValue) : null);
-        payload.put(Parameters.TR_SHIPPING,
-                this.shipping != null ? Double.toString(this.shipping) : null);
-        payload.put(Parameters.TR_CITY, this.city);
-        payload.put(Parameters.TR_STATE, this.state);
-        payload.put(Parameters.TR_COUNTRY, this.country);
-        payload.put(Parameters.TR_CURRENCY, this.currency);
+        payload.put(Parameters.TR_ID, orderId);
+        payload.put(Parameters.TR_TOTAL, Double.toString(totalValue));
+        if (affiliation != null) payload.put(Parameters.TR_AFFILIATION, affiliation);
+        if (taxValue != null) payload.put(Parameters.TR_TAX, Double.toString(taxValue));
+        if (shipping != null) payload.put(Parameters.TR_SHIPPING, Double.toString(shipping));
+        if (city != null) payload.put(Parameters.TR_CITY, city);
+        if (state != null) payload.put(Parameters.TR_STATE, state);
+        if (country != null) payload.put(Parameters.TR_COUNTRY, country);
+        if (currency != null) payload.put(Parameters.TR_CURRENCY, currency);
         return payload;
     }
 
@@ -229,15 +297,15 @@ public class EcommerceTransaction extends AbstractPrimitive {
      *
      * @return the items.
      */
+    @NonNull
     public List<EcommerceTransactionItem> getItems() {
         return this.items;
     }
 
     @Override
-    public void endProcessing(Tracker tracker) {
-        // Track each item individually
+    public void endProcessing(@NonNull Tracker tracker) {
         for(EcommerceTransactionItem item : items) {
-            item.setDeviceCreatedTimestamp(getDeviceCreatedTimestamp());
+            item.setOrderId(orderId);
             tracker.track(item);
         }
     }

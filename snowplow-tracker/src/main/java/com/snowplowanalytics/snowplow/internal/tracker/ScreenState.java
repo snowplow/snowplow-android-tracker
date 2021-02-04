@@ -1,5 +1,8 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -24,24 +27,27 @@ public class ScreenState {
         name = "Unknown";
     }
 
+    @Nullable
     public String getPreviousId() {
         return previousId;
     }
 
+    @Nullable
     public String getPreviousName() {
         return previousName;
     }
 
+    @Nullable
     public String getPreviousType() {
         return previousType;
     }
 
     @Deprecated
-    public void newScreenState(String name, String type, String transitionType) {
+    public void newScreenState(@NonNull String name, @Nullable String type, @Nullable String transitionType) {
         updateScreenState(Util.getUUIDString(), name, type, transitionType);
     }
 
-    public synchronized void updateScreenState(String id, String name, String type, String transitionType) {
+    public synchronized void updateScreenState(@NonNull String id, @NonNull String name, @Nullable String type, @Nullable String transitionType) {
         this.populatePreviousFields();
         this.name = name;
         this.type = type;
@@ -53,7 +59,7 @@ public class ScreenState {
         }
     }
 
-    public synchronized void updateScreenState(String id, String name, String type, String transitionType, String fragmentClassName, String fragmentTag, String activityClassName, String activityTag) {
+    public synchronized void updateScreenState(@NonNull String id, @NonNull String name, @Nullable String type, @Nullable String transitionType, @Nullable String fragmentClassName, @Nullable String fragmentTag, @Nullable String activityClassName, @Nullable String activityTag) {
         this.updateScreenState(id, name, type, transitionType);
         this.fragmentClassName = fragmentClassName;
         this.fragmentTag = fragmentTag;
@@ -67,7 +73,8 @@ public class ScreenState {
         this.previousId = this.id;
     }
 
-    public SelfDescribingJson getCurrentScreen(Boolean debug) {
+    @NonNull
+    public SelfDescribingJson getCurrentScreen(boolean debug) {
         // this creates a screen context from screen state
         TrackerPayload contextPayload = new TrackerPayload();
         contextPayload.add(Parameters.SCREEN_ID, this.id);
@@ -80,32 +87,6 @@ public class ScreenState {
         return new SelfDescribingJson(
                 TrackerConstants.SCHEMA_SCREEN,
                 contextPayload);
-    }
-
-    @Deprecated
-    public SelfDescribingJson getPreviousScreen(Boolean debug) {
-        // not sure when this is useful (but make sure fragment/activity
-        // isn't updated to current screen before calling this method)
-        TrackerPayload contextPayload = new TrackerPayload();
-        contextPayload.add(Parameters.SCREEN_ID, this.previousId);
-        contextPayload.add(Parameters.SCREEN_NAME, this.previousName);
-        contextPayload.add(Parameters.SCREEN_TYPE, this.previousType);
-        return new SelfDescribingJson(
-                TrackerConstants.SCHEMA_SCREEN,
-                contextPayload);
-    }
-
-    @Deprecated
-    public SelfDescribingJson getScreenViewEventJson() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.SV_NAME, this.name);
-        payload.add(Parameters.SV_ID, this.id);
-        payload.add(Parameters.SV_TYPE, this.type);
-        payload.add(Parameters.SV_PREVIOUS_ID, this.previousId);
-        payload.add(Parameters.SV_PREVIOUS_NAME, this.previousName);
-        payload.add(Parameters.SV_PREVIOUS_TYPE, this.previousType);
-        payload.add(Parameters.SV_TRANSITION_TYPE, this.transitionType);
-        return new SelfDescribingJson(TrackerConstants.SCHEMA_SCREEN_VIEW, payload);
     }
 
     // Private methods

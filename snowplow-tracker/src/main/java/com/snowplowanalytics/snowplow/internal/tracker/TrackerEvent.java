@@ -41,12 +41,8 @@ class TrackerEvent {
     boolean isService;
 
     TrackerEvent(@NonNull Event event) {
-        String userEventId = event.getActualEventId();
-        String newEventId = userEventId != null ? userEventId : Util.getUUIDString();
-        eventId = UUID.fromString(newEventId);
-
-        Long userTimestamp = event.getActualDeviceCreatedTimestamp();
-        timestamp = userTimestamp != null ? userTimestamp : System.currentTimeMillis();
+        eventId = UUID.randomUUID();
+        timestamp = System.currentTimeMillis();
 
         contexts = new ArrayList<>(event.getContexts());
         trueTimestamp = event.getTrueTimestamp();

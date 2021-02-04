@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -22,14 +23,26 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class ConsentGranted extends AbstractSelfDescribing {
 
-    private final String expiry;
-    private final List<ConsentDocument> consentDocuments;
+    @NonNull
+    public final String expiry;
+    @NonNull
+    public final String documentId;
+    @NonNull
+    public final String documentVersion;
+    @Nullable
+    public String documentName;
+    @Nullable
+    public String documentDescription;
+    @NonNull
+    public final List<ConsentDocument> consentDocuments = new LinkedList<>();
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -100,18 +113,21 @@ public class ConsentGranted extends AbstractSelfDescribing {
             return self();
         }
 
+        @NonNull
         public ConsentGranted build() {
             return new ConsentGranted(this);
         }
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -130,45 +146,66 @@ public class ConsentGranted extends AbstractSelfDescribing {
         Preconditions.checkArgument(!builder.documentVersion.isEmpty(), "Document version cannot be empty");
 
         this.expiry = builder.expiry;
-        List<ConsentDocument> documents = new LinkedList<>();
-        documents.add(ConsentDocument.builder()
-                .documentDescription(builder.documentDescription)
-                .documentId(builder.documentId)
-                .documentName(builder.documentName)
-                .documentVersion(builder.documentVersion)
-                .build());
-        documents.addAll(builder.consentDocuments);
-        this.consentDocuments = documents;
+        this.documentId = builder.documentId;
+        this.documentVersion = builder.documentVersion;
+        this.consentDocuments.addAll(builder.consentDocuments);
     }
+
+    public ConsentGranted(@NonNull String expiry, @NonNull String documentId, @NonNull String documentVersion) {
+        Preconditions.checkNotNull(expiry);
+        Preconditions.checkArgument(!expiry.isEmpty(), "Expiry cannot be empty");
+        Preconditions.checkNotNull(documentId);
+        Preconditions.checkArgument(!documentId.isEmpty(), "Document ID cannot be empty");
+        Preconditions.checkNotNull(documentVersion);
+        Preconditions.checkArgument(!documentVersion.isEmpty(), "Document version cannot be empty");
+        this.expiry = expiry;
+        this.documentId = documentId;
+        this.documentVersion = documentVersion;
+    }
+
+    // Builder methods
+
+    @NonNull
+    public ConsentGranted documentName(@Nullable String documentName) {
+        this.documentName = documentName;
+        return this;
+    }
+
+    @NonNull
+    public ConsentGranted documentDescription(@Nullable String documentDescription) {
+        this.documentDescription = documentDescription;
+        return this;
+    }
+
+    @NonNull
+    public ConsentGranted documents(@NonNull List<ConsentDocument> documents) {
+        consentDocuments.clear();
+        consentDocuments.addAll(documents);
+        return this;
+    }
+
+    // Public methods
 
     /**
      * Returns a list of consent documents associated with the event.
      *
      * @return the consent documents
      */
-    public @NonNull List<ConsentDocument> getConsentDocuments() {
-        return this.consentDocuments;
-    }
-
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
-     * replaced by {@link #getDataPayload()}.
-     *
-     * @return the payload to be sent.
-     */
-    @Deprecated
-    public @NonNull TrackerPayload getData() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.CG_EXPIRY, this.expiry);
-        return payload;
+    public @NonNull List<ConsentDocument> getDocuments() {
+        List<ConsentDocument> docs = new ArrayList<>();
+        ConsentDocument doc = new ConsentDocument(documentId, documentVersion)
+                .documentDescription(documentDescription)
+                .documentName(documentName);
+        docs.add(doc);
+        docs.addAll(consentDocuments);
+        return docs;
     }
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
-        return getData().getMap();
+        HashMap<String,Object> payload = new HashMap<>();
+        if (expiry != null) payload.put(Parameters.CG_EXPIRY, expiry);
+        return payload;
     }
 
     @Override
@@ -177,10 +214,10 @@ public class ConsentGranted extends AbstractSelfDescribing {
     }
 
     @Override
-    public void beginProcessing(Tracker tracker) {
-        for (ConsentDocument document : consentDocuments) {
+    public void beginProcessing(@NonNull Tracker tracker) {
+        for (ConsentDocument document : getDocuments()) {
             SelfDescribingJson context = new SelfDescribingJson(document.getSchema(), document.getDataPayload());
-            customContexts.add(context);
+            customContexts.add(context);  // TODO: Only the user should modify the public customContexts property
         }
     }
 }

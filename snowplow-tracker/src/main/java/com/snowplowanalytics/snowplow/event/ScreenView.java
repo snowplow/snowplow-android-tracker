@@ -28,23 +28,36 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ScreenView extends AbstractSelfDescribing {
 
     private final static String TAG = ScreenView.class.getSimpleName();
 
-    private final String name;
-    private final String id;
-    private String type;
-    private String transitionType;
-    private String previousName;
-    private String previousId;
-    private String previousType;
-    private String fragmentClassName;
-    private String fragmentTag;
-    private String activityClassName;
-    private String activityTag;
+    @NonNull
+    public final String name;
+    @NonNull
+    public final String id;
+    @Nullable
+    public String type;
+    @Nullable
+    public String transitionType;
+    @Nullable
+    public String previousName;
+    @Nullable
+    public String previousId;
+    @Nullable
+    public String previousType;
+    @Nullable
+    public String fragmentClassName;
+    @Nullable
+    public String fragmentTag;
+    @Nullable
+    public String activityClassName;
+    @Nullable
+    public String activityTag;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -161,12 +174,14 @@ public class ScreenView extends AbstractSelfDescribing {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -205,7 +220,8 @@ public class ScreenView extends AbstractSelfDescribing {
 
     protected ScreenView(@NonNull Builder<?> builder) {
         super(builder);
-
+        Preconditions.checkNotNull(builder.name);
+        Preconditions.checkArgument(!builder.name.isEmpty(), "Name cannot be empty.");
         if (builder.id != null) {
             Preconditions.checkArgument(Util.isUUIDString(builder.id));
             id = builder.id;
@@ -225,6 +241,75 @@ public class ScreenView extends AbstractSelfDescribing {
         this.activityTag = builder.activityTag;
     }
 
+    public ScreenView(@NonNull String name, @Nullable UUID screenId) {
+        Preconditions.checkNotNull(name);
+        Preconditions.checkArgument(!name.isEmpty(), "Name cannot be empty.");
+        this.name = name;
+        if (screenId != null) {
+            id = screenId.toString();
+        } else {
+            id = Util.getUUIDString();
+        }
+    }
+
+    // Builder methods
+
+    @NonNull
+    public ScreenView type(@Nullable String type) {
+        this.type = type;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView transitionType(@Nullable String transitionType) {
+        this.transitionType = transitionType;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView previousName(@Nullable String previousName) {
+        this.previousName = previousName;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView previousId(@Nullable String previousId) {
+        this.previousId = previousId;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView previousType(@Nullable String previousType) {
+        this.previousType = previousType;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView fragmentClassName(@Nullable String fragmentClassName) {
+        this.fragmentClassName = fragmentClassName;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView fragmentTag(@Nullable String fragmentTag) {
+        this.fragmentTag = fragmentTag;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView activityClassName(@Nullable String activityClassName) {
+        this.activityClassName = activityClassName;
+        return this;
+    }
+
+    @NonNull
+    public ScreenView activityTag(@Nullable String activityTag) {
+        this.activityTag = activityTag;
+        return this;
+    }
+
+    // Public methods
+
     /**
      * Update the passed screen state with the data related to
      * the current ScreenView event.
@@ -241,32 +326,17 @@ public class ScreenView extends AbstractSelfDescribing {
         }
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
-     * replaced by {@link #getDataPayload()}.
-     *
-     * @return the payload to be sent.
-     */
-    @Deprecated
-    @NonNull
-    public TrackerPayload getData() {
-        TrackerPayload payload = new TrackerPayload();
-        payload.add(Parameters.SV_NAME, this.name);
-        payload.add(Parameters.SV_ID, this.id);
-        payload.add(Parameters.SV_TYPE, this.type);
-        payload.add(Parameters.SV_PREVIOUS_ID, this.previousId);
-        payload.add(Parameters.SV_PREVIOUS_NAME, this.previousName);
-        payload.add(Parameters.SV_PREVIOUS_TYPE, this.previousType);
-        payload.add(Parameters.SV_TRANSITION_TYPE, this.transitionType);
-        return payload;
-    }
-
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
-        return getData().getMap();
+        HashMap<String,Object> payload = new HashMap<>();
+        payload.put(Parameters.SV_ID, id);
+        payload.put(Parameters.SV_NAME, name);
+        if (type != null) payload.put(Parameters.SV_TYPE, type);
+        if (previousId != null) payload.put(Parameters.SV_PREVIOUS_ID, previousId);
+        if (previousName != null) payload.put(Parameters.SV_PREVIOUS_NAME, previousName);
+        if (previousType != null) payload.put(Parameters.SV_PREVIOUS_TYPE, previousType);
+        if (transitionType != null) payload.put(Parameters.SV_TRANSITION_TYPE, transitionType);
+        return payload;
     }
 
     @Override

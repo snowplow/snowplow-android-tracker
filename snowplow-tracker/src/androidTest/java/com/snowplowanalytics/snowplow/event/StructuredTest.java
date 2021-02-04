@@ -27,10 +27,9 @@ public class StructuredTest extends AndroidTestCase {
                 .action("some action")
                 .build();
 
-        Map data = structured.getPayload().getMap();
-
+        assertEquals("se", structured.getName());
+        Map data = structured.getDataPayload();
         assertNotNull(data);
-        assertEquals("se", data.get(Parameters.EVENT));
         assertEquals("some category", data.get(Parameters.SE_CATEGORY));
         assertEquals("some action", data.get(Parameters.SE_ACTION));
         assertFalse(data.containsKey(Parameters.SE_LABEL));
@@ -43,22 +42,17 @@ public class StructuredTest extends AndroidTestCase {
                 .label("some label")
                 .property("some property")
                 .value(123.56700)
-                .timestamp(123456789)
-                .deviceCreatedTimestamp(987654321)
                 .trueTimestamp(123456789)
                 .build();
 
-        data = structured.getPayload().getMap();
+        data = structured.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("se", data.get(Parameters.EVENT));
         assertEquals("some category", data.get(Parameters.SE_CATEGORY));
         assertEquals("some action", data.get(Parameters.SE_ACTION));
         assertEquals("some label", data.get(Parameters.SE_LABEL));
         assertEquals("some property", data.get(Parameters.SE_PROPERTY));
         assertEquals("123.567", data.get(Parameters.SE_VALUE));
-        assertEquals("987654321", data.get(Parameters.DEVICE_TIMESTAMP));
-        assertEquals("123456789", data.get(Parameters.TRUE_TIMESTAMP));
     }
 
     public void testBuilderFailures() {
@@ -94,15 +88,6 @@ public class StructuredTest extends AndroidTestCase {
             Structured.builder().category("category").action("").build();
         } catch (Exception e) {
             assertEquals("action cannot be empty", e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            Structured.builder().category("category").action("action").eventId("").build();
-        } catch (Exception e) {
-            assertEquals("eventId cannot be empty", e.getMessage());
             exception = true;
         }
         assertTrue(exception);

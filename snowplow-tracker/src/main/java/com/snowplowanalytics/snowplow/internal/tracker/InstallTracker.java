@@ -99,7 +99,7 @@ public class InstallTracker {
     private void sendInstallEvent(long installTimestamp) {
         SelfDescribing event = SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL))
-                .deviceCreatedTimestamp(installTimestamp)
+                .trueTimestamp(installTimestamp)
                 .build();
         try {
             Tracker.instance().track(event);

@@ -27,7 +27,7 @@ public class ScreenViewTest extends AndroidTestCase {
                 .name("name")
                 .build();
 
-        Map data = screenView.getData().getMap();
+        Map<String, Object> data = screenView.getDataPayload();
 
         assertNotNull(data);
         assertEquals("name", data.get(Parameters.SV_NAME));
@@ -36,24 +36,14 @@ public class ScreenViewTest extends AndroidTestCase {
         String id = UUID.randomUUID().toString();
         screenView = ScreenView.builder()
                 .id(id)
-                .build();
-
-        data = screenView.getData().getMap();
-
-        assertNotNull(data);
-        assertEquals(id, data.get(Parameters.SV_ID));
-        assertFalse(data.containsKey(Parameters.SV_NAME));
-
-        screenView = ScreenView.builder()
                 .name("name")
-                .id(id)
                 .build();
 
-        data = screenView.getData().getMap();
+        data = screenView.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("name", data.get(Parameters.SV_NAME));
         assertEquals(id, data.get(Parameters.SV_ID));
+        assertEquals("name", data.get(Parameters.SV_NAME));
     }
 
     public void testBuilderFailures() {
@@ -61,7 +51,7 @@ public class ScreenViewTest extends AndroidTestCase {
             ScreenView.builder().id("id").build();
             fail();
         } catch (Exception e) {
-            assertEquals(null, e.getMessage());
+            assertNull(e.getMessage());
         }
     }
 }

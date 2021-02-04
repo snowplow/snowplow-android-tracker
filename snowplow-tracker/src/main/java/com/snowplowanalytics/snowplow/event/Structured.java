@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -27,11 +28,16 @@ import java.util.Map;
  */
 public class Structured extends AbstractPrimitive {
 
-    private final String category;
-    private final String action;
-    private final String label;
-    private final String property;
-    private final Double value;
+    @NonNull
+    public final String category;
+    @NonNull
+    public final String action;
+    @Nullable
+    public String label;
+    @Nullable
+    public String property;
+    @Nullable
+    public Double value;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -98,12 +104,14 @@ public class Structured extends AbstractPrimitive {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -124,16 +132,46 @@ public class Structured extends AbstractPrimitive {
         this.value = builder.value;
     }
 
+    public Structured(@NonNull String category, @NonNull String action) {
+        Preconditions.checkNotNull(category);
+        Preconditions.checkNotNull(action);
+        Preconditions.checkArgument(!category.isEmpty(), "category cannot be empty");
+        Preconditions.checkArgument(!action.isEmpty(), "action cannot be empty");
+        this.category = category;
+        this.action = action;
+    }
+
+    // Builder methods
+
+    @NonNull
+    public Structured label(@Nullable String label) {
+        this.label = label;
+        return this;
+    }
+
+    @NonNull
+    public Structured property(@Nullable String property) {
+        this.property = property;
+        return this;
+    }
+
+    @NonNull
+    public Structured value(@Nullable Double value) {
+        this.value = value;
+        return this;
+    }
+
+    // Public methods
+
     @NonNull
     @Override
     public Map<String, Object> getDataPayload() {
-        HashMap<String, Object> payload = new HashMap<>(6);
-        payload.put(Parameters.SE_CATEGORY, this.category);
-        payload.put(Parameters.SE_ACTION, this.action);
-        payload.put(Parameters.SE_LABEL, this.label);
-        payload.put(Parameters.SE_PROPERTY, this.property);
-        payload.put(Parameters.SE_VALUE,
-                this.value != null ? Double.toString(this.value) : null);
+        HashMap<String, Object> payload = new HashMap<>(5);
+        payload.put(Parameters.SE_CATEGORY, category);
+        payload.put(Parameters.SE_ACTION, action);
+        if (label != null) payload.put(Parameters.SE_LABEL, label);
+        if (property != null) payload.put(Parameters.SE_PROPERTY, property);
+        if (value != null) payload.put(Parameters.SE_VALUE, Double.toString(value));
         return payload;
     }
 

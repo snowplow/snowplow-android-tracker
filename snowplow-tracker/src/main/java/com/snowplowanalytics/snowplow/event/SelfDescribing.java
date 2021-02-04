@@ -15,21 +15,16 @@ package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 
 import java.util.Map;
 
 /**
  * Constructs an SelfDescribing event object.
+ * @deprecated It will be removed in version 3.0. Use {@link #Unstructured} instead.
  */
-public class SelfDescribing extends AbstractSelfDescribing {
-
-    private final SelfDescribingJson eventData;
-    private boolean base64Encode;
+@Deprecated
+public class SelfDescribing extends Unstructured {
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -54,74 +49,19 @@ public class SelfDescribing extends AbstractSelfDescribing {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
 
     protected SelfDescribing(@NonNull Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.eventData);
-
-        this.eventData = builder.eventData;
-    }
-
-    /**
-     * @param base64Encode whether to base64Encode the event data
-     */
-    public void setBase64Encode(boolean base64Encode) {
-        this.base64Encode = base64Encode;
-    }
-
-    /**
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     *
-     * This replace the {@link #getPayload()} returning a TrackerPayload.
-     * Do not use in production code as it's an internal deprecated method.
-     */
-    @Deprecated
-    @NonNull
-    public TrackerPayload getTrackerPayload() {
-        TrackerPayload payload = new TrackerPayload();
-        SelfDescribingJson envelope = new SelfDescribingJson(
-                TrackerConstants.SCHEMA_UNSTRUCT_EVENT, this.eventData.getMap());
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
-        payload.addMap(envelope.getMap(), this.base64Encode,
-                Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
-        return putDefaultParams(payload);
-    }
-
-    /**
-     * @deprecated As of release 1.5.0, it will be removed in the version 2.0.0.
-     *
-     * This method is for internal use and deprecated. Do not use in production code.
-     * In case it has been already used, it's replaceable by use of {@link #getTrackerPayload()}.
-     */
-    @Override
-    @Deprecated
-    @NonNull
-    public SelfDescribingJson getPayload() {
-        return super.getPayload();
-    }
-
-    @Override
-    public @NonNull Map<String, Object> getDataPayload() {
-        try {
-            return (Map<String, Object>) this.eventData.getMap().get(Parameters.DATA);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public @NonNull String getSchema() {
-        return (String) eventData.getMap().get(Parameters.SCHEMA);
+        super(builder.eventData);
     }
 }

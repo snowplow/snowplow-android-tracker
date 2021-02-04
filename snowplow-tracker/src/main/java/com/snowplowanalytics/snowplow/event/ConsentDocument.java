@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event;
  */
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -23,10 +24,14 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import java.util.Map;
 
 public class ConsentDocument extends AbstractSelfDescribing {
-    private final String documentId;
-    private final String documentVersion;
-    private final String documentName;
-    private final String documentDescription;
+    @NonNull
+    public final String documentId;
+    @NonNull
+    public final String documentVersion;
+    @Nullable
+    public String documentName;
+    @Nullable
+    public String documentDescription;
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -82,12 +87,14 @@ public class ConsentDocument extends AbstractSelfDescribing {
     }
 
     private static class Builder2 extends Builder<Builder2> {
+        @NonNull
         @Override
         protected Builder2 self() {
             return this;
         }
     }
 
+    @NonNull
     public static Builder<?> builder() {
         return new Builder2();
     }
@@ -109,28 +116,41 @@ public class ConsentDocument extends AbstractSelfDescribing {
         this.documentDescription = builder.documentDescription;
     }
 
-    /**
-     * Returns a TrackerPayload which can be stored into
-     * the local database.
-     *
-     * @deprecated As of release 1.5.0, it will be removed in version 2.0.0.
-     * replaced by {@link #getDataPayload()}.
-     *
-     * @return the payload to be sent.
-     */
-    @Deprecated
-    public @NonNull TrackerPayload getData() {
+    public ConsentDocument(@NonNull String documentId, @NonNull String documentVersion) {
+        Preconditions.checkNotNull(documentId);
+        Preconditions.checkArgument(!documentId.isEmpty(), "Document ID cannot be empty");
+
+        Preconditions.checkNotNull(documentVersion);
+        Preconditions.checkArgument(!documentVersion.isEmpty(), "Document version cannot be empty");
+
+        this.documentId = documentId;
+        this.documentVersion = documentVersion;
+    }
+
+    // Builder methods
+
+    @NonNull
+    public ConsentDocument documentName(@Nullable String documentName) {
+        this.documentName = documentName;
+        return this;
+    }
+
+    @NonNull
+    public ConsentDocument documentDescription(@Nullable String documentDescription) {
+        this.documentDescription = documentDescription;
+        return this;
+    }
+
+    // Schema and Payload
+
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
         TrackerPayload payload = new TrackerPayload();
         payload.add(Parameters.CD_ID, this.documentId);
         payload.add(Parameters.CD_NAME, this.documentName);
         payload.add(Parameters.CD_DESCRIPTION, this.documentDescription);
         payload.add(Parameters.CD_VERSION, this.documentVersion);
-        return payload;
-    }
-
-    @Override
-    public @NonNull Map<String, Object> getDataPayload() {
-        return getData().getMap();
+        return payload.getMap();
     }
 
     @Override
