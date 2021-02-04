@@ -135,7 +135,7 @@ public class Demo extends Activity implements LoggerDelegate {
     @Override
     protected void onResume() {
         super.onResume();
-        Tracker.instance().suspendSessionChecking(false);
+        Tracker.instance().resumeSessionChecking();
     }
 
     /**
@@ -145,7 +145,7 @@ public class Demo extends Activity implements LoggerDelegate {
         _tabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tracker.instance().suspendSessionChecking(true);
+                Tracker.instance().pauseSessionChecking();
                 String url = "https://snowplowanalytics.com/";
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();

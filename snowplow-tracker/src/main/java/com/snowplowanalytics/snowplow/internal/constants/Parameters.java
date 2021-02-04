@@ -24,8 +24,6 @@ public class Parameters {
     public static final String DATA = "data";
     public static final String EVENT = "e";
     public static final String EID = "eid";
-    @Deprecated
-    public static final String TIMESTAMP = "dtm";
     public static final String DEVICE_TIMESTAMP = "dtm";
     public static final String TRUE_TIMESTAMP = "ttm";
     public static final String SENT_TIMESTAMP = "stm";

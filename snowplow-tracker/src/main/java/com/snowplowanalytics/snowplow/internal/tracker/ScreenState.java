@@ -42,11 +42,6 @@ public class ScreenState {
         return previousType;
     }
 
-    @Deprecated
-    public void newScreenState(@NonNull String name, @Nullable String type, @Nullable String transitionType) {
-        updateScreenState(Util.getUUIDString(), name, type, transitionType);
-    }
-
     public synchronized void updateScreenState(@NonNull String id, @NonNull String name, @Nullable String type, @Nullable String transitionType) {
         this.populatePreviousFields();
         this.name = name;

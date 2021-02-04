@@ -22,14 +22,13 @@ import java.util.Map;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextPrimitive;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 /**
  * Returns a SelfDescribingJson object which will contain
  * both the Schema and Data.
  */
-public class SelfDescribingJson implements Payload, ContextPrimitive {
+public class SelfDescribingJson implements ContextPrimitive {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final HashMap<String,Object> payload = new HashMap<>();
@@ -188,47 +187,6 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
         return this;
     }
 
-    @Deprecated
-    @Override
-    public void add(@NonNull String key, @Nullable String value) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        Logger.v(TAG, "Payload: add(String, String) method called - Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void add(@NonNull String key, @Nullable Object value) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        Logger.v(TAG, "Payload: add(String, Object) method called - Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void addMap(@NonNull Map<String, Object> map) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        Logger.v(TAG, "Payload: addMap(Map<String, Object>) method called - Doing nothing.");
-    }
-
-    @Deprecated
-    @Override
-    public void addMap(@NonNull Map map, @NonNull Boolean base64_encoded, @Nullable String type_encoded,
-                       @Nullable String type_no_encoded) {
-        /*
-         * We intentionally do nothing because we do not want our SchemaPayload
-         * to do anything except accept a 'data' and 'schema'
-         */
-        Logger.v(TAG, "Payload: addMap(Map, Boolean, String, String) method called - Doing nothing.");
-    }
-
     @NonNull
     public Map<String, Object> getMap() {
         return payload;
@@ -243,6 +201,7 @@ public class SelfDescribingJson implements Payload, ContextPrimitive {
         return Util.getUTF8Length(toString());
     }
 
+    @NonNull
     @Override
     public String tag() {
         return this.tag;

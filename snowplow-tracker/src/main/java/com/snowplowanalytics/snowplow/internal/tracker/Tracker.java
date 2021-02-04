@@ -289,17 +289,6 @@ public class Tracker implements DiagnosticLogger {
         }
 
         /**
-         * @param sessionCheckInterval The session check interval
-         * @return itself
-         * @deprecated No longer needed as the session is checked for each event. It will be removed in the version 2.0.
-         */
-        @NonNull
-        @Deprecated
-        public TrackerBuilder sessionCheckInterval(long sessionCheckInterval) {
-            return this;
-        }
-
-        /**
          * @param foregroundTransitionCallback Called when session transitions to foreground
          * @param backgroundTransitionCallback Called when session transitions to background
          * @param foregroundTimeoutCallback Called when foregrounded session times-out
@@ -415,19 +404,6 @@ public class Tracker implements DiagnosticLogger {
         public TrackerBuilder screenviewEvents(@NonNull Boolean screenviewEvents) {
             this.activityTracking = screenviewEvents;
             return this;
-        }
-
-        /**
-         * @param activities whether to auto-track screenviews (onStart of activities)
-         * @param onlyTrackLabelledScreens track only activities or fragments that have a Snowplow tag
-         * @deprecated onlyTrackLabelledScreens can't filter the activities. Use {@link #screenviewEvents} instead.
-         * @return itself
-         */
-        @NonNull
-        @Deprecated
-        public TrackerBuilder screenviewEvents(@NonNull Boolean activities,
-                                               @NonNull Boolean onlyTrackLabelledScreens) {
-            return screenviewEvents(activities);
         }
 
         /**
@@ -782,18 +758,6 @@ public class Tracker implements DiagnosticLogger {
     }
 
     /**
-     * Effectively persists session also in case it expires, call the method with false to end suspension.
-     * @apiNote It can cause sessions that should be expired but still active. This way to use the session
-     * can be confusing and error prone. It will be removed in the version 2.0.
-     * @deprecated Not needed as it breaks the session concept causing weird data.
-     * Use `pauseSessionChecking` and `resumeSessionChecking` only instead.
-     */
-    @Deprecated
-    public void suspendSessionChecking(boolean isSuspended) {
-        trackerSession.isSessionUpdateEnabled = !isSuspended;
-    }
-
-    /**
      * Convenience function for starting a new session.
      */
     public void startNewSession() {
@@ -974,15 +938,6 @@ public class Tracker implements DiagnosticLogger {
      */
     public boolean getActivityTracking() {
         return this.activityTracking;
-    }
-
-    /**
-     * @return whether application lifecycle tracking is on
-     * @deprecated onlyTrackLabelledScreens is always set to false.
-     */
-    @Deprecated
-    public boolean getOnlyTrackLabelledScreens() {
-        return false;
     }
 
     /**

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
@@ -205,14 +206,16 @@ public class EventStoreTest extends AndroidTestCase {
         return eventStore;
     }
 
-    private SelfDescribingJson getEvent() {
+    private Payload getEvent() {
         TrackerPayload trackerPayload = new TrackerPayload();
         trackerPayload.add("someKey", "someValue");
         trackerPayload.add("anotherKey", "anotherValue");
-
-        return new SelfDescribingJson(
+        SelfDescribingJson event = new SelfDescribingJson(
                 "iglu:com.snowplowanalytics.snowplow/example/jsonschema/1-0-0",
                 trackerPayload);
+        TrackerPayload result = new TrackerPayload();
+        result.addMap(event.getMap());
+        return result;
     }
 
     private void waitUntilDatabaseOpen(SQLiteEventStore eventStore) throws InterruptedException {

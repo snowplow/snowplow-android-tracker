@@ -14,11 +14,14 @@
 package com.snowplowanalytics.snowplow.network;
 
 import androidx.annotation.NonNull;
+import androidx.core.provider.SelfDestructiveThread;
 
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,10 +74,12 @@ public class Request {
             payloadData.add(payload.getMap());
             tempUserAgent = getUserAgent(payload);
         }
-        this.payload = new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData);
+        payload = new TrackerPayload();
+        SelfDescribingJson payloadBundle = new SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData);
+        payload.addMap(payloadBundle.getMap());
         this.emitterEventIds = emitterEventIds;
-        this.oversize = false;
         customUserAgent = tempUserAgent;
+        oversize = false;
     }
 
     /**

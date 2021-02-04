@@ -134,7 +134,6 @@ public class Subject {
      *
      * @param context the android context
      */
-    @SuppressWarnings("deprecation")
     public void setDefaultScreenResolution(@NonNull Context context) {
         WindowManager windowManager =
                 (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);

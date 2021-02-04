@@ -241,6 +241,10 @@ public class ScreenView extends AbstractSelfDescribing {
         this.activityTag = builder.activityTag;
     }
 
+    public ScreenView(@NonNull String name) {
+        this(name, null);
+    }
+
     public ScreenView(@NonNull String name, @Nullable UUID screenId) {
         Preconditions.checkNotNull(name);
         Preconditions.checkArgument(!name.isEmpty(), "Name cannot be empty.");

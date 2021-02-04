@@ -105,18 +105,6 @@ public class Util {
     }
 
     /**
-     * Generates a random UUID for
-     * each event.
-     *
-     * @deprecated  Use `getUUIDString` instead.
-     */
-    @NonNull
-    @Deprecated
-    public static String getEventId() {
-        return getUUIDString();
-    }
-
-    /**
      *  Converts a Map to a JSONObject
      *
      *  @param map The map to convert

@@ -53,15 +53,6 @@ public class Session {
 
     private static final String TAG = Session.class.getSimpleName();
 
-    // Package Variables
-
-    /**
-     * @deprecated as it's confusing and it breaks the concept behind session keeping the session
-     * alive even when it's expired.
-     */
-    @Deprecated
-    public boolean isSessionUpdateEnabled = true;
-
     // Session Variables
     private String userId;
     private String currentSessionId = null;
@@ -180,7 +171,7 @@ public class Session {
             return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, getSessionValues());
         }
         synchronized (this) {
-            if (isSessionUpdateEnabled && shouldUpdateSession()) {
+            if (shouldUpdateSession()) {
                 Logger.d(TAG, "Update session information.");
                 updateSession(eventId);
             }

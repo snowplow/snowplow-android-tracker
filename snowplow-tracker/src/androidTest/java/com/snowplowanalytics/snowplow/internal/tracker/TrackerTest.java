@@ -17,6 +17,9 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
@@ -42,6 +45,8 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class TrackerTest extends AndroidTestCase {
 
     @Override
@@ -51,7 +56,7 @@ public class TrackerTest extends AndroidTestCase {
             Tracker tracker = Tracker.instance();
             Emitter emitter = tracker.getEmitter();
             emitter.shutdown(30);
-            tracker.close();
+            Tracker.close();
             boolean isClean = emitter.getEventStore().removeAllEvents();
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
             Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
@@ -114,15 +119,15 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals("myNamespace", tracker.getNamespace());
         assertEquals("myAppId", tracker.getAppId());
         assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
-        assertEquals(false, tracker.getBase64Encoded());
+        assertFalse(tracker.getBase64Encoded());
         assertNotNull(tracker.getEmitter());
         assertNotNull(tracker.getSubject());
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
-        assertEquals(false, tracker.getApplicationCrash());
-        assertEquals(true, tracker.getLifecycleEvents());
-        assertEquals(true, tracker.getInstallTracking());
-        assertEquals(true, tracker.getApplicationContext());
+        assertFalse(tracker.getApplicationCrash());
+        assertTrue(tracker.getLifecycleEvents());
+        assertTrue(tracker.getInstallTracking());
+        assertTrue(tracker.getApplicationContext());
     }
 
     public void testEmitterUpdate() {
@@ -172,7 +177,7 @@ public class TrackerTest extends AndroidTestCase {
                 .build();
         UUID id1 = new TrackerEvent(event).eventId;
         UUID id2 = new TrackerEvent(event).eventId;
-        assertFalse(id1.equals(id2));
+        assertNotEquals(id1, id2);
     }
 
     public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
@@ -253,7 +258,7 @@ public class TrackerTest extends AndroidTestCase {
                 .build();
 
         Log.i("testTrackWithNoContext", "Send ScreenView event");
-        tracker.track(ScreenView.builder().build());
+        tracker.track(new ScreenView("name"));
         RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
         assertNotNull(req);
         int reqCount = mockWebServer.getRequestCount();
@@ -299,7 +304,7 @@ public class TrackerTest extends AndroidTestCase {
             .build();
 
         tracker.pauseEventTracking();
-        tracker.track(ScreenView.builder().build());
+        tracker.track(new ScreenView("name"));
         RecordedRequest req = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
 
         assertEquals(0, tracker.getEmitter().getEventStore().getSize());
@@ -323,7 +328,6 @@ public class TrackerTest extends AndroidTestCase {
             .geoLocationContext(false)
             .foregroundTimeout(5)
             .backgroundTimeout(5)
-            .sessionCheckInterval(1)
             .timeUnit(TimeUnit.SECONDS)
             .build();
 
@@ -335,7 +339,7 @@ public class TrackerTest extends AndroidTestCase {
         mockWebServer.shutdown();
     }
 
-    public void testTrackScreenView() throws Exception {
+    public void testTrackScreenView() {
         Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
                 .option(BufferOption.Single)
                 .build();
@@ -349,7 +353,6 @@ public class TrackerTest extends AndroidTestCase {
                 .screenContext(true)
                 .foregroundTimeout(5)
                 .backgroundTimeout(5)
-                .sessionCheckInterval(1)
                 .timeUnit(TimeUnit.SECONDS)
                 .build();
 
@@ -382,7 +385,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(screenId, payload.get(Parameters.SV_PREVIOUS_ID));
     }
 
-    public void testTrackUncaughtException() throws InterruptedException {
+    public void testTrackUncaughtException() {
         Thread.setDefaultUncaughtExceptionHandler(
                 new TestExceptionHandler("Illegal State Exception has been thrown!")
         );
@@ -442,7 +445,7 @@ public class TrackerTest extends AndroidTestCase {
             this.expectedMessage = message;
         }
 
-        public void uncaughtException(Thread t, Throwable e) {
+        public void uncaughtException(@NonNull Thread t, Throwable e) {
             assertEquals(this.expectedMessage, e.getMessage());
         }
     }
@@ -459,6 +462,7 @@ public class TrackerTest extends AndroidTestCase {
         return mockServer;
     }
 
+    @Nullable
     @SuppressLint("DefaultLocale")
     public String getMockServerURI(MockWebServer mockServer) {
         if (mockServer != null) {

@@ -255,19 +255,4 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         json.setData(payload);
         assertEquals(45, json.getByteSize());
     }
-
-    public void testNothingFunctions() {
-        SelfDescribingJson json = new SelfDescribingJson(testSchema);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
-        json.add("k", "v");
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
-        json.add("k", (Object) null);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
-        Map<String, Object> m1 = new HashMap<>();
-        m1.put("a", "b");
-        json.addMap(m1);
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
-        json.addMap(m1, true, "co", "cx");
-        assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
-    }
 }
