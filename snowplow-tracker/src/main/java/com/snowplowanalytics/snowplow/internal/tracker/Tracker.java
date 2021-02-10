@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
@@ -72,31 +73,45 @@ public class Tracker implements DiagnosticLogger {
 
     // --- Singleton Access
 
-    private static @Nullable Tracker spTracker = null;
+    private static final @NonNull Object monitor = new Object();
+    private static volatile @Nullable Tracker spTracker = null;
 
     public static @NonNull Tracker init(@NonNull Tracker newTracker) {
-        if (spTracker == null) {
+        synchronized (monitor) {
+            if (spTracker != null) {
+                instance();
+            }
+            return reset(newTracker);
+        }
+    }
+
+    public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
+        synchronized (monitor) {
             spTracker = newTracker;
             spTracker.resumeSessionChecking();
             spTracker.getEmitter().flush();
             spTracker.initializeScreenviewTracking();
+            return instance();
         }
-        return instance();
     }
 
     public static @NonNull Tracker instance() {
-        if (spTracker == null) {
-            throw new IllegalStateException("FATAL: Tracker must be initialized first!");
-        }
+        synchronized (monitor) {
+            if (spTracker == null) {
+                throw new IllegalStateException("FATAL: Tracker must be initialized first!");
+            }
 
-        if (spTracker.getApplicationCrash() && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
-            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+            if (spTracker.getApplicationCrash() && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
+                Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+            }
+            return spTracker;
         }
-        return spTracker;
     }
 
     public static void close() {
-        if (spTracker != null) {
+        if (spTracker == null) return;
+        synchronized (monitor) {
+            if (spTracker == null) return;
             spTracker.pauseSessionChecking();
             spTracker.getEmitter().shutdown();
             spTracker = null;
@@ -423,6 +438,15 @@ public class Tracker implements DiagnosticLogger {
         @NonNull
         public Tracker build(){
             return init(new Tracker(this));
+        }
+
+        /**
+         * Reset the singleton tracker and creates a new one.
+         * @return the new Tracker object
+         */
+        @NonNull
+        Tracker buildAndReset() {
+            return reset(new Tracker(this));
         }
     }
 

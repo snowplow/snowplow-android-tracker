@@ -108,7 +108,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getForegroundTimeout(), TimeUnit.SECONDS);
+        return new TimeMeasure(tracker.getSession().getForegroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setForegroundTimeout(foregroundTimeout.convert(TimeUnit.SECONDS));
+        tracker.getSession().setForegroundTimeout(foregroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     @NonNull
@@ -127,7 +127,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getBackgroundTimeout(), TimeUnit.SECONDS);
+        return new TimeMeasure(tracker.getSession().getBackgroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.SECONDS));
+        tracker.getSession().setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     // Service method

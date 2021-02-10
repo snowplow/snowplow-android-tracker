@@ -198,7 +198,7 @@ public class ServiceProvider {
                     gdprConfiguration.documentVersion,
                     gdprConfiguration.documentDescription);
         }
-        Tracker tracker = builder.build();
+        Tracker tracker = builder.buildAndReset();
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
         }
