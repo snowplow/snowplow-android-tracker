@@ -11,16 +11,20 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.tracker.contexts.global;
+package com.snowplowanalytics.snowplow.globalcontexts;
 
+import androidx.annotation.NonNull;
+
+import com.snowplowanalytics.snowplow.internal.tracker.InspectableEvent;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
-/**
- * ContextFilter represents a callback checking an event payload on a user-provided
- * condition to decide whether a context or a set of contexts should be attached to
- * the event or not
- */
-public interface ContextFilter {
+import java.util.List;
 
-    boolean filter(TrackerPayload payload, String eventType, String eventSchema);
+public interface ContextGenerator {
+
+    @NonNull
+    List<SelfDescribingJson> generateContexts(@NonNull InspectableEvent event);
+
+    boolean filterEvent(@NonNull InspectableEvent event);
 }

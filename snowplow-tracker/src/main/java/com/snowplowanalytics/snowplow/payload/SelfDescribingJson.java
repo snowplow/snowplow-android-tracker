@@ -20,19 +20,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.contexts.global.ContextPrimitive;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 
 /**
  * Returns a SelfDescribingJson object which will contain
  * both the Schema and Data.
  */
-public class SelfDescribingJson implements ContextPrimitive {
+public class SelfDescribingJson {
 
     private final String TAG = SelfDescribingJson.class.getSimpleName();
     private final HashMap<String,Object> payload = new HashMap<>();
-    private String tag = "";
 
     /**
      * Builds a SelfDescribingJson object
@@ -45,28 +44,12 @@ public class SelfDescribingJson implements ContextPrimitive {
 
     /**
      * Builds a SelfDescribingJson object
-     */
-    public SelfDescribingJson(@NonNull String tag, @NonNull String schema) {
-        this(tag, schema, new HashMap<>());
-    }
-
-    /**
-     * Builds a SelfDescribingJson object
      *
      * @param schema the schema string
      * @param data to nest into the object
      *        as a TrackerPayload
      */
     public SelfDescribingJson(@NonNull String schema, @NonNull TrackerPayload data) {
-        setSchema(schema);
-        setData(data);
-    }
-
-    /**
-     * Builds a SelfDescribingJson object
-     */
-    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull TrackerPayload data) {
-        setTag(tag);
         setSchema(schema);
         setData(data);
     }
@@ -85,30 +68,12 @@ public class SelfDescribingJson implements ContextPrimitive {
 
     /**
      * Builds a SelfDescribingJson object
-     */
-    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull SelfDescribingJson data) {
-        setTag(tag);
-        setSchema(schema);
-        setData(data);
-    }
-
-    /**
-     * Builds a SelfDescribingJson object
      *
      * @param schema the schema string
      * @param data to nest into the object
      *        as a POJO
      */
     public SelfDescribingJson(@NonNull String schema, @NonNull Object data) {
-        setSchema(schema);
-        setData(data);
-    }
-
-    /**
-     * Builds a SelfDescribingJson object
-     */
-    public SelfDescribingJson(@NonNull String tag, @NonNull String schema, @NonNull Object data) {
-        setTag(tag);
         setSchema(schema);
         setData(data);
     }
@@ -125,17 +90,6 @@ public class SelfDescribingJson implements ContextPrimitive {
         Preconditions.checkNotNull(schema, "schema cannot be null");
         Preconditions.checkArgument(!schema.isEmpty(), "schema cannot be empty.");
         payload.put(Parameters.SCHEMA, schema);
-        return this;
-    }
-
-    /**
-     * Sets the tag for the SelfDescribingJson
-     * @param tag The identification string for the SelfDescribingJson
-     */
-    @NonNull
-    public SelfDescribingJson setTag(@NonNull String tag) {
-        Preconditions.checkNotNull(tag, "tag cannot be null");
-        this.tag = tag;
         return this;
     }
 
@@ -199,11 +153,5 @@ public class SelfDescribingJson implements ContextPrimitive {
 
     public long getByteSize() {
         return Util.getUTF8Length(toString());
-    }
-
-    @NonNull
-    @Override
-    public String tag() {
-        return this.tag;
     }
 }

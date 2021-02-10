@@ -19,18 +19,25 @@ import android.content.Context;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.configuration.Configuration;
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
@@ -41,8 +48,7 @@ import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
-import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContextUtils;
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.event.TrackerError;
 import com.snowplowanalytics.snowplow.payload.Payload;
@@ -50,7 +56,6 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.session.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.event.ScreenView;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr.Basis;
@@ -127,6 +132,8 @@ public class Tracker implements DiagnosticLogger {
     private Gdpr gdpr;
     private ScreenState screenState;
     private InstallTracker installTracker;
+
+    private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
     AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -499,6 +506,23 @@ public class Tracker implements DiagnosticLogger {
         Logger.v(TAG, "Tracker created successfully.");
     }
 
+    // --- New Methods
+
+    @NonNull
+    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
+        return ServiceProvider.setup(context, endpoint, protocol, method, namespace, appId);
+    }
+
+    @NonNull
+    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker) {
+        return ServiceProvider.setup(context, network, tracker);
+    }
+
+    @NonNull
+    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker, @NonNull List<Configuration> configurations) {
+        return ServiceProvider.setup(context, network, tracker, configurations);
+    }
+
     // --- Diagnostic
 
     @Override
@@ -559,7 +583,7 @@ public class Tracker implements DiagnosticLogger {
         }
         List<SelfDescribingJson> contexts = event.contexts;
         addBasicContextsToContexts(contexts, event);
-        addGlobalContextsToContexts(contexts, payload);
+        addGlobalContextsToContexts(contexts, event);
         wrapContextsToPayload(payload, contexts);
         return payload;
     }
@@ -634,10 +658,10 @@ public class Tracker implements DiagnosticLogger {
         }
     }
 
-    private void addGlobalContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerPayload payload) {
-        synchronized (globalContexts) {
-            if (!globalContexts.isEmpty()) {
-                contexts.addAll(GlobalContextUtils.evalGlobalContexts(payload, globalContexts));
+    private void addGlobalContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull InspectableEvent event) {
+        synchronized (globalContextGenerators) {
+            for (GlobalContext generator : globalContextGenerators.values()) {
+                contexts.addAll(generator.generateContexts(event));
             }
         }
     }
@@ -950,48 +974,36 @@ public class Tracker implements DiagnosticLogger {
 
     // --- Global contexts
 
-    private final List<GlobalContext> globalContexts = Collections.synchronizedList(new ArrayList<GlobalContext>());
-
-    public void clearGlobalContexts() {
-        globalContexts.clear();
+    public void setGlobalContextGenerators(@NonNull Map<String, GlobalContext> globalContexts) {
+        Objects.requireNonNull(globalContexts);
+        synchronized (globalContextGenerators) {
+            globalContextGenerators.clear();
+            globalContextGenerators.putAll(globalContexts);
+        }
     }
 
-    public void addGlobalContext(@NonNull GlobalContext context) {
-        globalContexts.add(context);
+    public boolean addGlobalContext(@NonNull GlobalContext generator, @NonNull String tag) {
+        Objects.requireNonNull(generator);
+        Objects.requireNonNull(tag);
+        synchronized (globalContextGenerators) {
+            if (globalContextGenerators.containsKey(tag)) {
+                return false;
+            }
+            globalContextGenerators.put(tag, generator);
+            return true;
+        }
     }
 
-    public void addGlobalContexts(@NonNull List<GlobalContext> contexts) {
-        for (GlobalContext context : contexts) {
-            addGlobalContext(context);
+    @Nullable
+    public GlobalContext removeGlobalContext(@NonNull String tag) {
+        Objects.requireNonNull(tag);
+        synchronized (globalContextGenerators) {
+            return globalContextGenerators.remove(tag);
         }
     }
 
     @NonNull
-    public ArrayList<GlobalContext> getGlobalContexts() {
-        return new ArrayList<>(globalContexts);
-    }
-
-    public void setGlobalContexts(@NonNull List<GlobalContext> contexts) {
-        clearGlobalContexts();
-        addGlobalContexts(contexts);
-    }
-
-    public void removeGlobalContexts(@NonNull List<String> tags) {
-        for (String tag: tags) {
-            removeGlobalContext(tag);
-        }
-    }
-
-    public void removeGlobalContext(@NonNull String tag) {
-        synchronized (globalContexts) {
-            Iterator<GlobalContext> it = globalContexts.iterator();
-
-            while(it.hasNext()){
-                GlobalContext globalContext = it.next();
-                if (globalContext.tag().equals(tag)) {
-                    it.remove();
-                }
-            }
-        }
+    public Set<String> getGlobalContextTags() {
+        return globalContextGenerators.keySet();
     }
 }

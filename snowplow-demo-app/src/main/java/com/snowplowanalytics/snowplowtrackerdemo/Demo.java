@@ -39,6 +39,7 @@ import android.text.method.ScrollingMovementMethod;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.net.Uri;
 
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
@@ -56,6 +57,8 @@ import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -379,7 +382,12 @@ public class Demo extends Activity implements LoggerDelegate {
         Map<String, Object> pairs = new HashMap<>();
         addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
         addToMap(Parameters.APP_BUILD, "3", pairs);
-        Tracker.instance().addGlobalContext(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs));
+        Tracker.instance().addGlobalContext(
+                new GlobalContext(
+                        Collections.singletonList(
+                                new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs)
+                        )
+                ), "test");
         Tracker.instance().enableGdprContext(Gdpr.Basis.CONSENT, "someId", "0.1.0", "this is a demo document description");
     }
 

@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive;
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-class TrackerEvent {
+public class TrackerEvent implements InspectableEvent {
     Map<String, Object> payload;
     String schema;
     String eventName;
@@ -40,7 +41,7 @@ class TrackerEvent {
     boolean isPrimitive;
     boolean isService;
 
-    TrackerEvent(@NonNull Event event) {
+    public TrackerEvent(@NonNull Event event) {
         eventId = UUID.randomUUID();
         timestamp = System.currentTimeMillis();
 
@@ -56,5 +57,25 @@ class TrackerEvent {
             schema = ((AbstractSelfDescribing) event).getSchema();
             isPrimitive = false;
         }
+    }
+
+    // InspectableEvent methods
+
+    @Nullable
+    @Override
+    public String getSchema() {
+        return schema;
+    }
+
+    @Nullable
+    @Override
+    public String getName() {
+        return eventName;
+    }
+
+    @NonNull
+    @Override
+    public Map<String, Object> getPayload() {
+        return payload;
     }
 }

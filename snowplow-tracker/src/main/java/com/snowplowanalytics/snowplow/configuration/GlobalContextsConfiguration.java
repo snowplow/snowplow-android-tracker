@@ -3,12 +3,14 @@ package com.snowplowanalytics.snowplow.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.contexts.global.GlobalContext;
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
+import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsConfigurationInterface;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public class GlobalContextsConfiguration implements Configuration {
+public class GlobalContextsConfiguration implements Configuration, GlobalContextsConfigurationInterface {
 
     @NonNull
     public final Map<String, GlobalContext> contextGenerators;
@@ -21,6 +23,13 @@ public class GlobalContextsConfiguration implements Configuration {
 
     // Methods
 
+    @NonNull
+    @Override
+    public Set<String> getTags() {
+        return contextGenerators.keySet();
+    }
+
+    @Override
     public boolean add(@NonNull String tag, @NonNull GlobalContext contextGenerator) {
         if (contextGenerators.get(tag) != null) {
             return false;
@@ -29,6 +38,7 @@ public class GlobalContextsConfiguration implements Configuration {
         return true;
     }
 
+    @Override
     @Nullable
     public GlobalContext remove(@NonNull String tag) {
         return contextGenerators.remove(tag);

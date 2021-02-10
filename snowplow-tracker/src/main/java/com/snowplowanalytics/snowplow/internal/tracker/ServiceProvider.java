@@ -191,9 +191,6 @@ public class ServiceProvider {
             builder.backgroundTimeout(sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS));
             builder.foregroundTimeout(sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
         }
-        if (globalContextsConfiguration != null) {
-            // TODO: Uniform Global Context
-        }
         if (gdprConfiguration != null) {
             builder.gdprContext(
                     gdprConfiguration.basisForProcessing,
@@ -201,7 +198,11 @@ public class ServiceProvider {
                     gdprConfiguration.documentVersion,
                     gdprConfiguration.documentDescription);
         }
-        return builder.build();
+        Tracker tracker = builder.build();
+        if (globalContextsConfiguration != null) {
+            tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
+        }
+        return tracker;
     }
 
     @NonNull

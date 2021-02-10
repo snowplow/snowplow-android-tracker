@@ -5,10 +5,12 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
+import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
+import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -28,6 +30,8 @@ public class TrackerControllerImpl implements TrackerController {
     private final EmitterControllerImpl emitter;
     @NonNull
     private final GdprControllerImpl gdpr;
+    @NonNull
+    private final GlobalContextsControllerImpl globalContexts;
 
     @NonNull
     private final Tracker tracker;
@@ -39,6 +43,7 @@ public class TrackerControllerImpl implements TrackerController {
         session = new SessionControllerImpl(tracker);
         emitter = new EmitterControllerImpl(tracker.emitter);
         gdpr = new GdprControllerImpl(tracker);
+        globalContexts = new GlobalContextsControllerImpl(tracker);
         // TODO: Add other controllers
         NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
         if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
@@ -70,6 +75,12 @@ public class TrackerControllerImpl implements TrackerController {
     @NonNull
     public GdprController getGdpr() {
         return gdpr;
+    }
+
+    @NonNull
+    @Override
+    public GlobalContextsController getGlobalContexts() {
+        return globalContexts;
     }
 
     // Control methods
