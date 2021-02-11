@@ -210,12 +210,12 @@ public class TrackerControllerImpl implements TrackerController {
 
     @Override
     public boolean isSessionContext() {
-        return tracker.sessionContext;
+        return tracker.getSessionContext();
     }
 
     @Override
     public void setSessionContext(boolean sessionContext) {
-        tracker.sessionContext = sessionContext;
+        tracker.setSessionContext(sessionContext);
     }
 
     @Override

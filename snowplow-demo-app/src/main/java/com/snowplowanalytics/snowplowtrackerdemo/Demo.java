@@ -41,7 +41,6 @@ import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -54,10 +53,10 @@ import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -388,7 +387,7 @@ public class Demo extends Activity implements LoggerDelegate {
                                 new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs)
                         )
                 ), "test");
-        Tracker.instance().enableGdprContext(Gdpr.Basis.CONSENT, "someId", "0.1.0", "this is a demo document description");
+        Tracker.instance().enableGdprContext(Basis.CONSENT, "someId", "0.1.0", "this is a demo document description");
     }
 
     /**

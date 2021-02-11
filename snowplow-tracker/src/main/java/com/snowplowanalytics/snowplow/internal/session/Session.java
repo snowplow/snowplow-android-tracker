@@ -101,18 +101,21 @@ public class Session {
      * @param backgroundTimeoutCallback called on background timeout.
      */
     @NonNull
-    public synchronized static Session getInstance(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit,
-                                                   @NonNull Context context,
-                                                   @Nullable Runnable foregroundTransitionCallback,
-                                                   @Nullable Runnable backgroundTransitionCallback,
-                                                   @Nullable Runnable foregroundTimeoutCallback,
-                                                   @Nullable Runnable backgroundTimeoutCallback)
+    public synchronized static Session getInstance(@NonNull Context context,
+                                                   long foregroundTimeout,
+                                                   long backgroundTimeout,
+                                                   @NonNull TimeUnit timeUnit,
+                                                   @Nullable Runnable[] sessionCallbacks)
     {
         Session session = new Session(foregroundTimeout, backgroundTimeout, timeUnit, context);
-        session.foregroundTransitionCallback = foregroundTransitionCallback;
-        session.backgroundTransitionCallback = backgroundTransitionCallback;
-        session.foregroundTimeoutCallback = foregroundTimeoutCallback;
-        session.backgroundTimeoutCallback = backgroundTimeoutCallback;
+        Runnable[] callbacks = {null, null, null, null};
+        if (sessionCallbacks.length == 4) {
+            callbacks = sessionCallbacks;
+        }
+        session.foregroundTransitionCallback = callbacks[0];
+        session.backgroundTransitionCallback = callbacks[1];
+        session.foregroundTimeoutCallback = callbacks[2];
+        session.backgroundTimeoutCallback = callbacks[3];
         return session;
     }
 

@@ -1,15 +1,14 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
+import com.snowplowanalytics.snowplow.util.Basis;
 
 public class GdprConfiguration implements Configuration, GdprConfigurationInterface {
 
     @NonNull
-    public final Gdpr.Basis basisForProcessing;
+    public final Basis basisForProcessing;
     @NonNull
     public final String documentId;
     @NonNull
@@ -19,7 +18,7 @@ public class GdprConfiguration implements Configuration, GdprConfigurationInterf
 
     // Constructors
 
-    public GdprConfiguration(@NonNull Gdpr.Basis basisForProcessing,
+    public GdprConfiguration(@NonNull Basis basisForProcessing,
                              @NonNull String documentId,
                              @NonNull String documentVersion,
                              @NonNull String documentDescription)
@@ -34,7 +33,7 @@ public class GdprConfiguration implements Configuration, GdprConfigurationInterf
 
     @Override
     @NonNull
-    public Gdpr.Basis getBasisForProcessing() {
+    public Basis getBasisForProcessing() {
         return basisForProcessing;
     }
 

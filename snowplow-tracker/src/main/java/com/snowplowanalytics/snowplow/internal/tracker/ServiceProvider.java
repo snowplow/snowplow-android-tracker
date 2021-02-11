@@ -53,7 +53,7 @@ public class ServiceProvider {
 
     // Constructors
 
-    private ServiceProvider(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
+    ServiceProvider(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(networkConfiguration);
         Objects.requireNonNull(trackerConfiguration);
@@ -108,7 +108,7 @@ public class ServiceProvider {
     // Getters
 
     @NonNull
-    private Subject getSubject() {
+    Subject getSubject() {
         if (subject == null) {
             subject = makeSubject();
         }
@@ -116,7 +116,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    private Emitter getEmitter() {
+    Emitter getEmitter() {
         if (emitter == null) {
             emitter = makeEmitter();
         }
@@ -124,7 +124,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    private Tracker getTracker() {
+    Tracker getTracker() {
         if (tracker == null) {
             tracker = makeTracker();
         }

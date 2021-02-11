@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
@@ -59,7 +58,7 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
-import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr.Basis;
+import com.snowplowanalytics.snowplow.util.Basis;
 
 
 /**
@@ -129,7 +128,7 @@ public class Tracker implements DiagnosticLogger {
     boolean base64Encoded;
     DevicePlatforms devicePlatform;
     LogLevel level;
-    boolean sessionContext;
+    private boolean sessionContext;
     Runnable[] sessionCallbacks;
     int threadCount;
     TimeUnit timeUnit;
@@ -147,6 +146,9 @@ public class Tracker implements DiagnosticLogger {
     private Gdpr gdpr;
     private ScreenState screenState;
     private InstallTracker installTracker;
+
+    private long foregroundTimeout;
+    private long backgroundTimeout;
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
@@ -481,6 +483,8 @@ public class Tracker implements DiagnosticLogger {
         this.applicationContext = builder.applicationContext;
         this.gdpr = builder.gdpr;
         this.level = builder.logLevel;
+        this.foregroundTimeout = builder.foregroundTimeout;
+        this.backgroundTimeout = builder.backgroundTimeout;
 
         if (trackerDiagnostic) {
             if (level == LogLevel.OFF) {
@@ -502,16 +506,7 @@ public class Tracker implements DiagnosticLogger {
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;
             }
-            this.trackerSession = Session.getInstance(
-                    builder.foregroundTimeout,
-                    builder.backgroundTimeout,
-                    builder.timeUnit,
-                    builder.context,
-                    callbacks[0],
-                    callbacks[1],
-                    callbacks[2],
-                    callbacks[3]
-            );
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
         }
 
         // If lifecycleEvents is True
@@ -656,16 +651,16 @@ public class Tracker implements DiagnosticLogger {
 
         if (sessionContext) {
             String eventId = event.eventId.toString();
-            if (trackerSession.getHasLoadedFromFile()) {
+            if (trackerSession != null && trackerSession.getHasLoadedFromFile()) {
                 synchronized (trackerSession) {
                     SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
                     if (sessionContextJson == null) {
-                        Logger.track(TAG, "Method getSessionContext method returned null with eventId: %s", eventId);
+                        Logger.track(TAG, "Method getSessionContext returned null with eventId: %s", eventId);
                     }
                     contexts.add(sessionContextJson);
                 }
             } else {
-                Logger.track(TAG, "Method getHasLoadedFromFile method returned false with eventId: %s", eventId);
+                Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
             }
         }
 
@@ -861,7 +856,20 @@ public class Tracker implements DiagnosticLogger {
      * Whether the session context should be sent with events
      * @param shouldSend
      */
-    public void setSessionContext(boolean shouldSend) { this.sessionContext = shouldSend; }
+    public void setSessionContext(boolean shouldSend) {
+        sessionContext = shouldSend;
+        if (trackerSession == null && shouldSend) {
+            Runnable[] callbacks = {null, null, null, null};
+            if (sessionCallbacks.length == 4) {
+                callbacks = sessionCallbacks;
+            }
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
+        }
+    }
+
+    public boolean getSessionContext() {
+        return sessionContext;
+    }
 
     /**
      * @param platform a valid DevicePlatforms object

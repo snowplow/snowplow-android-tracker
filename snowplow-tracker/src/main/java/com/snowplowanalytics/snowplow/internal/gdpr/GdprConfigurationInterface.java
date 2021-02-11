@@ -2,9 +2,11 @@ package com.snowplowanalytics.snowplow.internal.gdpr;
 
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.util.Basis;
+
 public interface GdprConfigurationInterface {
     @Nullable
-    Gdpr.Basis getBasisForProcessing();
+    Basis getBasisForProcessing();
 
     @Nullable
     String getDocumentId();

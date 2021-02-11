@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.util.Basis;
 
 public class GdprControllerImpl implements GdprController {
 
@@ -15,7 +16,7 @@ public class GdprControllerImpl implements GdprController {
     private Gdpr gdpr;
 
     @Nullable
-    private Gdpr.Basis basisForProcessing;
+    private Basis basisForProcessing;
     @Nullable
     private String documentId;
     @Nullable
@@ -30,7 +31,7 @@ public class GdprControllerImpl implements GdprController {
     }
 
     @Override
-    public void reset(@NonNull Gdpr.Basis basisForProcessing, @NonNull String documentId, @NonNull String documentVersion, @NonNull String documentDescription) {
+    public void reset(@NonNull Basis basisForProcessing, @NonNull String documentId, @NonNull String documentVersion, @NonNull String documentDescription) {
         tracker.enableGdprContext(basisForProcessing, documentId, documentVersion, documentDescription);
         gdpr = tracker.getGdprContext();
     }
@@ -56,7 +57,7 @@ public class GdprControllerImpl implements GdprController {
 
     @Nullable
     @Override
-    public Gdpr.Basis getBasisForProcessing() {
+    public Basis getBasisForProcessing() {
         if (gdpr == null) {
             return null;
         }
