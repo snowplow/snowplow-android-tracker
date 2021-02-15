@@ -9,7 +9,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }

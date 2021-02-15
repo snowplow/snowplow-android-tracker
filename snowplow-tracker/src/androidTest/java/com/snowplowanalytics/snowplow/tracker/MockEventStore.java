@@ -3,7 +3,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.emitter.EventStore;
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterEvent;
+import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;

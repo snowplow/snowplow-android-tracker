@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.internal.session;
 import android.annotation.TargetApi;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.Lifecycle;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();

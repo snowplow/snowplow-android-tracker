@@ -2,11 +2,13 @@ package com.snowplowanalytics.snowplow.internal.gdpr;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.util.Basis;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class GdprControllerImpl implements GdprController {
 
     @NonNull

@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.internal.globalcontexts;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class GlobalContextsControllerImpl implements GlobalContextsController {
 
     @NonNull

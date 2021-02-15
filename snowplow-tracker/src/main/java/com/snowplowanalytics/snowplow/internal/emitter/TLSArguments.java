@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.internal.emitter;
 
+import androidx.annotation.RestrictTo;
+
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,6 +27,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class TLSArguments {
     private X509TrustManager trustManager = null;
     private SSLSocketFactory sslSocketFactory = null;

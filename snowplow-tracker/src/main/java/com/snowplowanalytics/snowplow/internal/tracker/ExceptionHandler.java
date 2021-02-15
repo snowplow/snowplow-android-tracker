@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -24,6 +25,7 @@ import com.snowplowanalytics.snowplow.internal.utils.Util;
 import java.util.HashMap;
 import java.util.Map;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String TAG = ExceptionHandler.class.getSimpleName();

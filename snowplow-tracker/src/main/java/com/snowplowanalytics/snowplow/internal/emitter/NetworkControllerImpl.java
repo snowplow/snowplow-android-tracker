@@ -2,11 +2,13 @@ package com.snowplowanalytics.snowplow.internal.emitter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.NetworkController;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class NetworkControllerImpl implements NetworkController {
 
     @NonNull

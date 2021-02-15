@@ -17,7 +17,7 @@ import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.tracker.InspectableEvent;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerEvent;
 import com.snowplowanalytics.snowplow.network.HttpMethod;

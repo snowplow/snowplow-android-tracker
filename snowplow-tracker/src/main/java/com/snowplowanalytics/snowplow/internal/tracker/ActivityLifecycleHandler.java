@@ -20,12 +20,15 @@ import android.os.Build;
 import android.os.Bundle;
 
 
+import androidx.annotation.RestrictTo;
+
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
     private static final String TAG = ActivityLifecycleHandler.class.getSimpleName();

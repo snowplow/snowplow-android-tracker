@@ -2,7 +2,7 @@ package com.snowplowanalytics.snowplow.globalcontexts;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.internal.tracker.InspectableEvent;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 
 public abstract class FunctionalFilter {
 

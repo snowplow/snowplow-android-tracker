@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.session;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
@@ -9,6 +10,7 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.concurrent.TimeUnit;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class SessionControllerImpl implements SessionController {
 
     private final String TAG = SessionControllerImpl.class.getName();

@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
@@ -20,6 +21,7 @@ import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class TrackerControllerImpl implements TrackerController {
 
     @Nullable
@@ -44,7 +46,6 @@ public class TrackerControllerImpl implements TrackerController {
         emitter = new EmitterControllerImpl(tracker.emitter);
         gdpr = new GdprControllerImpl(tracker);
         globalContexts = new GlobalContextsControllerImpl(tracker);
-        // TODO: Add other controllers
         NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
         if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
             network = new NetworkControllerImpl(tracker.emitter);

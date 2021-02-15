@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.emitter;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.payload.Payload;
 
 import java.util.List;

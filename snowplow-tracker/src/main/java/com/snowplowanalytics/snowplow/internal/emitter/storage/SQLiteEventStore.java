@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterEvent;
+import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;

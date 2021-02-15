@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.internal.gdpr;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -11,6 +12,7 @@ import com.snowplowanalytics.snowplow.util.Basis;
 import java.util.HashMap;
 import java.util.Map;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class Gdpr {
 
     final Basis basisForProcessing;

@@ -22,6 +22,7 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,6 +45,7 @@ import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -64,7 +66,9 @@ import com.snowplowanalytics.snowplow.util.Basis;
 /**
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
+ * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
  */
+@Deprecated
 public class Tracker implements DiagnosticLogger {
 
     private final static String TAG = Tracker.class.getSimpleName();
@@ -156,7 +160,9 @@ public class Tracker implements DiagnosticLogger {
 
     /**
      * Builder for the Tracker
+     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
      */
+    @Deprecated
     public static class TrackerBuilder {
 
         final @NonNull Emitter emitter; // Required
@@ -538,8 +544,8 @@ public class Tracker implements DiagnosticLogger {
     }
 
     @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker, @NonNull List<Configuration> configurations) {
-        return ServiceProvider.setup(context, network, tracker, configurations);
+    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker, @NonNull Configuration... configurations) {
+        return ServiceProvider.setup(context, network, tracker, Arrays.asList(configurations));
     }
 
     // --- Diagnostic

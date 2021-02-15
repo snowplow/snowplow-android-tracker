@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -9,6 +10,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class ScreenState {
     private String name;
     private String type;

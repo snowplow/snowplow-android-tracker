@@ -92,6 +92,9 @@
 
 package com.snowplowanalytics.snowplow.internal.utils;
 
+import androidx.annotation.RestrictTo;
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class Preconditions {
     private Preconditions() {}
 

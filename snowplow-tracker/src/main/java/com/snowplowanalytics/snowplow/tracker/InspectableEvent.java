@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.internal.tracker;
+package com.snowplowanalytics.snowplow.tracker;
 
 
 import androidx.annotation.NonNull;

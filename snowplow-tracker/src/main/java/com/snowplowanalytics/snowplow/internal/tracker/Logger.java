@@ -17,6 +17,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
@@ -27,6 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
  * of 'SnowplowTracker' to the log TAG as well as logging the
  * Thread.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class Logger {
 
     private static final String TAG = Logger.class.getSimpleName();
@@ -181,6 +183,7 @@ public class Logger {
 /**
  * Default internal logger delegate
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 class DefaultLoggerDelegate implements LoggerDelegate {
     @Override
     public void error(String tag, String msg) {

@@ -16,7 +16,7 @@ package com.snowplowanalytics.snowplow.globalcontexts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.internal.tracker.InspectableEvent;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.internal.tracker.SchemaRule;
 
 import java.util.ArrayList;

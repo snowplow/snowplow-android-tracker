@@ -21,7 +21,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.event.TrackerError;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;

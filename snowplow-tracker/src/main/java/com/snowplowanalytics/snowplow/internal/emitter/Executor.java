@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.internal.emitter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
@@ -27,6 +28,7 @@ import java.util.concurrent.Future;
  * Static Class which holds the logic for controlling
  * the Thread Pool for the Classic Tracker.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class Executor {
 
     private static ExecutorService executor;

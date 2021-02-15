@@ -112,7 +112,7 @@ install {
         pom.version = "$project.version"
         pom.project {
             name = 'snowplow-android-tracker'
-            description = 'Snowplow event tracker for Android 14+. Add analytics to your apps and games.'
+            description = 'Snowplow event tracker for Android 16+. Add analytics to your apps and games.'
             url = 'https://github.com/snowplow/snowplow-android-tracker'
             inceptionYear = '2014'
 

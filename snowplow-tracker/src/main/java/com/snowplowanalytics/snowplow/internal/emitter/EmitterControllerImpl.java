@@ -2,11 +2,13 @@ package com.snowplowanalytics.snowplow.internal.emitter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class EmitterControllerImpl implements EmitterController {
 
     @NonNull

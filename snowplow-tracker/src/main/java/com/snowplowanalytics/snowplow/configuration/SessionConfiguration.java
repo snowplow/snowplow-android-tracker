@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;

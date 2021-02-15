@@ -18,6 +18,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
@@ -47,7 +48,9 @@ import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
+ * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
  */
+@Deprecated
 public class Emitter {
 
     private static final int POST_WRAPPER_BYTES = 88; // "schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3","data":[]
@@ -80,7 +83,9 @@ public class Emitter {
 
     /**
      * Builder for the Emitter.
+     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
      */
+    @Deprecated
     public static class EmitterBuilder {
         final @Nullable String uri; // Required
         final @NonNull Context context; // Required

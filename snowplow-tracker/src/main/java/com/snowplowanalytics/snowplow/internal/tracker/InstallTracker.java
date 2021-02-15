@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -25,6 +26,7 @@ import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants
 
 import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class InstallTracker {
     /**
      * Class used to keep track of install state of app.

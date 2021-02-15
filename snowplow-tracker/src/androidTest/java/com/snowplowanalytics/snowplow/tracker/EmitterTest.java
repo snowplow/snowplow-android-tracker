@@ -20,7 +20,6 @@ import android.test.AndroidTestCase;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
@@ -29,14 +28,11 @@ import com.snowplowanalytics.snowplow.network.Request;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.network.RequestResult;
-import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.snowplowanalytics.snowplow.emitter.BufferOption.DefaultGroup;

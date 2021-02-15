@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class ServiceProvider {
 
     @NonNull

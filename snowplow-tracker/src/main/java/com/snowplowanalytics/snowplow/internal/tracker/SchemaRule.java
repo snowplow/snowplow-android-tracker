@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class SchemaRule {
 
     private final static String RULE_PATTERN = "^iglu:((?:(?:[a-zA-Z0-9-_]+|\\*)\\.)+(?:[a-zA-Z0-9-_]+|\\*))\\/([a-zA-Z0-9-_\\.]+|\\*)\\/([a-zA-Z0-9-_\\.]+|\\*)\\/([1-9][0-9]*|\\*)-(0|[1-9][0-9]*|\\*)-(0|[1-9][0-9]*|\\*)$";

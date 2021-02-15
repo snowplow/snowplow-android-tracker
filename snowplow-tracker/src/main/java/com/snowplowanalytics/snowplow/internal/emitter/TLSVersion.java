@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.internal.emitter;
 
+import androidx.annotation.RestrictTo;
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public enum TLSVersion {
     /**
      * Accepted versions of TLS to be used by emitter.

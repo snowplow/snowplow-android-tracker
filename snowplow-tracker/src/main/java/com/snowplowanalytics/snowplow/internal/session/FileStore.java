@@ -17,6 +17,7 @@ package com.snowplowanalytics.snowplow.internal.session;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
@@ -32,6 +33,7 @@ import java.util.Map;
  * Saves Map objects to physical files in a
  * private area designated to the application.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class FileStore {
 
     private static final String TAG = FileStore.class.getSimpleName();

@@ -17,12 +17,15 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.RestrictTo;
+
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 /**
  * Helper class for building and maintaining the SQLite
  * Database used by the Tracker.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class EventStoreHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_EVENTS         = "events";

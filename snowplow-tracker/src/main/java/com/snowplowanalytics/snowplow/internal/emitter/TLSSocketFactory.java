@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.internal.emitter;
 
+import androidx.annotation.RestrictTo;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -24,6 +26,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class TLSSocketFactory extends SSLSocketFactory {
 
     private SSLSocketFactory internalSSLSocketFactory;
