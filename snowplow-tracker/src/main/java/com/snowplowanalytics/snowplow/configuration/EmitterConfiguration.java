@@ -135,7 +135,7 @@ public class EmitterConfiguration implements Configuration, com.snowplowanalytic
     }
 
     @NonNull
-    public EmitterConfiguration threadPoolSize(@Nullable RequestCallback requestCallback) {
+    public EmitterConfiguration requestCallback(@Nullable RequestCallback requestCallback) {
         this.requestCallback = requestCallback;
         return this;
     }

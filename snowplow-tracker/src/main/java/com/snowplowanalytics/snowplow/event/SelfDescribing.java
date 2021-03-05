@@ -15,16 +15,16 @@ package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
 
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 
 import java.util.Map;
 
 /**
  * Constructs an SelfDescribing event object.
- * @deprecated It will be removed in version 3.0. Use {@link #Unstructured} instead.
  */
-@Deprecated
-public class SelfDescribing extends Unstructured {
+public class SelfDescribing extends AbstractSelfDescribing {
 
     public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
 
@@ -62,6 +62,37 @@ public class SelfDescribing extends Unstructured {
     }
 
     protected SelfDescribing(@NonNull Builder<?> builder) {
-        super(builder.eventData);
+        this(builder.eventData);
+    }
+
+    @NonNull
+    public final SelfDescribingJson eventData;
+
+    @NonNull
+    private final Map<String, Object> payload;
+    @NonNull
+    private final String schema;
+
+    public SelfDescribing(@NonNull SelfDescribingJson eventData) {
+        Preconditions.checkNotNull(eventData);
+        Map<String, Object> eventDataMap = eventData.getMap();
+        Preconditions.checkNotNull(eventDataMap);
+        Map<String, Object> payload = (Map<String, Object>)eventDataMap.get(Parameters.DATA);
+        Preconditions.checkNotNull(payload);
+        this.payload = payload;
+        String schema = (String)eventDataMap.get(Parameters.SCHEMA);
+        Preconditions.checkNotNull(schema);
+        this.schema = schema;
+        this.eventData = eventData;
+    }
+
+    @Override
+    public @NonNull Map<String, Object> getDataPayload() {
+        return payload;
+    }
+
+    @Override
+    public @NonNull String getSchema() {
+        return schema;
     }
 }

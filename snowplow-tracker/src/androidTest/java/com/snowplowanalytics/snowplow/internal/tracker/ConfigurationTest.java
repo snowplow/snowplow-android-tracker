@@ -63,10 +63,10 @@ public class ConfigurationTest {
     @Test
     public void basicInitialization() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
         trackerConfiguration.platformContext = true;
-        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration);
+        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
 
         assertNotNull(tracker);
         URI uri = URI.create(tracker.getNetwork().getEndpoint());
@@ -87,7 +87,7 @@ public class ConfigurationTest {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         TimeMeasure expectedForeground = new TimeMeasure(42, TimeUnit.SECONDS);
         TimeMeasure expectedBackground = new TimeMeasure(24, TimeUnit.SECONDS);
-        NetworkConfiguration networkConfig = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfig = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
         SessionConfiguration sessionConfig = new SessionConfiguration(expectedForeground, expectedBackground);
         TrackerController tracker = Tracker.setup(context, networkConfig, trackerConfig, sessionConfig);
@@ -100,14 +100,14 @@ public class ConfigurationTest {
     @Test
     public void sessionControllerUnavailableWhenContextTurnedOff() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
         trackerConfiguration.sessionContext = true;
-        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration);
+        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
         assertNotNull(tracker.getSession());
 
         trackerConfiguration.sessionContext = false;
-        tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration);
+        tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
         assertNull(tracker.getSession());
 
         tracker.setSessionContext(true);
@@ -120,7 +120,7 @@ public class ConfigurationTest {
     @Test
     public void emitterConfiguration() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .bufferOption(BufferOption.DefaultGroup)
@@ -148,7 +148,7 @@ public class ConfigurationTest {
     public void gdprConfiguration() throws InterruptedException {
         MockEventStore eventStore = new MockEventStore();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid")
                 .base64encoding(false);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
@@ -209,7 +209,7 @@ public class ConfigurationTest {
     public void globalContextsConfiguration() throws InterruptedException {
         MockEventStore eventStore = new MockEventStore();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid")
                 .base64encoding(false);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()

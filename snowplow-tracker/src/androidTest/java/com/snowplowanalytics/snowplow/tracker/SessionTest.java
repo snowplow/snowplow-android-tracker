@@ -81,7 +81,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     public void testEventsOnSameSession() throws InterruptedException {
-        Session session = getSession(20, 0);
+        Session session = getSession(5, 0);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
         String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
@@ -103,7 +103,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(20100);
+        Thread.sleep(5100);
 
         sessionContext = getSessionContext(session, "event_4");
         assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
@@ -112,7 +112,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
-        Session session = getSession(0, 20);
+        Session session = getSession(0, 5);
 
         session.setIsBackground(true);
 
@@ -136,7 +136,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(20100);
+        Thread.sleep(5100);
 
         sessionContext = getSessionContext(session, "event_4");
         assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));

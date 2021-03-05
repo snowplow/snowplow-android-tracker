@@ -14,9 +14,7 @@
 package com.snowplowanalytics.snowplow.network;
 
 import androidx.annotation.NonNull;
-import androidx.core.provider.SelfDestructiveThread;
 
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.Payload;

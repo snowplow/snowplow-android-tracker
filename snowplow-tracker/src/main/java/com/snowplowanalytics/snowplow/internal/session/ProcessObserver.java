@@ -23,11 +23,10 @@ import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
 
-import com.snowplowanalytics.snowplow.event.Unstructured;
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
@@ -91,7 +90,7 @@ public class ProcessObserver implements LifecycleObserver {
                 if (tracker.getLifecycleEvents()) {
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
-                    tracker.track(new Unstructured(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
+                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
                             .contexts(lifecycleContexts)
                     );
                 }
@@ -122,7 +121,7 @@ public class ProcessObserver implements LifecycleObserver {
                 if (tracker.getLifecycleEvents()) {
                     Map<String, Object> data = new HashMap<>();
                     Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
-                    tracker.track(new Unstructured(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
+                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
                             .contexts(lifecycleContexts)
                     );
                 }

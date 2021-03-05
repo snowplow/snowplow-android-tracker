@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.configuration;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -35,13 +37,30 @@ public class NetworkConfiguration implements Configuration {
         method = HttpMethod.POST;
     }
 
-    public NetworkConfiguration(@NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method) {
-        Objects.requireNonNull(endpoint);
-        Objects.requireNonNull(protocol);
+    public NetworkConfiguration(@NonNull String endpoint, @NonNull HttpMethod method) {
         Objects.requireNonNull(method);
-        this.endpoint = endpoint;
-        this.protocol = protocol;
         this.method = method;
+        Objects.requireNonNull(endpoint);
+        Uri uri = Uri.parse(endpoint);
+        String scheme = uri.getScheme();
+        if (scheme == null) {
+            protocol = Protocol.HTTPS;
+            this.endpoint = endpoint;
+            return;
+        }
+        switch (scheme) {
+            case "https":
+                protocol = Protocol.HTTPS;
+                this.endpoint = endpoint.substring(8);
+                break;
+            case "http":
+                protocol = Protocol.HTTP;
+                this.endpoint = endpoint.substring(7);
+                break;
+            default:
+                protocol = Protocol.HTTPS;
+                this.endpoint = endpoint;
+        }
     }
 
     public NetworkConfiguration(@NonNull NetworkConnection networkConnection) {
@@ -92,7 +111,8 @@ public class NetworkConfiguration implements Configuration {
             Objects.requireNonNull(endpoint);
             Objects.requireNonNull(protocol);
             Objects.requireNonNull(method);
-            copy = new NetworkConfiguration(endpoint, protocol, method);
+            String scheme = protocol == Protocol.HTTPS ? "https://" : "http://";
+            copy = new NetworkConfiguration(scheme + endpoint, method);
         }
         copy.customPostPath = customPostPath;
         copy.timeout = timeout;

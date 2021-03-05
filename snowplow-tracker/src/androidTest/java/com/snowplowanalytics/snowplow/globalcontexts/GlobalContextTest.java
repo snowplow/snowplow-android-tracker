@@ -247,7 +247,7 @@ public class GlobalContextTest {
 
     private TrackerController getTracker(Map<String, GlobalContext> generators) {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
-        NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme.fake", Protocol.HTTPS, HttpMethod.POST);
+        NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme.fake", HttpMethod.POST);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("aNamespace", "anAppId")
                 .platformContext(true)
                 .geoLocationContext(false)

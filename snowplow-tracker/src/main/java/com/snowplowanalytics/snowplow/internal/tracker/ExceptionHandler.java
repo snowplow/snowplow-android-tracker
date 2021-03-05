@@ -16,9 +16,9 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 

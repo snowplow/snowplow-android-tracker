@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
 import androidx.annotation.NonNull;
 
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.event.ConsentDocument;
 import com.snowplowanalytics.snowplow.event.ConsentGranted;
@@ -23,7 +24,6 @@ import com.snowplowanalytics.snowplow.event.EcommerceTransaction;
 import com.snowplowanalytics.snowplow.event.EcommerceTransactionItem;
 import com.snowplowanalytics.snowplow.event.PageView;
 import com.snowplowanalytics.snowplow.event.ScreenView;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;

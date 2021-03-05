@@ -534,13 +534,15 @@ public class Tracker implements DiagnosticLogger {
     // --- New Methods
 
     @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
-        return ServiceProvider.setup(context, endpoint, protocol, method, namespace, appId);
+    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
+        NetworkConfiguration network = new NetworkConfiguration(endpoint, method);
+        TrackerConfiguration tracker = new TrackerConfiguration(namespace, appId);
+        return Tracker.setup(context, network, tracker);
     }
 
     @NonNull
     public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker) {
-        return ServiceProvider.setup(context, network, tracker);
+        return Tracker.setup(context, network, tracker);
     }
 
     @NonNull

@@ -90,18 +90,6 @@ public class ServiceProvider {
     // Setup
 
     @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull Protocol protocol, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration(endpoint, protocol, method);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration(namespace, appId);
-        return setup(context, networkConfiguration, trackerConfiguration);
-    }
-
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration) {
-        return setup(context, networkConfiguration, trackerConfiguration, new ArrayList<>());
-    }
-
-    @NonNull
     public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
         ServiceProvider serviceProvider = new ServiceProvider(context, networkConfiguration, trackerConfiguration, configurations);
         return serviceProvider.getTrackerController();
