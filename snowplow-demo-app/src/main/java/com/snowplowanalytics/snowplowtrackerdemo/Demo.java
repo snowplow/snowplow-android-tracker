@@ -39,29 +39,38 @@ import android.text.method.ScrollingMovementMethod;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.net.Uri;
 
+import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.configuration.GdprConfiguration;
+import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.Gdpr;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.tracker.Subject;
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
-import com.snowplowanalytics.snowplow.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.Emitter;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Util;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.snowplow.util.Basis;
+import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static com.snowplowanalytics.snowplow.tracker.utils.Util.addToMap;
+import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 
 /**
  * Classic Demo Activity.
@@ -135,7 +144,7 @@ public class Demo extends Activity implements LoggerDelegate {
     @Override
     protected void onResume() {
         super.onResume();
-        Tracker.instance().suspendSessionChecking(false);
+        Tracker.instance().resumeSessionChecking();
     }
 
     /**
@@ -145,7 +154,7 @@ public class Demo extends Activity implements LoggerDelegate {
         _tabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tracker.instance().suspendSessionChecking(true);
+                Tracker.instance().pauseSessionChecking();
                 String url = "https://snowplowanalytics.com/";
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
@@ -194,8 +203,8 @@ public class Demo extends Activity implements LoggerDelegate {
 
         HttpMethod method = _type.getCheckedRadioButtonId() ==
                 _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
-        RequestSecurity security = _security.getCheckedRadioButtonId() ==
-                _radioHttp.getId() ? RequestSecurity.HTTP : RequestSecurity.HTTPS;
+        Protocol security = _security.getCheckedRadioButtonId() ==
+                _radioHttp.getId() ? Protocol.HTTP : Protocol.HTTPS;
 
         if (!e.getEmitterStatus()) {
             e.setEmitterUri(uri);
@@ -204,7 +213,7 @@ public class Demo extends Activity implements LoggerDelegate {
         }
 
         if (!uri.equals("")) {
-            eventsCreated += 14;
+            eventsCreated += 9;
             final String made = "Made: " + eventsCreated;
             _eventsCreated.setText(made);
             TrackerEvents.trackAll(Tracker.instance());
@@ -343,44 +352,52 @@ public class Demo extends Activity implements LoggerDelegate {
      * Builds a Tracker
      */
     private void initAndroidTracker() {
-        Tracker.close();
-
-        Emitter emitter = new Emitter.EmitterBuilder("", this.getApplicationContext())
-                .callback(getCallback())
-                .tick(1)
-                .build();
-
-        Subject subject = new Subject.SubjectBuilder()
-                .context(this.getApplicationContext())
-                .build();
-
-        Tracker.init(new Tracker.TrackerBuilder(emitter, namespace, appId, this.getApplicationContext())
-                .level(LogLevel.VERBOSE)
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("");
+        EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
+                .requestCallback(getCallback())
+                .threadPoolSize(20)
+                .emitRange(500)
+                .byteLimitPost(52000);
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration(namespace, appId)
+                .logLevel(LogLevel.VERBOSE)
                 .loggerDelegate(this)
-                .base64(false)
-                .platform(DevicePlatforms.Mobile)
-                .subject(subject)
-                .threadCount(20)
+                .base64encoding(false)
+                .devicePlatform(DevicePlatforms.Mobile)
                 .sessionContext(true)
-                .mobileContext(true)
+                .platformContext(true)
+                .applicationContext(true)
                 .geoLocationContext(true)
-                .applicationCrash(true)
-                .trackerDiagnostic(true)
-                .lifecycleEvents(true)
-                .foregroundTimeout(60)
-                .backgroundTimeout(30)
-                .screenviewEvents(true)
+                .lifecycleAutotracking(true)
+                .screenViewAutotracking(true)
                 .screenContext(true)
-                .installTracking(true)
-                .applicationContext(false)
-                .build()
+                .exceptionAutotracking(true)
+                .installAutotracking(true)
+                .diagnosticAutotracking(true)
+                .installAutotracking(true);
+        SessionConfiguration sessionConfiguration = new SessionConfiguration(
+                new TimeMeasure(60, TimeUnit.SECONDS),
+                new TimeMeasure(30, TimeUnit.SECONDS)
         );
-
+        GdprConfiguration gdprConfiguration = new GdprConfiguration(
+                Basis.CONSENT,
+                "someId",
+                "0.1.0",
+                "this is a demo document description"
+        );
+        GlobalContextsConfiguration gcConfiguration = new GlobalContextsConfiguration(null);
         Map<String, Object> pairs = new HashMap<>();
         addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
         addToMap(Parameters.APP_BUILD, "3", pairs);
-        Tracker.instance().addGlobalContext(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs));
-        Tracker.instance().enableGdprContext(Gdpr.Basis.CONSENT, "someId", "0.1.0", "this is a demo document description");
+        gcConfiguration.add("ruleSetExampleTag", new GlobalContext(List.of(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs))));
+
+        Tracker.setup(getApplicationContext(),
+                networkConfiguration,
+                trackerConfiguration,
+                emitterConfiguration,
+                sessionConfiguration,
+                gdprConfiguration,
+                gcConfiguration
+        );
     }
 
     /**

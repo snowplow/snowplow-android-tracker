@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.tracker.emitter;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.internal.emitter.TLSArguments;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+
 import java.util.Arrays;
 import java.util.EnumSet;
 

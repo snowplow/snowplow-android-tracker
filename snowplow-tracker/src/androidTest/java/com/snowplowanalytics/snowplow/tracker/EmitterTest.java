@@ -17,34 +17,31 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent;
-import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity;
-import com.snowplowanalytics.snowplow.tracker.emitter.TLSVersion;
-import com.snowplowanalytics.snowplow.tracker.networkconnection.Request;
-import com.snowplowanalytics.snowplow.tracker.payload.Payload;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestResult;
-import com.snowplowanalytics.snowplow.tracker.storage.EventStore;
-import com.snowplowanalytics.snowplow.tracker.utils.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.utils.Logger;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.network.NetworkConnection;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+import com.snowplowanalytics.snowplow.network.Request;
+import com.snowplowanalytics.snowplow.payload.Payload;
+import com.snowplowanalytics.snowplow.payload.TrackerPayload;
+import com.snowplowanalytics.snowplow.network.RequestResult;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.DefaultGroup;
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.HeavyGroup;
-import static com.snowplowanalytics.snowplow.tracker.emitter.BufferOption.Single;
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.GET;
-import static com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTP;
-import static com.snowplowanalytics.snowplow.tracker.emitter.RequestSecurity.HTTPS;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.DefaultGroup;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.HeavyGroup;
+import static com.snowplowanalytics.snowplow.emitter.BufferOption.Single;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
+import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
+import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
+import static com.snowplowanalytics.snowplow.network.Protocol.HTTPS;
 
 public class EmitterTest extends AndroidTestCase {
 
@@ -135,7 +132,7 @@ public class EmitterTest extends AndroidTestCase {
         emitter = new Emitter.EmitterBuilder("com.acme", getContext())
                 .security(HTTPS)
                 .build();
-        assertEquals(RequestSecurity.HTTPS, emitter.getRequestSecurity());
+        assertEquals(Protocol.HTTPS, emitter.getRequestSecurity());
     }
 
     public void testTickSet() {
@@ -192,8 +189,9 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(Single, emitter.getBufferOption());
         assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setHttpMethod(GET);
+        String ur = emitter.getEmitterUri();
         assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
-        emitter.setRequestSecurity(RequestSecurity.HTTPS);
+        emitter.setRequestSecurity(Protocol.HTTPS);
         assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com.acme");
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
@@ -519,70 +517,3 @@ class MockNetworkConnection implements NetworkConnection {
     }
 }
 
-class MockEventStore implements EventStore {
-    private HashMap<Long, Payload> db = new HashMap<>();
-    private long lastInsertedRow = -1;
-
-    @Override
-    public void add(@NonNull Payload payload) {
-        synchronized (this) {
-            lastInsertedRow++;
-            Logger.v("MockEventStore", "Add %s", payload);
-            db.put(lastInsertedRow, payload);
-        }
-    }
-
-    @Override
-    public boolean removeEvent(long id) {
-        synchronized (this) {
-            Logger.v("MockEventStore", "Remove %s", id);
-            return db.remove(id) != null;
-        }
-    }
-
-    @Override
-    public boolean removeEvents(@NonNull List<Long> ids) {
-        boolean result = true;
-        for (long id : ids) {
-            boolean removed = removeEvent(id);
-            result = result && removed;
-        }
-        return result;
-    }
-
-    @Override
-    public boolean removeAllEvents() {
-        synchronized (this) {
-            Logger.v("MockEventStore", "Remove all");
-            db = new HashMap<>();
-            lastInsertedRow = 0;
-        }
-        return true;
-    }
-
-    @Override
-    public long getSize() {
-        return db.size();
-    }
-
-    @NonNull
-    @Override
-    public List<EmitterEvent> getEmittableEvents(int queryLimit) {
-        synchronized (this) {
-            List<Long> eventIds = new ArrayList<>();
-            List<EmitterEvent> events = new ArrayList<>();
-            for (Map.Entry<Long, Payload> entry : db.entrySet()) {
-                Payload payloadCopy = new TrackerPayload();
-                payloadCopy.addMap(entry.getValue().getMap());
-                EmitterEvent event = new EmitterEvent(payloadCopy, entry.getKey());
-                eventIds.add(event.eventId);
-                events.add(event);
-            }
-            if (queryLimit < events.size()) {
-                events = events.subList(0, queryLimit);
-            }
-            Logger.v("MockEventStore", "getEmittableEvents: %s", eventIds);
-            return events;
-        }
-    }
-}
