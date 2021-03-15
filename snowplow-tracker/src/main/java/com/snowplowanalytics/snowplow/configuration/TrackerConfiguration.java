@@ -13,8 +13,6 @@ import java.util.Objects;
 public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
 
     @NonNull
-    public String namespace;
-    @NonNull
     public String appId;
 
     @NonNull
@@ -38,17 +36,6 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     public boolean diagnosticAutotracking;
 
     // Getters and Setters
-
-    @Override
-    @NonNull
-    public String getNamespace() {
-        return namespace;
-    }
-
-    @Override
-    public void setNamespace(@NonNull String namespace) {
-        this.namespace = namespace;
-    }
 
     @Override
     @NonNull
@@ -206,10 +193,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     // Constructors
 
-    public TrackerConfiguration(@NonNull String namespace, @NonNull String appId) {
-        Objects.requireNonNull(namespace);
-        Objects.requireNonNull(appId);
-        this.namespace = namespace;
+    public TrackerConfiguration(@NonNull String appId) {
         this.appId = appId;
 
         devicePlatform = DevicePlatforms.Mobile;
@@ -231,12 +215,6 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     // Builder methods
-
-    @NonNull
-    public TrackerConfiguration namespace(@NonNull String namespace) {
-        this.namespace = namespace;
-        return this;
-    }
 
     @NonNull
     public TrackerConfiguration appId(@NonNull String appId) {
@@ -333,7 +311,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     @NonNull
     @Override
     public Configuration copy() {
-        TrackerConfiguration copy = new TrackerConfiguration(namespace, appId);
+        TrackerConfiguration copy = new TrackerConfiguration(appId);
         copy.devicePlatform = devicePlatform;
         copy.base64encoding = base64encoding;
 

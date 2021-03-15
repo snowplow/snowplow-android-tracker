@@ -66,7 +66,7 @@ import com.snowplowanalytics.snowplow.util.Basis;
 /**
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+ * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
 @Deprecated
 public class Tracker implements DiagnosticLogger {
@@ -160,7 +160,7 @@ public class Tracker implements DiagnosticLogger {
 
     /**
      * Builder for the Tracker
-     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
      */
     @Deprecated
     public static class TrackerBuilder {
@@ -464,9 +464,12 @@ public class Tracker implements DiagnosticLogger {
      * @param builder The builder that constructs a tracker
      */
     private Tracker(@NonNull TrackerBuilder builder) {
-
         this.context = builder.context;
+
+        String trackerNamespace = builder.namespace != null ? builder.namespace : "default";
         this.emitter = builder.emitter;
+        this.emitter.setNamespace(trackerNamespace);
+
         this.appId = builder.appId;
         this.base64Encoded = builder.base64Encoded;
         this.namespace = builder.namespace;
@@ -531,23 +534,11 @@ public class Tracker implements DiagnosticLogger {
         Logger.v(TAG, "Tracker created successfully.");
     }
 
-    // --- New Methods
+    // --- Private init functions
 
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
-        NetworkConfiguration network = new NetworkConfiguration(endpoint, method);
-        TrackerConfiguration tracker = new TrackerConfiguration(namespace, appId);
-        return Tracker.setup(context, network, tracker);
+    private void registerNotificationHandlers() {
     }
 
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker) {
-        return Tracker.setup(context, network, tracker);
-    }
-
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker, @NonNull Configuration... configurations) {
-        return ServiceProvider.setup(context, network, tracker, Arrays.asList(configurations));
     }
 
     // --- Diagnostic
@@ -556,8 +547,6 @@ public class Tracker implements DiagnosticLogger {
     public void log(@NonNull String source, @NonNull String errorMessage, @Nullable Throwable throwable) {
         this.track(new TrackerError(source, errorMessage, throwable));
     }
-
-    // --- Private init functions
 
     private void initializeScreenviewTracking() {
         if (this.activityTracking) {

@@ -10,11 +10,6 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
 public interface TrackerConfigurationInterface {
 
     @NonNull
-    String getNamespace();
-
-    void setNamespace(@NonNull String namespace);
-
-    @NonNull
     String getAppId();
 
     void setAppId(@NonNull String appId);

@@ -33,7 +33,7 @@ import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 /**
  * Provides Subject information for each
  * event sent from the Snowplow Tracker.
- * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+ * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
 @Deprecated
 public class Subject {
@@ -43,7 +43,7 @@ public class Subject {
 
     /**
      * Builder for the Subject
-     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
      */
     @Deprecated
     public static class SubjectBuilder {
