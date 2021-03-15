@@ -32,14 +32,14 @@ public class EventStoreTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         // Clean SQLite database
-        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         waitUntilDatabaseOpen(eventStore);
         eventStore.removeAllEvents();
         eventStore.close();
     }
 
     public void testAddEventOnEmptyStore() throws InterruptedException {
-        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
 
         eventStore.add(getEvent());
         assertFalse(eventStore.isDatabaseOpen());
@@ -52,7 +52,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testAddEventOnNotEmptyStore() throws InterruptedException {
-        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
 
         // fill eventStore with 1 event
         eventStore.add(getEvent());
@@ -61,7 +61,7 @@ public class EventStoreTest extends AndroidTestCase {
         eventStore.close();
 
         // add new event
-        eventStore = new SQLiteEventStore(getContext());
+        eventStore = new SQLiteEventStore(getContext(), "namespace");
         eventStore.add(getEvent());
         assertFalse(eventStore.isDatabaseOpen());
         assertEquals(0, eventStore.getEmittableEvents(QUERY_LIMIT).size());
@@ -73,7 +73,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testRemoveEventsOnNotEmptyStore() throws InterruptedException {
-        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
 
         // fill eventStore with 1 event
         eventStore.add(getEvent());
@@ -82,7 +82,7 @@ public class EventStoreTest extends AndroidTestCase {
         eventStore.close();
 
         // add new event and remove when database closed
-        eventStore = new SQLiteEventStore(getContext());
+        eventStore = new SQLiteEventStore(getContext(), "namespace");
         eventStore.add(getEvent());
         assertEquals(1, eventStore.getSize());
         eventStore.removeAllEvents();
@@ -192,7 +192,7 @@ public class EventStoreTest extends AndroidTestCase {
     }
 
     public void testUpgrade() {
-        EventStoreHelper helper = EventStoreHelper.getInstance(getContext());
+        EventStoreHelper helper = EventStoreHelper.getInstance(getContext(), "namespace");
         SQLiteDatabase database = helper.getWritableDatabase();
         helper.onUpgrade(database, 1, 2);
     }
@@ -200,7 +200,7 @@ public class EventStoreTest extends AndroidTestCase {
     // Helper Methods
 
     private SQLiteEventStore getEventStore() throws InterruptedException {
-        SQLiteEventStore eventStore = new SQLiteEventStore(getContext());
+        SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         waitUntilDatabaseOpen(eventStore);
         eventStore.removeAllEvents();
         return eventStore;

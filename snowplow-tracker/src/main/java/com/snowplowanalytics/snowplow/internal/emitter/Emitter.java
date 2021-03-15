@@ -337,12 +337,7 @@ public class Emitter {
         this.eventStore = null;
         this.customPostPath = builder.customPostPath;
         this.client = builder.client;
-
-        if (builder.eventStore == null) {
-            eventStore = new SQLiteEventStore(context);
-        } else {
-            this.eventStore = builder.eventStore;
-        }
+        this.eventStore = builder.eventStore;
 
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false;
