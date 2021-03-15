@@ -23,10 +23,15 @@ import android.os.Bundle;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.event.ScreenView;
+import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -63,7 +68,9 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Logger.d(TAG, "Auto screenview occurred - activity has resumed");
         try {
             ScreenView event = ScreenView.buildWithActivity(activity);
-            Tracker.instance().track(event);
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("event", event);
+            NotificationCenter.postNotification("SnowplowScreenView", notificationData);
         } catch (Exception e) {
             Logger.e(TAG, "Method onActivityResumed raised an exception: %s", e);
         }

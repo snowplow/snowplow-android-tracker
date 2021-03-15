@@ -15,6 +15,7 @@ import androidx.annotation.RestrictTo;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import java.util.Calendar;
@@ -34,12 +35,10 @@ public class InstallTracker {
      */
     private static String TAG = InstallTracker.class.getSimpleName();
     private Boolean isNewInstall;
-    private Context context;
 
     private SharedPreferences sharedPreferences;
 
-    public InstallTracker(Context context) {
-        this.context = context;
+    public InstallTracker(@NonNull Context context) {
         new SharedPreferencesTask().execute(context);
     }
 
@@ -64,49 +63,27 @@ public class InstallTracker {
 
         @Override
         protected void onPostExecute(Boolean isNewInstall) {
-            long installTimestamp = getInstallTimestamp();
-            if (isNewInstall) {
-                sendInstallEvent();
-                if (installTimestamp != 0) {
-                    clearInstallTimestamp();
-                }
-            } else if (installTimestamp != 0) {
-                sendInstallEvent(installTimestamp);
-                clearInstallTimestamp();
+            long installTimestamp = sharedPreferences.getLong(INSTALL_TIMESTAMP, 0);
+            // We send the installEvent if it's a new installed app but in case the tracker hasn't been able
+            // to send the event before we can retry checking if INSTALL_TIMESTAMP was already removed.
+            if (!isNewInstall && installTimestamp <= 0) {
+                return;
             }
-        }
-    }
-
-    private long getInstallTimestamp() {
-        return sharedPreferences.getLong(INSTALL_TIMESTAMP, 0);
-    }
-
-    private void clearInstallTimestamp() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(INSTALL_TIMESTAMP);
-        editor.apply();
-    }
-
-    private void sendInstallEvent() {
-        SelfDescribing event = SelfDescribing.builder()
-                .eventData(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL))
-                .build();
-        try {
-            Tracker.instance().track(event);
-        } catch(IllegalStateException e) {
-            Logger.e(TAG, "Failed to send install event as Tracker is not instanced: %s", e.getMessage());
+            sendInstallEvent(installTimestamp);
+            // clear install timestamp
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(INSTALL_TIMESTAMP);
+            editor.commit();
         }
     }
 
     private void sendInstallEvent(long installTimestamp) {
-        SelfDescribing event = SelfDescribing.builder()
-                .eventData(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL))
-                .trueTimestamp(installTimestamp)
-                .build();
-        try {
-            Tracker.instance().track(event);
-        } catch(IllegalStateException e) {
-            Logger.e(TAG, "Failed to send install event as Tracker is not instanced: %s", e.getMessage());
+        SelfDescribing event = new SelfDescribing(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL));
+        if (installTimestamp > 0) {
+            event.trueTimestamp(installTimestamp);
         }
+        Map<String, Object> notificationData = new HashMap<String, Object>();
+        notificationData.put("event", event);
+        NotificationCenter.postNotification("SnowplowInstallTracking", notificationData);
     }
 }

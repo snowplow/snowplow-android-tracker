@@ -19,9 +19,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
-import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
+import com.snowplowanalytics.snowplow.event.TrackerError;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Custom logger class to easily manage debug mode and appending
@@ -32,7 +36,6 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
 public class Logger {
 
     private static final String TAG = Logger.class.getSimpleName();
-    private static DiagnosticLogger errorLogger;
     private static LoggerDelegate delegate = new DefaultLoggerDelegate();
     private static int level = 0;
 
@@ -43,15 +46,6 @@ public class Logger {
      */
     public static void updateLogLevel(@NonNull LogLevel newLevel) {
         level = newLevel.getLevel();
-    }
-
-    /**
-     * Set the error logger used to track internal errors.
-     *
-     * @param errorLogger The error logger delegate in the app.
-     */
-    public static void setErrorLogger(@NonNull DiagnosticLogger errorLogger) {
-        Logger.errorLogger = errorLogger;
     }
 
     /**
@@ -83,19 +77,20 @@ public class Logger {
      */
     public static void track(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
         Logger.e(tag, msg, args);
-        if (errorLogger != null) {
-            try {
-                Throwable throwable = null;
-                for (Object arg : args) {
-                    if (Throwable.class.isInstance(arg)) {
-                        throwable = (Throwable) arg;
-                        break;
-                    }
+        try {
+            Throwable throwable = null;
+            for (Object arg : args) {
+                if (Throwable.class.isInstance(arg)) {
+                    throwable = (Throwable) arg;
+                    break;
                 }
-                errorLogger.log(tag, getMessage(msg, args), throwable);
-            } catch (Exception e) {
-                Logger.v(TAG, "Error logger can't report the error: " + e);
             }
+            TrackerError event = new TrackerError(tag, getMessage(msg, args), throwable);
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("event", event);
+            NotificationCenter.postNotification("SnowplowTrackerDiagnostic", notificationData);
+        } catch (Exception e) {
+            Logger.v(TAG, "Error logger can't report the error: " + e);
         }
     }
 

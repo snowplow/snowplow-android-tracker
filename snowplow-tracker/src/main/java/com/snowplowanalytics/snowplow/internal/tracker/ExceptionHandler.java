@@ -19,6 +19,7 @@ import androidx.annotation.RestrictTo;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
@@ -92,10 +93,12 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         Util.addToMap(Parameters.APP_ERROR_EXCEPTION_NAME, exceptionName, data);
         Util.addToMap(Parameters.APP_ERROR_FATAL, true, data);
 
-        Tracker.instance().track(SelfDescribing.builder()
+        SelfDescribing event = SelfDescribing.builder()
                 .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_ERROR_SCHEMA, data))
-                .build()
-        );
+                .build();
+        Map<String, Object> notificationData = new HashMap<String, Object>();
+        notificationData.put("event", event);
+        NotificationCenter.postNotification("SnowplowCrashReporting", notificationData);
 
         defaultHandler.uncaughtException(t, e);
     }

@@ -37,11 +37,11 @@ import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
@@ -69,7 +69,7 @@ import com.snowplowanalytics.snowplow.util.Basis;
  * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
 @Deprecated
-public class Tracker implements DiagnosticLogger {
+public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
@@ -90,9 +90,13 @@ public class Tracker implements DiagnosticLogger {
 
     public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
         synchronized (monitor) {
+            if (spTracker != null) {
+                spTracker.unregisterNotificationHandlers();
+            }
             spTracker = newTracker;
             spTracker.resumeSessionChecking();
             spTracker.getEmitter().flush();
+            spTracker.initializeInstallTracking();
             spTracker.initializeScreenviewTracking();
             return instance();
         }
@@ -155,6 +159,51 @@ public class Tracker implements DiagnosticLogger {
     private long backgroundTimeout;
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
+
+    private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (screenviewEvents) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveInstallNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (installTracking) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveDiagnosticNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (trackerDiagnostic) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveCrashReportingNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (applicationCrash) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
 
     AtomicBoolean dataCollection = new AtomicBoolean(true);
 
@@ -495,18 +544,13 @@ public class Tracker implements DiagnosticLogger {
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
 
+        registerNotificationHandlers();
+
         if (trackerDiagnostic) {
             if (level == LogLevel.OFF) {
                 level = LogLevel.ERROR;
             }
-            Logger.setErrorLogger(this);
             Logger.updateLogLevel(level);
-        }
-
-        if (this.installTracking) {
-            this.installTracker = new InstallTracker(this.context);
-        } else {
-            this.installTracker = null;
         }
 
         // When session context is enabled
@@ -537,15 +581,23 @@ public class Tracker implements DiagnosticLogger {
     // --- Private init functions
 
     private void registerNotificationHandlers() {
+        NotificationCenter.addObserver("SnowplowTrackerDiagnostic", receiveDiagnosticNotification);
+        NotificationCenter.addObserver("SnowplowScreenView", receiveScreenViewNotification);
+        NotificationCenter.addObserver("SnowplowInstallTracking", receiveInstallNotification);
+        NotificationCenter.addObserver("SnowplowCrashReporting", receiveCrashReportingNotification);
     }
 
+    private void unregisterNotificationHandlers() {
+        NotificationCenter.removeObserver(receiveDiagnosticNotification);
+        NotificationCenter.removeObserver(receiveScreenViewNotification);
+        NotificationCenter.removeObserver(receiveInstallNotification);
+        NotificationCenter.removeObserver(receiveCrashReportingNotification);
     }
 
-    // --- Diagnostic
-
-    @Override
-    public void log(@NonNull String source, @NonNull String errorMessage, @Nullable Throwable throwable) {
-        this.track(new TrackerError(source, errorMessage, throwable));
+    private void initializeInstallTracking() {
+        if (installTracking) {
+            installTracker = new InstallTracker(context);
+        }
     }
 
     private void initializeScreenviewTracking() {
