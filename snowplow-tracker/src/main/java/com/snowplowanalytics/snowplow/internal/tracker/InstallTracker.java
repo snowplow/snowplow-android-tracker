@@ -109,29 +109,4 @@ public class InstallTracker {
             Logger.e(TAG, "Failed to send install event as Tracker is not instanced: %s", e.getMessage());
         }
     }
-
-    @Nullable
-    static public SelfDescribingJson getApplicationContext(@NonNull Context context) {
-        try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String versionName = pInfo.versionName;
-            String versionCode = "";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                versionCode = String.valueOf(pInfo.getLongVersionCode());
-            } else {
-                versionCode = String.valueOf(pInfo.versionCode);
-            }
-            if (versionName != null) {
-                Map<String, Object> pairs = new HashMap<>();
-                addToMap(Parameters.APP_VERSION, versionName, pairs);
-                addToMap(Parameters.APP_BUILD, versionCode, pairs);
-                return new SelfDescribingJson(
-                        TrackerConstants.SCHEMA_APPLICATION, pairs
-                );
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Logger.e(TAG, "Failed to find application context: %s", e.getMessage());
-        }
-        return null;
-    }
 }
