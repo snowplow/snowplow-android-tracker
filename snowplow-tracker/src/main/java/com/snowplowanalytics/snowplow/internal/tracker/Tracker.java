@@ -646,7 +646,7 @@ public class Tracker implements DiagnosticLogger {
 
     private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
         if (applicationContext) {
-            contexts.add(InstallTracker.getApplicationContext(this.context));
+            contexts.add(Util.getApplicationContext(this.context));
         }
 
         if (mobileContext) {
@@ -742,7 +742,7 @@ public class Tracker implements DiagnosticLogger {
 
         // Add application context
         if (this.applicationContext) {
-            contexts.add(InstallTracker.getApplicationContext(this.context));
+            contexts.add(Util.getApplicationContext(this.context));
         }
 
         // If there are contexts to nest

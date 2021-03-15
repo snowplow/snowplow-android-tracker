@@ -14,6 +14,8 @@
 package com.snowplowanalytics.snowplow.internal.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -342,6 +344,36 @@ public class Util {
         }
 
         return location;
+    }
+
+    // --- Application Context
+
+    /**
+     * Returns the Application Context
+     */
+    @Nullable
+    static public SelfDescribingJson getApplicationContext(@NonNull Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String versionName = pInfo.versionName;
+            String versionCode = "";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                versionCode = String.valueOf(pInfo.getLongVersionCode());
+            } else {
+                versionCode = String.valueOf(pInfo.versionCode);
+            }
+            if (versionName != null) {
+                Map<String, Object> pairs = new HashMap<>();
+                addToMap(Parameters.APP_VERSION, versionName, pairs);
+                addToMap(Parameters.APP_BUILD, versionCode, pairs);
+                return new SelfDescribingJson(
+                        TrackerConstants.SCHEMA_APPLICATION, pairs
+                );
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.e(TAG, "Failed to find application context: %s", e.getMessage());
+        }
+        return null;
     }
 
     // --- Mobile Context
