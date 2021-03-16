@@ -68,6 +68,8 @@ public class EventStoreHelper extends SQLiteOpenHelper {
             String sqliteSuffix = namespace.replaceAll("[^a-zA-Z0-9_]+", "-");
             String dbName = DATABASE_NAME + "-" + sqliteSuffix + ".sqlite";
             allowedDbFiles.add(dbName);
+            allowedDbFiles.add(dbName + "-wal");
+            allowedDbFiles.add(dbName + "-shm");
         }
         List<String> removedDbFiles = new ArrayList<>();
         for (String dbName : databaseList) {
@@ -115,9 +117,16 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     }
 
     private static boolean renameLegacyDatabase(@NonNull Context context, String newDatabaseFilename) {
-        File databaseFile = context.getDatabasePath("snowplowEvents.sqlite");
-        File newDatabaseFile = new File(databaseFile.getParentFile(), newDatabaseFilename);
-        return databaseFile.renameTo(newDatabaseFile);
+        File database = context.getDatabasePath("snowplowEvents.sqlite");
+        File databaseWal = context.getDatabasePath("snowplowEvents.sqlite-wal");
+        File databaseShm = context.getDatabasePath("snowplowEvents.sqlite-shm");
+        File parentFile = database.getParentFile();
+        File newDatabase = new File(parentFile, newDatabaseFilename);
+        File newDatabaseWal = new File(parentFile, newDatabaseFilename + "-wal");
+        File newDatabaseShm = new File(parentFile, newDatabaseFilename + "-shm");
+        return database.renameTo(newDatabase)
+                && databaseWal.renameTo(newDatabaseWal)
+                && databaseShm.renameTo(newDatabaseShm);
     }
 
     /**
