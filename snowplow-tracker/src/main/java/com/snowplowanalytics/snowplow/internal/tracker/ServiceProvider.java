@@ -27,7 +27,7 @@ public class ServiceProvider {
     @NonNull
     private Context context;
     @NonNull
-    private final String namespace;
+    public final String namespace;
     @NonNull
     private NetworkConfiguration networkConfiguration;
     @NonNull
@@ -69,7 +69,7 @@ public class ServiceProvider {
         stopServices();
         processConfigurations(configurations);
         resetServices();
-        trackerController.reset(tracker);
+        trackerController.reset(getTracker());
     }
 
     public void shutdown() {
