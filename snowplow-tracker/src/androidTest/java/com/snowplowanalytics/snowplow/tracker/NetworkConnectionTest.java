@@ -16,7 +16,7 @@ package com.snowplowanalytics.snowplow.tracker;
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
+import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.network.Request;

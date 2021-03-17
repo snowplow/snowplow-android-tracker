@@ -48,6 +48,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * Essentially will update if it is not accessed within
  * a configurable timeout.
+ *
+ * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.SessionConfiguration SessionConfiguration}
+ * for the configuration or {@link com.snowplowanalytics.snowplow.controller.SessionController SessionController}
+ * for the runtime information and setup.
  */
 public class Session {
 

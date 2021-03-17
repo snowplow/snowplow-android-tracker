@@ -15,7 +15,7 @@ import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
-import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
+import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
