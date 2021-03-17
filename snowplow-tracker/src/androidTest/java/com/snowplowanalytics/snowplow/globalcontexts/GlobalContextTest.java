@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
@@ -248,12 +249,12 @@ public class GlobalContextTest {
     private TrackerController getTracker(Map<String, GlobalContext> generators) {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme.fake", HttpMethod.POST);
-        TrackerConfiguration trackerConfig = new TrackerConfiguration("aNamespace", "anAppId")
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("anAppId")
                 .platformContext(true)
                 .geoLocationContext(false)
                 .base64encoding(false)
                 .sessionContext(true);
         GlobalContextsConfiguration gcConfig = new GlobalContextsConfiguration(generators);
-        return ServiceProvider.setup(context, networkConfig, trackerConfig, Collections.singletonList(gcConfig));
+        return Snowplow.createTracker(context, "aNamespace", networkConfig, trackerConfig, gcConfig);
     }
 }

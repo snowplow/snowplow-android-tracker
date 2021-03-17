@@ -76,7 +76,7 @@ public class EventSendingTest extends AndroidTestCase {
     // Test Setup
 
     private MockWebServer getMockServer(int count) throws IOException {
-        EventStore eventStore = new SQLiteEventStore(getContext());
+        EventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         eventStore.removeAllEvents();
 
         MockWebServer mockServer = new MockWebServer();
@@ -146,8 +146,6 @@ public class EventSendingTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        emitter.getEventStore().removeAllEvents();
-
         Subject subject = new Subject
                 .SubjectBuilder()
                 .context(getContext())
@@ -164,7 +162,9 @@ public class EventSendingTest extends AndroidTestCase {
                     .geoLocationContext(false)
                     .build()
         );
-        return Tracker.instance();
+        Tracker tracker = Tracker.instance();
+        emitter.getEventStore().removeAllEvents();
+        return tracker;
     }
 
     @SuppressLint("DefaultLocale")

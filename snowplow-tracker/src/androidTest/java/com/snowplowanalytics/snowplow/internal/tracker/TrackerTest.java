@@ -20,6 +20,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
@@ -55,11 +56,17 @@ public class TrackerTest extends AndroidTestCase {
         try {
             Tracker tracker = Tracker.instance();
             Emitter emitter = tracker.getEmitter();
+            EventStore eventStore = emitter.getEventStore();
+            if (eventStore != null) {
+                boolean isClean = eventStore.removeAllEvents();
+                Log.i("TrackerTest", "EventStore cleaned: " + isClean);
+                Log.i("TrackerTest", "Events in the store: " + eventStore.getSize());
+            } else {
+                Log.i("TrackerTest", "EventStore null");
+            }
             emitter.shutdown(30);
             Tracker.close();
-            boolean isClean = emitter.getEventStore().removeAllEvents();
-            Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
-            Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
+            Log.i("TrackerTest", "Tracker closed");
         } catch(IllegalStateException e) {
             Log.i("TrackerTest", "Tracker already closed.");
         }
