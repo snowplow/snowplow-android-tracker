@@ -4,11 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-
-import java.util.Objects;
 
 public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
 
@@ -16,7 +14,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     public String appId;
 
     @NonNull
-    public DevicePlatforms devicePlatform;  // TODO: Make DevicePlatforms name as singular
+    public DevicePlatform devicePlatform;
     public boolean base64encoding;
 
     @NonNull
@@ -50,12 +48,12 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     @Override
     @NonNull
-    public DevicePlatforms getDevicePlatform() {
+    public DevicePlatform getDevicePlatform() {
         return devicePlatform;
     }
 
     @Override
-    public void setDevicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
         this.devicePlatform = devicePlatform;
     }
 
@@ -196,7 +194,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     public TrackerConfiguration(@NonNull String appId) {
         this.appId = appId;
 
-        devicePlatform = DevicePlatforms.Mobile;
+        devicePlatform = DevicePlatform.Mobile;
         base64encoding = true;
 
         logLevel = LogLevel.OFF;
@@ -223,7 +221,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     @NonNull
-    public TrackerConfiguration devicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public TrackerConfiguration devicePlatform(@NonNull DevicePlatform devicePlatform) {
         this.devicePlatform = devicePlatform;
         return this;
     }

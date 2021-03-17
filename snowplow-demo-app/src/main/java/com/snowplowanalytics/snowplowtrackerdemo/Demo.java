@@ -51,7 +51,7 @@ import com.snowplowanalytics.snowplow.controller.NetworkController;
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -372,7 +372,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 .logLevel(LogLevel.VERBOSE)
                 .loggerDelegate(this)
                 .base64encoding(false)
-                .devicePlatform(DevicePlatforms.Mobile)
+                .devicePlatform(DevicePlatform.Mobile)
                 .sessionContext(true)
                 .platformContext(true)
                 .applicationContext(true)

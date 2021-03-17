@@ -22,7 +22,6 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,15 +32,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.snowplowanalytics.snowplow.configuration.Configuration;
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
-import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
-import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
@@ -134,7 +127,7 @@ public class Tracker {
     String namespace;
     String appId;
     boolean base64Encoded;
-    DevicePlatforms devicePlatform;
+    DevicePlatform devicePlatform;
     LogLevel level;
     private boolean sessionContext;
     Runnable[] sessionCallbacks;
@@ -220,7 +213,8 @@ public class Tracker {
         final @NonNull Context context; // Required
         @Nullable Subject subject = null; // Optional
         boolean base64Encoded = true; // Optional
-        @Nullable DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        @Nullable
+        DevicePlatform devicePlatform = DevicePlatform.Mobile; // Optional
         LogLevel logLevel = LogLevel.OFF; // Optional
         boolean sessionContext = false; // Optional
         long foregroundTimeout = 600; // Optional - 10 minutes
@@ -312,7 +306,7 @@ public class Tracker {
          * @return itself
          */
         @NonNull
-        public TrackerBuilder platform(@Nullable DevicePlatforms platform) {
+        public TrackerBuilder platform(@Nullable DevicePlatform platform) {
             this.devicePlatform = platform;
             return this;
         }
@@ -921,9 +915,9 @@ public class Tracker {
     }
 
     /**
-     * @param platform a valid DevicePlatforms object
+     * @param platform a valid DevicePlatform object
      */
-    public void setPlatform(@NonNull DevicePlatforms platform) {
+    public void setPlatform(@NonNull DevicePlatform platform) {
         this.devicePlatform = platform;
     }
 
@@ -992,7 +986,7 @@ public class Tracker {
      * @return the trackers device platform
      */
     @NonNull
-    public DevicePlatforms getPlatform() {
+    public DevicePlatform getPlatform() {
         return this.devicePlatform;
     }
 

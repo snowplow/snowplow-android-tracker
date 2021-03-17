@@ -66,7 +66,7 @@ public class EventStoreTest extends AndroidTestCase {
         // fill eventStore with 1 event
         TrackerPayload trackerPayload = new TrackerPayload();
         trackerPayload.add("k", "v");
-        eventStore.add(trackerPayload);  // TODO: getEvent());
+        eventStore.add(trackerPayload);
         waitUntilDatabaseOpen(eventStore);
         List<EmitterEvent> list = eventStore.getEmittableEvents(QUERY_LIMIT);
         assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());

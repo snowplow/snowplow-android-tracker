@@ -13,18 +13,27 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.test.AndroidTestCase;
+/**
+ * The different platforms available to the Tracker.
+ */
+public enum DevicePlatform {
 
-public class DevicePlatformsTest extends AndroidTestCase {
+    Web("web"),
+    Mobile("mob"),
+    Desktop("pc"),
+    ServerSideApp("srv"),
+    General("app"),
+    ConnectedTV("tv"),
+    GameConsole("cnsl"),
+    InternetOfThings("iot");
 
-    public void testPlatforms() {
-        assertEquals("web", DevicePlatforms.Web.getValue());
-        assertEquals("mob", DevicePlatforms.Mobile.getValue());
-        assertEquals("pc", DevicePlatforms.Desktop.getValue());
-        assertEquals("srv", DevicePlatforms.ServerSideApp.getValue());
-        assertEquals("app", DevicePlatforms.General.getValue());
-        assertEquals("tv", DevicePlatforms.ConnectedTV.getValue());
-        assertEquals("cnsl", DevicePlatforms.GameConsole.getValue());
-        assertEquals("iot", DevicePlatforms.InternetOfThings.getValue());
+    private final String value;
+
+    DevicePlatform(final String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

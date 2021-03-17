@@ -12,8 +12,7 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
@@ -145,12 +144,12 @@ public class TrackerControllerImpl implements TrackerController {
 
     @NonNull
     @Override
-    public DevicePlatforms getDevicePlatform() {
+    public DevicePlatform getDevicePlatform() {
         return tracker.devicePlatform;
     }
 
     @Override
-    public void setDevicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
         tracker.devicePlatform = devicePlatform;
     }
 

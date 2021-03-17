@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.tracker.noise;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -37,7 +37,7 @@ public class NoiseTest extends AndroidTestCase {
         NoiseTest.superficialEnumCodeCoverage(HttpMethod.class);
         NoiseTest.superficialEnumCodeCoverage(Protocol.class);
         NoiseTest.superficialEnumCodeCoverage(LogLevel.class);
-        NoiseTest.superficialEnumCodeCoverage(DevicePlatforms.class);
+        NoiseTest.superficialEnumCodeCoverage(DevicePlatform.class);
     }
 
     public void testPrivateConstructor() {

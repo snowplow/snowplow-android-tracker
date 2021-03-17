@@ -3,7 +3,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
@@ -15,9 +15,9 @@ public interface TrackerConfigurationInterface {
     void setAppId(@NonNull String appId);
 
     @NonNull
-    DevicePlatforms getDevicePlatform();
+    DevicePlatform getDevicePlatform();
 
-    void setDevicePlatform(@NonNull DevicePlatforms devicePlatform);
+    void setDevicePlatform(@NonNull DevicePlatform devicePlatform);
 
     boolean isBase64encoding();
 
