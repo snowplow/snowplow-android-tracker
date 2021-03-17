@@ -38,9 +38,9 @@ public class EventStoreTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        openedEventStores.forEach(sqLiteEventStore -> {
-            sqLiteEventStore.close();
-        });
+        for (SQLiteEventStore eventStore : openedEventStores) {
+            eventStore.close();
+        }
         openedEventStores.clear();
         EventStoreHelper.removeUnsentEventsExceptForNamespaces(getContext(), new ArrayList<>());
     }
