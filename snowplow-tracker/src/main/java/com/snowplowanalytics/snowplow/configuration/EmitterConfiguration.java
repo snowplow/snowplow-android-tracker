@@ -73,98 +73,62 @@ public class EmitterConfiguration implements Configuration, com.snowplowanalytic
 
     // Getters and Setters
 
-    /**
-     * @return The data set in {@link #bufferOption(BufferOption)} 
-     */
     @Override
     @NonNull
     public BufferOption getBufferOption() {
         return bufferOption;
     }
 
-    /**
-     * @see #bufferOption(BufferOption) 
-     */
     @Override
     public void setBufferOption(@NonNull BufferOption bufferOption) {
         this.bufferOption = bufferOption;
     }
 
-    /**
-     * @return The data set in {@link #emitRange(int)}
-     */
     @Override
     public int getEmitRange() {
         return emitRange;
     }
 
-    /**
-     * Sets the maximum amount of events to grab for an emit attempt.
-     */
     @Override
     public void setEmitRange(int emitRange) {
         this.emitRange = emitRange;
     }
 
-    /**
-     * @return The data set in {@link #threadPoolSize(int)}
-     */
     @Override
     public int getThreadPoolSize() {
         return threadPoolSize;
     }
 
-    /**
-     * The number of threads available for the tracker's operations.
-     */
     public void setThreadPoolSize(int threadPoolSize) {
         this.threadPoolSize = threadPoolSize;
     }
 
-    /**
-     * @return The data set in {@link #byteLimitGet(int)} 
-     */
     @Override
     public long getByteLimitGet() {
         return byteLimitGet;
     }
 
-    /**
-     * @return The data set in {@link #byteLimitGet(int)} 
-     */
     @Override
     public void setByteLimitGet(long byteLimitGet) {
         this.byteLimitGet = byteLimitGet;
     }
 
-    /**
-     * @return The data set in {@link #byteLimitPost(int)}
-     */
     @Override
     public long getByteLimitPost() {
         return byteLimitPost;
     }
 
-    /**
-     * @return The data set in {@link #byteLimitPost(int)} 
-     */
     @Override
     public void setByteLimitPost(long byteLimitPost) {
         this.byteLimitPost = byteLimitPost;
     }
 
-    /**
-     * @return The data set in {@link #requestCallback(RequestCallback)} 
-     */
     @Override
     @Nullable
     public RequestCallback getRequestCallback() {
         return requestCallback;
     }
 
-    /**
-     * @return The data set in {@link #requestCallback(RequestCallback)} 
-     */
     @Override
     public void setRequestCallback(@Nullable RequestCallback requestCallback) {
         this.requestCallback = requestCallback;

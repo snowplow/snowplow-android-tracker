@@ -135,7 +135,6 @@ public class NetworkConfiguration implements Configuration {
     /**
      * A custom path which will be added to the endpoint URL to specify the
      * complete URL of the collector when used in pair with the POST method.
-     * @return the configuration object.
      */
     @NonNull
     public NetworkConfiguration customPostPath(@NonNull String customPostPath) {

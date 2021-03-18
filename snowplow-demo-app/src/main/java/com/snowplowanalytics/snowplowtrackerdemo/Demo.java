@@ -382,8 +382,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 .screenContext(true)
                 .exceptionAutotracking(true)
                 .installAutotracking(true)
-                .diagnosticAutotracking(true)
-                .installAutotracking(true);
+                .diagnosticAutotracking(true);
         SessionConfiguration sessionConfiguration = new SessionConfiguration(
                 new TimeMeasure(60, TimeUnit.SECONDS),
                 new TimeMeasure(30, TimeUnit.SECONDS)

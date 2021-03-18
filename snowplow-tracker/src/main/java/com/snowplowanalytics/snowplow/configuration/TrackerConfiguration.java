@@ -88,245 +88,155 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     // Getters and Setters
 
-    /**
-     * @return The data set in {@link #appId(String)}
-     */
     @Override
     @NonNull
     public String getAppId() {
         return appId;
     }
 
-    /**
-     * @see #appId(String)
-     */
     @Override
     public void setAppId(@NonNull String appId) {
         this.appId = appId;
     }
 
-    /**
-     * @return The data set in {@link #devicePlatform(DevicePlatform)}
-     */
     @Override
     @NonNull
     public DevicePlatform getDevicePlatform() {
         return devicePlatform;
     }
 
-    /**
-     * @see #devicePlatform(DevicePlatform)
-     */
     @Override
     public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
         this.devicePlatform = devicePlatform;
     }
 
-    /**
-     * @return The data set in {@link #base64encoding(boolean)}
-     */
     @Override
     public boolean isBase64encoding() {
         return base64encoding;
     }
 
-    /**
-     * @see #base64encoding(boolean)
-     */
     @Override
     public void setBase64encoding(boolean base64encoding) {
         this.base64encoding = base64encoding;
     }
 
-    /**
-     * @return The data set in {@link #logLevel(LogLevel)}
-     */
     @Override
     @NonNull
     public LogLevel getLogLevel() {
         return logLevel;
     }
 
-    /**
-     * @see #logLevel(LogLevel)
-     */
     @Override
     public void setLogLevel(@NonNull LogLevel logLevel) {
         this.logLevel = logLevel;
     }
 
-    /**
-     * @return The data set in {@link #loggerDelegate(LoggerDelegate)}
-     */
     @Override
     @Nullable
     public LoggerDelegate getLoggerDelegate() {
         return loggerDelegate;
     }
 
-    /**
-     * @see #loggerDelegate(LoggerDelegate)
-     */
     @Override
     public void setLoggerDelegate(@Nullable LoggerDelegate loggerDelegate) {
         this.loggerDelegate = loggerDelegate;
     }
 
-    /**
-     * @return The data set in {@link #applicationContext(boolean)}
-     */
     @Override
     public boolean isApplicationContext() {
         return applicationContext;
     }
 
-    /**
-     * @see #applicationContext(boolean)
-     */
     @Override
     public void setApplicationContext(boolean applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    /**
-     * @return The data set in {@link #platformContext(boolean)}
-     */
     @Override
     public boolean isPlatformContext() {
         return platformContext;
     }
 
-    /**
-     * @see #platformContext(boolean)
-     */
     @Override
     public void setPlatformContext(boolean platformContext) {
         this.platformContext = platformContext;
     }
 
-    /**
-     * @return The data set in {@link #geoLocationContext(boolean)}
-     */
     @Override
     public boolean isGeoLocationContext() {
         return geoLocationContext;
     }
 
-    /**
-     * @see #geoLocationContext(boolean)
-     */
     @Override
     public void setGeoLocationContext(boolean geoLocationContext) {
         this.geoLocationContext = geoLocationContext;
     }
 
-    /**
-     * @return The data set in {@link #sessionContext(boolean)}
-     */
     @Override
     public boolean isSessionContext() {
         return sessionContext;
     }
 
-    /**
-     * @see #sessionContext(boolean)
-     */
     @Override
     public void setSessionContext(boolean sessionContext) {
         this.sessionContext = sessionContext;
     }
 
-    /**
-     * @return The data set in {@link #screenContext(boolean)}
-     */
     @Override
     public boolean isScreenContext() {
         return screenContext;
     }
 
-    /**
-     * @see #screenContext(boolean)
-     */
     @Override
     public void setScreenContext(boolean screenContext) {
         this.screenContext = screenContext;
     }
 
-    /**
-     * @return The data set in {@link #screenViewAutotracking(boolean)}
-     */
     @Override
     public boolean isScreenViewAutotracking() {
         return screenViewAutotracking;
     }
 
-    /**
-     * @see #screenViewAutotracking(boolean)
-     */
     @Override
     public void setScreenViewAutotracking(boolean screenViewAutotracking) {
         this.screenViewAutotracking = screenViewAutotracking;
     }
 
-    /**
-     * @return The data set in {@link #lifecycleAutotracking(boolean)}
-     */
     @Override
     public boolean isLifecycleAutotracking() {
         return lifecycleAutotracking;
     }
 
-    /**
-     * @see #lifecycleAutotracking(boolean)
-     */
     @Override
     public void setLifecycleAutotracking(boolean lifecycleAutotracking) {
         this.lifecycleAutotracking = lifecycleAutotracking;
     }
 
-    /**
-     * @return The data set in {@link #installAutotracking(boolean)}
-     */
     @Override
     public boolean isInstallAutotracking() {
         return installAutotracking;
     }
 
-    /**
-     * @see #installAutotracking(boolean)
-     */
     @Override
     public void setInstallAutotracking(boolean installAutotracking) {
         this.installAutotracking = installAutotracking;
     }
 
-    /**
-     * @return The data set in {@link #exceptionAutotracking(boolean)}
-     */
     @Override
     public boolean isExceptionAutotracking() {
         return exceptionAutotracking;
     }
 
-    /**
-     * @see #exceptionAutotracking(boolean)
-     */
     @Override
     public void setExceptionAutotracking(boolean exceptionAutotracking) {
         this.exceptionAutotracking = exceptionAutotracking;
     }
 
-    /**
-     * @return The data set in {@link #diagnosticAutotracking(boolean)}
-     */
     @Override
     public boolean isDiagnosticAutotracking() {
         return diagnosticAutotracking;
     }
 
-    /**
-     * @see #diagnosticAutotracking(boolean)
-     */
     @Override
     public void setDiagnosticAutotracking(boolean diagnosticAutotracking) {
         this.diagnosticAutotracking = diagnosticAutotracking;

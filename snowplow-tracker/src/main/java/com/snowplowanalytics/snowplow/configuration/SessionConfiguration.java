@@ -21,12 +21,17 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 public class SessionConfiguration implements SessionConfigurationInterface, Configuration {
 
     /**
-     * The timeout set for the inactivity of app when in foreground.
+     * The amount of time that can elapse before the
+     * session id is updated while the app is in the
+     * foreground.
      */
     @NonNull
     public TimeMeasure foregroundTimeout;
+
     /**
-     * The timeout set for the inactivity of app when in background.
+     * The amount of time that can elapse before the
+     * session id is updated while the app is in the
+     * background.
      */
     @NonNull
     public TimeMeasure backgroundTimeout;
