@@ -19,6 +19,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ public class SQLiteEventStore implements EventStore {
 
     private final List<Payload> payloadWaitingList = new ArrayList<>();
 
+    private final String namespace;
     private SQLiteDatabase database;
     private EventStoreHelper dbHelper;
     private final String[] allColumns = {
@@ -58,14 +60,20 @@ public class SQLiteEventStore implements EventStore {
     };
     private long lastInsertedRowId = -1;
 
+    @NonNull
+    public static List<String> removeUnsentEventsExceptForNamespaces(@NonNull Context context, @Nullable List<String> allowedNamespaces) {
+        return EventStoreHelper.removeUnsentEventsExceptForNamespaces(context, allowedNamespaces);
+    }
+
     /**
      * Creates a new Event Store
      *
      * @param context The android context object
      */
-    public SQLiteEventStore(Context context) {
+    public SQLiteEventStore(@NonNull Context context, @NonNull String namespace) {
+        this.namespace = namespace;
         Executor.futureCallable((Callable<Void>) () -> {
-            dbHelper = EventStoreHelper.getInstance(context);
+            dbHelper = EventStoreHelper.getInstance(context, namespace);
             open();
             Logger.d(TAG, "DB Path: %s", database.getPath());
             return null;
@@ -100,6 +108,7 @@ public class SQLiteEventStore implements EventStore {
      */
     public void close() {
         dbHelper.close();
+        EventStoreHelper.removeInstance(namespace);
     }
 
     /**
@@ -111,7 +120,7 @@ public class SQLiteEventStore implements EventStore {
      * was a success or not
      */
     @SuppressWarnings("unchecked")
-    public long insertEvent(Payload payload) {
+    public long insertEvent(@NonNull Payload payload) {
         if (isDatabaseOpen()) {
             byte[] bytes = Util.serialize(payload.getMap());
             ContentValues values = new ContentValues(2);
@@ -172,6 +181,7 @@ public class SQLiteEventStore implements EventStore {
      * @return the list of events that satisfied
      * the query
      */
+    @NonNull
     private List<Map<String, Object>> queryDatabase(String query, String orderBy) {
         List<Map<String, Object>> res = new ArrayList<>();
         if (isDatabaseOpen()) {
@@ -258,6 +268,7 @@ public class SQLiteEventStore implements EventStore {
      * @param id the row id of the event to get
      * @return event metadata
      */
+    @Nullable
     public Map<String, Object> getEvent(long id) {
         List<Map<String, Object>> res =
                 queryDatabase(EventStoreHelper.COLUMN_ID + "=" + id, null);
@@ -275,6 +286,7 @@ public class SQLiteEventStore implements EventStore {
      *
      * @return the events in the database
      */
+    @NonNull
     public List<Map<String, Object>> getAllEvents() {
         return queryDatabase(null, null);
     }
@@ -286,6 +298,7 @@ public class SQLiteEventStore implements EventStore {
      * @param range amount of rows to take
      * @return a list of event metadata
      */
+    @NonNull
     public List<Map<String, Object>> getDescEventsInRange(int range) {
         return queryDatabase(null, "id DESC LIMIT " + range);
     }

@@ -4,21 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-
-import java.util.Objects;
 
 public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
 
     @NonNull
-    public String namespace;
-    @NonNull
     public String appId;
 
     @NonNull
-    public DevicePlatforms devicePlatform;  // TODO: Make DevicePlatforms name as singular
+    public DevicePlatform devicePlatform;
     public boolean base64encoding;
 
     @NonNull
@@ -41,17 +37,6 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     @Override
     @NonNull
-    public String getNamespace() {
-        return namespace;
-    }
-
-    @Override
-    public void setNamespace(@NonNull String namespace) {
-        this.namespace = namespace;
-    }
-
-    @Override
-    @NonNull
     public String getAppId() {
         return appId;
     }
@@ -63,12 +48,12 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     @Override
     @NonNull
-    public DevicePlatforms getDevicePlatform() {
+    public DevicePlatform getDevicePlatform() {
         return devicePlatform;
     }
 
     @Override
-    public void setDevicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
         this.devicePlatform = devicePlatform;
     }
 
@@ -206,13 +191,10 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     // Constructors
 
-    public TrackerConfiguration(@NonNull String namespace, @NonNull String appId) {
-        Objects.requireNonNull(namespace);
-        Objects.requireNonNull(appId);
-        this.namespace = namespace;
+    public TrackerConfiguration(@NonNull String appId) {
         this.appId = appId;
 
-        devicePlatform = DevicePlatforms.Mobile;
+        devicePlatform = DevicePlatform.Mobile;
         base64encoding = true;
 
         logLevel = LogLevel.OFF;
@@ -233,19 +215,13 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     // Builder methods
 
     @NonNull
-    public TrackerConfiguration namespace(@NonNull String namespace) {
-        this.namespace = namespace;
-        return this;
-    }
-
-    @NonNull
     public TrackerConfiguration appId(@NonNull String appId) {
         this.appId = appId;
         return this;
     }
 
     @NonNull
-    public TrackerConfiguration devicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public TrackerConfiguration devicePlatform(@NonNull DevicePlatform devicePlatform) {
         this.devicePlatform = devicePlatform;
         return this;
     }
@@ -333,7 +309,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     @NonNull
     @Override
     public Configuration copy() {
-        TrackerConfiguration copy = new TrackerConfiguration(namespace, appId);
+        TrackerConfiguration copy = new TrackerConfiguration(appId);
         copy.devicePlatform = devicePlatform;
         copy.base64encoding = base64encoding;
 

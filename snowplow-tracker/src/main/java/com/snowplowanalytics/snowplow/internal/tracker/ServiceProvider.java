@@ -16,10 +16,7 @@ import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -28,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 public class ServiceProvider {
 
     @NonNull
-    private final Context context;
+    private Context context;
     @NonNull
-    private final NetworkConfiguration networkConfiguration;
+    public final String namespace;
     @NonNull
-    private final TrackerConfiguration trackerConfiguration;
+    private NetworkConfiguration networkConfiguration;
+    @NonNull
+    private TrackerConfiguration trackerConfiguration;
     @Nullable
     private EmitterConfiguration emitterConfiguration;
     @Nullable
@@ -51,19 +50,47 @@ public class ServiceProvider {
     @Nullable
     private Subject subject;
     @Nullable
-    private TrackerController trackerController;
+    private TrackerControllerImpl trackerController;
 
     // Constructors
 
-    ServiceProvider(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
+    public ServiceProvider(@NonNull Context context, @NonNull String namespace, @NonNull NetworkConfiguration networkConfiguration, @NonNull List<Configuration> configurations) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(networkConfiguration);
-        Objects.requireNonNull(trackerConfiguration);
         Objects.requireNonNull(configurations);
         this.context = context;
+        this.namespace = namespace;
         this.networkConfiguration = networkConfiguration;
-        this.trackerConfiguration = trackerConfiguration;
+        trackerConfiguration = new TrackerConfiguration(context.getPackageName());
+        processConfigurations(configurations);
+    }
+
+    public void reset(@NonNull List<Configuration> configurations) {
+        stopServices();
+        processConfigurations(configurations);
+        resetServices();
+        trackerController.reset(getTracker());
+    }
+
+    public void shutdown() {
+        tracker.pauseEventTracking();
+        stopServices();
+        resetServices();
+        trackerController = null;
+    }
+
+    // Private methods
+
+    private void processConfigurations(@NonNull List<Configuration> configurations) {
         for (Configuration configuration : configurations) {
+            if (configuration instanceof NetworkConfiguration) {
+                networkConfiguration = (NetworkConfiguration)configuration;
+                continue;
+            }
+            if (configuration instanceof TrackerConfiguration) {
+                trackerConfiguration = (TrackerConfiguration)configuration;
+                continue;
+            }
             if (configuration instanceof SubjectConfiguration) {
                 subjectConfiguration = (SubjectConfiguration)configuration;
                 continue;
@@ -87,12 +114,14 @@ public class ServiceProvider {
         }
     }
 
-    // Setup
+    private void stopServices() {
+        emitter.shutdown();
+    }
 
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration networkConfiguration, @NonNull TrackerConfiguration trackerConfiguration, @NonNull List<Configuration> configurations) {
-        ServiceProvider serviceProvider = new ServiceProvider(context, networkConfiguration, trackerConfiguration, configurations);
-        return serviceProvider.getTrackerController();
+    private void resetServices() {
+        emitter = null;
+        subject = null;
+        tracker = null;
     }
 
     // Getters
@@ -162,7 +191,7 @@ public class ServiceProvider {
     private Tracker makeTracker() {
         Emitter emitter = getEmitter();
         Subject subject = getSubject();
-        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, trackerConfiguration.namespace, trackerConfiguration.appId, context)
+        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfiguration.appId, context)
                 .subject(subject)
                 .base64(trackerConfiguration.base64encoding)
                 .level(trackerConfiguration.logLevel)

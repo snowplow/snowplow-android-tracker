@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GdprConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
@@ -64,9 +65,9 @@ public class ConfigurationTest {
     public void basicInitialization() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid");
         trackerConfiguration.platformContext = true;
-        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
 
         assertNotNull(tracker);
         URI uri = URI.create(tracker.getNetwork().getEndpoint());
@@ -79,7 +80,7 @@ public class ConfigurationTest {
         assertEquals(networkConfiguration.getEndpoint(), host);
         assertEquals(protocol, scheme);
         assertEquals(trackerConfiguration.appId, tracker.getAppId());
-        assertEquals(trackerConfiguration.namespace, tracker.getNamespace());
+        assertEquals("namespace", tracker.getNamespace());
     }
 
     @Test
@@ -88,9 +89,9 @@ public class ConfigurationTest {
         TimeMeasure expectedForeground = new TimeMeasure(42, TimeUnit.SECONDS);
         TimeMeasure expectedBackground = new TimeMeasure(24, TimeUnit.SECONDS);
         NetworkConfiguration networkConfig = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfig = new TrackerConfiguration("namespace", "appId");
+        TrackerConfiguration trackerConfig = new TrackerConfiguration( "appId");
         SessionConfiguration sessionConfig = new SessionConfiguration(expectedForeground, expectedBackground);
-        TrackerController tracker = Tracker.setup(context, networkConfig, trackerConfig, sessionConfig);
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfig, trackerConfig, sessionConfig);
         TimeMeasure foreground = tracker.getSession().getForegroundTimeout();
         TimeMeasure background = tracker.getSession().getBackgroundTimeout();
         assertEquals(expectedForeground, foreground);
@@ -101,13 +102,13 @@ public class ConfigurationTest {
     public void sessionControllerUnavailableWhenContextTurnedOff() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid");
         trackerConfiguration.sessionContext = true;
-        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNotNull(tracker.getSession());
 
         trackerConfiguration.sessionContext = false;
-        tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList());
+        tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNull(tracker.getSession());
 
         tracker.setSessionContext(true);
@@ -121,12 +122,12 @@ public class ConfigurationTest {
     public void emitterConfiguration() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid");
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid");
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .bufferOption(BufferOption.DefaultGroup)
                 .byteLimitGet(10000)
                 .emitRange(10);
-        TrackerController tracker = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Collections.singletonList(emitterConfiguration));
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, emitterConfiguration);
         tracker.pause(); // To block the flush operation that would turn isRunning flag on.
         EmitterController emitterController = tracker.getEmitter();
 
@@ -149,13 +150,13 @@ public class ConfigurationTest {
         MockEventStore eventStore = new MockEventStore();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid")
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid")
                 .base64encoding(false);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .eventStore(eventStore)
                 .threadPoolSize(10);
         GdprConfiguration gdprConfiguration = new GdprConfiguration(Basis.CONSENT, "id", "ver", "desc");
-        TrackerController trackerController = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList(gdprConfiguration, emitterConfiguration));
+        TrackerController trackerController = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, gdprConfiguration, emitterConfiguration);
         GdprController gdprController = trackerController.getGdpr();
 
         // Check gdpr settings
@@ -210,7 +211,7 @@ public class ConfigurationTest {
         MockEventStore eventStore = new MockEventStore();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("namespace", "appid")
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid")
                 .base64encoding(false);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .eventStore(eventStore);
@@ -218,7 +219,7 @@ public class ConfigurationTest {
         gcConfiguration.add("k1", new GlobalContext(Collections.singletonList(new SelfDescribingJson("schema", new HashMap<String, Object>() {{
             put("key", "value1");
         }}))));
-        TrackerController trackerController = ServiceProvider.setup(context, networkConfiguration, trackerConfiguration, Arrays.asList(gcConfiguration, emitterConfiguration));
+        TrackerController trackerController = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, gcConfiguration, emitterConfiguration);
         GlobalContextsController gcController = trackerController.getGlobalContexts();
 
         // Check global contexts settings

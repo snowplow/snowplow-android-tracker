@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
-import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
@@ -13,8 +12,7 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.emitter.OkHttpNetworkConnection;
@@ -27,20 +25,32 @@ public class TrackerControllerImpl implements TrackerController {
     @Nullable
     private NetworkControllerImpl network;
     @NonNull
-    private final SessionControllerImpl session;
+    private SessionControllerImpl session;
     @NonNull
-    private final EmitterControllerImpl emitter;
+    private EmitterControllerImpl emitter;
     @NonNull
-    private final GdprControllerImpl gdpr;
+    private GdprControllerImpl gdpr;
     @NonNull
-    private final GlobalContextsControllerImpl globalContexts;
+    private GlobalContextsControllerImpl globalContexts;
 
     @NonNull
-    private final Tracker tracker;
+    private Tracker tracker;
 
     // Constructors
 
     public TrackerControllerImpl(@NonNull Tracker tracker) {
+        this.tracker = tracker;
+        session = new SessionControllerImpl(tracker);
+        emitter = new EmitterControllerImpl(tracker.emitter);
+        gdpr = new GdprControllerImpl(tracker);
+        globalContexts = new GlobalContextsControllerImpl(tracker);
+        NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
+        if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
+            network = new NetworkControllerImpl(tracker.emitter);
+        }
+    }
+
+    public void reset(@NonNull Tracker tracker) {
         this.tracker = tracker;
         session = new SessionControllerImpl(tracker);
         emitter = new EmitterControllerImpl(tracker.emitter);
@@ -112,17 +122,13 @@ public class TrackerControllerImpl implements TrackerController {
         return tracker.getDataCollection();
     }
 
+
+
     // Getters and Setters
 
     @NonNull
-    @Override
     public String getNamespace() {
         return tracker.namespace;
-    }
-
-    @Override
-    public void setNamespace(@NonNull String namespace) {
-        tracker.namespace = namespace;
     }
 
     @NonNull
@@ -138,12 +144,12 @@ public class TrackerControllerImpl implements TrackerController {
 
     @NonNull
     @Override
-    public DevicePlatforms getDevicePlatform() {
+    public DevicePlatform getDevicePlatform() {
         return tracker.devicePlatform;
     }
 
     @Override
-    public void setDevicePlatform(@NonNull DevicePlatforms devicePlatform) {
+    public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
         tracker.devicePlatform = devicePlatform;
     }
 

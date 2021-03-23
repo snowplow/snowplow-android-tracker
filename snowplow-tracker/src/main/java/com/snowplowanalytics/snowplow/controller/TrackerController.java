@@ -11,6 +11,8 @@ public interface TrackerController extends TrackerConfigurationInterface {
     @NonNull
     String getVersion();
     boolean isTracking();
+    @NonNull
+    String getNamespace();
 
     @Nullable
     NetworkController getNetwork();

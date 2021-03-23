@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
 import androidx.annotation.NonNull;
 
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.event.ConsentDocument;
 import com.snowplowanalytics.snowplow.event.ConsentGranted;
 import com.snowplowanalytics.snowplow.event.ConsentWithdrawn;
@@ -40,7 +40,7 @@ import java.util.UUID;
  */
 public class TrackerEvents {
 
-    public static void trackAll(@NonNull Tracker tracker) {
+    public static void trackAll(@NonNull TrackerController tracker) {
         trackPageView(tracker);
         trackStructuredEvent(tracker);
         trackScreenView(tracker);
@@ -51,30 +51,30 @@ public class TrackerEvents {
         trackConsentWithdrawn(tracker);
     }
 
-    private static void trackPageView(Tracker tracker) {
+    private static void trackPageView(TrackerController tracker) {
         tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
     }
 
-    private static void trackStructuredEvent(Tracker tracker) {
+    private static void trackStructuredEvent(TrackerController tracker) {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
     }
 
-    private static void trackScreenView(Tracker tracker) {
+    private static void trackScreenView(TrackerController tracker) {
         tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
     }
 
-    private static void trackTimings(Tracker tracker) {
+    private static void trackTimings(TrackerController tracker) {
         tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
     }
 
-    private static void trackUnstructuredEvent(Tracker tracker) {
+    private static void trackUnstructuredEvent(TrackerController tracker) {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("targetUrl", "http://a-target-url.com");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
     }
 
-    private static void trackEcommerceEvent(Tracker tracker) {
+    private static void trackEcommerceEvent(TrackerController tracker) {
         EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
@@ -82,7 +82,7 @@ public class TrackerEvents {
         tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
     }
 
-    private static void trackConsentGranted(Tracker tracker) {
+    private static void trackConsentGranted(TrackerController tracker) {
         List<ConsentDocument> documents = new LinkedList<>();
         documents.add(ConsentDocument.builder()
                 .documentDescription("granted context desc 1")
@@ -108,7 +108,7 @@ public class TrackerEvents {
         tracker.track(event);
     }
 
-    private static void trackConsentWithdrawn(Tracker tracker) {
+    private static void trackConsentWithdrawn(TrackerController tracker) {
         List<ConsentDocument> documents = new LinkedList<>();
         documents.add(ConsentDocument.builder()
                 .documentDescription("withdrawn context desc 1")

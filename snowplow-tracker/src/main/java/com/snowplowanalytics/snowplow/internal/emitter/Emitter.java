@@ -48,7 +48,7 @@ import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+ * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
 @Deprecated
 public class Emitter {
@@ -64,6 +64,7 @@ public class Emitter {
     private Protocol requestSecurity;
     private EnumSet<TLSVersion> tlsVersions;
     private String uri;
+    private String namespace;
     private int emitterTick;
     private int emptyLimit;
     private int sendLimit;
@@ -83,7 +84,7 @@ public class Emitter {
 
     /**
      * Builder for the Emitter.
-     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
      */
     @Deprecated
     public static class EmitterBuilder {
@@ -336,12 +337,7 @@ public class Emitter {
         this.eventStore = null;
         this.customPostPath = builder.customPostPath;
         this.client = builder.client;
-
-        if (builder.eventStore == null) {
-            eventStore = new SQLiteEventStore(context);
-        } else {
-            this.eventStore = builder.eventStore;
-        }
+        this.eventStore = builder.eventStore;
 
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false;
@@ -648,6 +644,13 @@ public class Emitter {
      */
     public boolean getEmitterStatus() {
         return isRunning.get();
+    }
+
+    public void setNamespace(@NonNull String namespace) {
+        this.namespace = namespace;
+        if (eventStore == null) {
+            eventStore = new SQLiteEventStore(context, namespace);
+        }
     }
 
     /**

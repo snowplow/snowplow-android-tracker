@@ -17,9 +17,16 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Helper class for building and maintaining the SQLite
@@ -37,7 +44,7 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     public static final String METADATA_EVENT_DATA  = "eventData";
     public static final String METADATA_DATE_CREATED= "dateCreated";
 
-    private static final String DATABASE_NAME       = "snowplowEvents.sqlite";
+    private static final String DATABASE_NAME       = "snowplowEvents";
     private static final String TAG                 = EventStoreHelper.class.getName();
     private static final int DATABASE_VERSION       = 1;
 
@@ -48,7 +55,35 @@ public class EventStoreHelper extends SQLiteOpenHelper {
             "dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
     // Prevents multiple instances being created and avoids memory leaks.
-    private static EventStoreHelper sInstance;
+    private static HashMap<String, EventStoreHelper> instances = new HashMap<>();
+
+    @NonNull
+    public synchronized static List<String> removeUnsentEventsExceptForNamespaces(@NonNull Context context, @Nullable List<String> allowedNamespaces) {
+        String[] databaseList = context.databaseList();
+        if (databaseList == null) {
+            return new ArrayList<>();
+        }
+        List<String> allowedDbFiles = new ArrayList<>(allowedNamespaces.size());
+        for (String namespace : allowedNamespaces) {
+            String sqliteSuffix = namespace.replaceAll("[^a-zA-Z0-9_]+", "-");
+            String dbName = DATABASE_NAME + "-" + sqliteSuffix + ".sqlite";
+            allowedDbFiles.add(dbName);
+            allowedDbFiles.add(dbName + "-wal");
+            allowedDbFiles.add(dbName + "-shm");
+        }
+        List<String> removedDbFiles = new ArrayList<>();
+        for (String dbName : databaseList) {
+            if (!dbName.startsWith(DATABASE_NAME)) {
+                continue;
+            }
+            if (!allowedDbFiles.contains(dbName)) {
+                if (context.deleteDatabase(dbName)) {
+                    removedDbFiles.add(dbName);
+                }
+            }
+        }
+        return removedDbFiles;
+    }
 
     /**
      * Use the application context, which will ensure that you
@@ -58,27 +93,56 @@ public class EventStoreHelper extends SQLiteOpenHelper {
      * @param context the android context
      * @return the EventStoreHelper instance
      */
-    public static EventStoreHelper getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new EventStoreHelper(context.getApplicationContext());
+    @NonNull
+    public synchronized static EventStoreHelper getInstance(@NonNull Context context, @NonNull String namespace) {
+        if (instances.containsKey(namespace)) {
+            return instances.get(namespace);
         }
-        return sInstance;
+        // Create new database name
+        String sqliteSuffix = namespace.replaceAll("[^a-zA-Z0-9_]+", "-");
+        String dbName = DATABASE_NAME + "-" + sqliteSuffix + ".sqlite";
+
+        // Migrate old database if it exists
+        renameLegacyDatabase(context, dbName);
+
+        // Create database helper
+        EventStoreHelper eventStoreHelper = new EventStoreHelper(context.getApplicationContext(), dbName);
+        instances.put(namespace, eventStoreHelper);
+        return eventStoreHelper;
+    }
+
+    @Nullable
+    public synchronized static EventStoreHelper removeInstance(@NonNull String namespace) {
+        return instances.remove(namespace);
+    }
+
+    private static boolean renameLegacyDatabase(@NonNull Context context, String newDatabaseFilename) {
+        File database = context.getDatabasePath("snowplowEvents.sqlite");
+        File databaseWal = context.getDatabasePath("snowplowEvents.sqlite-wal");
+        File databaseShm = context.getDatabasePath("snowplowEvents.sqlite-shm");
+        File parentFile = database.getParentFile();
+        File newDatabase = new File(parentFile, newDatabaseFilename);
+        File newDatabaseWal = new File(parentFile, newDatabaseFilename + "-wal");
+        File newDatabaseShm = new File(parentFile, newDatabaseFilename + "-shm");
+        return database.renameTo(newDatabase)
+                && databaseWal.renameTo(newDatabaseWal)
+                && databaseShm.renameTo(newDatabaseShm);
     }
 
     /**
      * @param context the android context
      */
-    private EventStoreHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    private EventStoreHelper(Context context, String databaseName) {
+        super(context, databaseName, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase database) {
+    public void onCreate(@NonNull SQLiteDatabase database) {
         database.execSQL(queryCreateTable);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+    public void onUpgrade(@NonNull SQLiteDatabase database, int oldVersion, int newVersion) {
         Logger.d(TAG, "Upgrade not implemented, resetting database...");
         database.execSQL(queryDropTable);
         onCreate(database);

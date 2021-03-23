@@ -22,7 +22,6 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,15 +32,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.snowplowanalytics.snowplow.configuration.Configuration;
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
-import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
-import com.snowplowanalytics.snowplow.tracker.DiagnosticLogger;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
@@ -66,10 +59,10 @@ import com.snowplowanalytics.snowplow.util.Basis;
 /**
  * Builds a Tracker object which is used to
  * send events to a Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+ * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
 @Deprecated
-public class Tracker implements DiagnosticLogger {
+public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
     private final String trackerVersion = BuildConfig.TRACKER_LABEL;
@@ -90,9 +83,13 @@ public class Tracker implements DiagnosticLogger {
 
     public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
         synchronized (monitor) {
+            if (spTracker != null) {
+                spTracker.unregisterNotificationHandlers();
+            }
             spTracker = newTracker;
             spTracker.resumeSessionChecking();
             spTracker.getEmitter().flush();
+            spTracker.initializeInstallTracking();
             spTracker.initializeScreenviewTracking();
             return instance();
         }
@@ -130,7 +127,7 @@ public class Tracker implements DiagnosticLogger {
     String namespace;
     String appId;
     boolean base64Encoded;
-    DevicePlatforms devicePlatform;
+    DevicePlatform devicePlatform;
     LogLevel level;
     private boolean sessionContext;
     Runnable[] sessionCallbacks;
@@ -156,11 +153,56 @@ public class Tracker implements DiagnosticLogger {
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
+    private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (screenviewEvents) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveInstallNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (installTracking) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveDiagnosticNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (trackerDiagnostic) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveCrashReportingNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (applicationCrash) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+
     AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
      * Builder for the Tracker
-     * @deprecated It will be removed in the next major version, please use Tracker.setup methods.
+     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
      */
     @Deprecated
     public static class TrackerBuilder {
@@ -171,7 +213,8 @@ public class Tracker implements DiagnosticLogger {
         final @NonNull Context context; // Required
         @Nullable Subject subject = null; // Optional
         boolean base64Encoded = true; // Optional
-        @Nullable DevicePlatforms devicePlatform = DevicePlatforms.Mobile; // Optional
+        @Nullable
+        DevicePlatform devicePlatform = DevicePlatform.Mobile; // Optional
         LogLevel logLevel = LogLevel.OFF; // Optional
         boolean sessionContext = false; // Optional
         long foregroundTimeout = 600; // Optional - 10 minutes
@@ -263,7 +306,7 @@ public class Tracker implements DiagnosticLogger {
          * @return itself
          */
         @NonNull
-        public TrackerBuilder platform(@Nullable DevicePlatforms platform) {
+        public TrackerBuilder platform(@Nullable DevicePlatform platform) {
             this.devicePlatform = platform;
             return this;
         }
@@ -464,9 +507,12 @@ public class Tracker implements DiagnosticLogger {
      * @param builder The builder that constructs a tracker
      */
     private Tracker(@NonNull TrackerBuilder builder) {
-
         this.context = builder.context;
+
+        String trackerNamespace = builder.namespace != null ? builder.namespace : "default";
         this.emitter = builder.emitter;
+        this.emitter.setNamespace(trackerNamespace);
+
         this.appId = builder.appId;
         this.base64Encoded = builder.base64Encoded;
         this.namespace = builder.namespace;
@@ -492,18 +538,13 @@ public class Tracker implements DiagnosticLogger {
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
 
+        registerNotificationHandlers();
+
         if (trackerDiagnostic) {
             if (level == LogLevel.OFF) {
                 level = LogLevel.ERROR;
             }
-            Logger.setErrorLogger(this);
             Logger.updateLogLevel(level);
-        }
-
-        if (this.installTracking) {
-            this.installTracker = new InstallTracker(this.context);
-        } else {
-            this.installTracker = null;
         }
 
         // When session context is enabled
@@ -531,33 +572,27 @@ public class Tracker implements DiagnosticLogger {
         Logger.v(TAG, "Tracker created successfully.");
     }
 
-    // --- New Methods
-
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull String endpoint, @NonNull HttpMethod method, @NonNull String namespace, @NonNull String appId) {
-        NetworkConfiguration network = new NetworkConfiguration(endpoint, method);
-        TrackerConfiguration tracker = new TrackerConfiguration(namespace, appId);
-        return Tracker.setup(context, network, tracker);
-    }
-
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker) {
-        return Tracker.setup(context, network, tracker);
-    }
-
-    @NonNull
-    public static TrackerController setup(@NonNull Context context, @NonNull NetworkConfiguration network, @NonNull TrackerConfiguration tracker, @NonNull Configuration... configurations) {
-        return ServiceProvider.setup(context, network, tracker, Arrays.asList(configurations));
-    }
-
-    // --- Diagnostic
-
-    @Override
-    public void log(@NonNull String source, @NonNull String errorMessage, @Nullable Throwable throwable) {
-        this.track(new TrackerError(source, errorMessage, throwable));
-    }
-
     // --- Private init functions
+
+    private void registerNotificationHandlers() {
+        NotificationCenter.addObserver("SnowplowTrackerDiagnostic", receiveDiagnosticNotification);
+        NotificationCenter.addObserver("SnowplowScreenView", receiveScreenViewNotification);
+        NotificationCenter.addObserver("SnowplowInstallTracking", receiveInstallNotification);
+        NotificationCenter.addObserver("SnowplowCrashReporting", receiveCrashReportingNotification);
+    }
+
+    private void unregisterNotificationHandlers() {
+        NotificationCenter.removeObserver(receiveDiagnosticNotification);
+        NotificationCenter.removeObserver(receiveScreenViewNotification);
+        NotificationCenter.removeObserver(receiveInstallNotification);
+        NotificationCenter.removeObserver(receiveCrashReportingNotification);
+    }
+
+    private void initializeInstallTracking() {
+        if (installTracking) {
+            installTracker = new InstallTracker(context);
+        }
+    }
 
     private void initializeScreenviewTracking() {
         if (this.activityTracking) {
@@ -646,7 +681,7 @@ public class Tracker implements DiagnosticLogger {
 
     private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
         if (applicationContext) {
-            contexts.add(InstallTracker.getApplicationContext(this.context));
+            contexts.add(Util.getApplicationContext(this.context));
         }
 
         if (mobileContext) {
@@ -742,7 +777,7 @@ public class Tracker implements DiagnosticLogger {
 
         // Add application context
         if (this.applicationContext) {
-            contexts.add(InstallTracker.getApplicationContext(this.context));
+            contexts.add(Util.getApplicationContext(this.context));
         }
 
         // If there are contexts to nest
@@ -880,9 +915,9 @@ public class Tracker implements DiagnosticLogger {
     }
 
     /**
-     * @param platform a valid DevicePlatforms object
+     * @param platform a valid DevicePlatform object
      */
-    public void setPlatform(@NonNull DevicePlatforms platform) {
+    public void setPlatform(@NonNull DevicePlatform platform) {
         this.devicePlatform = platform;
     }
 
@@ -951,7 +986,7 @@ public class Tracker implements DiagnosticLogger {
      * @return the trackers device platform
      */
     @NonNull
-    public DevicePlatforms getPlatform() {
+    public DevicePlatform getPlatform() {
         return this.devicePlatform;
     }
 

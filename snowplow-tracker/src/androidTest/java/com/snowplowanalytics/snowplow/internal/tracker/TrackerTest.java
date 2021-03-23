@@ -20,9 +20,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -55,11 +56,17 @@ public class TrackerTest extends AndroidTestCase {
         try {
             Tracker tracker = Tracker.instance();
             Emitter emitter = tracker.getEmitter();
+            EventStore eventStore = emitter.getEventStore();
+            if (eventStore != null) {
+                boolean isClean = eventStore.removeAllEvents();
+                Log.i("TrackerTest", "EventStore cleaned: " + isClean);
+                Log.i("TrackerTest", "Events in the store: " + eventStore.getSize());
+            } else {
+                Log.i("TrackerTest", "EventStore null");
+            }
             emitter.shutdown(30);
             Tracker.close();
-            boolean isClean = emitter.getEventStore().removeAllEvents();
-            Log.i("TrackerTest", "Tracker closed - EventStore cleaned: " + isClean);
-            Log.i("TrackerTest", "Events in the store: " + emitter.getEventStore().getSize());
+            Log.i("TrackerTest", "Tracker closed");
         } catch(IllegalStateException e) {
             Log.i("TrackerTest", "Tracker already closed.");
         }
@@ -84,7 +91,7 @@ public class TrackerTest extends AndroidTestCase {
 
         return new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .subject(subject)
-            .platform(DevicePlatforms.InternetOfThings)
+            .platform(DevicePlatform.InternetOfThings)
             .base64(false)
             .level(LogLevel.VERBOSE)
             .threadCount(1)
@@ -118,7 +125,7 @@ public class TrackerTest extends AndroidTestCase {
         Tracker tracker = getTracker(true);
         assertEquals("myNamespace", tracker.getNamespace());
         assertEquals("myAppId", tracker.getAppId());
-        assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
+        assertEquals(DevicePlatform.InternetOfThings, tracker.getPlatform());
         assertFalse(tracker.getBase64Encoded());
         assertNotNull(tracker.getEmitter());
         assertNotNull(tracker.getSubject());
@@ -148,10 +155,10 @@ public class TrackerTest extends AndroidTestCase {
 
     public void testPlatformUpdate() {
         Tracker tracker = getTracker();
-        assertEquals(DevicePlatforms.InternetOfThings, tracker.getPlatform());
+        assertEquals(DevicePlatform.InternetOfThings, tracker.getPlatform());
 
-        tracker.setPlatform(DevicePlatforms.Mobile);
-        assertEquals(DevicePlatforms.Mobile, tracker.getPlatform());
+        tracker.setPlatform(DevicePlatform.Mobile);
+        assertEquals(DevicePlatform.Mobile, tracker.getPlatform());
     }
 
     public void testDataCollectionSwitch() {

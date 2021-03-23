@@ -16,7 +16,7 @@ public class NetworkConfiguration implements Configuration {
     @Nullable
     private String endpoint;
     @Nullable
-    private HttpMethod method;  // TODO: change the class name in iOS
+    private HttpMethod method;
     @Nullable
     private Protocol protocol;
 

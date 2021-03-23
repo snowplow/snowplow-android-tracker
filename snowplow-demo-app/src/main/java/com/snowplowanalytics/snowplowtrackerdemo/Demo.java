@@ -39,22 +39,25 @@ import android.text.method.ScrollingMovementMethod;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.net.Uri;
 
+import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GdprConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.controller.EmitterController;
+import com.snowplowanalytics.snowplow.controller.NetworkController;
+import com.snowplowanalytics.snowplow.controller.SessionController;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
-import com.snowplowanalytics.snowplow.tracker.DevicePlatforms;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.network.Protocol;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
@@ -65,7 +68,6 @@ import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -75,7 +77,6 @@ import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 /**
  * Classic Demo Activity.
  */
-@SuppressWarnings("FieldCanBeLocal")
 public class Demo extends Activity implements LoggerDelegate {
 
     private Button _startButton, _tabButton;
@@ -144,7 +145,10 @@ public class Demo extends Activity implements LoggerDelegate {
     @Override
     protected void onResume() {
         super.onResume();
-        Tracker.instance().resumeSessionChecking();
+        SessionController sessionController = Snowplow.getDefaultTracker().getSession();
+        if (sessionController != null) {
+            sessionController.resume();
+        }
     }
 
     /**
@@ -154,7 +158,10 @@ public class Demo extends Activity implements LoggerDelegate {
         _tabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tracker.instance().pauseSessionChecking();
+                SessionController sessionController = Snowplow.getDefaultTracker().getSession();
+                if (sessionController != null) {
+                    sessionController.pause();
+                }
                 String url = "https://snowplowanalytics.com/";
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
@@ -172,10 +179,11 @@ public class Demo extends Activity implements LoggerDelegate {
         _collection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
+                TrackerController tracker = Snowplow.getDefaultTracker();
                 if (i == R.id.radio_data_on) {
-                    Tracker.instance().resumeEventTracking();
+                    tracker.resume();
                 } else if (i == R.id.radio_data_off) {
-                    Tracker.instance().pauseEventTracking();
+                    tracker.pause();
                 }
             }
         });
@@ -195,7 +203,6 @@ public class Demo extends Activity implements LoggerDelegate {
     }
 
     private void setupAndTrackDemoEvents() {
-        Emitter e = Tracker.instance().getEmitter();
         String uri = _uriField.getText().toString();
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
@@ -206,17 +213,19 @@ public class Demo extends Activity implements LoggerDelegate {
         Protocol security = _security.getCheckedRadioButtonId() ==
                 _radioHttp.getId() ? Protocol.HTTP : Protocol.HTTPS;
 
-        if (!e.getEmitterStatus()) {
-            e.setEmitterUri(uri);
-            e.setRequestSecurity(security);
-            e.setHttpMethod(method);
+        EmitterController e = Snowplow.getDefaultTracker().getEmitter();
+        NetworkController n = Snowplow.getDefaultTracker().getNetwork();
+        if (!e.isSending()) {
+            n.setEndpoint(uri);
+            n.setProtocol(security);
+            n.setMethod(method);
         }
 
         if (!uri.equals("")) {
             eventsCreated += 9;
             final String made = "Made: " + eventsCreated;
             _eventsCreated.setText(made);
-            TrackerEvents.trackAll(Tracker.instance());
+            TrackerEvents.trackAll(Snowplow.getDefaultTracker());
         } else {
             updateLogger("URI field empty!\n");
         }
@@ -334,10 +343,11 @@ public class Demo extends Activity implements LoggerDelegate {
             @Override
             public void run() {
                 boolean isOnline = Util.isOnline(context);
-                Emitter e = Tracker.instance().getEmitter();
-                boolean isRunning = e.getEmitterStatus();
-                long dbSize = e.getEventStore().getSize();
-                int sessionIndex = Tracker.instance().getSession().getSessionIndex();
+                EmitterController e = Snowplow.getDefaultTracker().getEmitter();
+                boolean isRunning = e.isSending();
+                long dbSize = e.getDbCount();
+                SessionController session = Snowplow.getDefaultTracker().getSession();
+                int sessionIndex = session != null ? -1 : session.getSessionIndex();
                 updateEmitterStats(isOnline, isRunning, dbSize, sessionIndex);
             }
         }, 1, 1, TimeUnit.SECONDS);
@@ -358,11 +368,11 @@ public class Demo extends Activity implements LoggerDelegate {
                 .threadPoolSize(20)
                 .emitRange(500)
                 .byteLimitPost(52000);
-        TrackerConfiguration trackerConfiguration = new TrackerConfiguration(namespace, appId)
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration(appId)
                 .logLevel(LogLevel.VERBOSE)
                 .loggerDelegate(this)
                 .base64encoding(false)
-                .devicePlatform(DevicePlatforms.Mobile)
+                .devicePlatform(DevicePlatform.Mobile)
                 .sessionContext(true)
                 .platformContext(true)
                 .applicationContext(true)
@@ -388,9 +398,10 @@ public class Demo extends Activity implements LoggerDelegate {
         Map<String, Object> pairs = new HashMap<>();
         addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
         addToMap(Parameters.APP_BUILD, "3", pairs);
-        gcConfiguration.add("ruleSetExampleTag", new GlobalContext(List.of(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs))));
+        gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs))));
 
-        Tracker.setup(getApplicationContext(),
+        Snowplow.createTracker(getApplicationContext(),
+                namespace,
                 networkConfiguration,
                 trackerConfiguration,
                 emitterConfiguration,
