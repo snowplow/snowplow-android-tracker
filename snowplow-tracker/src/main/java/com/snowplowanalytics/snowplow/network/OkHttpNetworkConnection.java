@@ -164,18 +164,15 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         TLSArguments tlsArguments = new TLSArguments(builder.tlsVersions);
         buildUri();
 
-        final OkHttpClient.Builder clientBuilder;
         if (builder.client == null) {
-            clientBuilder = new OkHttpClient.Builder();
+            client = new OkHttpClient.Builder()
+                    .sslSocketFactory(tlsArguments.getSslSocketFactory(), tlsArguments.getTrustManager())
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .build();
         } else {
-            clientBuilder = builder.client.newBuilder();
+            client = builder.client;
         }
-
-        this.client = clientBuilder.sslSocketFactory(tlsArguments.getSslSocketFactory(),
-                tlsArguments.getTrustManager())
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .build();
     }
 
     @Override
