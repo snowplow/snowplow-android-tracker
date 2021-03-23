@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class allows the setup of Global Contexts to attach to selected events to send.
+ * This class allows the setup of Global Contexts which are attached to selected events.
  */
 public class GlobalContextsConfiguration implements Configuration, GlobalContextsConfigurationInterface {
 
@@ -21,7 +21,7 @@ public class GlobalContextsConfiguration implements Configuration, GlobalContext
     // Constructors
 
     /**
-     * It lets to create a map of tags and associated {@link GlobalContext GlobalContext} generators.
+     * Allows for the creation of a map of tags and associated {@link GlobalContext GlobalContext} generators.
      * They are used by the tracker based on the filter settings defined on each {@link GlobalContext GlobalContext}.
      * @param contextGenerators
      */

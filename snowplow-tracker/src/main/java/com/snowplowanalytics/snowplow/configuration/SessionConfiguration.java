@@ -7,7 +7,7 @@ import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInter
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 /**
- * This class allows the tracker configuration from the session perspective.
+ * This class represents the configuration of the applications session.
  * The SessionConfiguration can be used to setup the behaviour of sessions.
  *
  * A session is a context which is appended to each event sent.
@@ -16,7 +16,7 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
  * - the timeout set for the inactivity of app when in background.
  *
  * Session data is maintained for the life of the application being installed on a device.
- * Essentially will update if it is not accessed within a configurable timeout.
+ * A new session will be created if the session information is not accessed within a configurable timeout.
  */
 public class SessionConfiguration implements SessionConfigurationInterface, Configuration {
 

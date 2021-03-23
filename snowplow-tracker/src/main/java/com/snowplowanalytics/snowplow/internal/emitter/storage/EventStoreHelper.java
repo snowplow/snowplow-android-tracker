@@ -58,10 +58,10 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     private static HashMap<String, EventStoreHelper> instances = new HashMap<>();
 
     /**
-     * IMPORTANT: This method is for internal use only. It can change signature and behaviour in any
-     * next tracker release.
+     * IMPORTANT:  This method is for internal use only. It's signature and behaviour might change in any
+     * future tracker release.
      *
-     * It clear all the EventStores not associated at any of the namespaces passed as parameter.
+     * Clears all the EventStores not associated at any of the namespaces passed as parameter.
      *
      * @param context The Android app context.
      * @param allowedNamespaces The namespace allowed. All the EventStores not associated at any of

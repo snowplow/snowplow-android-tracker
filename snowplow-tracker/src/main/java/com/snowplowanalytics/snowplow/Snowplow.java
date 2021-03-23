@@ -44,15 +44,15 @@ public class Snowplow {
      * To configure tracker with more details see {@link #createTracker(Context, String, NetworkConfiguration, Configuration...)}
      * To use the tracker as singleton see {@link #getDefaultTracker()}
      *
-     * @apiNote IMPORTANT: The EventStore persist locally all the events tracked but not sent.
-     * Those events are hooked the namespace.
+     * @apiNote IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
      * To remove all the zombie events you can an internal method {@link com.snowplowanalytics.snowplow.internal.emitter.storage.EventStoreHelper#removeUnsentEventsExceptForNamespaces(Context, List) removeUnsentEventsExceptForNamespaces}
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
-     * @param namespace The namespace label used to identify the current tracker among the possible
+     * @param namespace The namespace used to identify the current tracker among the possible
      *                  multiple tracker instances.
      * @param endpoint The URL of the collector.
      * @param method The method for the requests to the collector (GET or POST).
@@ -77,15 +77,15 @@ public class Snowplow {
      *
      * To use the tracker as singleton see {@link #getDefaultTracker()}
      *
-     * @apiNote IMPORTANT: The EventStore persist locally all the events tracked but not sent.
-     * Those events are hooked the namespace.
+     * @apiNote IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
      * To remove all the zombie events you can an internal method {@link com.snowplowanalytics.snowplow.internal.emitter.storage.EventStoreHelper#removeUnsentEventsExceptForNamespaces(Context, List) removeUnsentEventsExceptForNamespaces}
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
-     * @param namespace The namespace label used to identify the current tracker among the possible
+     * @param namespace The namespace used to identify the current tracker among the possible
      *                  multiple tracker instances.
      * @param network The NetworkConfiguration object with settings for the communication with the
      *                collector.
@@ -121,8 +121,8 @@ public class Snowplow {
 
     /**
      * Set the passed tracker as default tracker if it's registered as an active tracker in the app.
-     * If the instance of a tracker already removed (see {@link #removeTracker(TrackerController) removeTracker}) is passed it can't become the new default tracker
-     * and the operation fails.
+     * If the passed instance is of a tracker which is already removed (see {@link #removeTracker(TrackerController) removeTracker})
+     * then it can't become the new default tracker and the operation fails.
      *
      * @param trackerController The new default tracker.
      * @return Whether the tracker passed is registered among the active trackers of the app.
@@ -137,7 +137,7 @@ public class Snowplow {
     }
 
     /**
-     * A tracker can be removed by the active trackers of the app.
+     * A tracker can be removed from the active trackers of the app.
      * Once it has been removed it can't be added again or set as default.
      * The unique way to resume a removed tracker is creating a new tracker with same namespace and
      * same configurations.

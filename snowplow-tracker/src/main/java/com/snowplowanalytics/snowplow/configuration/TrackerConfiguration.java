@@ -10,7 +10,7 @@ import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 /**
- * This class allows the tracker configuration from the tracking perspective.
+ * This class represents the configuration of the tracker and the core tracker properties.
  * The TrackerConfiguration can be used to setup the tracker behaviour indicating what should be
  * tracked in term of automatic tracking and contexts/entities to track with the events.
  */
@@ -352,7 +352,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     /**
      * Whether geo-location context is sent with all the tracked events.
      *
-     * @apiNote Requires Location permissions accordingly to the requirements of the various
+     * @apiNote Requires Location permissions as per the requirements of the various
      * Android versions. Otherwise the whole context is skipped.
      */
     @NonNull

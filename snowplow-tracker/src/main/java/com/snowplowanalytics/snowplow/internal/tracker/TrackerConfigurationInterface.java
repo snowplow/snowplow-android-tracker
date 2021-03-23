@@ -86,7 +86,7 @@ public interface TrackerConfigurationInterface {
     /**
      * Whether geo-location context is sent with all the tracked events.
      *
-     * @apiNote Requires Location permissions accordingly to the requirements of the various
+     * @apiNote Requires Location permissions as per the requirements of the various
      * Android versions. Otherwise the whole context is skipped.
      */
     boolean isGeoLocationContext();
@@ -94,7 +94,7 @@ public interface TrackerConfigurationInterface {
     /**
      * Whether geo-location context is sent with all the tracked events.
      *
-     * @apiNote Requires Location permissions accordingly to the requirements of the various
+     * @apiNote Requires Location permissions as per the requirements of the various
      * Android versions. Otherwise the whole context is skipped.
      */
     void setGeoLocationContext(boolean geoLocationContext);

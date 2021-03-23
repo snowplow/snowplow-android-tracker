@@ -43,13 +43,13 @@ public interface NetworkController {
 
     /**
      * A custom path which will be added to the endpoint URL to specify the
-     * complete URL of the collector when used in pair with the POST method.
+     * complete URL of the collector when paired with the POST method.
      */
     void setCustomPostPath(@Nullable String customPostPath);
 
     /**
      * A custom path which will be added to the endpoint URL to specify the
-     * complete URL of the collector when used in pair with the POST method.
+     * complete URL of the collector when paired with the POST method.
      */
     @Nullable
     String getCustomPostPath();

@@ -14,8 +14,8 @@ import java.util.Objects;
 import okhttp3.OkHttpClient;
 
 /**
- * It allows the tracker configuration from the network communication
- * perspective making the tracker able to send events to the Snowplow collector.
+ * Represents the network communication configuration
+ * allowing the tracker to be able to send events to the Snowplow collector.
  */
 public class NetworkConfiguration implements Configuration {
 
@@ -96,7 +96,7 @@ public class NetworkConfiguration implements Configuration {
     }
 
     /**
-     * @param networkConnection The NetworkConnection component which will take full ownership of the
+     * @param networkConnection The NetworkConnection component which will control the
      *                          communication between the tracker and the collector.
      */
     public NetworkConfiguration(@NonNull NetworkConnection networkConnection) {
@@ -134,7 +134,7 @@ public class NetworkConfiguration implements Configuration {
 
     /**
      * A custom path which will be added to the endpoint URL to specify the
-     * complete URL of the collector when used in pair with the POST method.
+     * complete URL of the collector when paired with the POST method.
      */
     @NonNull
     public NetworkConfiguration customPostPath(@NonNull String customPostPath) {

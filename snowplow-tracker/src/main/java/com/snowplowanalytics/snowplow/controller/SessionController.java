@@ -8,7 +8,7 @@ public interface SessionController extends SessionConfigurationInterface {
 
     /**
      * The session index.
-     * A progressive number helping to order the sequence of sessions.
+     * A increasing number which helps to order the sequence of sessions.
      */
     int getSessionIndex();
 
@@ -21,7 +21,7 @@ public interface SessionController extends SessionConfigurationInterface {
 
     /**
      * The session user identifier.
-     * It identifies this app installation and it doesn't change along all the life of the app.
+     * It identifies this app installation and it doesn't change for the life of the app.
      * It will change only when the app is uninstalled and installed again.
      * An app update doesn't change the value.
      */
