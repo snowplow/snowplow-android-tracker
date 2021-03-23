@@ -22,33 +22,12 @@ import java.util.Set;
 
 public class Snowplow {
 
-    private static volatile Snowplow singleton;
-
     // Private properties
 
     @Nullable
-    private ServiceProvider defaultServiceProvider;
+    private static ServiceProvider defaultServiceProvider;
     @NonNull
-    private final Map<String, ServiceProvider> serviceProviderInstances = new HashMap<>();
-
-    // Singleton
-
-    private Snowplow() {
-        if (singleton != null) {
-            throw new RuntimeException("Use `getInstance` method to create this class.");
-        }
-    }
-
-    private static Snowplow getInstance() {
-        if (singleton == null) {
-            synchronized (Snowplow.class) {
-                if (singleton == null) {
-                    singleton = new Snowplow();
-                }
-            }
-        }
-        return singleton;
-    }
+    private final static Map<String, ServiceProvider> serviceProviderInstances = new HashMap<>();
 
     // Public methods
 
@@ -61,74 +40,64 @@ public class Snowplow {
 
     @NonNull
     public static TrackerController createTracker(@NonNull Context context, @NonNull String namespace, @NonNull NetworkConfiguration network, @NonNull Configuration... configurations) {
-        Snowplow snowplow = Snowplow.getInstance();
-        ServiceProvider serviceProvider = snowplow.serviceProviderInstances.get(namespace);
+        ServiceProvider serviceProvider = serviceProviderInstances.get(namespace);
         if (serviceProvider != null) {
             List<Configuration> configList = new ArrayList<>(Arrays.asList(configurations));
             configList.add(network);
             serviceProvider.reset(configList);
         } else {
             serviceProvider = new ServiceProvider(context, namespace, network, Arrays.asList(configurations));
-            snowplow.registerInstance(serviceProvider);
+            registerInstance(serviceProvider);
         }
         return serviceProvider.getTrackerController();
     }
 
     @Nullable
     public static TrackerController getDefaultTracker() {
-        ServiceProvider serviceProvider = Snowplow.getInstance().defaultServiceProvider;
+        ServiceProvider serviceProvider = defaultServiceProvider;
         return serviceProvider == null ? null : serviceProvider.getTrackerController();
     }
 
-    public static boolean setTrackerAsDefault(@NonNull TrackerController trackerController) {
-        Snowplow snowplow = Snowplow.getInstance();
-        synchronized (snowplow) {
-            ServiceProvider serviceProvider = snowplow.serviceProviderInstances.get(trackerController.getNamespace());
-            if (serviceProvider != null) {
-                snowplow.defaultServiceProvider = serviceProvider;
-                return true;
-            }
-            return false;
+    public synchronized static boolean setTrackerAsDefault(@NonNull TrackerController trackerController) {
+        ServiceProvider serviceProvider = serviceProviderInstances.get(trackerController.getNamespace());
+        if (serviceProvider != null) {
+            defaultServiceProvider = serviceProvider;
+            return true;
         }
+        return false;
     }
 
-    public static boolean removeTracker(@NonNull TrackerController trackerController) {
-        Snowplow snowplow = Snowplow.getInstance();
-        synchronized (snowplow) {
-            String namespace = trackerController.getNamespace();
-            ServiceProvider serviceProvider = snowplow.serviceProviderInstances.get(namespace);
-            if (serviceProvider != null) {
-                serviceProvider.shutdown();
-                snowplow.serviceProviderInstances.remove(namespace);
-                if (serviceProvider == snowplow.defaultServiceProvider) {
-                    snowplow.defaultServiceProvider = null;
-                }
-                return true;
+    public synchronized static boolean removeTracker(@NonNull TrackerController trackerController) {
+        String namespace = trackerController.getNamespace();
+        ServiceProvider serviceProvider = serviceProviderInstances.get(namespace);
+        if (serviceProvider != null) {
+            serviceProvider.shutdown();
+            serviceProviderInstances.remove(namespace);
+            if (serviceProvider == defaultServiceProvider) {
+                defaultServiceProvider = null;
             }
-            return false;
+            return true;
         }
+        return false;
     }
 
-    public static void removeAllTrackers() {
-        Snowplow snowplow = Snowplow.getInstance();
-        synchronized (snowplow) {
-            snowplow.defaultServiceProvider = null;
-            Collection<ServiceProvider> serviceProviders = snowplow.serviceProviderInstances.values();
-            snowplow.serviceProviderInstances.clear();
-            for (ServiceProvider sp : serviceProviders) {
-                sp.shutdown();
-            }
+    public synchronized static void removeAllTrackers() {
+        defaultServiceProvider = null;
+        Collection<ServiceProvider> serviceProviders = serviceProviderInstances.values();
+        serviceProviderInstances.clear();
+        for (ServiceProvider sp : serviceProviders) {
+            sp.shutdown();
         }
     }
 
     @NonNull
     public static Set<String> getInstancedTrackerNamespaces() {
-        return Snowplow.getInstance().serviceProviderInstances.keySet();
+        return serviceProviderInstances.keySet();
     }
 
     // Private methods
 
-    private synchronized boolean registerInstance(@NonNull ServiceProvider serviceProvider) {
+    private synchronized static boolean registerInstance(@NonNull ServiceProvider serviceProvider) {
         String namespace = serviceProvider.namespace;
         boolean isOverriding = serviceProviderInstances.put(namespace, serviceProvider) != null;
         if (defaultServiceProvider == null) {
