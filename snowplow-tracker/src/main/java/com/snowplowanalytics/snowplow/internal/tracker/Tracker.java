@@ -57,9 +57,8 @@ import com.snowplowanalytics.snowplow.util.Basis;
 
 
 /**
- * Builds a Tracker object which is used to
- * send events to a Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
+ * Builds a Tracker object which is used to send events to a Snowplow Collector.
+ * @deprecated It will be removed in the next major version, please use Snowplow.createTracker methods.
  */
 @Deprecated
 public class Tracker {
@@ -248,6 +247,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#applicationContext(boolean)}
          * @param isEnabled Whether application contexts are sent with all events
          * @return itself
          */
@@ -272,6 +272,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#installAutotracking(boolean)}
          * @param willTrack Whether install events will be tracked
          * @return itself
          */
@@ -292,6 +293,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#base64encoding(boolean)}
          * @param base64 Whether JSONs in the payload should be base-64 encoded
          * @return itself
          */
@@ -302,6 +304,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#devicePlatform(DevicePlatform)}
          * @param platform The device platform the tracker is running on
          * @return itself
          */
@@ -312,6 +315,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#logLevel(LogLevel)}
          * @param log The log level for the Tracker class
          * @return itself
          */
@@ -322,6 +326,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#loggerDelegate(LoggerDelegate)} 
          * @param delegate The logger delegate that receive logs from the tracker.
          * @return itself
          */
@@ -332,6 +337,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#sessionContext(boolean)}
          * @param sessionContext whether to add a session context
          * @return itself
          */
@@ -402,9 +408,7 @@ public class Tracker {
         }
 
         /**
-         * @apiNote Requires Location permissions accordingly to the requirements of the various
-         * Android versions. Otherwise the whole context is skipped.
-         *
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#geoLocationContext(boolean)}
          * @param geoLocationContext whether to add a geo-location context
          * @return itself
          */
@@ -415,6 +419,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#platformContext(boolean)}
          * @param mobileContext whether to add a mobile context
          * @return itself
          */
@@ -425,8 +430,8 @@ public class Tracker {
         }
 
         /**
-         * @param applicationCrash whether to automatically track application
-         *                         crashes
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#exceptionAutotracking(boolean)}
+         * @param applicationCrash whether to automatically track application crashes
          * @return itself
          */
         @NonNull
@@ -436,6 +441,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#diagnosticAutotracking(boolean)}
          * @param trackerDiagnostic whether to automatically track error within the tracker.
          * @return itself
          */
@@ -446,8 +452,7 @@ public class Tracker {
         }
 
         /**
-         * @apiNote It needs the Foreground library installed.
-         *
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#lifecycleAutotracking(boolean)}
          * @param lifecycleEvents whether to automatically track transition
          *                        from foreground to background
          * @return itself
@@ -459,6 +464,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#screenContext(boolean)}
          * @param screenContext whether to send a screen context (info pertaining
          *                      to current screen) with every event
          * @return itself
@@ -470,6 +476,7 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#screenViewAutotracking(boolean)}
          * @param screenviewEvents whether to auto-track screenviews
          * @return itself
          */
@@ -858,6 +865,8 @@ public class Tracker {
      * @param documentId ID of a GDPR basis document
      * @param documentVersion Version of the document
      * @param documentDescription Description of the document
+     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
+     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
      */
     public void enableGdprContext(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
@@ -865,11 +874,17 @@ public class Tracker {
 
     /**
      * Disable GDPR context.
+     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
+     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
      */
     public synchronized void disableGdprContext() {
         this.gdpr = null;
     }
 
+    /**
+     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
+     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
+     */
     @Nullable
     public Gdpr getGdprContext() {
         return gdpr;
@@ -879,6 +894,7 @@ public class Tracker {
 
     /**
      * @param subject a valid subject object
+     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.SubjectConfiguration}
      */
     public void setSubject(@Nullable Subject subject) {
         this.subject = subject;

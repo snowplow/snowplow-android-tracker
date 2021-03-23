@@ -1,17 +1,15 @@
-package com.snowplowanalytics.snowplow.internal.emitter;
+package com.snowplowanalytics.snowplow.network;
 
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.internal.emitter.Executor;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSArguments;
+import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
-import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
-import com.snowplowanalytics.snowplow.network.RequestResult;
-import com.snowplowanalytics.snowplow.network.Request;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.io.IOException;

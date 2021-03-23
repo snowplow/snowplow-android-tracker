@@ -174,7 +174,8 @@ public class ServiceProvider {
                 .networkConnection(networkConfiguration.networkConnection)
                 .method(networkConfiguration.getMethod())
                 .security(networkConfiguration.getProtocol())
-                .customPostPath(networkConfiguration.customPostPath);
+                .customPostPath(networkConfiguration.customPostPath)
+                .client(networkConfiguration.okHttpClient);
         if (emitterConfiguration != null) {
             builder.sendLimit(emitterConfiguration.emitRange)
                     .option(emitterConfiguration.bufferOption)

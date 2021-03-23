@@ -5,17 +5,32 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * It represents time durations and provides utility methods to convert across time units.
+ */
 public class TimeMeasure {
 
+    /** Time duration at the selected TimeUnit. */
     public final long value;
+    /** Measure unit of the time duration. */
     public final TimeUnit unit;
 
+    /**
+     * Create an object that represent a time duration at a specific time unit.
+     * @param value Time duration at the selected TimeUnit.
+     * @param unit Measure unit of the time duration.
+     */
     public TimeMeasure(long value, @NonNull TimeUnit unit) {
         Objects.requireNonNull(unit);
         this.value = value;
         this.unit = unit;
     }
 
+    /**
+     * Convert the time unit of current time duration.
+     * @param toUnit The new measure unit.
+     * @return The same time duration converted to the new measure unit.
+     */
     public long convert(@NonNull TimeUnit toUnit) {
         return toUnit.convert(value, unit);
     }

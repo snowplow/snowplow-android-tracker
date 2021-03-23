@@ -57,6 +57,17 @@ public class EventStoreHelper extends SQLiteOpenHelper {
     // Prevents multiple instances being created and avoids memory leaks.
     private static HashMap<String, EventStoreHelper> instances = new HashMap<>();
 
+    /**
+     * IMPORTANT:  This method is for internal use only. It's signature and behaviour might change in any
+     * future tracker release.
+     *
+     * Clears all the EventStores not associated at any of the namespaces passed as parameter.
+     *
+     * @param context The Android app context.
+     * @param allowedNamespaces The namespace allowed. All the EventStores not associated at any of
+     *                          the allowedNamespaces will be cleared.
+     * @return The list of namespaces that have been found with EventStores and have been cleared out.
+     */
     @NonNull
     public synchronized static List<String> removeUnsentEventsExceptForNamespaces(@NonNull Context context, @Nullable List<String> allowedNamespaces) {
         String[] databaseList = context.databaseList();

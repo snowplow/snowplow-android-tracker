@@ -18,11 +18,13 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.network.Request;
@@ -84,7 +86,7 @@ public class Emitter {
 
     /**
      * Builder for the Emitter.
-     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
+     * @deprecated It will be removed in the next major version, please use {@link com.snowplowanalytics.snowplow.Snowplow} methods.
      */
     @Deprecated
     public static class EmitterBuilder {
@@ -109,6 +111,7 @@ public class Emitter {
         @Nullable EventStore eventStore = null; // Optional
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}.
          * @param uri The uri of the collector
          * @param context the android context
          */
@@ -118,6 +121,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(NetworkConnection)}.
          * @param networkConnection The component in charge for sending events to the collector.
          * @return itself
          */
@@ -128,6 +132,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#eventStore(EventStore)}.
          * @param eventStore The component in charge for persisting events before sending.
          * @return itself
          */
@@ -138,6 +143,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}.
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
@@ -148,6 +154,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#bufferOption(BufferOption)}
          * @param option the buffer option for the emitter
          * @return itself
          */
@@ -158,6 +165,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}
          * @param protocol the security chosen for requests
          * @return itself
          */
@@ -168,6 +176,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated No longer needed.
          * @param version the TLS version allowed for requests
          * @return itself
          */
@@ -178,6 +187,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated No longer needed.
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
@@ -188,6 +198,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#requestCallback(RequestCallback)}.
          * @param requestCallback Request callback function
          * @return itself
          */
@@ -198,6 +209,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated No longer needed.
          * @param emitterTick The tick count between emitter attempts
          * @return itself
          */
@@ -208,6 +220,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#emitRange(int)}.
          * @param sendLimit The maximum amount of events to grab for an emit attempt
          * @return itself
          */
@@ -218,6 +231,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated No longer needed.
          * @param emptyLimit The amount of emitter ticks that are performed before we shut down
          *                   due to the database being empty.
          * @return itself
@@ -229,6 +243,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#byteLimitGet(int)}.
          * @param byteLimitGet The maximum amount of bytes allowed to be sent in a payload
          *                     in a GET request.
          * @return itself
@@ -240,6 +255,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#byteLimitPost(int)}.
          * @param byteLimitPost The maximum amount of bytes allowed to be sent in a payload
          *                      in a POST request.
          * @return itself
@@ -251,6 +267,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#timeout(Integer)}.
          * @param emitTimeout The maximum timeout for emitting events. If emit time exceeds this value
          *                    TimeOutException will be thrown
          * @return itself
@@ -262,6 +279,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated No longer needed.
          * @param timeUnit a valid TimeUnit
          * @return itself
          */
@@ -272,6 +290,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link NetworkConfiguration#okHttpClient(OkHttpClient)}
          * @param client An OkHttp client that will be used in the emitter, you can provide your
          *               own if you want to share your Singleton client's interceptors, connection pool etc..
          *               ,otherwise a new one is created.
@@ -284,6 +303,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#customPostPath(String)}.
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
@@ -294,6 +314,7 @@ public class Emitter {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#threadPoolSize(int)}.
          * @param threadPoolSize The number of threads available for the tracker's operations.
          * @return itself
          */
