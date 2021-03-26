@@ -18,15 +18,21 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.session.FileStore;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertNotEquals;
 
 public class SessionTest extends AndroidTestCase {
 
@@ -255,6 +261,60 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
+    }
+
+    public void testMultipleTrackersUpdateDifferentSessions() throws InterruptedException {
+        Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
+        Tracker tracker1 = new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(10)
+                .backgroundTimeout(10)
+                .build();
+        Tracker tracker2 = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(10)
+                .backgroundTimeout(10)
+                .build();
+        Session session1 = tracker1.getSession();
+        Session session2 = tracker2.getSession();
+        session1.waitForSessionFileLoad();
+        session2.waitForSessionFileLoad();
+
+        session1.getSessionContext("fake-id");
+        session2.getSessionContext("fake-id");
+
+        long initialValue1 = session1.getSessionIndex();
+        String id1 = session1.getCurrentSessionId();
+        long initialValue2 = session2.getSessionIndex();
+        String id2 = session2.getCurrentSessionId();
+
+        // Retrigger session in tracker1
+        Thread.sleep(7000);
+        session1.getSessionContext("fake-id");
+        Thread.sleep(5000);
+
+        // Retrigger timedout session in tracker2
+        session2.getSessionContext("fake-id");
+        id2 = session2.getCurrentSessionId();
+
+        // Check sessions have the correct state
+        assertEquals(0, session1.getSessionIndex() - initialValue1);
+        assertEquals(1, session2.getSessionIndex() - initialValue2);
+
+        // Recreate tracker2
+        Tracker tracker2b = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(10)
+                .backgroundTimeout(10)
+                .build();
+        tracker2b.getSession().getSessionContext("fake-id");
+        long initialValue2b = tracker2b.getSession().getSessionIndex();
+        String previousId2b = tracker2b.getSession().getPreviousSessionId();
+
+        // Check the new tracker session gets the data from the old tracker2 session
+        assertEquals(initialValue2 + 2, initialValue2b);
+        assertEquals(id2, previousId2b);
+        assertNotEquals(id1, previousId2b);
     }
 
     // Private methods

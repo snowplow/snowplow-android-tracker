@@ -560,7 +560,7 @@ public class Tracker {
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;
             }
-            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
 
         // If lifecycleEvents is True
@@ -922,7 +922,7 @@ public class Tracker {
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;
             }
-            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
     }
 

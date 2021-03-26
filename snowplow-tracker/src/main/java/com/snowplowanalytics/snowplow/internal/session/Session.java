@@ -87,6 +87,17 @@ public class Session {
     private Runnable backgroundTimeoutCallback = null;
 
     private SharedPreferences sharedPreferences;
+    private String sessionVarsName;
+
+    @NonNull
+    public synchronized static Session getInstance(@NonNull Context context,
+                                                   long foregroundTimeout,
+                                                   long backgroundTimeout,
+                                                   @NonNull TimeUnit timeUnit,
+                                                   @Nullable Runnable[] sessionCallbacks)
+    {
+        return Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, null, sessionCallbacks);
+    }
 
     /**
      * Creates a new Session object which will
@@ -113,9 +124,10 @@ public class Session {
                                                    long foregroundTimeout,
                                                    long backgroundTimeout,
                                                    @NonNull TimeUnit timeUnit,
+                                                   @Nullable String namespace,
                                                    @Nullable Runnable[] sessionCallbacks)
     {
-        Session session = new Session(foregroundTimeout, backgroundTimeout, timeUnit, context);
+        Session session = new Session(foregroundTimeout, backgroundTimeout, timeUnit, namespace, context);
         Runnable[] callbacks = {null, null, null, null};
         if (sessionCallbacks.length == 4) {
             callbacks = sessionCallbacks;
@@ -129,15 +141,26 @@ public class Session {
 
     @Deprecated
     public Session(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit, @NonNull Context context) {
+        this(foregroundTimeout, backgroundTimeout, timeUnit, null, context);
+    }
+
+    @Deprecated
+    public Session(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit, @Nullable String namespace, @NonNull Context context) {
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         isSessionCheckerEnabled = true;
         isNewSession = true;
 
+        sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS;
+        if (namespace != null && !namespace.isEmpty()) {
+            String sessionVarsSuffix = namespace.replaceAll("[^a-zA-Z0-9_]+", "-");
+            sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS + "_" + sessionVarsSuffix;
+        }
+
         this.loadFromFileFuture = Executor.futureCallable((Callable<Void>) () -> {
             synchronized (this) {
-                sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-                if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+                sharedPreferences = getSessionFromSharedPreferences(context, sessionVarsName);
+                if (sharedPreferences != null) {
                     userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
                     currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
                     sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
@@ -156,6 +179,8 @@ public class Session {
                         userId = Util.getUUIDString();
                     }
                 }
+                // Force sharedPreferences to be the correct one.
+                sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
                 lastSessionCheck = System.currentTimeMillis();
                 hasLoadedFromFile.set(true);
                 return null;
@@ -334,6 +359,20 @@ public class Session {
         return FileStore.getMapFromFile(
                 TrackerConstants.SNOWPLOW_SESSION_VARS,
                 context);
+    }
+
+    @Nullable
+    private SharedPreferences getSessionFromSharedPreferences(@NonNull Context context, @NonNull String sessionVarsName) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+            return sharedPreferences;
+        } else {
+            sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+            if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+                return sharedPreferences;
+            }
+        }
+        return null;
     }
 
     /**
