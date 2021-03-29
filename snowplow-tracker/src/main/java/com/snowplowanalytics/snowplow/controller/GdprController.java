@@ -17,7 +17,7 @@ public interface GdprController extends GdprConfigurationInterface {
     void reset(@NonNull Basis basisForProcessing, @NonNull String documentId, @NonNull String documentVersion, @NonNull String documentDescription);
 
     /**
-     * Whether the recorded GDPR context is enabled and so attachable as context.
+     * Whether the recorded GDPR context is enabled and will be attached as context.
      */
     boolean isEnabled();
 
