@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -146,29 +147,34 @@ public class Session {
             sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS + "_" + sessionVarsSuffix;
         }
 
-        sharedPreferences = getSessionFromSharedPreferences(context, sessionVarsName);
-        if (sharedPreferences != null) {
-            userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
-            currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
-            sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
-        } else {
-            Map<String, Object> sessionInfo = getSessionFromFile(context);
-            if (sessionInfo != null) {
-                try {
-                    userId = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
-                    currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
-                    sessionIndex = (int) sessionInfo.get(Parameters.SESSION_INDEX);
-                } catch (Exception e) {
-                    Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
+        StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
+        try {
+            sharedPreferences = getSessionFromSharedPreferences(context, sessionVarsName);
+            if (sharedPreferences != null) {
+                userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
+                currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
+                sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
+            } else {
+                Map<String, Object> sessionInfo = getSessionFromFile(context);
+                if (sessionInfo != null) {
+                    try {
+                        userId = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
+                        currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
+                        sessionIndex = (int) sessionInfo.get(Parameters.SESSION_INDEX);
+                    } catch (Exception e) {
+                        Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
+                        userId = Util.getUUIDString();
+                    }
+                } else {
                     userId = Util.getUUIDString();
                 }
-            } else {
-                userId = Util.getUUIDString();
             }
+            // Force sharedPreferences to be the correct one.
+            sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+            lastSessionCheck = System.currentTimeMillis();
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
         }
-        // Force sharedPreferences to be the correct one.
-        sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-        lastSessionCheck = System.currentTimeMillis();
         Logger.v(TAG, "Tracker Session Object created.");
     }
 
@@ -343,14 +349,19 @@ public class Session {
 
     @Nullable
     private SharedPreferences getSessionFromSharedPreferences(@NonNull Context context, @NonNull String sessionVarsName) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
-        if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
-            return sharedPreferences;
-        } else {
-            sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+        StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
             if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
                 return sharedPreferences;
+            } else {
+                sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+                if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+                    return sharedPreferences;
+                }
             }
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
         }
         return null;
     }
