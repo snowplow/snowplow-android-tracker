@@ -188,6 +188,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
@@ -296,6 +299,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithoutDataCollection() throws Exception {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
@@ -321,6 +327,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithSession() throws Exception {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
