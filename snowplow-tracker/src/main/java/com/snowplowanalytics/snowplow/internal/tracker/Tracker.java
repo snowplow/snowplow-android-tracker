@@ -701,7 +701,7 @@ public class Tracker {
 
         if (sessionContext) {
             String eventId = event.eventId.toString();
-            if (trackerSession != null && trackerSession.getHasLoadedFromFile()) {
+            if (trackerSession != null) {
                 synchronized (trackerSession) {
                     SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
                     if (sessionContextJson == null) {
