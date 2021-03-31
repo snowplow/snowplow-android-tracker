@@ -67,7 +67,7 @@ public class NotificationCenter {
         notificationMap.clear();
     }
 
-    public static boolean postNotification(@NonNull String notificationType, @NonNull Map<String,Object> data) {
+    public synchronized static boolean postNotification(@NonNull String notificationType, @NonNull Map<String,Object> data) {
         List<WeakObserver> observers = notificationMap.get(notificationType);
         if (observers == null || observers.isEmpty()) {
             return false;
