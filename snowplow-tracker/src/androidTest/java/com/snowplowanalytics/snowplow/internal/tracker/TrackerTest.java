@@ -212,6 +212,12 @@ public class TrackerTest extends AndroidTestCase {
                 .geoLocationContext(false)
                 .build();
 
+        EventStore eventStore = emitter.getEventStore();
+        if (eventStore != null) {
+            boolean isClean = eventStore.removeAllEvents();
+            Log.i("testTrackSelfDescribingEvent", "EventStore clean: " + isClean);
+        }
+
         Log.i("testTrackSelfDescribingEvent", "Send SelfDescribing event");
 
         SelfDescribingJson sdj = new SelfDescribingJson("iglu:foo/bar/jsonschema/1-0-0");
