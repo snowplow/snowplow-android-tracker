@@ -210,6 +210,9 @@ public class TrackerTest extends AndroidTestCase {
                 .mobileContext(false)
                 .screenContext(false)
                 .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .build();
 
         EventStore eventStore = emitter.getEventStore();
@@ -274,6 +277,9 @@ public class TrackerTest extends AndroidTestCase {
                 .mobileContext(false)
                 .screenContext(false)
                 .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .build();
 
         Log.i("testTrackWithNoContext", "Send ScreenView event");
@@ -321,12 +327,15 @@ public class TrackerTest extends AndroidTestCase {
                 .build();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .sessionContext(false)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .build();
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(false)
+                .mobileContext(false)
+                .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
+                .build();
 
         tracker.pauseEventTracking();
         tracker.track(new ScreenView("name"));
@@ -352,15 +361,18 @@ public class TrackerTest extends AndroidTestCase {
                 .build();
 
         Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .sessionContext(true)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .foregroundTimeout(5)
-            .backgroundTimeout(5)
-            .timeUnit(TimeUnit.SECONDS)
-            .build();
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(true)
+                .mobileContext(false)
+                .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
+                .foregroundTimeout(5)
+                .backgroundTimeout(5)
+                .timeUnit(TimeUnit.SECONDS)
+                .build();
 
         assertNotNull(tracker.getSession());
         tracker.resumeSessionChecking();
@@ -385,6 +397,9 @@ public class TrackerTest extends AndroidTestCase {
                 .mobileContext(false)
                 .geoLocationContext(false)
                 .screenContext(true)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .foregroundTimeout(5)
                 .backgroundTimeout(5)
                 .timeUnit(TimeUnit.SECONDS)
@@ -394,25 +409,25 @@ public class TrackerTest extends AndroidTestCase {
         assertNotNull(screenState);
 
         Map<String, Object> screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
-        Map<String, Object> screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        Map<String, Object> screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("Unknown", screenStateMap.get(Parameters.SCREEN_NAME));
 
         // Send screenView
         ScreenView screenView = ScreenView.builder().name("screen1").build();
-        String screenId = (String)screenView.getDataPayload().get("id");
+        String screenId = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
         screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
-        screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("screen1", screenStateMap.get(Parameters.SCREEN_NAME));
         assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
 
         // Send another screenView
         screenView = ScreenView.builder().name("screen2").build();
-        String screenId1 = (String)screenView.getDataPayload().get("id");
+        String screenId1 = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
-        Map<String, Object> payload = (Map<String, Object>)screenView.getDataPayload();
+        Map<String, Object> payload = (Map<String, Object>) screenView.getDataPayload();
         assertEquals("screen2", payload.get(Parameters.SCREEN_NAME));
         assertEquals(screenId1, payload.get(Parameters.SCREEN_ID));
         assertEquals("screen1", payload.get(Parameters.SV_PREVIOUS_NAME));
@@ -437,6 +452,8 @@ public class TrackerTest extends AndroidTestCase {
         Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
+                .installTracking(false)
+                .screenviewEvents(false)
                 .applicationCrash(true)
                 .build();
 
@@ -463,6 +480,8 @@ public class TrackerTest extends AndroidTestCase {
         new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
+                .installTracking(false)
+                .screenviewEvents(false)
                 .applicationCrash(false)
                 .build();
 
