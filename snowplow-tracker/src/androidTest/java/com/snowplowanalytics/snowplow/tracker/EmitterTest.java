@@ -189,8 +189,8 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(Single, emitter.getBufferOption());
         assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setHttpMethod(GET);
-        String ur = emitter.getEmitterUri();
         assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
+        emitter.setEmitterUri(uri);
         emitter.setRequestSecurity(Protocol.HTTPS);
         assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com.acme");
@@ -204,8 +204,6 @@ public class EmitterTest extends AndroidTestCase {
 
         assertTrue(emitter.getEmitterStatus());
         emitter.setHttpMethod(POST);
-        assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setRequestSecurity(HTTP);
         assertEquals("https://com.acme/i", emitter.getEmitterUri());
         emitter.setEmitterUri("com/foo");
         assertEquals("https://com.acme/i", emitter.getEmitterUri());

@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.internal.emitter;
 
 import android.content.Context;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +36,7 @@ import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.EnumSet;
@@ -362,8 +364,14 @@ public class Emitter {
 
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(builder.uri)
-                    .security(builder.requestSecurity)
+            String endpoint = builder.uri;
+            Uri uri = Uri.parse(endpoint);
+            if (!endpoint.startsWith("http")) {
+                String protocol = builder.requestSecurity == Protocol.HTTPS ? "https://" : "http://";
+                endpoint = protocol + endpoint;
+            }
+            this.uri = endpoint;
+            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
                     .emitTimeout(builder.emitTimeout)
@@ -703,7 +711,6 @@ public class Emitter {
         if (!isCustomNetworkConnection && !isRunning.get()) {
             this.httpMethod = method;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
-                    .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
@@ -722,7 +729,6 @@ public class Emitter {
         if (!isCustomNetworkConnection && !isRunning.get()) {
             this.requestSecurity = security;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
-                    .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
@@ -741,7 +747,6 @@ public class Emitter {
         if (!isCustomNetworkConnection && !isRunning.get()) {
             this.uri = uri;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
-                    .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
@@ -760,7 +765,6 @@ public class Emitter {
         if (!isCustomNetworkConnection && !isRunning.get()) {
             this.customPostPath = customPostPath;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
-                    .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
@@ -779,7 +783,6 @@ public class Emitter {
         if (!isCustomNetworkConnection && !isRunning.get()) {
             this.emitTimeout = emitTimeout;
             this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
-                    .security(requestSecurity)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)

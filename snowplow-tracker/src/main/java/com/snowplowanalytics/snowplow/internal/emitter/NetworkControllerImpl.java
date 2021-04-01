@@ -45,17 +45,6 @@ public class NetworkControllerImpl implements NetworkController {
     }
 
     @Override
-    public void setProtocol(@NonNull Protocol protocol) {
-        emitter.setRequestSecurity(protocol);
-    }
-
-    @NonNull
-    @Override
-    public Protocol getProtocol() {
-        return emitter.getRequestSecurity();
-    }
-
-    @Override
     public void setCustomPostPath(@Nullable String customPostPath) {
         emitter.setCustomPostPath(customPostPath);
     }

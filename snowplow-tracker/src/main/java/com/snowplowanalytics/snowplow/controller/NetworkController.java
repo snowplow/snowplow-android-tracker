@@ -9,12 +9,12 @@ import com.snowplowanalytics.snowplow.network.Protocol;
 public interface NetworkController {
 
     /**
-     * URL (without schema/protocol) used to send events to the collector.
+     * URL used to send events to the collector.
      */
     void setEndpoint(@NonNull String endpoint);
 
     /**
-     * URL (without schema/protocol) used to send events to the collector.
+     * URL used to send events to the collector.
      */
     @NonNull
     String getEndpoint();
@@ -29,17 +29,6 @@ public interface NetworkController {
      */
     @NonNull
     HttpMethod getMethod();
-
-    /**
-     * Protocol used to send events to the collector.
-     */
-    void setProtocol(@NonNull Protocol protocol);
-
-    /**
-     * Protocol used to send events to the collector.
-     */
-    @NonNull
-    Protocol getProtocol();
 
     /**
      * A custom path which will be added to the endpoint URL to specify the
