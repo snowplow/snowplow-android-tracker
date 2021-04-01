@@ -14,14 +14,19 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -78,6 +83,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     private Tracker getTracker(boolean installTracking) {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Emitter emitter = new Emitter
                 .EmitterBuilder("testUrl", getContext())
                 .tick(0)
@@ -109,17 +117,6 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     // Tests
-
-    public void testTrackerNotInit() {
-        boolean exception = false;
-        try {
-            Tracker.instance();
-        } catch (Exception e) {
-            assertEquals("FATAL: Tracker must be initialized first!", e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-    }
 
     public void testSetValues() {
         Tracker tracker = getTracker(true);
@@ -191,6 +188,9 @@ public class TrackerTest extends AndroidTestCase {
         Executor.setThreadCount(30);
         Executor.shutdown();
 
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
@@ -203,7 +203,7 @@ public class TrackerTest extends AndroidTestCase {
             fail("Exception on Emitter creation");
         }
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
@@ -246,6 +246,9 @@ public class TrackerTest extends AndroidTestCase {
         Executor.setThreadCount(30);
         Executor.shutdown();
 
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
@@ -258,7 +261,7 @@ public class TrackerTest extends AndroidTestCase {
             fail("Exception on Emitter creation");
         }
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
@@ -302,13 +305,16 @@ public class TrackerTest extends AndroidTestCase {
         Executor.setThreadCount(30);
         Executor.shutdown();
 
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
             .base64(false)
             .level(LogLevel.VERBOSE)
             .sessionContext(false)
@@ -330,13 +336,16 @@ public class TrackerTest extends AndroidTestCase {
         Executor.setThreadCount(30);
         Executor.shutdown();
 
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
             .base64(false)
             .level(LogLevel.VERBOSE)
             .sessionContext(true)
@@ -356,11 +365,14 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackScreenView() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
@@ -402,6 +414,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackUncaughtException() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Thread.setDefaultUncaughtExceptionHandler(
                 new TestExceptionHandler("Illegal State Exception has been thrown!")
         );
@@ -413,7 +428,7 @@ public class TrackerTest extends AndroidTestCase {
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .applicationCrash(true)
@@ -427,6 +442,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testExceptionHandler() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         TestExceptionHandler handler = new TestExceptionHandler("Illegal State Exception has been thrown!");
         Thread.setDefaultUncaughtExceptionHandler(handler);
 
@@ -436,7 +454,7 @@ public class TrackerTest extends AndroidTestCase {
         );
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
-        new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .applicationCrash(false)
