@@ -1,5 +1,6 @@
 package com.snowplowanalytics.snowplow.network;
 
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
@@ -38,6 +39,7 @@ import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 public class OkHttpNetworkConnection implements NetworkConnection {
     private final String TAG = OkHttpNetworkConnection.class.getSimpleName();
 
+    private static final int TRAFFIC_STATS_TAG = 1;
     private static final String DEFAULT_USER_AGENT = String.format("snowplow/%s android/%s", BuildConfig.TRACKER_LABEL, Build.VERSION.RELEASE);
     private final MediaType JSON = MediaType.parse(TrackerConstants.POST_CONTENT_TYPE);
 
@@ -317,7 +319,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     private int requestSender(okhttp3.Request request) {
         try {
             Logger.v(TAG, "Sending request: %s", request);
-
+            TrafficStats.setThreadStatsTag(TRAFFIC_STATS_TAG);
             Response resp = client.newCall(request).execute();
             int code = resp.code();
             resp.body().close();
