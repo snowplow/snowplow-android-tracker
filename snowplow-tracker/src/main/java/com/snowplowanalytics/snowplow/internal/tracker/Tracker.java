@@ -560,7 +560,7 @@ public class Tracker {
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;
             }
-            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
 
         // If lifecycleEvents is True
@@ -701,7 +701,7 @@ public class Tracker {
 
         if (sessionContext) {
             String eventId = event.eventId.toString();
-            if (trackerSession != null && trackerSession.getHasLoadedFromFile()) {
+            if (trackerSession != null) {
                 synchronized (trackerSession) {
                     SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
                     if (sessionContextJson == null) {
@@ -922,7 +922,7 @@ public class Tracker {
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;
             }
-            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, callbacks);
+            trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
     }
 

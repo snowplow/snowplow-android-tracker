@@ -14,14 +14,19 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -78,6 +83,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     private Tracker getTracker(boolean installTracking) {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Emitter emitter = new Emitter
                 .EmitterBuilder("testUrl", getContext())
                 .tick(0)
@@ -109,17 +117,6 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     // Tests
-
-    public void testTrackerNotInit() {
-        boolean exception = false;
-        try {
-            Tracker.instance();
-        } catch (Exception e) {
-            assertEquals("FATAL: Tracker must be initialized first!", e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-    }
 
     public void testSetValues() {
         Tracker tracker = getTracker(true);
@@ -188,6 +185,12 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
@@ -200,14 +203,23 @@ public class TrackerTest extends AndroidTestCase {
             fail("Exception on Emitter creation");
         }
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
                 .mobileContext(false)
                 .screenContext(false)
                 .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .build();
+
+        EventStore eventStore = emitter.getEventStore();
+        if (eventStore != null) {
+            boolean isClean = eventStore.removeAllEvents();
+            Log.i("testTrackSelfDescribingEvent", "EventStore clean: " + isClean);
+        }
 
         Log.i("testTrackSelfDescribingEvent", "Send SelfDescribing event");
 
@@ -243,6 +255,9 @@ public class TrackerTest extends AndroidTestCase {
         Executor.setThreadCount(30);
         Executor.shutdown();
 
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
@@ -255,13 +270,16 @@ public class TrackerTest extends AndroidTestCase {
             fail("Exception on Emitter creation");
         }
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "testTrackWithNoContext", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
                 .mobileContext(false)
                 .screenContext(false)
                 .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .build();
 
         Log.i("testTrackWithNoContext", "Send ScreenView event");
@@ -296,19 +314,28 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithoutDataCollection() throws Exception {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .sessionContext(false)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(false)
+                .mobileContext(false)
+                .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
+                .build();
 
         tracker.pauseEventTracking();
         tracker.track(new ScreenView("name"));
@@ -321,22 +348,31 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackWithSession() throws Exception {
+        Executor.setThreadCount(30);
+        Executor.shutdown();
+
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .sessionContext(true)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .foregroundTimeout(5)
-            .backgroundTimeout(5)
-            .timeUnit(TimeUnit.SECONDS)
-            .build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(true)
+                .mobileContext(false)
+                .geoLocationContext(false)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
+                .foregroundTimeout(5)
+                .backgroundTimeout(5)
+                .timeUnit(TimeUnit.SECONDS)
+                .build();
 
         assertNotNull(tracker.getSession());
         tracker.resumeSessionChecking();
@@ -347,17 +383,23 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackScreenView() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
                 .option(BufferOption.Single)
                 .build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
                 .sessionContext(false)
                 .mobileContext(false)
                 .geoLocationContext(false)
                 .screenContext(true)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
                 .foregroundTimeout(5)
                 .backgroundTimeout(5)
                 .timeUnit(TimeUnit.SECONDS)
@@ -367,25 +409,25 @@ public class TrackerTest extends AndroidTestCase {
         assertNotNull(screenState);
 
         Map<String, Object> screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
-        Map<String, Object> screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        Map<String, Object> screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("Unknown", screenStateMap.get(Parameters.SCREEN_NAME));
 
         // Send screenView
         ScreenView screenView = ScreenView.builder().name("screen1").build();
-        String screenId = (String)screenView.getDataPayload().get("id");
+        String screenId = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
         screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
-        screenStateMap = (Map<String, Object>)screenStateMapWrapper.get(Parameters.DATA);
+        screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("screen1", screenStateMap.get(Parameters.SCREEN_NAME));
         assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
 
         // Send another screenView
         screenView = ScreenView.builder().name("screen2").build();
-        String screenId1 = (String)screenView.getDataPayload().get("id");
+        String screenId1 = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
-        Map<String, Object> payload = (Map<String, Object>)screenView.getDataPayload();
+        Map<String, Object> payload = (Map<String, Object>) screenView.getDataPayload();
         assertEquals("screen2", payload.get(Parameters.SCREEN_NAME));
         assertEquals(screenId1, payload.get(Parameters.SCREEN_ID));
         assertEquals("screen1", payload.get(Parameters.SV_PREVIOUS_NAME));
@@ -393,6 +435,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackUncaughtException() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Thread.setDefaultUncaughtExceptionHandler(
                 new TestExceptionHandler("Illegal State Exception has been thrown!")
         );
@@ -404,9 +449,11 @@ public class TrackerTest extends AndroidTestCase {
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
 
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
+                .installTracking(false)
+                .screenviewEvents(false)
                 .applicationCrash(true)
                 .build();
 
@@ -418,6 +465,9 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testExceptionHandler() {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         TestExceptionHandler handler = new TestExceptionHandler("Illegal State Exception has been thrown!");
         Thread.setDefaultUncaughtExceptionHandler(handler);
 
@@ -427,9 +477,11 @@ public class TrackerTest extends AndroidTestCase {
         );
 
         Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
-        new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+        new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)
+                .installTracking(false)
+                .screenviewEvents(false)
                 .applicationCrash(false)
                 .build();
 

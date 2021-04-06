@@ -17,6 +17,7 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
@@ -137,6 +138,9 @@ public class EventSendingTest extends AndroidTestCase {
     // Helpers
 
     public Tracker getTracker(String uri, HttpMethod method) {
+        String namespace = "myNamespace";
+        TestUtils.createSessionSharedPreferences(getContext(), namespace);
+
         Emitter emitter = new Emitter
                 .EmitterBuilder(uri, getContext())
                 .option(BufferOption.Single)
@@ -153,7 +157,7 @@ public class EventSendingTest extends AndroidTestCase {
 
         Tracker.close();
         Tracker.init(
-                new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
+                new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                     .subject(subject)
                     .base64(false)
                     .level(LogLevel.DEBUG)
