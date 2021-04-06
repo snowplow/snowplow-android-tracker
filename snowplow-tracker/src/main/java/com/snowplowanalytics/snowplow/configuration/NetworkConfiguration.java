@@ -77,21 +77,21 @@ public class NetworkConfiguration implements Configuration {
         String scheme = uri.getScheme();
         if (scheme == null) {
             protocol = Protocol.HTTPS;
-            this.endpoint = endpoint;
+            this.endpoint = "https://" + endpoint;
             return;
         }
         switch (scheme) {
             case "https":
                 protocol = Protocol.HTTPS;
-                this.endpoint = endpoint.substring(8);
+                this.endpoint = endpoint;
                 break;
             case "http":
                 protocol = Protocol.HTTP;
-                this.endpoint = endpoint.substring(7);
+                this.endpoint = endpoint;
                 break;
             default:
                 protocol = Protocol.HTTPS;
-                this.endpoint = endpoint;
+                this.endpoint = "https://" + endpoint;
         }
     }
 

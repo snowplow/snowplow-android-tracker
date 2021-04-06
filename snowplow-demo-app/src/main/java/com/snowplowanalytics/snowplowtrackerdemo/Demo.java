@@ -217,7 +217,6 @@ public class Demo extends Activity implements LoggerDelegate {
         NetworkController n = Snowplow.getDefaultTracker().getNetwork();
         if (!e.isSending()) {
             n.setEndpoint(uri);
-            n.setProtocol(security);
             n.setMethod(method);
         }
 

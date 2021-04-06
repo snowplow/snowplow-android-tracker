@@ -77,7 +77,7 @@ public class ConfigurationTest {
 
         String protocol = networkConfiguration.getProtocol() == Protocol.HTTP ? "http" : "https";
 
-        assertEquals(networkConfiguration.getEndpoint(), host);
+        assertEquals(networkConfiguration.getEndpoint(), scheme + "://" + host);
         assertEquals(protocol, scheme);
         assertEquals(trackerConfiguration.appId, tracker.getAppId());
         assertEquals("namespace", tracker.getNamespace());

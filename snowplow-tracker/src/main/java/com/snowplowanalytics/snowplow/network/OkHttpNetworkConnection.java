@@ -30,7 +30,6 @@ import okhttp3.Response;
 
 import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
 
 /**
  * Components in charge to send events to the collector.
@@ -57,7 +56,6 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     public static class OkHttpNetworkConnectionBuilder {
         final String uri; // Required
         HttpMethod httpMethod = POST; // Optional
-        Protocol protocol = Protocol.HTTP; // Optional
         EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         private int emitTimeout = 5; // Optional
         OkHttpClient client = null; //Optional
@@ -77,16 +75,6 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         @NonNull
         public OkHttpNetworkConnectionBuilder method(@NonNull HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
-            return this;
-        }
-
-        /**
-         * @param protocol the security chosen for requests
-         * @return itself
-         */
-        @NonNull
-        public OkHttpNetworkConnectionBuilder security(@NonNull Protocol protocol) {
-            this.protocol = protocol;
             return this;
         }
 
@@ -155,15 +143,45 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     }
 
     private OkHttpNetworkConnection(OkHttpNetworkConnectionBuilder builder) {
-        this.uri = builder.uri;
-        this.protocol = builder.protocol;
-        this.httpMethod = builder.httpMethod;
-        this.emitTimeout = builder.emitTimeout;
-        this.customPostPath = builder.customPostPath;
+        // Decode uri to extract protocol
+        String tempUri = builder.uri;
+        Uri url = Uri.parse(builder.uri);
+        Protocol tempProtocol = Protocol.HTTPS;
+        if (url.getScheme() == null) {
+            tempUri = "https://" + builder.uri;
+        } else {
+            switch (url.getScheme()) {
+                case "https":
+                    break;
+                case "http":
+                    tempProtocol = Protocol.HTTP;
+                    break;
+                default:
+                    tempUri = "https://" + builder.uri;
+            }
+        }
+
+        // Configure
+        uri = tempUri;
+        protocol = tempProtocol;
+        httpMethod = builder.httpMethod;
+        emitTimeout = builder.emitTimeout;
+        customPostPath = builder.customPostPath;
 
         TLSArguments tlsArguments = new TLSArguments(builder.tlsVersions);
-        buildUri();
+        String protocolString = protocol == Protocol.HTTP ? "http://" : "https://";
+        uriBuilder = Uri.parse(uri).buildUpon();
 
+        if (httpMethod == GET) {
+            uriBuilder.appendPath("i");
+        } else if (this.customPostPath == null) {
+            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
+                    TrackerConstants.PROTOCOL_VERSION);
+        } else {
+            uriBuilder.appendEncodedPath(this.customPostPath);
+        }
+
+        // Configure with external OkHttpClient
         if (builder.client == null) {
             client = new OkHttpClient.Builder()
                     .sslSocketFactory(tlsArguments.getSslSocketFactory(), tlsArguments.getTrustManager())
@@ -231,20 +249,6 @@ public class OkHttpNetworkConnection implements NetworkConnection {
             }
         }
         return results;
-    }
-
-    private void buildUri() {
-        String protocolString = protocol == HTTP ? "http://" : "https://";
-        uriBuilder = Uri.parse(protocolString + uri).buildUpon();
-
-        if (httpMethod == GET) {
-            uriBuilder.appendPath("i");
-        } else if (this.customPostPath == null) {
-            uriBuilder.appendEncodedPath(TrackerConstants.PROTOCOL_VENDOR + "/" +
-                    TrackerConstants.PROTOCOL_VERSION);
-        } else {
-            uriBuilder.appendEncodedPath(this.customPostPath);
-        }
     }
 
     /**
