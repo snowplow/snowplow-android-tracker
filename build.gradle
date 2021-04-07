@@ -2,7 +2,6 @@ buildscript {
     ext.kotlin_version = '1.3.72'
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -12,18 +11,18 @@ buildscript {
         classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.13.0'
     }
 }
 
 subprojects {
     group = 'com.snowplowanalytics'
-    version = '1.7.1'
+    version = '2.0.0-beta.0'
     repositories {
         google()
         maven {
             url "http://maven.snplow.com/releases"
         }
         mavenCentral()
-        jcenter()
     }
 }

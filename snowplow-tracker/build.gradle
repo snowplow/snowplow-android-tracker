@@ -1,12 +1,10 @@
-plugins {
-    id "com.jfrog.bintray" version "1.5"
-}
 
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.vanniktech.maven.publish'
 
 jacoco {
     toolVersion = "0.8.5"
@@ -106,60 +104,22 @@ coveralls {
     jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
 }
 
-install {
-    repositories.mavenInstaller {
-        pom.artifactId = 'snowplow-android-tracker'
-        pom.version = "$project.version"
-        pom.project {
-            name = 'snowplow-android-tracker'
-            description = 'Snowplow event tracker for Android 16+. Add analytics to your apps and games.'
-            url = 'https://github.com/snowplow/snowplow-android-tracker'
-            inceptionYear = '2014'
-
-            packaging = 'aar'
-            groupId = 'com.snowplowanalytics'
-
-            licenses {
-                license {
-                    name = 'The Apache Software License, Version 2.0'
-                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution = 'repo'
-                }
-            }
-            scm {
-                connection = 'https://github.com/snowplow/snowplow-android-tracker.git'
-                url = 'https://github.com/snowplow/snowplow-android-tracker'
-            }
-            developers {
-                developer {
-                    name = 'Joshua Beemster'
-                }
-            }
-        }
-    }
+signing {
+    useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
 }
 
-bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_SNOWPLOW_MAVEN_API_KEY')
-
-    configurations = ['archives']
-
-    publish = true
-
-    pkg {
-        repo = 'snowplow-maven'
-        name = 'snowplow-android-tracker'
-        group = 'com.snowplowanalytics'
-        userOrg = 'snowplow'
-
-        websiteUrl = 'https://github.com/snowplow/snowplow-android-tracker'
-        vcsUrl = 'https://github.com/snowplow/snowplow-android-tracker'
-        issueTrackerUrl = 'https://github.com/snowplow/snowplow-android-tracker/issues'
-
-        licenses = ['Apache-2.0']
-
-        version.name = "$project.version"
+// Deprecated: to fix as explained in https://github.com/vanniktech/gradle-maven-publish-plugin/issues/137
+mavenPublish {
+    targets {
+        uploadArchives {
+            releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            repositoryUsername = System.getenv('SONA_USER')
+            repositoryPassword = System.getenv('SONA_PASS')
+        }
+    }
+    nexus {
+        repositoryUsername = System.getenv('SONA_USER') // defaults to the mavenCentralRepositoryUsername Gradle Property
+        repositoryPassword = System.getenv('SONA_PASS') // defaults to the mavenCentralRepositoryPassword Gradle Property
     }
 }
 

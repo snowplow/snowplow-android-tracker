@@ -9,9 +9,11 @@ jobs:
   deploy:    
     runs-on: macos-latest
 
-    env:
-      BINTRAY_SNOWPLOW_MAVEN_USER: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_USER }}
-      BINTRAY_SNOWPLOW_MAVEN_API_KEY: ${{ secrets.BINTRAY_SNOWPLOW_MAVEN_API_KEY }}
+    env: 
+      SONA_USER: ${{ secrets.SONA_USER }}
+      SONA_PASS: ${{ secrets.SONA_PASS }}
+      SONA_PGP_PASSPHRASE: ${{ secrets.SONA_PGP_PASSPHRASE }}
+      SONA_PGP_SECRET: ${{ secrets.SONA_PGP_SECRET }}
             
     steps:
       - name: Checkout
@@ -36,4 +38,6 @@ jobs:
           exit 1
       
       - name: Publish
-        run: ./gradlew bintrayUpload
+        run: |
+          ./gradlew uploadArchives
+          ./gradlew closeAndReleaseRepository
