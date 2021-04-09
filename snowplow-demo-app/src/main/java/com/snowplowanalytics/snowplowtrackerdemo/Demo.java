@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
@@ -95,14 +94,6 @@ public class Demo extends Activity implements LoggerDelegate {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .penaltyDialog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
-                .penaltyLog()
-                .build());
         setContentView(R.layout.activity_demo);
 
         // Init Tracker
