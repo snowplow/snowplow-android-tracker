@@ -1,63 +1,44 @@
 # Android Analytics for Snowplow
 
-[![actively-maintained]][tracker-classificiation] [![Build Status][gh-actions-image]][gh-actions] [![Coverage Status][coveralls-image]][coveralls] [![Release][release-image]][releases] [![License][license-image]][license]
+[![actively-maintained]][tracker-classificiation]
+[![Build Status][gh-actions-image]][gh-actions]
+[![Coverage Status][coveralls-image]][coveralls]
+[![Release][release-image]][releases]
+[![License][license-image]][license]
 
-## Overview
+![snowplow-logo](.github/media/snowplow_logo.png)
 
-Add analytics to your Java software with the **[Snowplow][snowplow]** event tracker for **[Android][android]**. See also: **[Snowplow Java Tracker][snowplow-java-tracker]**.
+Snowplow is a scalable open-source platform for rich, high quality, low-latency data collection. It is designed to collect high quality, complete behavioral data for enterprise business.
 
-With this tracker you can collect event data from your Android applications, games or frameworks.
+**To find out more, please check out the [Snowplow website][website] and our [documentation][docs].**
 
-## Quickstart
+## Snowplow Android Tracker Overview
 
-### Building
+The Snowplow Android Tracker allows you to add analytics to your mobile apps when using a [Snowplow][snowplow] pipeline.
 
-Assuming git is installed, clone the project.
+With this tracker you can collect event data from your applications, games or frameworks.
 
-```bash
-$ git clone https://github.com/snowplow/snowplow-android-tracker.git
-```
+**Technical documentation can be found for each tracker in our [Documentation][mobile-docs].**
 
-Then open the project in Android Studio and finish the setup.
+### Demo apps using the Snowplow Android Tracker
 
-### Testing
+A [demo app](https://github.com/snowplow/snowplow-android-tracker/tree/master/snowplow-demo-app) is part of this repository.
 
-1. Tests require a device, whether emulator-based or a real one.
+An example of app instrumented with the Android Tracker can be found in the [snowplow-android-tracker-examples](https://github.com/snowplow-incubator/snowplow-android-tracker-examples) repository.
 
-2. We need to run [Snowplow Micro][micro] before running trackers' tests. Micro will provide an endpoint that our tests will interact with.
+### Instrument the iOS Tracker
 
-3. Assuming Micro is running on `localhost:9090`, we need to make this endpoint publicly available. An option could be using an ssh-based service, `serveo`. Feel free to use any other tool serving the same purpose, like `ngrok`. The following is an example for `serveo`.
+| Technical Docs                      | Setup Guide                           | API Docs                            |
+|-------------------------------------|---------------------------------------|-------------------------------------|
+| [![i1][tech-docs-image]][tech-docs] | [![i2][setup-docs-image]][setup-docs] | [![i3][setup-docs-image]][api-docs] |
+| [Technical Docs][tech-docs]         | [Setup Guide][setup-docs]             | [API Docs][api-docs]                | 
 
-```bash
-ssh -R 80:localhost:9090 serveo.net
-```
+## Maintainers 
 
-which should print something similar to
-
-```bash
-Forwarding HTTP traffic from https://micro.serveo.net
-```
-
-4. Copy the url without the scheme, `micro.serveo.net` in the example above, and insert a line to `local.properties` file as following:
-
-```bash
-microSubdomain=micro.serveo.net
-```
-
-5. Use Android Studio's capabilities to run tests or use `gradlew` CLI tool. e.g. At the root of the repository, run
-
-```bash
-./gradlew connectedCheck
-```
-
-## Find out more
-
-| Technical Docs                 | Quick Start              | Roadmap                | Contributing                     |
-|:-------------------------------|:-------------------------|:-----------------------|:---------------------------------|
-| ![i1][techdocs-image]          | ![i2][quick-start-image]       | ![i3][roadmap-image]   | ![i4][contributing-image]        |
-| **[Technical Docs][techdocs]** | **[Quick Start][setup]** | **[Roadmap][roadmap]** | **[Contributing](Contributing.md)** |
-
-Older documentation can be found [here][techdocs-old].
+| Contributing                                 |
+|----------------------------------------------|
+| [![i4][contributing-image]](CONTRIBUTING.md) |
+| [Contributing](CONTRIBUTING.md)              |
 
 ## Copyright and license
 
@@ -72,34 +53,30 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[android]: https://www.android.com/
 
-[snowplow]: https://snowplowanalytics.com
-[snowplow-java-tracker]: https://github.com/snowplow/snowplow-java-tracker
+[website]: https://snowplowanalytics.com
+[snowplow]: https://github.com/snowplow/snowplow
+[docs]: https://docs.snowplowanalytics.com/
+[mobile-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/
 
-[micro]: https://github.com/snowplow-incubator/snowplow-micro
+[gh-actions]: https://github.com/snowplow/snowplow-objc-tracker/actions
+[gh-actions-image]: https://github.com/snowplow/snowplow-android-tracker/workflows/Build/badge.svg
 
-[techdocs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
-[quick-start-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
-[roadmap-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
-[contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
-
-[techdocs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/
-[techdocs-old]: https://github.com/snowplow/snowplow/wiki/Android-Tracker
-[setup]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/android-tracker/android-1-4-0/#quick-start
-[roadmap]: https://github.com/snowplow/snowplow/wiki/Product-roadmap
-
-[gh-actions]: https://github.com/snowplow/snowplow-android-tracker/actions
-[gh-actions-image]: https://github.com/snowplow/snowplow-android-tracker/workflows/build/badge.svg?branch=master
-
-[release-image]: https://img.shields.io/badge/release-1.4.2-blue.svg?style=flat
-[releases]: https://github.com/snowplow/snowplow-android-tracker/releases
-
-[license-image]: https://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
-[license]: https://www.apache.org/licenses/LICENSE-2.0
-
-[coveralls-image]: https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master
 [coveralls]: https://coveralls.io/github/snowplow/snowplow-android-tracker?branch=master
+[coveralls-image]: https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master
+
+[license]: https://www.apache.org/licenses/LICENSE-2.0
+[license-image]: https://img.shields.io/cocoapods/l/SnowplowTracker.svg
+
+[setup-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v2-0/quick-start-guide/#tab-android-tracker
+[setup-docs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
+
+[tech-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v2-0/introduction/
+[tech-docs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
+
+[api-docs]: https://snowplow.github.io/snowplow-android-tracker/
+
+[contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
 [tracker-classificiation]: https://github.com/snowplow/snowplow/wiki/Tracker-Maintenance-Classification
 [actively-maintained]: https://img.shields.io/static/v1?style=flat&label=Snowplow&message=Actively%20Maintained&color=6638b8&labelColor=9ba0aa&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAeFBMVEVMaXGXANeYANeXANZbAJmXANeUANSQAM+XANeMAMpaAJhZAJeZANiXANaXANaOAM2WANVnAKWXANZ9ALtmAKVaAJmXANZaAJlXAJZdAJxaAJlZAJdbAJlbAJmQAM+UANKZANhhAJ+EAL+BAL9oAKZnAKVjAKF1ALNBd8J1AAAAKHRSTlMAa1hWXyteBTQJIEwRgUh2JjJon21wcBgNfmc+JlOBQjwezWF2l5dXzkW3/wAAAHpJREFUeNokhQOCA1EAxTL85hi7dXv/E5YPCYBq5DeN4pcqV1XbtW/xTVMIMAZE0cBHEaZhBmIQwCFofeprPUHqjmD/+7peztd62dWQRkvrQayXkn01f/gWp2CrxfjY7rcZ5V7DEMDQgmEozFpZqLUYDsNwOqbnMLwPAJEwCopZxKttAAAAAElFTkSuQmCC
