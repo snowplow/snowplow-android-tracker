@@ -79,7 +79,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:4.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
     // test
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
