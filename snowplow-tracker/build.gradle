@@ -11,7 +11,7 @@ jacoco {
 }
 
 project.ext {
-    archLifecycleVersion = "1.1.1"
+    archLifecycleVersion = "2.2.0"
 }
 
 android {
@@ -76,11 +76,12 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.1.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation 'androidx.annotation:annotation:1.2.0'
+    compileOnly "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
     // test
+    testImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

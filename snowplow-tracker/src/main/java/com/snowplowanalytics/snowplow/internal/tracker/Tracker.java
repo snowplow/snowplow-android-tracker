@@ -17,10 +17,9 @@ import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -563,15 +562,17 @@ public class Tracker {
             trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
 
-        // If lifecycleEvents is True
-        if (this.lifecycleEvents || this.sessionContext) {
-
+        if (this.lifecycleEvents) {
             // addObserver must execute on the mainThread
             Handler mainHandler = new Handler(context.getMainLooper());
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
+                    try {
+                        ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
+                    } catch (NoClassDefFoundError e) {
+                        Logger.e(TAG,"Class 'ProcessLifecycleOwner' not found. The tracker can't track lifecycle events.");
+                    }
                 }
             });
         }

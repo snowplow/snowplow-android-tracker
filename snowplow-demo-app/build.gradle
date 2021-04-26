@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 project.ext {
-    archLifecycleVersion = "1.1.1"
+    archLifecycleVersion = "2.2.0"
 }
 
 android {
@@ -43,7 +43,7 @@ android {
 }
 
 dependencies {
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':snowplow-android-tracker')
     implementation 'androidx.browser:browser:1.3.0'
