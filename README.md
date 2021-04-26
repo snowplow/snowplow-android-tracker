@@ -66,7 +66,7 @@ limitations under the License.
 [coveralls-image]: https://coveralls.io/repos/github/snowplow/snowplow-android-tracker/badge.svg?branch=master
 
 [license]: https://www.apache.org/licenses/LICENSE-2.0
-[license-image]: https://img.shields.io/cocoapods/l/SnowplowTracker.svg
+[license-image]: https://img.shields.io/github/license/snowplow/snowplow-android-tracker
 
 [release-image]: https://img.shields.io/github/v/release/snowplow/snowplow-android-tracker?sort=semver
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
