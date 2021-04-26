@@ -1,7 +1,6 @@
 package com.snowplowanalytics.snowplow.internal.utils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;

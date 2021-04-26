@@ -1,7 +1,6 @@
 package com.snowplowanalytics.snowplow.internal.utils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Assert;

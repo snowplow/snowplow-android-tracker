@@ -257,7 +257,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      *         geoLocationContext = false;
      *         screenContext = true;
      *         screenViewAutotracking = true;
-     *         lifecycleAutotracking = true;
+     *         lifecycleAutotracking = false;
      *         installAutotracking = true;
      *         exceptionAutotracking = true;
      *         diagnosticAutotracking = false;
@@ -278,7 +278,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         geoLocationContext = false;
         screenContext = true;
         screenViewAutotracking = true;
-        lifecycleAutotracking = true;
+        lifecycleAutotracking = false;
         installAutotracking = true;
         exceptionAutotracking = true;
         diagnosticAutotracking = false;
