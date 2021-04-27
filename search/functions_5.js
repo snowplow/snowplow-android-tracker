@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['fail_745',['fail',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils_1_1_preconditions.html#aeb04e2ebbbe9c18faae15134a4c2c2e0',1,'com::snowplowanalytics::snowplow::tracker::utils::Preconditions']]],
-  ['filter_746',['filter',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1contexts_1_1global_1_1_context_filter.html#a7753af70d0a2d91397dd2bd23c09360a',1,'com::snowplowanalytics::snowplow::tracker::contexts::global::ContextFilter']]],
-  ['filterprovider_747',['FilterProvider',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1contexts_1_1global_1_1_filter_provider.html#a32fff4f85f8564c621c11be56802fdfa',1,'com.snowplowanalytics.snowplow.tracker.contexts.global.FilterProvider.FilterProvider(String tag, ContextFilter contextFilter, List&lt; ContextPrimitive &gt; contextPrimitives)'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1contexts_1_1global_1_1_filter_provider.html#ad1515d767df41e0a1d4ac0fb606a775d',1,'com.snowplowanalytics.snowplow.tracker.contexts.global.FilterProvider.FilterProvider(String tag, ContextFilter contextFilter, ContextPrimitive contextPrimitive)']]],
-  ['flush_748',['flush',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_emitter.html#a6567e99887d2805b5db59a2824f28086',1,'com::snowplowanalytics::snowplow::tracker::Emitter']]],
-  ['futurecallable_749',['futureCallable',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_executor.html#ae37dfbb4571dda39d5c61ef834ad7456',1,'com::snowplowanalytics::snowplow::tracker::Executor']]]
+  ['fail_1046',['fail',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_preconditions.html#ad4e8648e822aa6eef2945af996955d68',1,'com::snowplowanalytics::snowplow::internal::utils::Preconditions']]],
+  ['filterevent_1047',['filterEvent',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1globalcontexts_1_1_context_generator.html#ab1f745104681d8789ff9b32a74f04f5e',1,'com::snowplowanalytics::snowplow::globalcontexts::ContextGenerator']]],
+  ['flush_1048',['flush',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#aa0b8d200e751b39f496bc167a97046e3',1,'com::snowplowanalytics::snowplow::internal::emitter::Emitter']]],
+  ['fragmentclassname_1049',['fragmentClassName',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#a373f3e961946a6b50b0cb64f1cb6fb07',1,'com::snowplowanalytics::snowplow::event::ScreenView']]],
+  ['fragmenttag_1050',['fragmentTag',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#af6d67b3131c86277d199216790abdc64',1,'com::snowplowanalytics::snowplow::event::ScreenView']]],
+  ['futurecallable_1051',['futureCallable',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor.html#a93d25dca3584bb1c1f4e7578d740e88c',1,'com::snowplowanalytics::snowplow::internal::emitter::Executor']]]
 ];

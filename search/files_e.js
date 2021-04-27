@@ -1,11 +1,21 @@
 var searchData=
 [
-  ['screenstate_2ejava_688',['ScreenState.java',['../_screen_state_8java.html',1,'']]],
-  ['screenview_2ejava_689',['ScreenView.java',['../_screen_view_8java.html',1,'']]],
-  ['selfdescribing_2ejava_690',['SelfDescribing.java',['../_self_describing_8java.html',1,'']]],
-  ['selfdescribingjson_2ejava_691',['SelfDescribingJson.java',['../_self_describing_json_8java.html',1,'']]],
-  ['session_2ejava_692',['Session.java',['../_session_8java.html',1,'']]],
-  ['sqliteeventstore_2ejava_693',['SQLiteEventStore.java',['../_s_q_lite_event_store_8java.html',1,'']]],
-  ['structured_2ejava_694',['Structured.java',['../_structured_8java.html',1,'']]],
-  ['subject_2ejava_695',['Subject.java',['../_subject_8java.html',1,'']]]
+  ['schemarule_2ejava_937',['SchemaRule.java',['../_schema_rule_8java.html',1,'']]],
+  ['schemaruleset_2ejava_938',['SchemaRuleSet.java',['../_schema_rule_set_8java.html',1,'']]],
+  ['screenstate_2ejava_939',['ScreenState.java',['../_screen_state_8java.html',1,'']]],
+  ['screenview_2ejava_940',['ScreenView.java',['../_screen_view_8java.html',1,'']]],
+  ['selfdescribing_2ejava_941',['SelfDescribing.java',['../_self_describing_8java.html',1,'']]],
+  ['selfdescribingjson_2ejava_942',['SelfDescribingJson.java',['../_self_describing_json_8java.html',1,'']]],
+  ['serviceprovider_2ejava_943',['ServiceProvider.java',['../_service_provider_8java.html',1,'']]],
+  ['session_2ejava_944',['Session.java',['../_session_8java.html',1,'']]],
+  ['sessionconfiguration_2ejava_945',['SessionConfiguration.java',['../_session_configuration_8java.html',1,'']]],
+  ['sessionconfigurationinterface_2ejava_946',['SessionConfigurationInterface.java',['../_session_configuration_interface_8java.html',1,'']]],
+  ['sessioncontroller_2ejava_947',['SessionController.java',['../_session_controller_8java.html',1,'']]],
+  ['sessioncontrollerimpl_2ejava_948',['SessionControllerImpl.java',['../_session_controller_impl_8java.html',1,'']]],
+  ['size_2ejava_949',['Size.java',['../_size_8java.html',1,'']]],
+  ['snowplow_2ejava_950',['Snowplow.java',['../_snowplow_8java.html',1,'']]],
+  ['sqliteeventstore_2ejava_951',['SQLiteEventStore.java',['../_s_q_lite_event_store_8java.html',1,'']]],
+  ['structured_2ejava_952',['Structured.java',['../_structured_8java.html',1,'']]],
+  ['subject_2ejava_953',['Subject.java',['../_subject_8java.html',1,'']]],
+  ['subjectconfiguration_2ejava_954',['SubjectConfiguration.java',['../_subject_configuration_8java.html',1,'']]]
 ];

@@ -1,13 +1,9 @@
 var searchData=
 [
-  ['page_5frefr_1070',['PAGE_REFR',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_parameters.html#ab07b4a2e3dc270a2ec049d013196fabe',1,'com::snowplowanalytics::snowplow::tracker::constants::Parameters']]],
-  ['page_5ftitle_1071',['PAGE_TITLE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_parameters.html#af8fb4858dea24e284c7e1cc8dc717031',1,'com::snowplowanalytics::snowplow::tracker::constants::Parameters']]],
-  ['page_5furl_1072',['PAGE_URL',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_parameters.html#a965982413058d6d7095a1250c36d08c4',1,'com::snowplowanalytics::snowplow::tracker::constants::Parameters']]],
-  ['payload_1073',['payload',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1emitter_1_1_emitter_event.html#a0e134206fb0a3c0a1cbf154ba4933e04',1,'com.snowplowanalytics.snowplow.tracker.emitter.EmitterEvent.payload()'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1networkconnection_1_1_request.html#a995195ab3171f426b2875d1d32f56d38',1,'com.snowplowanalytics.snowplow.tracker.networkconnection.Request.payload()']]],
-  ['platform_1074',['PLATFORM',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_parameters.html#a409d3093c7e789a773e534bf47d8dfaa',1,'com::snowplowanalytics::snowplow::tracker::constants::Parameters']]],
-  ['post_1075',['POST',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1emitter_1_1_http_method.html#a26c35c7e0dbac18e57d43a72d08881c0',1,'com::snowplowanalytics::snowplow::tracker::emitter::HttpMethod']]],
-  ['post_5fcontent_5ftype_1076',['POST_CONTENT_TYPE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_tracker_constants.html#ab7083d75499a6ce37c8c6238531874c1',1,'com::snowplowanalytics::snowplow::tracker::constants::TrackerConstants']]],
-  ['protocol_5fvendor_1077',['PROTOCOL_VENDOR',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_tracker_constants.html#a46232afe5432278285294f43490e9c4d',1,'com::snowplowanalytics::snowplow::tracker::constants::TrackerConstants']]],
-  ['protocol_5fversion_1078',['PROTOCOL_VERSION',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants_1_1_tracker_constants.html#a135ee1fd382cb5a841b1e799079fac8c',1,'com::snowplowanalytics::snowplow::tracker::constants::TrackerConstants']]],
-  ['public_5ftask_1079',['PUBLIC_TASK',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_gdpr_1_1_basis.html#abef16d53d2e1acc86402ff8ddbc9f8eb',1,'com::snowplowanalytics::snowplow::tracker::Gdpr::Basis']]]
+  ['off_1522',['OFF',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_log_level.html#a8a566fb104cf853bfc96fea6457b8a52',1,'com::snowplowanalytics::snowplow::tracker::LogLevel']]],
+  ['okhttpclient_1523',['okHttpClient',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_network_configuration.html#ae43977d30e948ba88364707e21763e2a',1,'com::snowplowanalytics::snowplow::configuration::NetworkConfiguration']]],
+  ['orderid_1524',['orderId',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#a9b5fa97a5fedcb8f68ae09b3736c8162',1,'com::snowplowanalytics::snowplow::event::EcommerceTransaction']]],
+  ['os_5ftype_1525',['OS_TYPE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#af4535d339352f0cbaafc42b522944929',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],
+  ['os_5fversion_1526',['OS_VERSION',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a8866fc08b101e5f41861567161c876ee',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],
+  ['oversize_1527',['oversize',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request.html#a3eb1e59c9bfeb7c7cc523958b1dad17a',1,'com::snowplowanalytics::snowplow::network::Request']]]
 ];

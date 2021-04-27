@@ -1,16 +1,17 @@
 var searchData=
 [
-  ['com_627',['com',['../namespacecom.html',1,'']]],
-  ['constants_628',['constants',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1constants.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['contexts_629',['contexts',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1contexts.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['emitter_630',['emitter',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1emitter.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['events_631',['events',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1events.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['global_632',['global',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1contexts_1_1global.html',1,'com::snowplowanalytics::snowplow::tracker::contexts']]],
-  ['networkconnection_633',['networkconnection',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1networkconnection.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['payload_634',['payload',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1payload.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['snowplow_635',['snowplow',['../namespacecom_1_1snowplowanalytics_1_1snowplow.html',1,'com::snowplowanalytics']]],
-  ['snowplowanalytics_636',['snowplowanalytics',['../namespacecom_1_1snowplowanalytics.html',1,'com']]],
-  ['storage_637',['storage',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1storage.html',1,'com::snowplowanalytics::snowplow::tracker']]],
-  ['tracker_638',['tracker',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html',1,'com.snowplowanalytics.snowplow.tracker'],['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1tracker.html',1,'com.snowplowanalytics.snowplow.tracker.tracker']]],
-  ['utils_639',['utils',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1utils.html',1,'com::snowplowanalytics::snowplow::tracker']]]
+  ['configuration_863',['configuration',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration.html',1,'com::snowplowanalytics::snowplow']]],
+  ['constants_864',['constants',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants.html',1,'com::snowplowanalytics::snowplow::internal']]],
+  ['controller_865',['controller',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1controller.html',1,'com::snowplowanalytics::snowplow']]],
+  ['emitter_866',['emitter',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1emitter.html',1,'com.snowplowanalytics.snowplow.emitter'],['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter.html',1,'com.snowplowanalytics.snowplow.internal.emitter']]],
+  ['event_867',['event',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1event.html',1,'com::snowplowanalytics::snowplow']]],
+  ['gdpr_868',['gdpr',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr.html',1,'com::snowplowanalytics::snowplow::internal']]],
+  ['globalcontexts_869',['globalcontexts',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1globalcontexts.html',1,'com.snowplowanalytics.snowplow.globalcontexts'],['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1globalcontexts.html',1,'com.snowplowanalytics.snowplow.internal.globalcontexts']]],
+  ['network_870',['network',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1network.html',1,'com::snowplowanalytics::snowplow']]],
+  ['payload_871',['payload',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1payload.html',1,'com::snowplowanalytics::snowplow']]],
+  ['session_872',['session',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session.html',1,'com::snowplowanalytics::snowplow::internal']]],
+  ['storage_873',['storage',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage.html',1,'com::snowplowanalytics::snowplow::internal::emitter']]],
+  ['tracker_874',['tracker',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker.html',1,'com.snowplowanalytics.snowplow.internal.tracker'],['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker.html',1,'com.snowplowanalytics.snowplow.tracker']]],
+  ['util_875',['util',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1util.html',1,'com::snowplowanalytics::snowplow']]],
+  ['utils_876',['utils',['../namespacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils.html',1,'com::snowplowanalytics::snowplow::internal']]]
 ];
