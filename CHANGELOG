@@ -1,4 +1,23 @@
 
+Version 2.0.0 (2021-04-27)
+--------------------------
+Set lifecycle tracking off by default (#443)
+Bump min Android API to 21+ (#445)
+Fix crash with OkHttp 4.0.0 on API-30 (#446)
+Update README (#369)
+Fix crash on demo app on API 30 (#438)
+Publish to MavenCentral (#436)
+Fix StrictMode alerts (#434)
+Remove protocol from NetworkController and NetworkConnection (#432)
+Store sessions info separately per tracker namespace (#430)
+Fix OkHttpClient sslSocketFactory always overriden (#417)
+Add API reference documentation for configurations and controllers (#428)
+Allow multiple instances of the tracker (#426)
+Create API for v.2.0 (#422)
+Add Nullability annotations to methods and parameters (#420)
+Migrate to AndroidX (#411)
+Bump min Android API to 16+ (#349)
+
 Version 1.7.1 (2020-10-02)
 --------------------------
 Cannot provide OkHttp client when setting up Emitter (#414)

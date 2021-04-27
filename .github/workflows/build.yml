@@ -10,12 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         api-level:
-          # Test against the API 17, as the API 16 raises an error:
-          # `com.android.ddmlib.InstallException: Unknown failure: Error: Unknown option: -d`
-          # `usage: pm list packages [-f] [-d] [-e] [-s] [-3] [-i] [-u] [FILTER]`
-          - 17 
+          - 21 
           - 24
-          - 29
+          - 30
 
     steps:
       - name: Checkout
@@ -28,6 +25,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          target: google_apis
           script: |
             adb logcat -c
             adb logcat > logcat.log &

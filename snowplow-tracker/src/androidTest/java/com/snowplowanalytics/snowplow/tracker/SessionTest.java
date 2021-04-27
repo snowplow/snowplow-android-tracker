@@ -18,14 +18,21 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.tracker.constants.Parameters;
-import com.snowplowanalytics.snowplow.tracker.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.tracker.utils.FileStore;
+import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.session.Session;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.session.FileStore;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertNotEquals;
 
 public class SessionTest extends AndroidTestCase {
 
@@ -33,20 +40,7 @@ public class SessionTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         Context context = getContext();
-        FileStore.deleteFile(TrackerConstants.SNOWPLOW_SESSION_VARS, context);
-        if (Build.VERSION.SDK_INT >= 24) {
-            context.deleteSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS);
-        } else {
-            SharedPreferences.Editor editor =
-                    context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE).edit();
-            editor.remove(Parameters.SESSION_USER_ID);
-            editor.remove(Parameters.SESSION_ID);
-            editor.remove(Parameters.SESSION_PREVIOUS_ID);
-            editor.remove(Parameters.SESSION_INDEX);
-            editor.remove(Parameters.SESSION_FIRST_ID);
-            editor.remove(Parameters.SESSION_STORAGE);
-            editor.commit();
-        }
+        cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS);
     }
 
     public void testSessionInit() {
@@ -80,7 +74,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     public void testEventsOnSameSession() throws InterruptedException {
-        Session session = getSession(3, 3);
+        Session session = getSession(15, 0);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
         String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
@@ -88,30 +82,23 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         sessionContext = getSessionContext(session, "event_2");
         assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(1000);
+        Thread.sleep(15100);
 
         sessionContext = getSessionContext(session, "event_3");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
-
-        Thread.sleep(3100);
-
-        sessionContext = getSessionContext(session, "event_4");
         assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals("event_4", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
-        Session session = getSession(3, 2);
+        Session session = getSession(0, 15);
 
         session.setIsBackground(true);
 
@@ -121,26 +108,19 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         sessionContext = getSessionContext(session, "event_2");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
+        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
-        Thread.sleep(1000);
+        Thread.sleep(15100);
 
         sessionContext = getSessionContext(session, "event_3");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
-
-        Thread.sleep(2100);
-
-        sessionContext = getSessionContext(session, "event_4");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals("event_4", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
     public void testMixedEventsOnManySessions() throws InterruptedException {
@@ -228,7 +208,6 @@ public class SessionTest extends AndroidTestCase {
 
         Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
 
-        assertTrue(session.waitForSessionFileLoad());
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
@@ -256,6 +235,60 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
+    public void testMultipleTrackersUpdateDifferentSessions() throws InterruptedException {
+        cleanSharedPreferences(getContext(), "tracker1");
+        cleanSharedPreferences(getContext(), "tracker2");
+
+        Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
+        Tracker tracker1 = new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(20)
+                .backgroundTimeout(20)
+                .build();
+        Tracker tracker2 = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(20)
+                .backgroundTimeout(20)
+                .build();
+        Session session1 = tracker1.getSession();
+        Session session2 = tracker2.getSession();
+
+        session1.getSessionContext("fake-id1");
+        session2.getSessionContext("fake-id1");
+
+        long initialValue1 = session1.getSessionIndex();
+        String id1 = session1.getCurrentSessionId();
+        long initialValue2 = session2.getSessionIndex();
+
+        // Retrigger session in tracker1
+        Thread.sleep(2000);
+        session1.getSessionContext("fake-id2");
+        Thread.sleep(18000);
+
+        // Retrigger timedout session in tracker2
+        session2.getSessionContext("fake-id2");
+
+        // Check sessions have the correct state
+        assertEquals(0, session1.getSessionIndex() - initialValue1);
+        assertEquals(1, session2.getSessionIndex() - initialValue2);
+        String id2 = session2.getCurrentSessionId();
+
+        // Recreate tracker2
+        Tracker tracker2b = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+                .sessionContext(true)
+                .foregroundTimeout(20)
+                .backgroundTimeout(20)
+                .build();
+        tracker2b.getSession().getSessionContext("fake-id3");
+        long initialValue2b = tracker2b.getSession().getSessionIndex();
+        String previousId2b = tracker2b.getSession().getPreviousSessionId();
+
+        // Check the new tracker session gets the data from the old tracker2 session
+        assertEquals(initialValue2 + 2, initialValue2b);
+        assertEquals(id2, previousId2b);
+        assertNotEquals(id1, previousId2b);
+    }
+
     // Private methods
 
     private Session getSession(long foregroundTimeout, long backgroundTimeout) {
@@ -264,11 +297,27 @@ public class SessionTest extends AndroidTestCase {
                 .clear()
                 .commit();
         Session session = new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, getContext());
-        session.waitForSessionFileLoad();
         return session;
     }
 
     private Map<String, Object> getSessionContext(Session session, String eventId) {
         return (Map<String, Object>)session.getSessionContext(eventId).getMap().get(Parameters.DATA);
+    }
+
+    private void cleanSharedPreferences(Context context, String sharedPreferencesName) {
+        FileStore.deleteFile(sharedPreferencesName, context);
+        if (Build.VERSION.SDK_INT >= 24) {
+            context.deleteSharedPreferences(sharedPreferencesName);
+        } else {
+            SharedPreferences.Editor editor =
+                    context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).edit();
+            editor.remove(Parameters.SESSION_USER_ID);
+            editor.remove(Parameters.SESSION_ID);
+            editor.remove(Parameters.SESSION_PREVIOUS_ID);
+            editor.remove(Parameters.SESSION_INDEX);
+            editor.remove(Parameters.SESSION_FIRST_ID);
+            editor.remove(Parameters.SESSION_STORAGE);
+            editor.commit();
+        }
     }
 }

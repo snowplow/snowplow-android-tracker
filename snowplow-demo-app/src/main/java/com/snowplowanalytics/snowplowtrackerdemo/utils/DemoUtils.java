@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplowtrackerdemo.utils;
 
+import androidx.annotation.NonNull;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +35,7 @@ public class DemoUtils {
      * @param delay the delay between polls
      * @param timeUnit the time-unit for the delays
      */
-    public static void scheduleRepeating(Runnable runnable, long initDelay, long delay, TimeUnit timeUnit) {
+    public static void scheduleRepeating(@NonNull Runnable runnable, long initDelay, long delay, @NonNull TimeUnit timeUnit) {
         executor.scheduleAtFixedRate(runnable, initDelay, delay, timeUnit);
     }
 
