@@ -29,6 +29,8 @@ public class TrackerControllerImpl implements TrackerController {
     @NonNull
     private EmitterControllerImpl emitter;
     @NonNull
+    private SubjectControllerImpl subject;
+    @NonNull
     private GdprControllerImpl gdpr;
     @NonNull
     private GlobalContextsControllerImpl globalContexts;
@@ -42,6 +44,7 @@ public class TrackerControllerImpl implements TrackerController {
         this.tracker = tracker;
         session = new SessionControllerImpl(tracker);
         emitter = new EmitterControllerImpl(tracker.emitter);
+        subject = new SubjectControllerImpl(tracker.subject);
         gdpr = new GdprControllerImpl(tracker);
         globalContexts = new GlobalContextsControllerImpl(tracker);
         NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
@@ -54,6 +57,7 @@ public class TrackerControllerImpl implements TrackerController {
         this.tracker = tracker;
         session = new SessionControllerImpl(tracker);
         emitter = new EmitterControllerImpl(tracker.emitter);
+        subject = new SubjectControllerImpl(tracker.subject);
         gdpr = new GdprControllerImpl(tracker);
         globalContexts = new GlobalContextsControllerImpl(tracker);
         NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
@@ -80,6 +84,12 @@ public class TrackerControllerImpl implements TrackerController {
     @NonNull
     public EmitterControllerImpl getEmitter() {
         return emitter;
+    }
+
+    @Override
+    @NonNull
+    public SubjectControllerImpl getSubject() {
+        return subject;
     }
 
     @Override
