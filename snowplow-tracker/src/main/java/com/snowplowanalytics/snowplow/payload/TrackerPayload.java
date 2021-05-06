@@ -22,6 +22,8 @@ import java.util.Map;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
+import org.json.JSONObject;
+
 /**
  * Returns a standard Tracker Payload consisting of
  * many key - pair values.
@@ -74,7 +76,7 @@ public class TrackerPayload implements Payload {
             return;
         }
 
-        String mapString = Util.mapToJSONObject(map).toString();
+        String mapString = new JSONObject(map).toString();
         Logger.v(TAG, "Adding new map: %s", map);
 
         if (base64_encoded) { // base64 encoded data
@@ -91,7 +93,7 @@ public class TrackerPayload implements Payload {
 
     @NonNull
     public String toString() {
-        return Util.mapToJSONObject(payload).toString();
+        return new JSONObject(payload).toString();
     }
 
     public long getByteSize() {

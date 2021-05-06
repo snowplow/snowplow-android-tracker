@@ -1,18 +1,24 @@
 package com.snowplowanalytics.snowplow.configuration;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
+
+import org.json.JSONObject;
 
 /**
  * It allows the tracker configuration from the emission perspective.
  * The EmitterConfiguration can be used to setup details about how the tracker should treat the events
  * to emit to the collector.
  */
-public class EmitterConfiguration implements Configuration, com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface {
+public class EmitterConfiguration implements Configuration, EmitterConfigurationInterface {
 
     /**
      * @see #bufferOption(BufferOption)
@@ -217,4 +223,40 @@ public class EmitterConfiguration implements Configuration, com.snowplowanalytic
         copy.requestCallback = requestCallback;
         return copy;
     }
+
+    // Parcelable
+
+    protected EmitterConfiguration(@NonNull Parcel in) {
+        bufferOption = BufferOption.valueOf(in.readString());
+        emitRange = in.readInt();
+        threadPoolSize = in.readInt();
+        byteLimitGet = in.readLong();
+        byteLimitPost = in.readLong();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(bufferOption.name());
+        dest.writeInt(emitRange);
+        dest.writeInt(threadPoolSize);
+        dest.writeLong(byteLimitGet);
+        dest.writeLong(byteLimitPost);
+    }
+
+    public static final Creator<EmitterConfiguration> CREATOR = new Creator<EmitterConfiguration>() {
+        @Override
+        public EmitterConfiguration createFromParcel(Parcel in) {
+            return new EmitterConfiguration(in);
+        }
+
+        @Override
+        public EmitterConfiguration[] newArray(int size) {
+            return new EmitterConfiguration[size];
+        }
+    };
 }

@@ -1,13 +1,19 @@
 package com.snowplowanalytics.snowplow.configuration;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+
+import org.json.JSONObject;
 
 /**
  * This class represents the configuration of the tracker and the core tracker properties.
@@ -15,6 +21,7 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
  * tracked in term of automatic tracking and contexts/entities to track with the events.
  */
 public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
+    public final static String TAG = TrackerConfiguration.class.getSimpleName();
 
     /**
      * @see #appId(String)
@@ -445,8 +452,90 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         copy.screenViewAutotracking = screenViewAutotracking;
         copy.lifecycleAutotracking = lifecycleAutotracking;
         copy.installAutotracking = installAutotracking;
-        copy. exceptionAutotracking = exceptionAutotracking;
-        copy. diagnosticAutotracking = diagnosticAutotracking;
+        copy.exceptionAutotracking = exceptionAutotracking;
+        copy.diagnosticAutotracking = diagnosticAutotracking;
         return copy;
     }
+
+    // JSON Formatter
+
+    public TrackerConfiguration(@NonNull JSONObject jsonObject) {
+        this(jsonObject.optString("appId", "default-AppId"));
+        if (!jsonObject.has("appId")) {
+            // track error
+        }
+        devicePlatform = DevicePlatform.valueOf(jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue()));
+        String log = jsonObject.optString("logLevel");
+        if (log != null) {
+            try {
+                logLevel = LogLevel.valueOf(log);
+            } catch (Exception e) {
+                Logger.e(TAG, "Unable to decode logLevel from remote configuration");
+            }
+        }
+        sessionContext = jsonObject.optBoolean("sessionContext", sessionContext);
+        applicationContext = jsonObject.optBoolean("applicationContext", applicationContext);
+        platformContext = jsonObject.optBoolean("platformContext", platformContext);
+        geoLocationContext = jsonObject.optBoolean("geoLocationContext", geoLocationContext);
+        screenContext = jsonObject.optBoolean("screenContext", screenContext);
+        screenViewAutotracking = jsonObject.optBoolean("screenViewAutotracking", screenViewAutotracking);
+        lifecycleAutotracking = jsonObject.optBoolean("lifecycleAutotracking", lifecycleAutotracking);
+        installAutotracking = jsonObject.optBoolean("installAutotracking", installAutotracking);
+        exceptionAutotracking = jsonObject.optBoolean("exceptionAutotracking", exceptionAutotracking);
+        diagnosticAutotracking = jsonObject.optBoolean("diagnosticAutotracking", diagnosticAutotracking);
+    }
+
+    // Parcelable
+
+    protected TrackerConfiguration(@NonNull Parcel in) {
+        appId = in.readString();
+        devicePlatform = DevicePlatform.valueOf(in.readString());
+        base64encoding = in.readByte() > -1;
+        logLevel = LogLevel.valueOf(in.readString());
+        applicationContext = in.readByte() > -1;
+        platformContext = in.readByte() > -1;
+        geoLocationContext = in.readByte() > -1;
+        sessionContext = in.readByte() > -1;
+        screenContext = in.readByte() > -1;
+        screenViewAutotracking = in.readByte() > -1;
+        lifecycleAutotracking = in.readByte() > -1;
+        installAutotracking = in.readByte() > -1;
+        exceptionAutotracking = in.readByte() > -1;
+        diagnosticAutotracking = in.readByte() > -1;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(appId);
+        dest.writeString(devicePlatform.getValue());
+        dest.writeByte((byte)(base64encoding ? 1 : -1));
+        dest.writeString(logLevel.name());
+        dest.writeByte((byte)(applicationContext ? 1 : -1));
+        dest.writeByte((byte)(platformContext ? 1 : -1));
+        dest.writeByte((byte)(geoLocationContext ? 1 : -1));
+        dest.writeByte((byte)(sessionContext ? 1 : -1));
+        dest.writeByte((byte)(screenContext ? 1 : -1));
+        dest.writeByte((byte)(screenViewAutotracking ? 1 : -1));
+        dest.writeByte((byte)(lifecycleAutotracking ? 1 : -1));
+        dest.writeByte((byte)(installAutotracking ? 1 : -1));
+        dest.writeByte((byte)(exceptionAutotracking ? 1 : -1));
+        dest.writeByte((byte)(diagnosticAutotracking ? 1 : -1));
+    }
+
+    public static final Creator<TrackerConfiguration> CREATOR = new Parcelable.Creator<TrackerConfiguration>() {
+        @Override
+        public TrackerConfiguration createFromParcel(Parcel in) {
+            return new TrackerConfiguration(in);
+        }
+
+        @Override
+        public TrackerConfiguration[] newArray(int size) {
+            return new TrackerConfiguration[size];
+        }
+    };
 }

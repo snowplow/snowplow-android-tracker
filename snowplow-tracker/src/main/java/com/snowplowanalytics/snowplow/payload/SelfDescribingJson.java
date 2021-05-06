@@ -24,6 +24,8 @@ import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 
+import org.json.JSONObject;
+
 /**
  * Returns a SelfDescribingJson object which will contain
  * both the Schema and Data.
@@ -148,7 +150,7 @@ public class SelfDescribingJson {
 
     @NonNull
     public String toString() {
-        return Util.mapToJSONObject(payload).toString();
+        return new JSONObject(payload).toString();
     }
 
     public long getByteSize() {

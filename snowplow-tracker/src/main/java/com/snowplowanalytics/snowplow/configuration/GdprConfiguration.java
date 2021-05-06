@@ -1,9 +1,14 @@
 package com.snowplowanalytics.snowplow.configuration;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
 import com.snowplowanalytics.snowplow.util.Basis;
+
+import org.json.JSONObject;
 
 /**
  * This class allows the GDPR configuration of the tracker.
@@ -80,4 +85,38 @@ public class GdprConfiguration implements Configuration, GdprConfigurationInterf
     public GdprConfiguration copy() {
         return new GdprConfiguration(basisForProcessing, documentId, documentVersion, documentDescription);
     }
+
+    // Parcelable
+
+    protected GdprConfiguration(@NonNull Parcel in) {
+        basisForProcessing = Basis.valueOf(in.readString());
+        documentId = in.readString();
+        documentVersion = in.readString();
+        documentDescription = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(basisForProcessing.name());
+        dest.writeString(documentId);
+        dest.writeString(documentVersion);
+        dest.writeString(documentDescription);
+    }
+
+    public static final Creator<GdprConfiguration> CREATOR = new Parcelable.Creator<GdprConfiguration>() {
+        @Override
+        public GdprConfiguration createFromParcel(Parcel in) {
+            return new GdprConfiguration(in);
+        }
+
+        @Override
+        public GdprConfiguration[] newArray(int size) {
+            return new GdprConfiguration[size];
+        }
+    };
 }
