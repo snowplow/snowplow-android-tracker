@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.0</span>
+   &#160;<span id="projectnumber">2.0.1</span>
    </div>
   </td>
  </tr>
@@ -153,6 +153,11 @@ $(function() {
 <li>getCode()
 : <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html#a0477d929212a96a557b785928582a03d">com.snowplowanalytics.snowplow.emitter.BufferOption</a>
 </li>
+<li>getColorDepth()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#aaa1636b462d0e678de36def89e58b218">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#aea27230a5a6b03a185dee3bbf3bf7303">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#ac0dd45d9a669c88d8342c88f4fa8628c">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getContext()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr.html#aeb561fae95a2f8a951cff6c9935f6b56">com.snowplowanalytics.snowplow.internal.gdpr.Gdpr</a>
 </li>
@@ -236,6 +241,11 @@ $(function() {
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html#ae2e8292cfe80f88cf4b1541af2f41586">com.snowplowanalytics.snowplow.configuration.GdprConfiguration</a>
 , <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr_configuration_interface.html#ad9792eb6c4172d5d3977186d98cb2808">com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr_controller_impl.html#a5f280534f2bd086ddfcb6fd2f06310af">com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl</a>
+</li>
+<li>getDomainUserId()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#af25b4d9a28a432fde70da8f5ac9cfd9e">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#adfa6a6a79854f0e39c437a4618524a4b">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a1e32af9edda2143a72a2697356518138">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
 </li>
 <li>getEmitRange()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a639eaede9fb942b0350d237e83f2a685">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>
@@ -326,13 +336,23 @@ $(function() {
 </li>
 <li>getInstance()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage_1_1_event_store_helper.html#a51ec4db69b5eb4f3e8bfb23ff9104600">com.snowplowanalytics.snowplow.internal.emitter.storage.EventStoreHelper</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session.html#a37658e7159269d6c930358cd88daf649">com.snowplowanalytics.snowplow.internal.session.Session</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session.html#a3b08211da8d61d56a2e096c6819cba0b">com.snowplowanalytics.snowplow.internal.session.Session</a>
 </li>
 <li>getInstancedTrackerNamespaces()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a30b75a4009b3eb3efa21e41952ba4593">com.snowplowanalytics.snowplow.Snowplow</a>
 </li>
+<li>getIpAddress()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a4c7ab58b229429d436ce11c5db48524c">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a302539572782a872054ef53c39885faf">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a790392506e2b8c8969a0b263b25798cb">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getItems()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#adbd109b355566d14681670570041bf37">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>
+</li>
+<li>getLanguage()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a547447d2ad4d9f5d9a4328985b231ff4">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#ab4663c52b13f081f21f2e748dcdbf072">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a7eabed0b8dca8372ea0d5861e8481084">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
 </li>
 <li>getLastInsertedRowId()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage_1_1_s_q_lite_event_store.html#aa32b7bb10caf3e5ea4d0fa86207b4877">com.snowplowanalytics.snowplow.internal.emitter.storage.SQLiteEventStore</a>
@@ -407,6 +427,11 @@ $(function() {
 <li>getNetworkType()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_util.html#a9fde808a5ebe68624d20c0d320a956fd">com.snowplowanalytics.snowplow.internal.utils.Util</a>
 </li>
+<li>getNetworkUserId()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#af2dbecd81eb82ef078ba1bfb87e3f87e">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a1283af36aec9e7241a6b155e80332ab3">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a47acf981f393dd0d96c0e740900555ec">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getOsType()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_util.html#ac484dcccce70def2de886f7128c75d25">com.snowplowanalytics.snowplow.internal.utils.Util</a>
 </li>
@@ -459,8 +484,18 @@ $(function() {
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_event.html#adc31254235756bf1a711f7347717baeb">com.snowplowanalytics.snowplow.internal.tracker.TrackerEvent</a>
 , <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_inspectable_event.html#ae8937392298a8735f58edbf62d4a2231">com.snowplowanalytics.snowplow.tracker.InspectableEvent</a>
 </li>
+<li>getScreenResolution()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#ad9e4ec5a63738a4d3fc46af0873513c9">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a94530d6eac60ddb4cfb7b36567bf4bff">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#aa063c2ffb169cb10968a6335ceefc9b9">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getScreenState()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ada1ed2a0753fa4f290d93943c39dcc37">com.snowplowanalytics.snowplow.internal.tracker.Tracker</a>
+</li>
+<li>getScreenViewPort()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a2499d6b6b4ac8a73806336b14d970de6">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a0604eb06246d6699ee8d5a0c2f1c7436">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a42cd6bd8e0bdc90c6bafcd6972646055">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
 </li>
 <li>getSendLimit()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#a1e4d5420bc33ba06db368644e249e888">com.snowplowanalytics.snowplow.internal.emitter.Emitter</a>
@@ -497,8 +532,10 @@ $(function() {
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_t_l_s_arguments.html#a61456a117a77a3fac390863ed8e639a7">com.snowplowanalytics.snowplow.internal.emitter.TLSArguments</a>
 </li>
 <li>getSubject()
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ad955e11ce33afd1f49fce333ee894cbf">com.snowplowanalytics.snowplow.internal.tracker.Subject</a>
+: <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html#a019e65ee9dcbcff08499275e961824de">com.snowplowanalytics.snowplow.controller.TrackerController</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ad955e11ce33afd1f49fce333ee894cbf">com.snowplowanalytics.snowplow.internal.tracker.Subject</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a67d60de514dcc8858cdc62f4b78f37b5">com.snowplowanalytics.snowplow.internal.tracker.Tracker</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a120a626c9011712cf7f4ed57ffc564d1">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>
 </li>
 <li>getSuccess()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request_result.html#ab90e95c55ca294d14e89055e5808c200">com.snowplowanalytics.snowplow.network.RequestResult</a>
@@ -527,6 +564,11 @@ $(function() {
 <li>getTimestamp()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_util.html#a0977febdf11fc1d531827bda40dab64c">com.snowplowanalytics.snowplow.internal.utils.Util</a>
 </li>
+<li>getTimezone()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#af8a853bb7784eb702a7ee14c7eb84666">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a5fe749bbff1283ded99148352b87442a">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a5796fb8ac7d875afcbfade41737d9bdf">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getTlsVersions()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#a736052d364becdccd7b5aa4b8d176bd1">com.snowplowanalytics.snowplow.internal.emitter.Emitter</a>
 </li>
@@ -547,10 +589,18 @@ $(function() {
 : <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_network_connection.html#ae1e61a966aef01fb986790ef825a0327">com.snowplowanalytics.snowplow.network.NetworkConnection</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_ok_http_network_connection.html#affea386d3ff683c5edc5384b8cd60969">com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection</a>
 </li>
+<li>getUseragent()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#ab1e784fc1c5f55981fc3fef197edc90b">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a25edda409bb2c7307b18b7db9428ec18">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a035cd0c4e85b27d36b704ee387de9631">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
+</li>
 <li>getUserId()
-: <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_session_controller.html#a2db67599fd06172e0d4c10bb620dddfd">com.snowplowanalytics.snowplow.controller.SessionController</a>
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a514dcf6cd2df058e99598ade659e6dae">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_session_controller.html#a2db67599fd06172e0d4c10bb620dddfd">com.snowplowanalytics.snowplow.controller.SessionController</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session.html#a1832f087bfe660090d39230a7bea356b">com.snowplowanalytics.snowplow.internal.session.Session</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_controller_impl.html#a7214eccc7b2d8f9e0335fa984bc7c941">com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl</a>
+, <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a1397643ad3065d4eba3d3a64a436a299">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#a8dcb91c9cf60b230f8db73a8ed177c4d">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl</a>
 </li>
 <li>getUTF8Length()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_util.html#abf25cbc772d5bdccf3fd84986ec38c94">com.snowplowanalytics.snowplow.internal.utils.Util</a>
