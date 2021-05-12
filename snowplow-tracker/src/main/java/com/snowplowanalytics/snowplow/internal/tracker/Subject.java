@@ -42,6 +42,28 @@ public class Subject {
     private static final String TAG = Subject.class.getSimpleName();
     private final HashMap<String, String> standardPairs = new HashMap<>();
 
+    @Nullable
+    String userId;
+    @Nullable
+    String networkUserId;
+    @Nullable
+    String domainUserId;
+    @Nullable
+    String useragent;
+    @Nullable
+    String ipAddress;
+    @Nullable
+    String timezone;
+    @Nullable
+    String language;
+    @Nullable
+    Size screenResolution;
+    @Nullable
+    Size screenViewPort;
+    @Nullable
+    Integer colorDepth;
+
+
     /**
      * Builder for the Subject
      * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
@@ -157,6 +179,7 @@ public class Subject {
      * @param userId a user id string
      */
     public void setUserId(@NonNull String userId) {
+        this.userId = userId;
         this.standardPairs.put(Parameters.UID, userId);
     }
 
@@ -177,6 +200,7 @@ public class Subject {
      * @param height the height of the screen
      */
     public void setScreenResolution(int width, int height) {
+        this.screenResolution = new Size(width, height);
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameters.RESOLUTION, res);
     }
@@ -190,6 +214,7 @@ public class Subject {
      * @param height the height of the viewport
      */
     public void setViewPort(int width, int height) {
+        this.screenViewPort = new Size(width, height);
         String res = Integer.toString(width) + "x" + Integer.toString(height);
         this.standardPairs.put(Parameters.VIEWPORT, res);
     }
@@ -202,6 +227,7 @@ public class Subject {
      * @param depth the color depth
      */
     public void setColorDepth(int depth) {
+        this.colorDepth = depth;
         this.standardPairs.put(Parameters.COLOR_DEPTH, Integer.toString(depth));
     }
 
@@ -211,6 +237,7 @@ public class Subject {
      * @param timezone a valid timezone
      */
     public void setTimezone(@NonNull String timezone) {
+        this.timezone = timezone;
         this.standardPairs.put(Parameters.TIMEZONE, timezone);
     }
 
@@ -221,6 +248,7 @@ public class Subject {
      * @param language language setting
      */
     public void setLanguage(@NonNull String language) {
+        this.language = language;
         this.standardPairs.put(Parameters.LANGUAGE, language);
     }
 
@@ -231,6 +259,7 @@ public class Subject {
      * @param ipAddress an ip address
      */
     public void setIpAddress(@NonNull String ipAddress) {
+        this.ipAddress = ipAddress;
         this.standardPairs.put(Parameters.IP_ADDRESS, ipAddress);
     }
 
@@ -241,6 +270,7 @@ public class Subject {
      * @param useragent a useragent
      */
     public void setUseragent(@NonNull String useragent) {
+        this.useragent = useragent;
         this.standardPairs.put(Parameters.USERAGENT, useragent);
     }
 
@@ -251,6 +281,7 @@ public class Subject {
      * @param networkUserId a network user id
      */
     public void setNetworkUserId(@NonNull String networkUserId) {
+        this.networkUserId = networkUserId;
         this.standardPairs.put(Parameters.NETWORK_UID, networkUserId);
     }
 
@@ -261,6 +292,7 @@ public class Subject {
      * @param domainUserId a domain user id
      */
     public void setDomainUserId(@NonNull String domainUserId) {
+        this.domainUserId = domainUserId;
         this.standardPairs.put(Parameters.DOMAIN_UID, domainUserId);
     }
 

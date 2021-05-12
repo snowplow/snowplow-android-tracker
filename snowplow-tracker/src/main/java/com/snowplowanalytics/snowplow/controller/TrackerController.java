@@ -49,6 +49,13 @@ public interface TrackerController extends TrackerConfigurationInterface {
     EmitterController getEmitter();
 
     /**
+     * SubjectController.
+     * @apiNote Don't retain the reference. It may change on tracker reconfiguration.
+     */
+    @NonNull
+    SubjectController getSubject();
+
+    /**
      * GdprController.
      * @apiNote Don't retain the reference. It may change on tracker reconfiguration.
      */

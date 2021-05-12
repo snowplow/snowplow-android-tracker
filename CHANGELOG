@@ -1,4 +1,8 @@
 
+Version 2.0.1 (2021-05-12)
+--------------------------
+Add SubjectController to update userId (#447)
+
 Version 2.0.0 (2021-04-27)
 --------------------------
 Set lifecycle tracking off by default (#443)

@@ -15,9 +15,12 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.Snowplow;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 import java.util.Map;
 
@@ -115,4 +118,16 @@ public class SubjectTest extends AndroidTestCase {
         subject.setDomainUserId("duid-test");
         assertEquals("duid-test", subject.getSubject().get("duid"));
     }
+
+    public void testSubjectUserIdCanBeUpdated() {
+        TrackerController tracker = Snowplow.createTracker(getContext(), "default", "https://fake-url", HttpMethod.POST);
+        assertNotNull(tracker.getSubject());
+        assertNull(tracker.getSubject().getUserId());
+        tracker.getSubject().setUserId("fakeUserId");
+        assertEquals("fakeUserId", tracker.getSubject().getUserId());
+        tracker.getSubject().setUserId(null);
+        assertNull(tracker.getSubject().getUserId());
+    }
+
+
 }
