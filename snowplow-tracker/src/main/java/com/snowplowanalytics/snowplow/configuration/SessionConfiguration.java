@@ -1,10 +1,6 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
@@ -108,34 +104,4 @@ public class SessionConfiguration implements SessionConfigurationInterface, Conf
         this.foregroundTimeout = new TimeMeasure(foregroundTimeout, TimeUnit.SECONDS);
         this.backgroundTimeout = new TimeMeasure(backgroundTimeout, TimeUnit.SECONDS);
     }
-
-    // Parcelable
-
-    protected SessionConfiguration(@NonNull Parcel in) {
-        foregroundTimeout = new TimeMeasure(in.readLong(), TimeUnit.SECONDS);
-        backgroundTimeout = new TimeMeasure(in.readLong(), TimeUnit.SECONDS);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeLong(foregroundTimeout.convert(TimeUnit.SECONDS));
-        dest.writeLong(backgroundTimeout.convert(TimeUnit.SECONDS));
-    }
-
-    public static final Creator<SessionConfiguration> CREATOR = new Parcelable.Creator<SessionConfiguration>() {
-        @Override
-        public SessionConfiguration createFromParcel(Parcel in) {
-            return new SessionConfiguration(in);
-        }
-
-        @Override
-        public SessionConfiguration[] newArray(int size) {
-            return new SessionConfiguration[size];
-        }
-    };
 }

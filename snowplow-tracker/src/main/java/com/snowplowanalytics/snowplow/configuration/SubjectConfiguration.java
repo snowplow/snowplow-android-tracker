@@ -1,8 +1,5 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -309,68 +306,12 @@ public class SubjectConfiguration implements Configuration, SubjectConfiguration
 
     public SubjectConfiguration(@NonNull JSONObject jsonObject) {
         this();
-        userId = jsonObject.optString("userId");
-        networkUserId = jsonObject.optString("networkUserId");
-        domainUserId = jsonObject.optString("domainUserId");
-        useragent = jsonObject.optString("useragent");
-        ipAddress = jsonObject.optString("ipAddress");
-        timezone = jsonObject.optString("timezone");
-        language = jsonObject.optString("language");
+        userId = jsonObject.has("userId") ? jsonObject.optString("userId") : null;
+        networkUserId = jsonObject.has("networkUserId") ? jsonObject.optString("networkUserId") : null;
+        domainUserId = jsonObject.has("domainUserId") ? jsonObject.optString("domainUserId") : null;
+        useragent = jsonObject.has("useragent") ? jsonObject.optString("useragent") : null;
+        ipAddress = jsonObject.has("ipAddress") ? jsonObject.optString("ipAddress") : null;
+        timezone = jsonObject.has("timezone") ? jsonObject.optString("timezone") : null;
+        language = jsonObject.has("language") ? jsonObject.optString("language") : null;
     }
-
-    // Parcelable
-
-    protected SubjectConfiguration(@NonNull Parcel in) {
-        userId = in.readString();
-        networkUserId = in.readString();
-        domainUserId = in.readString();
-        useragent = in.readString();
-        ipAddress = in.readString();
-        timezone = in.readString();
-        language = in.readString();
-        int width = in.readInt();
-        int height = in.readInt();
-        if (width > 0 && height > 0) {
-            screenResolution = new Size(width, height);
-        }
-        width = in.readInt();
-        height = in.readInt();
-        if (width > 0 && height > 0) {
-            screenViewPort = new Size(in.readInt(), in.readInt());
-        }
-        colorDepth = in.readInt();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(userId);
-        dest.writeString(networkUserId);
-        dest.writeString(domainUserId);
-        dest.writeString(useragent);
-        dest.writeString(ipAddress);
-        dest.writeString(timezone);
-        dest.writeString(language);
-        dest.writeInt(screenResolution == null ? -1 : screenResolution.getWidth());
-        dest.writeInt(screenResolution == null ? -1 : screenResolution.getHeight());
-        dest.writeInt(screenViewPort == null ? -1 : screenViewPort.getWidth());
-        dest.writeInt(screenViewPort == null ? -1 : screenViewPort.getHeight());
-        dest.writeInt(colorDepth);
-    }
-
-    public static final Creator<SubjectConfiguration> CREATOR = new Parcelable.Creator<SubjectConfiguration>() {
-        @Override
-        public SubjectConfiguration createFromParcel(Parcel in) {
-            return new SubjectConfiguration(in);
-        }
-
-        @Override
-        public SubjectConfiguration[] newArray(int size) {
-            return new SubjectConfiguration[size];
-        }
-    };
 }

@@ -1,12 +1,8 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
@@ -462,16 +458,17 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     public TrackerConfiguration(@NonNull JSONObject jsonObject) {
         this(jsonObject.optString("appId", "default-AppId"));
         if (!jsonObject.has("appId")) {
-            // track error
+            appId = jsonObject.optString("appId", appId);
+        } else {
+            Logger.e(TAG, "The field 'appId' is mandatory in the remote `trackerConfiguration`.");
         }
-        devicePlatform = DevicePlatform.valueOf(jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue()));
-        String log = jsonObject.optString("logLevel");
-        if (log != null) {
-            try {
-                logLevel = LogLevel.valueOf(log);
-            } catch (Exception e) {
-                Logger.e(TAG, "Unable to decode logLevel from remote configuration");
-            }
+        String val = jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue());
+        devicePlatform = DevicePlatform.getByValue(val);
+        String log = jsonObject.optString("logLevel", LogLevel.OFF.name());
+        try {
+            logLevel = LogLevel.valueOf(log.toUpperCase());
+        } catch (Exception e) {
+            Logger.e(TAG, "Unable to decode `logLevel from remote configuration.");
         }
         sessionContext = jsonObject.optBoolean("sessionContext", sessionContext);
         applicationContext = jsonObject.optBoolean("applicationContext", applicationContext);
@@ -484,58 +481,4 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         exceptionAutotracking = jsonObject.optBoolean("exceptionAutotracking", exceptionAutotracking);
         diagnosticAutotracking = jsonObject.optBoolean("diagnosticAutotracking", diagnosticAutotracking);
     }
-
-    // Parcelable
-
-    protected TrackerConfiguration(@NonNull Parcel in) {
-        appId = in.readString();
-        devicePlatform = DevicePlatform.valueOf(in.readString());
-        base64encoding = in.readByte() > -1;
-        logLevel = LogLevel.valueOf(in.readString());
-        applicationContext = in.readByte() > -1;
-        platformContext = in.readByte() > -1;
-        geoLocationContext = in.readByte() > -1;
-        sessionContext = in.readByte() > -1;
-        screenContext = in.readByte() > -1;
-        screenViewAutotracking = in.readByte() > -1;
-        lifecycleAutotracking = in.readByte() > -1;
-        installAutotracking = in.readByte() > -1;
-        exceptionAutotracking = in.readByte() > -1;
-        diagnosticAutotracking = in.readByte() > -1;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(appId);
-        dest.writeString(devicePlatform.getValue());
-        dest.writeByte((byte)(base64encoding ? 1 : -1));
-        dest.writeString(logLevel.name());
-        dest.writeByte((byte)(applicationContext ? 1 : -1));
-        dest.writeByte((byte)(platformContext ? 1 : -1));
-        dest.writeByte((byte)(geoLocationContext ? 1 : -1));
-        dest.writeByte((byte)(sessionContext ? 1 : -1));
-        dest.writeByte((byte)(screenContext ? 1 : -1));
-        dest.writeByte((byte)(screenViewAutotracking ? 1 : -1));
-        dest.writeByte((byte)(lifecycleAutotracking ? 1 : -1));
-        dest.writeByte((byte)(installAutotracking ? 1 : -1));
-        dest.writeByte((byte)(exceptionAutotracking ? 1 : -1));
-        dest.writeByte((byte)(diagnosticAutotracking ? 1 : -1));
-    }
-
-    public static final Creator<TrackerConfiguration> CREATOR = new Parcelable.Creator<TrackerConfiguration>() {
-        @Override
-        public TrackerConfiguration createFromParcel(Parcel in) {
-            return new TrackerConfiguration(in);
-        }
-
-        @Override
-        public TrackerConfiguration[] newArray(int size) {
-            return new TrackerConfiguration[size];
-        }
-    };
 }

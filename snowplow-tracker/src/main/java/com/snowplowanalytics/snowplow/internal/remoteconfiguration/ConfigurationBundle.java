@@ -1,8 +1,5 @@
 package com.snowplowanalytics.snowplow.internal.remoteconfiguration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -14,6 +11,9 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigurationBundle implements Configuration {
 
@@ -29,8 +29,13 @@ public class ConfigurationBundle implements Configuration {
     @Nullable
     public SessionConfiguration sessionConfiguration;
 
-    private ConfigurationBundle(String namespace) {
+    ConfigurationBundle(@NonNull String namespace) {
+        this(namespace, null);
+    }
+
+    ConfigurationBundle(@NonNull String namespace, @Nullable NetworkConfiguration networkConfiguration) {
         this.namespace = namespace;
+        this.networkConfiguration = networkConfiguration;
     }
 
     public ConfigurationBundle(@NonNull JSONObject jsonObject) throws JSONException {
@@ -53,6 +58,16 @@ public class ConfigurationBundle implements Configuration {
         }
     }
 
+    @NonNull
+    public List<Configuration> getConfigurations() {
+        List<Configuration> array = new ArrayList<>();
+        if (networkConfiguration != null) array.add(networkConfiguration);
+        if (trackerConfiguration != null) array.add(trackerConfiguration);
+        if (subjectConfiguration != null) array.add(subjectConfiguration);
+        if (sessionConfiguration != null) array.add(sessionConfiguration);
+        return array;
+    }
+
     // Copyable
 
     @NonNull
@@ -65,40 +80,4 @@ public class ConfigurationBundle implements Configuration {
         copy.sessionConfiguration = sessionConfiguration;
         return copy;
     }
-
-    // Parcelable
-
-    protected ConfigurationBundle(@NonNull Parcel in) {
-        namespace = in.readString();
-        networkConfiguration = in.readParcelable(NetworkConfiguration.class.getClassLoader());
-        trackerConfiguration = in.readParcelable(TrackerConfiguration.class.getClassLoader());
-        subjectConfiguration = in.readParcelable(SubjectConfiguration.class.getClassLoader());
-        sessionConfiguration = in.readParcelable(SessionConfiguration.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(namespace);
-        dest.writeParcelable(networkConfiguration, flags);
-        dest.writeParcelable(trackerConfiguration, flags);
-        dest.writeParcelable(subjectConfiguration, flags);
-        dest.writeParcelable(sessionConfiguration, flags);
-    }
-
-    public static final Creator<ConfigurationBundle> CREATOR = new Parcelable.Creator<ConfigurationBundle>() {
-        @Override
-        public ConfigurationBundle createFromParcel(Parcel in) {
-            return new ConfigurationBundle(in);
-        }
-
-        @Override
-        public ConfigurationBundle[] newArray(int size) {
-            return new ConfigurationBundle[size];
-        }
-    };
 }

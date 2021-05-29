@@ -1,15 +1,10 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsConfigurationInterface;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +23,7 @@ public class GlobalContextsConfiguration implements Configuration, GlobalContext
     /**
      * Allows for the creation of a map of tags and associated {@link GlobalContext GlobalContext} generators.
      * They are used by the tracker based on the filter settings defined on each {@link GlobalContext GlobalContext}.
-     * @param contextGenerators
+     * @param contextGenerators Map of Global Contexts generators.
      */
     public GlobalContextsConfiguration(@Nullable Map<String, GlobalContext> contextGenerators) {
         this.contextGenerators = contextGenerators != null ? contextGenerators : new HashMap<>();
@@ -78,33 +73,4 @@ public class GlobalContextsConfiguration implements Configuration, GlobalContext
     public GlobalContextsConfiguration copy() {
         return new GlobalContextsConfiguration(contextGenerators);
     }
-
-    // Parcelable
-
-    protected GlobalContextsConfiguration(@NonNull Parcel in) {
-        // Not possible as we can't encode and decode contextGenerators
-        this(new HashMap<>());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-    }
-
-    public static final Creator<GlobalContextsConfiguration> CREATOR = new Parcelable.Creator<GlobalContextsConfiguration>() {
-        @Override
-        public GlobalContextsConfiguration createFromParcel(Parcel in) {
-            return new GlobalContextsConfiguration(in);
-        }
-
-        @Override
-        public GlobalContextsConfiguration[] newArray(int size) {
-            return new GlobalContextsConfiguration[size];
-        }
-    };
-
 }

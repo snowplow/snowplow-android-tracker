@@ -1,10 +1,10 @@
 package com.snowplowanalytics.snowplow.configuration;
 
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 
-public interface Configuration extends Parcelable {
+import java.io.Serializable;
+
+public interface Configuration extends Serializable {
 
     @NonNull
     Configuration copy();

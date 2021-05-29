@@ -1,8 +1,5 @@
 package com.snowplowanalytics.snowplow.internal.remoteconfiguration;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
@@ -12,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FetchedConfigurationBundle implements Configuration {
 
@@ -21,9 +19,9 @@ public class FetchedConfigurationBundle implements Configuration {
     public int configurationVersion;
 
     @NonNull
-    public ArrayList<ConfigurationBundle> configurationBundle;
+    public List<ConfigurationBundle> configurationBundle;
 
-    private FetchedConfigurationBundle(@NonNull String formatVersion) {
+    FetchedConfigurationBundle(@NonNull String formatVersion) {
         this.formatVersion = formatVersion;
         this.configurationVersion = -1;
         this.configurationBundle = new ArrayList<>();
@@ -55,37 +53,4 @@ public class FetchedConfigurationBundle implements Configuration {
         }
         return copy;
     }
-
-    // Parcelable
-
-    protected FetchedConfigurationBundle(@NonNull Parcel in) {
-        formatVersion = in.readString();
-        configurationVersion = in.readInt();
-        configurationBundle = new ArrayList<>();
-        in.readTypedList(configurationBundle, ConfigurationBundle.CREATOR);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(formatVersion);
-        dest.writeInt(configurationVersion);
-        dest.writeTypedList(configurationBundle);
-    }
-
-    public static final Creator<FetchedConfigurationBundle> CREATOR = new Parcelable.Creator<FetchedConfigurationBundle>() {
-        @Override
-        public FetchedConfigurationBundle createFromParcel(Parcel in) {
-            return new FetchedConfigurationBundle(in);
-        }
-
-        @Override
-        public FetchedConfigurationBundle[] newArray(int size) {
-            return new FetchedConfigurationBundle[size];
-        }
-    };
 }

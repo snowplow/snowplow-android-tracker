@@ -1,8 +1,6 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,7 +10,6 @@ import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
@@ -196,45 +193,9 @@ public class NetworkConfiguration implements Configuration {
         try {
             this.endpoint = jsonObject.getString("endpoint");
             String methodStr = jsonObject.getString("method");
-            this.method = HttpMethod.valueOf(methodStr);
+            this.method = HttpMethod.valueOf(methodStr.toUpperCase());
         } catch (Exception e) {
             Logger.e(TAG, "Unable to get remote configuration");
         }
     }
-
-    // Parcelable
-
-    protected NetworkConfiguration(@NonNull Parcel in) {
-        endpoint = in.readString();
-        method = HttpMethod.valueOf(in.readString());
-        protocol = Protocol.valueOf(in.readString());
-        customPostPath = in.readString();
-        timeout = in.readInt();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(endpoint);
-        dest.writeString(method.name());
-        dest.writeString(protocol.name());
-        dest.writeString(customPostPath);
-        dest.writeInt(timeout);
-    }
-
-    public static final Creator<NetworkConfiguration> CREATOR = new Parcelable.Creator<NetworkConfiguration>() {
-        @Override
-        public NetworkConfiguration createFromParcel(Parcel in) {
-            return new NetworkConfiguration(in);
-        }
-
-        @Override
-        public NetworkConfiguration[] newArray(int size) {
-            return new NetworkConfiguration[size];
-        }
-    };
 }

@@ -1,15 +1,11 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -57,34 +53,4 @@ public class RemoteConfiguration implements Configuration {
     public Configuration copy() {
         return new RemoteConfiguration(endpoint, method);
     }
-
-    // Parcelable
-
-    protected RemoteConfiguration(@NonNull Parcel in) {
-        endpoint = in.readString();
-        method = HttpMethod.valueOf(in.readString());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeString(endpoint);
-        dest.writeString(method.name());
-    }
-
-    public static final Creator<RemoteConfiguration> CREATOR = new Parcelable.Creator<RemoteConfiguration>() {
-        @Override
-        public RemoteConfiguration createFromParcel(Parcel in) {
-            return new RemoteConfiguration(in);
-        }
-
-        @Override
-        public RemoteConfiguration[] newArray(int size) {
-            return new RemoteConfiguration[size];
-        }
-    };
 }
