@@ -14,20 +14,25 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
+import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ServiceProvider {
+public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
-    private Context context;
+    private final Context context;
     @NonNull
-    public final String namespace;
+    private final String namespace;
     @NonNull
     private NetworkConfiguration networkConfiguration;
     @NonNull
@@ -49,8 +54,21 @@ public class ServiceProvider {
     private Emitter emitter;
     @Nullable
     private Subject subject;
+
     @Nullable
     private TrackerControllerImpl trackerController;
+    @Nullable
+    private EmitterControllerImpl emitterController;
+    @Nullable
+    private NetworkControllerImpl networkController;
+    @Nullable
+    private SubjectControllerImpl subjectController;
+    @Nullable
+    private SessionControllerImpl sessionController;
+    @Nullable
+    private GdprControllerImpl gdprController;
+    @Nullable
+    private GlobalContextsControllerImpl globalContextsController;
 
     // Constructors
 
@@ -69,14 +87,21 @@ public class ServiceProvider {
         stopServices();
         processConfigurations(configurations);
         resetServices();
-        trackerController.reset(getTracker());
+        getTracker();
     }
 
     public void shutdown() {
-        tracker.pauseEventTracking();
+        if (tracker != null) {
+            tracker.pauseEventTracking();
+        }
         stopServices();
         resetServices();
-        trackerController = null;
+        resetControllers();
+    }
+
+    @NonNull
+    public String getNamespace() {
+        return namespace;
     }
 
     // Private methods
@@ -115,7 +140,9 @@ public class ServiceProvider {
     }
 
     private void stopServices() {
-        emitter.shutdown();
+        if (emitter != null) {
+            emitter.shutdown();
+        }
     }
 
     private void resetServices() {
@@ -124,10 +151,20 @@ public class ServiceProvider {
         tracker = null;
     }
 
+    private void resetControllers() {
+        trackerController = null;
+        sessionController = null;
+        emitterController = null;
+        gdprController = null;
+        globalContextsController = null;
+        subjectController = null;
+        networkController = null;
+    }
+
     // Getters
 
     @NonNull
-    Subject getSubject() {
+    public Subject getSubject() {
         if (subject == null) {
             subject = makeSubject();
         }
@@ -135,7 +172,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    Emitter getEmitter() {
+    public Emitter getEmitter() {
         if (emitter == null) {
             emitter = makeEmitter();
         }
@@ -143,7 +180,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    Tracker getTracker() {
+    public Tracker getTracker() {
         if (tracker == null) {
             tracker = makeTracker();
         }
@@ -151,11 +188,59 @@ public class ServiceProvider {
     }
 
     @NonNull
-    public TrackerController getTrackerController() {
+    public TrackerControllerImpl getTrackerController() {
         if (trackerController == null) {
             trackerController = makeTrackerController();
         }
         return trackerController;
+    }
+
+    @NonNull
+    public SessionControllerImpl getSessionController() {
+        if (sessionController == null) {
+            sessionController = makeSessionController();
+        }
+        return sessionController;
+    }
+
+    @NonNull
+    public EmitterControllerImpl getEmitterController() {
+        if (emitterController == null) {
+            emitterController = makeEmitterController();
+        }
+        return emitterController;
+    }
+
+    @NonNull
+    public GdprControllerImpl getGdprController() {
+        if (gdprController == null) {
+            gdprController = makeGdprController();
+        }
+        return gdprController;
+    }
+
+    @NonNull
+    public GlobalContextsControllerImpl getGlobalContextsController() {
+        if (globalContextsController == null) {
+            globalContextsController = makeGlobalContextsController();
+        }
+        return globalContextsController;
+    }
+
+    @NonNull
+    public SubjectControllerImpl getSubjectController() {
+        if (subjectController == null) {
+            subjectController = makeSubjectController();
+        }
+        return subjectController;
+    }
+
+    @NonNull
+    public NetworkControllerImpl getNetworkController() {
+        if (networkController == null) {
+            networkController = makeNetworkController();
+        }
+        return networkController;
     }
 
     // Factories
@@ -227,6 +312,41 @@ public class ServiceProvider {
 
     @NonNull
     private TrackerControllerImpl makeTrackerController() {
-        return new TrackerControllerImpl(getTracker());
+        return new TrackerControllerImpl(this);
+    }
+
+    @NonNull
+    private SessionControllerImpl makeSessionController() {
+        return new SessionControllerImpl(this);
+    }
+
+    @NonNull
+    private EmitterControllerImpl makeEmitterController() {
+        return new EmitterControllerImpl(this);
+    }
+
+    @NonNull
+    private GdprControllerImpl makeGdprController() {
+        GdprControllerImpl controller = new GdprControllerImpl(this);
+        Gdpr gdpr = getTracker().getGdprContext();
+        if (gdpr != null) {
+            controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+        }
+        return controller;
+    }
+
+    @NonNull
+    private GlobalContextsControllerImpl makeGlobalContextsController() {
+        return new GlobalContextsControllerImpl(this);
+    }
+
+    @NonNull
+    private SubjectControllerImpl makeSubjectController() {
+        return new SubjectControllerImpl(this);
+    }
+
+    @NonNull
+    private NetworkControllerImpl makeNetworkController() {
+        return new NetworkControllerImpl(this);
     }
 }

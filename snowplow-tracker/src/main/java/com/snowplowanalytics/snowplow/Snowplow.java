@@ -303,7 +303,7 @@ public class Snowplow {
     }
 
     private synchronized static boolean registerInstance(@NonNull ServiceProvider serviceProvider) {
-        String namespace = serviceProvider.namespace;
+        String namespace = serviceProvider.getNamespace();
         boolean isOverriding = serviceProviderInstances.put(namespace, serviceProvider) != null;
         if (defaultServiceProvider == null) {
             defaultServiceProvider = serviceProvider;

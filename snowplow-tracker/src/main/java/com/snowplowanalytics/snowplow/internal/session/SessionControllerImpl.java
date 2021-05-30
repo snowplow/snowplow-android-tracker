@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.SessionController;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
@@ -11,29 +13,25 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import java.util.concurrent.TimeUnit;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class SessionControllerImpl implements SessionController {
-
+public class SessionControllerImpl extends Controller implements SessionController {
     private final String TAG = SessionControllerImpl.class.getName();
-
-    @NonNull
-    private Tracker tracker;
 
     // Constructors
 
-    public SessionControllerImpl(@NonNull Tracker tracker) {
-        this.tracker = tracker;
+    public SessionControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     // Control methods
 
     @Override
     public void pause() {
-        tracker.pauseSessionChecking();
+        getTracker().pauseSessionChecking();
     }
 
     @Override
     public void resume() {
-        tracker.resumeSessionChecking();
+        getTracker().resumeSessionChecking();
     }
 
     @Override
@@ -42,7 +40,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().startNewSession();
+        getSession().startNewSession();
     }
 
     // Getters and Setters
@@ -53,7 +51,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getSessionIndex();
+        return getSession().getSessionIndex();
     }
 
     @NonNull
@@ -63,7 +61,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return "";
         }
-        return tracker.getSession().getCurrentSessionId();
+        return getSession().getCurrentSessionId();
     }
 
     @NonNull
@@ -73,7 +71,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return "";
         }
-        return tracker.getSession().getUserId();
+        return getSession().getUserId();
     }
 
     @Override
@@ -82,7 +80,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return false;
         }
-        return tracker.getSession().isBackground();
+        return getSession().isBackground();
     }
 
     @Override
@@ -91,7 +89,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getBackgroundIndex();
+        return getSession().getBackgroundIndex();
     }
 
     @Override
@@ -100,7 +98,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getForegroundIndex();
+        return getSession().getForegroundIndex();
     }
 
     @NonNull
@@ -110,7 +108,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getForegroundTimeout(), TimeUnit.MILLISECONDS);
+        return new TimeMeasure(getSession().getForegroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -119,7 +117,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setForegroundTimeout(foregroundTimeout.convert(TimeUnit.MILLISECONDS));
+        getSession().setForegroundTimeout(foregroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     @NonNull
@@ -129,7 +127,7 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getBackgroundTimeout(), TimeUnit.MILLISECONDS);
+        return new TimeMeasure(getSession().getBackgroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -138,12 +136,22 @@ public class SessionControllerImpl implements SessionController {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
+        getSession().setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     // Service method
 
     public boolean isEnabled() {
-        return tracker.getSession() != null;
+        return getTracker().getSession() != null;
+    }
+
+    // Private methods
+
+    private Tracker getTracker() {
+        return serviceProvider.getTracker();
+    }
+
+    private Session getSession() {
+        return serviceProvider.getTracker().getSession();
     }
 }

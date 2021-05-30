@@ -6,16 +6,22 @@ import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.emitter.EventStore;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class EmitterControllerImpl implements EmitterController {
+public class EmitterControllerImpl extends Controller implements EmitterController {
+    private final static String TAG = EmitterControllerImpl.class.getSimpleName();
 
-    @NonNull
-    private final Emitter emitter;
+    public EmitterControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
+    }
 
-    public EmitterControllerImpl(@NonNull Emitter emitter) {
-        this.emitter = emitter;
+    private Emitter getEmitter() {
+        return serviceProvider.getTracker().getEmitter();
     }
 
     // Getters and Setters
@@ -23,22 +29,22 @@ public class EmitterControllerImpl implements EmitterController {
     @NonNull
     @Override
     public BufferOption getBufferOption() {
-        return emitter.getBufferOption();
+        return getEmitter().getBufferOption();
     }
 
     @Override
     public void setBufferOption(@NonNull BufferOption bufferOption) {
-        emitter.setBufferOption(bufferOption);
+        getEmitter().setBufferOption(bufferOption);
     }
 
     @Override
     public int getEmitRange() {
-        return emitter.getSendLimit();
+        return getEmitter().getSendLimit();
     }
 
     @Override
     public void setEmitRange(int emitRange) {
-        emitter.setSendLimit(emitRange);
+        getEmitter().setSendLimit(emitRange);
     }
 
     @Override
@@ -48,28 +54,28 @@ public class EmitterControllerImpl implements EmitterController {
 
     @Override
     public long getByteLimitGet() {
-        return emitter.getByteLimitGet();
+        return getEmitter().getByteLimitGet();
     }
 
     @Override
     public void setByteLimitGet(long byteLimitGet) {
-        emitter.setByteLimitGet(byteLimitGet);
+        getEmitter().setByteLimitGet(byteLimitGet);
     }
 
     @Override
     public long getByteLimitPost() {
-        return emitter.getByteLimitPost();
+        return getEmitter().getByteLimitPost();
     }
 
     @Override
     public void setByteLimitPost(long byteLimitPost) {
-        emitter.setByteLimitPost(byteLimitPost);
+        getEmitter().setByteLimitPost(byteLimitPost);
     }
 
     @Nullable
     @Override
     public RequestCallback getRequestCallback() {
-        return emitter.getRequestCallback();
+        return getEmitter().getRequestCallback();
     }
 
     @Override
@@ -79,11 +85,16 @@ public class EmitterControllerImpl implements EmitterController {
 
     @Override
     public long getDbCount() {
-        return emitter.getEventStore().getSize();
+        EventStore eventStore = getEmitter().getEventStore();
+        if (eventStore == null) {
+            Logger.e(TAG,"EventStore not available in the Emitter.");
+            return -1;
+        }
+        return eventStore.getSize();
     }
 
     @Override
     public boolean isSending() {
-        return emitter.getEmitterStatus();
+        return getEmitter().getEmitterStatus();
     }
 }

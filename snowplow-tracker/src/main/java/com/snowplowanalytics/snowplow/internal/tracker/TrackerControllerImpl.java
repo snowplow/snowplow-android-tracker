@@ -4,132 +4,106 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
+import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
+import com.snowplowanalytics.snowplow.controller.NetworkController;
+import com.snowplowanalytics.snowplow.controller.SessionController;
+import com.snowplowanalytics.snowplow.controller.SubjectController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
-import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
-import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
-import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.Controller;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
+import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.network.NetworkConnection;
-import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class TrackerControllerImpl implements TrackerController {
-
-    @Nullable
-    private NetworkControllerImpl network;
-    @NonNull
-    private SessionControllerImpl session;
-    @NonNull
-    private EmitterControllerImpl emitter;
-    @NonNull
-    private SubjectControllerImpl subject;
-    @NonNull
-    private GdprControllerImpl gdpr;
-    @NonNull
-    private GlobalContextsControllerImpl globalContexts;
-
-    @NonNull
-    private Tracker tracker;
+public class TrackerControllerImpl extends Controller implements TrackerController {
 
     // Constructors
 
-    public TrackerControllerImpl(@NonNull Tracker tracker) {
-        this.tracker = tracker;
-        session = new SessionControllerImpl(tracker);
-        emitter = new EmitterControllerImpl(tracker.emitter);
-        subject = new SubjectControllerImpl(tracker.subject);
-        gdpr = new GdprControllerImpl(tracker);
-        globalContexts = new GlobalContextsControllerImpl(tracker);
-        NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
-        if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
-            network = new NetworkControllerImpl(tracker.emitter);
-        }
+    public TrackerControllerImpl(@NonNull ServiceProvider serviceProvider) {
+        super(serviceProvider);
     }
 
-    public void reset(@NonNull Tracker tracker) {
-        this.tracker = tracker;
-        session = new SessionControllerImpl(tracker);
-        emitter = new EmitterControllerImpl(tracker.emitter);
-        subject = new SubjectControllerImpl(tracker.subject);
-        gdpr = new GdprControllerImpl(tracker);
-        globalContexts = new GlobalContextsControllerImpl(tracker);
-        NetworkConnection networkConnection = tracker.emitter.getNetworkConnection();
-        if (networkConnection == null || networkConnection instanceof OkHttpNetworkConnection) {
-            network = new NetworkControllerImpl(tracker.emitter);
-        }
+    //
+
+    @NonNull
+    public Tracker getTracker() {
+        return serviceProvider.getTracker();
     }
 
     // Sub-controllers
 
     @Nullable
     @Override
-    public NetworkControllerImpl getNetwork() {
-        return network;
-    }
-
-    @Override
-    @Nullable
-    public SessionControllerImpl getSession() {
-        return session.isEnabled() ? session : null;
+    public NetworkController getNetwork() {
+        return serviceProvider.getNetworkController();
     }
 
     @Override
     @NonNull
-    public EmitterControllerImpl getEmitter() {
-        return emitter;
+    public EmitterController getEmitter() {
+        return serviceProvider.getEmitterController();
     }
 
     @Override
     @NonNull
-    public SubjectControllerImpl getSubject() {
-        return subject;
+    public SubjectController getSubject() {
+        return serviceProvider.getSubjectController();
     }
 
     @Override
     @NonNull
     public GdprController getGdpr() {
-        return gdpr;
+        return serviceProvider.getGdprController();
     }
 
     @NonNull
     @Override
     public GlobalContextsController getGlobalContexts() {
-        return globalContexts;
+        return serviceProvider.getGlobalContextsController();
+    }
+
+    @NonNull
+    public SessionControllerImpl getSessionController() {
+        return serviceProvider.getSessionController();
+    }
+
+    @Nullable
+    public SessionController getSession() {
+        SessionControllerImpl sessionController = getSessionController();
+        return sessionController.isEnabled() ? sessionController : null;
     }
 
     // Control methods
 
     @Override
     public void pause() {
-        tracker.pauseEventTracking();
+        getTracker().pauseEventTracking();
     }
 
     @Override
     public void resume() {
-        tracker.resumeEventTracking();
+        getTracker().resumeEventTracking();
     }
 
     @Override
     public void track(@NonNull Event event) {
-        tracker.track(event);
+        getTracker().track(event);
     }
 
     @NonNull
     @Override
     public String getVersion() {
-        return null;
+        return BuildConfig.TRACKER_LABEL;
     }
 
     @Override
     public boolean isTracking() {
-        return tracker.getDataCollection();
+        return getTracker().getDataCollection();
     }
 
 
@@ -138,50 +112,50 @@ public class TrackerControllerImpl implements TrackerController {
 
     @NonNull
     public String getNamespace() {
-        return tracker.namespace;
+        return getTracker().namespace;
     }
 
     @NonNull
     @Override
     public String getAppId() {
-        return tracker.appId;
+        return getTracker().appId;
     }
 
     @Override
     public void setAppId(@NonNull String appId) {
-        tracker.appId = appId;
+        getTracker().appId = appId;
     }
 
     @NonNull
     @Override
     public DevicePlatform getDevicePlatform() {
-        return tracker.devicePlatform;
+        return getTracker().devicePlatform;
     }
 
     @Override
     public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
-        tracker.devicePlatform = devicePlatform;
+        getTracker().devicePlatform = devicePlatform;
     }
 
     @Override
     public boolean isBase64encoding() {
-        return tracker.base64Encoded;
+        return getTracker().base64Encoded;
     }
 
     @Override
     public void setBase64encoding(boolean base64encoding) {
-        tracker.base64Encoded = base64encoding;
+        getTracker().base64Encoded = base64encoding;
     }
 
     @NonNull
     @Override
     public LogLevel getLogLevel() {
-        return tracker.level;
+        return getTracker().level;
     }
 
     @Override
     public void setLogLevel(@NonNull LogLevel logLevel) {
-        tracker.level = logLevel;
+        getTracker().level = logLevel;
     }
 
     @Nullable
@@ -197,101 +171,101 @@ public class TrackerControllerImpl implements TrackerController {
 
     @Override
     public boolean isApplicationContext() {
-        return tracker.applicationContext;
+        return getTracker().applicationContext;
     }
 
     @Override
     public void setApplicationContext(boolean applicationContext) {
-        tracker.applicationContext = applicationContext;
+        getTracker().applicationContext = applicationContext;
     }
 
     @Override
     public boolean isPlatformContext() {
-        return tracker.mobileContext;
+        return getTracker().mobileContext;
     }
 
     @Override
     public void setPlatformContext(boolean platformContext) {
-        tracker.mobileContext = platformContext;
+        getTracker().mobileContext = platformContext;
     }
 
     @Override
     public boolean isGeoLocationContext() {
-        return tracker.geoLocationContext;
+        return getTracker().geoLocationContext;
     }
 
     @Override
     public void setGeoLocationContext(boolean geoLocationContext) {
-        tracker.geoLocationContext = geoLocationContext;
+        getTracker().geoLocationContext = geoLocationContext;
     }
 
     @Override
     public boolean isSessionContext() {
-        return tracker.getSessionContext();
+        return getTracker().getSessionContext();
     }
 
     @Override
     public void setSessionContext(boolean sessionContext) {
-        tracker.setSessionContext(sessionContext);
+        getTracker().setSessionContext(sessionContext);
     }
 
     @Override
     public boolean isScreenContext() {
-        return tracker.screenContext;
+        return getTracker().screenContext;
     }
 
     @Override
     public void setScreenContext(boolean screenContext) {
-        tracker.screenContext = screenContext;
+        getTracker().screenContext = screenContext;
     }
 
     @Override
     public boolean isScreenViewAutotracking() {
-        return tracker.screenviewEvents;
+        return getTracker().screenviewEvents;
     }
 
     @Override
     public void setScreenViewAutotracking(boolean screenViewAutotracking) {
-        tracker.screenviewEvents = screenViewAutotracking;
+        getTracker().screenviewEvents = screenViewAutotracking;
     }
 
     @Override
     public boolean isLifecycleAutotracking() {
-        return tracker.lifecycleEvents;
+        return getTracker().lifecycleEvents;
     }
 
     @Override
     public void setLifecycleAutotracking(boolean lifecycleAutotracking) {
-        tracker.lifecycleEvents = lifecycleAutotracking;
+        getTracker().lifecycleEvents = lifecycleAutotracking;
     }
 
     @Override
     public boolean isInstallAutotracking() {
-        return tracker.installTracking;
+        return getTracker().installTracking;
     }
 
     @Override
     public void setInstallAutotracking(boolean installAutotracking) {
-        tracker.installTracking = installAutotracking;
+        getTracker().installTracking = installAutotracking;
     }
 
     @Override
     public boolean isExceptionAutotracking() {
-        return tracker.applicationCrash;
+        return getTracker().applicationCrash;
     }
 
     @Override
     public void setExceptionAutotracking(boolean exceptionAutotracking) {
-        tracker.applicationCrash = exceptionAutotracking;
+        getTracker().applicationCrash = exceptionAutotracking;
     }
 
     @Override
     public boolean isDiagnosticAutotracking() {
-        return tracker.trackerDiagnostic;
+        return getTracker().trackerDiagnostic;
     }
 
     @Override
     public void setDiagnosticAutotracking(boolean diagnosticAutotracking) {
-        tracker.trackerDiagnostic = diagnosticAutotracking;
+        getTracker().trackerDiagnostic = diagnosticAutotracking;
     }
 }
