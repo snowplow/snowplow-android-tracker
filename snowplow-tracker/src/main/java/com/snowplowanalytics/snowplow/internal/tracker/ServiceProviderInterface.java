@@ -13,47 +13,50 @@ import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 public interface ServiceProviderInterface {
 
     @NonNull
-    public String getNamespace();
+    String getNamespace();
 
     // Internal services
 
     @NonNull
-    public Tracker getTracker();
+    Tracker getTracker();
 
     @NonNull
-    public Emitter getEmitter();
+    Emitter getEmitter();
 
     @NonNull
-    public Subject getSubject();
+    Subject getSubject();
 
     // Controllers
 
     @NonNull
-    public TrackerControllerImpl getTrackerController();
+    TrackerControllerImpl getTrackerController();
 
     @NonNull
-    public EmitterControllerImpl getEmitterController();
+    EmitterControllerImpl getEmitterController();
 
     @NonNull
-    public NetworkControllerImpl getNetworkController();
+    NetworkControllerImpl getNetworkController();
 
     @NonNull
-    public GdprControllerImpl getGdprController();
+    GdprControllerImpl getGdprController();
 
     @NonNull
-    public GlobalContextsControllerImpl getGlobalContextsController();
+    GlobalContextsControllerImpl getGlobalContextsController();
 
     @NonNull
-    public SubjectControllerImpl getSubjectController();
+    SubjectControllerImpl getSubjectController();
 
     @NonNull
-    public SessionControllerImpl getSessionController();
+    SessionControllerImpl getSessionController();
 
     // Configuration Updates
 
     @NonNull
-    public TrackerConfigurationUpdate getTrackerConfigurationUpdate();
+    TrackerConfigurationUpdate getTrackerConfigurationUpdate();
 
     @NonNull
     NetworkConfigurationUpdate getNetworkConfigurationUpdate();
+
+    @NonNull
+    SubjectConfigurationUpdate getSubjectConfigurationUpdate();
 }

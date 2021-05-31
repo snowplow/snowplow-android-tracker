@@ -71,7 +71,7 @@ public class Subject {
     @Deprecated
     public static class SubjectBuilder {
         private Context context = null; // Optional
-        private SubjectConfiguration subjectConfiguration = null; // Optional
+        private SubjectConfigurationInterface subjectConfiguration = null; // Optional
 
         /**
          * @param context The android context to pass to the subject
@@ -88,7 +88,7 @@ public class Subject {
          * @return itself
          */
         @NonNull
-        public SubjectBuilder subjectConfiguration(@Nullable SubjectConfiguration subjectConfiguration) {
+        public SubjectBuilder subjectConfiguration(@Nullable SubjectConfigurationInterface subjectConfiguration) {
             this.subjectConfiguration = subjectConfiguration;
             return this;
         }
@@ -115,22 +115,24 @@ public class Subject {
         if (builder.context != null) {
             setDefaultScreenResolution(builder.context);
         }
-        SubjectConfiguration config = builder.subjectConfiguration;
+        SubjectConfigurationInterface config = builder.subjectConfiguration;
         if (config != null) {
-            if (config.userId != null) setUserId(config.userId);
-            if (config.networkUserId != null) setNetworkUserId(config.networkUserId);
-            if (config.domainUserId != null) setDomainUserId(config.domainUserId);
-            if (config.useragent != null) setUseragent(config.useragent);
-            if (config.ipAddress != null) setIpAddress(config.ipAddress);
-            if (config.timezone != null) setTimezone(config.timezone);
-            if (config.language != null) setLanguage(config.language);
-            if (config.screenResolution != null) {
-                setScreenResolution(config.screenResolution.getWidth(), config.screenResolution.getHeight());
+            if (config.getUserId() != null) setUserId(config.getUserId());
+            if (config.getNetworkUserId() != null) setNetworkUserId(config.getNetworkUserId());
+            if (config.getDomainUserId() != null) setDomainUserId(config.getDomainUserId());
+            if (config.getUseragent() != null) setUseragent(config.getUseragent());
+            if (config.getIpAddress() != null) setIpAddress(config.getIpAddress());
+            if (config.getTimezone() != null) setTimezone(config.getTimezone());
+            if (config.getLanguage() != null) setLanguage(config.getLanguage());
+            if (config.getScreenResolution() != null) {
+                Size size = config.getScreenResolution();
+                setScreenResolution(size.getWidth(), size.getHeight());
             }
-            if (config.screenViewPort != null) {
-                setViewPort(config.screenViewPort.getWidth(), config.screenViewPort.getHeight());
+            if (config.getScreenViewPort() != null) {
+                Size size = config.getScreenViewPort();
+                setViewPort(size.getWidth(), size.getHeight());
             }
-            if (config.colorDepth != null) setColorDepth(config.colorDepth);
+            if (config.getColorDepth() != null) setColorDepth(config.getColorDepth());
         }
         Logger.v(TAG, "Subject created successfully.");
     }

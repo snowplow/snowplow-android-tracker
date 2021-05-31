@@ -81,6 +81,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     private TrackerConfigurationUpdate trackerConfigurationUpdate;
     @NonNull
     private NetworkConfigurationUpdate networkConfigurationUpdate;
+    @NonNull
+    private SubjectConfigurationUpdate subjectConfigurationUpdate;
 
     // Constructors
 
@@ -93,6 +95,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         // Reset configurationUpdates
         trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
         networkConfigurationUpdate = new NetworkConfigurationUpdate();
+        subjectConfigurationUpdate = new SubjectConfigurationUpdate();
         // Initialization
         this.namespace = namespace;
         networkConfigurationUpdate.sourceConfig = networkConfiguration;
@@ -139,7 +142,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof SubjectConfiguration) {
-                subjectConfiguration = (SubjectConfiguration)configuration;
+                subjectConfigurationUpdate.sourceConfig = (SubjectConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof SessionConfiguration) {
@@ -186,6 +189,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     private void resetConfigurationUpdates() {
         trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
         networkConfigurationUpdate = new NetworkConfigurationUpdate();
+        subjectConfigurationUpdate = new SubjectConfigurationUpdate();
     }
 
     // Getters
@@ -282,13 +286,19 @@ public class ServiceProvider implements ServiceProviderInterface {
         return networkConfigurationUpdate;
     }
 
+    @NonNull
+    @Override
+    public SubjectConfigurationUpdate getSubjectConfigurationUpdate() {
+        return subjectConfigurationUpdate;
+    }
+
     // Factories
 
     @NonNull
     private Subject makeSubject() {
         return new Subject.SubjectBuilder()
                 .context(context)
-                .subjectConfiguration(subjectConfiguration)
+                .subjectConfiguration(subjectConfigurationUpdate)
                 .build();
     }
 

@@ -27,6 +27,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setUserId(@Nullable String userId) {
+        getDirtyConfig().userId = userId;
+        getDirtyConfig().userIdUpdated = true;
         getSubject().setUserId(userId);
     }
 
@@ -38,6 +40,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setNetworkUserId(@Nullable String networkUserId) {
+        getDirtyConfig().networkUserId = networkUserId;
+        getDirtyConfig().networkUserIdUpdated = true;
         getSubject().setNetworkUserId(networkUserId);
     }
 
@@ -49,6 +53,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setDomainUserId(@Nullable String domainUserId) {
+        getDirtyConfig().domainUserId = domainUserId;
+        getDirtyConfig().domainUserIdUpdated = true;
         getSubject().setDomainUserId(domainUserId);
     }
 
@@ -60,6 +66,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setUseragent(@Nullable String useragent) {
+        getDirtyConfig().useragent = useragent;
+        getDirtyConfig().useragentUpdated = true;
         getSubject().setUseragent(useragent);
     }
 
@@ -71,6 +79,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setIpAddress(@Nullable String ipAddress) {
+        getDirtyConfig().ipAddress = ipAddress;
+        getDirtyConfig().ipAddressUpdated = true;
         getSubject().setIpAddress(ipAddress);
     }
 
@@ -82,6 +92,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setTimezone(@Nullable String timezone) {
+        getDirtyConfig().timezone = timezone;
+        getDirtyConfig().timezoneUpdated = true;
         getSubject().setTimezone(timezone);
     }
 
@@ -93,6 +105,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setLanguage(@Nullable String language) {
+        getDirtyConfig().language = language;
+        getDirtyConfig().languageUpdated = true;
         getSubject().setLanguage(language);
     }
 
@@ -104,6 +118,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setScreenResolution(@Nullable Size screenResolution) {
+        getDirtyConfig().screenResolution = screenResolution;
+        getDirtyConfig().screenResolutionUpdated = true;
         getSubject().setScreenResolution(screenResolution.getWidth(), screenResolution.getHeight());
     }
 
@@ -115,6 +131,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setScreenViewPort(@Nullable Size screenViewPort) {
+        getDirtyConfig().screenViewPort = screenViewPort;
+        getDirtyConfig().screenViewPortUpdated = true;
         getSubject().setViewPort(screenViewPort.getWidth(), screenViewPort.getHeight());
     }
 
@@ -126,6 +144,8 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     @Override
     public void setColorDepth(@Nullable Integer colorDepth) {
+        getDirtyConfig().colorDepth = colorDepth;
+        getDirtyConfig().colorDepthUpdated = true;
         getSubject().setColorDepth(colorDepth);
     }
 
@@ -133,5 +153,9 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
 
     private Subject getSubject() {
         return serviceProvider.getSubject();
+    }
+
+    private SubjectConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getSubjectConfigurationUpdate();
     }
 }
