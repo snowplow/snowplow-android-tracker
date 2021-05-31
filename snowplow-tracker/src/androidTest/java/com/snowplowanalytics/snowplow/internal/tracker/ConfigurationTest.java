@@ -107,12 +107,6 @@ public class ConfigurationTest {
         trackerConfiguration.sessionContext = false;
         tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNull(tracker.getSession());
-
-        tracker.setSessionContext(true);
-        assertNotNull(tracker.getSession());
-
-        tracker.setSessionContext(false);
-        assertNotNull(tracker.getSession());
     }
 
     // TODO: Flaky test to fix

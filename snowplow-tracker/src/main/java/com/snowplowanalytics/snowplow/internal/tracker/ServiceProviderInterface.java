@@ -14,6 +14,8 @@ public interface ServiceProviderInterface {
     @NonNull
     public String getNamespace();
 
+    // Internal services
+
     @NonNull
     public Tracker getTracker();
 
@@ -22,6 +24,8 @@ public interface ServiceProviderInterface {
 
     @NonNull
     public Subject getSubject();
+
+    // Controllers
 
     @NonNull
     public TrackerControllerImpl getTrackerController();
@@ -43,4 +47,9 @@ public interface ServiceProviderInterface {
 
     @NonNull
     public SessionControllerImpl getSessionController();
+
+    // Configuration Updates
+
+    @NonNull
+    public TrackerConfigurationUpdate getTrackerConfigurationUpdate();
 }

@@ -455,13 +455,8 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
 
     // JSON Formatter
 
-    public TrackerConfiguration(@NonNull JSONObject jsonObject) {
-        this(jsonObject.optString("appId", "default-AppId"));
-        if (!jsonObject.has("appId")) {
-            appId = jsonObject.optString("appId", appId);
-        } else {
-            Logger.e(TAG, "The field 'appId' is mandatory in the remote `trackerConfiguration`.");
-        }
+    public TrackerConfiguration(@NonNull String appId, @NonNull JSONObject jsonObject) {
+        this(jsonObject.optString("appId", appId));
         String val = jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue());
         devicePlatform = DevicePlatform.getByValue(val);
         String log = jsonObject.optString("logLevel", LogLevel.OFF.name());

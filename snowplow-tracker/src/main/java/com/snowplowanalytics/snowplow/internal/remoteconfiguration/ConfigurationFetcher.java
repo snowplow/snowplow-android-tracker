@@ -1,5 +1,6 @@
 package com.snowplowanalytics.snowplow.internal.remoteconfiguration;
 
+import android.content.Context;
 import android.net.TrafficStats;
 import android.net.Uri;
 
@@ -27,15 +28,15 @@ public class ConfigurationFetcher {
     @NonNull
     private final Consumer<FetchedConfigurationBundle> onFetchCallback;
 
-    public ConfigurationFetcher(@NonNull RemoteConfiguration remoteConfiguration, @NonNull Consumer<FetchedConfigurationBundle> onFetchCallback) {
+    public ConfigurationFetcher(@NonNull Context context, @NonNull RemoteConfiguration remoteConfiguration, @NonNull Consumer<FetchedConfigurationBundle> onFetchCallback) {
         this.remoteConfiguration = remoteConfiguration;
         this.onFetchCallback = onFetchCallback;
-        performRequest();
+        performRequest(context);
     }
 
     // Private methods
 
-    private void performRequest() {
+    private void performRequest(@NonNull Context context) {
         Uri.Builder uriBuilder = Uri.parse(remoteConfiguration.endpoint).buildUpon();
         String uri = uriBuilder.build().toString();
         OkHttpClient client = new OkHttpClient.Builder()
@@ -51,7 +52,7 @@ public class ConfigurationFetcher {
             Response resp = client.newCall(request).execute();
             ResponseBody body = resp.body();
             if (resp.isSuccessful() && body != null) {
-                resolveRequest(body);
+                resolveRequest(context, body);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,12 +60,12 @@ public class ConfigurationFetcher {
         }
     }
 
-    private void resolveRequest(ResponseBody responseBody) {
+    private void resolveRequest(@NonNull Context context, ResponseBody responseBody) {
         String data = null;
         try {
             data = responseBody.string();
             JSONObject jsonObject = new JSONObject(data);
-            FetchedConfigurationBundle bundle = new FetchedConfigurationBundle(jsonObject);
+            FetchedConfigurationBundle bundle = new FetchedConfigurationBundle(context, jsonObject);
             if (bundle != null) {
                 onFetchCallback.accept(bundle);
             }

@@ -28,13 +28,6 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
         super(serviceProvider);
     }
 
-    //
-
-    @NonNull
-    public Tracker getTracker() {
-        return serviceProvider.getTracker();
-    }
-
     // Sub-controllers
 
     @Nullable
@@ -82,11 +75,13 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void pause() {
+        getDirtyConfig().isPaused = true;
         getTracker().pauseEventTracking();
     }
 
     @Override
     public void resume() {
+        getDirtyConfig().isPaused = false;
         getTracker().resumeEventTracking();
     }
 
@@ -123,6 +118,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setAppId(@NonNull String appId) {
+        getDirtyConfig().appId = appId;
+        getDirtyConfig().appIdUpdated = true;
         getTracker().appId = appId;
     }
 
@@ -134,6 +131,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setDevicePlatform(@NonNull DevicePlatform devicePlatform) {
+        getDirtyConfig().devicePlatform = devicePlatform;
+        getDirtyConfig().devicePlatformUpdated = true;
         getTracker().devicePlatform = devicePlatform;
     }
 
@@ -144,6 +143,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setBase64encoding(boolean base64encoding) {
+        getDirtyConfig().base64encoding = base64encoding;
+        getDirtyConfig().base64encodingUpdated = true;
         getTracker().base64Encoded = base64encoding;
     }
 
@@ -155,6 +156,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setLogLevel(@NonNull LogLevel logLevel) {
+        getDirtyConfig().logLevel = logLevel;
+        getDirtyConfig().logLevelUpdated = true;
         getTracker().level = logLevel;
     }
 
@@ -166,6 +169,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setLoggerDelegate(@Nullable LoggerDelegate loggerDelegate) {
+        getDirtyConfig().loggerDelegate = loggerDelegate;
+        getDirtyConfig().loggerDelegateUpdated = true;
         Logger.setDelegate(loggerDelegate);
     }
 
@@ -176,6 +181,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setApplicationContext(boolean applicationContext) {
+        getDirtyConfig().applicationContext = applicationContext;
+        getDirtyConfig().applicationContextUpdated = true;
         getTracker().applicationContext = applicationContext;
     }
 
@@ -186,6 +193,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setPlatformContext(boolean platformContext) {
+        getDirtyConfig().platformContext = platformContext;
+        getDirtyConfig().platformContextUpdated = true;
         getTracker().mobileContext = platformContext;
     }
 
@@ -196,6 +205,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setGeoLocationContext(boolean geoLocationContext) {
+        getDirtyConfig().geoLocationContext = geoLocationContext;
+        getDirtyConfig().geoLocationContextUpdated = true;
         getTracker().geoLocationContext = geoLocationContext;
     }
 
@@ -206,6 +217,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setSessionContext(boolean sessionContext) {
+        getDirtyConfig().sessionContext = sessionContext;
+        getDirtyConfig().sessionContextUpdated = true;
         getTracker().setSessionContext(sessionContext);
     }
 
@@ -216,6 +229,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setScreenContext(boolean screenContext) {
+        getDirtyConfig().screenContext = screenContext;
+        getDirtyConfig().screenContextUpdated = true;
         getTracker().screenContext = screenContext;
     }
 
@@ -226,6 +241,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setScreenViewAutotracking(boolean screenViewAutotracking) {
+        getDirtyConfig().screenViewAutotracking = screenViewAutotracking;
+        getDirtyConfig().screenViewAutotrackingUpdated = true;
         getTracker().screenviewEvents = screenViewAutotracking;
     }
 
@@ -236,6 +253,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setLifecycleAutotracking(boolean lifecycleAutotracking) {
+        getDirtyConfig().lifecycleAutotracking = lifecycleAutotracking;
+        getDirtyConfig().lifecycleAutotrackingUpdated = true;
         getTracker().lifecycleEvents = lifecycleAutotracking;
     }
 
@@ -246,6 +265,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setInstallAutotracking(boolean installAutotracking) {
+        getDirtyConfig().installAutotracking = installAutotracking;
+        getDirtyConfig().installAutotrackingUpdated = true;
         getTracker().installTracking = installAutotracking;
     }
 
@@ -256,6 +277,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setExceptionAutotracking(boolean exceptionAutotracking) {
+        getDirtyConfig().exceptionAutotracking = exceptionAutotracking;
+        getDirtyConfig().exceptionAutotrackingUpdated = true;
         getTracker().applicationCrash = exceptionAutotracking;
     }
 
@@ -266,6 +289,20 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public void setDiagnosticAutotracking(boolean diagnosticAutotracking) {
+        getDirtyConfig().diagnosticAutotracking = diagnosticAutotracking;
+        getDirtyConfig().diagnosticAutotrackingUpdated = true;
         getTracker().trackerDiagnostic = diagnosticAutotracking;
+    }
+
+    // Private methods
+
+    @NonNull
+    private Tracker getTracker() {
+        return serviceProvider.getTracker();
+    }
+
+    @NonNull
+    private TrackerConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getTrackerConfigurationUpdate();
     }
 }

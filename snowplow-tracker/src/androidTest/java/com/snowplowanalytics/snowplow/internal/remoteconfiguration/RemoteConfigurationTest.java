@@ -42,6 +42,7 @@ public class RemoteConfigurationTest {
 
     @Test
     public void testJSONToConfigurations() throws JSONException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String config = "{\"formatVersion\":\"1.2\",\"configurationVersion\":12,\"configurationBundle\": ["
                 + "{\"namespace\": \"default1\","
                 + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplowanalytics.com\",\"method\":\"get\"},"
@@ -54,7 +55,7 @@ public class RemoteConfigurationTest {
                 + "]}";
         JSONObject json = new JSONObject(config);
 
-        FetchedConfigurationBundle fetchedConfigurationBundle = new FetchedConfigurationBundle(json);
+        FetchedConfigurationBundle fetchedConfigurationBundle = new FetchedConfigurationBundle(context, json);
         assertEquals("1.2", fetchedConfigurationBundle.formatVersion);
         assertEquals(12, fetchedConfigurationBundle.configurationVersion);
         assertEquals(2, fetchedConfigurationBundle.configurationBundle.size());
@@ -84,12 +85,13 @@ public class RemoteConfigurationTest {
 
     @Test
     public void testDownloadConfiguration() throws IOException, InterruptedException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"1.2\",\"configurationVersion\":12,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
         final Object expectation = new Object();
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        new ConfigurationFetcher(remoteConfig, new Consumer<FetchedConfigurationBundle>() {
+        new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
                 assertNotNull(fetchedConfigurationBundle);
@@ -134,6 +136,7 @@ public class RemoteConfigurationTest {
     @Test
     public void testConfigurationFetcher_downloads() throws IOException, InterruptedException {
         // prepare test
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"2.0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
 
@@ -141,7 +144,7 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
         AtomicBoolean expectationNotified = new AtomicBoolean(false);
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        ConfigurationFetcher fetcher = new ConfigurationFetcher(remoteConfig, new Consumer<FetchedConfigurationBundle>() {
+        ConfigurationFetcher fetcher = new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
                 expectationNotified.set(true);

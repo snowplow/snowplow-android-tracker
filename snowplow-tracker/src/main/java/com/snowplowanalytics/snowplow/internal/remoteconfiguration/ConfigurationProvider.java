@@ -52,7 +52,7 @@ public class ConfigurationProvider {
                 onFetchCallback.accept(retrievedBundle);
             }
         }
-        fetcher = new ConfigurationFetcher(remoteConfiguration, new Consumer<FetchedConfigurationBundle>() {
+        fetcher = new ConfigurationFetcher(context, remoteConfiguration, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
                 if (!versionCompatibility(fetchedConfigurationBundle.formatVersion)) {

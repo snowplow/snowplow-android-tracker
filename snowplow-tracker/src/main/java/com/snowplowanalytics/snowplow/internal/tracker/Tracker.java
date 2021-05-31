@@ -914,11 +914,14 @@ public class Tracker {
 
     /**
      * Whether the session context should be sent with events
-     * @param shouldSend
+     * @param sessionContext
      */
-    public void setSessionContext(boolean shouldSend) {
-        sessionContext = shouldSend;
-        if (trackerSession == null && shouldSend) {
+    public synchronized void setSessionContext(boolean sessionContext) {
+        this.sessionContext = sessionContext;
+        if (trackerSession != null && !sessionContext) {
+            pauseSessionChecking();
+            trackerSession = null;
+        } else if (trackerSession == null && sessionContext) {
             Runnable[] callbacks = {null, null, null, null};
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;

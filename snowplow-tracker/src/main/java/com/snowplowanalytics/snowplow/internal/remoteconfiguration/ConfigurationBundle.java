@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.remoteconfiguration;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -38,7 +40,7 @@ public class ConfigurationBundle implements Configuration {
         this.networkConfiguration = networkConfiguration;
     }
 
-    public ConfigurationBundle(@NonNull JSONObject jsonObject) throws JSONException {
+    public ConfigurationBundle(@NonNull Context context, @NonNull JSONObject jsonObject) throws JSONException {
         this(jsonObject.getString("namespace"));
         JSONObject json = jsonObject.optJSONObject("networkConfiguration");
         if (json != null) {
@@ -46,7 +48,7 @@ public class ConfigurationBundle implements Configuration {
         }
         json = jsonObject.optJSONObject("trackerConfiguration");
         if (json != null) {
-            trackerConfiguration = new TrackerConfiguration(json);
+            trackerConfiguration = new TrackerConfiguration(context.getPackageName(), json);
         }
         json = jsonObject.optJSONObject("subjectConfiguration");
         if (json != null) {

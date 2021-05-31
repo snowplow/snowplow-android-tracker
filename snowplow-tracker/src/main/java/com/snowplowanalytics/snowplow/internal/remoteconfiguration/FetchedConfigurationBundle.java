@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.remoteconfiguration;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
@@ -29,14 +31,14 @@ public class FetchedConfigurationBundle implements Configuration {
 
     // JSON formatter
 
-    public FetchedConfigurationBundle(@NonNull JSONObject jsonObject) throws JSONException {
+    public FetchedConfigurationBundle(@NonNull Context context, @NonNull JSONObject jsonObject) throws JSONException {
         formatVersion = jsonObject.getString("formatVersion");
         configurationVersion = jsonObject.getInt("configurationVersion");
         configurationBundle = new ArrayList<>();
         JSONArray array = jsonObject.getJSONArray("configurationBundle");
         for (int i = 0; i < array.length(); i++) {
             JSONObject bundleJson = array.getJSONObject(i);
-            ConfigurationBundle bundle = new ConfigurationBundle(bundleJson);
+            ConfigurationBundle bundle = new ConfigurationBundle(context, bundleJson);
             configurationBundle.add(bundle);
         }
     }

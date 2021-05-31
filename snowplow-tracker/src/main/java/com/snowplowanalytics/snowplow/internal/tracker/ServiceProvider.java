@@ -34,20 +34,9 @@ public class ServiceProvider implements ServiceProviderInterface {
     @NonNull
     private final String namespace;
     @NonNull
-    private NetworkConfiguration networkConfiguration;
-    @NonNull
-    private TrackerConfiguration trackerConfiguration;
-    @Nullable
-    private EmitterConfiguration emitterConfiguration;
-    @Nullable
-    private SubjectConfiguration subjectConfiguration;
-    @Nullable
-    private SessionConfiguration sessionConfiguration;
-    @Nullable
-    private GdprConfiguration gdprConfiguration;
-    @Nullable
-    private GlobalContextsConfiguration globalContextsConfiguration;
+    private String appId;
 
+    // Internal services
     @Nullable
     private Tracker tracker;
     @Nullable
@@ -55,6 +44,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     @Nullable
     private Subject subject;
 
+    // Controllers
     @Nullable
     private TrackerControllerImpl trackerController;
     @Nullable
@@ -70,6 +60,26 @@ public class ServiceProvider implements ServiceProviderInterface {
     @Nullable
     private GlobalContextsControllerImpl globalContextsController;
 
+    // Original configurations
+    @NonNull
+    private NetworkConfiguration networkConfiguration;
+    @NonNull
+    private TrackerConfiguration trackerConfiguration;
+    @Nullable
+    private EmitterConfiguration emitterConfiguration;
+    @Nullable
+    private SubjectConfiguration subjectConfiguration;
+    @Nullable
+    private SessionConfiguration sessionConfiguration;
+    @Nullable
+    private GdprConfiguration gdprConfiguration;
+    @Nullable
+    private GlobalContextsConfiguration globalContextsConfiguration;
+
+    // Configuration updates
+    @NonNull
+    private TrackerConfigurationUpdate trackerConfigurationUpdate;
+
     // Constructors
 
     public ServiceProvider(@NonNull Context context, @NonNull String namespace, @NonNull NetworkConfiguration networkConfiguration, @NonNull List<Configuration> configurations) {
@@ -77,10 +87,18 @@ public class ServiceProvider implements ServiceProviderInterface {
         Objects.requireNonNull(networkConfiguration);
         Objects.requireNonNull(configurations);
         this.context = context;
+        appId = context.getPackageName();
+        // Reset configurationUpdates
+        trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
+        // Initialization
         this.namespace = namespace;
         this.networkConfiguration = networkConfiguration;
         trackerConfiguration = new TrackerConfiguration(context.getPackageName());
         processConfigurations(configurations);
+        // Apply sourceConfig
+        if (trackerConfigurationUpdate.sourceConfig == null) {
+            trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
+        }
     }
 
     public void reset(@NonNull List<Configuration> configurations) {
@@ -97,6 +115,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         stopServices();
         resetServices();
         resetControllers();
+        resetConfigurationUpdates();
     }
 
     @NonNull
@@ -113,7 +132,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof TrackerConfiguration) {
-                trackerConfiguration = (TrackerConfiguration)configuration;
+                trackerConfigurationUpdate.sourceConfig = (TrackerConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof SubjectConfiguration) {
@@ -159,6 +178,10 @@ public class ServiceProvider implements ServiceProviderInterface {
         globalContextsController = null;
         subjectController = null;
         networkController = null;
+    }
+
+    private void resetConfigurationUpdates() {
+        trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
     }
 
     // Getters
@@ -243,6 +266,12 @@ public class ServiceProvider implements ServiceProviderInterface {
         return networkController;
     }
 
+    @NonNull
+    @Override
+    public TrackerConfigurationUpdate getTrackerConfigurationUpdate() {
+        return trackerConfigurationUpdate;
+    }
+
     // Factories
 
     @NonNull
@@ -277,21 +306,22 @@ public class ServiceProvider implements ServiceProviderInterface {
     private Tracker makeTracker() {
         Emitter emitter = getEmitter();
         Subject subject = getSubject();
-        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfiguration.appId, context)
+        TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
+        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
-                .base64(trackerConfiguration.base64encoding)
-                .level(trackerConfiguration.logLevel)
-                .loggerDelegate(trackerConfiguration.loggerDelegate)
-                .platform(trackerConfiguration.devicePlatform)
-                .sessionContext(trackerConfiguration.sessionContext)
-                .applicationContext(trackerConfiguration.applicationContext)
-                .mobileContext(trackerConfiguration.platformContext)
-                .screenContext(trackerConfiguration.screenContext)
-                .screenviewEvents(trackerConfiguration.screenViewAutotracking)
-                .lifecycleEvents(trackerConfiguration.lifecycleAutotracking)
-                .installTracking(trackerConfiguration.installAutotracking)
-                .applicationCrash(trackerConfiguration.exceptionAutotracking)
-                .trackerDiagnostic(trackerConfiguration.diagnosticAutotracking);
+                .base64(trackerConfig.isBase64encoding())
+                .level(trackerConfig.getLogLevel())
+                .loggerDelegate(trackerConfig.getLoggerDelegate())
+                .platform(trackerConfig.getDevicePlatform())
+                .sessionContext(trackerConfig.isSessionContext())
+                .applicationContext(trackerConfig.isApplicationContext())
+                .mobileContext(trackerConfig.isPlatformContext())
+                .screenContext(trackerConfig.isScreenContext())
+                .screenviewEvents(trackerConfig.isScreenViewAutotracking())
+                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())
+                .installTracking(trackerConfig.isInstallAutotracking())
+                .applicationCrash(trackerConfig.isExceptionAutotracking())
+                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking());
         if (sessionConfiguration != null) {
             builder.backgroundTimeout(sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS));
             builder.foregroundTimeout(sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
@@ -306,6 +336,9 @@ public class ServiceProvider implements ServiceProviderInterface {
         Tracker tracker = builder.buildAndReset();
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
+        }
+        if (trackerConfigurationUpdate.isPaused) {
+            tracker.pauseEventTracking();
         }
         return tracker;
     }
