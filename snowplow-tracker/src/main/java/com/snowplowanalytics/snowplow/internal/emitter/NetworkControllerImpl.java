@@ -52,6 +52,8 @@ public class NetworkControllerImpl extends Controller implements NetworkControll
 
     @Override
     public void setCustomPostPath(@Nullable String customPostPath) {
+        getDirtyConfig().customPostPath = customPostPath;
+        getDirtyConfig().customPostPathUpdated = true;
         getEmitter().setCustomPostPath(customPostPath);
     }
 
@@ -75,5 +77,9 @@ public class NetworkControllerImpl extends Controller implements NetworkControll
 
     private Emitter getEmitter() {
         return serviceProvider.getEmitter();
+    }
+
+    private NetworkConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getNetworkConfigurationUpdate();
     }
 }

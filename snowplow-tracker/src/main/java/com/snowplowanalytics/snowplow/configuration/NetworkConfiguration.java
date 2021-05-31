@@ -5,6 +5,7 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
@@ -20,7 +21,7 @@ import okhttp3.OkHttpClient;
  * Represents the network communication configuration
  * allowing the tracker to be able to send events to the Snowplow collector.
  */
-public class NetworkConfiguration implements Configuration {
+public class NetworkConfiguration implements NetworkConfigurationInterface, Configuration {
     private final static String TAG = NetworkConfiguration.class.getSimpleName();
 
     @Nullable
@@ -113,6 +114,7 @@ public class NetworkConfiguration implements Configuration {
     /**
      * @return URL (without schema/protocol) used to send events to the collector.
      */
+    @Override
     @Nullable
     public String getEndpoint() {
         return endpoint;
@@ -121,6 +123,7 @@ public class NetworkConfiguration implements Configuration {
     /**
      * @return Method used to send events to the collector.
      */
+    @Override
     @Nullable
     public HttpMethod getMethod() {
         return method;
@@ -129,9 +132,34 @@ public class NetworkConfiguration implements Configuration {
     /**
      * @return Protocol used to send events to the collector.
      */
+    @Override
     @Nullable
     public Protocol getProtocol() {
         return protocol;
+    }
+
+    @Override
+    @Nullable
+    public String getCustomPostPath() {
+        return customPostPath;
+    }
+
+    @Override
+    @Nullable
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    @Nullable
+    public NetworkConnection getNetworkConnection() {
+        return networkConnection;
+    }
+
+    @Override
+    @Nullable
+    public OkHttpClient getOkHttpClient() {
+        return okHttpClient;
     }
 
     // Builder methods

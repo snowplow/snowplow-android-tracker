@@ -16,6 +16,8 @@ import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
@@ -34,7 +36,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     @NonNull
     private final String namespace;
     @NonNull
-    private String appId;
+    private final String appId;
 
     // Internal services
     @Nullable
@@ -62,8 +64,6 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     // Original configurations
     @NonNull
-    private NetworkConfiguration networkConfiguration;
-    @NonNull
     private TrackerConfiguration trackerConfiguration;
     @Nullable
     private EmitterConfiguration emitterConfiguration;
@@ -79,6 +79,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     // Configuration updates
     @NonNull
     private TrackerConfigurationUpdate trackerConfigurationUpdate;
+    @NonNull
+    private NetworkConfigurationUpdate networkConfigurationUpdate;
 
     // Constructors
 
@@ -90,12 +92,13 @@ public class ServiceProvider implements ServiceProviderInterface {
         appId = context.getPackageName();
         // Reset configurationUpdates
         trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
+        networkConfigurationUpdate = new NetworkConfigurationUpdate();
         // Initialization
         this.namespace = namespace;
-        this.networkConfiguration = networkConfiguration;
-        trackerConfiguration = new TrackerConfiguration(context.getPackageName());
+        networkConfigurationUpdate.sourceConfig = networkConfiguration;
+        trackerConfiguration = new TrackerConfiguration(appId);
+        // Process configurations
         processConfigurations(configurations);
-        // Apply sourceConfig
         if (trackerConfigurationUpdate.sourceConfig == null) {
             trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         }
@@ -128,7 +131,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     private void processConfigurations(@NonNull List<Configuration> configurations) {
         for (Configuration configuration : configurations) {
             if (configuration instanceof NetworkConfiguration) {
-                networkConfiguration = (NetworkConfiguration)configuration;
+                networkConfigurationUpdate.sourceConfig = (NetworkConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof TrackerConfiguration) {
@@ -182,6 +185,7 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     private void resetConfigurationUpdates() {
         trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
+        networkConfigurationUpdate = new NetworkConfigurationUpdate();
     }
 
     // Getters
@@ -272,6 +276,12 @@ public class ServiceProvider implements ServiceProviderInterface {
         return trackerConfigurationUpdate;
     }
 
+    @NonNull
+    @Override
+    public NetworkConfigurationUpdate getNetworkConfigurationUpdate() {
+        return networkConfigurationUpdate;
+    }
+
     // Factories
 
     @NonNull
@@ -284,12 +294,13 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
     private Emitter makeEmitter() {
-        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder(networkConfiguration.getEndpoint(), context)
-                .networkConnection(networkConfiguration.networkConnection)
-                .method(networkConfiguration.getMethod())
-                .security(networkConfiguration.getProtocol())
-                .customPostPath(networkConfiguration.customPostPath)
-                .client(networkConfiguration.okHttpClient);
+        NetworkConfigurationInterface networkConfig = networkConfigurationUpdate;
+        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder(networkConfig.getEndpoint(), context)
+                .networkConnection(networkConfig.getNetworkConnection())
+                .method(networkConfig.getMethod())
+                .security(networkConfig.getProtocol())
+                .customPostPath(networkConfig.getCustomPostPath())
+                .client(networkConfig.getOkHttpClient());
         if (emitterConfiguration != null) {
             builder.sendLimit(emitterConfiguration.emitRange)
                     .option(emitterConfiguration.bufferOption)

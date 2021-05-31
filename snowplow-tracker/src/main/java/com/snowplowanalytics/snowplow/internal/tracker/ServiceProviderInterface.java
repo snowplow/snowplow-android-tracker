@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
@@ -52,4 +53,7 @@ public interface ServiceProviderInterface {
 
     @NonNull
     public TrackerConfigurationUpdate getTrackerConfigurationUpdate();
+
+    @NonNull
+    NetworkConfigurationUpdate getNetworkConfigurationUpdate();
 }
