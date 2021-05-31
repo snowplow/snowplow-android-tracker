@@ -75,6 +75,12 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
     // Getters and Setters
 
     @Override
+    @Nullable
+    public EventStore getEventStore() {
+        return eventStore;
+    }
+
+    @Override
     @NonNull
     public BufferOption getBufferOption() {
         return bufferOption;

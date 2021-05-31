@@ -26,6 +26,12 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     // Getters and Setters
 
+    @Nullable
+    @Override
+    public EventStore getEventStore() {
+        return getEmitter().getEventStore();
+    }
+
     @NonNull
     @Override
     public BufferOption getBufferOption() {
@@ -34,6 +40,8 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     @Override
     public void setBufferOption(@NonNull BufferOption bufferOption) {
+        getDirtyConfig().bufferOption = bufferOption;
+        getDirtyConfig().bufferOptionUpdated = true;
         getEmitter().setBufferOption(bufferOption);
     }
 
@@ -44,6 +52,8 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     @Override
     public void setEmitRange(int emitRange) {
+        getDirtyConfig().emitRange = emitRange;
+        getDirtyConfig().emitRangeUpdated = true;
         getEmitter().setSendLimit(emitRange);
     }
 
@@ -59,6 +69,8 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     @Override
     public void setByteLimitGet(long byteLimitGet) {
+        getDirtyConfig().byteLimitGet = byteLimitGet;
+        getDirtyConfig().byteLimitGetUpdated = true;
         getEmitter().setByteLimitGet(byteLimitGet);
     }
 
@@ -69,6 +81,8 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     @Override
     public void setByteLimitPost(long byteLimitPost) {
+        getDirtyConfig().byteLimitPost = byteLimitPost;
+        getDirtyConfig().byteLimitPostUpdated = true;
         getEmitter().setByteLimitPost(byteLimitPost);
     }
 
@@ -80,7 +94,7 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
 
     @Override
     public void setRequestCallback(@Nullable RequestCallback requestCallback) {
-
+        getEmitter().setRequestCallback(requestCallback);
     }
 
     @Override
@@ -96,5 +110,12 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
     @Override
     public boolean isSending() {
         return getEmitter().getEmitterStatus();
+    }
+
+    // Private methods
+
+    @NonNull
+    public EmitterConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getEmitterConfigurationUpdate();
     }
 }

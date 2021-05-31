@@ -3,6 +3,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
@@ -59,4 +60,7 @@ public interface ServiceProviderInterface {
 
     @NonNull
     SubjectConfigurationUpdate getSubjectConfigurationUpdate();
+
+    @NonNull
+    EmitterConfigurationUpdate getEmitterConfigurationUpdate();
 }
