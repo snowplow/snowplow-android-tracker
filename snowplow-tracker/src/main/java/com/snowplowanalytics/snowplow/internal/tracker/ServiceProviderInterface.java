@@ -9,6 +9,7 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdat
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 
 public interface ServiceProviderInterface {
@@ -63,4 +64,7 @@ public interface ServiceProviderInterface {
 
     @NonNull
     EmitterConfigurationUpdate getEmitterConfigurationUpdate();
+
+    @NonNull
+    SessionConfigurationUpdate getSessionConfigurationUpdate();
 }

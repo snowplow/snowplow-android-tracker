@@ -24,6 +24,8 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 
 import java.util.List;
@@ -87,6 +89,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     private SubjectConfigurationUpdate subjectConfigurationUpdate;
     @NonNull
     private EmitterConfigurationUpdate emitterConfigurationUpdate;
+    @NonNull
+    private SessionConfigurationUpdate sessionConfigurationUpdate;
 
     // Constructors
 
@@ -103,6 +107,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         networkConfigurationUpdate = new NetworkConfigurationUpdate();
         subjectConfigurationUpdate = new SubjectConfigurationUpdate();
         emitterConfigurationUpdate = new EmitterConfigurationUpdate();
+        sessionConfigurationUpdate = new SessionConfigurationUpdate();
         // Process configurations
         networkConfigurationUpdate.sourceConfig = networkConfiguration;
         trackerConfiguration = new TrackerConfiguration(appId);
@@ -152,7 +157,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof SessionConfiguration) {
-                sessionConfiguration = (SessionConfiguration)configuration;
+                sessionConfigurationUpdate.sourceConfig = (SessionConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof EmitterConfiguration) {
@@ -198,6 +203,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         subjectConfigurationUpdate.sourceConfig = null;
         emitterConfigurationUpdate.sourceConfig = null;
+        sessionConfigurationUpdate.sourceConfig = null;
     }
 
     private void initializeConfigurationUpdates() {
@@ -205,6 +211,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
         emitterConfigurationUpdate = new EmitterConfigurationUpdate();
         subjectConfigurationUpdate = new SubjectConfigurationUpdate();
+        sessionConfigurationUpdate = new SessionConfigurationUpdate();
     }
 
     // Getters
@@ -313,6 +320,12 @@ public class ServiceProvider implements ServiceProviderInterface {
         return emitterConfigurationUpdate;
     }
 
+    @Override
+    @NonNull
+    public SessionConfigurationUpdate getSessionConfigurationUpdate() {
+        return sessionConfigurationUpdate;
+    }
+
     // Factories
 
     @NonNull
@@ -332,16 +345,14 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .method(networkConfig.getMethod())
                 .security(networkConfig.getProtocol())
                 .customPostPath(networkConfig.getCustomPostPath())
-                .client(networkConfig.getOkHttpClient());
-        if (emitterConfig != null) {
-            builder.sendLimit(emitterConfig.getEmitRange())
-                    .option(emitterConfig.getBufferOption())
-                    .eventStore(emitterConfig.getEventStore())
-                    .byteLimitPost(emitterConfig.getByteLimitPost())
-                    .byteLimitGet(emitterConfig.getByteLimitGet())
-                    .threadPoolSize(emitterConfig.getThreadPoolSize())
-                    .callback(emitterConfig.getRequestCallback());
-        }
+                .client(networkConfig.getOkHttpClient())
+                .sendLimit(emitterConfig.getEmitRange())
+                .option(emitterConfig.getBufferOption())
+                .eventStore(emitterConfig.getEventStore())
+                .byteLimitPost(emitterConfig.getByteLimitPost())
+                .byteLimitGet(emitterConfig.getByteLimitGet())
+                .threadPoolSize(emitterConfig.getThreadPoolSize())
+                .callback(emitterConfig.getRequestCallback());
         return builder.build();
     }
 
@@ -350,6 +361,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         Emitter emitter = getEmitter();
         Subject subject = getSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
+        SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
         Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
                 .base64(trackerConfig.isBase64encoding())
@@ -364,11 +376,9 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .lifecycleEvents(trackerConfig.isLifecycleAutotracking())
                 .installTracking(trackerConfig.isInstallAutotracking())
                 .applicationCrash(trackerConfig.isExceptionAutotracking())
-                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking());
-        if (sessionConfiguration != null) {
-            builder.backgroundTimeout(sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS));
-            builder.foregroundTimeout(sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
-        }
+                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())
+                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
+                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));
         if (gdprConfiguration != null) {
             builder.gdprContext(
                     gdprConfiguration.basisForProcessing,
@@ -382,6 +392,9 @@ public class ServiceProvider implements ServiceProviderInterface {
         }
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking();
+        }
+        if (sessionConfigurationUpdate.isPaused) {
+            tracker.pauseSessionChecking();
         }
         return tracker;
     }
