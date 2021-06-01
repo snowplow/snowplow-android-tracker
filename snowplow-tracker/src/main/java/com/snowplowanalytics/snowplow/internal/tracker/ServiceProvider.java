@@ -22,6 +22,8 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationInter
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
@@ -91,6 +93,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     private EmitterConfigurationUpdate emitterConfigurationUpdate;
     @NonNull
     private SessionConfigurationUpdate sessionConfigurationUpdate;
+    @NonNull
+    private GdprConfigurationUpdate gdprConfigurationUpdate;
 
     // Constructors
 
@@ -108,6 +112,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         subjectConfigurationUpdate = new SubjectConfigurationUpdate();
         emitterConfigurationUpdate = new EmitterConfigurationUpdate();
         sessionConfigurationUpdate = new SessionConfigurationUpdate();
+        gdprConfigurationUpdate = new GdprConfigurationUpdate();
         // Process configurations
         networkConfigurationUpdate.sourceConfig = networkConfiguration;
         trackerConfiguration = new TrackerConfiguration(appId);
@@ -165,7 +170,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof GdprConfiguration) {
-                gdprConfiguration = (GdprConfiguration)configuration;
+                gdprConfigurationUpdate.sourceConfig = (GdprConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof GlobalContextsConfiguration) {
@@ -204,6 +209,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         subjectConfigurationUpdate.sourceConfig = null;
         emitterConfigurationUpdate.sourceConfig = null;
         sessionConfigurationUpdate.sourceConfig = null;
+        gdprConfigurationUpdate.sourceConfig = null;
     }
 
     private void initializeConfigurationUpdates() {
@@ -212,6 +218,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         emitterConfigurationUpdate = new EmitterConfigurationUpdate();
         subjectConfigurationUpdate = new SubjectConfigurationUpdate();
         sessionConfigurationUpdate = new SessionConfigurationUpdate();
+        gdprConfigurationUpdate = new GdprConfigurationUpdate();
     }
 
     // Getters
@@ -326,6 +333,12 @@ public class ServiceProvider implements ServiceProviderInterface {
         return sessionConfigurationUpdate;
     }
 
+    @NonNull
+    @Override
+    public GdprConfigurationUpdate getGdprConfigurationUpdate() {
+        return gdprConfigurationUpdate;
+    }
+
     // Factories
 
     @NonNull
@@ -362,6 +375,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         Subject subject = getSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
+        GdprConfigurationInterface gdprConfig = getGdprConfigurationUpdate();
         Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
                 .base64(trackerConfig.isBase64encoding())
@@ -379,12 +393,12 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())
                 .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
                 .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));
-        if (gdprConfiguration != null) {
+        if (gdprConfig != null) {
             builder.gdprContext(
-                    gdprConfiguration.basisForProcessing,
-                    gdprConfiguration.documentId,
-                    gdprConfiguration.documentVersion,
-                    gdprConfiguration.documentDescription);
+                    gdprConfig.getBasisForProcessing(),
+                    gdprConfig.getDocumentId(),
+                    gdprConfig.getDocumentVersion(),
+                    gdprConfig.getDocumentDescription());
         }
         Tracker tracker = builder.buildAndReset();
         if (globalContextsConfiguration != null) {

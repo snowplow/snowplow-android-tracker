@@ -33,6 +33,8 @@ public class GdprControllerImpl extends Controller implements GdprController {
     public void reset(@NonNull Basis basisForProcessing, @NonNull String documentId, @NonNull String documentVersion, @NonNull String documentDescription) {
         getTracker().enableGdprContext(basisForProcessing, documentId, documentVersion, documentDescription);
         gdpr = getTracker().getGdprContext();
+        getDirtyConfig().gdpr = gdpr;
+        getDirtyConfig().gdprUpdated = true;
     }
 
     @Override
@@ -46,11 +48,13 @@ public class GdprControllerImpl extends Controller implements GdprController {
             return false;
         }
         getTracker().enableGdprContext(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+        getDirtyConfig().isEnabled = true;
         return true;
     }
 
     @Override
     public void disable() {
+        getDirtyConfig().isEnabled = false;
         getTracker().disableGdprContext();
     }
 
@@ -95,5 +99,10 @@ public class GdprControllerImpl extends Controller implements GdprController {
     @NonNull
     private Tracker getTracker() {
         return serviceProvider.getTracker();
+    }
+
+    @NonNull
+    private GdprConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getGdprConfigurationUpdate();
     }
 }
