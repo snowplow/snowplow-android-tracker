@@ -55,7 +55,7 @@ public class ConfigurationProvider {
         fetcher = new ConfigurationFetcher(context, remoteConfiguration, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (!versionCompatibility(fetchedConfigurationBundle.formatVersion)) {
+                if (!schemaCompatibility(fetchedConfigurationBundle.schema)) {
                     return;
                 }
                 synchronized (this) {
@@ -72,7 +72,7 @@ public class ConfigurationProvider {
 
     // Private methods
 
-    private boolean versionCompatibility(String version) {
-        return version.startsWith("1.");
+    private boolean schemaCompatibility(@NonNull String schema) {
+        return schema.startsWith("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-");
     }
 }

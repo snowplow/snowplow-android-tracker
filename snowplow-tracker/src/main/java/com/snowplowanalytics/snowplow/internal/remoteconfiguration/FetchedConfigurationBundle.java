@@ -16,15 +16,15 @@ import java.util.List;
 public class FetchedConfigurationBundle implements Configuration {
 
     @NonNull
-    public String formatVersion;
+    public String schema;
 
     public int configurationVersion;
 
     @NonNull
     public List<ConfigurationBundle> configurationBundle;
 
-    FetchedConfigurationBundle(@NonNull String formatVersion) {
-        this.formatVersion = formatVersion;
+    FetchedConfigurationBundle(@NonNull String schema) {
+        this.schema = schema;
         this.configurationVersion = -1;
         this.configurationBundle = new ArrayList<>();
     }
@@ -32,7 +32,7 @@ public class FetchedConfigurationBundle implements Configuration {
     // JSON formatter
 
     public FetchedConfigurationBundle(@NonNull Context context, @NonNull JSONObject jsonObject) throws JSONException {
-        formatVersion = jsonObject.getString("formatVersion");
+        schema = jsonObject.getString("$schema");
         configurationVersion = jsonObject.getInt("configurationVersion");
         configurationBundle = new ArrayList<>();
         JSONArray array = jsonObject.getJSONArray("configurationBundle");
@@ -48,7 +48,7 @@ public class FetchedConfigurationBundle implements Configuration {
     @NonNull
     @Override
     public Configuration copy() {
-        FetchedConfigurationBundle copy = new FetchedConfigurationBundle(formatVersion);
+        FetchedConfigurationBundle copy = new FetchedConfigurationBundle(schema);
         copy.configurationVersion = configurationVersion;
         for (ConfigurationBundle bundle : configurationBundle) {
             copy.configurationBundle.add((ConfigurationBundle)bundle.copy());

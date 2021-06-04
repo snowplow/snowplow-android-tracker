@@ -14,7 +14,6 @@ import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 import org.json.JSONException;
@@ -28,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,7 +41,8 @@ public class RemoteConfigurationTest {
     @Test
     public void testJSONToConfigurations() throws JSONException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        String config = "{\"formatVersion\":\"1.2\",\"configurationVersion\":12,\"configurationBundle\": ["
+        String config = "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\","
+                + "\"configurationVersion\":12,\"configurationBundle\": ["
                 + "{\"namespace\": \"default1\","
                 + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplowanalytics.com\",\"method\":\"get\"},"
                 + "\"trackerConfiguration\": {\"applicationContext\":false,\"screenContext\":false},"
@@ -56,7 +55,9 @@ public class RemoteConfigurationTest {
         JSONObject json = new JSONObject(config);
 
         FetchedConfigurationBundle fetchedConfigurationBundle = new FetchedConfigurationBundle(context, json);
-        assertEquals("1.2", fetchedConfigurationBundle.formatVersion);
+        assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
+                fetchedConfigurationBundle.schema);
+
         assertEquals(12, fetchedConfigurationBundle.configurationVersion);
         assertEquals(2, fetchedConfigurationBundle.configurationBundle.size());
 
@@ -86,7 +87,8 @@ public class RemoteConfigurationTest {
     @Test
     public void testDownloadConfiguration() throws IOException, InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"1.2\",\"configurationVersion\":12,\"configurationBundle\":[]}");
+        String body = "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}";
+        MockWebServer mockWebServer = getMockServer(200, body);
         String endpoint = getMockServerURI(mockWebServer);
         final Object expectation = new Object();
 
@@ -95,7 +97,7 @@ public class RemoteConfigurationTest {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
                 assertNotNull(fetchedConfigurationBundle);
-                assertEquals("1.2", fetchedConfigurationBundle.formatVersion);
+                assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
                 synchronized (expectation) {
                     expectation.notify();
                 }
@@ -113,7 +115,7 @@ public class RemoteConfigurationTest {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         ConfigurationBundle bundle = new ConfigurationBundle("test");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
-        FetchedConfigurationBundle expected = new FetchedConfigurationBundle("1.2");
+        FetchedConfigurationBundle expected = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
         expected.configurationVersion = 12;
         expected.configurationBundle = Lists.newArrayList(bundle);
 
@@ -125,7 +127,7 @@ public class RemoteConfigurationTest {
         FetchedConfigurationBundle config = cache.readCache(context);
 
         assertEquals(expected.configurationVersion, config.configurationVersion);
-        assertEquals(expected.formatVersion, config.formatVersion);
+        assertEquals(expected.schema, config.schema);
         assertEquals(expected.configurationBundle.size(), config.configurationBundle.size());
         ConfigurationBundle expectedBundle = expected.configurationBundle.get(0);
         ConfigurationBundle configBundle = config.configurationBundle.get(0);
@@ -137,7 +139,7 @@ public class RemoteConfigurationTest {
     public void testConfigurationFetcher_downloads() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"2.0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/2-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
 
         // test
@@ -186,12 +188,12 @@ public class RemoteConfigurationTest {
     }
 
     @Test
-    public void testConfigurationProvider_downloadOfWrongFormatVersion_fails() throws IOException, InterruptedException {
+    public void testConfigurationProvider_downloadOfWrongSchema_fails() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         ConfigurationCache cache = new ConfigurationCache();
         cache.clearCache(context);
-        MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"2.0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
 
         // test
@@ -219,11 +221,11 @@ public class RemoteConfigurationTest {
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
-        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("1.0");
+        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
-        MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"1.1\",\"configurationVersion\":1,\"configurationBundle\":[]}");
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
 
         // test
@@ -234,10 +236,10 @@ public class RemoteConfigurationTest {
         provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.formatVersion.equals("1.1")) {
+                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                     fail();
                 }
-                if (i[0] == 0 && fetchedConfigurationBundle.formatVersion.equals("1.0")) {
+                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
                     i[0]++;
                 }
             }
@@ -258,11 +260,11 @@ public class RemoteConfigurationTest {
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
-        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("1.0");
+        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
-        MockWebServer mockWebServer = getMockServer(200, "{\"formatVersion\":\"1.1\",\"configurationVersion\":2,\"configurationBundle\":[]}");
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
 
         // test
@@ -273,10 +275,10 @@ public class RemoteConfigurationTest {
         provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.formatVersion.equals("1.1")) {
+                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                     i[0]++;
                 }
-                if (i[0] == 0 && fetchedConfigurationBundle.formatVersion.equals("1.0")) {
+                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
                     i[0]++;
                 }
             }
@@ -297,7 +299,7 @@ public class RemoteConfigurationTest {
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
-        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("1.0");
+        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
@@ -324,7 +326,7 @@ public class RemoteConfigurationTest {
         MockResponse mockResponse = new MockResponse()
                 .setResponseCode(200)
                 .setHeader("Content-Type", "application/json")
-                .setBody("{\"formatVersion\":\"1.1\",\"configurationVersion\":1,\"configurationBundle\":[]}");
+                .setBody("{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}");
         mockWebServer.enqueue(mockResponse);
 
         // test
@@ -350,7 +352,7 @@ public class RemoteConfigurationTest {
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
-        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("1.0");
+        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
@@ -377,7 +379,7 @@ public class RemoteConfigurationTest {
         MockResponse mockResponse = new MockResponse()
                 .setResponseCode(200)
                 .setHeader("Content-Type", "application/json")
-                .setBody("{\"formatVersion\":\"1.1\",\"configurationVersion\":2,\"configurationBundle\":[]}");
+                .setBody("{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
         mockWebServer.enqueue(mockResponse);
 
         // test
@@ -386,7 +388,7 @@ public class RemoteConfigurationTest {
         provider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
             @Override
             public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (fetchedConfigurationBundle.formatVersion.equals("1.1")) {
+                if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                     j[0]++;
                     synchronized (expectation2) {
                         expectation2.notify();
