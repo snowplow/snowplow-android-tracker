@@ -54,12 +54,8 @@ public class ConfigurationFetcher {
                     if (body != null) {
                         resolveRequest(context, body, onFetchCallback);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // TODO: log
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    // TODO: log
+                } catch (Exception e) {
+                    Logger.e(TAG, "Unable to get remote configuration: "+e.getMessage(), e);
                 }
             }
         };
