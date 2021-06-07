@@ -379,7 +379,7 @@ public class RemoteConfigurationTest {
         MockResponse mockResponse = new MockResponse()
                 .setResponseCode(200)
                 .setHeader("Content-Type", "application/json")
-                .setBody("{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
+                .setBody("{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
         mockWebServer.enqueue(mockResponse);
 
         // test

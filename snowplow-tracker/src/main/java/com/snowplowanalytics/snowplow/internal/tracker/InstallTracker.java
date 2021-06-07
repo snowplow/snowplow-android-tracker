@@ -2,18 +2,13 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -24,8 +19,6 @@ import java.util.Map;
 
 import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.INSTALLED_BEFORE;
 import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.INSTALL_TIMESTAMP;
-
-import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class InstallTracker {
