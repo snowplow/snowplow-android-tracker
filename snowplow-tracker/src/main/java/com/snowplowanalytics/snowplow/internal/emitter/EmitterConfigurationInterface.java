@@ -4,9 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
 public interface EmitterConfigurationInterface {
+
+    /**
+     * Custom component with full ownership for persisting events before to be sent to the collector.
+     * If it's not set the tracker will use a SQLite database as default EventStore.
+     */
+    @Nullable
+    EventStore getEventStore();
 
     /**
      * Whether the buffer should send events instantly or after the buffer

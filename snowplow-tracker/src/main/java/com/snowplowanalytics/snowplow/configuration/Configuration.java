@@ -2,9 +2,11 @@ package com.snowplowanalytics.snowplow.configuration;
 
 import androidx.annotation.NonNull;
 
-public interface Configuration {
+import java.io.Serializable;
+
+public interface Configuration extends Serializable {
 
     @NonNull
-    public Configuration copy();
+    Configuration copy();
 
 }

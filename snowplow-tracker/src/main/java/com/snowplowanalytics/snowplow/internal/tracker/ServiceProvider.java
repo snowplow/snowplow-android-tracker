@@ -14,22 +14,61 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
+import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
+import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationUpdate;
+import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
+import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
+import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate;
+import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ServiceProvider {
+public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
-    private Context context;
+    private final Context context;
     @NonNull
-    public final String namespace;
+    private final String namespace;
     @NonNull
-    private NetworkConfiguration networkConfiguration;
+    private final String appId;
+
+    // Internal services
+    @Nullable
+    private Tracker tracker;
+    @Nullable
+    private Emitter emitter;
+    @Nullable
+    private Subject subject;
+
+    // Controllers
+    @Nullable
+    private TrackerControllerImpl trackerController;
+    @Nullable
+    private EmitterControllerImpl emitterController;
+    @Nullable
+    private NetworkControllerImpl networkController;
+    @Nullable
+    private SubjectControllerImpl subjectController;
+    @Nullable
+    private SessionControllerImpl sessionController;
+    @Nullable
+    private GdprControllerImpl gdprController;
+    @Nullable
+    private GlobalContextsControllerImpl globalContextsController;
+
+    // Original configurations
     @NonNull
     private TrackerConfiguration trackerConfiguration;
     @Nullable
@@ -43,14 +82,19 @@ public class ServiceProvider {
     @Nullable
     private GlobalContextsConfiguration globalContextsConfiguration;
 
-    @Nullable
-    private Tracker tracker;
-    @Nullable
-    private Emitter emitter;
-    @Nullable
-    private Subject subject;
-    @Nullable
-    private TrackerControllerImpl trackerController;
+    // Configuration updates
+    @NonNull
+    private TrackerConfigurationUpdate trackerConfigurationUpdate;
+    @NonNull
+    private NetworkConfigurationUpdate networkConfigurationUpdate;
+    @NonNull
+    private SubjectConfigurationUpdate subjectConfigurationUpdate;
+    @NonNull
+    private EmitterConfigurationUpdate emitterConfigurationUpdate;
+    @NonNull
+    private SessionConfigurationUpdate sessionConfigurationUpdate;
+    @NonNull
+    private GdprConfigurationUpdate gdprConfigurationUpdate;
 
     // Constructors
 
@@ -58,25 +102,47 @@ public class ServiceProvider {
         Objects.requireNonNull(context);
         Objects.requireNonNull(networkConfiguration);
         Objects.requireNonNull(configurations);
-        this.context = context;
+        // Initialization
         this.namespace = namespace;
-        this.networkConfiguration = networkConfiguration;
-        trackerConfiguration = new TrackerConfiguration(context.getPackageName());
+        this.context = context;
+        appId = context.getPackageName();
+        // Reset configurationUpdates
+        trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
+        networkConfigurationUpdate = new NetworkConfigurationUpdate();
+        subjectConfigurationUpdate = new SubjectConfigurationUpdate();
+        emitterConfigurationUpdate = new EmitterConfigurationUpdate();
+        sessionConfigurationUpdate = new SessionConfigurationUpdate();
+        gdprConfigurationUpdate = new GdprConfigurationUpdate();
+        // Process configurations
+        networkConfigurationUpdate.sourceConfig = networkConfiguration;
+        trackerConfiguration = new TrackerConfiguration(appId);
         processConfigurations(configurations);
+        if (trackerConfigurationUpdate.sourceConfig == null) {
+            trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
+        }
     }
 
     public void reset(@NonNull List<Configuration> configurations) {
         stopServices();
+        resetConfigurationUpdates();
         processConfigurations(configurations);
         resetServices();
-        trackerController.reset(getTracker());
+        getTracker();
     }
 
     public void shutdown() {
-        tracker.pauseEventTracking();
+        if (tracker != null) {
+            tracker.pauseEventTracking();
+        }
         stopServices();
         resetServices();
-        trackerController = null;
+        resetControllers();
+        initializeConfigurationUpdates();
+    }
+
+    @NonNull
+    public String getNamespace() {
+        return namespace;
     }
 
     // Private methods
@@ -84,27 +150,27 @@ public class ServiceProvider {
     private void processConfigurations(@NonNull List<Configuration> configurations) {
         for (Configuration configuration : configurations) {
             if (configuration instanceof NetworkConfiguration) {
-                networkConfiguration = (NetworkConfiguration)configuration;
+                networkConfigurationUpdate.sourceConfig = (NetworkConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof TrackerConfiguration) {
-                trackerConfiguration = (TrackerConfiguration)configuration;
+                trackerConfigurationUpdate.sourceConfig = (TrackerConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof SubjectConfiguration) {
-                subjectConfiguration = (SubjectConfiguration)configuration;
+                subjectConfigurationUpdate.sourceConfig = (SubjectConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof SessionConfiguration) {
-                sessionConfiguration = (SessionConfiguration)configuration;
+                sessionConfigurationUpdate.sourceConfig = (SessionConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof EmitterConfiguration) {
-                emitterConfiguration = (EmitterConfiguration)configuration;
+                emitterConfigurationUpdate.sourceConfig = (EmitterConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof GdprConfiguration) {
-                gdprConfiguration = (GdprConfiguration)configuration;
+                gdprConfigurationUpdate.sourceConfig = (GdprConfiguration)configuration;
                 continue;
             }
             if (configuration instanceof GlobalContextsConfiguration) {
@@ -115,7 +181,9 @@ public class ServiceProvider {
     }
 
     private void stopServices() {
-        emitter.shutdown();
+        if (emitter != null) {
+            emitter.shutdown();
+        }
     }
 
     private void resetServices() {
@@ -124,10 +192,39 @@ public class ServiceProvider {
         tracker = null;
     }
 
+    private void resetControllers() {
+        trackerController = null;
+        sessionController = null;
+        emitterController = null;
+        gdprController = null;
+        globalContextsController = null;
+        subjectController = null;
+        networkController = null;
+    }
+
+    private void resetConfigurationUpdates() {
+        // Don't reset networkConfiguration as it's needed in case it's not passed in the new configurations.
+        // Set a default trackerConfiguration to reset to default if not passed.
+        trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
+        subjectConfigurationUpdate.sourceConfig = null;
+        emitterConfigurationUpdate.sourceConfig = null;
+        sessionConfigurationUpdate.sourceConfig = null;
+        gdprConfigurationUpdate.sourceConfig = null;
+    }
+
+    private void initializeConfigurationUpdates() {
+        networkConfigurationUpdate = new NetworkConfigurationUpdate();
+        trackerConfigurationUpdate = new TrackerConfigurationUpdate(appId);
+        emitterConfigurationUpdate = new EmitterConfigurationUpdate();
+        subjectConfigurationUpdate = new SubjectConfigurationUpdate();
+        sessionConfigurationUpdate = new SessionConfigurationUpdate();
+        gdprConfigurationUpdate = new GdprConfigurationUpdate();
+    }
+
     // Getters
 
     @NonNull
-    Subject getSubject() {
+    public Subject getSubject() {
         if (subject == null) {
             subject = makeSubject();
         }
@@ -135,7 +232,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    Emitter getEmitter() {
+    public Emitter getEmitter() {
         if (emitter == null) {
             emitter = makeEmitter();
         }
@@ -143,7 +240,7 @@ public class ServiceProvider {
     }
 
     @NonNull
-    Tracker getTracker() {
+    public Tracker getTracker() {
         if (tracker == null) {
             tracker = makeTracker();
         }
@@ -151,11 +248,95 @@ public class ServiceProvider {
     }
 
     @NonNull
-    public TrackerController getTrackerController() {
+    public TrackerControllerImpl getTrackerController() {
         if (trackerController == null) {
             trackerController = makeTrackerController();
         }
         return trackerController;
+    }
+
+    @NonNull
+    public SessionControllerImpl getSessionController() {
+        if (sessionController == null) {
+            sessionController = makeSessionController();
+        }
+        return sessionController;
+    }
+
+    @NonNull
+    public EmitterControllerImpl getEmitterController() {
+        if (emitterController == null) {
+            emitterController = makeEmitterController();
+        }
+        return emitterController;
+    }
+
+    @NonNull
+    public GdprControllerImpl getGdprController() {
+        if (gdprController == null) {
+            gdprController = makeGdprController();
+        }
+        return gdprController;
+    }
+
+    @NonNull
+    public GlobalContextsControllerImpl getGlobalContextsController() {
+        if (globalContextsController == null) {
+            globalContextsController = makeGlobalContextsController();
+        }
+        return globalContextsController;
+    }
+
+    @NonNull
+    public SubjectControllerImpl getSubjectController() {
+        if (subjectController == null) {
+            subjectController = makeSubjectController();
+        }
+        return subjectController;
+    }
+
+    @NonNull
+    public NetworkControllerImpl getNetworkController() {
+        if (networkController == null) {
+            networkController = makeNetworkController();
+        }
+        return networkController;
+    }
+
+    @NonNull
+    @Override
+    public TrackerConfigurationUpdate getTrackerConfigurationUpdate() {
+        return trackerConfigurationUpdate;
+    }
+
+    @NonNull
+    @Override
+    public NetworkConfigurationUpdate getNetworkConfigurationUpdate() {
+        return networkConfigurationUpdate;
+    }
+
+    @NonNull
+    @Override
+    public SubjectConfigurationUpdate getSubjectConfigurationUpdate() {
+        return subjectConfigurationUpdate;
+    }
+
+    @Override
+    @NonNull
+    public EmitterConfigurationUpdate getEmitterConfigurationUpdate() {
+        return emitterConfigurationUpdate;
+    }
+
+    @Override
+    @NonNull
+    public SessionConfigurationUpdate getSessionConfigurationUpdate() {
+        return sessionConfigurationUpdate;
+    }
+
+    @NonNull
+    @Override
+    public GdprConfigurationUpdate getGdprConfigurationUpdate() {
+        return gdprConfigurationUpdate;
     }
 
     // Factories
@@ -164,27 +345,27 @@ public class ServiceProvider {
     private Subject makeSubject() {
         return new Subject.SubjectBuilder()
                 .context(context)
-                .subjectConfiguration(subjectConfiguration)
+                .subjectConfiguration(subjectConfigurationUpdate)
                 .build();
     }
 
     @NonNull
     private Emitter makeEmitter() {
-        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder(networkConfiguration.getEndpoint(), context)
-                .networkConnection(networkConfiguration.networkConnection)
-                .method(networkConfiguration.getMethod())
-                .security(networkConfiguration.getProtocol())
-                .customPostPath(networkConfiguration.customPostPath)
-                .client(networkConfiguration.okHttpClient);
-        if (emitterConfiguration != null) {
-            builder.sendLimit(emitterConfiguration.emitRange)
-                    .option(emitterConfiguration.bufferOption)
-                    .eventStore(emitterConfiguration.eventStore)
-                    .byteLimitPost(emitterConfiguration.byteLimitPost)
-                    .byteLimitGet(emitterConfiguration.byteLimitGet)
-                    .threadPoolSize(emitterConfiguration.threadPoolSize)
-                    .callback(emitterConfiguration.requestCallback);
-        }
+        NetworkConfigurationInterface networkConfig = networkConfigurationUpdate;
+        EmitterConfigurationInterface emitterConfig = emitterConfigurationUpdate;
+        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder(networkConfig.getEndpoint(), context)
+                .networkConnection(networkConfig.getNetworkConnection())
+                .method(networkConfig.getMethod())
+                .security(networkConfig.getProtocol())
+                .customPostPath(networkConfig.getCustomPostPath())
+                .client(networkConfig.getOkHttpClient())
+                .sendLimit(emitterConfig.getEmitRange())
+                .option(emitterConfig.getBufferOption())
+                .eventStore(emitterConfig.getEventStore())
+                .byteLimitPost(emitterConfig.getByteLimitPost())
+                .byteLimitGet(emitterConfig.getByteLimitGet())
+                .threadPoolSize(emitterConfig.getThreadPoolSize())
+                .callback(emitterConfig.getRequestCallback());
         return builder.build();
     }
 
@@ -192,41 +373,83 @@ public class ServiceProvider {
     private Tracker makeTracker() {
         Emitter emitter = getEmitter();
         Subject subject = getSubject();
-        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfiguration.appId, context)
+        TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
+        SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
+        GdprConfigurationInterface gdprConfig = getGdprConfigurationUpdate();
+        Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
-                .base64(trackerConfiguration.base64encoding)
-                .level(trackerConfiguration.logLevel)
-                .loggerDelegate(trackerConfiguration.loggerDelegate)
-                .platform(trackerConfiguration.devicePlatform)
-                .sessionContext(trackerConfiguration.sessionContext)
-                .applicationContext(trackerConfiguration.applicationContext)
-                .mobileContext(trackerConfiguration.platformContext)
-                .screenContext(trackerConfiguration.screenContext)
-                .screenviewEvents(trackerConfiguration.screenViewAutotracking)
-                .lifecycleEvents(trackerConfiguration.lifecycleAutotracking)
-                .installTracking(trackerConfiguration.installAutotracking)
-                .applicationCrash(trackerConfiguration.exceptionAutotracking)
-                .trackerDiagnostic(trackerConfiguration.diagnosticAutotracking);
-        if (sessionConfiguration != null) {
-            builder.backgroundTimeout(sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS));
-            builder.foregroundTimeout(sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
-        }
-        if (gdprConfiguration != null) {
+                .base64(trackerConfig.isBase64encoding())
+                .level(trackerConfig.getLogLevel())
+                .loggerDelegate(trackerConfig.getLoggerDelegate())
+                .platform(trackerConfig.getDevicePlatform())
+                .sessionContext(trackerConfig.isSessionContext())
+                .applicationContext(trackerConfig.isApplicationContext())
+                .mobileContext(trackerConfig.isPlatformContext())
+                .screenContext(trackerConfig.isScreenContext())
+                .screenviewEvents(trackerConfig.isScreenViewAutotracking())
+                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())
+                .installTracking(trackerConfig.isInstallAutotracking())
+                .applicationCrash(trackerConfig.isExceptionAutotracking())
+                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())
+                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
+                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));
+        if (gdprConfig != null) {
             builder.gdprContext(
-                    gdprConfiguration.basisForProcessing,
-                    gdprConfiguration.documentId,
-                    gdprConfiguration.documentVersion,
-                    gdprConfiguration.documentDescription);
+                    gdprConfig.getBasisForProcessing(),
+                    gdprConfig.getDocumentId(),
+                    gdprConfig.getDocumentVersion(),
+                    gdprConfig.getDocumentDescription());
         }
         Tracker tracker = builder.buildAndReset();
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
+        }
+        if (trackerConfigurationUpdate.isPaused) {
+            tracker.pauseEventTracking();
+        }
+        if (sessionConfigurationUpdate.isPaused) {
+            tracker.pauseSessionChecking();
         }
         return tracker;
     }
 
     @NonNull
     private TrackerControllerImpl makeTrackerController() {
-        return new TrackerControllerImpl(getTracker());
+        return new TrackerControllerImpl(this);
+    }
+
+    @NonNull
+    private SessionControllerImpl makeSessionController() {
+        return new SessionControllerImpl(this);
+    }
+
+    @NonNull
+    private EmitterControllerImpl makeEmitterController() {
+        return new EmitterControllerImpl(this);
+    }
+
+    @NonNull
+    private GdprControllerImpl makeGdprController() {
+        GdprControllerImpl controller = new GdprControllerImpl(this);
+        Gdpr gdpr = getTracker().getGdprContext();
+        if (gdpr != null) {
+            controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+        }
+        return controller;
+    }
+
+    @NonNull
+    private GlobalContextsControllerImpl makeGlobalContextsController() {
+        return new GlobalContextsControllerImpl(this);
+    }
+
+    @NonNull
+    private SubjectControllerImpl makeSubjectController() {
+        return new SubjectControllerImpl(this);
+    }
+
+    @NonNull
+    private NetworkControllerImpl makeNetworkController() {
+        return new NetworkControllerImpl(this);
     }
 }

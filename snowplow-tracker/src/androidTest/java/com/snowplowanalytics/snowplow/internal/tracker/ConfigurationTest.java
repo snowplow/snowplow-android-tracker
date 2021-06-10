@@ -12,11 +12,9 @@ import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
@@ -34,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -110,12 +107,6 @@ public class ConfigurationTest {
         trackerConfiguration.sessionContext = false;
         tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNull(tracker.getSession());
-
-        tracker.setSessionContext(true);
-        assertNotNull(tracker.getSession());
-
-        tracker.setSessionContext(false);
-        assertNotNull(tracker.getSession());
     }
 
     // TODO: Flaky test to fix

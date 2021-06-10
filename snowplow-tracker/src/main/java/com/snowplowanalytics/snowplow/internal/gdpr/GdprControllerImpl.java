@@ -5,14 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.GdprController;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.util.Basis;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class GdprControllerImpl implements GdprController {
-
-    @NonNull
-    private Tracker tracker;
+public class GdprControllerImpl extends Controller implements GdprController {
 
     @Nullable
     private Gdpr gdpr;
@@ -26,21 +25,21 @@ public class GdprControllerImpl implements GdprController {
     @Nullable
     private String documentDescription;
 
-
-    public GdprControllerImpl(@NonNull Tracker tracker) {
-        this.tracker = tracker;
-        gdpr = tracker.getGdprContext();
+    public GdprControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     @Override
     public void reset(@NonNull Basis basisForProcessing, @NonNull String documentId, @NonNull String documentVersion, @NonNull String documentDescription) {
-        tracker.enableGdprContext(basisForProcessing, documentId, documentVersion, documentDescription);
-        gdpr = tracker.getGdprContext();
+        getTracker().enableGdprContext(basisForProcessing, documentId, documentVersion, documentDescription);
+        gdpr = getTracker().getGdprContext();
+        getDirtyConfig().gdpr = gdpr;
+        getDirtyConfig().gdprUpdated = true;
     }
 
     @Override
     public boolean isEnabled() {
-        return tracker.getGdprContext() != null;
+        return getTracker().getGdprContext() != null;
     }
 
     @Override
@@ -48,13 +47,15 @@ public class GdprControllerImpl implements GdprController {
         if (gdpr == null) {
             return false;
         }
-        tracker.enableGdprContext(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+        getTracker().enableGdprContext(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+        getDirtyConfig().isEnabled = true;
         return true;
     }
 
     @Override
     public void disable() {
-        tracker.disableGdprContext();
+        getDirtyConfig().isEnabled = false;
+        getTracker().disableGdprContext();
     }
 
     @Nullable
@@ -91,5 +92,17 @@ public class GdprControllerImpl implements GdprController {
             return null;
         }
         return gdpr.documentDescription;
+    }
+
+    // Private methods
+
+    @NonNull
+    private Tracker getTracker() {
+        return serviceProvider.getTracker();
+    }
+
+    @NonNull
+    private GdprConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getGdprConfigurationUpdate();
     }
 }

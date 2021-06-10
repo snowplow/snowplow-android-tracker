@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 
@@ -12,7 +13,7 @@ import com.snowplowanalytics.snowplow.emitter.EventStore;
  * The EmitterConfiguration can be used to setup details about how the tracker should treat the events
  * to emit to the collector.
  */
-public class EmitterConfiguration implements Configuration, com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface {
+public class EmitterConfiguration implements Configuration, EmitterConfigurationInterface {
 
     /**
      * @see #bufferOption(BufferOption)
@@ -72,6 +73,12 @@ public class EmitterConfiguration implements Configuration, com.snowplowanalytic
     }
 
     // Getters and Setters
+
+    @Override
+    @Nullable
+    public EventStore getEventStore() {
+        return eventStore;
+    }
 
     @Override
     @NonNull

@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface;
 import com.snowplowanalytics.snowplow.util.Size;
 
+import org.json.JSONObject;
+
 /**
  * This class represents the configuration of the subject.
  * The SubjectConfiguration can be used to setup the tracker with the basic information about the
@@ -13,6 +15,10 @@ import com.snowplowanalytics.snowplow.util.Size;
  * The contexts to track can be enabled in the {@link TrackerConfiguration} class.
  */
 public class SubjectConfiguration implements Configuration, SubjectConfigurationInterface {
+
+    public SubjectConfiguration() {
+        super();
+    }
 
     /**
      * @see #userId(String) 
@@ -294,5 +300,18 @@ public class SubjectConfiguration implements Configuration, SubjectConfiguration
         copy.screenViewPort = screenViewPort;
         copy.colorDepth = colorDepth;
         return copy;
+    }
+
+    // JSON Formatter
+
+    public SubjectConfiguration(@NonNull JSONObject jsonObject) {
+        this();
+        userId = jsonObject.has("userId") ? jsonObject.optString("userId") : null;
+        networkUserId = jsonObject.has("networkUserId") ? jsonObject.optString("networkUserId") : null;
+        domainUserId = jsonObject.has("domainUserId") ? jsonObject.optString("domainUserId") : null;
+        useragent = jsonObject.has("useragent") ? jsonObject.optString("useragent") : null;
+        ipAddress = jsonObject.has("ipAddress") ? jsonObject.optString("ipAddress") : null;
+        timezone = jsonObject.has("timezone") ? jsonObject.optString("timezone") : null;
+        language = jsonObject.has("language") ? jsonObject.optString("language") : null;
     }
 }

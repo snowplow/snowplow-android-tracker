@@ -15,10 +15,10 @@ import java.util.Map;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class Gdpr {
 
-    final Basis basisForProcessing;
-    final String documentId;
-    final String documentVersion;
-    final String documentDescription;
+    public final Basis basisForProcessing;
+    public final String documentId;
+    public final String documentVersion;
+    public final String documentDescription;
 
     public Gdpr(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         Preconditions.checkArgument(basisForProcessing != null, "GDPR basisForProcessiong can't be null.");

@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplowtrackerdemo.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.event.AbstractPrimitive;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.ConsentDocument;
 import com.snowplowanalytics.snowplow.event.ConsentGranted;
@@ -132,4 +133,5 @@ public class TrackerEvents {
                 .build();
         tracker.track(event);
     }
+
 }
