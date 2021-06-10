@@ -36,6 +36,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.util.Consumer;
+
 import android.net.Uri;
 
 import com.snowplowanalytics.snowplow.Snowplow;
@@ -69,7 +71,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
 
@@ -185,21 +186,11 @@ public class Demo extends Activity implements LoggerDelegate {
         _startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (Build.VERSION.SDK_INT < 24) {
-                    setupTracker(new androidx.core.util.Consumer<Boolean>() {
-                        @Override
-                        public void accept(Boolean aBoolean) {
-                            trackEvents();
-                        }
-                    });
+                    setupTracker(aBoolean -> trackEvents());
                 }
-                requestPermissions((isGranted) -> {
+                requestPermissions(isGranted -> {
                     if (isGranted) {
-                        setupTracker(new androidx.core.util.Consumer<Boolean>() {
-                            @Override
-                            public void accept(Boolean aBoolean) {
-                                trackEvents();
-                            }
-                        });
+                        setupTracker(callbackTrackerReady -> trackEvents());
                         trackEvents();
                     }
                 });
@@ -209,7 +200,7 @@ public class Demo extends Activity implements LoggerDelegate {
 
     // Configuration
 
-    private void setupTracker(@NonNull androidx.core.util.Consumer<Boolean> callbackTrackerReady) {
+    private void setupTracker(@NonNull Consumer<Boolean> callbackTrackerReady) {
         boolean isRemoteConfig = _remoteConfig.getCheckedRadioButtonId() == _radioRemoteConfig.getId();
         if (isRemoteConfig) {
             setupWithRemoteConfig(callbackTrackerReady);
@@ -218,10 +209,9 @@ public class Demo extends Activity implements LoggerDelegate {
         }
     }
 
-    private boolean setupWithRemoteConfig(@NonNull androidx.core.util.Consumer<Boolean> callbackTrackerReady) {
+    private boolean setupWithRemoteConfig(@NonNull Consumer<Boolean> callbackTrackerReady) {
         String uri = _uriField.getText().toString();
         if (uri.isEmpty()) {
-            uri = "https://mobile-app-config-bucket.s3.us-east-2.amazonaws.com/materialistic-v2-config.json";
             updateLogger("URI field empty!");
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
@@ -230,7 +220,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(uri, method);
-        Snowplow.setup(getApplicationContext(), remoteConfig, null, new androidx.core.util.Consumer<List<String>>() {
+        Snowplow.setup(getApplicationContext(), remoteConfig, null, new Consumer<List<String>>() {
             @Override
             public void accept(List<String> strings) {
                 updateLogger("Created namespaces: " + strings);
@@ -313,7 +303,6 @@ public class Demo extends Activity implements LoggerDelegate {
         runOnUiThread(() -> _eventsCreated.setText(made));
     }
 
-    @TargetApi(24)
     private void requestPermissions(@NonNull Consumer<Boolean> callbackIsGranted) {
         callbackIsPermissionGranted = callbackIsGranted;
         int permissionState = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
