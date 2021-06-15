@@ -459,6 +459,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         this(jsonObject.optString("appId", appId));
         String val = jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue());
         devicePlatform = DevicePlatform.getByValue(val);
+        base64encoding = jsonObject.optBoolean("base64encoding", base64encoding);
         String log = jsonObject.optString("logLevel", LogLevel.OFF.name());
         try {
             logLevel = LogLevel.valueOf(log.toUpperCase());
