@@ -236,14 +236,14 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public boolean isScreenViewAutotracking() {
-        return getTracker().screenviewEvents;
+        return getTracker().activityTracking;
     }
 
     @Override
     public void setScreenViewAutotracking(boolean screenViewAutotracking) {
         getDirtyConfig().screenViewAutotracking = screenViewAutotracking;
         getDirtyConfig().screenViewAutotrackingUpdated = true;
-        getTracker().screenviewEvents = screenViewAutotracking;
+        getTracker().activityTracking = screenViewAutotracking;
     }
 
     @Override

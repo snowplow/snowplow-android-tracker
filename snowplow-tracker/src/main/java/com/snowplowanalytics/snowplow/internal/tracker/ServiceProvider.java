@@ -120,6 +120,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (trackerConfigurationUpdate.sourceConfig == null) {
             trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         }
+        getTracker(); // Build tracker to initialize NotificationCenter receivers
     }
 
     public void reset(@NonNull List<Configuration> configurations) {
