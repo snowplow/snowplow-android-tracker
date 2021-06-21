@@ -62,7 +62,17 @@ public class SelfDescribing extends AbstractSelfDescribing {
     }
 
     protected SelfDescribing(@NonNull Builder<?> builder) {
-        this(builder.eventData);
+        super(builder);
+        Preconditions.checkNotNull(builder.eventData);
+        Map<String, Object> eventDataMap = builder.eventData.getMap();
+        Preconditions.checkNotNull(eventDataMap);
+        Map<String, Object> payload = (Map<String, Object>)eventDataMap.get(Parameters.DATA);
+        Preconditions.checkNotNull(payload);
+        this.payload = payload;
+        String schema = (String)eventDataMap.get(Parameters.SCHEMA);
+        Preconditions.checkNotNull(schema);
+        this.schema = schema;
+        this.eventData = builder.eventData;
     }
 
     @NonNull

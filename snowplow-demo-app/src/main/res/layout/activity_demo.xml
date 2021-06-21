@@ -52,24 +52,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/emitter_uri_text"
+            android:text="@string/uri_text"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
 
         <EditText
-            android:id="@+id/emitter_uri_field"
+            android:id="@+id/uri_field"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_weight="23"
-            android:hint="@string/emitter_uri_hint"
+            android:hint="@string/uri_hint"
             android:inputType="textUri"
-            android:paddingLeft="5dp"
             android:paddingStart="5dp"
+            android:paddingLeft="5dp"
             android:paddingEnd="5dp"
-            android:textSize="13sp"
-            android:layout_marginStart="8dp" />
+            android:textSize="13sp" />
 
     </LinearLayout>
 
@@ -85,6 +85,36 @@
         android:layout_marginTop="10dp"
         android:orientation="horizontal"
         android:weightSum="1">
+
+        <RadioGroup
+            android:id="@+id/radio_config_type"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.33"
+            android:checkedButton="@id/radio_remote_config">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/emitter_config_text"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/radio_remote_config"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radio_remote_config" />
+
+            <RadioButton
+                android:id="@+id/radio_local_config"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_local_config" />
+        </RadioGroup>
 
         <RadioGroup
             android:id="@+id/radio_send_type"
@@ -113,35 +143,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/radio_post" />
-        </RadioGroup>
-
-        <RadioGroup
-            android:id="@+id/radio_send_security"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.33">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="@string/emitter_protocol_text"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:layout_marginStart="5dp" />
-
-            <RadioButton
-                android:id="@+id/radio_http"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/radio_http" />
-
-            <RadioButton
-                android:id="@+id/radio_https"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/radio_https" />
         </RadioGroup>
 
         <RadioGroup

@@ -5,18 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.SubjectController;
+import com.snowplowanalytics.snowplow.internal.Controller;
 import com.snowplowanalytics.snowplow.util.Size;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class SubjectControllerImpl implements SubjectController {
-
-    @NonNull
-    private Subject subject;
+public class SubjectControllerImpl extends Controller implements SubjectController {
 
     // Constructors
 
-    public SubjectControllerImpl(@NonNull Subject subject) {
-        this.subject = subject;
+    public SubjectControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     // Getters and Setters
@@ -24,110 +22,140 @@ public class SubjectControllerImpl implements SubjectController {
     @Nullable
     @Override
     public String getUserId() {
-        return subject.userId;
+        return getSubject().userId;
     }
 
     @Override
     public void setUserId(@Nullable String userId) {
-        subject.setUserId(userId);
+        getDirtyConfig().userId = userId;
+        getDirtyConfig().userIdUpdated = true;
+        getSubject().setUserId(userId);
     }
 
     @Nullable
     @Override
     public String getNetworkUserId() {
-        return subject.networkUserId;
+        return getSubject().networkUserId;
     }
 
     @Override
     public void setNetworkUserId(@Nullable String networkUserId) {
-        subject.setNetworkUserId(networkUserId);
+        getDirtyConfig().networkUserId = networkUserId;
+        getDirtyConfig().networkUserIdUpdated = true;
+        getSubject().setNetworkUserId(networkUserId);
     }
 
     @Nullable
     @Override
     public String getDomainUserId() {
-        return subject.domainUserId;
+        return getSubject().domainUserId;
     }
 
     @Override
     public void setDomainUserId(@Nullable String domainUserId) {
-        subject.setDomainUserId(domainUserId);
+        getDirtyConfig().domainUserId = domainUserId;
+        getDirtyConfig().domainUserIdUpdated = true;
+        getSubject().setDomainUserId(domainUserId);
     }
 
     @Nullable
     @Override
     public String getUseragent() {
-        return subject.useragent;
+        return getSubject().useragent;
     }
 
     @Override
     public void setUseragent(@Nullable String useragent) {
-        subject.setUseragent(useragent);
+        getDirtyConfig().useragent = useragent;
+        getDirtyConfig().useragentUpdated = true;
+        getSubject().setUseragent(useragent);
     }
 
     @Nullable
     @Override
     public String getIpAddress() {
-        return subject.ipAddress;
+        return getSubject().ipAddress;
     }
 
     @Override
     public void setIpAddress(@Nullable String ipAddress) {
-        subject.setIpAddress(ipAddress);
+        getDirtyConfig().ipAddress = ipAddress;
+        getDirtyConfig().ipAddressUpdated = true;
+        getSubject().setIpAddress(ipAddress);
     }
 
     @Nullable
     @Override
     public String getTimezone() {
-        return subject.timezone;
+        return getSubject().timezone;
     }
 
     @Override
     public void setTimezone(@Nullable String timezone) {
-        subject.setTimezone(timezone);
+        getDirtyConfig().timezone = timezone;
+        getDirtyConfig().timezoneUpdated = true;
+        getSubject().setTimezone(timezone);
     }
 
     @Nullable
     @Override
     public String getLanguage() {
-        return subject.language;
+        return getSubject().language;
     }
 
     @Override
     public void setLanguage(@Nullable String language) {
-        subject.setLanguage(language);
+        getDirtyConfig().language = language;
+        getDirtyConfig().languageUpdated = true;
+        getSubject().setLanguage(language);
     }
 
     @Nullable
     @Override
     public Size getScreenResolution() {
-        return subject.screenResolution;
+        return getSubject().screenResolution;
     }
 
     @Override
     public void setScreenResolution(@Nullable Size screenResolution) {
-        subject.setScreenResolution(screenResolution.getWidth(), screenResolution.getHeight());
+        getDirtyConfig().screenResolution = screenResolution;
+        getDirtyConfig().screenResolutionUpdated = true;
+        getSubject().setScreenResolution(screenResolution.getWidth(), screenResolution.getHeight());
     }
 
     @Nullable
     @Override
     public Size getScreenViewPort() {
-        return subject.screenViewPort;
+        return getSubject().screenViewPort;
     }
 
     @Override
     public void setScreenViewPort(@Nullable Size screenViewPort) {
-        subject.setViewPort(screenViewPort.getWidth(), screenViewPort.getHeight());
+        getDirtyConfig().screenViewPort = screenViewPort;
+        getDirtyConfig().screenViewPortUpdated = true;
+        getSubject().setViewPort(screenViewPort.getWidth(), screenViewPort.getHeight());
     }
 
     @Nullable
     @Override
     public Integer getColorDepth() {
-        return subject.colorDepth;
+        return getSubject().colorDepth;
     }
 
     @Override
     public void setColorDepth(@Nullable Integer colorDepth) {
-        subject.setColorDepth(colorDepth);
+        getDirtyConfig().colorDepth = colorDepth;
+        getDirtyConfig().colorDepthUpdated = true;
+        getSubject().setColorDepth(colorDepth);
+    }
+
+    // Private methods
+
+    private Subject getSubject() {
+        return serviceProvider.getSubject();
+    }
+
+    private SubjectConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getSubjectConfigurationUpdate();
     }
 }

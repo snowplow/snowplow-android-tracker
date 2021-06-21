@@ -136,7 +136,6 @@ public class Tracker {
     boolean applicationCrash;
     boolean trackerDiagnostic;
     boolean lifecycleEvents;
-    boolean screenviewEvents;
     boolean screenContext;
     boolean installTracking;
     boolean activityTracking;
@@ -154,7 +153,7 @@ public class Tracker {
     private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
         @Override
         public void apply(@NonNull Map<String, Object> data) {
-            if (screenviewEvents) {
+            if (activityTracking) {
                 Event event = (Event) data.get("event");
                 if (event != null) {
                     track(event);
@@ -225,7 +224,6 @@ public class Tracker {
         boolean applicationCrash = true; // Optional
         boolean trackerDiagnostic = false; // Optional
         boolean lifecycleEvents = false; // Optional
-        boolean screenviewEvents = false; // Optional
         boolean screenContext = false; // Optional
         boolean activityTracking = false; // Optional
         boolean installTracking = false; // Optional
@@ -533,7 +531,6 @@ public class Tracker {
         this.applicationCrash = builder.applicationCrash;
         this.trackerDiagnostic = builder.trackerDiagnostic;
         this.lifecycleEvents = builder.lifecycleEvents;
-        this.screenviewEvents = builder.screenviewEvents;
         this.activityTracking = builder.activityTracking;
         this.screenState = new ScreenState();
         this.screenContext = builder.screenContext;
@@ -914,11 +911,14 @@ public class Tracker {
 
     /**
      * Whether the session context should be sent with events
-     * @param shouldSend
+     * @param sessionContext
      */
-    public void setSessionContext(boolean shouldSend) {
-        sessionContext = shouldSend;
-        if (trackerSession == null && shouldSend) {
+    public synchronized void setSessionContext(boolean sessionContext) {
+        this.sessionContext = sessionContext;
+        if (trackerSession != null && !sessionContext) {
+            pauseSessionChecking();
+            trackerSession = null;
+        } else if (trackerSession == null && sessionContext) {
             Runnable[] callbacks = {null, null, null, null};
             if (sessionCallbacks.length == 4) {
                 callbacks = sessionCallbacks;

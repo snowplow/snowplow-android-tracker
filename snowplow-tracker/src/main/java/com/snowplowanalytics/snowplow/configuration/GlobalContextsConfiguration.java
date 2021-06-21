@@ -23,7 +23,7 @@ public class GlobalContextsConfiguration implements Configuration, GlobalContext
     /**
      * Allows for the creation of a map of tags and associated {@link GlobalContext GlobalContext} generators.
      * They are used by the tracker based on the filter settings defined on each {@link GlobalContext GlobalContext}.
-     * @param contextGenerators
+     * @param contextGenerators Map of Global Contexts generators.
      */
     public GlobalContextsConfiguration(@Nullable Map<String, GlobalContext> contextGenerators) {
         this.contextGenerators = contextGenerators != null ? contextGenerators : new HashMap<>();

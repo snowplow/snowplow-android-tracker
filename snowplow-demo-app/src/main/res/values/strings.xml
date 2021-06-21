@@ -19,8 +19,8 @@
     <string name="demo_header">Tracker Demo</string>
     <string name="demo_info">Enter settings below and then hit start.</string>
 
-    <string name="emitter_uri_text">Emitter URI:</string>
-    <string name="emitter_protocol_text">Protocol:</string>
+    <string name="uri_text">URI:</string>
+    <string name="emitter_config_text">Config:</string>
     <string name="emitter_type_text">Type:</string>
     <string name="data_collection_text">Collection:</string>
     <string name="emitter_logging_text">Emitter Callback:</string>
@@ -32,14 +32,14 @@
     <string name="database_size">DB Size: 0</string>
     <string name="session_index">Session #: 0</string>
 
-    <string name="radio_http">HTTP</string>
-    <string name="radio_https">HTTPS</string>
+    <string name="radio_remote_config">Remote</string>
+    <string name="radio_local_config">Local</string>
     <string name="radio_get">GET</string>
     <string name="radio_post">POST</string>
     <string name="radio_data_on">ON</string>
     <string name="radio_data_off">OFF</string>
 
-    <string name="emitter_uri_hint">Enter endpoint here…</string>
+    <string name="uri_hint">Enter collector URI or remote config URI…</string>
     <string name="start">Start!</string>
     <string name="tab">Chrome Tab</string>
 

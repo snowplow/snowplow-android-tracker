@@ -13,6 +13,10 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import androidx.annotation.NonNull;
+
+import java.util.EnumSet;
+
 /**
  * The different platforms available to the Tracker.
  */
@@ -33,7 +37,18 @@ public enum DevicePlatform {
         this.value = value;
     }
 
+    @NonNull
     public String getValue() {
         return value;
+    }
+
+    @NonNull
+    public static DevicePlatform getByValue(@NonNull String value){
+        for (final DevicePlatform element : EnumSet.allOf(DevicePlatform.class)) {
+            if (element.toString().equals(value)) {
+                return element;
+            }
+        }
+        return Mobile;
     }
 }

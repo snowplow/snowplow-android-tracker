@@ -1,9 +1,12 @@
 package com.snowplowanalytics.snowplow.internal.session;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.SessionController;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
@@ -11,139 +14,169 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import java.util.concurrent.TimeUnit;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class SessionControllerImpl implements SessionController {
-
+public class SessionControllerImpl extends Controller implements SessionController {
     private final String TAG = SessionControllerImpl.class.getName();
-
-    @NonNull
-    private Tracker tracker;
 
     // Constructors
 
-    public SessionControllerImpl(@NonNull Tracker tracker) {
-        this.tracker = tracker;
+    public SessionControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     // Control methods
 
     @Override
     public void pause() {
-        tracker.pauseSessionChecking();
+        getDirtyConfig().isPaused = true;
+        getTracker().pauseSessionChecking();
     }
 
     @Override
     public void resume() {
-        tracker.resumeSessionChecking();
+        getDirtyConfig().isPaused = false;
+        getTracker().resumeSessionChecking();
     }
 
     @Override
     public void startNewSession() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().startNewSession();
+        session.startNewSession();
     }
 
     // Getters and Setters
 
     @Override
     public int getSessionIndex() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getSessionIndex();
+        return session.getSessionIndex();
     }
 
     @NonNull
     @Override
     public String getSessionId() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return "";
         }
-        return tracker.getSession().getCurrentSessionId();
+        return session.getCurrentSessionId();
     }
 
     @NonNull
     @Override
     public String getUserId() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return "";
         }
-        return tracker.getSession().getUserId();
+        return session.getUserId();
     }
 
     @Override
     public boolean isInBackground() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return false;
         }
-        return tracker.getSession().isBackground();
+        return session.isBackground();
     }
 
     @Override
     public int getBackgroundIndex() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getBackgroundIndex();
+        return session.getBackgroundIndex();
     }
 
     @Override
     public int getForegroundIndex() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return -1;
         }
-        return tracker.getSession().getForegroundIndex();
+        return session.getForegroundIndex();
     }
 
     @NonNull
     @Override
     public TimeMeasure getForegroundTimeout() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getForegroundTimeout(), TimeUnit.MILLISECONDS);
+        return new TimeMeasure(session.getForegroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void setForegroundTimeout(@NonNull TimeMeasure foregroundTimeout) {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setForegroundTimeout(foregroundTimeout.convert(TimeUnit.MILLISECONDS));
+        getDirtyConfig().foregroundTimeout = foregroundTimeout;
+        getDirtyConfig().foregroundTimeoutUpdated = true;
+        session.setForegroundTimeout(foregroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     @NonNull
     @Override
     public TimeMeasure getBackgroundTimeout() {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return new TimeMeasure(0, TimeUnit.SECONDS);
         }
-        return new TimeMeasure(tracker.getSession().getBackgroundTimeout(), TimeUnit.MILLISECONDS);
+        return new TimeMeasure(session.getBackgroundTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void setBackgroundTimeout(@NonNull TimeMeasure backgroundTimeout) {
-        if (!isEnabled()) {
+        Session session = getSession();
+        if (session == null) {
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return;
         }
-        tracker.getSession().setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
+        getDirtyConfig().backgroundTimeout = backgroundTimeout;
+        getDirtyConfig().backgroundTimeoutUpdated = true;
+        session.setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
     }
 
     // Service method
 
     public boolean isEnabled() {
-        return tracker.getSession() != null;
+        return getTracker().getSession() != null;
+    }
+
+    // Private methods
+
+    @NonNull
+    private Tracker getTracker() {
+        return serviceProvider.getTracker();
+    }
+
+    @Nullable
+    private Session getSession() {
+        return serviceProvider.getTracker().getSession();
+    }
+
+    @NonNull
+    private SessionConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getSessionConfigurationUpdate();
     }
 }

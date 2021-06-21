@@ -3,11 +3,13 @@ package com.snowplowanalytics.snowplow.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+
+import org.json.JSONObject;
 
 /**
  * This class represents the configuration of the tracker and the core tracker properties.
@@ -15,6 +17,7 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
  * tracked in term of automatic tracking and contexts/entities to track with the events.
  */
 public class TrackerConfiguration implements TrackerConfigurationInterface, Configuration {
+    public final static String TAG = TrackerConfiguration.class.getSimpleName();
 
     /**
      * @see #appId(String)
@@ -445,8 +448,33 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         copy.screenViewAutotracking = screenViewAutotracking;
         copy.lifecycleAutotracking = lifecycleAutotracking;
         copy.installAutotracking = installAutotracking;
-        copy. exceptionAutotracking = exceptionAutotracking;
-        copy. diagnosticAutotracking = diagnosticAutotracking;
+        copy.exceptionAutotracking = exceptionAutotracking;
+        copy.diagnosticAutotracking = diagnosticAutotracking;
         return copy;
+    }
+
+    // JSON Formatter
+
+    public TrackerConfiguration(@NonNull String appId, @NonNull JSONObject jsonObject) {
+        this(jsonObject.optString("appId", appId));
+        String val = jsonObject.optString("devicePlatform", DevicePlatform.Mobile.getValue());
+        devicePlatform = DevicePlatform.getByValue(val);
+        base64encoding = jsonObject.optBoolean("base64encoding", base64encoding);
+        String log = jsonObject.optString("logLevel", LogLevel.OFF.name());
+        try {
+            logLevel = LogLevel.valueOf(log.toUpperCase());
+        } catch (Exception e) {
+            Logger.e(TAG, "Unable to decode `logLevel from remote configuration.");
+        }
+        sessionContext = jsonObject.optBoolean("sessionContext", sessionContext);
+        applicationContext = jsonObject.optBoolean("applicationContext", applicationContext);
+        platformContext = jsonObject.optBoolean("platformContext", platformContext);
+        geoLocationContext = jsonObject.optBoolean("geoLocationContext", geoLocationContext);
+        screenContext = jsonObject.optBoolean("screenContext", screenContext);
+        screenViewAutotracking = jsonObject.optBoolean("screenViewAutotracking", screenViewAutotracking);
+        lifecycleAutotracking = jsonObject.optBoolean("lifecycleAutotracking", lifecycleAutotracking);
+        installAutotracking = jsonObject.optBoolean("installAutotracking", installAutotracking);
+        exceptionAutotracking = jsonObject.optBoolean("exceptionAutotracking", exceptionAutotracking);
+        diagnosticAutotracking = jsonObject.optBoolean("diagnosticAutotracking", diagnosticAutotracking);
     }
 }

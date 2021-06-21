@@ -1,4 +1,11 @@
 
+Version 2.1.0 (2021-06-18)
+--------------------------
+Fix trueTimestamp not set by SelfDescribing builder (#451)
+Fix screenView autotracking unable to send events (#455)
+Fix missing base64encoding in remote config (#454)
+Add remote configuration (#452)
+
 Version 2.0.1 (2021-05-12)
 --------------------------
 Add SubjectController to update userId (#447)

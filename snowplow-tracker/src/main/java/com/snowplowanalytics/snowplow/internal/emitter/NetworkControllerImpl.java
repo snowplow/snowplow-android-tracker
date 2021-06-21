@@ -5,63 +5,81 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.NetworkController;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.NetworkConnection;
+import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.network.Protocol;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class NetworkControllerImpl implements NetworkController {
-
-    @NonNull
-    private final Emitter emitter;
+public class NetworkControllerImpl extends Controller implements NetworkController {
 
     // Constructors
 
-    public NetworkControllerImpl(@NonNull Emitter emitter) {
-        this.emitter = emitter;
+    public NetworkControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     // Getters and Setters
 
+    public boolean isCustomNetworkConnection() {
+        NetworkConnection networkConnection = getEmitter().getNetworkConnection();
+        return networkConnection != null && !(networkConnection instanceof OkHttpNetworkConnection);
+    }
+
     @Override
     public void setEndpoint(@NonNull String endpoint) {
-        emitter.setEmitterUri(endpoint);
+        getEmitter().setEmitterUri(endpoint);
     }
 
     @NonNull
     @Override
     public String getEndpoint() {
-        return emitter.getEmitterUri();
+        return getEmitter().getEmitterUri();
     }
 
     @Override
     public void setMethod(@NonNull HttpMethod method) {
-        emitter.setHttpMethod(method);
+        getEmitter().setHttpMethod(method);
     }
 
     @NonNull
     @Override
     public HttpMethod getMethod() {
-        return emitter.getHttpMethod();
+        return getEmitter().getHttpMethod();
     }
 
     @Override
     public void setCustomPostPath(@Nullable String customPostPath) {
-        emitter.setCustomPostPath(customPostPath);
+        getDirtyConfig().customPostPath = customPostPath;
+        getDirtyConfig().customPostPathUpdated = true;
+        getEmitter().setCustomPostPath(customPostPath);
     }
 
     @Nullable
     @Override
     public String getCustomPostPath() {
-        return emitter.getCustomPostPath();
+        return getEmitter().getCustomPostPath();
     }
 
     @Override
     public void setTimeout(int timeout) {
-        emitter.setEmitTimeout(timeout);
+        getEmitter().setEmitTimeout(timeout);
     }
 
     @Override
     public int getTimeout() {
-        return emitter.getEmitTimeout();
+        return getEmitter().getEmitTimeout();
+    }
+
+    // Private methods
+
+    private Emitter getEmitter() {
+        return serviceProvider.getEmitter();
+    }
+
+    private NetworkConfigurationUpdate getDirtyConfig() {
+        return serviceProvider.getNetworkConfigurationUpdate();
     }
 }

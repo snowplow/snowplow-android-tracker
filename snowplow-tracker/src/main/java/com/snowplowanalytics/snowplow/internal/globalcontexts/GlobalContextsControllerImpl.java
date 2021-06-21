@@ -6,6 +6,8 @@ import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
+import com.snowplowanalytics.snowplow.internal.Controller;
+import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 
 import java.util.List;
@@ -13,29 +15,32 @@ import java.util.Map;
 import java.util.Set;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class GlobalContextsControllerImpl implements GlobalContextsController {
+public class GlobalContextsControllerImpl extends Controller implements GlobalContextsController {
 
-    @NonNull
-    private final Tracker tracker;
-
-    public GlobalContextsControllerImpl(@NonNull Tracker tracker) {
-        this.tracker = tracker;
+    public GlobalContextsControllerImpl(@NonNull ServiceProviderInterface serviceProvider) {
+        super(serviceProvider);
     }
 
     @NonNull
     @Override
     public Set<String> getTags() {
-        return tracker.getGlobalContextTags();
+        return getTracker().getGlobalContextTags();
     }
 
     @Override
     public boolean add(@NonNull String tag, @NonNull GlobalContext contextGenerator) {
-        return tracker.addGlobalContext(contextGenerator, tag);
+        return getTracker().addGlobalContext(contextGenerator, tag);
     }
 
     @Nullable
     @Override
     public GlobalContext remove(@NonNull String tag) {
-        return tracker.removeGlobalContext(tag);
+        return getTracker().removeGlobalContext(tag);
+    }
+
+    // Private methods
+
+    private Tracker getTracker() {
+        return serviceProvider.getTracker();
     }
 }
