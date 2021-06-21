@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -81,12 +81,15 @@ Inheritance diagram for com.snowplowanalytics.snowplow.internal.emitter.EmitterC
   <map id="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface_map" name="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface_map">
 <area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.EmitterConfiguration" shape="rect" coords="0,56,458,80"/>
 <area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_emitter_controller.html" alt="com.snowplowanalytics.snowplow.controller.EmitterController" shape="rect" coords="468,56,926,80"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html" alt="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate" shape="rect" coords="0,112,458,136"/>
 <area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html" alt="com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl" shape="rect" coords="468,112,926,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a5bc9a3345259f83428291aa6f90eeb30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_event_store.html">EventStore</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a5bc9a3345259f83428291aa6f90eeb30">getEventStore</a> ()</td></tr>
+<tr class="separator:a5bc9a3345259f83428291aa6f90eeb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6867ed9dff1c6b81c9059d703065d1ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html">BufferOption</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a6867ed9dff1c6b81c9059d703065d1ac">getBufferOption</a> ()</td></tr>
 <tr class="separator:a6867ed9dff1c6b81c9059d703065d1ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c7f1e7a00bf2d8951efe59324797980"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a8c7f1e7a00bf2d8951efe59324797980">setBufferOption</a> (@NonNull <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html">BufferOption</a> bufferOption)</td></tr>
@@ -112,7 +115,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_interface_8java_source.html#l00009">9</a> of file <a class="el" href="_emitter_configuration_interface_8java_source.html">EmitterConfigurationInterface.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_interface_8java_source.html#l00010">10</a> of file <a class="el" href="_emitter_configuration_interface_8java_source.html">EmitterConfigurationInterface.java</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6867ed9dff1c6b81c9059d703065d1ac"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6867ed9dff1c6b81c9059d703065d1ac">&#9670;&nbsp;</a></span>getBufferOption()</h2>
@@ -130,7 +133,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Whether the buffer should send events instantly or after the buffer has reached it's limit. By default, this is set to BufferOption Default. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a96e2a27762c44eda4e8b3d6d7ba31379">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a9c4a2ee48bdfa49cc10b2ce6e0a3b26b">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a96e2a27762c44eda4e8b3d6d7ba31379">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a5836b021babca1a08228dfe8fa4db5c8">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a9c4a2ee48bdfa49cc10b2ce6e0a3b26b">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>
@@ -150,7 +153,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum amount of bytes allowed to be sent in a payload in a GET request. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a5f9638a2bc34e294c42d57eab763b9e4">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a205bdece501072e2a02879b5f1bc1a42">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a5f9638a2bc34e294c42d57eab763b9e4">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#afb03a724ef0a626f0f585fa94ca240ca">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a205bdece501072e2a02879b5f1bc1a42">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>
@@ -170,7 +173,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum amount of bytes allowed to be sent in a payload in a POST request. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#ae2db80cf15cb40658d0d4c2ee32daaae">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a7634ffb56a3169541b51df2acc38380c">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#ae2db80cf15cb40658d0d4c2ee32daaae">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#ab93e4746a1b44b1a1cf9eb2486ce5bb9">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a7634ffb56a3169541b51df2acc38380c">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>
@@ -190,7 +193,27 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of events collected from the EventStore to be sent in a request. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a9f40a15b49cded4526f6258e982ea941">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a639eaede9fb942b0350d237e83f2a685">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a9f40a15b49cded4526f6258e982ea941">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#adaadc31c4d55be8b157a504081fe8f5d">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a639eaede9fb942b0350d237e83f2a685">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+
+</div>
+</div>
+<a id="a5bc9a3345259f83428291aa6f90eeb30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bc9a3345259f83428291aa6f90eeb30">&#9670;&nbsp;</a></span>getEventStore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_event_store.html">EventStore</a> com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface.getEventStore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Custom component with full ownership for persisting events before to be sent to the collector. If it's not set the tracker will use a SQLite database as default EventStore. </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#ab933a6f7f2ecb9dd3c90acaab9155fec">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a3fb68a424cae99d86434db19fad2d5b4">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a7b5ffed9e87e2c077459b679d485f9b7">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>
@@ -210,7 +233,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Callback called for each request performed by the tracker to the collector. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#aedc88ab88404917c96bbcbfd3b063bdc">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#ad62a52dd18d3b7624276109aead1a398">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#aedc88ab88404917c96bbcbfd3b063bdc">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a85f8551fbef49a13a9aced36a20c37ec">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#ad62a52dd18d3b7624276109aead1a398">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>
@@ -230,7 +253,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of threads working in parallel in the tracker to send requests. </p>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#acdab5b280ae9553dbc3c0fbf805c42d0">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a30b4fd73f49947937c72b7dc10da34da">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#acdab5b280ae9553dbc3c0fbf805c42d0">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a4b08b0c0d1b155edf83934e6d8c06496">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a30b4fd73f49947937c72b7dc10da34da">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>.</p>
 
 </div>
 </div>

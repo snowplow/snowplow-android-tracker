@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['handle_374',['handle',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor_1_1_exception_handler.html#a46be593348d0bbdf8aa7f142d7f37d8a',1,'com::snowplowanalytics::snowplow::internal::emitter::Executor::ExceptionHandler']]],
-  ['hashcode_375',['hashCode',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_schema_rule.html#a92853e7543d452850ac729ef2d5cfb21',1,'com.snowplowanalytics.snowplow.internal.tracker.SchemaRule.hashCode()'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1util_1_1_time_measure.html#a88a9a48ab1e5fa0b302fef2e6e50b29b',1,'com.snowplowanalytics.snowplow.util.TimeMeasure.hashCode()']]],
-  ['heavygroup_376',['HeavyGroup',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html#a941d038657d2232cb6cafa632f247ca3',1,'com::snowplowanalytics::snowplow::emitter::BufferOption']]],
-  ['http_377',['HTTP',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_protocol.html#a0fd64be603a2f37a74dd7461e5abbbb6',1,'com::snowplowanalytics::snowplow::network::Protocol']]],
-  ['httpmethod_378',['HttpMethod',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_http_method.html',1,'com::snowplowanalytics::snowplow::network']]],
-  ['httpmethod_2ejava_379',['HttpMethod.java',['../_http_method_8java.html',1,'']]],
-  ['https_380',['HTTPS',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_protocol.html#a7b8aa3fa510ef58109c3280321046717',1,'com::snowplowanalytics::snowplow::network::Protocol']]]
+  ['handle_432',['handle',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor_1_1_exception_handler.html#a46be593348d0bbdf8aa7f142d7f37d8a',1,'com::snowplowanalytics::snowplow::internal::emitter::Executor::ExceptionHandler']]],
+  ['hashcode_433',['hashCode',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_schema_rule.html#a92853e7543d452850ac729ef2d5cfb21',1,'com.snowplowanalytics.snowplow.internal.tracker.SchemaRule.hashCode()'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1util_1_1_time_measure.html#a88a9a48ab1e5fa0b302fef2e6e50b29b',1,'com.snowplowanalytics.snowplow.util.TimeMeasure.hashCode()']]],
+  ['heavygroup_434',['HeavyGroup',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html#a941d038657d2232cb6cafa632f247ca3',1,'com::snowplowanalytics::snowplow::emitter::BufferOption']]],
+  ['http_435',['HTTP',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_protocol.html#a0fd64be603a2f37a74dd7461e5abbbb6',1,'com::snowplowanalytics::snowplow::network::Protocol']]],
+  ['httpmethod_436',['HttpMethod',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_http_method.html',1,'com::snowplowanalytics::snowplow::network']]],
+  ['httpmethod_2ejava_437',['HttpMethod.java',['../_http_method_8java.html',1,'']]],
+  ['https_438',['HTTPS',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_protocol.html#a7b8aa3fa510ef58109c3280321046717',1,'com::snowplowanalytics::snowplow::network::Protocol']]]
 ];

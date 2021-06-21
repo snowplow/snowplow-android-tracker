@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -67,6 +67,9 @@ $(function() {
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>SCHEMA
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a9f4282e09489b30e38d0b56870d6ddf9">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
+</li>
+<li>schema
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html#ae31fe39d3bed6a1aabdfa4061dbf3152">com.snowplowanalytics.snowplow.internal.remoteconfiguration.FetchedConfigurationBundle</a>
 </li>
 <li>SCHEMA_APPLICATION
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a3bc04e6eff9d5bb5d89c1f7a445be42f">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
@@ -125,14 +128,26 @@ $(function() {
 <li>screenContext
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#acc0aad04b44f173ce24debf60a73d7c1">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>
 </li>
+<li>screenContextUpdated
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a2c9ab4eec009d438d26e033a2d4ba664">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>
+</li>
 <li>screenResolution
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a49345d1c84e59f7c9be35e1a97c40795">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+</li>
+<li>screenResolutionUpdated
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#ac10ffa515c58c5e8911b41a4cc15f479">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>
 </li>
 <li>screenViewAutotracking
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a223c0463481b1150c5a7f823e00320e2">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>
 </li>
+<li>screenViewAutotrackingUpdated
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a3c9e6536195e23621cc2dcfbe63a27bb">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>
+</li>
 <li>screenViewPort
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#ac3501e08f57c3db226e07190cd955941">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a>
+</li>
+<li>screenViewPortUpdated
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#ad0174c0f6010affa1545b76d4083474a">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>
 </li>
 <li>SE_ACTION
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#add6c6c6985230fbe901fc75616cf67c0">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
@@ -155,6 +170,9 @@ $(function() {
 <li>ServerSideApp
 : <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_device_platform.html#af5c883137031f43496b08d0d7df8d93d">com.snowplowanalytics.snowplow.tracker.DevicePlatform</a>
 </li>
+<li>serviceProvider
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1_controller.html#af38a6ca141d9f5bde25292a298c21fba">com.snowplowanalytics.snowplow.internal.Controller</a>
+</li>
 <li>SESSION_FIRST_ID
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a9bf20d3801cd3f05d283f09489537b75">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
@@ -176,8 +194,14 @@ $(function() {
 <li>SESSION_USER_ID
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a42ea1e241ce4d7b6a3f48adc93986620">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
+<li>sessionConfiguration
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html#abb0f5d3de688f283277a3d138b42434a">com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationBundle</a>
+</li>
 <li>sessionContext
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a0b44baaea72c1a1dbcc6b4221d8671d8">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>
+</li>
+<li>sessionContextUpdated
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a89e684eb9c5f7933c3e1402bf24a3447">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>
 </li>
 <li>shipping
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#a9de02e650356c147980bbf679204b69a">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>
@@ -191,11 +215,22 @@ $(function() {
 <li>SNOWPLOW_SESSION_VARS
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a80012590204885a495ecbe33b0a24604">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
 </li>
+<li>sourceConfig
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#aceb19560c5a2342989b8786a05283401">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_network_configuration_update.html#ab76ea59abc5f5cab798a4cc0e8ab0753">com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr_configuration_update.html#af6f1eed7cab040c41c4b3e9084a5fe32">com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationUpdate</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_update.html#a877ab01fbef87519d502545d66af79f6">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a75fe684edb54a9730171af3ad0d03311">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a734bd32966f102850d18ab1ab03e4f79">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>
+</li>
 <li>SPEED
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#ae75fd590dab2d714284c9d5af79230b4">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
 <li>state
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#af1bef167ac21ce3c2025bf33a442a729">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>
+</li>
+<li>subjectConfiguration
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html#ac12ea9ea3a9d37c4ad406042fa5a12b1">com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationBundle</a>
 </li>
 <li>SV_ID
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a8d7b5207331bb37121bc35df78567c15">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>

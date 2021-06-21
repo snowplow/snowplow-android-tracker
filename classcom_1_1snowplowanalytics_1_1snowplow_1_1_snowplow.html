@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -76,12 +76,18 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:af89187e4bfdb50510a0b39c1342fb5d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#af89187e4bfdb50510a0b39c1342fb5d6">setup</a> (@NonNull Context context, @NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration.html">RemoteConfiguration</a> remoteConfiguration, @Nullable List&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html">ConfigurationBundle</a> &gt; defaultBundles, @Nullable Consumer&lt; List&lt; String &gt;&gt; onSuccess)</td></tr>
+<tr class="separator:af89187e4bfdb50510a0b39c1342fb5d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fba9ba8efb5abbb5e49538bc46752d1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a6fba9ba8efb5abbb5e49538bc46752d1">refresh</a> (@NonNull Context context, @Nullable Consumer&lt; List&lt; String &gt;&gt; onSuccess)</td></tr>
+<tr class="separator:a6fba9ba8efb5abbb5e49538bc46752d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a481d3b5346b91b0af22de6db75356972"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a481d3b5346b91b0af22de6db75356972">createTracker</a> (@NonNull Context context, @NonNull String namespace, @NonNull String endpoint, @NonNull <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_http_method.html">HttpMethod</a> method)</td></tr>
 <tr class="separator:a481d3b5346b91b0af22de6db75356972"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af241abb6f7babe9d6e52f1a1929a73db"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#af241abb6f7babe9d6e52f1a1929a73db">createTracker</a> (@NonNull Context context, @NonNull String namespace, @NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_network_configuration.html">NetworkConfiguration</a> network, @NonNull Configuration... configurations)</td></tr>
 <tr class="separator:af241abb6f7babe9d6e52f1a1929a73db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fc81f310e8f7bb85996ddc9158bc546"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a3fc81f310e8f7bb85996ddc9158bc546">getDefaultTracker</a> ()</td></tr>
 <tr class="separator:a3fc81f310e8f7bb85996ddc9158bc546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c2a281b812ec1ec92919787ff69b90d"><td class="memItemLeft" align="right" valign="top">static synchronized <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a2c2a281b812ec1ec92919787ff69b90d">getTracker</a> (@NonNull String namespace)</td></tr>
+<tr class="separator:a2c2a281b812ec1ec92919787ff69b90d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c1dd1479569100926d85ef676c64343"><td class="memItemLeft" align="right" valign="top">static synchronized boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a0c1dd1479569100926d85ef676c64343">setTrackerAsDefault</a> (@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a> trackerController)</td></tr>
 <tr class="separator:a0c1dd1479569100926d85ef676c64343"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7f298a401d27cf6e88b45a09ca49670"><td class="memItemLeft" align="right" valign="top">static synchronized boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#aa7f298a401d27cf6e88b45a09ca49670">removeTracker</a> (@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a> trackerController)</td></tr>
@@ -94,7 +100,7 @@ Static Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Entry point to instance a new <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00026">26</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00032">32</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="af241abb6f7babe9d6e52f1a1929a73db"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af241abb6f7babe9d6e52f1a1929a73db">&#9670;&nbsp;</a></span>createTracker() <span class="overload">[1/2]</span></h2>
@@ -156,7 +162,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The tracker instance created. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00097">97</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00180">180</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -219,7 +225,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The tracker instance created. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00062">62</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00145">145</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -248,7 +254,7 @@ Static Public Member Functions</h2></td></tr>
 <p>The default tracker instance is the first created in the app, but that can be overridden programmatically calling <a class="el" href="">setTrackerAsDefault(TrackerController)</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>The default tracker instance or <code>null</code> whether the tracker has been removed or never initialized. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00117">117</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00200">200</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -276,7 +282,91 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Set of namespace of the active trackers in the app. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00181">181</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00279">279</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+
+</div>
+</div>
+<a id="a2c2a281b812ec1ec92919787ff69b90d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c2a281b812ec1ec92919787ff69b90d">&#9670;&nbsp;</a></span>getTracker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static synchronized <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_tracker_controller.html">TrackerController</a> com.snowplowanalytics.snowplow.Snowplow.getTracker </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull String&#160;</td>
+          <td class="paramname"><em>namespace</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Using the namespace identifier is possible to get the trackerController if already instanced.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">namespace</td><td>The namespace that identifies the tracker. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The tracker if it exist with that namespace. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00212">212</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+
+</div>
+</div>
+<a id="a6fba9ba8efb5abbb5e49538bc46752d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fba9ba8efb5abbb5e49538bc46752d1">&#9670;&nbsp;</a></span>refresh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void com.snowplowanalytics.snowplow.Snowplow.refresh </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull Context&#160;</td>
+          <td class="paramname"><em>context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@Nullable Consumer&lt; List&lt; String &gt;&gt;&#160;</td>
+          <td class="paramname"><em>onSuccess</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reconfigure, create or delete the trackers based on the configuration downloaded remotely. The trackers configuration is automatically download from the endpoint indicated in the <code>RemoteConfiguration</code> previously used to setup the trackers.</p>
+<p>The method is asynchronous and you can receive the list of the created trackers in the callbacks once the trackers are created. The downloaded configuration updates the cached one only if the configuration version is greater than the cached one. Otherwise the cached one is kept and the callback is not called.</p>
+<p>IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent. Those events are attached to the namespace. If the tracker is removed or the app relaunched with a different namespace, those events can't be sent to the collector and they remain in a zombie state inside the EventStore. To remove all the zombie events you can an internal method <code>removeUnsentEventsExceptForNamespaces</code> on <code>SPSQLEventStore</code> which will delete all the EventStores instanced with namespaces not listed in the passed list.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">context</td><td>The Android app context. </td></tr>
+    <tr><td class="paramname">onSuccess</td><td>The callback called when a configuration (cached or downloaded) is set It passes the list of the namespaces associated to the created trackers. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00104">104</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -304,7 +394,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Remove all the trackers. The removed tracker is always stopped. </p><dl class="section see"><dt>See also</dt><dd>#removeTracker(TrackerController) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00168">168</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00266">266</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -340,7 +430,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether it has been able to remove it. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00149">149</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00247">247</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>
@@ -376,7 +466,69 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the tracker passed is registered among the active trackers of the app. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00130">130</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00228">228</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
+
+</div>
+</div>
+<a id="af89187e4bfdb50510a0b39c1342fb5d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af89187e4bfdb50510a0b39c1342fb5d6">&#9670;&nbsp;</a></span>setup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void com.snowplowanalytics.snowplow.Snowplow.setup </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull Context&#160;</td>
+          <td class="paramname"><em>context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration.html">RemoteConfiguration</a>&#160;</td>
+          <td class="paramname"><em>remoteConfiguration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@Nullable List&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html">ConfigurationBundle</a> &gt;&#160;</td>
+          <td class="paramname"><em>defaultBundles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@Nullable Consumer&lt; List&lt; String &gt;&gt;&#160;</td>
+          <td class="paramname"><em>onSuccess</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Setup a single or a set of tracker instances which will be used inside the app to track events. The app can run multiple tracker instances which will be identified by string <code>namespaces</code>. The trackers configuration is automatically download from the endpoint indicated in the <code>RemoteConfiguration</code> passed as argument. For more details see <code>RemoteConfiguration</code>.</p>
+<p>The method is asynchronous and you can receive the list of the created trackers in the callbacks once the trackers are created. The callback can be called multiple times in case a cached configuration is ready and later a fetched configuration is available. You can also pass as argument a default configuration in case there isn't a cached configuration and it's not able to download a new one. The downloaded configuration updates the cached one only if the configuration version is greater than the cached one. Otherwise the cached one is kept and the callback is not called.</p>
+<p>IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent. Those events are attached to the namespace. If the tracker is removed or the app relaunched with a different namespace, those events can't be sent to the collector and they remain in a zombie state inside the EventStore. To remove all the zombie events you can an internal method <code>removeUnsentEventsExceptForNamespaces</code> on <code>SPSQLEventStore</code> which will delete all the EventStores instanced with namespaces not listed in the passed list.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">context</td><td>The Android app context. </td></tr>
+    <tr><td class="paramname">remoteConfiguration</td><td>The remote configuration used to indicate where to download the configuration from. </td></tr>
+    <tr><td class="paramname">defaultBundles</td><td>The default configuration passed by default in case there isn't a cached version and it's able to download a new one. </td></tr>
+    <tr><td class="paramname">onSuccess</td><td>The callback called when a configuration (cached or downloaded) is set It passes the list of the namespaces associated to the created trackers. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_snowplow_8java_source.html#l00070">70</a> of file <a class="el" href="_snowplow_8java_source.html">Snowplow.java</a>.</p>
 
 </div>
 </div>

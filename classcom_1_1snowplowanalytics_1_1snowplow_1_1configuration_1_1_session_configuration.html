@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -80,8 +80,9 @@ Inheritance diagram for com.snowplowanalytics.snowplow.configuration.SessionConf
  <div class="center">
   <img src="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_session_configuration.png" usemap="#com.snowplowanalytics.snowplow.configuration.SessionConfiguration_map" alt=""/>
   <map id="com.snowplowanalytics.snowplow.configuration.SessionConfiguration_map" name="com.snowplowanalytics.snowplow.configuration.SessionConfiguration_map">
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface" shape="rect" coords="0,0,469,24"/>
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="479,0,948,24"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface" shape="rect" coords="0,56,469,80"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="479,56,948,80"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_update.html" alt="com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate" shape="rect" coords="239,168,708,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -99,6 +100,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:abda81706a835ae13b4ca89ed74a0f34a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b0fb2173c69575350a0c68759a0f549"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html">Configuration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_session_configuration.html#a1b0fb2173c69575350a0c68759a0f549">copy</a> ()</td></tr>
 <tr class="separator:a1b0fb2173c69575350a0c68759a0f549"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29bb5b8e4d66fb49031ca6cce12bc7f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_session_configuration.html#a29bb5b8e4d66fb49031ca6cce12bc7f0">SessionConfiguration</a> (@NonNull JSONObject jsonObject)</td></tr>
+<tr class="separator:a29bb5b8e4d66fb49031ca6cce12bc7f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -115,10 +118,10 @@ Public Attributes</h2></td></tr>
 </ul>
 <p>Session data is maintained for the life of the application being installed on a device. A new session will be created if the session information is not accessed within a configurable timeout. </p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00021">21</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00024">24</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad28a265921cd3c4e8f8c16d3fb848ef8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad28a265921cd3c4e8f8c16d3fb848ef8">&#9670;&nbsp;</a></span>SessionConfiguration()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad28a265921cd3c4e8f8c16d3fb848ef8">&#9670;&nbsp;</a></span>SessionConfiguration() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +153,27 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00046">46</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00049">49</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+
+</div>
+</div>
+<a id="a29bb5b8e4d66fb49031ca6cce12bc7f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29bb5b8e4d66fb49031ca6cce12bc7f0">&#9670;&nbsp;</a></span>SessionConfiguration() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.configuration.SessionConfiguration.SessionConfiguration </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull JSONObject&#160;</td>
+          <td class="paramname"><em>jsonObject</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00100">100</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -172,7 +195,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html#a5565a39816f9e69efa0eff920f250b82">com.snowplowanalytics.snowplow.configuration.Configuration</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00091">91</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00094">94</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -194,7 +217,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html#a61ce3e94d9973d4552c990e330fd3e03">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00075">75</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_update.html#a1f32e70d03726c553fd3e2a8173a5672">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00078">78</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -216,7 +241,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html#a4911bcb82beb67a39487e9d2d416d7ca">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00058">58</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_update.html#a3e49c5e4744dfeadbc34aeca2b317885">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00061">61</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -239,7 +266,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html#a037db962691972f3ccf0da1580c2f2a0">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00083">83</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00086">86</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -262,7 +289,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html#ae0b5e9912d71001f9a4062e6ef319fec">com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00066">66</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00069">69</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -280,7 +307,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The amount of time that can elapse before the session id is updated while the app is in the background. </p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00037">37</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00040">40</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -297,7 +324,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The amount of time that can elapse before the session id is updated while the app is in the foreground. </p>
 
-<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00029">29</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_session_configuration_8java_source.html#l00032">32</a> of file <a class="el" href="_session_configuration_8java_source.html">SessionConfiguration.java</a>.</p>
 
 </div>
 </div>

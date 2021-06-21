@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -80,8 +80,9 @@ Inheritance diagram for com.snowplowanalytics.snowplow.configuration.EmitterConf
  <div class="center">
   <img src="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.png" usemap="#com.snowplowanalytics.snowplow.configuration.EmitterConfiguration_map" alt=""/>
   <map id="com.snowplowanalytics.snowplow.configuration.EmitterConfiguration_map" name="com.snowplowanalytics.snowplow.configuration.EmitterConfiguration_map">
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="0,0,458,24"/>
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface" shape="rect" coords="468,0,926,24"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="0,56,458,80"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface" shape="rect" coords="468,56,926,80"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html" alt="com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate" shape="rect" coords="234,168,692,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -89,6 +90,8 @@ Inheritance diagram for com.snowplowanalytics.snowplow.configuration.EmitterConf
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a47670f9fc6f54e5d5b520b22cbd69540"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a47670f9fc6f54e5d5b520b22cbd69540">EmitterConfiguration</a> ()</td></tr>
 <tr class="separator:a47670f9fc6f54e5d5b520b22cbd69540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b5ffed9e87e2c077459b679d485f9b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_event_store.html">EventStore</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a7b5ffed9e87e2c077459b679d485f9b7">getEventStore</a> ()</td></tr>
+<tr class="separator:a7b5ffed9e87e2c077459b679d485f9b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c4a2ee48bdfa49cc10b2ce6e0a3b26b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html">BufferOption</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a9c4a2ee48bdfa49cc10b2ce6e0a3b26b">getBufferOption</a> ()</td></tr>
 <tr class="separator:a9c4a2ee48bdfa49cc10b2ce6e0a3b26b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dcbf8f4533b3c4c3fc60e5e7182aa01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a7dcbf8f4533b3c4c3fc60e5e7182aa01">setBufferOption</a> (@NonNull <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html">BufferOption</a> <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a1cf48e080f46f83ced089f34f13a1506">bufferOption</a>)</td></tr>
@@ -150,7 +153,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>It allows the tracker configuration from the emission perspective. The <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html">EmitterConfiguration</a> can be used to setup details about how the tracker should treat the events to emit to the collector. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00015">15</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00016">16</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a47670f9fc6f54e5d5b520b22cbd69540"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a47670f9fc6f54e5d5b520b22cbd69540">&#9670;&nbsp;</a></span>EmitterConfiguration()</h2>
@@ -168,7 +171,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>It sets a default <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html">EmitterConfiguration</a>. Default values: bufferOption = <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_buffer_option.html#af39909e94fd2d6753985239ee8a5a0ba">BufferOption.Single</a>; emitRange = 150; threadPoolSize = 15; byteLimitGet = 40000; byteLimitPost = 40000; </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00066">66</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00067">67</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -190,7 +193,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Sets whether the buffer should send events instantly or after the buffer has reached it's limit. By default, this is set to BufferOption Default. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00145">145</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00152">152</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -211,7 +214,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum amount of bytes allowed to be sent in a payload in a GET request. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00172">172</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00179">179</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -232,7 +235,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum amount of bytes allowed to be sent in a payload in a POST request. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00181">181</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00188">188</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -253,7 +256,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html#a5565a39816f9e69efa0eff920f250b82">com.snowplowanalytics.snowplow.configuration.Configuration</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00209">209</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00216">216</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -274,7 +277,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of events collected from the EventStore to be sent in a request. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00154">154</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00161">161</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -295,7 +298,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Custom component with full ownership for persisting events before to be sent to the collector. If it's not set the tracker will use a SQLite database as default EventStore. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00191">191</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00198">198</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -317,7 +320,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a6867ed9dff1c6b81c9059d703065d1ac">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00078">78</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a5836b021babca1a08228dfe8fa4db5c8">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00085">85</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -339,7 +344,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#ab64dce35f926211d24a6969a65ef15e3">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00107">107</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#afb03a724ef0a626f0f585fa94ca240ca">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00114">114</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -361,7 +368,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a25be68be780fa66debf4db56f3f14e61">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00117">117</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#ab93e4746a1b44b1a1cf9eb2486ce5bb9">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00124">124</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -383,7 +392,33 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a5acf3f0b1411b557984ad42cd5a5bdec">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00088">88</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#adaadc31c4d55be8b157a504081fe8f5d">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00095">95</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+
+</div>
+</div>
+<a id="a7b5ffed9e87e2c077459b679d485f9b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b5ffed9e87e2c077459b679d485f9b7">&#9670;&nbsp;</a></span>getEventStore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1emitter_1_1_event_store.html">EventStore</a> com.snowplowanalytics.snowplow.configuration.EmitterConfiguration.getEventStore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Custom component with full ownership for persisting events before to be sent to the collector. If it's not set the tracker will use a SQLite database as default EventStore. </p>
+
+<p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a5bc9a3345259f83428291aa6f90eeb30">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a3fb68a424cae99d86434db19fad2d5b4">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00079">79</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -405,7 +440,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a3d6a108a876a1db350ae3663c332a31c">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00128">128</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a85f8551fbef49a13a9aced36a20c37ec">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00135">135</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -427,7 +464,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a656321da5e46692b78b61583ca7d9c2a">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00098">98</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#a4b08b0c0d1b155edf83934e6d8c06496">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00105">105</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -448,7 +487,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Callback called for each request performed by the tracker to the collector. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00200">200</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00207">207</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -471,7 +510,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a8c7f1e7a00bf2d8951efe59324797980">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00083">83</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00090">90</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -494,7 +533,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a84ad8facbd98c8e5b501780aadf5b0ad">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00112">112</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00119">119</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -517,7 +556,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#acf66e6f1c97f4380632f15baada145ee">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00122">122</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00129">129</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -540,7 +579,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#aa03231bd6bbcec87d24086ae2fe591f1">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00093">93</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00100">100</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -563,7 +602,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#ae66eb5a7aa42fd493a465edfbac1f493">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00133">133</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00140">140</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -583,7 +622,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00102">102</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00109">109</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -604,7 +643,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of threads working in parallel in the tracker to send requests. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00163">163</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00170">170</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -622,7 +661,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#bufferOption(BufferOption) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00021">21</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00022">22</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -639,7 +678,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#af8cb1e0c494d85b7a8693beec8bd36ef">byteLimitGet(int)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00036">36</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00037">37</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -656,7 +695,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a2604fa6e3435d39ab75b1d0652c1467d">byteLimitPost(int)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00041">41</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00042">42</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -673,7 +712,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a4a273ab8a95c4cc7e60bbc130b980ea4">emitRange(int)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00026">26</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00027">27</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -690,7 +729,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#eventStore(EventStore) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00053">53</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00054">54</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -707,7 +746,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#requestCallback(RequestCallback) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00047">47</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00048">48</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -724,7 +763,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a354349dee7723aca87c396cbad826539">threadPoolSize(int)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00031">31</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_configuration_8java_source.html#l00032">32</a> of file <a class="el" href="_emitter_configuration_8java_source.html">EmitterConfiguration.java</a>.</p>
 
 </div>
 </div>

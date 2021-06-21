@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -80,13 +80,16 @@ Inheritance diagram for com.snowplowanalytics.snowplow.configuration.SubjectConf
  <div class="center">
   <img src="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.png" usemap="#com.snowplowanalytics.snowplow.configuration.SubjectConfiguration_map" alt=""/>
   <map id="com.snowplowanalytics.snowplow.configuration.SubjectConfiguration_map" name="com.snowplowanalytics.snowplow.configuration.SubjectConfiguration_map">
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="0,0,465,24"/>
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface" shape="rect" coords="475,0,940,24"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html" alt="com.snowplowanalytics.snowplow.configuration.Configuration" shape="rect" coords="0,56,465,80"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html" alt="com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface" shape="rect" coords="475,56,940,80"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html" alt="com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate" shape="rect" coords="237,168,702,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a96f53cdc6e3cb5ff6d6ca8b281e0362c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a96f53cdc6e3cb5ff6d6ca8b281e0362c">SubjectConfiguration</a> ()</td></tr>
+<tr class="separator:a96f53cdc6e3cb5ff6d6ca8b281e0362c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1220947d4fe2d583ad81d8afbedea91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html">SubjectConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#ab1220947d4fe2d583ad81d8afbedea91">userId</a> (@Nullable String userId)</td></tr>
 <tr class="separator:ab1220947d4fe2d583ad81d8afbedea91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55de2a8468a6292ba5a71a9b03dc189e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html">SubjectConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a55de2a8468a6292ba5a71a9b03dc189e">networkUserId</a> (@Nullable String networkUserId)</td></tr>
@@ -149,6 +152,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad7e5db92d0ca9e3e3493f16814019d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43dabee03878f8acf3c14b5f187f35da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html">SubjectConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a43dabee03878f8acf3c14b5f187f35da">copy</a> ()</td></tr>
 <tr class="separator:a43dabee03878f8acf3c14b5f187f35da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59ea029fc2a61a1b0c422ffe33653c57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a59ea029fc2a61a1b0c422ffe33653c57">SubjectConfiguration</a> (@NonNull JSONObject jsonObject)</td></tr>
+<tr class="separator:a59ea029fc2a61a1b0c422ffe33653c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -176,8 +181,48 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class represents the configuration of the subject. The <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html">SubjectConfiguration</a> can be used to setup the tracker with the basic information about the user and the app which will be attached on all the events as contexts. The contexts to track can be enabled in the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html">TrackerConfiguration</a> class. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00015">15</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00017">17</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a96f53cdc6e3cb5ff6d6ca8b281e0362c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96f53cdc6e3cb5ff6d6ca8b281e0362c">&#9670;&nbsp;</a></span>SubjectConfiguration() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration.SubjectConfiguration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00019">19</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+
+</div>
+</div>
+<a id="a59ea029fc2a61a1b0c422ffe33653c57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59ea029fc2a61a1b0c422ffe33653c57">&#9670;&nbsp;</a></span>SubjectConfiguration() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration.SubjectConfiguration </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull JSONObject&#160;</td>
+          <td class="paramname"><em>jsonObject</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00307">307</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a1b88d558721fa5f53a86202c256b99e6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b88d558721fa5f53a86202c256b99e6">&#9670;&nbsp;</a></span>colorDepth()</h2>
 
@@ -195,7 +240,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The color depth. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00163">163</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00169">169</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -216,7 +261,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_configuration.html#a5565a39816f9e69efa0eff920f250b82">com.snowplowanalytics.snowplow.configuration.Configuration</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00284">284</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00290">290</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -237,7 +282,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The domain UserID. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00096">96</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00102">102</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -258,7 +303,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#aea27230a5a6b03a185dee3bbf3bf7303">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00271">271</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a8a763015e2b223b65e187c3cb5e27ded">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00277">277</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -279,7 +326,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#adfa6a6a79854f0e39c437a4618524a4b">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00194">194</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#af9b55bfa947c56c1471d2e88086e8e6f">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00200">200</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -300,7 +349,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a302539572782a872054ef53c39885faf">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00216">216</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a927da38e5d79396f266c5d68c725c097">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00222">222</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -321,7 +372,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#ab4663c52b13f081f21f2e748dcdbf072">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00238">238</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a68b86f321c966767b44bac911e2e6194">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00244">244</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -342,7 +395,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a1283af36aec9e7241a6b155e80332ab3">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00183">183</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a91629b0ff7018df0686841905ba034d8">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00189">189</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -363,7 +418,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a94530d6eac60ddb4cfb7b36567bf4bff">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00249">249</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a7ba85916733bf2b3f7870794e47b645e">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00255">255</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -384,7 +441,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a0604eb06246d6699ee8d5a0c2f1c7436">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00260">260</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a05ea802a309d9c918f585065e8f16ff9">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00266">266</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -405,7 +464,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a5fe749bbff1283ded99148352b87442a">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00227">227</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a970f386034c7cc473a8f75e46bbf446a">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00233">233</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -426,7 +487,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a25edda409bb2c7307b18b7db9428ec18">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00205">205</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#ab910386662ae2417f22dcb3dd0f22285">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00211">211</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -447,7 +510,9 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a1397643ad3065d4eba3d3a64a436a299">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00172">172</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a82fe2258dcff78882cae333167f5384c">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationUpdate</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00178">178</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -468,7 +533,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The IP address. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00116">116</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00122">122</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -489,7 +554,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The language set in the device. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00134">134</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00140">140</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -510,7 +575,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The network UserID. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00086">86</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00092">92</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -531,7 +596,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The screen resolution. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00143">143</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00149">149</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -552,7 +617,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The screen viewport. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00153">153</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00159">159</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -574,7 +639,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a113798b0733794655f2356c49b71ffbd">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00276">276</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00282">282</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -596,7 +661,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a1fe626ebe934a06dda22fc5bd876d419">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00199">199</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00205">205</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -618,7 +683,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a0f2d5fc9528f31b66cc5d349287c7d13">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00221">221</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00227">227</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -640,7 +705,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#acbe5fcfccaef2112f593f41270aed8cf">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00243">243</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00249">249</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -662,7 +727,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#afddf2f8ac67228adaa29292482c7d1d4">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00188">188</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00194">194</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -684,7 +749,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a361bd0e9b2a7ff22083fe16b2f91f2a0">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00254">254</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00260">260</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -706,7 +771,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#af0d81d327874a8aba196216cdf4d4687">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00265">265</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00271">271</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -728,7 +793,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#a917af87b2f7d7d89ee5e7b124e61e5b6">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00232">232</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00238">238</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -750,7 +815,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#ae12e74a15b47be96a3a75c56fa82af84">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00210">210</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00216">216</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -772,7 +837,7 @@ Public Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html#af4b239e424765f8acc8f22d16f3d8a03">com.snowplowanalytics.snowplow.internal.tracker.SubjectConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00177">177</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00183">183</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -793,7 +858,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The current timezone. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00125">125</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00131">131</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -814,7 +879,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The user-agent. @apiNote It's not generated by the tracker, it needs to be filled by the developer when instrumenting the tracker. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00106">106</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00112">112</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -835,7 +900,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The custom UserID. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00076">76</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00082">82</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -853,7 +918,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#colorDepth(Integer) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00068">68</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00074">74</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -870,7 +935,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#domainUserId(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00031">31</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00037">37</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -887,7 +952,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#ipAddress(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00041">41</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00047">47</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -904,7 +969,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#language(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00052">52</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00058">58</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -921,7 +986,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#networkUserId(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00026">26</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00032">32</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -938,7 +1003,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#screenResolution(Size) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00058">58</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00064">64</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -955,7 +1020,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#screenViewPort(Size) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00063">63</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00069">69</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -972,7 +1037,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#timezone(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00047">47</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00053">53</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -989,7 +1054,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#useragent(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00036">36</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00042">42</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
@@ -1006,7 +1071,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd>#userId(String) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00021">21</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_configuration_8java_source.html#l00027">27</a> of file <a class="el" href="_subject_configuration_8java_source.html">SubjectConfiguration.java</a>.</p>
 
 </div>
 </div>
