@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: macos-10.15
 
     strategy:
       fail-fast: false
