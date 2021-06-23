@@ -376,7 +376,6 @@ public class ServiceProvider implements ServiceProviderInterface {
         Subject subject = getSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
-        GdprConfigurationInterface gdprConfig = getGdprConfigurationUpdate();
         Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
                 .base64(trackerConfig.isBase64encoding())
@@ -394,7 +393,8 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())
                 .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
                 .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));
-        if (gdprConfig != null) {
+        GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();
+        if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(
                     gdprConfig.getBasisForProcessing(),
                     gdprConfig.getDocumentId(),
