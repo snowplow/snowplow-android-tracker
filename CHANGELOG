@@ -1,4 +1,8 @@
 
+Version 2.1.1 (2021-06-24)
+--------------------------
+Fix Gdpr context being tracked without enabling it (#457)
+
 Version 2.1.0 (2021-06-18)
 --------------------------
 Fix trueTimestamp not set by SelfDescribing builder (#451)
