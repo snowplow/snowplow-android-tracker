@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.1.1</span>
    </div>
   </td>
  </tr>
@@ -448,25 +448,25 @@ $(function() {
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        Subject subject = getSubject();</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        GdprConfigurationInterface gdprConfig = getGdprConfigurationUpdate();</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;        Tracker.TrackerBuilder builder = <span class="keyword">new</span> Tracker.TrackerBuilder(emitter, <span class="keyword">namespace</span>, trackerConfig.getAppId(), context)</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                .subject(subject)</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                .base64(trackerConfig.isBase64encoding())</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                .level(trackerConfig.getLogLevel())</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                .loggerDelegate(trackerConfig.getLoggerDelegate())</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                .platform(trackerConfig.getDevicePlatform())</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                .sessionContext(trackerConfig.isSessionContext())</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                .applicationContext(trackerConfig.isApplicationContext())</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                .mobileContext(trackerConfig.isPlatformContext())</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                .screenContext(trackerConfig.isScreenContext())</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                .screenviewEvents(trackerConfig.isScreenViewAutotracking())</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                .installTracking(trackerConfig.isInstallAutotracking())</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                .applicationCrash(trackerConfig.isExceptionAutotracking())</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">if</span> (gdprConfig != <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        Tracker.TrackerBuilder builder = <span class="keyword">new</span> Tracker.TrackerBuilder(emitter, <span class="keyword">namespace</span>, trackerConfig.getAppId(), context)</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                .subject(subject)</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                .base64(trackerConfig.isBase64encoding())</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                .level(trackerConfig.getLogLevel())</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                .loggerDelegate(trackerConfig.getLoggerDelegate())</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                .platform(trackerConfig.getDevicePlatform())</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                .sessionContext(trackerConfig.isSessionContext())</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                .applicationContext(trackerConfig.isApplicationContext())</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                .mobileContext(trackerConfig.isPlatformContext())</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                .screenContext(trackerConfig.isScreenContext())</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                .screenviewEvents(trackerConfig.isScreenViewAutotracking())</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                .installTracking(trackerConfig.isInstallAutotracking())</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                .applicationCrash(trackerConfig.isExceptionAutotracking())</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">if</span> (gdprConfig.sourceConfig != <span class="keyword">null</span>) {</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            builder.gdprContext(</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                    gdprConfig.getBasisForProcessing(),</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                    gdprConfig.getDocumentId(),</div>
