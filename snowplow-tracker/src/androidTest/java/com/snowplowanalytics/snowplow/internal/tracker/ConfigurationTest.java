@@ -201,6 +201,55 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void withoutGdprConfiguration() throws InterruptedException {
+        MockEventStore eventStore = new MockEventStore();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid")
+                .base64encoding(false);
+        EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
+                .eventStore(eventStore)
+                .threadPoolSize(10);
+        TrackerController trackerController = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, emitterConfiguration);
+        GdprController gdprController = trackerController.getGdpr();
+
+        // Check gdpr settings
+        assertFalse(gdprController.isEnabled());
+
+        // Check gdpr context not added
+        trackerController.track(new Structured("category", "action"));
+        for (int i = 0; eventStore.getSize() < 1 && i < 10; i++) {
+            Thread.sleep(1000);
+        }
+        List<EmitterEvent> events = eventStore.getEmittableEvents(10);
+        eventStore.removeAllEvents();
+        assertEquals(1, events.size());
+        Payload payload = events.get(0).payload;
+        String contexts = (String) payload.getMap().get("co");
+        assertFalse(contexts.contains("\"basisForProcessing\""));
+
+        // Check gdpr can be enabled again
+        gdprController.reset(Basis.CONTRACT, "id2", "1", "desc");
+        gdprController.enable();
+        assertEquals(Basis.CONTRACT, gdprController.getBasisForProcessing());
+        assertEquals("id2", gdprController.getDocumentId());
+        assertTrue(gdprController.isEnabled());
+
+        // Check gdpr context added
+        trackerController.track(new Structured("category", "action"));
+        for (int i = 0; eventStore.getSize() < 1 && i < 10; i++) {
+            Thread.sleep(1000);
+        }
+        events = eventStore.getEmittableEvents(10);
+        eventStore.removeAllEvents();
+        assertEquals(1, events.size());
+        payload = events.get(0).payload;
+        contexts = (String) payload.getMap().get("co");
+        assertTrue(contexts.contains("\"basisForProcessing\":\"contract\""));
+        assertTrue(contexts.contains("\"documentId\":\"id2\""));
+    }
+
+    @Test
     public void globalContextsConfiguration() throws InterruptedException {
         MockEventStore eventStore = new MockEventStore();
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
