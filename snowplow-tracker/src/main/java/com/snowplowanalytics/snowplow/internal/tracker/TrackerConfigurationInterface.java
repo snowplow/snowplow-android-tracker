@@ -170,4 +170,18 @@ public interface TrackerConfigurationInterface {
      * Whether enable diagnostic reporting.
      */
     void setDiagnosticAutotracking(boolean diagnosticAutotracking);
+
+    /**
+     * Decorate the v_tracker field in the tracker protocol.
+     *
+     * @note Do not use. Internal use only.
+     */
+    @Nullable
+    String getTrackerVersionSuffix();
+
+    /**
+     * Decorate the v_tracker field in the tracker protocol.
+     * @note Do not use. Internal use only.
+     */
+    void setTrackerVersionSuffix(@Nullable String trackerVersionSuffix);
 }

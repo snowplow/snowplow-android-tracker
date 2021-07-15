@@ -23,6 +23,7 @@ import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.MockEventStore;
 import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
@@ -138,6 +139,38 @@ public class ConfigurationTest {
         assertEquals(1, emitterController.getEmitRange());
     }
     */
+
+    @Test
+    public void trackerVersionSuffix() throws InterruptedException {
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appId")
+                .base64encoding(false)
+                .installAutotracking(false)
+                .trackerVersionSuffix("test With Space 1-2-3");
+
+        // Setup tracker
+        MockEventStore eventStore = new MockEventStore();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
+                .eventStore(eventStore)
+                .threadPoolSize(10);
+        TrackerController trackerController = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, emitterConfiguration);
+
+        // Track fake event
+        trackerController.track(new Structured("category", "action"));
+        for (int i = 0; eventStore.getSize() < 1 && i < 10; i++) {
+            Thread.sleep(1000);
+        }
+        List<EmitterEvent> events = eventStore.getEmittableEvents(10);
+        eventStore.removeAllEvents();
+        assertEquals(1, events.size());
+        Payload payload = events.get(0).payload;
+
+        // Check v_tracker field
+        String versionTracker = (String) payload.getMap().get("tv");
+        String expected = BuildConfig.TRACKER_LABEL + " testWithSpace1-2-3";
+        assertEquals(expected, versionTracker);
+    }
     
     @Test
     public void gdprConfiguration() throws InterruptedException {

@@ -294,6 +294,17 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
         getTracker().trackerDiagnostic = diagnosticAutotracking;
     }
 
+    @Nullable
+    @Override
+    public String getTrackerVersionSuffix() {
+        return getTracker().trackerVersionSuffix;
+    }
+
+    @Override
+    public void setTrackerVersionSuffix(@Nullable String trackerVersionSuffix) {
+        // The trackerVersionSuffix shouldn't be updated.
+    }
+
     // Private methods
 
     @NonNull
