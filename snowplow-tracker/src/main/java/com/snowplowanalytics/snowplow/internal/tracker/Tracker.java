@@ -635,9 +635,21 @@ public class Tracker {
 
     private void processEvent(@NonNull Event event) {
         TrackerEvent trackerEvent = new TrackerEvent(event);
+        transformEvent(trackerEvent);
         Payload payload = payloadWithEvent(trackerEvent);
         Logger.v(TAG, "Adding new payload to event storage: %s", payload);
         this.emitter.add(payload);
+    }
+
+    private void transformEvent(@NonNull TrackerEvent event) {
+        // Application_install event needs the timestamp to the real installation event.
+        if (event.schema != null
+                && event.schema.equals(TrackerConstants.SCHEMA_APPLICATION_INSTALL)
+                && event.trueTimestamp != null)
+        {
+            event.timestamp = event.trueTimestamp;
+            event.trueTimestamp = null;
+        }
     }
 
     private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {
