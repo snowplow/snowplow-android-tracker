@@ -378,6 +378,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
         Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
                 .subject(subject)
+                .trackerVersionSuffix(trackerConfig.getTrackerVersionSuffix())
                 .base64(trackerConfig.isBase64encoding())
                 .level(trackerConfig.getLogLevel())
                 .loggerDelegate(trackerConfig.getLoggerDelegate())

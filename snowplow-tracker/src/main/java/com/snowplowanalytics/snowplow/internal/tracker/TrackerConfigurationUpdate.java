@@ -148,4 +148,13 @@ public class TrackerConfigurationUpdate extends TrackerConfiguration {
     public boolean isDiagnosticAutotracking() {
         return (sourceConfig == null || diagnosticAutotrackingUpdated) ? super.diagnosticAutotracking : sourceConfig.diagnosticAutotracking;
     }
+
+    // trackerVersionSuffix flag
+
+    public boolean trackerVersionSuffixUpdated;
+
+    @Nullable
+    public String getTrackerVersionSuffix() {
+        return (sourceConfig == null || trackerVersionSuffixUpdated) ? super.trackerVersionSuffix : sourceConfig.trackerVersionSuffix;
+    }
 }

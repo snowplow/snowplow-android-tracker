@@ -88,6 +88,11 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      * @see #diagnosticAutotracking(boolean) 
      */
     public boolean diagnosticAutotracking;
+    /**
+     * @see #trackerVersionSuffix(String)
+     */
+    @Nullable
+    public String trackerVersionSuffix;
 
     // Getters and Setters
 
@@ -243,6 +248,17 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     @Override
     public void setDiagnosticAutotracking(boolean diagnosticAutotracking) {
         this.diagnosticAutotracking = diagnosticAutotracking;
+    }
+
+    @Override
+    @Nullable
+    public String getTrackerVersionSuffix() {
+        return trackerVersionSuffix;
+    }
+
+    @Override
+    public void setTrackerVersionSuffix(@Nullable String trackerVersionSuffix) {
+        this.trackerVersionSuffix = trackerVersionSuffix;
     }
 
     // Constructors
@@ -428,6 +444,16 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         return this;
     }
 
+    /**
+     * Decorate the v_tracker field in the tracker protocol.
+     * @note Do not use. Internal use only.
+     */
+    @NonNull
+    public TrackerConfiguration trackerVersionSuffix(@Nullable String trackerVersionSuffix) {
+        this.trackerVersionSuffix = trackerVersionSuffix;
+        return this;
+    }
+
     // Copyable
 
     @NonNull
@@ -450,6 +476,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         copy.installAutotracking = installAutotracking;
         copy.exceptionAutotracking = exceptionAutotracking;
         copy.diagnosticAutotracking = diagnosticAutotracking;
+        copy.trackerVersionSuffix = trackerVersionSuffix;
         return copy;
     }
 

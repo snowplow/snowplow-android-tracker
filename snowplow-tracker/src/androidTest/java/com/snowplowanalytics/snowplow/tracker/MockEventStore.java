@@ -64,18 +64,21 @@ public class MockEventStore implements EventStore {
     public List<EmitterEvent> getEmittableEvents(int queryLimit) {
         synchronized (this) {
             List<Long> eventIds = new ArrayList<>();
+            List<String> eventPayloads = new ArrayList<>();
             List<EmitterEvent> events = new ArrayList<>();
             for (Map.Entry<Long, Payload> entry : db.entrySet()) {
                 Payload payloadCopy = new TrackerPayload();
                 payloadCopy.addMap(entry.getValue().getMap());
                 EmitterEvent event = new EmitterEvent(payloadCopy, entry.getKey());
                 eventIds.add(event.eventId);
+                eventPayloads.add(payloadCopy.getMap().toString());
                 events.add(event);
             }
             if (queryLimit < events.size()) {
                 events = events.subList(0, queryLimit);
             }
-            Logger.v("MockEventStore", "getEmittableEvents: %s", eventIds);
+            Logger.v("MockEventStore", "getEmittableEvents ids: %s", eventIds);
+            Logger.v("MockEventStore", "getEmittableEvents payloads: %s", eventPayloads);
             return events;
         }
     }

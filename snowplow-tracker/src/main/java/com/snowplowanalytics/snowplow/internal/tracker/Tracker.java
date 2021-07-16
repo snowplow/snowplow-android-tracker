@@ -63,7 +63,7 @@ import com.snowplowanalytics.snowplow.util.Basis;
 public class Tracker {
 
     private final static String TAG = Tracker.class.getSimpleName();
-    private final String trackerVersion = BuildConfig.TRACKER_LABEL;
+    private String trackerVersion = BuildConfig.TRACKER_LABEL;
 
     // --- Singleton Access
 
@@ -140,6 +140,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
+    String trackerVersionSuffix;
 
     private Gdpr gdpr;
     private ScreenState screenState;
@@ -229,6 +230,7 @@ public class Tracker {
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
         @Nullable Gdpr gdpr = null; // Optional
+        @Nullable String trackerVersionSuffix = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -484,6 +486,16 @@ public class Tracker {
         }
 
         /**
+         * Internal use only.
+         * Decorate the `tv` (tracker version) field in the tracker protocol.
+         */
+        @NonNull
+        public TrackerBuilder trackerVersionSuffix(@Nullable String trackerVersionSuffix) {
+            this.trackerVersionSuffix = trackerVersionSuffix;
+            return this;
+        }
+
+        /**
          * Creates a new Tracker or throws an
          * Exception of we cannot find a suitable
          * extensible class.
@@ -540,6 +552,14 @@ public class Tracker {
         this.level = builder.logLevel;
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
+        this.trackerVersionSuffix = builder.trackerVersionSuffix;
+
+        if (trackerVersionSuffix != null) {
+            String suffix = trackerVersionSuffix.replaceAll("[^A-Za-z0-9.-]", "");
+            if (!suffix.isEmpty()) {
+                trackerVersion = trackerVersion + " " + suffix;
+            }
+        }
 
         registerNotificationHandlers();
 
@@ -635,9 +655,21 @@ public class Tracker {
 
     private void processEvent(@NonNull Event event) {
         TrackerEvent trackerEvent = new TrackerEvent(event);
+        transformEvent(trackerEvent);
         Payload payload = payloadWithEvent(trackerEvent);
         Logger.v(TAG, "Adding new payload to event storage: %s", payload);
         this.emitter.add(payload);
+    }
+
+    private void transformEvent(@NonNull TrackerEvent event) {
+        // Application_install event needs the timestamp to the real installation event.
+        if (event.schema != null
+                && event.schema.equals(TrackerConstants.SCHEMA_APPLICATION_INSTALL)
+                && event.trueTimestamp != null)
+        {
+            event.timestamp = event.trueTimestamp;
+            event.trueTimestamp = null;
+        }
     }
 
     private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {

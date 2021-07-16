@@ -1,4 +1,10 @@
 
+Version 2.2.0 (2021-07-16)
+--------------------------
+Set amended v_tracker indicating wrapper tracker version (#465)
+Remove bufferOption tests (#464)
+Set application install timestamp on device timestamp field (#462)
+
 Version 2.1.1 (2021-06-24)
 --------------------------
 Fix Gdpr context being tracked without enabling it (#457)
