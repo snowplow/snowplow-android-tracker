@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.1.1</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -148,6 +148,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a952bea9b9443f7bc4d57547aa87113e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07eb1e27fc414930898ae328c2c6a498"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a07eb1e27fc414930898ae328c2c6a498">setDiagnosticAutotracking</a> (boolean diagnosticAutotracking)</td></tr>
 <tr class="separator:a07eb1e27fc414930898ae328c2c6a498"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41e5e4856b738a77cab8dda1c9c7a3bc"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a41e5e4856b738a77cab8dda1c9c7a3bc">getTrackerVersionSuffix</a> ()</td></tr>
+<tr class="separator:a41e5e4856b738a77cab8dda1c9c7a3bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe55c71ab06e0b7dfc1ad68c8d2bf1e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#afe55c71ab06e0b7dfc1ad68c8d2bf1e6">setTrackerVersionSuffix</a> (@Nullable String trackerVersionSuffix)</td></tr>
+<tr class="separator:afe55c71ab06e0b7dfc1ad68c8d2bf1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -230,6 +234,27 @@ Public Member Functions</h2></td></tr>
 <p>It sets the log level of tracker logs. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a36b8a168509f5832c5f77035161a78b9">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a05fe8b41d245fafa37c8601b93253cb2">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#ab2f05191bfe8458427f46efddcbdcd82">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
+
+</div>
+</div>
+<a id="a41e5e4856b738a77cab8dda1c9c7a3bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41e5e4856b738a77cab8dda1c9c7a3bc">&#9670;&nbsp;</a></span>getTrackerVersionSuffix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.getTrackerVersionSuffix </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Decorate the v_tracker field in the tracker protocol.</p>
+<dl class="section note"><dt>Note</dt><dd>Do not use. Internal use only. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a7cac0d3e28763a37b9689b232ec0e283">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a920f8e01c51ea87044e998debe761806">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#afe91aa067677a294c0ffeeb74a5c56c6">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
 
 </div>
 </div>
@@ -767,6 +792,27 @@ Public Member Functions</h2></td></tr>
 <p>Whether session context is sent with all the tracked events. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a31114e4af46949e9894559a3781aa493">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a4811dd74a0cb565b2c3ddd06c79a6d7b">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
+
+</div>
+</div>
+<a id="afe55c71ab06e0b7dfc1ad68c8d2bf1e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe55c71ab06e0b7dfc1ad68c8d2bf1e6">&#9670;&nbsp;</a></span>setTrackerVersionSuffix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.setTrackerVersionSuffix </td>
+          <td>(</td>
+          <td class="paramtype">@Nullable String&#160;</td>
+          <td class="paramname"><em>trackerVersionSuffix</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Decorate the v_tracker field in the tracker protocol. </p><dl class="section note"><dt>Note</dt><dd>Do not use. Internal use only. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a08e365ba37b2e63838ca4c8fe8489bc8">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a11423f823081a01934a3e05cea5ffa0e">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.1.1</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -450,82 +450,83 @@ $(function() {
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        Tracker.TrackerBuilder builder = <span class="keyword">new</span> Tracker.TrackerBuilder(emitter, <span class="keyword">namespace</span>, trackerConfig.getAppId(), context)</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                .subject(subject)</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                .base64(trackerConfig.isBase64encoding())</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                .level(trackerConfig.getLogLevel())</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                .loggerDelegate(trackerConfig.getLoggerDelegate())</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                .platform(trackerConfig.getDevicePlatform())</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                .sessionContext(trackerConfig.isSessionContext())</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                .applicationContext(trackerConfig.isApplicationContext())</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                .mobileContext(trackerConfig.isPlatformContext())</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                .screenContext(trackerConfig.isScreenContext())</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                .screenviewEvents(trackerConfig.isScreenViewAutotracking())</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                .installTracking(trackerConfig.isInstallAutotracking())</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                .applicationCrash(trackerConfig.isExceptionAutotracking())</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">if</span> (gdprConfig.sourceConfig != <span class="keyword">null</span>) {</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            builder.gdprContext(</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                    gdprConfig.getBasisForProcessing(),</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                    gdprConfig.getDocumentId(),</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                    gdprConfig.getDocumentVersion(),</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;                    gdprConfig.getDocumentDescription());</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        }</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        Tracker tracker = builder.buildAndReset();</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;        <span class="keywordflow">if</span> (globalContextsConfiguration != <span class="keyword">null</span>) {</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;            tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        }</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keywordflow">if</span> (trackerConfigurationUpdate.isPaused) {</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;            tracker.pauseEventTracking();</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        }</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        <span class="keywordflow">if</span> (sessionConfigurationUpdate.isPaused) {</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            tracker.pauseSessionChecking();</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        }</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="keywordflow">return</span> tracker;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    }</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keyword">private</span> TrackerControllerImpl makeTrackerController() {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> TrackerControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    }</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="keyword">private</span> SessionControllerImpl makeSessionController() {</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> SessionControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keyword">private</span> EmitterControllerImpl makeEmitterController() {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> EmitterControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    }</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keyword">private</span> GdprControllerImpl makeGdprController() {</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        GdprControllerImpl controller = <span class="keyword">new</span> GdprControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        Gdpr gdpr = getTracker().getGdprContext();</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        <span class="keywordflow">if</span> (gdpr != <span class="keyword">null</span>) {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;            controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        }</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <span class="keywordflow">return</span> controller;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    }</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="keyword">private</span> GlobalContextsControllerImpl makeGlobalContextsController() {</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> GlobalContextsControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    }</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keyword">private</span> SubjectControllerImpl makeSubjectController() {</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> SubjectControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    }</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160; </div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    @NonNull</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    <span class="keyword">private</span> NetworkControllerImpl makeNetworkController() {</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> NetworkControllerImpl(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    }</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;}</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                .trackerVersionSuffix(trackerConfig.getTrackerVersionSuffix())</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                .base64(trackerConfig.isBase64encoding())</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                .level(trackerConfig.getLogLevel())</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                .loggerDelegate(trackerConfig.getLoggerDelegate())</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                .platform(trackerConfig.getDevicePlatform())</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                .sessionContext(trackerConfig.isSessionContext())</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                .applicationContext(trackerConfig.isApplicationContext())</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                .mobileContext(trackerConfig.isPlatformContext())</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                .screenContext(trackerConfig.isScreenContext())</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                .screenviewEvents(trackerConfig.isScreenViewAutotracking())</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                .lifecycleEvents(trackerConfig.isLifecycleAutotracking())</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                .installTracking(trackerConfig.isInstallAutotracking())</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                .applicationCrash(trackerConfig.isExceptionAutotracking())</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordflow">if</span> (gdprConfig.sourceConfig != <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            builder.gdprContext(</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                    gdprConfig.getBasisForProcessing(),</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                    gdprConfig.getDocumentId(),</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;                    gdprConfig.getDocumentVersion(),</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;                    gdprConfig.getDocumentDescription());</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        }</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;        Tracker tracker = builder.buildAndReset();</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        <span class="keywordflow">if</span> (globalContextsConfiguration != <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;            tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        }</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">if</span> (trackerConfigurationUpdate.isPaused) {</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;            tracker.pauseEventTracking();</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        }</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        <span class="keywordflow">if</span> (sessionConfigurationUpdate.isPaused) {</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;            tracker.pauseSessionChecking();</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        }</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <span class="keywordflow">return</span> tracker;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    }</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    <span class="keyword">private</span> TrackerControllerImpl makeTrackerController() {</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> TrackerControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    }</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keyword">private</span> SessionControllerImpl makeSessionController() {</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> SessionControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    }</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    <span class="keyword">private</span> EmitterControllerImpl makeEmitterController() {</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> EmitterControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160; </div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keyword">private</span> GdprControllerImpl makeGdprController() {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        GdprControllerImpl controller = <span class="keyword">new</span> GdprControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        Gdpr gdpr = getTracker().getGdprContext();</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        <span class="keywordflow">if</span> (gdpr != <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;            controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        }</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        <span class="keywordflow">return</span> controller;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    }</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="keyword">private</span> GlobalContextsControllerImpl makeGlobalContextsController() {</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> GlobalContextsControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    }</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="keyword">private</span> SubjectControllerImpl makeSubjectController() {</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> SubjectControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    }</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    @NonNull</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keyword">private</span> NetworkControllerImpl makeNetworkController() {</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> NetworkControllerImpl(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    }</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a></div><div class="ttdef"><b>Definition:</b> <a href="_emitter_configuration_8java_source.html#l00016">EmitterConfiguration.java:16</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">com.snowplowanalytics.snowplow.configuration.GdprConfiguration</a></div><div class="ttdef"><b>Definition:</b> <a href="_gdpr_configuration_8java_source.html#l00011">GdprConfiguration.java:11</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_global_contexts_configuration_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_global_contexts_configuration.html">com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration</a></div><div class="ttdef"><b>Definition:</b> <a href="_global_contexts_configuration_8java_source.html#l00016">GlobalContextsConfiguration.java:16</a></div></div>

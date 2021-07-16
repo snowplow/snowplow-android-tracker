@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['android_20analytics_20for_20snowplow_1902',['Android Analytics for Snowplow',['../index.html',1,'']]]
+  ['android_20analytics_20for_20snowplow_1906',['Android Analytics for Snowplow',['../index.html',1,'']]]
 ];
