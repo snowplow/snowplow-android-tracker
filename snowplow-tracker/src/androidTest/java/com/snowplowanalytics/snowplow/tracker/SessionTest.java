@@ -41,6 +41,7 @@ public class SessionTest extends AndroidTestCase {
         super.setUp();
         Context context = getContext();
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS);
+        cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_GENERAL_VARS);
     }
 
     public void testSessionInit() {
@@ -66,6 +67,7 @@ public class SessionTest extends AndroidTestCase {
         Session session = getSession(3, 3);
 
         Map<String, Object> sessionContext = getSessionContext(session,"event_1");
+        assertNotNull(sessionContext.get(Parameters.SESSION_USER_ID));
         String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
         assertEquals(1, session.getSessionIndex());
         assertNotNull(sessionContext.get(Parameters.SESSION_INDEX));

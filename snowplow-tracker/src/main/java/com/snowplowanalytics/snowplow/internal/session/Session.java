@@ -13,6 +13,7 @@
 
 package com.snowplowanalytics.snowplow.internal.session;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
@@ -134,6 +135,7 @@ public class Session {
         this(foregroundTimeout, backgroundTimeout, timeUnit, null, context);
     }
 
+    @SuppressLint("ApplySharedPref")
     @Deprecated
     public Session(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit, @Nullable String namespace, @NonNull Context context) {
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
@@ -175,6 +177,18 @@ public class Session {
         } finally {
             StrictMode.setThreadPolicy(oldPolicy);
         }
+
+        // Get or Set the Session UserID
+        SharedPreferences generalPref = context.getSharedPreferences(TrackerConstants.SNOWPLOW_GENERAL_VARS, Context.MODE_PRIVATE);
+        String storedUserId = generalPref.getString(TrackerConstants.INSTALLATION_USER_ID, null);
+        if (storedUserId != null) {
+            userId = storedUserId;
+        } else if (userId != null) {
+            generalPref.edit()
+                    .putString(TrackerConstants.INSTALLATION_USER_ID, userId)
+                    .commit();
+        }
+
         Logger.v(TAG, "Tracker Session Object created.");
     }
 
@@ -237,7 +251,6 @@ public class Session {
         }
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Parameters.SESSION_USER_ID, userId);
         editor.putString(Parameters.SESSION_ID, currentSessionId);
         editor.putString(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
         editor.putInt(Parameters.SESSION_INDEX, sessionIndex);
@@ -352,11 +365,11 @@ public class Session {
         StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
         try {
             SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
-            if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+            if (sharedPreferences.contains(Parameters.SESSION_ID)) {
                 return sharedPreferences;
             } else {
                 sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-                if (sharedPreferences.contains(Parameters.SESSION_USER_ID)) {
+                if (sharedPreferences.contains(Parameters.SESSION_ID)) {
                     return sharedPreferences;
                 }
             }
