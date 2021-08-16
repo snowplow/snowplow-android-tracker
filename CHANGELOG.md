@@ -1,4 +1,8 @@
 
+Version 2.2.1 (2021-08-16)
+--------------------------
+Fix Session UserID not consistent among tracker instances (#466)
+
 Version 2.2.0 (2021-07-16)
 --------------------------
 Set amended v_tracker indicating wrapper tracker version (#465)
