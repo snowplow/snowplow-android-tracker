@@ -654,7 +654,7 @@ public class Tracker {
     }
 
     private void processEvent(@NonNull Event event) {
-        TrackerEvent trackerEvent = new TrackerEvent(event);
+        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
         transformEvent(trackerEvent);
         Payload payload = payloadWithEvent(trackerEvent);
         Logger.v(TAG, "Adding new payload to event storage: %s", payload);

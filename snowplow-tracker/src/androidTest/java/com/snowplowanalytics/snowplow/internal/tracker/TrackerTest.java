@@ -42,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import java.util.UUID;
@@ -179,8 +180,8 @@ public class TrackerTest extends AndroidTestCase {
                 .variable("variable")
                 .timing(100)
                 .build();
-        UUID id1 = new TrackerEvent(event).eventId;
-        UUID id2 = new TrackerEvent(event).eventId;
+        UUID id1 = new TrackerEvent(event, new HashMap<>()).eventId;
+        UUID id2 = new TrackerEvent(event, new HashMap<>()).eventId;
         assertNotEquals(id1, id2);
     }
 

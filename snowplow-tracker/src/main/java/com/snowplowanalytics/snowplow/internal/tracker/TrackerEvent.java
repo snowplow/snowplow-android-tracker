@@ -37,17 +37,19 @@ public class TrackerEvent implements InspectableEvent {
     long timestamp;
     Long trueTimestamp;
     List<SelfDescribingJson> contexts;
+    Map<String, StateFuture> state;
 
     boolean isPrimitive;
     boolean isService;
 
-    public TrackerEvent(@NonNull Event event) {
+    public TrackerEvent(@NonNull Event event, @NonNull Map<String, StateFuture> stateCopy) {
         eventId = UUID.randomUUID();
         timestamp = System.currentTimeMillis();
 
         contexts = new ArrayList<>(event.getContexts());
         trueTimestamp = event.getTrueTimestamp();
         payload = new HashMap<>(event.getDataPayload());
+        state = stateCopy;
 
         isService = event instanceof TrackerError;
         if (event instanceof AbstractPrimitive) {
@@ -77,5 +79,11 @@ public class TrackerEvent implements InspectableEvent {
     @Override
     public Map<String, Object> getPayload() {
         return payload;
+    }
+
+    @NonNull
+    @Override
+    public Map<String, StateFuture> getState() {
+        return state;
     }
 }
