@@ -11,7 +11,7 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ScreenState {
+public class ScreenState implements State {
     private String name;
     private String type;
     private String id;

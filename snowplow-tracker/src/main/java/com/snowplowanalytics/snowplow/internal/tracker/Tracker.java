@@ -143,8 +143,8 @@ public class Tracker {
     String trackerVersionSuffix;
 
     private Gdpr gdpr;
-    private ScreenState screenState;
     private InstallTracker installTracker;
+    private StateManager stateManager;
 
     private long foregroundTimeout;
     private long backgroundTimeout;
@@ -469,7 +469,7 @@ public class Tracker {
          * @return itself
          */
         @NonNull
-        public TrackerBuilder screenContext(@NonNull Boolean screenContext) {
+        public synchronized TrackerBuilder screenContext(@NonNull Boolean screenContext) {
             this.screenContext = screenContext;
             return this;
         }
@@ -523,6 +523,7 @@ public class Tracker {
      * @param builder The builder that constructs a tracker
      */
     private Tracker(@NonNull TrackerBuilder builder) {
+        this.stateManager = new StateManager();
         this.context = builder.context;
 
         String trackerNamespace = builder.namespace != null ? builder.namespace : "default";
@@ -544,8 +545,6 @@ public class Tracker {
         this.trackerDiagnostic = builder.trackerDiagnostic;
         this.lifecycleEvents = builder.lifecycleEvents;
         this.activityTracking = builder.activityTracking;
-        this.screenState = new ScreenState();
-        this.screenContext = builder.screenContext;
         this.installTracking = builder.installTracking;
         this.applicationContext = builder.applicationContext;
         this.gdpr = builder.gdpr;
@@ -553,6 +552,13 @@ public class Tracker {
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
         this.trackerVersionSuffix = builder.trackerVersionSuffix;
+
+        this.screenContext = builder.screenContext;
+        if (screenContext) {
+            stateManager.addStateMachine(new ScreenStateMachine(), "ScreenContext");
+        } else {
+            stateManager.removeStateMachine("ScreenContext");
+        }
 
         if (trackerVersionSuffix != null) {
             String suffix = trackerVersionSuffix.replaceAll("[^A-Za-z0-9.-]", "");
@@ -639,26 +645,20 @@ public class Tracker {
         if (!dataCollection.get()) {
             return;
         }
-
-        if (event instanceof ScreenView && screenState != null) {
-            ScreenView screenView = (ScreenView) event;
-            screenView.updateScreenState(screenState);
+        event.beginProcessing(this);
+        Map<String, StateFuture> stateCopy;
+        synchronized (this) {
+            stateCopy = stateManager.trackerStateByProcessedEvent(event);
         }
-
         boolean reportsOnDiagnostic = !(event instanceof TrackerError);
         Executor.execute(reportsOnDiagnostic, TAG, () -> {
-            event.beginProcessing(this);
-            processEvent(event);
+            TrackerEvent trackerEvent = new TrackerEvent(event, stateCopy);
+            transformEvent(trackerEvent);
+            Payload payload = payloadWithEvent(trackerEvent);
+            Logger.v(TAG, "Adding new payload to event storage: %s", payload);
+            this.emitter.add(payload);
             event.endProcessing(this);
         });
-    }
-
-    private void processEvent(@NonNull Event event) {
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
-        transformEvent(trackerEvent);
-        Payload payload = payloadWithEvent(trackerEvent);
-        Logger.v(TAG, "Adding new payload to event storage: %s", payload);
-        this.emitter.add(payload);
     }
 
     private void transformEvent(@NonNull TrackerEvent event) {
@@ -683,6 +683,7 @@ public class Tracker {
         List<SelfDescribingJson> contexts = event.contexts;
         addBasicContextsToContexts(contexts, event);
         addGlobalContextsToContexts(contexts, event);
+        addStateMachineEntitiesToContexts(contexts, event);
         wrapContextsToPayload(payload, contexts);
         return payload;
     }
@@ -748,10 +749,6 @@ public class Tracker {
             contexts.add(Util.getGeoLocationContext(this.context));
         }
 
-        if (screenContext) {
-            contexts.add(screenState.getCurrentScreen(true));
-        }
-
         if (gdpr != null) {
             contexts.add(gdpr.getContext());
         }
@@ -763,6 +760,11 @@ public class Tracker {
                 contexts.addAll(generator.generateContexts(event));
             }
         }
+    }
+
+    private void addStateMachineEntitiesToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull InspectableEvent event) {
+        List<SelfDescribingJson> stateManagerEntities = stateManager.entitiesByProcessedEvent(event);
+        contexts.addAll(stateManagerEntities);
     }
 
     private void wrapContextsToPayload(@NonNull Payload payload, @NonNull List<SelfDescribingJson> contexts) {
@@ -1092,8 +1094,15 @@ public class Tracker {
      * @return screen state from tracker
      */
     @Nullable
+    @Deprecated
     public ScreenState getScreenState() {
-        return this.screenState;
+        StateFuture stateFuture = stateManager.stateIdentifierToCurrentState.get("ScreenContext");
+        if (stateFuture == null) return null;
+        State state = stateFuture.getState();
+        if (state instanceof ScreenState) {
+            return (ScreenState) state;
+        }
+        return null;
     }
 
     // --- Global contexts

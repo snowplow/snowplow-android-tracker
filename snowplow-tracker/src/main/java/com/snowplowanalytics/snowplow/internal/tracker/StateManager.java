@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
 
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -18,7 +19,7 @@ public class StateManager {
     private HashMap<StateMachineInterface, String> stateMachineToIdentifier = new HashMap<>();
     private HashMap<String, List<StateMachineInterface>> eventSchemaToStateMachine = new HashMap<>();
     private HashMap<String, List<StateMachineInterface>> eventSchemaToEntitiesGenerator = new HashMap<>();
-    private HashMap<String, StateFuture> stateIdentifierToCurrentState = new HashMap<>();
+    HashMap<String, StateFuture> stateIdentifierToCurrentState = new HashMap<>();
 
 
     public synchronized void addStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
@@ -62,8 +63,8 @@ public class StateManager {
 
     @NonNull
     synchronized Map<String, StateFuture> trackerStateByProcessedEvent(@NonNull Event event) {
-        if (event instanceof SelfDescribing) {
-            SelfDescribing sdEvent = (SelfDescribing)event;
+        if (event instanceof AbstractSelfDescribing) {
+            AbstractSelfDescribing sdEvent = (AbstractSelfDescribing)event;
             List<StateMachineInterface> stateMachines = eventSchemaToStateMachine.get(sdEvent.getSchema());
             if (stateMachines == null) {
                 stateMachines = new LinkedList<>();
@@ -96,7 +97,11 @@ public class StateManager {
         for (StateMachineInterface stateMachine : stateMachines) {
             String stateIdentifier = stateMachineToIdentifier.get(stateMachine);
             StateFuture stateFuture = event.getState().get(stateIdentifier);
-            List<SelfDescribingJson> entities = stateMachine.entities(event, stateFuture.getState());
+            State state = null;
+            if (stateFuture != null) {
+                state = stateFuture.getState();
+            }
+            List<SelfDescribingJson> entities = stateMachine.entities(event, state);
             result.addAll(entities);
         }
         return result;

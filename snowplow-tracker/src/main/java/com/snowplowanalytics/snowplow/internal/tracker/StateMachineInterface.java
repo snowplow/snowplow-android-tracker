@@ -21,5 +21,5 @@ public interface StateMachineInterface {
     State transition(@NonNull Event event, @Nullable State currentState);
 
     @NonNull
-    List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @NonNull State state);
+    List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @Nullable State state);
 }

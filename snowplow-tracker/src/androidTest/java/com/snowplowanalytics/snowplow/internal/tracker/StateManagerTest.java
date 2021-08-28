@@ -3,11 +3,16 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.event.Timing;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
+import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+
+import android.content.Context;
 
 @RunWith(AndroidJUnit4.class)
 public class StateManagerTest {
@@ -80,6 +87,28 @@ public class StateManagerTest {
         InspectableEvent e = new TrackerEvent(eventInc, state);
         List<SelfDescribingJson> entities = stateManager.entitiesByProcessedEvent(e);
         assertEquals(0, entities.size());
+    }
+
+    @Test
+    public void testScreenState() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Emitter emitter = new Emitter.EmitterBuilder("http://snowplow-fake-url.com", context).build();
+        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
+                .screenContext(true)
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .build();
+
+        // Send events
+        tracker.track(new Timing("category", "variable", 123));
+
+        tracker.track(new ScreenView("screen1"));
+
+        tracker.track(new Timing("category", "variable", 123));
+
+        tracker.track(new ScreenView("screen2"));
+
+        tracker.track(new Timing("category", "variable", 123));
     }
 }
 
