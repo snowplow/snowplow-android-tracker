@@ -419,7 +419,7 @@ public class TrackerTest extends AndroidTestCase {
         String screenId = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
-        screenStateMapWrapper = screenState.getCurrentScreen(true).getMap();
+        screenStateMapWrapper = tracker.getScreenState().getCurrentScreen(true).getMap();
         screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
         assertEquals("screen1", screenStateMap.get(Parameters.SCREEN_NAME));
         assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
@@ -428,12 +428,6 @@ public class TrackerTest extends AndroidTestCase {
         screenView = ScreenView.builder().name("screen2").build();
         String screenId1 = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
-
-        Map<String, Object> payload = (Map<String, Object>) screenView.getDataPayload();
-        assertEquals("screen2", payload.get(Parameters.SCREEN_NAME));
-        assertEquals(screenId1, payload.get(Parameters.SCREEN_ID));
-        assertEquals("screen1", payload.get(Parameters.SV_PREVIOUS_NAME));
-        assertEquals(screenId, payload.get(Parameters.SV_PREVIOUS_ID));
     }
 
     public void testTrackUncaughtException() {

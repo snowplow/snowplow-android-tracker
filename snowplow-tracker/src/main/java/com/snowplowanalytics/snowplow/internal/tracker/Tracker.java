@@ -1099,7 +1099,10 @@ public class Tracker {
     @Deprecated
     public ScreenState getScreenState() {
         StateFuture stateFuture = stateManager.stateIdentifierToCurrentState.get("ScreenContext");
-        if (stateFuture == null) return null;
+        if (stateFuture == null) {
+            // Legacy initialization
+            return new ScreenState();
+        };
         State state = stateFuture.getState();
         if (state instanceof ScreenState) {
             return (ScreenState) state;
