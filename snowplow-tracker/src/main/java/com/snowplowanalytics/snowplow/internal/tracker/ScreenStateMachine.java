@@ -6,13 +6,16 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ScreenStateMachine implements StateMachineInterface {
 
@@ -26,6 +29,12 @@ public class ScreenStateMachine implements StateMachineInterface {
     @Override
     public List<String> subscribedEventSchemasForEntitiesGeneration() {
         return Collections.singletonList("*");
+    }
+
+    @NonNull
+    @Override
+    public List<String> subscribedEventSchemasForPayloadUpdating() {
+        return Collections.singletonList(TrackerConstants.SCHEMA_SCREEN_VIEW);
     }
 
     @Nullable
@@ -49,5 +58,19 @@ public class ScreenStateMachine implements StateMachineInterface {
         ScreenState screenState = (ScreenState) state;
         SelfDescribingJson entity = screenState.getCurrentScreen(true);
         return Collections.singletonList(entity);
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> payloadValues(@NonNull InspectableEvent event, @Nullable State state) {
+        if (state instanceof ScreenState) {
+            ScreenState screenState = ((ScreenState) state);
+            Map<String, Object> addedValues = new HashMap<>();
+            addedValues.put(Parameters.SV_PREVIOUS_NAME, screenState.getPreviousName());
+            addedValues.put(Parameters.SV_PREVIOUS_TYPE, screenState.getPreviousType());
+            addedValues.put(Parameters.SV_PREVIOUS_ID, screenState.getPreviousId());
+            return addedValues;
+        }
+        return null;
     }
 }

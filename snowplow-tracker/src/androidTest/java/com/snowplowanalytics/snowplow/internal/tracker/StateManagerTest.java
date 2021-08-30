@@ -10,9 +10,11 @@ import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.MockEventStore;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +40,7 @@ public class StateManagerTest {
 
         SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
         SelfDescribing eventDec = new SelfDescribing("dec", new HashMap() {{ put("value", 2); }});
-        SelfDescribing event = new SelfDescribing("nothing", new HashMap() {{ put("value", 3); }});
+        SelfDescribing event = new SelfDescribing("event", new HashMap() {{ put("value", 3); }});
 
         Map<String, StateFuture> state = stateManager.trackerStateByProcessedEvent(eventInc);
         MockState mockState = (MockState)(state.get("identifier").getState());
@@ -47,6 +49,8 @@ public class StateManagerTest {
         List<SelfDescribingJson> entities = stateManager.entitiesByProcessedEvent(e);
         Map<String,Integer> data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
+        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertNull(e.getPayload().get("newParam"));
 
         state = stateManager.trackerStateByProcessedEvent(eventInc);
         mockState = (MockState)(state.get("identifier").getState());
@@ -55,6 +59,8 @@ public class StateManagerTest {
         entities = stateManager.entitiesByProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(2, data.get("value").intValue());
+        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertNull(e.getPayload().get("newParam"));
 
         state = stateManager.trackerStateByProcessedEvent(eventDec);
         mockState = (MockState)(state.get("identifier").getState());
@@ -63,6 +69,8 @@ public class StateManagerTest {
         entities = stateManager.entitiesByProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
+        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertNull(e.getPayload().get("newParam"));
 
         state = stateManager.trackerStateByProcessedEvent(event);
         mockState = (MockState)(state.get("identifier").getState());
@@ -71,6 +79,8 @@ public class StateManagerTest {
         entities = stateManager.entitiesByProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
+        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertEquals("value", e.getPayload().get("newParam"));
     }
 
     @Test
@@ -90,9 +100,12 @@ public class StateManagerTest {
     }
 
     @Test
-    public void testScreenState() {
+    public void testScreenStateMachine() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Emitter emitter = new Emitter.EmitterBuilder("http://snowplow-fake-url.com", context).build();
+        MockEventStore eventStore = new MockEventStore();
+        Emitter emitter = new Emitter.EmitterBuilder("http://snowplow-fake-url.com", context)
+                .eventStore(eventStore)
+                .build();
         Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .screenContext(true)
                 .base64(false)
@@ -101,14 +114,48 @@ public class StateManagerTest {
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        Payload payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        String entities = (String) payload.getMap().get("co");
+        assertNull(entities);
 
         tracker.track(new ScreenView("screen1"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        assertTrue(entities.contains("screen1"));
 
         tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertTrue(entities.contains("screen1"));
 
         tracker.track(new ScreenView("screen2"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertTrue(entities.contains("screen2"));
+        String eventPayload = (String) payload.getMap().get("ue_pr");
+        assertTrue(eventPayload.contains("screen1"));
+        assertTrue(eventPayload.contains("screen2"));
 
         tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertTrue(entities.contains("screen2"));
     }
 }
 
@@ -136,6 +183,12 @@ class MockStateMachine implements StateMachineInterface {
         return new LinkedList<>(Collections.singletonList("*"));
     }
 
+    @NonNull
+    @Override
+    public List<String> subscribedEventSchemasForPayloadUpdating() {
+        return new LinkedList<>(Collections.singletonList("event"));
+    }
+
     @Nullable
     @Override
     public State transition(@NonNull Event event, @Nullable State currentState) {
@@ -155,11 +208,17 @@ class MockStateMachine implements StateMachineInterface {
 
     @NonNull
     @Override
-    public List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @NonNull State state) {
+    public List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @Nullable State state) {
         MockState mockState = (MockState)state;
         SelfDescribingJson sdj = new SelfDescribingJson("enitity", new HashMap<String,Integer>() {{
             put("value", mockState.value);
         }});
         return new LinkedList<>(Arrays.asList(sdj));
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> payloadValues(@NonNull InspectableEvent event, @Nullable State state) {
+        return new HashMap<String, Object>() {{ put("newParam", "value"); }};
     }
 }

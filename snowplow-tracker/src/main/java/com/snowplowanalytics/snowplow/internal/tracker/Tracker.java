@@ -670,6 +670,8 @@ public class Tracker {
             event.timestamp = event.trueTimestamp;
             event.trueTimestamp = null;
         }
+        // Payload can be optionally updated with values based on internal state
+        stateManager.addPayloadValuesForEvent(event);
     }
 
     private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {

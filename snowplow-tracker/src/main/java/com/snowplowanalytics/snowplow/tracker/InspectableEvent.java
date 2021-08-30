@@ -21,4 +21,6 @@ public interface InspectableEvent {
 
     @NonNull
     Map<String, StateFuture> getState();
+
+    boolean addPayloadValues(@NonNull Map<String, Object> payload);
 }

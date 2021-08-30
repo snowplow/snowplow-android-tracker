@@ -86,4 +86,19 @@ public class TrackerEvent implements InspectableEvent {
     public Map<String, StateFuture> getState() {
         return state;
     }
+
+    @Override
+    public boolean addPayloadValues(@NonNull Map<String, Object> payloadAdding) {
+        boolean result = true;
+        for (Map.Entry<String, Object> entry : payloadAdding.entrySet()) {
+            String key = entry.getKey();
+            if (payload.get(key) == null) {
+                payload.put(key, entry.getValue());
+            } else {
+                result = false;
+            }
+        }
+        return result;
+    }
+
 }

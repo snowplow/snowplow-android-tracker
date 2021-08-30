@@ -36,6 +36,7 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.MockEventStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;

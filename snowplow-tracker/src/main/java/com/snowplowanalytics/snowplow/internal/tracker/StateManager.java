@@ -15,32 +15,20 @@ import java.util.Map;
 
 public class StateManager {
 
-    private HashMap<String, StateMachineInterface> identifierToStateMachine = new HashMap<>();
-    private HashMap<StateMachineInterface, String> stateMachineToIdentifier = new HashMap<>();
-    private HashMap<String, List<StateMachineInterface>> eventSchemaToStateMachine = new HashMap<>();
-    private HashMap<String, List<StateMachineInterface>> eventSchemaToEntitiesGenerator = new HashMap<>();
+    private final HashMap<String, StateMachineInterface> identifierToStateMachine = new HashMap<>();
+    private final HashMap<StateMachineInterface, String> stateMachineToIdentifier = new HashMap<>();
+    private final HashMap<String, List<StateMachineInterface>> eventSchemaToStateMachine = new HashMap<>();
+    private final HashMap<String, List<StateMachineInterface>> eventSchemaToEntitiesGenerator = new HashMap<>();
+    private final HashMap<String, List<StateMachineInterface>> eventSchemaToPayloadUpdater = new HashMap<>();
     HashMap<String, StateFuture> stateIdentifierToCurrentState = new HashMap<>();
 
 
     public synchronized void addStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
         identifierToStateMachine.put(identifier, stateMachine);
         stateMachineToIdentifier.put(stateMachine, identifier);
-        for (String eventSchema : stateMachine.subscribedEventSchemasForTransitions()) {
-            List<StateMachineInterface> list = eventSchemaToStateMachine.get(eventSchema);
-            if (list == null) {
-                list = new LinkedList<>();
-                eventSchemaToStateMachine.put(eventSchema, list);
-            }
-            list.add(stateMachine);
-        }
-        for (String eventSchema : stateMachine.subscribedEventSchemasForEntitiesGeneration()) {
-            List<StateMachineInterface> list = eventSchemaToEntitiesGenerator.get(eventSchema);
-            if (list == null) {
-                list = new LinkedList<>();
-                eventSchemaToEntitiesGenerator.put(eventSchema, list);
-            }
-            list.add(stateMachine);
-        }
+        addToSchemaRegistry(eventSchemaToStateMachine, stateMachine.subscribedEventSchemasForTransitions(), stateMachine);
+        addToSchemaRegistry(eventSchemaToEntitiesGenerator, stateMachine.subscribedEventSchemasForEntitiesGeneration(), stateMachine);
+        addToSchemaRegistry(eventSchemaToPayloadUpdater, stateMachine.subscribedEventSchemasForPayloadUpdating(), stateMachine);
     }
 
     public synchronized boolean removeStateMachine(@NonNull String identifier) {
@@ -50,21 +38,16 @@ public class StateManager {
         }
         stateMachineToIdentifier.remove(stateMachine);
         stateIdentifierToCurrentState.remove(identifier);
-        for (String eventSchema : stateMachine.subscribedEventSchemasForTransitions()) {
-            List<StateMachineInterface> list = eventSchemaToStateMachine.get(eventSchema);
-            list.remove(stateMachine);
-        }
-        for (String eventSchema : stateMachine.subscribedEventSchemasForEntitiesGeneration()) {
-            List<StateMachineInterface> list = eventSchemaToEntitiesGenerator.get(eventSchema);
-            list.remove(stateMachine);
-        }
+        removeFromSchemaRegistry(eventSchemaToStateMachine, stateMachine.subscribedEventSchemasForTransitions(), stateMachine);
+        removeFromSchemaRegistry(eventSchemaToEntitiesGenerator, stateMachine.subscribedEventSchemasForEntitiesGeneration(), stateMachine);
+        removeFromSchemaRegistry(eventSchemaToPayloadUpdater, stateMachine.subscribedEventSchemasForPayloadUpdating(), stateMachine);
         return true;
     }
 
     @NonNull
     synchronized Map<String, StateFuture> trackerStateByProcessedEvent(@NonNull Event event) {
         if (event instanceof AbstractSelfDescribing) {
-            AbstractSelfDescribing sdEvent = (AbstractSelfDescribing)event;
+            AbstractSelfDescribing sdEvent = (AbstractSelfDescribing) event;
             List<StateMachineInterface> stateMachines = eventSchemaToStateMachine.get(sdEvent.getSchema());
             if (stateMachines == null) {
                 stateMachines = new LinkedList<>();
@@ -102,9 +85,58 @@ public class StateManager {
                 state = stateFuture.getState();
             }
             List<SelfDescribingJson> entities = stateMachine.entities(event, state);
-            result.addAll(entities);
+            if (entities != null) {
+                result.addAll(entities);
+            }
         }
         return result;
+    }
+
+    public synchronized boolean addPayloadValuesForEvent(@NonNull InspectableEvent event) {
+        int failures = 0;
+        List<StateMachineInterface> stateMachines = eventSchemaToPayloadUpdater.get(event.getSchema());
+        if (stateMachines == null) {
+            stateMachines = new LinkedList<>();
+        }
+        List<StateMachineInterface> stateMachinesGeneral = eventSchemaToPayloadUpdater.get("*");
+        if (stateMachinesGeneral != null) {
+            stateMachines.addAll(stateMachinesGeneral);
+        }
+        for (StateMachineInterface stateMachine : stateMachines) {
+            String stateIdentifier = stateMachineToIdentifier.get(stateMachine);
+            StateFuture stateFuture = event.getState().get(stateIdentifier);
+            State state = null;
+            if (stateFuture != null) {
+                state = stateFuture.getState();
+            }
+            Map<String, Object> payloadValues = stateMachine.payloadValues(event, state);
+            if (payloadValues != null && !event.addPayloadValues(payloadValues)) {
+                failures++;
+            }
+        }
+        return failures == 0;
+    }
+
+    // Private methods
+
+    private void addToSchemaRegistry(Map<String, List<StateMachineInterface>> schemaRegistry, List<String> schemas, StateMachineInterface stateMachine) {
+        for (String eventSchema : schemas) {
+            List<StateMachineInterface> list = schemaRegistry.get(eventSchema);
+            if (list == null) {
+                list = new LinkedList<>();
+                schemaRegistry.put(eventSchema, list);
+            }
+            list.add(stateMachine);
+        }
+    }
+
+    private void removeFromSchemaRegistry(Map<String, List<StateMachineInterface>> schemaRegistry, List<String> schemas, StateMachineInterface stateMachine) {
+        for (String eventSchema : schemas) {
+            List<StateMachineInterface> list = schemaRegistry.get(eventSchema);
+            if (list != null) {
+                list.remove(stateMachine);
+            }
+        }
     }
 
 }
