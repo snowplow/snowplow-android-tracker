@@ -61,6 +61,18 @@ public class StateManager {
                 StateFuture previousState = stateIdentifierToCurrentState.get(stateIdentifier);
                 StateFuture newState = new StateFuture(sdEvent, previousState, stateMachine);
                 stateIdentifierToCurrentState.put(stateIdentifier, newState);
+                // TODO: Remove early state computation.
+                /*
+                The early state-computation causes low performance as it's executed synchronously on
+                the track method thread. Ideally, the state computation should be executed only on
+                entities generation or payload updating (outputs). In that case there are two problems
+                to address:
+                 - long chains of StateFuture filling the memory (in case the outputs are not generated)
+                 - event object reuse by the user (the event object in the StateFuture could be modified
+                   externally)
+                 Remove the early state-computation only when these two problems are fixed.
+                 */
+                newState.getState(); // Early state-computation
             }
         }
         return new HashMap<>(stateIdentifierToCurrentState);

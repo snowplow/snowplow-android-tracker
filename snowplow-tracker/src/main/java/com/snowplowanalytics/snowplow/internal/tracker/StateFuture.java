@@ -13,7 +13,7 @@ public class StateFuture {
 
     private State computedState;
 
-    public StateFuture(@NonNull Event event, @Nullable StateFuture previousState, StateMachineInterface stateMachine) {
+    public StateFuture(@NonNull Event event, @Nullable StateFuture previousState, @NonNull StateMachineInterface stateMachine) {
         this.event = event;
         this.previousState = previousState;
         this.stateMachine = stateMachine;
@@ -21,7 +21,7 @@ public class StateFuture {
 
     @Nullable
     public synchronized State getState() {
-        if (computedState == null) {
+        if (computedState == null && stateMachine != null) {
             State prevState = null;
             if (previousState != null) {
                 prevState = previousState.getState();

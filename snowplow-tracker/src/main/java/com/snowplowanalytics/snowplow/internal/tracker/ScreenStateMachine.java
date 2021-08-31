@@ -19,6 +19,16 @@ import java.util.Map;
 
 public class ScreenStateMachine implements StateMachineInterface {
 
+    /*
+     States: Init, Screen
+     Events: SV (ScreenView)
+     Transitions:
+      - Init (SV) Screen
+      - Screen (SV) Screen
+     Entity Generation:
+      - Screen
+     */
+
     @NonNull
     @Override
     public List<String> subscribedEventSchemasForTransitions() {
@@ -43,8 +53,10 @@ public class ScreenStateMachine implements StateMachineInterface {
         ScreenView screenView = (ScreenView) event;
         ScreenState screenState;
         if (currentState != null) {
+            // - Screen (SV) Screen
             screenState = (ScreenState) currentState;
         } else {
+            // - Init (SV) Screen
             screenState = new ScreenState();
         }
         screenView.updateScreenState(screenState);
