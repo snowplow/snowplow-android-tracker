@@ -22,7 +22,7 @@ public interface StateMachineInterface {
     List<String> subscribedEventSchemasForPayloadUpdating();
 
     @Nullable
-    State transition(@NonNull Event event, @Nullable State currentState);
+    State transition(@NonNull Event event, @Nullable State state);
 
     @Nullable
     List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @Nullable State state);

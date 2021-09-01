@@ -5,6 +5,13 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.event.Event;
 
+/**
+ StateFuture represents the placeholder of a future computation.
+ The proper state value is computed when it's observed. Until that moment the StateFuture keeps the elements
+ (event, previous StateFuture, StateMachine) needed to calculate the real state value.
+ For this reason, the StateFuture can be the head of StateFuture chain which will collapse once the StateFuture
+ head is asked to get the real state value.
+ */
 public class StateFuture {
 
     private Event event;

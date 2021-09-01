@@ -181,8 +181,8 @@ public class TrackerTest extends AndroidTestCase {
                 .variable("variable")
                 .timing(100)
                 .build();
-        UUID id1 = new TrackerEvent(event, new HashMap<>()).eventId;
-        UUID id2 = new TrackerEvent(event, new HashMap<>()).eventId;
+        UUID id1 = new TrackerEvent(event).eventId;
+        UUID id2 = new TrackerEvent(event).eventId;
         assertNotEquals(id1, id2);
     }
 

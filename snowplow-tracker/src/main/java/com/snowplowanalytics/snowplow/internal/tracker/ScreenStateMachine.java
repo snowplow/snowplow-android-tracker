@@ -49,12 +49,12 @@ public class ScreenStateMachine implements StateMachineInterface {
 
     @Nullable
     @Override
-    public State transition(@NonNull Event event, @Nullable State currentState) {
+    public State transition(@NonNull Event event, @Nullable State state) {
         ScreenView screenView = (ScreenView) event;
         ScreenState screenState;
-        if (currentState != null) {
+        if (state != null) {
             // - Screen (SV) Screen
-            screenState = (ScreenState) currentState;
+            screenState = (ScreenState) state;
         } else {
             // - Init (SV) Screen
             screenState = new ScreenState();

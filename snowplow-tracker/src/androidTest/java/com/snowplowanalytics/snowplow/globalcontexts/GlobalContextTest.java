@@ -145,7 +145,7 @@ public class GlobalContextTest {
         GlobalContext staticGC = new GlobalContext(Collections.singletonList(sdj));
 
         AbstractPrimitive event = new Structured("Category", "Action");
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
+        TrackerEvent trackerEvent = new TrackerEvent(event);
 
         List<SelfDescribingJson> contexts = staticGC.generateContexts(trackerEvent);
         assertEquals(1, contexts.size());
@@ -164,7 +164,7 @@ public class GlobalContextTest {
         });
 
         AbstractPrimitive event = new Structured(stringToMatch, "Action");
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
+        TrackerEvent trackerEvent = new TrackerEvent(event);
 
         List<SelfDescribingJson> contexts = filterMatchingGC.generateContexts(trackerEvent);
         assertEquals(1, contexts.size());
@@ -193,21 +193,21 @@ public class GlobalContextTest {
 
         // Not matching primitive event
         AbstractPrimitive event = new Structured("Category", "Action");
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
+        TrackerEvent trackerEvent = new TrackerEvent(event);
         List<SelfDescribingJson> contexts = rulesetGC.generateContexts(trackerEvent);
         assertEquals(0, contexts.size());
 
         // Not matching self-describing event with mobile schema
         AbstractSelfDescribing selfDescribingEvent = new ScreenView("Name", null)
                 .type("Type");
-        trackerEvent = new TrackerEvent(selfDescribingEvent, new HashMap<>());
+        trackerEvent = new TrackerEvent(selfDescribingEvent);
         contexts = rulesetGC.generateContexts(trackerEvent);
         assertEquals(0, contexts.size());
 
         // Matching self-describing event with general schema
         selfDescribingEvent = new Timing("Category", "Variable", 123)
                 .label("Label");
-        trackerEvent = new TrackerEvent(selfDescribingEvent, new HashMap<>());
+        trackerEvent = new TrackerEvent(selfDescribingEvent);
         contexts = rulesetGC.generateContexts(trackerEvent);
         assertEquals(1, contexts.size());
         assertEquals("schema", contexts.get(0).getMap().get("schema"));
@@ -226,7 +226,7 @@ public class GlobalContextTest {
         });
 
         AbstractPrimitive event = new Structured("Category", "Action");
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
+        TrackerEvent trackerEvent = new TrackerEvent(event);
 
         List<SelfDescribingJson> contexts = blockGC.generateContexts(trackerEvent);
         assertEquals(1, contexts.size());
@@ -237,7 +237,7 @@ public class GlobalContextTest {
     public void testContextGenerator() {
         GlobalContext contextGeneratorGC = new GlobalContext(new GlobalContextGenerator());
         AbstractPrimitive event = new Structured("StringToMatch", "Action");
-        TrackerEvent trackerEvent = new TrackerEvent(event, new HashMap<>());
+        TrackerEvent trackerEvent = new TrackerEvent(event);
 
         List<SelfDescribingJson> contexts = contextGeneratorGC.generateContexts(trackerEvent);
         assertEquals(1, contexts.size());

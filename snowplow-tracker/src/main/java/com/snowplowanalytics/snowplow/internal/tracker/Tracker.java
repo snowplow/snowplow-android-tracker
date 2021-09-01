@@ -49,7 +49,6 @@ import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.session.ProcessObserver;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.util.Basis;
@@ -646,13 +645,13 @@ public class Tracker {
             return;
         }
         event.beginProcessing(this);
-        Map<String, StateFuture> stateCopy;
+        TrackerStateSnapshot stateSnapshot;
         synchronized (this) {
-            stateCopy = stateManager.trackerStateByProcessedEvent(event);
+            stateSnapshot = stateManager.trackerStateForProcessedEvent(event);
         }
         boolean reportsOnDiagnostic = !(event instanceof TrackerError);
         Executor.execute(reportsOnDiagnostic, TAG, () -> {
-            TrackerEvent trackerEvent = new TrackerEvent(event, stateCopy);
+            TrackerEvent trackerEvent = new TrackerEvent(event, stateSnapshot);
             transformEvent(trackerEvent);
             Payload payload = payloadWithEvent(trackerEvent);
             Logger.v(TAG, "Adding new payload to event storage: %s", payload);
@@ -671,7 +670,7 @@ public class Tracker {
             event.trueTimestamp = null;
         }
         // Payload can be optionally updated with values based on internal state
-        stateManager.addPayloadValuesForEvent(event);
+        stateManager.addPayloadValuesToEvent(event);
     }
 
     private @NonNull Payload payloadWithEvent(@NonNull TrackerEvent event) {
@@ -765,7 +764,7 @@ public class Tracker {
     }
 
     private void addStateMachineEntitiesToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull InspectableEvent event) {
-        List<SelfDescribingJson> stateManagerEntities = stateManager.entitiesByProcessedEvent(event);
+        List<SelfDescribingJson> stateManagerEntities = stateManager.entitiesForProcessedEvent(event);
         contexts.addAll(stateManagerEntities);
     }
 
@@ -1098,12 +1097,11 @@ public class Tracker {
     @Nullable
     @Deprecated
     public ScreenState getScreenState() {
-        StateFuture stateFuture = stateManager.stateIdentifierToCurrentState.get("ScreenContext");
-        if (stateFuture == null) {
+        State state = stateManager.trackerState.getState("ScreenContext");
+        if (state == null) {
             // Legacy initialization
             return new ScreenState();
         };
-        State state = stateFuture.getState();
         if (state instanceof ScreenState) {
             return (ScreenState) state;
         }

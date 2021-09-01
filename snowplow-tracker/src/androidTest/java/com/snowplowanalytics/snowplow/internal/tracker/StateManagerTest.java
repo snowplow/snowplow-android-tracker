@@ -42,44 +42,44 @@ public class StateManagerTest {
         SelfDescribing eventDec = new SelfDescribing("dec", new HashMap() {{ put("value", 2); }});
         SelfDescribing event = new SelfDescribing("event", new HashMap() {{ put("value", 3); }});
 
-        Map<String, StateFuture> state = stateManager.trackerStateByProcessedEvent(eventInc);
-        MockState mockState = (MockState)(state.get("identifier").getState());
+        TrackerStateSnapshot trackerState = stateManager.trackerStateForProcessedEvent(eventInc);
+        MockState mockState = (MockState)(trackerState.getState("identifier"));
         assertEquals(1, mockState.value);
-        InspectableEvent e = new TrackerEvent(eventInc, state);
-        List<SelfDescribingJson> entities = stateManager.entitiesByProcessedEvent(e);
+        InspectableEvent e = new TrackerEvent(eventInc, trackerState);
+        List<SelfDescribingJson> entities = stateManager.entitiesForProcessedEvent(e);
         Map<String,Integer> data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
-        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertTrue(stateManager.addPayloadValuesToEvent(e));
         assertNull(e.getPayload().get("newParam"));
 
-        state = stateManager.trackerStateByProcessedEvent(eventInc);
-        mockState = (MockState)(state.get("identifier").getState());
+        trackerState = stateManager.trackerStateForProcessedEvent(eventInc);
+        mockState = (MockState)(trackerState.getState("identifier"));
         assertEquals(2, mockState.value);
-        e = new TrackerEvent(eventInc, state);
-        entities = stateManager.entitiesByProcessedEvent(e);
+        e = new TrackerEvent(eventInc, trackerState);
+        entities = stateManager.entitiesForProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(2, data.get("value").intValue());
-        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertTrue(stateManager.addPayloadValuesToEvent(e));
         assertNull(e.getPayload().get("newParam"));
 
-        state = stateManager.trackerStateByProcessedEvent(eventDec);
-        mockState = (MockState)(state.get("identifier").getState());
+        trackerState = stateManager.trackerStateForProcessedEvent(eventDec);
+        mockState = (MockState)(trackerState.getState("identifier"));
         assertEquals(1, mockState.value);
-        e = new TrackerEvent(eventDec, state);
-        entities = stateManager.entitiesByProcessedEvent(e);
+        e = new TrackerEvent(eventDec, trackerState);
+        entities = stateManager.entitiesForProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
-        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertTrue(stateManager.addPayloadValuesToEvent(e));
         assertNull(e.getPayload().get("newParam"));
 
-        state = stateManager.trackerStateByProcessedEvent(event);
-        mockState = (MockState)(state.get("identifier").getState());
+        trackerState = stateManager.trackerStateForProcessedEvent(event);
+        mockState = (MockState)(trackerState.getState("identifier"));
         assertEquals(1, mockState.value);
-        e = new TrackerEvent(event, state);
-        entities = stateManager.entitiesByProcessedEvent(e);
+        e = new TrackerEvent(event, trackerState);
+        entities = stateManager.entitiesForProcessedEvent(e);
         data = (Map<String, Integer>) entities.get(0).getMap().get("data");
         assertEquals(1, data.get("value").intValue());
-        assertTrue(stateManager.addPayloadValuesForEvent(e));
+        assertTrue(stateManager.addPayloadValuesToEvent(e));
         assertEquals("value", e.getPayload().get("newParam"));
     }
 
@@ -91,11 +91,11 @@ public class StateManagerTest {
 
         SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
 
-        Map<String, StateFuture> state = stateManager.trackerStateByProcessedEvent(eventInc);
-        StateFuture stateFuture = state.get("identifier");
-        assertNull(stateFuture);
-        InspectableEvent e = new TrackerEvent(eventInc, state);
-        List<SelfDescribingJson> entities = stateManager.entitiesByProcessedEvent(e);
+        TrackerStateSnapshot trackerState = stateManager.trackerStateForProcessedEvent(eventInc);
+        State state = trackerState.getState("identifier");
+        assertNull(state);
+        InspectableEvent e = new TrackerEvent(eventInc, trackerState);
+        List<SelfDescribingJson> entities = stateManager.entitiesForProcessedEvent(e);
         assertEquals(0, entities.size());
     }
 

@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.event.Event;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 
@@ -20,7 +19,7 @@ public class StateManager {
     private final HashMap<String, List<StateMachineInterface>> eventSchemaToStateMachine = new HashMap<>();
     private final HashMap<String, List<StateMachineInterface>> eventSchemaToEntitiesGenerator = new HashMap<>();
     private final HashMap<String, List<StateMachineInterface>> eventSchemaToPayloadUpdater = new HashMap<>();
-    HashMap<String, StateFuture> stateIdentifierToCurrentState = new HashMap<>();
+    final TrackerState trackerState = new TrackerState();
 
 
     public synchronized void addStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
@@ -37,7 +36,7 @@ public class StateManager {
             return false;
         }
         stateMachineToIdentifier.remove(stateMachine);
-        stateIdentifierToCurrentState.remove(identifier);
+        trackerState.removeState(identifier);
         removeFromSchemaRegistry(eventSchemaToStateMachine, stateMachine.subscribedEventSchemasForTransitions(), stateMachine);
         removeFromSchemaRegistry(eventSchemaToEntitiesGenerator, stateMachine.subscribedEventSchemasForEntitiesGeneration(), stateMachine);
         removeFromSchemaRegistry(eventSchemaToPayloadUpdater, stateMachine.subscribedEventSchemasForPayloadUpdating(), stateMachine);
@@ -45,7 +44,7 @@ public class StateManager {
     }
 
     @NonNull
-    synchronized Map<String, StateFuture> trackerStateByProcessedEvent(@NonNull Event event) {
+    synchronized TrackerStateSnapshot trackerStateForProcessedEvent(@NonNull Event event) {
         if (event instanceof AbstractSelfDescribing) {
             AbstractSelfDescribing sdEvent = (AbstractSelfDescribing) event;
             List<StateMachineInterface> stateMachines = eventSchemaToStateMachine.get(sdEvent.getSchema());
@@ -58,9 +57,9 @@ public class StateManager {
             }
             for (StateMachineInterface stateMachine : stateMachines) {
                 String stateIdentifier = stateMachineToIdentifier.get(stateMachine);
-                StateFuture previousState = stateIdentifierToCurrentState.get(stateIdentifier);
-                StateFuture newState = new StateFuture(sdEvent, previousState, stateMachine);
-                stateIdentifierToCurrentState.put(stateIdentifier, newState);
+                StateFuture previousStateFuture = trackerState.getStateFuture(stateIdentifier);
+                StateFuture currentStateFuture = new StateFuture(sdEvent, previousStateFuture, stateMachine);
+                trackerState.put(stateIdentifier, currentStateFuture);
                 // TODO: Remove early state computation.
                 /*
                 The early state-computation causes low performance as it's executed synchronously on
@@ -72,14 +71,14 @@ public class StateManager {
                    externally)
                  Remove the early state-computation only when these two problems are fixed.
                  */
-                newState.getState(); // Early state-computation
+                currentStateFuture.getState(); // Early state-computation
             }
         }
-        return new HashMap<>(stateIdentifierToCurrentState);
+        return trackerState.getSnapshot();
     }
 
     @NonNull
-    synchronized List<SelfDescribingJson> entitiesByProcessedEvent(@NonNull InspectableEvent event) {
+    synchronized List<SelfDescribingJson> entitiesForProcessedEvent(@NonNull InspectableEvent event) {
         List<SelfDescribingJson> result = new LinkedList<>();
         List<StateMachineInterface> stateMachines = eventSchemaToEntitiesGenerator.get(event.getSchema());
         if (stateMachines == null) {
@@ -91,11 +90,7 @@ public class StateManager {
         }
         for (StateMachineInterface stateMachine : stateMachines) {
             String stateIdentifier = stateMachineToIdentifier.get(stateMachine);
-            StateFuture stateFuture = event.getState().get(stateIdentifier);
-            State state = null;
-            if (stateFuture != null) {
-                state = stateFuture.getState();
-            }
+            State state = event.getState().getState(stateIdentifier);
             List<SelfDescribingJson> entities = stateMachine.entities(event, state);
             if (entities != null) {
                 result.addAll(entities);
@@ -104,7 +99,7 @@ public class StateManager {
         return result;
     }
 
-    public synchronized boolean addPayloadValuesForEvent(@NonNull InspectableEvent event) {
+    public synchronized boolean addPayloadValuesToEvent(@NonNull InspectableEvent event) {
         int failures = 0;
         List<StateMachineInterface> stateMachines = eventSchemaToPayloadUpdater.get(event.getSchema());
         if (stateMachines == null) {
@@ -116,11 +111,7 @@ public class StateManager {
         }
         for (StateMachineInterface stateMachine : stateMachines) {
             String stateIdentifier = stateMachineToIdentifier.get(stateMachine);
-            StateFuture stateFuture = event.getState().get(stateIdentifier);
-            State state = null;
-            if (stateFuture != null) {
-                state = stateFuture.getState();
-            }
+            State state = event.getState().getState(stateIdentifier);
             Map<String, Object> payloadValues = stateMachine.payloadValues(event, state);
             if (payloadValues != null && !event.addPayloadValues(payloadValues)) {
                 failures++;
