@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -94,6 +95,12 @@ public class SelfDescribing extends AbstractSelfDescribing {
         Preconditions.checkNotNull(schema);
         this.schema = schema;
         this.eventData = eventData;
+    }
+
+    public SelfDescribing(@NonNull String schema, @NonNull Map<String, Object> payload) {
+        this.schema = schema;
+        this.payload = payload;
+        this.eventData = new SelfDescribingJson(schema, payload);
     }
 
     @Override
