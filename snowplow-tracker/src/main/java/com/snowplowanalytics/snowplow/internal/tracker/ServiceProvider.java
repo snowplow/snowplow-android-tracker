@@ -386,6 +386,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .sessionContext(trackerConfig.isSessionContext())
                 .applicationContext(trackerConfig.isApplicationContext())
                 .mobileContext(trackerConfig.isPlatformContext())
+                .deepLinkContext(trackerConfig.isDeepLinkContext())
                 .screenContext(trackerConfig.isScreenContext())
                 .screenviewEvents(trackerConfig.isScreenViewAutotracking())
                 .lifecycleEvents(trackerConfig.isLifecycleAutotracking())

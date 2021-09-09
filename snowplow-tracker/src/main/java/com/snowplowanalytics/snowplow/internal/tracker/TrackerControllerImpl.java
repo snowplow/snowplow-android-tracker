@@ -223,15 +223,27 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     }
 
     @Override
+    public boolean isDeepLinkContext() {
+        return getTracker().getDeepLinkContext();
+    }
+
+    @Override
+    public void setDeepLinkContext(boolean deepLinkContext) {
+        getDirtyConfig().deepLinkContext = deepLinkContext;
+        getDirtyConfig().deepLinkContextUpdated = true;
+        getTracker().setDeepLinkContext(deepLinkContext);
+    }
+
+    @Override
     public boolean isScreenContext() {
-        return getTracker().screenContext;
+        return getTracker().getScreenContext();
     }
 
     @Override
     public void setScreenContext(boolean screenContext) {
         getDirtyConfig().screenContext = screenContext;
         getDirtyConfig().screenContextUpdated = true;
-        getTracker().screenContext = screenContext;
+        getTracker().setScreenContext(screenContext);
     }
 
     @Override

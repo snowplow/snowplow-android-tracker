@@ -51,6 +51,7 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
@@ -298,7 +299,7 @@ public class Demo extends Activity implements LoggerDelegate {
             return;
         }
         TrackerEvents.trackAll(tracker);
-        eventsCreated += 9;
+        eventsCreated += 10;
         final String made = "Made: " + eventsCreated;
         runOnUiThread(() -> _eventsCreated.setText(made));
     }

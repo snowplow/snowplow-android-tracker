@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive;
+import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.ConsentDocument;
 import com.snowplowanalytics.snowplow.event.ConsentGranted;
@@ -42,6 +43,7 @@ import java.util.UUID;
 public class TrackerEvents {
 
     public static void trackAll(@NonNull TrackerController tracker) {
+        trackDeepLink(tracker);
         trackPageView(tracker);
         trackStructuredEvent(tracker);
         trackScreenView(tracker);
@@ -50,6 +52,11 @@ public class TrackerEvents {
         trackEcommerceEvent(tracker);
         trackConsentGranted(tracker);
         trackConsentWithdrawn(tracker);
+    }
+    
+    private static void trackDeepLink(TrackerController tracker) {
+        DeepLinkReceived event = new DeepLinkReceived("url link").referrer("referrer url");
+        tracker.track(event);
     }
 
     private static void trackPageView(TrackerController tracker) {
@@ -133,5 +140,4 @@ public class TrackerEvents {
                 .build();
         tracker.track(event);
     }
-
 }

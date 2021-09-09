@@ -65,6 +65,10 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      */
     public boolean sessionContext;
     /**
+     * @see #deepLinkContext(boolean)
+     */
+    public boolean deepLinkContext;
+    /**
      * @see #screenContext(boolean) 
      */
     public boolean screenContext;
@@ -191,6 +195,16 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     @Override
+    public boolean isDeepLinkContext() {
+        return deepLinkContext;
+    }
+
+    @Override
+    public void setDeepLinkContext(boolean deepLinkContext) {
+        this.deepLinkContext = deepLinkContext;
+    }
+
+    @Override
     public boolean isScreenContext() {
         return screenContext;
     }
@@ -275,6 +289,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      *         platformContext = true;
      *         geoLocationContext = false;
      *         screenContext = true;
+     *         deepLinkContext = true;
      *         screenViewAutotracking = true;
      *         lifecycleAutotracking = false;
      *         installAutotracking = true;
@@ -295,6 +310,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         applicationContext = true;
         platformContext = true;
         geoLocationContext = false;
+        deepLinkContext = true;
         screenContext = true;
         screenViewAutotracking = true;
         lifecycleAutotracking = false;
@@ -390,6 +406,15 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     /**
+     * Whether deepLink context is sent with all the ScreenView events.
+     */
+    @NonNull
+    public TrackerConfiguration deepLinkContext(boolean deepLinkContext) {
+        this.deepLinkContext = deepLinkContext;
+        return this;
+    }
+
+    /**
      * Whether screen context is sent with all the tracked events.
      */
     @NonNull
@@ -471,6 +496,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         copy.platformContext = platformContext;
         copy.geoLocationContext = geoLocationContext;
         copy.screenContext = screenContext;
+        copy.deepLinkContext = deepLinkContext;
         copy.screenViewAutotracking = screenViewAutotracking;
         copy.lifecycleAutotracking = lifecycleAutotracking;
         copy.installAutotracking = installAutotracking;
@@ -498,6 +524,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         platformContext = jsonObject.optBoolean("platformContext", platformContext);
         geoLocationContext = jsonObject.optBoolean("geoLocationContext", geoLocationContext);
         screenContext = jsonObject.optBoolean("screenContext", screenContext);
+        deepLinkContext = jsonObject.optBoolean("deepLinkContext", deepLinkContext);
         screenViewAutotracking = jsonObject.optBoolean("screenViewAutotracking", screenViewAutotracking);
         lifecycleAutotracking = jsonObject.optBoolean("lifecycleAutotracking", lifecycleAutotracking);
         installAutotracking = jsonObject.optBoolean("installAutotracking", installAutotracking);
