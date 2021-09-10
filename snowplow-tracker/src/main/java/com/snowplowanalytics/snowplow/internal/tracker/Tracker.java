@@ -605,6 +605,8 @@ public class Tracker {
                     }
                 }
             });
+            // Initialize LifecycleStateMachine for lifecycle entities
+            stateManager.addStateMachine(new LifecycleStateMachine(), "Lifecycle");
         }
 
         Logger.v(TAG, "Tracker created successfully.");
