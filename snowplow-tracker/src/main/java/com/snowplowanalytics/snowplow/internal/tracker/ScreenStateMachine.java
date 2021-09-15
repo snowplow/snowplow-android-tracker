@@ -78,9 +78,18 @@ public class ScreenStateMachine implements StateMachineInterface {
         if (state instanceof ScreenState) {
             ScreenState screenState = ((ScreenState) state);
             Map<String, Object> addedValues = new HashMap<>();
-            addedValues.put(Parameters.SV_PREVIOUS_NAME, screenState.getPreviousName());
-            addedValues.put(Parameters.SV_PREVIOUS_TYPE, screenState.getPreviousType());
-            addedValues.put(Parameters.SV_PREVIOUS_ID, screenState.getPreviousId());
+            String value = screenState.getPreviousName();
+            if (value != null && !value.isEmpty()) {
+                addedValues.put(Parameters.SV_PREVIOUS_NAME, value);
+            }
+            value = screenState.getPreviousId();
+            if (value != null && !value.isEmpty()) {
+                addedValues.put(Parameters.SV_PREVIOUS_ID, value);
+            }
+            value = screenState.getPreviousType();
+            if (value != null && !value.isEmpty()) {
+                addedValues.put(Parameters.SV_PREVIOUS_TYPE, value);
+            }
             return addedValues;
         }
         return null;

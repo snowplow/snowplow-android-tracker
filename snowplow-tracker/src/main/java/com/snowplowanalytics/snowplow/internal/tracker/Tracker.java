@@ -135,11 +135,13 @@ public class Tracker {
     boolean applicationCrash;
     boolean trackerDiagnostic;
     boolean lifecycleEvents;
-    boolean screenContext;
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
     String trackerVersionSuffix;
+
+    private boolean deepLinkcontext;
+    private boolean screenContext;
 
     private Gdpr gdpr;
     private InstallTracker installTracker;
@@ -224,6 +226,7 @@ public class Tracker {
         boolean applicationCrash = true; // Optional
         boolean trackerDiagnostic = false; // Optional
         boolean lifecycleEvents = false; // Optional
+        boolean deepLinkContext = true; // Optional
         boolean screenContext = false; // Optional
         boolean activityTracking = false; // Optional
         boolean installTracking = false; // Optional
@@ -462,6 +465,15 @@ public class Tracker {
         }
 
         /**
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#deepLinkContext(boolean)}
+         */
+        @NonNull
+        public TrackerBuilder deepLinkContext(@NonNull Boolean deepLinkContext) {
+            this.deepLinkContext = deepLinkContext;
+            return this;
+        }
+
+        /**
          * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#screenContext(boolean)}
          * @param screenContext whether to send a screen context (info pertaining
          *                      to current screen) with every event
@@ -552,12 +564,8 @@ public class Tracker {
         this.backgroundTimeout = builder.backgroundTimeout;
         this.trackerVersionSuffix = builder.trackerVersionSuffix;
 
-        this.screenContext = builder.screenContext;
-        if (screenContext) {
-            stateManager.addStateMachine(new ScreenStateMachine(), "ScreenContext");
-        } else {
-            stateManager.removeStateMachine("ScreenContext");
-        }
+        setScreenContext(builder.screenContext);
+        setDeepLinkContext(builder.deepLinkContext);
 
         if (trackerVersionSuffix != null) {
             String suffix = trackerVersionSuffix.replaceAll("[^A-Za-z0-9.-]", "");
@@ -962,10 +970,6 @@ public class Tracker {
         }
     }
 
-    public boolean getSessionContext() {
-        return sessionContext;
-    }
-
     /**
      * @param platform a valid DevicePlatform object
      */
@@ -973,7 +977,49 @@ public class Tracker {
         this.devicePlatform = platform;
     }
 
+    /**
+     * @deprecated Internal use only
+     */
+    public void setScreenContext(boolean screenContext) {
+        this.screenContext = screenContext;
+        if (screenContext) {
+            stateManager.addStateMachine(new ScreenStateMachine(), "ScreenContext");
+        } else {
+            stateManager.removeStateMachine("ScreenContext");
+        }
+    }
+
+    /**
+     * @deprecated Internal use only
+     */
+    public void setDeepLinkContext(boolean deepLinkContext) {
+        this.deepLinkcontext = deepLinkContext;
+        if (deepLinkcontext) {
+            stateManager.addStateMachine(new DeepLinkStateMachine(), "DeepLinkContext");
+        } else {
+            stateManager.removeStateMachine("DeepLinkContext");
+        }
+    }
+
     // --- Getters
+
+    /**
+     * @deprecated Internal use only
+     */
+    public boolean getScreenContext() {
+        return screenContext;
+    }
+
+    /**
+     * @deprecated Internal use only
+     */
+    public boolean getDeepLinkContext() {
+        return deepLinkcontext;
+    }
+
+    public boolean getSessionContext() {
+        return sessionContext;
+    }
 
     /**
      * @return the tracker version that was set

@@ -101,6 +101,14 @@ public class TrackerConfigurationUpdate extends TrackerConfiguration {
         return (sourceConfig == null || sessionContextUpdated) ? super.sessionContext : sourceConfig.sessionContext;
     }
 
+    // deepLinkContext flag
+
+    public boolean deepLinkContextUpdated;
+
+    public boolean isDeepLinkContext() {
+        return (sourceConfig == null || deepLinkContextUpdated) ? super.deepLinkContext : sourceConfig.deepLinkContext;
+    }
+
     // screenContext flag
 
     public boolean screenContextUpdated;
