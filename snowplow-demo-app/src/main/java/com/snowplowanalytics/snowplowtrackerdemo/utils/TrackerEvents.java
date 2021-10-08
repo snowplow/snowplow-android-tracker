@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
+import com.snowplowanalytics.snowplow.event.MessageNotification;
+import com.snowplowanalytics.snowplow.event.MessageNotificationTrigger;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.ConsentDocument;
 import com.snowplowanalytics.snowplow.event.ConsentGranted;
@@ -30,6 +32,7 @@ import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +55,7 @@ public class TrackerEvents {
         trackEcommerceEvent(tracker);
         trackConsentGranted(tracker);
         trackConsentWithdrawn(tracker);
+        trackMessageNotification(tracker);
     }
     
     private static void trackDeepLink(TrackerController tracker) {
@@ -138,6 +142,20 @@ public class TrackerEvents {
                 .documentVersion("withdrawn event doc version")
                 .consentDocuments(documents)
                 .build();
+        tracker.track(event);
+    }
+
+    private static void trackMessageNotification(TrackerController tracker) {
+        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.push)
+                .notificationTimestamp("2020-12-31T15:59:60-08:00")
+                .category("category")
+                .action("action")
+                .bodyLocKey("loc key")
+                .bodyLocArgs(Arrays.asList("loc arg1", "loc arg2"))
+                .sound("chime.mp3")
+                .notificationCount(9)
+                .category("category1");
+
         tracker.track(event);
     }
 }
