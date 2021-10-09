@@ -13,17 +13,31 @@
 
 package com.snowplowanalytics.snowplow.internal.tracker;
 
-import android.test.AndroidTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import android.content.Context;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.Map;
 
-public class PlatformContextTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class PlatformContextTest {
 
-    public void testMobileContextNonMocked() {
+    // --- TESTS
+
+    @Test
+    public void addsNotMockedMobileContext() {
         PlatformContext platformContext = new PlatformContext(getContext());
         SelfDescribingJson sdj = platformContext.getMobileContext();
         assertNotNull(sdj);
@@ -40,7 +54,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE));
     }
 
-    public void testAddsAllMockedInfo() {
+    @Test
+    public void addsAllMockedInfo() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         SelfDescribingJson sdj = platformContext.getMobileContext();
@@ -62,7 +77,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertEquals(70000L, (long) sdjData.get(Parameters.TOTAL_STORAGE));
     }
 
-    public void testUpdatesMobileInfo() {
+    @Test
+    public void updatesMobileInfo() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
@@ -72,7 +88,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
     }
 
-    public void testDoesntUpdateMobileInfoWithinUpdateWindow() {
+    @Test
+    public void doesntUpdateMobileInfoWithinUpdateWindow() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(1000, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
@@ -82,7 +99,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
     }
 
-    public void testUpdatesNetworkInfo() {
+    @Test
+    public void updatesNetworkInfo() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
@@ -92,7 +110,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
     }
 
-    public void testDoesntUpdateNetworkInfoWithinUpdateWindow() {
+    @Test
+    public void doesntUpdateNetworkInfoWithinUpdateWindow() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 1000, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
@@ -102,7 +121,8 @@ public class PlatformContextTest extends AndroidTestCase {
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
     }
 
-    public void testDoesntUpdateNonEphemeralInfo() {
+    @Test
+    public void doesntUpdateNonEphemeralInfo() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType"));
@@ -110,6 +130,12 @@ public class PlatformContextTest extends AndroidTestCase {
         platformContext.getMobileContext();
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage"));
+    }
+
+    // --- PRIVATE
+
+    private Context getContext() {
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
 }
