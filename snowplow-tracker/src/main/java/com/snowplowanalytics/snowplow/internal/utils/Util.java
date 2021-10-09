@@ -308,96 +308,96 @@ public class Util {
     // --- Mobile Context
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * @return the OS Type
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getOsType() {
         return new DeviceInfoMonitor().getOsType();
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * @return the OS Version
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getOsVersion() {
         return new DeviceInfoMonitor().getOsVersion();
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * @return the device model
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getDeviceModel() {
         return new DeviceInfoMonitor().getDeviceModel();
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * @return the device vendor
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getDeviceVendor() {
         return new DeviceInfoMonitor().getDeviceVendor();
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * @param context the android context
      * @return a carrier name or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getCarrier(@NonNull Context context) {
         return new DeviceInfoMonitor().getCarrier(context);
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * The function that actually fetches the Advertising ID.
      * - If called from the UI Thread will throw an Exception
      *
      * @param context the android context
      * @return an empty string if limited tracking is on otherwise the advertising id or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getAndroidIdfa(@NonNull Context context) {
         return new DeviceInfoMonitor().getAndroidIdfa(context);
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * Returns the network type that the device is connected to
      *
      * @param networkInfo The NetworkInformation object
      * @return the type of the network
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getNetworkType(@Nullable NetworkInfo networkInfo) {
         return new DeviceInfoMonitor().getNetworkType(networkInfo);
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * Returns the network technology
      *
      * @param networkInfo The NetworkInformation object
      * @return the technology of the network
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getNetworkTechnology(@Nullable NetworkInfo networkInfo) {
         return new DeviceInfoMonitor().getNetworkTechnology(networkInfo);
     }
 
     /**
-     * @deprecated Moved to internal API.
+     * @deprecated Will be removed in v3.
      * Returns an instance that represents the current network connection
      *
      * @param context the android context
      * @return the representation of the current network connection or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static NetworkInfo getNetworkInfo(@NonNull Context context) {
         return new DeviceInfoMonitor().getNetworkInfo(context);
     }
