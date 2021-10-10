@@ -37,43 +37,26 @@ import java.lang.reflect.Method;
 
 public class DeviceInfoMonitor {
 
-    /**
-     * @return the OS Type
-     */
     @NonNull
     public String getOsType() {
         return "android";
     }
 
-    /**
-     * @return the OS Version
-     */
     @NonNull
     public String getOsVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
 
-
-    /**
-     * @return the device model
-     */
     @NonNull
     public String getDeviceModel() {
         return android.os.Build.MODEL;
     }
 
-    /**
-     * @return the device vendor
-     */
     @NonNull
     public String getDeviceVendor() {
         return android.os.Build.MANUFACTURER;
     }
 
-    /**
-     * @param context the android context
-     * @return a carrier name or null
-     */
     @Nullable
     public String getCarrier(@NonNull Context context) {
         TelephonyManager telephonyManager =
@@ -114,12 +97,6 @@ public class DeviceInfoMonitor {
         }
     }
 
-    /**
-     * Returns the network type that the device is connected to
-     *
-     * @param networkInfo The NetworkInformation object
-     * @return the type of the network
-     */
     @NonNull
     public String getNetworkType(@Nullable NetworkInfo networkInfo) {
         String networkType = "offline";
@@ -136,12 +113,6 @@ public class DeviceInfoMonitor {
         return networkType;
     }
 
-    /**
-     * Returns the network technology
-     *
-     * @param networkInfo The NetworkInformation object
-     * @return the technology of the network
-     */
     @Nullable
     public String getNetworkTechnology(@Nullable NetworkInfo networkInfo) {
         String networkTech = null;
@@ -154,12 +125,6 @@ public class DeviceInfoMonitor {
         return networkTech;
     }
 
-    /**
-     * Returns an instance that represents the current network connection
-     *
-     * @param context the android context
-     * @return the representation of the current network connection or null
-     */
     @Nullable
     public NetworkInfo getNetworkInfo(@NonNull Context context) {
         ConnectivityManager cm = (ConnectivityManager)

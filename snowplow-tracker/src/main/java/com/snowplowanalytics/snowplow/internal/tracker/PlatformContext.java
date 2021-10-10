@@ -65,11 +65,6 @@ public class PlatformContext {
         this(100, 10 * 1000, new DeviceInfoMonitor(), context);
     }
 
-    /**
-     * Returns the Mobile Context
-     *
-     * @return the mobile context
-     */
     @Nullable
     public SelfDescribingJson getMobileContext() {
         updateEphemeralDictsIfNecessary();
