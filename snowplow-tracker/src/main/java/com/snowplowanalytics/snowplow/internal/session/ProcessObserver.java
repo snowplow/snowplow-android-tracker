@@ -23,6 +23,8 @@ import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
 
+import com.snowplowanalytics.snowplow.event.Background;
+import com.snowplowanalytics.snowplow.event.Foreground;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -88,10 +90,9 @@ public class ProcessObserver implements LifecycleObserver {
 
                 // Send Foreground Event
                 if (tracker.getLifecycleEvents()) {
-                    Map<String, Object> data = new HashMap<>();
-                    Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
-                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                            .contexts(lifecycleContexts)
+                    tracker.track(
+                            new Foreground().foregroundIndex(index)
+                                    .contexts(lifecycleContexts)
                     );
                 }
             } catch (Exception e) {
@@ -119,10 +120,9 @@ public class ProcessObserver implements LifecycleObserver {
 
                 // Send Background Event
                 if (tracker.getLifecycleEvents()) {
-                    Map<String, Object> data = new HashMap<>();
-                    Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
-                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                            .contexts(lifecycleContexts)
+                    tracker.track(
+                            new Background().backgroundIndex(index)
+                                    .contexts(lifecycleContexts)
                     );
                 }
             } catch (Exception e) {
