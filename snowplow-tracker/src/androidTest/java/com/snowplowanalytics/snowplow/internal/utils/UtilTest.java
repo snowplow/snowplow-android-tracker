@@ -2,10 +2,6 @@ package com.snowplowanalytics.snowplow.internal.utils;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,22 +38,6 @@ public class UtilTest extends AndroidTestCase {
         assertEquals("1,2,3", Util.joinLongList(list));
         list.add((long)5);
         assertEquals("1,2,3,5", Util.joinLongList(list));
-    }
-
-    public void testMobileContext() {
-        SelfDescribingJson sdj = Util.getMobileContext(getContext());
-        assertNotNull(sdj);
-
-        Map<String, Object> sdjMap = sdj.getMap();
-        assertEquals((String) sdjMap.get("schema"), TrackerConstants.MOBILE_SCHEMA);
-
-        Map sdjData = (Map) sdjMap.get("data");
-        assertEquals((String) sdjData.get(Parameters.OS_TYPE), "android");
-        assertTrue(sdjData.containsKey(Parameters.OS_VERSION));
-        assertTrue(sdjData.containsKey(Parameters.DEVICE_MODEL));
-        assertTrue(sdjData.containsKey(Parameters.DEVICE_MANUFACTURER));
-        assertTrue(sdjData.containsKey(Parameters.CARRIER));
-        assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE));
     }
 
     public void testDeserialize() {

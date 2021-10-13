@@ -150,6 +150,8 @@ public class Tracker {
     private long foregroundTimeout;
     private long backgroundTimeout;
 
+    private @NonNull PlatformContext platformContext;
+
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
     private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
@@ -564,6 +566,8 @@ public class Tracker {
         this.backgroundTimeout = builder.backgroundTimeout;
         this.trackerVersionSuffix = builder.trackerVersionSuffix;
 
+        this.platformContext = new PlatformContext(this.context);
+
         setScreenContext(builder.screenContext);
         setDeepLinkContext(builder.deepLinkContext);
 
@@ -734,7 +738,7 @@ public class Tracker {
         }
 
         if (mobileContext) {
-            contexts.add(Util.getMobileContext(this.context));
+            contexts.add(platformContext.getMobileContext());
         }
 
         if (event.isService) {
@@ -822,7 +826,7 @@ public class Tracker {
 
         // Add Mobile Context
         if (this.mobileContext) {
-            contexts.add(Util.getMobileContext(this.context));
+            contexts.add(platformContext.getMobileContext());
         }
 
         // Add application context

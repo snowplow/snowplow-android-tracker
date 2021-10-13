@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.snowplow.internal.tracker.PlatformContext;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import org.json.JSONArray;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import okhttp3.internal.platform.Platform;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -305,173 +308,98 @@ public class Util {
     // --- Mobile Context
 
     /**
-     * Returns the Mobile Context
-     *
-     * @param context the Android context
-     * @return the mobile context
-     */
-    @Nullable
-    public static SelfDescribingJson getMobileContext(@NonNull Context context) {
-        Map<String, Object> pairs = new HashMap<>();
-        addToMap(Parameters.OS_TYPE, getOsType(), pairs);
-        addToMap(Parameters.OS_VERSION, getOsVersion(), pairs);
-        addToMap(Parameters.DEVICE_MODEL, getDeviceModel(), pairs);
-        addToMap(Parameters.DEVICE_MANUFACTURER, getDeviceVendor(), pairs);
-        addToMap(Parameters.CARRIER, getCarrier(context), pairs);
-        addToMap(Parameters.ANDROID_IDFA, getAndroidIdfa(context), pairs);
-
-        NetworkInfo networkInfo = getNetworkInfo(context);
-        addToMap(Parameters.NETWORK_TYPE, getNetworkType(networkInfo), pairs);
-        addToMap(Parameters.NETWORK_TECHNOLOGY, getNetworkTechnology(networkInfo), pairs);
-
-        if (mapHasKeys(pairs,
-                Parameters.OS_TYPE,
-                Parameters.OS_VERSION,
-                Parameters.DEVICE_MANUFACTURER,
-                Parameters.DEVICE_MODEL)) {
-            return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
-        } else {
-            return null;
-        }
-    }
-
-    /**
+     * @deprecated Will be removed in v3.
      * @return the OS Type
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getOsType() {
-        return "android";
+        return new DeviceInfoMonitor().getOsType();
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * @return the OS Version
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getOsVersion() {
-        return android.os.Build.VERSION.RELEASE;
+        return new DeviceInfoMonitor().getOsVersion();
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * @return the device model
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getDeviceModel() {
-        return android.os.Build.MODEL;
+        return new DeviceInfoMonitor().getDeviceModel();
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * @return the device vendor
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getDeviceVendor() {
-        return android.os.Build.MANUFACTURER;
+        return new DeviceInfoMonitor().getDeviceVendor();
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * @param context the android context
      * @return a carrier name or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getCarrier(@NonNull Context context) {
-        TelephonyManager telephonyManager =
-                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-        if (telephonyManager != null) {
-            String carrierName = telephonyManager.getNetworkOperatorName();
-            if (!carrierName.equals("")) {
-                return carrierName;
-            }
-        }
-        return null;
+        return new DeviceInfoMonitor().getCarrier(context);
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * The function that actually fetches the Advertising ID.
      * - If called from the UI Thread will throw an Exception
      *
      * @param context the android context
      * @return an empty string if limited tracking is on otherwise the advertising id or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getAndroidIdfa(@NonNull Context context) {
-        try {
-            Object advertisingInfoObject = invokeStaticMethod(
-                    "com.google.android.gms.ads.identifier.AdvertisingIdClient",
-                    "getAdvertisingIdInfo", new Class[]{Context.class}, context);
-            Boolean limitedTracking = (Boolean) invokeInstanceMethod(advertisingInfoObject,
-                    "isLimitAdTrackingEnabled", null);
-            if (limitedTracking) {
-                return "";
-            }
-            return (String) invokeInstanceMethod(advertisingInfoObject, "getId", null);
-        }
-        catch (Exception e) {
-            Logger.e(TAG, "Exception getting the Advertising ID: %s", e.toString());
-            return null;
-        }
+        return new DeviceInfoMonitor().getAndroidIdfa(context);
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * Returns the network type that the device is connected to
      *
      * @param networkInfo The NetworkInformation object
      * @return the type of the network
      */
-    @NonNull
+    @NonNull @Deprecated
     public static String getNetworkType(@Nullable NetworkInfo networkInfo) {
-        String networkType = "offline";
-        if (networkInfo != null) {
-            String maybeNetworkType = networkInfo.getTypeName().toLowerCase();
-            switch (maybeNetworkType) {
-                case "mobile":
-                case "wifi":
-                    networkType = maybeNetworkType;
-                    break;
-                default: break;
-            }
-        }
-        return networkType;
+        return new DeviceInfoMonitor().getNetworkType(networkInfo);
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * Returns the network technology
      *
      * @param networkInfo The NetworkInformation object
      * @return the technology of the network
      */
-    @Nullable
+    @Nullable @Deprecated
     public static String getNetworkTechnology(@Nullable NetworkInfo networkInfo) {
-        String networkTech = null;
-        if (networkInfo != null) {
-            String networkType = networkInfo.getTypeName();
-            if (networkType.equalsIgnoreCase("MOBILE")) {
-                networkTech = networkInfo.getSubtypeName();
-            }
-        }
-        return networkTech;
+        return new DeviceInfoMonitor().getNetworkTechnology(networkInfo);
     }
 
     /**
+     * @deprecated Will be removed in v3.
      * Returns an instance that represents the current network connection
      *
      * @param context the android context
      * @return the representation of the current network connection or null
      */
-    @Nullable
+    @Nullable @Deprecated
     public static NetworkInfo getNetworkInfo(@NonNull Context context) {
-        ConnectivityManager cm = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo ni = null;
-        try {
-            NetworkInfo maybeNi = cm.getActiveNetworkInfo();
-            if (maybeNi != null && maybeNi.isConnected()) {
-                ni = maybeNi;
-            }
-        } catch (SecurityException e) {
-            Logger.e(TAG, "Security exception getting NetworkInfo: %s", e.toString());
-        }
-        return ni;
+        return new DeviceInfoMonitor().getNetworkInfo(context);
     }
 
     // --- Context Helpers
@@ -504,62 +432,10 @@ public class Util {
      *              the key
      * @param map the map to insert the pair into
      */
-    public static void addToMap(@NonNull String key, @NonNull Object value, @NonNull Map<String, Object> map) {
+    public static void addToMap(@Nullable String key, @Nullable Object value, @NonNull Map<String, Object> map) {
         if (key != null && value != null && !key.isEmpty()) {
             map.put(key, value);
         }
-    }
-
-    /**
-     * Invokes a static method within a class
-     * if it can be found on the classpath.
-     *
-     * @param className The full defined classname
-     * @param methodName The name of the method to invoke
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    private static Object invokeStaticMethod(String className, String methodName,
-                                             Class[] cArgs, Object... args) throws Exception {
-        Class classObject = Class.forName(className);
-        return invokeMethod(classObject, methodName, null, cArgs, args);
-    }
-
-    /**
-     * Invokes a method on a static instance
-     * within a class by reflection.
-     *
-     * @param instance The instance to invoke a method on
-     * @param methodName The name of the method to invoke
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    private static Object invokeInstanceMethod(Object instance, String methodName,
-                                               Class[] cArgs, Object... args) throws Exception {
-        Class classObject = instance.getClass();
-        return invokeMethod(classObject, methodName, instance, cArgs, args);
-    }
-
-    /**
-     * Invokes methods of a class via reflection
-     *
-     * @param classObject The class to attempt invocation on
-     * @param methodName The name of the method to invoke
-     * @param instance The object instance to invoke on
-     * @param cArgs The args that the method can take
-     * @param args The args to pass to the method on invocation
-     * @return the result of the method invoke
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private static Object invokeMethod(Class classObject, String methodName, Object instance,
-                                       Class[] cArgs, Object... args) throws Exception {
-        Method methodObject = classObject.getMethod(methodName, cArgs);
-        return methodObject.invoke(instance, args);
     }
 
     /**
