@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.entity.DeepLink;
+import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
@@ -725,11 +727,32 @@ public class Tracker {
 
     private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
+
+        workaroundForCampaignAttributionEnrichment(payload, event); // TODO: To remove when Atomic table refactoring is finished
+
         SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
         HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
         unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
         unstructuredEventPayload.put(Parameters.DATA, data.getMap());
         payload.addMap(unstructuredEventPayload, base64Encoded, Parameters.UNSTRUCTURED_ENCODED, Parameters.UNSTRUCTURED);
+    }
+
+    /*
+     This is needed because the campaign-attribution-enrichment (in the pipeline) is able to parse
+     the `url` and `referrer` only if they are part of a PageView event.
+     The PageView event is an atomic event but the DeepLinkReceived is a SelfDescribing event.
+     For this reason we copy these two fields in the atomic fields in order to let the enrichment
+     to process correctly the fields even if the event is not a PageView and it's a SelfDescribing event.
+     This is a hack that should be removed once the atomic event table is dismissed and all the events
+     will be SelfDescribing.
+    */
+    private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event) {
+        if (event.schema.equals(DeepLinkReceived.SCHEMA_DEEPLINKRECEIVED) && event.payload != null) {
+            String url = (String)event.payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_URL);
+            String referrer = (String)event.payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_REFERRER);
+            payload.add(Parameters.PAGE_URL, url);
+            payload.add(Parameters.PAGE_REFR, referrer);
+        }
     }
 
     private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
