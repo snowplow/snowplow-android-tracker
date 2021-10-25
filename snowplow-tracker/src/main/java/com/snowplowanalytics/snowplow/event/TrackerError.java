@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+
 package com.snowplowanalytics.snowplow.event;
 
 import androidx.annotation.NonNull;
@@ -10,6 +23,7 @@ import com.snowplowanalytics.snowplow.internal.utils.Util;
 import java.util.HashMap;
 import java.util.Map;
 
+/** An error event representing an exception, error or warning message in the app. */
 public class TrackerError extends AbstractSelfDescribing {
     private static final int MAX_MESSAGE_LENGTH = 2048;
     private static final int MAX_STACK_LENGTH = 8192;
@@ -29,6 +43,8 @@ public class TrackerError extends AbstractSelfDescribing {
         this.message = message;
         this.throwable = throwable;
     }
+
+    // Tracker methods
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
@@ -54,6 +70,8 @@ public class TrackerError extends AbstractSelfDescribing {
     public @NonNull String getSchema() {
         return TrackerConstants.SCHEMA_DIAGNOSTIC_ERROR;
     }
+
+    // Private methods
 
     private String truncate(String s, int maxLength) {
         if (s == null) return null;

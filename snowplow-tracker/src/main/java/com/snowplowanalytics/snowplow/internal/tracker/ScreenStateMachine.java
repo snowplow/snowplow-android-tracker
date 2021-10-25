@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.event.ScreenView;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -59,7 +58,7 @@ public class ScreenStateMachine implements StateMachineInterface {
             // - Init (SV) Screen
             screenState = new ScreenState();
         }
-        screenView.updateScreenState(screenState);
+        screenState.updateScreenState(screenView.id, screenView.name, screenView.type, screenView.transitionType, screenView.fragmentClassName, screenView.fragmentTag, screenView.activityClassName, screenView.activityTag);
         return screenState;
     }
 
@@ -94,4 +93,5 @@ public class ScreenStateMachine implements StateMachineInterface {
         }
         return null;
     }
+
 }

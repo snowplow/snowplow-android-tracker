@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.snowplowanalytics.snowplow.entity.DeepLink;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
@@ -747,9 +746,9 @@ public class Tracker {
      will be SelfDescribing.
     */
     private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event) {
-        if (event.schema.equals(DeepLinkReceived.SCHEMA_DEEPLINKRECEIVED) && event.payload != null) {
-            String url = (String)event.payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_URL);
-            String referrer = (String)event.payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_REFERRER);
+        if (event.schema.equals(DeepLinkReceived.SCHEMA) && event.payload != null) {
+            String url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
+            String referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
             payload.add(Parameters.PAGE_URL, url);
             payload.add(Parameters.PAGE_REFR, referrer);
         }

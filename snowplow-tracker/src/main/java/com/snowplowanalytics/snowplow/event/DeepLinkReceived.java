@@ -25,20 +25,25 @@ import com.android.installreferrer.api.ReferrerDetails;
 import java.util.HashMap;
 import java.util.Map;
 
+/** A deep-link received in the app. */
 public class DeepLinkReceived extends AbstractSelfDescribing {
 
-    public final static String SCHEMA_DEEPLINKRECEIVED = "iglu:com.snowplowanalytics.mobile/deep_link_received/jsonschema/1-0-0";
+    public final static String SCHEMA = "iglu:com.snowplowanalytics.mobile/deep_link_received/jsonschema/1-0-0";
 
-    public final static String PARAM_DEEPLINKRECEIVED_REFERRER = "referrer";
-    public final static String PARAM_DEEPLINKRECEIVED_URL = "url";
+    public final static String PARAM_REFERRER = "referrer";
+    public final static String PARAM_URL = "url";
 
-    /// It's the property for `referrer` JSON key
+    /** Referrer URL, source of this deep-link. */
     @Nullable
     public String referrer;
-    /// It's the property for `url` JSON key
+    /** URL in the received deep-link. */
     @NonNull
     public final String url;
 
+    /**
+     * Creates a deep-link received event.
+     * @param url URL in the received deep-link.
+     */
     public DeepLinkReceived(@NonNull String url) {
         this.url = url;
     }
@@ -90,6 +95,8 @@ public class DeepLinkReceived extends AbstractSelfDescribing {
     }
 
     // Builder methods
+
+    /** Referrer URL, source of this deep-link. */
     @NonNull
     public DeepLinkReceived referrer(@Nullable String referrer) {
         this.referrer = referrer;
@@ -101,16 +108,16 @@ public class DeepLinkReceived extends AbstractSelfDescribing {
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
-        payload.put(PARAM_DEEPLINKRECEIVED_URL, url);
+        payload.put(PARAM_URL, url);
         if (referrer != null) {
-            payload.put(PARAM_DEEPLINKRECEIVED_REFERRER, referrer);
+            payload.put(PARAM_REFERRER, referrer);
         }
         return payload;
     }
 
     @Override
     public @NonNull String getSchema() {
-        return SCHEMA_DEEPLINKRECEIVED;
+        return SCHEMA;
     }
 }
 

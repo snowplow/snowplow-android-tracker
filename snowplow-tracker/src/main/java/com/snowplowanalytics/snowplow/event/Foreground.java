@@ -19,19 +19,20 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/** A foreground transition event. */
 public class Foreground extends AbstractSelfDescribing {
 
+    public final static String SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_foreground/jsonschema/1-0-0";
 
-    public final static String SCHEMA_FOREGROUND = "iglu:com.snowplowanalytics.snowplow/application_foreground/jsonschema/1-0-0";
+    public final static String PARAM_INDEX = "foregroundIndex";
 
-    public final static String PARAM_FOREGROUNDINDEX = "foregroundIndex";
-
-    /// It's the property for `backgroundIndex` JSON key
+    /** Index indicating the current transition. */
     @Nullable
     public Integer foregroundIndex;
 
     // Builder methods
 
+    /** Index indicating the current transition. */
     @NonNull
     public Foreground foregroundIndex(@Nullable Integer foregroundIndex) {
         this.foregroundIndex = foregroundIndex;
@@ -43,7 +44,7 @@ public class Foreground extends AbstractSelfDescribing {
     @NonNull
     @Override
     public String getSchema() {
-        return SCHEMA_FOREGROUND;
+        return SCHEMA;
     }
 
     @NonNull
@@ -51,7 +52,7 @@ public class Foreground extends AbstractSelfDescribing {
     public Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
         if (foregroundIndex != null) {
-            payload.put(PARAM_FOREGROUNDINDEX, foregroundIndex);
+            payload.put(PARAM_INDEX, foregroundIndex);
         }
         return payload;
     }

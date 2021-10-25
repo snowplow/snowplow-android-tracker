@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -392,78 +392,66 @@ public class EventSendingTest extends AndroidTestCase {
     // Event Tracker Functions
 
     public void trackPageView(Tracker tracker) throws Exception {
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").build());
-        tracker.track(PageView.builder().pageUrl("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(getCustomContext()).build());
+        tracker.track(new PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"));
+        tracker.track(new PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(getCustomContext()));
     }
 
     public void trackStructuredEvent(Tracker tracker) throws Exception {
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).contexts(getCustomContext()).build());
+        tracker.track(new Structured("category", "action").label("label").property("property").value(0.00));
+        tracker.track(new Structured("category", "action").label("label").property("property").value(0.00).contexts(getCustomContext()));
     }
 
     public void trackScreenView(Tracker tracker) throws Exception {
         String id = UUID.randomUUID().toString();
-        tracker.track(ScreenView.builder().name("screenName").build());
-        tracker.track(ScreenView.builder().name("screenName").contexts(getCustomContext()).build());
+        tracker.track(new ScreenView("screenName"));
+        tracker.track(new ScreenView("screenName").contexts(getCustomContext()));
     }
 
     public void trackTimings(Tracker tracker) throws Exception {
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").build());
-        tracker.track(Timing.builder().category("category").variable("variable").timing(1).label("label").contexts(getCustomContext()).build());
+        tracker.track(new Timing("category", "variable", 1).label("label"));
+        tracker.track(new Timing("category", "variable", 1).label("label").contexts(getCustomContext()));
     }
 
     public void trackUnstructuredEvent(Tracker tracker) throws Exception {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
-        tracker.track(SelfDescribing.builder().eventData(test).build());
-        tracker.track(SelfDescribing.builder().eventData(test).contexts(getCustomContext()).build());
+        tracker.track(new SelfDescribing(test));
+        tracker.track(new SelfDescribing(test).contexts(getCustomContext()));
     }
 
     public void trackEcommerceEvent(Tracker tracker) throws Exception {
-        EcommerceTransactionItem item = EcommerceTransactionItem.builder().itemId("item-1").sku("sku-1").price(35.00).quantity(1).name("Acme 1").category("Stuff").currency("AUD").build();
+        EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD");
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).build());
-        tracker.track(EcommerceTransaction.builder().orderId("order-1").totalValue(42.50).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").items(items).contexts(getCustomContext()).build());
+        tracker.track(new EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD"));
+        tracker.track(new EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").contexts(getCustomContext()));
     }
 
     public void trackConsentGranted(Tracker tracker) throws Exception {
         List<ConsentDocument> documents = new LinkedList<>();
-        documents.add(ConsentDocument.builder()
+        documents.add(new ConsentDocument("granted context id 1", "granted context version 1")
                 .documentDescription("granted context desc 1")
-                .documentId("granted context id 1")
-                .documentName("granted context name 1")
-                .documentVersion("granted context version 1")
-                .build());
-        documents.add(ConsentDocument.builder()
+                .documentName("granted context name 1"));
+        documents.add(new ConsentDocument("granted context id 2", "granted context version 2")
                 .documentDescription("granted context desc 2")
-                .documentId("granted context id 2")
-                .documentName("granted context name 2")
-                .documentVersion("granted context version 2")
-                .build());
+                .documentName("granted context name 2"));
 
-        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
-        tracker.track(ConsentGranted.builder().expiry("gexpiry").documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).contexts(getCustomContext()).build());
+        tracker.track(new ConsentGranted("gexpiry", "gid", "dversion").documentDescription("gdesc").documentName("dname").documents(documents));
+        tracker.track(new ConsentGranted("gexpiry", "gid", "dversion").documentDescription("gdesc").documentName("dname").documents(documents).contexts(getCustomContext()));
     }
 
     public void trackConsentWithdrawn(Tracker tracker) throws Exception {
         List<ConsentDocument> documents = new LinkedList<>();
-        documents.add(ConsentDocument.builder()
+        documents.add(new ConsentDocument("withdrawn context id 1", "withdrawn context version 1")
                 .documentDescription("withdrawn context desc 1")
-                .documentId("withdrawn context id 1")
-                .documentName("withdrawn context name 1")
-                .documentVersion("withdrawn context version 1")
-                .build());
-        documents.add(ConsentDocument.builder()
+                .documentName("withdrawn context name 1"));
+        documents.add(new ConsentDocument("withdrawn context id 2", "withdrawn context version 2")
                 .documentDescription("withdrawn context desc 2")
-                .documentId("withdrawn context id 2")
-                .documentName("withdrawn context name 2")
-                .documentVersion("withdrawn context version 2")
-                .build());
+                .documentName("withdrawn context name 2"));
 
-        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).build());
-        tracker.track(ConsentWithdrawn.builder().all(false).documentDescription("gdesc").documentId("gid").documentName("dname").documentVersion("dversion").consentDocuments(documents).contexts(getCustomContext()).build());
+        tracker.track(new ConsentWithdrawn(false, "gid", "dversion").documentDescription("gdesc").documentName("dname").documents(documents));
+        tracker.track(new ConsentWithdrawn(false, "gid", "dversion").documentDescription("gdesc").documentName("dname").documents(documents).contexts(getCustomContext()));
     }
 
     public List<SelfDescribingJson> getCustomContext() {

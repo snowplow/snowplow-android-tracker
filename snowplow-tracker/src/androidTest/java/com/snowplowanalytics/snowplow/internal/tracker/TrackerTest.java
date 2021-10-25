@@ -176,11 +176,7 @@ public class TrackerTest extends AndroidTestCase {
     }
 
     public void testTrackEventMultipleTimes() {
-        Timing event = Timing.builder()
-                .category("category")
-                .variable("variable")
-                .timing(100)
-                .build();
+        Timing event = new Timing("category", "variable", 100);
         UUID id1 = new TrackerEvent(event).eventId;
         UUID id2 = new TrackerEvent(event).eventId;
         assertNotEquals(id1, id2);
@@ -227,9 +223,7 @@ public class TrackerTest extends AndroidTestCase {
 
         SelfDescribingJson sdj = new SelfDescribingJson("iglu:foo/bar/jsonschema/1-0-0");
 
-        SelfDescribing sdEvent = SelfDescribing.builder()
-                .eventData(sdj)
-                .build();
+        SelfDescribing sdEvent = new SelfDescribing(sdj);
 
         tracker.track(sdEvent);
         RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
@@ -415,7 +409,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals("Unknown", screenStateMap.get(Parameters.SCREEN_NAME));
 
         // Send screenView
-        ScreenView screenView = ScreenView.builder().name("screen1").build();
+        ScreenView screenView = new ScreenView("screen1");
         String screenId = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
 
@@ -425,7 +419,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(screenId, screenStateMap.get(Parameters.SCREEN_ID));
 
         // Send another screenView
-        screenView = ScreenView.builder().name("screen2").build();
+        screenView = new ScreenView("screen2");
         String screenId1 = (String) screenView.getDataPayload().get("id");
         tracker.track(screenView);
     }

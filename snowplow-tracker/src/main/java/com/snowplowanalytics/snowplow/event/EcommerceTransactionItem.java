@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -23,140 +23,37 @@ import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
 
+/** An ecommerce item event. */
 public class EcommerceTransactionItem extends AbstractPrimitive {
 
-    @Nullable
-    private String orderId;
+    /** Stock Keeping Unit of the item. */
     @NonNull
     public final String sku;
+    /** Price of the item. */
     @NonNull
     public final Double price;
+    /** Quantity of the item. */
     @NonNull
     public final Integer quantity;
+    /** Name of the item. */
     @Nullable
     public String name;
+    /** Category of the item. */
     @Nullable
     public String category;
+    /** Currency used for the price of the item. */
     @Nullable
     public String currency;
+    /** OrderID of the order that contains this item. */
+    @Nullable
+    public String orderId;
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private String itemId;
-        private String sku;
-        private Double price;
-        private Integer quantity;
-        private String name;
-        private String category;
-        private String currency;
-
-        /**
-         * @param itemId Item ID
-         * @return itself
-         */
-        @NonNull
-        public T itemId(@NonNull String itemId) {
-            this.itemId = itemId;
-            return self();
-        }
-
-        /**
-         * @param sku Item SKU
-         * @return itself
-         */
-        @NonNull
-        public T sku(@NonNull String sku) {
-            this.sku = sku;
-            return self();
-        }
-
-        /**
-         * @param price Item price
-         * @return itself
-         */
-        @NonNull
-        public T price(@NonNull Double price) {
-            this.price = price;
-            return self();
-        }
-
-        /**
-         * @param quantity Item quantity
-         * @return itself
-         */
-        @NonNull
-        public T quantity(@NonNull Integer quantity) {
-            this.quantity = quantity;
-            return self();
-        }
-
-        /**
-         * @param name Item name
-         * @return itself
-         */
-        @NonNull
-        public T name(@NonNull String name) {
-            this.name = name;
-            return self();
-        }
-
-        /**
-         * @param category Item category
-         * @return itself
-         */
-        @NonNull
-        public T category(@NonNull String category) {
-            this.category = category;
-            return self();
-        }
-
-        /**
-         * @param currency The currency the price is expressed in
-         * @return itself
-         */
-        @NonNull
-        public T currency(@NonNull String currency) {
-            this.currency = currency;
-            return self();
-        }
-
-        @NonNull
-        public EcommerceTransactionItem build() {
-            return new EcommerceTransactionItem(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    private EcommerceTransactionItem(@NonNull Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.sku);
-        Preconditions.checkNotNull(builder.price);
-        Preconditions.checkNotNull(builder.quantity);
-        Preconditions.checkArgument(!builder.sku.isEmpty(), "sku cannot be empty");
-
-        this.orderId = builder.itemId;
-        this.sku = builder.sku;
-        this.price = builder.price;
-        this.quantity = builder.quantity;
-        this.name = builder.name;
-        this.category = builder.category;
-        this.currency = builder.currency;
-    }
-
+    /**
+     Creates an ecommerce item event.
+     @param sku Stock Keeping Unit of the item.
+     @param price Price of the item.
+     @param quantity Quantity of the item.
+     */
     public EcommerceTransactionItem(@NonNull String sku, double price, int quantity) {
         Preconditions.checkNotNull(sku);
         Preconditions.checkArgument(!sku.isEmpty(), "sku cannot be empty");
@@ -167,31 +64,35 @@ public class EcommerceTransactionItem extends AbstractPrimitive {
 
     // Builder methods
 
+    /** Name of the item. */
     @NonNull
     public EcommerceTransactionItem name(@Nullable String name) {
         this.name = name;
         return this;
     }
 
+    /** Category of the item. */
     @NonNull
     public EcommerceTransactionItem category(@Nullable String category) {
         this.category = category;
         return this;
     }
 
+    /** Currency used for the price of the item. */
     @NonNull
     public EcommerceTransactionItem currency(@Nullable String currency) {
         this.currency = currency;
         return this;
     }
 
-    // Public methods
-
-    public void setOrderId(@NonNull String orderId) {
-        Preconditions.checkNotNull(orderId);
-        Preconditions.checkArgument(!orderId.isEmpty(), "orderId cannot be empty");
+    /** OrderID of the order that contains this item. */
+    @NonNull
+    public EcommerceTransactionItem orderId(@Nullable String orderId) {
         this.orderId = orderId;
+        return this;
     }
+
+    // Public methods
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {

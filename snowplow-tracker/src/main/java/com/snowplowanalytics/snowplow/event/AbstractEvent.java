@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,16 +17,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.payload.TrackerPayload;
-import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Base AbstractEvent class which contains common
@@ -37,73 +32,22 @@ import java.util.UUID;
  */
 public abstract class AbstractEvent implements Event {
 
-    public final List<SelfDescribingJson> customContexts;
+    /** List of custom contexts associated to the event. */
+    public final List<SelfDescribingJson> customContexts = new LinkedList<>();
+    /** Custom timestamp of the event. */
     @Nullable
     public Long trueTimestamp;
 
-    public static abstract class Builder<T extends Builder<T>> {
-
-        private final List<SelfDescribingJson> customContexts = new LinkedList<>();
-        private Long trueTimestamp;
-
-        @NonNull
-        protected abstract T self();
-
-        /**
-         * Adds a list of custom contexts.
-         *
-         * @param contexts the list of contexts
-         * @return itself
-         */
-        @NonNull
-        public T contexts(@NonNull List<SelfDescribingJson> contexts) {
-            customContexts.addAll(contexts);
-            return self();
-        }
-
-        /**
-         * A custom event timestamp.
-         *
-         * @param trueTimestamp the true event timestamp as
-         *                      unix epoch
-         * @return itself
-         */
-        @NonNull
-        public T trueTimestamp(long trueTimestamp) {
-            this.trueTimestamp = trueTimestamp;
-            return self();
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    protected AbstractEvent() {
-        this(new Builder2());
-    }
-
-    AbstractEvent(Builder<?> builder) {
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.customContexts);
-
-        this.customContexts = builder.customContexts;
-        this.trueTimestamp = builder.trueTimestamp;
-    }
-
     // Builder methods
 
+    /** Adds a list of contexts. */
     @NonNull
     public AbstractEvent contexts(@Nullable List<SelfDescribingJson> contexts) {
         if (contexts != null) customContexts.addAll(contexts);
         return this;
     }
 
+    /** Set the custom timestamp of the event. */
     @NonNull
     public AbstractEvent trueTimestamp(@Nullable Long trueTimestamp) {
         this.trueTimestamp = trueTimestamp;

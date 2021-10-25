@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -23,9 +23,7 @@ import java.util.UUID;
 public class ScreenViewTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        ScreenView screenView = ScreenView.builder()
-                .name("name")
-                .build();
+        ScreenView screenView = new ScreenView("name");
 
         Map<String, Object> data = screenView.getDataPayload();
 
@@ -33,22 +31,19 @@ public class ScreenViewTest extends AndroidTestCase {
         assertEquals("name", data.get(Parameters.SV_NAME));
         assertTrue(data.containsKey(Parameters.SV_ID));
 
-        String id = UUID.randomUUID().toString();
-        screenView = ScreenView.builder()
-                .id(id)
-                .name("name")
-                .build();
+        UUID id = UUID.randomUUID();
+        screenView = new ScreenView("name", id);
 
         data = screenView.getDataPayload();
 
         assertNotNull(data);
-        assertEquals(id, data.get(Parameters.SV_ID));
+        assertEquals(id.toString(), data.get(Parameters.SV_ID));
         assertEquals("name", data.get(Parameters.SV_NAME));
     }
 
     public void testBuilderFailures() {
         try {
-            ScreenView.builder().id("id").build();
+            new ScreenView(null, UUID.randomUUID());
             fail();
         } catch (Exception e) {
             assertNull(e.getMessage());

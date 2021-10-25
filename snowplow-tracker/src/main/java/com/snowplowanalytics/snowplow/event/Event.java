@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,6 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+
 package com.snowplowanalytics.snowplow.event;
 
 // Java
@@ -21,7 +22,6 @@ import java.util.Map;
 
 // This library
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 /**
@@ -47,14 +47,12 @@ public interface Event {
 
     /**
      * Hook method called just before the event processing in order to execute special operations.
-     *
      * @apiNote Internal use only - Don't use in production, it can change without notice.
      */
     void beginProcessing(@NonNull Tracker tracker);
 
     /**
      * Hook method called just after the event processing in order to execute special operations.
-     *
      * @apiNote Internal use only - Don't use in production, it can change without notice.
      */
     void endProcessing(@NonNull Tracker tracker);

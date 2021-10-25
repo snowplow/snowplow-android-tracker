@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -24,84 +24,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Constructs a PageView event object.
+ * A pageview event.
+ * @deprecated This event has been designed for web trackers, not suitable for mobile apps. Use `DeepLinkReceived` event to track deep-link received in the app.
  */
 public class PageView extends AbstractPrimitive {
 
+    /** Page URL. */
     @NonNull
     private final String pageUrl;
+    /** Page title. */
     @Nullable
     private String pageTitle;
+    /** Page referrer URL. */
     @Nullable
     private String referrer;
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private String pageUrl;
-        private String pageTitle;
-        private String referrer;
-
-        /**
-         * @param pageUrl URL of the viewed page
-         * @return itself
-         */
-        @NonNull
-        public T pageUrl(@NonNull String pageUrl) {
-            this.pageUrl = pageUrl;
-            return self();
-        }
-
-        /**
-         * @param pageTitle Title of the viewed page
-         * @return itself
-         */
-        @NonNull
-        public T pageTitle(@NonNull String pageTitle) {
-            this.pageTitle = pageTitle;
-            return self();
-        }
-
-        /**
-         * @param referrer Referrer of the page
-         * @return itself
-         */
-        @NonNull
-        public T referrer(@NonNull String referrer) {
-            this.referrer = referrer;
-            return self();
-        }
-
-        @NonNull
-        public PageView build() {
-            return new PageView(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    protected PageView(@NonNull Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.pageUrl);
-        Preconditions.checkArgument(!builder.pageUrl.isEmpty(), "pageUrl cannot be empty");
-
-        this.pageUrl = builder.pageUrl;
-        this.pageTitle = builder.pageTitle;
-        this.referrer = builder.referrer;
-    }
-
+    /**
+     * Creates a pageview event.
+     * @param pageUrl The page URL.
+     */
     public PageView(@NonNull String pageUrl) {
         Preconditions.checkNotNull(pageUrl);
         Preconditions.checkArgument(!pageUrl.isEmpty(), "pageUrl cannot be empty");
@@ -110,12 +51,14 @@ public class PageView extends AbstractPrimitive {
 
     // Builder methods
 
+    /** Page title. */
     @NonNull
     public PageView pageTitle(@Nullable String pageTitle) {
         this.pageTitle = pageTitle;
         return this;
     }
 
+    /** Page referrer URL. */
     @NonNull
     public PageView referrer(@Nullable String referrer) {
         this.referrer = referrer;

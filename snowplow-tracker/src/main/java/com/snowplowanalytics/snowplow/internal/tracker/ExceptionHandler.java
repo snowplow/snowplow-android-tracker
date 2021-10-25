@@ -93,10 +93,8 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         Util.addToMap(Parameters.APP_ERROR_EXCEPTION_NAME, exceptionName, data);
         Util.addToMap(Parameters.APP_ERROR_FATAL, true, data);
 
-        SelfDescribing event = SelfDescribing.builder()
-                .eventData(new SelfDescribingJson(TrackerConstants.APPLICATION_ERROR_SCHEMA, data))
-                .build();
-        Map<String, Object> notificationData = new HashMap<String, Object>();
+        SelfDescribing event = new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_ERROR_SCHEMA, data));
+        Map<String, Object> notificationData = new HashMap<>();
         notificationData.put("event", event);
         NotificationCenter.postNotification("SnowplowCrashReporting", notificationData);
 
