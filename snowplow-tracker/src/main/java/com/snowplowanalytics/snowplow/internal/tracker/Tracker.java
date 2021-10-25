@@ -62,146 +62,6 @@ import com.snowplowanalytics.snowplow.util.Basis;
 @Deprecated
 public class Tracker {
 
-    private final static String TAG = Tracker.class.getSimpleName();
-    private String trackerVersion = BuildConfig.TRACKER_LABEL;
-
-    // --- Singleton Access
-
-    private static final @NonNull Object monitor = new Object();
-    private static volatile @Nullable Tracker spTracker = null;
-
-    public static @NonNull Tracker init(@NonNull Tracker newTracker) {
-        synchronized (monitor) {
-            if (spTracker != null) {
-                instance();
-            }
-            return reset(newTracker);
-        }
-    }
-
-    public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
-        synchronized (monitor) {
-            if (spTracker != null) {
-                spTracker.unregisterNotificationHandlers();
-            }
-            spTracker = newTracker;
-            spTracker.resumeSessionChecking();
-            spTracker.getEmitter().flush();
-            spTracker.initializeInstallTracking();
-            spTracker.initializeScreenviewTracking();
-            return instance();
-        }
-    }
-
-    public static @NonNull Tracker instance() {
-        synchronized (monitor) {
-            if (spTracker == null) {
-                throw new IllegalStateException("FATAL: Tracker must be initialized first!");
-            }
-
-            if (spTracker.getApplicationCrash() && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
-                Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-            }
-            return spTracker;
-        }
-    }
-
-    public static void close() {
-        if (spTracker == null) return;
-        synchronized (monitor) {
-            if (spTracker == null) return;
-            spTracker.pauseSessionChecking();
-            spTracker.getEmitter().shutdown();
-            spTracker = null;
-        }
-    }
-
-    // --- Builder
-
-    final Context context;
-    Emitter emitter;
-    Subject subject;
-    Session trackerSession;
-    String namespace;
-    String appId;
-    boolean base64Encoded;
-    DevicePlatform devicePlatform;
-    LogLevel level;
-    private boolean sessionContext;
-    Runnable[] sessionCallbacks;
-    int threadCount;
-    TimeUnit timeUnit;
-    boolean geoLocationContext;
-    boolean mobileContext;
-    boolean applicationCrash;
-    boolean trackerDiagnostic;
-    boolean lifecycleEvents;
-    boolean installTracking;
-    boolean activityTracking;
-    boolean applicationContext;
-    String trackerVersionSuffix;
-
-    private boolean deepLinkcontext;
-    private boolean screenContext;
-
-    private Gdpr gdpr;
-    private InstallTracker installTracker;
-    private StateManager stateManager;
-
-    private long foregroundTimeout;
-    private long backgroundTimeout;
-
-    private @NonNull PlatformContext platformContext;
-
-    private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
-
-    private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
-        @Override
-        public void apply(@NonNull Map<String, Object> data) {
-            if (activityTracking) {
-                Event event = (Event) data.get("event");
-                if (event != null) {
-                    track(event);
-                }
-            }
-        }
-    };
-    private final NotificationCenter.FunctionalObserver receiveInstallNotification = new NotificationCenter.FunctionalObserver() {
-        @Override
-        public void apply(@NonNull Map<String, Object> data) {
-            if (installTracking) {
-                Event event = (Event) data.get("event");
-                if (event != null) {
-                    track(event);
-                }
-            }
-        }
-    };
-    private final NotificationCenter.FunctionalObserver receiveDiagnosticNotification = new NotificationCenter.FunctionalObserver() {
-        @Override
-        public void apply(@NonNull Map<String, Object> data) {
-            if (trackerDiagnostic) {
-                Event event = (Event) data.get("event");
-                if (event != null) {
-                    track(event);
-                }
-            }
-        }
-    };
-    private final NotificationCenter.FunctionalObserver receiveCrashReportingNotification = new NotificationCenter.FunctionalObserver() {
-        @Override
-        public void apply(@NonNull Map<String, Object> data) {
-            if (applicationCrash) {
-                Event event = (Event) data.get("event");
-                if (event != null) {
-                    track(event);
-                }
-            }
-        }
-    };
-
-    AtomicBoolean dataCollection = new AtomicBoolean(true);
-
     /**
      * Builder for the Tracker
      * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
@@ -330,7 +190,7 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#loggerDelegate(LoggerDelegate)} 
+         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#loggerDelegate(LoggerDelegate)}
          * @param delegate The logger delegate that receive logs from the tracker.
          * @return itself
          */
@@ -508,35 +368,153 @@ public class Tracker {
             this.trackerVersionSuffix = trackerVersionSuffix;
             return this;
         }
+    }
 
-        /**
-         * Creates a new Tracker or throws an
-         * Exception of we cannot find a suitable
-         * extensible class.
-         *
-         * @return the new Tracker object
-         */
-        @NonNull
-        public Tracker build(){
-            return init(new Tracker(this));
-        }
+    // ----
 
-        /**
-         * Reset the singleton tracker and creates a new one.
-         * @return the new Tracker object
-         */
-        @NonNull
-        Tracker buildAndReset() {
-            return reset(new Tracker(this));
+    private final static String TAG = Tracker.class.getSimpleName();
+    private String trackerVersion = BuildConfig.TRACKER_LABEL;
+
+    // --- Singleton Access
+
+    private static final @NonNull Object monitor = new Object();
+    private static volatile @Nullable Tracker spTracker = null;
+
+    public static @NonNull Tracker init(@NonNull Tracker newTracker) {
+        synchronized (monitor) {
+            if (spTracker != null) {
+                instance();
+            }
+            return reset(newTracker);
         }
     }
+
+    public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
+        synchronized (monitor) {
+            if (spTracker != null) {
+                spTracker.unregisterNotificationHandlers();
+            }
+            spTracker = newTracker;
+            spTracker.resumeSessionChecking();
+            spTracker.getEmitter().flush();
+            spTracker.initializeInstallTracking();
+            spTracker.initializeScreenviewTracking();
+            return instance();
+        }
+    }
+
+    public static @NonNull Tracker instance() {
+        synchronized (monitor) {
+            if (spTracker == null) {
+                throw new IllegalStateException("FATAL: Tracker must be initialized first!");
+            }
+
+            return spTracker;
+        }
+    }
+
+    public static void close() {
+        if (spTracker == null) return;
+        synchronized (monitor) {
+            if (spTracker == null) return;
+            spTracker.pauseSessionChecking();
+            spTracker.getEmitter().shutdown();
+            spTracker = null;
+        }
+    }
+
+    // --- Builder
+
+    final Context context;
+    Emitter emitter;
+    Subject subject;
+    Session trackerSession;
+    String namespace;
+    String appId;
+    boolean base64Encoded;
+    DevicePlatform devicePlatform;
+    LogLevel level;
+    private boolean sessionContext;
+    Runnable[] sessionCallbacks;
+    int threadCount;
+    TimeUnit timeUnit;
+    boolean geoLocationContext;
+    boolean mobileContext;
+    boolean applicationCrash;
+    boolean trackerDiagnostic;
+    boolean lifecycleEvents;
+    boolean installTracking;
+    boolean activityTracking;
+    boolean applicationContext;
+    String trackerVersionSuffix;
+
+    private boolean deepLinkcontext;
+    private boolean screenContext;
+
+    private Gdpr gdpr;
+    private InstallTracker installTracker;
+    private StateManager stateManager;
+
+    private long foregroundTimeout;
+    private long backgroundTimeout;
+
+    private @NonNull PlatformContext platformContext;
+
+    private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
+
+    private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (activityTracking) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveInstallNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (installTracking) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveDiagnosticNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (trackerDiagnostic) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+    private final NotificationCenter.FunctionalObserver receiveCrashReportingNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            if (applicationCrash) {
+                Event event = (Event) data.get("event");
+                if (event != null) {
+                    track(event);
+                }
+            }
+        }
+    };
+
+    AtomicBoolean dataCollection = new AtomicBoolean(true);
 
     /**
      * Creates a new Snowplow Tracker.
      *
      * @param builder The builder that constructs a tracker
      */
-    private Tracker(@NonNull TrackerBuilder builder) {
+    public Tracker(@NonNull TrackerBuilder builder) {
         this.stateManager = new StateManager();
         this.context = builder.context;
 
@@ -597,9 +575,16 @@ public class Tracker {
             trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
 
+        //$ TODO: The exception handler has to be common for all the tracker instances
+        if (this.applicationCrash && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
+            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+        }
+
+        //$ TODO: The lifecycle has to be common for all the tracker instances
         if (this.lifecycleEvents) {
             // addObserver must execute on the mainThread
             Handler mainHandler = new Handler(context.getMainLooper());
+            Tracker tracker = this;
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {

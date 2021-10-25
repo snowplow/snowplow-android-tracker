@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.annotation.TargetApi;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.lifecycle.LifecycleObserver;
@@ -52,7 +53,9 @@ public class ProcessObserver implements LifecycleObserver {
         lifecycleContexts = contexts;
     }
 
-    public ProcessObserver() {}
+    public ProcessObserver(@NonNull Tracker tracker) {
+
+    }
 
     public static void setLifecycleContexts(@Nullable List<SelfDescribingJson> contexts) {
         lifecycleContexts = contexts;

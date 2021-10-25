@@ -156,16 +156,14 @@ public class EventSendingTest extends AndroidTestCase {
                 .build();
 
         Tracker.close();
-        Tracker.init(
-                new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                    .subject(subject)
-                    .base64(false)
-                    .level(LogLevel.DEBUG)
-                    .sessionContext(true)
-                    .mobileContext(true)
-                    .geoLocationContext(false)
-                    .build()
-        );
+        Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
+                .subject(subject)
+                .base64(false)
+                .level(LogLevel.DEBUG)
+                .sessionContext(true)
+                .mobileContext(true)
+                .geoLocationContext(false)
+        ));
         Tracker tracker = Tracker.instance();
         emitter.getEventStore().removeAllEvents();
         return tracker;

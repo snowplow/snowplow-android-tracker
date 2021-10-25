@@ -242,16 +242,16 @@ public class SessionTest extends AndroidTestCase {
         cleanSharedPreferences(getContext(), "tracker2");
 
         Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
-        Tracker tracker1 = new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
+        Tracker tracker1 = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
-        Tracker tracker2 = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        ));
+        Tracker tracker2 = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
+        ));
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
@@ -276,11 +276,11 @@ public class SessionTest extends AndroidTestCase {
         String id2 = session2.getCurrentSessionId();
 
         // Recreate tracker2
-        Tracker tracker2b = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        Tracker tracker2b = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
+        ));
         tracker2b.getSession().getSessionContext("fake-id3");
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getPreviousSessionId();

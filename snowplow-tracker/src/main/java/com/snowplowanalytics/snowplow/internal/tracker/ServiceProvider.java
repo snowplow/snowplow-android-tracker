@@ -403,7 +403,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                     gdprConfig.getDocumentVersion(),
                     gdprConfig.getDocumentDescription());
         }
-        Tracker tracker = builder.buildAndReset();
+        Tracker tracker = Tracker.reset(new Tracker(builder));
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
         }
