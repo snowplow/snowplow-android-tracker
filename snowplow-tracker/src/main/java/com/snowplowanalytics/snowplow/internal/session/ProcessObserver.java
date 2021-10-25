@@ -15,122 +15,44 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.annotation.TargetApi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.Lifecycle;
 import android.os.Build;
 
-
-import com.snowplowanalytics.snowplow.event.Background;
-import com.snowplowanalytics.snowplow.event.Foreground;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();
-    private static boolean isInBackground = true;
-    private static final AtomicInteger foregroundIndex = new AtomicInteger(0);
-    private static final AtomicInteger backgroundIndex = new AtomicInteger(0);
-    private static boolean isHandlerPaused = false;
-    private static List<SelfDescribingJson> lifecycleContexts = null;
-
-    public ProcessObserver(@Nullable List<SelfDescribingJson> contexts) {
-        lifecycleContexts = contexts;
-    }
-
-    public ProcessObserver(@NonNull Tracker tracker) {
-
-    }
-
-    public static void setLifecycleContexts(@Nullable List<SelfDescribingJson> contexts) {
-        lifecycleContexts = contexts;
-    }
-
-    @Nullable
-    public static List<SelfDescribingJson> getLifecycleContexts() {
-        return lifecycleContexts;
-    }
-
-    public static void pauseHandler() {
-        isHandlerPaused = true;
-    }
-
-    public static void resumeHandler() {
-        isHandlerPaused = false;
-    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    public static void onEnterForeground() {
-        if (isInBackground && !isHandlerPaused){
-            Logger.d(TAG, "Application is in the foreground");
-            isInBackground = false;
-
-            try {
-                Tracker tracker = Tracker.instance();
-                int index = foregroundIndex.addAndGet(1);
-
-                // Update Session
-                Session session = tracker.getSession();
-                if (session != null) {
-                    session.setIsBackground(false);
-                    session.setForegroundIndex(index);
-                }
-
-                // Send Foreground Event
-                if (tracker.getLifecycleEvents()) {
-                    tracker.track(
-                            new Foreground().foregroundIndex(index)
-                                    .contexts(lifecycleContexts)
-                    );
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
-            }
+    public void onEnterForeground() {
+        Logger.d(TAG, "App enter foreground");
+        try {
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("isForeground", Boolean.TRUE);
+            NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+        } catch (Exception e) {
+            Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public static void onEnterBackground() {
-        if (!isHandlerPaused) {
-            Logger.d(TAG, "Application is in the background");
-            isInBackground = true;
-
-            try {
-                Tracker tracker = Tracker.instance();
-                int index = backgroundIndex.addAndGet(1);
-
-                // Update Session
-                Session session = tracker.getSession();
-                if (session != null) {
-                    session.setIsBackground(true);
-                    session.setBackgroundIndex(index);
-                }
-
-                // Send Background Event
-                if (tracker.getLifecycleEvents()) {
-                    tracker.track(
-                            new Background().backgroundIndex(index)
-                                    .contexts(lifecycleContexts)
-                    );
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);
-            }
+    public void onEnterBackground() {
+        Logger.d(TAG, "App enter background");
+        try {
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("isForeground", Boolean.FALSE);
+            NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+        } catch (Exception e) {
+            Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);
         }
     }
 }

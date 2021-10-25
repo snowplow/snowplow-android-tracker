@@ -31,7 +31,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.event.Background;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
+import com.snowplowanalytics.snowplow.event.Foreground;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
@@ -399,6 +401,7 @@ public class Tracker {
             spTracker.getEmitter().flush();
             spTracker.initializeInstallTracking();
             spTracker.initializeScreenviewTracking();
+            spTracker.initializeLifecycleTracking();
             return instance();
         }
     }
@@ -462,6 +465,28 @@ public class Tracker {
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
+    private final NotificationCenter.FunctionalObserver receiveLifecycleNotification = new NotificationCenter.FunctionalObserver() {
+        @Override
+        public void apply(@NonNull Map<String, Object> data) {
+            Session session = getSession();
+            if (lifecycleEvents && session != null) {
+                Boolean isForeground = (Boolean) data.get("isForeground");
+                if (isForeground == null) {
+                    return;
+                }
+                int index = session.updateLifecycleNotification(isForeground);
+                // If index is -1 means that the lifecycle is not changed so don't need to send a lifecycle event.
+                if (index == -1) {
+                    return;
+                }
+                if (isForeground) {
+                    track(new Foreground().foregroundIndex(index));
+                } else {
+                    track(new Background().backgroundIndex(index));
+                }
+            }
+        }
+    };
     private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
         @Override
         public void apply(@NonNull Map<String, Object> data) {
@@ -580,11 +605,47 @@ public class Tracker {
             Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         }
 
-        //$ TODO: The lifecycle has to be common for all the tracker instances
-        if (this.lifecycleEvents) {
+        Logger.v(TAG, "Tracker created successfully.");
+    }
+
+    // --- Private init functions
+
+    private void registerNotificationHandlers() {
+        NotificationCenter.addObserver("SnowplowTrackerDiagnostic", receiveDiagnosticNotification);
+        NotificationCenter.addObserver("SnowplowScreenView", receiveScreenViewNotification);
+        NotificationCenter.addObserver("SnowplowLifecycleTracking", receiveLifecycleNotification);
+        NotificationCenter.addObserver("SnowplowInstallTracking", receiveInstallNotification);
+        NotificationCenter.addObserver("SnowplowCrashReporting", receiveCrashReportingNotification);
+    }
+
+    private void unregisterNotificationHandlers() {
+        NotificationCenter.removeObserver(receiveDiagnosticNotification);
+        NotificationCenter.removeObserver(receiveScreenViewNotification);
+        NotificationCenter.removeObserver(receiveLifecycleNotification);
+        NotificationCenter.removeObserver(receiveInstallNotification);
+        NotificationCenter.removeObserver(receiveCrashReportingNotification);
+    }
+
+    //$ TODO: All of this has to be common for all the trackers
+    private void initializeInstallTracking() {
+        if (installTracking) {
+            installTracker = new InstallTracker(context);
+        }
+    }
+
+    private void initializeScreenviewTracking() {
+        if (activityTracking) {
+            ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
+            Application application = (Application) context.getApplicationContext();
+            application.registerActivityLifecycleCallbacks(handler);
+        }
+    }
+
+    //$ TODO: The lifecycle has to be common for all the tracker instances - it has to be a singleton
+    private void initializeLifecycleTracking() {
+        if (lifecycleEvents) {
             // addObserver must execute on the mainThread
             Handler mainHandler = new Handler(context.getMainLooper());
-            Tracker tracker = this;
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -595,40 +656,9 @@ public class Tracker {
                     }
                 }
             });
+            //$ TODO: This state machine has to be specific for the tracker!
             // Initialize LifecycleStateMachine for lifecycle entities
             stateManager.addStateMachine(new LifecycleStateMachine(), "Lifecycle");
-        }
-
-        Logger.v(TAG, "Tracker created successfully.");
-    }
-
-    // --- Private init functions
-
-    private void registerNotificationHandlers() {
-        NotificationCenter.addObserver("SnowplowTrackerDiagnostic", receiveDiagnosticNotification);
-        NotificationCenter.addObserver("SnowplowScreenView", receiveScreenViewNotification);
-        NotificationCenter.addObserver("SnowplowInstallTracking", receiveInstallNotification);
-        NotificationCenter.addObserver("SnowplowCrashReporting", receiveCrashReportingNotification);
-    }
-
-    private void unregisterNotificationHandlers() {
-        NotificationCenter.removeObserver(receiveDiagnosticNotification);
-        NotificationCenter.removeObserver(receiveScreenViewNotification);
-        NotificationCenter.removeObserver(receiveInstallNotification);
-        NotificationCenter.removeObserver(receiveCrashReportingNotification);
-    }
-
-    private void initializeInstallTracking() {
-        if (installTracking) {
-            installTracker = new InstallTracker(context);
-        }
-    }
-
-    private void initializeScreenviewTracking() {
-        if (this.activityTracking) {
-            ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
-            Application application = (Application) context.getApplicationContext();
-            application.registerActivityLifecycleCallbacks(handler);
         }
     }
 

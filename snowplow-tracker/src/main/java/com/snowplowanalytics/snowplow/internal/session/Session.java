@@ -267,32 +267,36 @@ public class Session {
     }
 
     /**
-     * Changes the truth of isBackground.
-     * @param isBackground whether the application is in
-     *                     the background or not
+     * Updates the session with information about lifecycle tracking.
+     * Note: Internal use only.
+     * @param isForeground whether or not the application moved to foreground.
+     * @return foreground or background index. Returns -1 if the lifecycle state is not changed.
      */
-    public void setIsBackground(boolean isBackground) {
-        Logger.d(TAG, "Application is in the background: %s", isBackground);
+    public synchronized int updateLifecycleNotification(boolean isForeground) {
+        boolean toBackground = !isForeground;
+        // if the new lifecycle state confirms the session state, there isn't any lifecycle transition
+        if (isBackground.get() == toBackground) {
+            return -1;
+        }
+        Logger.d(TAG, "Application is in the background: %s", toBackground);
+        isBackground.set(toBackground);
 
-        // If we are currently in the background and the new state is
-        // foreground restart session checking
-        boolean currentState = this.isBackground.get();
-        if (currentState && !isBackground) {
+        if (!toBackground) {
             Logger.d(TAG, "Application moved to foreground, starting session checking...");
             this.executeEventCallback(this.foregroundTransitionCallback);
             try {
-                Tracker.instance().resumeSessionChecking();
+                setIsSuspended(false);
             } catch (Exception e) {
                 Logger.e(TAG, "Could not resume checking as tracker not setup. Exception: %s", e);
             }
-        }
-
-        if (!currentState && isBackground) {
+            foregroundIndex++;
+            return foregroundIndex;
+        } else {
             Logger.d(TAG, "Application moved to background");
             this.executeEventCallback(this.backgroundTransitionCallback);
+            backgroundIndex++;
+            return backgroundIndex;
         }
-
-        this.isBackground.set(isBackground);
     }
 
     /**
