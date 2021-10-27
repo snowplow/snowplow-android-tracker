@@ -106,11 +106,11 @@ public class StateManagerTest {
         Emitter emitter = new Emitter.EmitterBuilder("http://snowplow-fake-url.com", context)
                 .eventStore(eventStore)
                 .build();
-        Tracker tracker = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .screenContext(true)
                 .base64(false)
                 .level(LogLevel.VERBOSE)
-        ));
+        );
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));

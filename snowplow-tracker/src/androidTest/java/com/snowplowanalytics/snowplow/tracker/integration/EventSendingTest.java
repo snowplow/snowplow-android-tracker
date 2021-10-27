@@ -59,11 +59,13 @@ import java.util.concurrent.TimeUnit;
 
 public class EventSendingTest extends AndroidTestCase {
 
+    private static Tracker tracker;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         try {
-            Tracker tracker = Tracker.instance();
+            if (tracker == null) return;
             Emitter emitter = tracker.getEmitter();
             tracker.close();
             boolean isClean = emitter.getEventStore().removeAllEvents();
@@ -155,16 +157,15 @@ public class EventSendingTest extends AndroidTestCase {
                 .context(getContext())
                 .build();
 
-        Tracker.close();
-        Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
+        if (tracker != null) tracker.close();
+        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .subject(subject)
                 .base64(false)
                 .level(LogLevel.DEBUG)
                 .sessionContext(true)
                 .mobileContext(true)
                 .geoLocationContext(false)
-        ));
-        Tracker tracker = Tracker.instance();
+        );
         emitter.getEventStore().removeAllEvents();
         return tracker;
     }

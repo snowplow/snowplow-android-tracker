@@ -15,11 +15,16 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.annotation.TargetApi;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
+import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
@@ -31,6 +36,36 @@ import java.util.Map;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();
+
+    private enum InitializationState {
+        NONE,
+        IN_PROGRESS,
+        COMPLETE
+    }
+
+    private static InitializationState initializationState = InitializationState.NONE;
+
+    public synchronized static void initialize(@NonNull Context context) {
+        if (initializationState == InitializationState.NONE) {
+            initializationState = InitializationState.IN_PROGRESS;
+            // addObserver must execute on the mainThread
+            Handler mainHandler = new Handler(context.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
+                        initializationState = InitializationState.COMPLETE;
+                    } catch (NoClassDefFoundError e) {
+                        initializationState = InitializationState.NONE;
+                        Logger.e(TAG,"Class 'ProcessLifecycleOwner' not found. The tracker can't track lifecycle events.");
+                    }
+                }
+            });
+        }
+    }
+
+    private ProcessObserver() {}
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onEnterForeground() {

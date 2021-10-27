@@ -182,6 +182,9 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     private void stopServices() {
+        if (tracker != null) {
+            tracker.close();
+        }
         if (emitter != null) {
             emitter.shutdown();
         }
@@ -403,7 +406,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                     gdprConfig.getDocumentVersion(),
                     gdprConfig.getDocumentDescription());
         }
-        Tracker tracker = Tracker.reset(new Tracker(builder));
+        Tracker tracker = new Tracker(builder);
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
         }

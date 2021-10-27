@@ -13,13 +13,10 @@
 
 package com.snowplowanalytics.snowplow.internal.tracker;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ProcessLifecycleOwner;
-import android.os.Handler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,16 +56,12 @@ import com.snowplowanalytics.snowplow.util.Basis;
 
 /**
  * Builds a Tracker object which is used to send events to a Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Snowplow.createTracker methods.
  */
-@Deprecated
 public class Tracker {
 
     /**
      * Builder for the Tracker
-     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
      */
-    @Deprecated
     public static class TrackerBuilder {
 
         final @NonNull Emitter emitter; // Required
@@ -113,7 +106,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#applicationContext(boolean)}
          * @param isEnabled Whether application contexts are sent with all events
          * @return itself
          */
@@ -138,7 +130,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#installAutotracking(boolean)}
          * @param willTrack Whether install events will be tracked
          * @return itself
          */
@@ -159,7 +150,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#base64encoding(boolean)}
          * @param base64 Whether JSONs in the payload should be base-64 encoded
          * @return itself
          */
@@ -170,7 +160,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#devicePlatform(DevicePlatform)}
          * @param platform The device platform the tracker is running on
          * @return itself
          */
@@ -181,7 +170,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#logLevel(LogLevel)}
          * @param log The log level for the Tracker class
          * @return itself
          */
@@ -192,7 +180,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#loggerDelegate(LoggerDelegate)}
          * @param delegate The logger delegate that receive logs from the tracker.
          * @return itself
          */
@@ -203,7 +190,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#sessionContext(boolean)}
          * @param sessionContext whether to add a session context
          * @return itself
          */
@@ -274,7 +260,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#geoLocationContext(boolean)}
          * @param geoLocationContext whether to add a geo-location context
          * @return itself
          */
@@ -285,7 +270,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#platformContext(boolean)}
          * @param mobileContext whether to add a mobile context
          * @return itself
          */
@@ -296,7 +280,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#exceptionAutotracking(boolean)}
          * @param applicationCrash whether to automatically track application crashes
          * @return itself
          */
@@ -307,7 +290,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#diagnosticAutotracking(boolean)}
          * @param trackerDiagnostic whether to automatically track error within the tracker.
          * @return itself
          */
@@ -318,7 +300,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#lifecycleAutotracking(boolean)}
          * @param lifecycleEvents whether to automatically track transition
          *                        from foreground to background
          * @return itself
@@ -329,9 +310,6 @@ public class Tracker {
             return this;
         }
 
-        /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#deepLinkContext(boolean)}
-         */
         @NonNull
         public TrackerBuilder deepLinkContext(@NonNull Boolean deepLinkContext) {
             this.deepLinkContext = deepLinkContext;
@@ -339,7 +317,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#screenContext(boolean)}
          * @param screenContext whether to send a screen context (info pertaining
          *                      to current screen) with every event
          * @return itself
@@ -351,7 +328,6 @@ public class Tracker {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.TrackerConfiguration#screenViewAutotracking(boolean)}
          * @param screenviewEvents whether to auto-track screenviews
          * @return itself
          */
@@ -377,55 +353,6 @@ public class Tracker {
     private final static String TAG = Tracker.class.getSimpleName();
     private String trackerVersion = BuildConfig.TRACKER_LABEL;
 
-    // --- Singleton Access
-
-    private static final @NonNull Object monitor = new Object();
-    private static volatile @Nullable Tracker spTracker = null;
-
-    public static @NonNull Tracker init(@NonNull Tracker newTracker) {
-        synchronized (monitor) {
-            if (spTracker != null) {
-                instance();
-            }
-            return reset(newTracker);
-        }
-    }
-
-    public static @NonNull Tracker reset(@NonNull Tracker newTracker) {
-        synchronized (monitor) {
-            if (spTracker != null) {
-                spTracker.unregisterNotificationHandlers();
-            }
-            spTracker = newTracker;
-            spTracker.resumeSessionChecking();
-            spTracker.getEmitter().flush();
-            spTracker.initializeInstallTracking();
-            spTracker.initializeScreenviewTracking();
-            spTracker.initializeLifecycleTracking();
-            return instance();
-        }
-    }
-
-    public static @NonNull Tracker instance() {
-        synchronized (monitor) {
-            if (spTracker == null) {
-                throw new IllegalStateException("FATAL: Tracker must be initialized first!");
-            }
-
-            return spTracker;
-        }
-    }
-
-    public static void close() {
-        if (spTracker == null) return;
-        synchronized (monitor) {
-            if (spTracker == null) return;
-            spTracker.pauseSessionChecking();
-            spTracker.getEmitter().shutdown();
-            spTracker = null;
-        }
-    }
-
     // --- Builder
 
     final Context context;
@@ -440,7 +367,6 @@ public class Tracker {
     private boolean sessionContext;
     Runnable[] sessionCallbacks;
     int threadCount;
-    TimeUnit timeUnit;
     boolean geoLocationContext;
     boolean mobileContext;
     boolean applicationCrash;
@@ -451,17 +377,18 @@ public class Tracker {
     boolean applicationContext;
     String trackerVersionSuffix;
 
-    private boolean deepLinkcontext;
+    private boolean deepLinkContext;
     private boolean screenContext;
 
     private Gdpr gdpr;
-    private InstallTracker installTracker;
-    private StateManager stateManager;
+    private final StateManager stateManager;
 
-    private long foregroundTimeout;
-    private long backgroundTimeout;
+    private final TimeUnit timeUnit;
+    private final long foregroundTimeout;
+    private final long backgroundTimeout;
 
-    private @NonNull PlatformContext platformContext;
+    @NonNull
+    private final PlatformContext platformContext;
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
@@ -536,26 +463,26 @@ public class Tracker {
 
     /**
      * Creates a new Snowplow Tracker.
-     *
      * @param builder The builder that constructs a tracker
      */
     public Tracker(@NonNull TrackerBuilder builder) {
         this.stateManager = new StateManager();
         this.context = builder.context;
 
-        String trackerNamespace = builder.namespace != null ? builder.namespace : "default";
         this.emitter = builder.emitter;
-        this.emitter.setNamespace(trackerNamespace);
+        this.emitter.flush();
+
+        this.namespace = builder.namespace;
+        this.emitter.setNamespace(namespace);
 
         this.appId = builder.appId;
         this.base64Encoded = builder.base64Encoded;
-        this.namespace = builder.namespace;
+
         this.subject = builder.subject;
         this.devicePlatform = builder.devicePlatform;
         this.sessionContext = builder.sessionContext;
         this.sessionCallbacks = builder.sessionCallbacks;
         this.threadCount = Math.max(builder.threadCount, 2);
-        this.timeUnit = builder.timeUnit;
         this.geoLocationContext = builder.geoLocationContext;
         this.mobileContext = builder.mobileContext;
         this.applicationCrash = builder.applicationCrash;
@@ -566,9 +493,10 @@ public class Tracker {
         this.applicationContext = builder.applicationContext;
         this.gdpr = builder.gdpr;
         this.level = builder.logLevel;
+        this.trackerVersionSuffix = builder.trackerVersionSuffix;
+        this.timeUnit = builder.timeUnit;
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
-        this.trackerVersionSuffix = builder.trackerVersionSuffix;
 
         this.platformContext = new PlatformContext(this.context);
 
@@ -581,8 +509,6 @@ public class Tracker {
                 trackerVersion = trackerVersion + " " + suffix;
             }
         }
-
-        registerNotificationHandlers();
 
         if (trackerDiagnostic) {
             if (level == LogLevel.OFF) {
@@ -600,10 +526,17 @@ public class Tracker {
             trackerSession = Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, namespace, callbacks);
         }
 
-        //$ TODO: The exception handler has to be common for all the tracker instances
-        if (this.applicationCrash && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
-            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-        }
+        // Register notification receivers from singleton services
+        registerNotificationHandlers();
+
+        // Initialization of services shared with all the tracker instances
+        initializeCrashReporting();
+        initializeInstallTracking();
+        initializeScreenviewTracking();
+        initializeLifecycleTracking();
+
+        // Resume session
+        resumeSessionChecking();
 
         Logger.v(TAG, "Tracker created successfully.");
     }
@@ -626,40 +559,36 @@ public class Tracker {
         NotificationCenter.removeObserver(receiveCrashReportingNotification);
     }
 
-    //$ TODO: All of this has to be common for all the trackers
     private void initializeInstallTracking() {
         if (installTracking) {
-            installTracker = new InstallTracker(context);
+            InstallTracker.getInstance(context);
         }
     }
 
     private void initializeScreenviewTracking() {
         if (activityTracking) {
-            ActivityLifecycleHandler handler = new ActivityLifecycleHandler();
-            Application application = (Application) context.getApplicationContext();
-            application.registerActivityLifecycleCallbacks(handler);
+            ActivityLifecycleHandler.getInstance(context);
         }
     }
 
-    //$ TODO: The lifecycle has to be common for all the tracker instances - it has to be a singleton
     private void initializeLifecycleTracking() {
         if (lifecycleEvents) {
-            // addObserver must execute on the mainThread
-            Handler mainHandler = new Handler(context.getMainLooper());
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
-                    } catch (NoClassDefFoundError e) {
-                        Logger.e(TAG,"Class 'ProcessLifecycleOwner' not found. The tracker can't track lifecycle events.");
-                    }
-                }
-            });
-            //$ TODO: This state machine has to be specific for the tracker!
+            ProcessObserver.initialize(context);
             // Initialize LifecycleStateMachine for lifecycle entities
             stateManager.addStateMachine(new LifecycleStateMachine(), "Lifecycle");
         }
+    }
+
+    private void initializeCrashReporting() {
+        if (applicationCrash && !(Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)) {
+            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+        }
+    }
+
+    public void close() {
+        unregisterNotificationHandlers();
+        pauseSessionChecking();
+        getEmitter().shutdown();
     }
 
     // --- Event Tracking Functions
@@ -787,9 +716,6 @@ public class Tracker {
             if (trackerSession != null) {
                 synchronized (trackerSession) {
                     SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
-                    if (sessionContextJson == null) {
-                        Logger.track(TAG, "Method getSessionContext returned null with eventId: %s", eventId);
-                    }
                     contexts.add(sessionContextJson);
                 }
             } else {
@@ -823,16 +749,13 @@ public class Tracker {
         if (contexts.isEmpty()) {
             return;
         }
-        List<Map> data = new LinkedList<>();
+        List<Map<String, Object>> data = new LinkedList<>();
         for (SelfDescribingJson context : contexts) {
             if (context != null) {
                 data.add(context.getMap());
             }
         }
         SelfDescribingJson finalContext = new SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data);
-        if (finalContext == null) {
-            return;
-        }
         payload.addMap(finalContext.getMap(), base64Encoded, Parameters.CONTEXT_ENCODED, Parameters.CONTEXT);
     }
 
@@ -949,8 +872,6 @@ public class Tracker {
      * @param documentId ID of a GDPR basis document
      * @param documentVersion Version of the document
      * @param documentDescription Description of the document
-     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
-     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
      */
     public void enableGdprContext(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
         this.gdpr = new Gdpr(basisForProcessing, documentId, documentVersion, documentDescription);
@@ -958,17 +879,11 @@ public class Tracker {
 
     /**
      * Disable GDPR context.
-     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
-     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
      */
     public synchronized void disableGdprContext() {
         this.gdpr = null;
     }
 
-    /**
-     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprConfiguration}
-     * or {@link com.snowplowanalytics.snowplow.configuration.GdprConfiguration GdprController}
-     */
     @Nullable
     public Gdpr getGdprContext() {
         return gdpr;
@@ -978,7 +893,6 @@ public class Tracker {
 
     /**
      * @param subject a valid subject object
-     * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.SubjectConfiguration}
      */
     public void setSubject(@Nullable Subject subject) {
         this.subject = subject;
@@ -1020,9 +934,7 @@ public class Tracker {
         this.devicePlatform = platform;
     }
 
-    /**
-     * @deprecated Internal use only
-     */
+    /** Internal use only */
     public void setScreenContext(boolean screenContext) {
         this.screenContext = screenContext;
         if (screenContext) {
@@ -1032,12 +944,10 @@ public class Tracker {
         }
     }
 
-    /**
-     * @deprecated Internal use only
-     */
+    /** Internal use only */
     public void setDeepLinkContext(boolean deepLinkContext) {
-        this.deepLinkcontext = deepLinkContext;
-        if (deepLinkcontext) {
+        this.deepLinkContext = deepLinkContext;
+        if (this.deepLinkContext) {
             stateManager.addStateMachine(new DeepLinkStateMachine(), "DeepLinkContext");
         } else {
             stateManager.removeStateMachine("DeepLinkContext");
@@ -1046,18 +956,14 @@ public class Tracker {
 
     // --- Getters
 
-    /**
-     * @deprecated Internal use only
-     */
+    /** Internal use only */
     public boolean getScreenContext() {
         return screenContext;
     }
 
-    /**
-     * @deprecated Internal use only
-     */
+    /** Internal use only */
     public boolean getDeepLinkContext() {
-        return deepLinkcontext;
+        return deepLinkContext;
     }
 
     public boolean getSessionContext() {
@@ -1181,10 +1087,10 @@ public class Tracker {
     }
 
     /**
+     * Internal use only
      * @return screen state from tracker
      */
     @Nullable
-    @Deprecated
     public ScreenState getScreenState() {
         State state = stateManager.trackerState.getState("ScreenContext");
         if (state == null) {

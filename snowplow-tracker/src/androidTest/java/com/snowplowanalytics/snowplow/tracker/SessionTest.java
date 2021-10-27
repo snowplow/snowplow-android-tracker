@@ -18,8 +18,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.event.Event;
-import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -102,7 +100,7 @@ public class SessionTest extends AndroidTestCase {
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
         Session session = getSession(0, 15);
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
         String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
@@ -135,7 +133,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         String oldSessionId = sessionId;
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_2");
@@ -145,7 +143,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.setIsBackground(false);
+        session.updateLifecycleNotification(true);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_3");
@@ -155,7 +153,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_4");
@@ -242,16 +240,16 @@ public class SessionTest extends AndroidTestCase {
         cleanSharedPreferences(getContext(), "tracker2");
 
         Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
-        Tracker tracker1 = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
+        Tracker tracker1 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-        ));
-        Tracker tracker2 = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        );
+        Tracker tracker2 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-        ));
+        );
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
@@ -276,11 +274,11 @@ public class SessionTest extends AndroidTestCase {
         String id2 = session2.getCurrentSessionId();
 
         // Recreate tracker2
-        Tracker tracker2b = Tracker.init(new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        Tracker tracker2b = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-        ));
+        );
         tracker2b.getSession().getSessionContext("fake-id3");
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getPreviousSessionId();
