@@ -30,19 +30,10 @@ public class SubjectTest extends AndroidTestCase {
 
     private Subject getSubject() {
         Logger.updateLogLevel(LogLevel.DEBUG);
-        return new Subject
-                .SubjectBuilder()
-                .context(getContext())
-                .build();
+        return new Subject(getContext(), null);
     }
 
     // Tests
-
-    public void testSubjectWithNullContext() {
-        Subject subject = new Subject.SubjectBuilder().build();
-        Map<String, String> map = subject.getSubject();
-        assertFalse(map.containsKey(Parameters.RESOLUTION));
-    }
 
     public void testGetSubjectStandardPairs() throws Exception {
         Subject subject = getSubject();
@@ -56,12 +47,6 @@ public class SubjectTest extends AndroidTestCase {
     public void testSetUserId() {
         Subject subject = getSubject();
         subject.setUserId("newUserId");
-        assertEquals("newUserId", subject.getSubject().get("uid"));
-    }
-
-    public void testIdentifyUser() {
-        Subject subject = getSubject();
-        subject.identifyUser("newUserId");
         assertEquals("newUserId", subject.getSubject().get("uid"));
     }
 

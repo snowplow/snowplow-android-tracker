@@ -347,10 +347,7 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
     private Subject makeSubject() {
-        return new Subject.SubjectBuilder()
-                .context(context)
-                .subjectConfiguration(subjectConfigurationUpdate)
-                .build();
+        return new Subject(context, subjectConfigurationUpdate);
     }
 
     @NonNull

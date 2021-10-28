@@ -152,10 +152,7 @@ public class EventSendingTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        Subject subject = new Subject
-                .SubjectBuilder()
-                .context(getContext())
-                .build();
+        Subject subject = new Subject(getContext(), null);
 
         if (tracker != null) tracker.close();
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())

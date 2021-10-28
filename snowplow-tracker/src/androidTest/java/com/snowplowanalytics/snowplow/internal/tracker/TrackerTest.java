@@ -96,10 +96,7 @@ public class TrackerTest extends AndroidTestCase {
                 .emptyLimit(0)
                 .build();
 
-        Subject subject = new Subject
-                .SubjectBuilder()
-                .context(getContext())
-                .build();
+        Subject subject = new Subject(getContext(), null);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
             .subject(subject)

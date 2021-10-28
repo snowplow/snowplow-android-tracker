@@ -27,16 +27,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.util.Size;
 
 /**
  * Provides Subject information for each
  * event sent from the Snowplow Tracker.
- * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
-@Deprecated
 public class Subject {
 
     private static final String TAG = Subject.class.getSimpleName();
@@ -63,59 +60,10 @@ public class Subject {
     @Nullable
     Integer colorDepth;
 
-
-    /**
-     * Builder for the Subject
-     * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
-     */
-    @Deprecated
-    public static class SubjectBuilder {
-        private Context context = null; // Optional
-        private SubjectConfigurationInterface subjectConfiguration = null; // Optional
-
-        /**
-         * @param context The android context to pass to the subject
-         * @return itself
-         */
-        @NonNull
-        public SubjectBuilder context(@NonNull Context context) {
-            this.context = context;
-            return this;
-        }
-
-        /**
-         * @param subjectConfiguration The subjectConfiguration to configure the subject
-         * @return itself
-         */
-        @NonNull
-        public SubjectBuilder subjectConfiguration(@Nullable SubjectConfigurationInterface subjectConfiguration) {
-            this.subjectConfiguration = subjectConfiguration;
-            return this;
-        }
-
-        /**
-         * Creates a new Subject
-         *
-         * @return a new Subject object
-         */
-        @NonNull
-        public Subject build() {
-            return new Subject(this);
-        }
-    }
-
-    /**
-     * Creates a Subject which will add extra data to each event.
-     *
-     * @param builder The builder that constructs a subject
-     */
-    private Subject(@NonNull SubjectBuilder builder) {
+    public Subject(@NonNull Context context, @Nullable SubjectConfigurationInterface config) {
         setDefaultTimezone();
         setDefaultLanguage();
-        if (builder.context != null) {
-            setDefaultScreenResolution(builder.context);
-        }
-        SubjectConfigurationInterface config = builder.subjectConfiguration;
+        setDefaultScreenResolution(context);
         if (config != null) {
             if (config.getUserId() != null) setUserId(config.getUserId());
             if (config.getNetworkUserId() != null) setNetworkUserId(config.getNetworkUserId());
@@ -177,7 +125,6 @@ public class Subject {
 
     /**
      * Sets the subjects userId
-     * @deprecated Use {@link SubjectConfiguration#userId(String)}
      * @param userId a user id string
      */
     public void setUserId(@NonNull String userId) {
@@ -186,18 +133,10 @@ public class Subject {
     }
 
     /**
-     * Sets the subjects userId
-     * @deprecated Use {@link SubjectConfiguration#userId(String)}
-     * @param userId a user id string
-     */
-    public void identifyUser(@NonNull String userId) { this.setUserId(userId); }
-
-    /**
      * Sets a custom screen resolution based
      * on user inputted width and height.
      *
      * Measured in pixels: 1920x1080
-     * @deprecated Use {@link SubjectConfiguration#screenResolution(Size)} 
      * @param width the width of the screen
      * @param height the height of the screen
      */
@@ -211,7 +150,6 @@ public class Subject {
      * Sets the view port resolution
      *
      * Measured in pixels: 1280x1024
-     * @deprecated Use {@link SubjectConfiguration#screenViewPort(Size)} 
      * @param width the width of the viewport
      * @param height the height of the viewport
      */
@@ -225,7 +163,6 @@ public class Subject {
      * user defined color depth.
      *
      * Measure as an integer
-     * @deprecated Use {@link SubjectConfiguration#colorDepth(Integer)} 
      * @param depth the color depth
      */
     public void setColorDepth(int depth) {
@@ -235,7 +172,6 @@ public class Subject {
 
     /**
      * User inputted timezone
-     * @deprecated Use {@link SubjectConfiguration#timezone(String)} 
      * @param timezone a valid timezone
      */
     public void setTimezone(@NonNull String timezone) {
@@ -246,7 +182,6 @@ public class Subject {
     /**
      * User inputted language for the
      * subject.
-     * @deprecated Use {@link SubjectConfiguration#language(String)} 
      * @param language language setting
      */
     public void setLanguage(@NonNull String language) {
@@ -257,7 +192,6 @@ public class Subject {
     /**
      * User inputted ip address for the
      * subject.
-     * @deprecated Use {@link SubjectConfiguration#ipAddress(String)} 
      * @param ipAddress an ip address
      */
     public void setIpAddress(@NonNull String ipAddress) {
@@ -268,7 +202,6 @@ public class Subject {
     /**
      * User inputted useragent for the
      * subject.
-     * @deprecated Use {@link SubjectConfiguration#useragent(String)} 
      * @param useragent a useragent
      */
     public void setUseragent(@NonNull String useragent) {
@@ -279,7 +212,6 @@ public class Subject {
     /**
      * User inputted Network User Id for the
      * subject.
-     * @deprecated Use {@link SubjectConfiguration#networkUserId(String)} 
      * @param networkUserId a network user id
      */
     public void setNetworkUserId(@NonNull String networkUserId) {
@@ -290,7 +222,6 @@ public class Subject {
     /**
      * User inputted Domain User Id for the
      * subject.
-     * @deprecated Use {@link SubjectConfiguration#domainUserId(String)}
      * @param domainUserId a domain user id
      */
     public void setDomainUserId(@NonNull String domainUserId) {
