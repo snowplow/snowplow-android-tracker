@@ -66,7 +66,6 @@ public class SessionTest extends AndroidTestCase {
 
         Map<String, Object> sessionContext = getSessionContext(session,"event_1");
         assertNotNull(sessionContext.get(Parameters.SESSION_USER_ID));
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
         assertEquals(1, session.getSessionIndex());
         assertNotNull(sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
@@ -206,7 +205,7 @@ public class SessionTest extends AndroidTestCase {
         prefs.edit().clear().commit();
         prefs.edit().putString(Parameters.SESSION_USER_ID, UUID.randomUUID().toString()).commit();
 
-        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+        Session session = new Session(600, 300, TimeUnit.SECONDS, null, getContext());
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
@@ -296,8 +295,7 @@ public class SessionTest extends AndroidTestCase {
                 .edit()
                 .clear()
                 .commit();
-        Session session = new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, getContext());
-        return session;
+        return new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, null, getContext());
     }
 
     private Map<String, Object> getSessionContext(Session session, String eventId) {

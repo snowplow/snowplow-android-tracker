@@ -21,14 +21,11 @@ import android.os.StrictMode;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.controller.SessionController;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +33,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A Session object which gets appended to each
- * event sent from the Tracker and changes based
- * on:
+ * Component that generate a Session context
+ * which gets appended to each event sent from
+ * the Tracker and changes based on:
  * - Timeout of use while app is in foreground
  * - Timeout of use while app is in background
  *
@@ -47,14 +44,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * Essentially will update if it is not accessed within
  * a configurable timeout.
- *
- * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.SessionConfiguration SessionConfiguration}
- * for the configuration or {@link com.snowplowanalytics.snowplow.controller.SessionController SessionController}
- * for the runtime information and setup.
  */
-@Deprecated
 public class Session {
-
     private static final String TAG = Session.class.getSimpleName();
 
     // Session Variables
@@ -70,7 +61,7 @@ public class Session {
     // Variables to control Session Updates
     private final AtomicBoolean isBackground = new AtomicBoolean(false);
     private long lastSessionCheck;
-    private boolean isNewSession;
+    private final AtomicBoolean isNewSession = new AtomicBoolean(true);
     private boolean isSessionCheckerEnabled;
     private long foregroundTimeout;
     private long backgroundTimeout;
@@ -82,17 +73,6 @@ public class Session {
     private Runnable backgroundTimeoutCallback = null;
 
     private SharedPreferences sharedPreferences;
-    private String sessionVarsName;
-
-    @NonNull
-    public synchronized static Session getInstance(@NonNull Context context,
-                                                   long foregroundTimeout,
-                                                   long backgroundTimeout,
-                                                   @NonNull TimeUnit timeUnit,
-                                                   @Nullable Runnable[] sessionCallbacks)
-    {
-        return Session.getInstance(context, foregroundTimeout, backgroundTimeout, timeUnit, null, sessionCallbacks);
-    }
 
     /**
      * Creates a new Session object which will
@@ -109,7 +89,6 @@ public class Session {
      * @param namespace the namespace used by the session.
      * @param sessionCallbacks Called when the app change state or when timeout is triggered.
      */
-    @Deprecated
     @NonNull
     public synchronized static Session getInstance(@NonNull Context context,
                                                    long foregroundTimeout,
@@ -130,20 +109,13 @@ public class Session {
         return session;
     }
 
-    @Deprecated
-    public Session(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit, @NonNull Context context) {
-        this(foregroundTimeout, backgroundTimeout, timeUnit, null, context);
-    }
-
     @SuppressLint("ApplySharedPref")
-    @Deprecated
     public Session(long foregroundTimeout, long backgroundTimeout, @NonNull TimeUnit timeUnit, @Nullable String namespace, @NonNull Context context) {
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout);
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout);
         isSessionCheckerEnabled = true;
-        isNewSession = true;
 
-        sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS;
+        String sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS;
         if (namespace != null && !namespace.isEmpty()) {
             String sessionVarsSuffix = namespace.replaceAll("[^a-zA-Z0-9_]+", "-");
             sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS + "_" + sessionVarsSuffix;
@@ -222,7 +194,7 @@ public class Session {
     }
 
     private boolean shouldUpdateSession() {
-        if (isNewSession) {
+        if (isNewSession.get()) {
             return true;
         }
         long now = System.currentTimeMillis();
@@ -231,7 +203,7 @@ public class Session {
     }
 
     private synchronized void updateSession(String eventId) {
-        isNewSession = false;
+        isNewSession.set(false);
         firstId = eventId;
         previousSessionId = this.currentSessionId;
         currentSessionId = Util.getUUIDString();
@@ -259,11 +231,8 @@ public class Session {
         editor.apply();
     }
 
-    /**
-     * @deprecated Use {@link SessionController#startNewSession()}
-     */
     public void startNewSession() {
-        isNewSession = true;
+        isNewSession.set(true);
     }
 
     /**
@@ -299,16 +268,12 @@ public class Session {
         }
     }
 
-    /**
-     * @deprecated Use {@link SessionController#isInBackground()}
-     */
     public boolean isBackground() {
         return isBackground.get();
     }
 
     /**
      * Changes the truth of isSuspended
-     * @deprecated Use {@link SessionController#pause()}
      * @param isSuspended whether the session tracking is suspended,
      *                    i.e. calls to update session are ignored,
      *                    but access time is changed to current time.
@@ -319,16 +284,8 @@ public class Session {
         isSessionCheckerEnabled = !isSuspended;
     }
 
-    void setBackgroundIndex(int backgroundIndex) {
-        this.backgroundIndex = backgroundIndex;
-    }
-
     int getBackgroundIndex() {
         return backgroundIndex;
-    }
-
-    void setForegroundIndex(int foregroundIndex) {
-        this.foregroundIndex = foregroundIndex;
     }
 
     int getForegroundIndex() {
@@ -337,7 +294,6 @@ public class Session {
 
     /**
      * Returns the values for the session context.
-     * @deprecated Use {@link SessionController}
      * @return a map containing all session values
      */
     @NonNull
@@ -384,19 +340,6 @@ public class Session {
     }
 
     /**
-     * Set session callbacks
-     */
-    public void setCallbacks(@NonNull Runnable[] callbacks) {
-        if (callbacks.length == 4) {
-            this.foregroundTransitionCallback = callbacks[0];
-            this.backgroundTransitionCallback = callbacks[1];
-            this.foregroundTimeoutCallback = callbacks[2];
-            this.backgroundTimeoutCallback = callbacks[3];
-        }
-    }
-
-    /**
-     * @deprecated Use {@link SessionController#getSessionIndex()}
      * @return the session index
      */
     public int getSessionIndex() {
@@ -404,7 +347,6 @@ public class Session {
     }
 
     /**
-     * @deprecated Use {@link SessionController#getUserId()}
      * @return the user id
      */
     @NonNull
@@ -413,7 +355,6 @@ public class Session {
     }
 
     /**
-     * @deprecated Use {@link SessionController#getSessionId()}
      * @return the current session id
      */
     @NonNull
@@ -422,8 +363,7 @@ public class Session {
     }
 
     /**
-     * @return the previous session id or an
-     *         empty String
+     * @return the previous session id or an empty String
      */
     @Nullable
     public String getPreviousSessionId() {
@@ -441,13 +381,12 @@ public class Session {
     /**
      * @return the first event id
      */
-    @NonNull
+    @Nullable
     public String getFirstId() {
         return this.firstId;
     }
 
     /**
-     * @deprecated Use {@link SessionController#setForegroundTimeout(TimeMeasure)}
      * Set foreground timeout
      */
     public void setForegroundTimeout(long foregroundTimeout) {
@@ -455,7 +394,6 @@ public class Session {
     }
 
     /**
-     * @deprecated Use {@link SessionController#getForegroundTimeout()}
      * @return the foreground session timeout
      */
     public long getForegroundTimeout() {
@@ -463,7 +401,6 @@ public class Session {
     }
 
     /**
-     * @deprecated Use {@link SessionController#setBackgroundTimeout(TimeMeasure)}
      * Set background timeout
      */
     public void setBackgroundTimeout(long backgroundTimeout) {
@@ -471,7 +408,6 @@ public class Session {
     }
 
     /**
-     * @deprecated Use {@link SessionController#getBackgroundTimeout()}
      * @return the background session timeout
      */
     public long getBackgroundTimeout() {
