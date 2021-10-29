@@ -14,12 +14,10 @@
 package com.snowplowanalytics.snowplow.internal.emitter;
 
 import android.content.Context;
-import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -36,7 +34,6 @@ import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.EnumSet;
@@ -52,14 +49,11 @@ import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
- * @deprecated It will be removed in the next major version, please use Snowplow.setup methods.
  */
-@Deprecated
 public class Emitter {
+    private final String TAG = Emitter.class.getSimpleName();
 
     private static final int POST_WRAPPER_BYTES = 88; // "schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3","data":[]
-
-    private final String TAG = Emitter.class.getSimpleName();
 
     private Context context;
     private RequestCallback requestCallback;
@@ -88,12 +82,8 @@ public class Emitter {
 
     /**
      * Builder for the Emitter.
-     * @deprecated It will be removed in the next major version, please use {@link com.snowplowanalytics.snowplow.Snowplow} methods.
      */
-    @Deprecated
     public static class EmitterBuilder {
-        final @Nullable String uri; // Required
-        final @NonNull Context context; // Required
         @Nullable RequestCallback requestCallback = null; // Optional
         @NonNull HttpMethod httpMethod = POST; // Optional
         @NonNull BufferOption bufferOption = BufferOption.DefaultGroup; // Optional
@@ -113,17 +103,6 @@ public class Emitter {
         @Nullable EventStore eventStore = null; // Optional
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}.
-         * @param uri The uri of the collector
-         * @param context the android context
-         */
-        public EmitterBuilder(@Nullable String uri, @NonNull Context context) {
-            this.uri = uri;
-            this.context = context;
-        }
-
-        /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(NetworkConnection)}.
          * @param networkConnection The component in charge for sending events to the collector.
          * @return itself
          */
@@ -134,7 +113,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#eventStore(EventStore)}.
          * @param eventStore The component in charge for persisting events before sending.
          * @return itself
          */
@@ -145,62 +123,56 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}.
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
         @NonNull
-        public EmitterBuilder method(@Nullable HttpMethod httpMethod) {
+        public EmitterBuilder method(@NonNull HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#bufferOption(BufferOption)}
          * @param option the buffer option for the emitter
          * @return itself
          */
         @NonNull
-        public EmitterBuilder option(@Nullable BufferOption option) {
+        public EmitterBuilder option(@NonNull BufferOption option) {
             this.bufferOption = option;
             return this;
         }
 
         /**
-         * @deprecated Use {@link NetworkConfiguration#NetworkConfiguration(String, HttpMethod)}
          * @param protocol the security chosen for requests
          * @return itself
          */
         @NonNull
-        public EmitterBuilder security(@Nullable Protocol protocol) {
+        public EmitterBuilder security(@NonNull Protocol protocol) {
             this.requestSecurity = protocol;
             return this;
         }
 
         /**
-         * @deprecated No longer needed.
          * @param version the TLS version allowed for requests
          * @return itself
          */
         @NonNull
-        public EmitterBuilder tls(@Nullable TLSVersion version) {
+        public EmitterBuilder tls(@NonNull TLSVersion version) {
             this.tlsVersions = EnumSet.of(version);
             return this;
         }
 
         /**
-         * @deprecated No longer needed.
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
         @NonNull
-        public EmitterBuilder tls(@Nullable EnumSet<TLSVersion> versions) {
+        public EmitterBuilder tls(@NonNull EnumSet<TLSVersion> versions) {
             this.tlsVersions = versions;
             return this;
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#requestCallback(RequestCallback)}.
          * @param requestCallback Request callback function
          * @return itself
          */
@@ -211,7 +183,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated No longer needed.
          * @param emitterTick The tick count between emitter attempts
          * @return itself
          */
@@ -222,7 +193,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#emitRange(int)}.
          * @param sendLimit The maximum amount of events to grab for an emit attempt
          * @return itself
          */
@@ -233,7 +203,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated No longer needed.
          * @param emptyLimit The amount of emitter ticks that are performed before we shut down
          *                   due to the database being empty.
          * @return itself
@@ -245,7 +214,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#byteLimitGet(int)}.
          * @param byteLimitGet The maximum amount of bytes allowed to be sent in a payload
          *                     in a GET request.
          * @return itself
@@ -257,7 +225,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#byteLimitPost(int)}.
          * @param byteLimitPost The maximum amount of bytes allowed to be sent in a payload
          *                      in a POST request.
          * @return itself
@@ -269,7 +236,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#timeout(Integer)}.
          * @param emitTimeout The maximum timeout for emitting events. If emit time exceeds this value
          *                    TimeOutException will be thrown
          * @return itself
@@ -281,18 +247,16 @@ public class Emitter {
         }
 
         /**
-         * @deprecated No longer needed.
          * @param timeUnit a valid TimeUnit
          * @return itself
          */
         @NonNull
-        public EmitterBuilder timeUnit(@Nullable TimeUnit timeUnit) {
+        public EmitterBuilder timeUnit(@NonNull TimeUnit timeUnit) {
             this.timeUnit = timeUnit;
             return this;
         }
 
         /**
-         * @deprecated Use {@link NetworkConfiguration#okHttpClient(OkHttpClient)}
          * @param client An OkHttp client that will be used in the emitter, you can provide your
          *               own if you want to share your Singleton client's interceptors, connection pool etc..
          *               ,otherwise a new one is created.
@@ -305,7 +269,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.NetworkConfiguration#customPostPath(String)}.
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
@@ -316,7 +279,6 @@ public class Emitter {
         }
 
         /**
-         * @deprecated Use {@link com.snowplowanalytics.snowplow.configuration.EmitterConfiguration#threadPoolSize(int)}.
          * @param threadPoolSize The number of threads available for the tracker's operations.
          * @return itself
          */
@@ -325,27 +287,17 @@ public class Emitter {
             this.threadPoolSize = threadPoolSize;
             return this;
         }
-
-        /**
-         * Creates a new Emitter
-         *
-         * @return a new Emitter object
-         */
-        @NonNull
-        public Emitter build() {
-            return new Emitter(this);
-        }
     }
 
     /**
      * Creates an emitter object
-     *
-     * @param builder The builder that constructs an emitter
      */
-    private Emitter(@NonNull EmitterBuilder builder) {
-        this.httpMethod = builder.httpMethod;
+    public Emitter(@NonNull Context context, @NonNull String collectorUri, @Nullable EmitterBuilder builder) {
+        this.context = context;
+        if (builder == null) {
+            builder = new EmitterBuilder();
+        }
         this.requestCallback = builder.requestCallback;
-        this.context = builder.context;
         this.bufferOption = builder.bufferOption;
         this.requestSecurity = builder.requestSecurity;
         this.tlsVersions = builder.tlsVersions;
@@ -355,17 +307,16 @@ public class Emitter {
         this.byteLimitGet = builder.byteLimitGet;
         this.byteLimitPost = builder.byteLimitPost;
         this.emitTimeout = builder.emitTimeout;
-        this.uri = builder.uri;
         this.timeUnit = builder.timeUnit;
-        this.eventStore = null;
-        this.customPostPath = builder.customPostPath;
         this.client = builder.client;
         this.eventStore = builder.eventStore;
 
+        this.uri = collectorUri;
+        this.httpMethod = builder.httpMethod;
+        this.customPostPath = builder.customPostPath;
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false;
-            String endpoint = builder.uri;
-            Uri uri = Uri.parse(endpoint);
+            String endpoint = collectorUri;
             if (!endpoint.startsWith("http")) {
                 String protocol = builder.requestSecurity == Protocol.HTTPS ? "https://" : "http://";
                 endpoint = protocol + endpoint;

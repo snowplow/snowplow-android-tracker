@@ -143,14 +143,13 @@ public class EventSendingTest extends AndroidTestCase {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter
-                .EmitterBuilder(uri, getContext())
+        Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
                 .method(method)
                 .security(Protocol.HTTP)
                 .tick(0)
                 .emptyLimit(0)
-                .build();
+        );
 
         Subject subject = new Subject(getContext(), null);
 

@@ -90,11 +90,10 @@ public class TrackerTest extends AndroidTestCase {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter
-                .EmitterBuilder("testUrl", getContext())
+        Emitter emitter = new Emitter(getContext(), "testUrl", new Emitter.EmitterBuilder()
                 .tick(0)
                 .emptyLimit(0)
-                .build();
+        );
 
         Subject subject = new Subject(getContext(), null);
 
@@ -140,7 +139,7 @@ public class TrackerTest extends AndroidTestCase {
         Tracker tracker = getTracker();
         assertNotNull(tracker.getEmitter());
 
-        tracker.setEmitter(new Emitter.EmitterBuilder("test", getContext()).build());
+        tracker.setEmitter(new Emitter(getContext(), "test", null));
         assertNotNull(tracker.getEmitter());
     }
 
@@ -193,9 +192,9 @@ public class TrackerTest extends AndroidTestCase {
 
         Emitter emitter = null;
         try {
-            emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
                     .option(BufferOption.Single)
-                    .build();
+            );
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception on Emitter creation");
@@ -258,9 +257,9 @@ public class TrackerTest extends AndroidTestCase {
 
         Emitter emitter = null;
         try {
-            emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
                     .option(BufferOption.Single)
-                    .build();
+            );
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception on Emitter creation");
@@ -318,9 +317,9 @@ public class TrackerTest extends AndroidTestCase {
 
         MockWebServer mockWebServer = getMockServer(1);
 
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
-                .build();
+        );
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -352,9 +351,9 @@ public class TrackerTest extends AndroidTestCase {
 
         MockWebServer mockWebServer = getMockServer(1);
 
-        Emitter emitter = new Emitter.EmitterBuilder(getMockServerURI(mockWebServer), getContext())
+        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
-                .build();
+        );
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -382,9 +381,9 @@ public class TrackerTest extends AndroidTestCase {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter.EmitterBuilder("fake-uri", getContext())
+        Emitter emitter = new Emitter(getContext(), "fake-uri", new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
-                .build();
+        );
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -437,7 +436,7 @@ public class TrackerTest extends AndroidTestCase {
                 Thread.getDefaultUncaughtExceptionHandler().getClass()
         );
 
-        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
+        Emitter emitter = new Emitter(getContext(), "com.acme", null);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -466,7 +465,7 @@ public class TrackerTest extends AndroidTestCase {
                 Thread.getDefaultUncaughtExceptionHandler().getClass()
         );
 
-        Emitter emitter = new Emitter.EmitterBuilder("com.acme", getContext()).build();
+        Emitter emitter = new Emitter(getContext(), "com.acme", null);
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
                 .level(LogLevel.VERBOSE)

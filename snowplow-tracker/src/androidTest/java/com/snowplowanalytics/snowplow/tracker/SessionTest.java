@@ -239,7 +239,7 @@ public class SessionTest extends AndroidTestCase {
         cleanSharedPreferences(getContext(), "tracker1");
         cleanSharedPreferences(getContext(), "tracker2");
 
-        Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
+        Emitter emitter = new Emitter(getContext(), "", null);
         Tracker tracker1 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
