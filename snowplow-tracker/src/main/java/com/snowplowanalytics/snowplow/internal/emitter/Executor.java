@@ -68,11 +68,21 @@ public class Executor {
      * @param runnable the runnable to be queued
      */
     public static void execute(boolean reportsOnDiagnostic, @Nullable String tag, @Nullable Runnable runnable) {
+        final String loggerTag;
+        if (tag == null) {
+            loggerTag = "Source not provided";
+        } else {
+            loggerTag = tag;
+        }
         execute(runnable, t -> {
+            String message = t.getLocalizedMessage();
+            if (message == null) {
+                message = "No message provided.";
+            }
             if (reportsOnDiagnostic) {
-                Logger.track(tag, t.getLocalizedMessage(), t);
+                Logger.track(loggerTag, message, t);
             } else {
-                Logger.e(tag, t.getLocalizedMessage(), t);
+                Logger.e(loggerTag, message, t);
             }
         });
     }

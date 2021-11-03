@@ -100,12 +100,6 @@ public class GlobalContext {
 
     @NonNull
     public  List<SelfDescribingJson> generateContexts(@NonNull InspectableEvent event) {
-        if (event == null) {
-            return new ArrayList<>();
-        }
-        if (generator == null) {
-            return new ArrayList<>();
-        }
         if (filter != null && !filter.apply(event)) {
             return new ArrayList<>();
         }

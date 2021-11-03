@@ -70,6 +70,9 @@ public class EventStoreHelper extends SQLiteOpenHelper {
      */
     @NonNull
     public synchronized static List<String> removeUnsentEventsExceptForNamespaces(@NonNull Context context, @Nullable List<String> allowedNamespaces) {
+        if (allowedNamespaces == null) {
+            allowedNamespaces = new ArrayList<>();
+        }
         String[] databaseList = context.databaseList();
         if (databaseList == null) {
             return new ArrayList<>();

@@ -70,7 +70,7 @@ public class PageView extends AbstractPrimitive {
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String, Object> payload = new HashMap<>();
-        if (pageUrl != null) payload.put(Parameters.PAGE_URL, pageUrl);
+        payload.put(Parameters.PAGE_URL, pageUrl);
         if (pageTitle != null) payload.put(Parameters.PAGE_TITLE, pageTitle);
         if (referrer != null) payload.put(Parameters.PAGE_REFR, referrer);
         return payload;

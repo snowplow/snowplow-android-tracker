@@ -186,12 +186,12 @@ class DefaultLoggerDelegate implements LoggerDelegate {
     }
 
     @Override
-    public void debug(@NonNull String tag, String msg) {
+    public void debug(@NonNull String tag, @NonNull String msg) {
         Log.d(tag, msg);
     }
 
     @Override
-    public void verbose(@NonNull String tag, String msg) {
+    public void verbose(@NonNull String tag, @NonNull String msg) {
         Log.v(tag, msg);
     }
 }

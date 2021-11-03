@@ -17,6 +17,9 @@ import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -54,7 +57,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class EventSendingTest extends AndroidTestCase {
@@ -139,6 +141,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     // Helpers
 
+    @NonNull
     public Tracker getTracker(String uri, HttpMethod method) {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
@@ -167,6 +170,7 @@ public class EventSendingTest extends AndroidTestCase {
     }
 
     @SuppressLint("DefaultLocale")
+    @Nullable
     public String getMockServerURI(MockWebServer mockServer) {
         if (mockServer != null) {
             return String.format("%s:%d", mockServer.getHostName(), mockServer.getPort());
@@ -174,6 +178,7 @@ public class EventSendingTest extends AndroidTestCase {
         return null;
     }
 
+    @NonNull
     public LinkedList<RecordedRequest> getRequests(MockWebServer mockServer, int count) throws Exception {
         LinkedList<RecordedRequest> requests = new LinkedList<>();
         for (int i = 0; i < count; i++) {
@@ -186,6 +191,7 @@ public class EventSendingTest extends AndroidTestCase {
         return requests;
     }
 
+    @NonNull
     public Map<String, String> getQueryMap(String query) throws Exception {
         String[] params = query.split("&");
         Map<String, String> map = new HashMap<>();
@@ -356,7 +362,7 @@ public class EventSendingTest extends AndroidTestCase {
     }
 
     public void checkConsentWithdrawnEvent(JSONObject json) throws Exception {
-        assertEquals(false, json.getBoolean("all"));
+        assertFalse(json.getBoolean("all"));
     }
 
     public void checkUnstructuredEvent(JSONObject json) throws Exception {
@@ -391,23 +397,22 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.track(new PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(getCustomContext()));
     }
 
-    public void trackStructuredEvent(Tracker tracker) throws Exception {
+    public void trackStructuredEvent(Tracker tracker) {
         tracker.track(new Structured("category", "action").label("label").property("property").value(0.00));
         tracker.track(new Structured("category", "action").label("label").property("property").value(0.00).contexts(getCustomContext()));
     }
 
-    public void trackScreenView(Tracker tracker) throws Exception {
-        String id = UUID.randomUUID().toString();
+    public void trackScreenView(Tracker tracker) {
         tracker.track(new ScreenView("screenName"));
         tracker.track(new ScreenView("screenName").contexts(getCustomContext()));
     }
 
-    public void trackTimings(Tracker tracker) throws Exception {
+    public void trackTimings(Tracker tracker) {
         tracker.track(new Timing("category", "variable", 1).label("label"));
         tracker.track(new Timing("category", "variable", 1).label("label").contexts(getCustomContext()));
     }
 
-    public void trackUnstructuredEvent(Tracker tracker) throws Exception {
+    public void trackUnstructuredEvent(Tracker tracker) {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("test-key-1", "test-value-1");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/test_sdj/jsonschema/1-0-1", attributes);
@@ -415,7 +420,7 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.track(new SelfDescribing(test).contexts(getCustomContext()));
     }
 
-    public void trackEcommerceEvent(Tracker tracker) throws Exception {
+    public void trackEcommerceEvent(Tracker tracker) {
         EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD");
         List<EcommerceTransactionItem> items = new LinkedList<>();
         items.add(item);
@@ -423,7 +428,7 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.track(new EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD").contexts(getCustomContext()));
     }
 
-    public void trackConsentGranted(Tracker tracker) throws Exception {
+    public void trackConsentGranted(Tracker tracker) {
         List<ConsentDocument> documents = new LinkedList<>();
         documents.add(new ConsentDocument("granted context id 1", "granted context version 1")
                 .documentDescription("granted context desc 1")
@@ -436,7 +441,7 @@ public class EventSendingTest extends AndroidTestCase {
         tracker.track(new ConsentGranted("gexpiry", "gid", "dversion").documentDescription("gdesc").documentName("dname").documents(documents).contexts(getCustomContext()));
     }
 
-    public void trackConsentWithdrawn(Tracker tracker) throws Exception {
+    public void trackConsentWithdrawn(Tracker tracker) {
         List<ConsentDocument> documents = new LinkedList<>();
         documents.add(new ConsentDocument("withdrawn context id 1", "withdrawn context version 1")
                 .documentDescription("withdrawn context desc 1")

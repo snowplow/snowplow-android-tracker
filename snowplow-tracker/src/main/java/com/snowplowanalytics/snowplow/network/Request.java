@@ -14,6 +14,7 @@
 package com.snowplowanalytics.snowplow.network;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -86,7 +87,7 @@ public class Request {
      * @param payload The payload where to get the `ua` parameter.
      * @return User-Agent string from subject settings or the default one.
      */
-    @NonNull
+    @Nullable
     private String getUserAgent(@NonNull Payload payload) {
         HashMap hashMap = (HashMap) payload.getMap();
         return (String) hashMap.get(Parameters.USERAGENT);

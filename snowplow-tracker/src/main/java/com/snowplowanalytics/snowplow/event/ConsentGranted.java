@@ -110,7 +110,7 @@ public class ConsentGranted extends AbstractSelfDescribing {
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
-        if (expiry != null) payload.put(Parameters.CG_EXPIRY, expiry);
+        payload.put(Parameters.CG_EXPIRY, expiry);
         return payload;
     }
 
