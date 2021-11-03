@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -181,17 +181,17 @@ public class Logger {
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class DefaultLoggerDelegate implements LoggerDelegate {
     @Override
-    public void error(String tag, String msg) {
+    public void error(@NonNull String tag, @NonNull String msg) {
         Log.e(tag, msg);
     }
 
     @Override
-    public void debug(String tag, String msg) {
+    public void debug(@NonNull String tag, String msg) {
         Log.d(tag, msg);
     }
 
     @Override
-    public void verbose(String tag, String msg) {
+    public void verbose(@NonNull String tag, String msg) {
         Log.v(tag, msg);
     }
 }
