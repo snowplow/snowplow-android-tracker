@@ -13,6 +13,7 @@
 
 package com.snowplowanalytics.snowplow.event;
 
+/** Trigger that caused the message notification. */
 public enum MessageNotificationTrigger {
     push,
     location,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,6 +13,7 @@
 
 package com.snowplowanalytics.snowplow.internal.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,7 +22,6 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.telephony.TelephonyManager;
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
@@ -30,12 +30,7 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
-import com.snowplowanalytics.snowplow.internal.tracker.PlatformContext;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,16 +39,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-
-import okhttp3.internal.platform.Platform;
 
 /**
  * Provides basic Utilities for the Snowplow Tracker.
@@ -93,20 +82,6 @@ public class Util {
     @NonNull
     public static String getUUIDString() {
         return UUID.randomUUID().toString();
-    }
-
-    /**
-     * Check the passed string is a UUID code.
-     *
-     * @param uuid a UUID code string.
-     * @return true if it's a UUID code.
-     */
-    public static boolean isUUIDString(@NonNull String uuid) {
-        try {
-            return UUID.fromString(uuid) != null;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**
@@ -163,26 +138,6 @@ public class Util {
     }
 
     /**
-     * The startTime must be greater than the endTime minus the
-     * interval to be within an acceptable range.
-     *
-     * Example:
-     * - Start Time = 1425060000000 // Fri, 27 Feb 2015 18:00:00 GMT
-     * - Check Time = 1425060300000 // Fri, 27 Feb 2015 18:05:00 GMT
-     * - Range = 600000 // 10 minutes
-     *
-     * If the start time is greater than 17:55:00 then it is in range.
-     *
-     * @param startTime the startTime of the check
-     * @param checkTime the time of the check
-     * @param range the allowed range the startTime must be in
-     * @return whether the time is in range or not
-     */
-    public static boolean isTimeInRange(long startTime, long checkTime, long range) {
-        return startTime > (checkTime - range);
-    }
-
-    /**
      * Joins a list of Longs into a single string
      *
      * @param list the list to join
@@ -190,23 +145,23 @@ public class Util {
      */
     @NonNull
     public static String joinLongList(@NonNull List<Long> list) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         for (int i = 0; i < list.size(); i++) {
             Long longVal = list.get(i);
             if (longVal != null) {
-                s += Long.toString(list.get(i));
+                s.append(list.get(i));
                 if (i < list.size() - 1) {
-                    s += ",";
+                    s.append(",");
                 }
             }
         }
 
-        if (s.substring(s.length() - 1).equals(",")) {
-            s = s.substring(0, s.length() - 1);
+        if (s.toString().endsWith(",")) {
+            s = new StringBuilder(s.substring(0, s.length() - 1));
         }
 
-        return s;
+        return s.toString();
     }
 
     // --- Geo-Location Context
@@ -247,6 +202,7 @@ public class Util {
      * @param context the android context
      * @return the phones Location
      */
+    @SuppressLint("MissingPermission") // Suppressed as it's caught by SecurityException catch block.
     @Nullable
     public static Location getLastKnownLocation(@NonNull Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -285,7 +241,7 @@ public class Util {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             String versionName = pInfo.versionName;
-            String versionCode = "";
+            String versionCode;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 versionCode = String.valueOf(pInfo.getLongVersionCode());
             } else {
@@ -303,103 +259,6 @@ public class Util {
             Logger.e(TAG, "Failed to find application context: %s", e.getMessage());
         }
         return null;
-    }
-
-    // --- Mobile Context
-
-    /**
-     * @deprecated Will be removed in v3.
-     * @return the OS Type
-     */
-    @NonNull @Deprecated
-    public static String getOsType() {
-        return new DeviceInfoMonitor().getOsType();
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * @return the OS Version
-     */
-    @NonNull @Deprecated
-    public static String getOsVersion() {
-        return new DeviceInfoMonitor().getOsVersion();
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * @return the device model
-     */
-    @NonNull @Deprecated
-    public static String getDeviceModel() {
-        return new DeviceInfoMonitor().getDeviceModel();
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * @return the device vendor
-     */
-    @NonNull @Deprecated
-    public static String getDeviceVendor() {
-        return new DeviceInfoMonitor().getDeviceVendor();
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * @param context the android context
-     * @return a carrier name or null
-     */
-    @Nullable @Deprecated
-    public static String getCarrier(@NonNull Context context) {
-        return new DeviceInfoMonitor().getCarrier(context);
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * The function that actually fetches the Advertising ID.
-     * - If called from the UI Thread will throw an Exception
-     *
-     * @param context the android context
-     * @return an empty string if limited tracking is on otherwise the advertising id or null
-     */
-    @Nullable @Deprecated
-    public static String getAndroidIdfa(@NonNull Context context) {
-        return new DeviceInfoMonitor().getAndroidIdfa(context);
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * Returns the network type that the device is connected to
-     *
-     * @param networkInfo The NetworkInformation object
-     * @return the type of the network
-     */
-    @NonNull @Deprecated
-    public static String getNetworkType(@Nullable NetworkInfo networkInfo) {
-        return new DeviceInfoMonitor().getNetworkType(networkInfo);
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * Returns the network technology
-     *
-     * @param networkInfo The NetworkInformation object
-     * @return the technology of the network
-     */
-    @Nullable @Deprecated
-    public static String getNetworkTechnology(@Nullable NetworkInfo networkInfo) {
-        return new DeviceInfoMonitor().getNetworkTechnology(networkInfo);
-    }
-
-    /**
-     * @deprecated Will be removed in v3.
-     * Returns an instance that represents the current network connection
-     *
-     * @param context the android context
-     * @return the representation of the current network connection or null
-     */
-    @Nullable @Deprecated
-    public static NetworkInfo getNetworkInfo(@NonNull Context context) {
-        return new DeviceInfoMonitor().getNetworkInfo(context);
     }
 
     // --- Context Helpers

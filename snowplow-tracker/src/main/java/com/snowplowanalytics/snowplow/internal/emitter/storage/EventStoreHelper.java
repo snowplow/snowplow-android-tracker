@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -70,6 +70,9 @@ public class EventStoreHelper extends SQLiteOpenHelper {
      */
     @NonNull
     public synchronized static List<String> removeUnsentEventsExceptForNamespaces(@NonNull Context context, @Nullable List<String> allowedNamespaces) {
+        if (allowedNamespaces == null) {
+            allowedNamespaces = new ArrayList<>();
+        }
         String[] databaseList = context.databaseList();
         if (databaseList == null) {
             return new ArrayList<>();

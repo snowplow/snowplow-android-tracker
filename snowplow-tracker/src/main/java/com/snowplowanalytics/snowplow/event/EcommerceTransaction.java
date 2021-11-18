@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,199 +22,50 @@ import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** An ecommerce event. */
 public class EcommerceTransaction extends AbstractPrimitive {
 
+    /** Identifier of the order. */
     @NonNull
     public final String orderId;
+    /** Total amount of the order. */
     @NonNull
     public final Double totalValue;
+    /** Items purchased. */
     @NonNull
     public final List<EcommerceTransactionItem> items;
+    /** Identifies an affiliation. */
     @Nullable
     public String affiliation;
+    /** Taxes applied to the purchase. */
     @Nullable
     public Double taxValue;
+    /** Total amount for shipping. */
     @Nullable
     public Double shipping;
+    /** City for shipping. */
     @Nullable
     public String city;
+    /** State for shipping. */
     @Nullable
     public String state;
+    /** Country for shipping. */
     @Nullable
     public String country;
+    /** Currency used for totalValue and taxValue. */
     @Nullable
     public String currency;
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private String orderId;
-        private Double totalValue;
-        private String affiliation;
-        private Double taxValue;
-        private Double shipping;
-        private String city;
-        private String state;
-        private String country;
-        private String currency;
-        private List<EcommerceTransactionItem> items;
-
-        /**
-         * @param orderId ID of the eCommerce transaction
-         * @return itself
-         */
-        @NonNull
-        public T orderId(@NonNull String orderId) {
-            this.orderId = orderId;
-            return self();
-        }
-
-        /**
-         * @param totalValue Total transaction value
-         * @return itself
-         */
-        @NonNull
-        public T totalValue(@NonNull Double totalValue) {
-            this.totalValue = totalValue;
-            return self();
-        }
-
-        /**
-         * @param affiliation Transaction affiliation
-         * @return itself
-         */
-        @NonNull
-        public T affiliation(@NonNull String affiliation) {
-            this.affiliation = affiliation;
-            return self();
-        }
-
-        /**
-         * @param taxValue Transaction tax value
-         * @return itself
-         */
-        @NonNull
-        public T taxValue(@NonNull Double taxValue) {
-            this.taxValue = taxValue;
-            return self();
-        }
-
-        /**
-         * @param shipping Delivery cost charged
-         * @return itself
-         */
-        @NonNull
-        public T shipping(@NonNull Double shipping) {
-            this.shipping = shipping;
-            return self();
-        }
-
-        /**
-         * @param city Delivery address city
-         * @return itself
-         */
-        @NonNull
-        public T city(@NonNull String city) {
-            this.city = city;
-            return self();
-        }
-
-        /**
-         * @param state Delivery address state
-         * @return itself
-         */
-        @NonNull
-        public T state(@NonNull String state) {
-            this.state = state;
-            return self();
-        }
-
-        /**
-         * @param country Delivery address country
-         * @return itself
-         */
-        @NonNull
-        public T country(@NonNull String country) {
-            this.country = country;
-            return self();
-        }
-
-        /**
-         * @param currency The currency the price is expressed in
-         * @return itself
-         */
-        @NonNull
-        public T currency(@NonNull String currency) {
-            this.currency = currency;
-            return self();
-        }
-
-        /**
-         * @param items The items in the transaction
-         * @return itself
-         */
-        @NonNull
-        public T items(@NonNull List<EcommerceTransactionItem> items) {
-            this.items = items;
-            return self();
-        }
-
-        /**
-         * @param itemArgs The items as a varargs argument
-         * @return itself
-         */
-        @NonNull
-        public T items(@NonNull EcommerceTransactionItem... itemArgs) {
-            List<EcommerceTransactionItem> items = new ArrayList<>();
-            Collections.addAll(items, itemArgs);
-            this.items = items;
-            return self();
-        }
-
-        @NonNull
-        public EcommerceTransaction build() {
-            return new EcommerceTransaction(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    protected EcommerceTransaction(@NonNull Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.orderId);
-        Preconditions.checkArgument(!builder.orderId.isEmpty(), "orderId cannot be empty");
-        Preconditions.checkNotNull(builder.totalValue);
-        Preconditions.checkNotNull(builder.items);
-
-        this.orderId = builder.orderId;
-        this.totalValue = builder.totalValue;
-        this.affiliation = builder.affiliation;
-        this.taxValue = builder.taxValue;
-        this.shipping = builder.shipping;
-        this.city = builder.city;
-        this.state = builder.state;
-        this.country = builder.country;
-        this.currency = builder.currency;
-        this.items = builder.items;
-    }
-
+    /**
+     * Creates an ecommerce event.
+     * @param orderId Identifier of the order.
+     * @param totalValue Total amount of the order.
+     * @param items Items purchased.
+     */
     public EcommerceTransaction(@NonNull String orderId, @NonNull Double totalValue, @NonNull List<EcommerceTransactionItem> items) {
         Preconditions.checkNotNull(orderId);
         Preconditions.checkArgument(!orderId.isEmpty(), "orderId cannot be empty");
@@ -227,48 +78,54 @@ public class EcommerceTransaction extends AbstractPrimitive {
 
     // Builder methods
 
+    /** Identifies an affiliation. */
     @NonNull
     public EcommerceTransaction affiliation(@Nullable String affiliation) {
         this.affiliation = affiliation;
         return this;
     }
 
+    /** Taxes applied to the purchase. */
     @NonNull
     public EcommerceTransaction taxValue(@Nullable Double taxValue) {
         this.taxValue = taxValue;
         return this;
     }
 
+    /** Total amount for shipping. */
     @NonNull
     public EcommerceTransaction shipping(@Nullable Double shipping) {
         this.shipping = shipping;
         return this;
     }
 
+    /** City for shipping. */
     @NonNull
     public EcommerceTransaction city(@Nullable String city) {
         this.city = city;
         return this;
     }
 
+    /** State for shipping. */
     @NonNull
     public EcommerceTransaction state(@Nullable String state) {
         this.state = state;
         return this;
     }
 
+    /** Country for shipping. */
     @NonNull
     public EcommerceTransaction country(@Nullable String country) {
         this.country = country;
         return this;
     }
 
+    /** Currency used for totalValue and taxValue. */
     @NonNull
     public EcommerceTransaction currency(@Nullable String currency) {
         this.currency = currency;
         return this;
     }
-
 
     // Public methods
 
@@ -292,11 +149,7 @@ public class EcommerceTransaction extends AbstractPrimitive {
         return TrackerConstants.EVENT_ECOMM;
     }
 
-    /**
-     * The list of Transaction Items passed with the event.
-     *
-     * @return the items.
-     */
+    /** The list of Transaction Items passed with the event. */
     @NonNull
     public List<EcommerceTransactionItem> getItems() {
         return this.items;
@@ -304,8 +157,8 @@ public class EcommerceTransaction extends AbstractPrimitive {
 
     @Override
     public void endProcessing(@NonNull Tracker tracker) {
-        for(EcommerceTransactionItem item : items) {
-            item.setOrderId(orderId);
+        for (EcommerceTransactionItem item : items) {
+            item.orderId = orderId;
             tracker.track(item);
         }
     }

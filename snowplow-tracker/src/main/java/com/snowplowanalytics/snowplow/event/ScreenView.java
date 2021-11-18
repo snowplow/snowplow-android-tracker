@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,10 +21,8 @@ import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.internal.tracker.ScreenState;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
-import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.lang.reflect.Field;
@@ -32,219 +30,88 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/** A ScreenView event. */
 public class ScreenView extends AbstractSelfDescribing {
 
     private final static String TAG = ScreenView.class.getSimpleName();
 
+    /** Name of the screen. */
     @NonNull
     public final String name;
+    /** Identifier of the screen. */
     @NonNull
     public final String id;
+    /** Type of screen. */
     @Nullable
     public String type;
-    @Nullable
-    public String transitionType;
+    /** Name of the previous screen. */
     @Nullable
     public String previousName;
+    /** Identifier of the previous screen. */
     @Nullable
     public String previousId;
+    /** Type of the previous screen. */
     @Nullable
     public String previousType;
+    /** Type of transition between previous and current screen. */
+    @Nullable
+    public String transitionType;
+    /** Name of the Fragment subclass. */
     @Nullable
     public String fragmentClassName;
+    /** Tag of the Fragment subclass. */
     @Nullable
     public String fragmentTag;
+    /** Name of the Activity subclass. */
     @Nullable
     public String activityClassName;
+    /** Tag of the Activity subclass. */
     @Nullable
     public String activityTag;
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private String name;
-        private String id;
-        private String type;
-        private String transitionType;
-        private String previousName;
-        private String previousId;
-        private String previousType;
-        private String fragmentClassName;
-        private String fragmentTag;
-        private String activityClassName;
-        private String activityTag;
-
-        /**
-         * @param name The name of the screen view event
-         * @return itself
-         */
-        @NonNull
-        public T name(@NonNull String name) {
-            this.name = name;
-            return self();
-        }
-
-        /**
-         * @param id Screen view ID
-         * @return itself
-         */
-        @NonNull
-        public T id(@NonNull String id) {
-            this.id = id;
-            return self();
-        }
-
-        /**
-         * @param type The type of the screen view event
-         * @return itself
-         */
-        @NonNull
-        public T type(@NonNull String type) {
-            this.type = type;
-            return self();
-        }
-
-        /**
-         * @param name The name from the previous screen view event
-         * @return itself
-         */
-        @NonNull
-        public T previousName(@NonNull String name) {
-            this.previousName = name;
-            return self();
-        }
-
-        /**
-         * @param type The type from the previous screen view event
-         * @return itself
-         */
-        @NonNull
-        public T previousType(@NonNull String type) {
-            this.previousType = type;
-            return self();
-        }
-
-        /**
-         * @param id The id from the previous screen view event
-         * @return itself
-         */
-        @NonNull
-        public T previousId(@Nullable String id) {
-            this.previousId = id;
-            return self();
-        }
-
-        /**
-         * @param transitionType The transition type of the screen view event
-         * @return itself
-         */
-        @NonNull
-        public T transitionType(@Nullable String transitionType) {
-            this.transitionType = transitionType;
-            return self();
-        }
-
-        @NonNull
-        public T fragmentClassName(@Nullable String fragmentClassName) {
-            this.fragmentClassName = fragmentClassName;
-            return self();
-        }
-
-        @NonNull
-        public T fragmentTag(@Nullable String fragmentTag) {
-            this.fragmentTag = fragmentTag;
-            return self();
-        }
-
-        @NonNull
-        public T activityClassName(@Nullable String activityClassName) {
-            this.activityClassName = activityClassName;
-            return self();
-        }
-
-        @NonNull
-        public T activityTag(@Nullable String activityTag) {
-            this.activityTag = activityTag;
-            return self();
-        }
-
-        @NonNull
-        public ScreenView build() {
-            return new ScreenView(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
+    /** Creates a ScreenView event using the data of an Activity class. */
     @NonNull
     public static ScreenView buildWithActivity(@NonNull Activity activity) {
         String activityClassName = activity.getLocalClassName();
         String activityTag = getSnowplowScreenId(activity);
         String name = getValidName(activityClassName, activityTag);
-        return ScreenView.builder()
+        return new ScreenView(name)
                 .activityClassName(activityClassName)
                 .activityTag(activityTag)
                 .fragmentClassName(null)
                 .fragmentTag(null)
-                .name(name)
                 .type(activityClassName)
-                .transitionType(null)
-                .build();
+                .transitionType(null);
     }
 
+    /** Creates a ScreenView event using the data of an Fragment class. */
     @NonNull
     public static ScreenView buildWithFragment(@NonNull Fragment fragment) {
         String fragmentClassName = fragment.getClass().getSimpleName();
         String fragmentTag = fragment.getTag();
         String name = getValidName(fragmentClassName, fragmentTag);
-        return ScreenView.builder()
+        return new ScreenView(name)
                 .activityClassName(null)
                 .activityTag(null)
                 .fragmentClassName(fragment.getClass().getSimpleName())
                 .fragmentTag(fragment.getTag())
-                .name(name)
                 .type(fragmentClassName)
-                .transitionType(null)
-                .build();
+                .transitionType(null);
     }
 
-    protected ScreenView(@NonNull Builder<?> builder) {
-        super(builder);
-        Preconditions.checkNotNull(builder.name);
-        Preconditions.checkArgument(!builder.name.isEmpty(), "Name cannot be empty.");
-        if (builder.id != null) {
-            Preconditions.checkArgument(Util.isUUIDString(builder.id));
-            id = builder.id;
-        } else {
-            id = Util.getUUIDString();
-        }
-
-        this.name = builder.name;
-        this.type = builder.type;
-        this.previousId = builder.previousId;
-        this.previousName = builder.previousName;
-        this.previousType = builder.previousType;
-        this.transitionType = builder.transitionType;
-        this.fragmentClassName = builder.fragmentClassName;
-        this.fragmentTag = builder.fragmentTag;
-        this.activityClassName = builder.activityClassName;
-        this.activityTag = builder.activityTag;
-    }
-
+    /**
+     * Creates a ScreenView event.
+     * @param name Name of the screen.
+     */
     public ScreenView(@NonNull String name) {
         this(name, null);
     }
 
+    /**
+     * Creates a ScreenView event.
+     * @param name Name of the screen.
+     * @param screenId Identifier of the screen.
+     */
     public ScreenView(@NonNull String name, @Nullable UUID screenId) {
         Preconditions.checkNotNull(name);
         Preconditions.checkArgument(!name.isEmpty(), "Name cannot be empty.");
@@ -258,77 +125,70 @@ public class ScreenView extends AbstractSelfDescribing {
 
     // Builder methods
 
+    /** Type of screen. */
     @NonNull
     public ScreenView type(@Nullable String type) {
         this.type = type;
         return this;
     }
 
-    @NonNull
-    public ScreenView transitionType(@Nullable String transitionType) {
-        this.transitionType = transitionType;
-        return this;
-    }
-
+    /** Name of the previous screen. */
     @NonNull
     public ScreenView previousName(@Nullable String previousName) {
         this.previousName = previousName;
         return this;
     }
 
+    /** Identifier of the previous screen. */
     @NonNull
     public ScreenView previousId(@Nullable String previousId) {
         this.previousId = previousId;
         return this;
     }
 
+    /** Type of the previous screen. */
     @NonNull
     public ScreenView previousType(@Nullable String previousType) {
         this.previousType = previousType;
         return this;
     }
 
+    /** Type of transition between previous and current screen. */
+    @NonNull
+    public ScreenView transitionType(@Nullable String transitionType) {
+        this.transitionType = transitionType;
+        return this;
+    }
+
+    /** Name of the Fragment subclass. */
     @NonNull
     public ScreenView fragmentClassName(@Nullable String fragmentClassName) {
         this.fragmentClassName = fragmentClassName;
         return this;
     }
 
+    /** Tag of the Fragment subclass. */
     @NonNull
     public ScreenView fragmentTag(@Nullable String fragmentTag) {
         this.fragmentTag = fragmentTag;
         return this;
     }
 
+    /** Name of the Activity subclass. */
     @NonNull
     public ScreenView activityClassName(@Nullable String activityClassName) {
         this.activityClassName = activityClassName;
         return this;
     }
 
+    /** Tag of the Activity subclass. */
     @NonNull
     public ScreenView activityTag(@Nullable String activityTag) {
         this.activityTag = activityTag;
         return this;
     }
 
-    // Public methods
-
-    /**
-     * Update the passed screen state with the data related to
-     * the current ScreenView event.
-     * @apiNote ScreenState updates back the previous screen fields
-     * in the ScreenView event (if `previousId` not already set).
-     * @param screenState The screen state to update.
-     */
-    public synchronized void updateScreenState(@NonNull ScreenState screenState) {
-        screenState.updateScreenState(id, name, type, transitionType, fragmentClassName, fragmentTag, activityClassName, activityTag);
-        if (previousId == null) {
-            previousId = screenState.getPreviousId();
-            previousName = screenState.getPreviousName();
-            previousType = screenState.getPreviousType();
-        }
-    }
+    // Tracker methods
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
@@ -347,6 +207,8 @@ public class ScreenView extends AbstractSelfDescribing {
     public @NonNull String getSchema() {
         return TrackerConstants.SCHEMA_SCREEN_VIEW;
     }
+
+    // Private methods
 
     @Nullable
     private static String getSnowplowScreenId(Activity activity) {
@@ -377,5 +239,4 @@ public class ScreenView extends AbstractSelfDescribing {
         }
         return "Unknown";
     }
-
 }

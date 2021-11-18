@@ -30,26 +30,26 @@ public class MessageNotificationTest {
 
         Map<String, Object> payload = event.getDataPayload();
         assertNotNull(payload);
-        assertEquals("title", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_TITLE));
-        assertEquals("body", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_BODY));
-        assertEquals("push", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_TRIGGER));
-        assertEquals("2020-12-31T15:59:60-08:00", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_NOTIFICATIONTIMESTAMP));
-        assertEquals("action", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_ACTION));
-        assertEquals("loc key", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_BODYLOCKEY));
-        List<String> locArgs = (List<String>)payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_BODYLOCARGS);
+        assertEquals("title", payload.get(MessageNotification.PARAM_TITLE));
+        assertEquals("body", payload.get(MessageNotification.PARAM_BODY));
+        assertEquals("push", payload.get(MessageNotification.PARAM_TRIGGER));
+        assertEquals("2020-12-31T15:59:60-08:00", payload.get(MessageNotification.PARAM_NOTIFICATIONTIMESTAMP));
+        assertEquals("action", payload.get(MessageNotification.PARAM_ACTION));
+        assertEquals("loc key", payload.get(MessageNotification.PARAM_BODYLOCKEY));
+        List<String> locArgs = (List<String>)payload.get(MessageNotification.PARAM_BODYLOCARGS);
         assertNotNull(locArgs);
         assertEquals(2, locArgs.size());
         assertEquals("loc arg1", locArgs.get(0));
         assertEquals("loc arg2", locArgs.get(1));
-        assertEquals("chime.mp3", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_SOUND));
-        assertEquals(9, payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_NOTIFICATIONCOUNT));
-        assertEquals("category1", payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_CATEGORY));
-        List<MessageNotificationAttachment> attachments = (List<MessageNotificationAttachment>)payload.get(MessageNotification.PARAM_MESSAGENOTIFICATION_MESSAGENOTIFICATIONATTACHMENTS);
+        assertEquals("chime.mp3", payload.get(MessageNotification.PARAM_SOUND));
+        assertEquals(9, payload.get(MessageNotification.PARAM_NOTIFICATIONCOUNT));
+        assertEquals("category1", payload.get(MessageNotification.PARAM_CATEGORY));
+        List<MessageNotificationAttachment> attachments = (List<MessageNotificationAttachment>)payload.get(MessageNotification.PARAM_MESSAGENOTIFICATIONATTACHMENTS);
         assertNotNull(attachments);
         assertEquals(1, attachments.size());
         MessageNotificationAttachment attachment = attachments.get(0);
-        assertEquals("id", attachment.get(MessageNotificationAttachment.PARAM_MESSAGENOTIFICATIONATTACHMENT_IDENTIFIER));
-        assertEquals("type", attachment.get(MessageNotificationAttachment.PARAM_MESSAGENOTIFICATIONATTACHMENT_TYPE));
-        assertEquals("url", attachment.get(MessageNotificationAttachment.PARAM_MESSAGENOTIFICATIONATTACHMENT_URL));
+        assertEquals("id", attachment.get(MessageNotificationAttachment.PARAM_IDENTIFIER));
+        assertEquals("type", attachment.get(MessageNotificationAttachment.PARAM_TYPE));
+        assertEquals("url", attachment.get(MessageNotificationAttachment.PARAM_URL));
     }
 }

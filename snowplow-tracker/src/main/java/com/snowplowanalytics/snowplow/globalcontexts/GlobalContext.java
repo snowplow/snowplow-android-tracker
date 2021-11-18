@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -100,12 +100,6 @@ public class GlobalContext {
 
     @NonNull
     public  List<SelfDescribingJson> generateContexts(@NonNull InspectableEvent event) {
-        if (event == null) {
-            return new ArrayList<>();
-        }
-        if (generator == null) {
-            return new ArrayList<>();
-        }
         if (filter != null && !filter.apply(event)) {
             return new ArrayList<>();
         }

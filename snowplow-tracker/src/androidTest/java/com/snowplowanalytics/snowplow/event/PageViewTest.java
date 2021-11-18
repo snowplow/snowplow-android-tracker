@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,9 +22,7 @@ import java.util.Map;
 public class PageViewTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        PageView pageView = PageView.builder()
-                .pageUrl("http://com.acme/foo/bar")
-                .build();
+        PageView pageView = new PageView("http://com.acme/foo/bar");
 
         assertEquals("pv", pageView.getName());
 
@@ -34,11 +32,9 @@ public class PageViewTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.PAGE_TITLE));
         assertFalse(data.containsKey(Parameters.PAGE_REFR));
 
-        pageView = PageView.builder()
-                .pageUrl("http://com.acme/foo/bar")
+        pageView = new PageView("http://com.acme/foo/bar")
                 .pageTitle("Page Title")
-                .referrer("http://refr.com")
-                .build();
+                .referrer("http://refr.com");
 
         data = pageView.getDataPayload();
 
@@ -51,7 +47,7 @@ public class PageViewTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            PageView.builder().build();
+            new PageView(null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -60,7 +56,7 @@ public class PageViewTest extends AndroidTestCase {
 
         exception = false;
         try {
-            PageView.builder().pageUrl("").build();
+            new PageView("");
         } catch (Exception e) {
             assertEquals("pageUrl cannot be empty", e.getMessage());
             exception = true;

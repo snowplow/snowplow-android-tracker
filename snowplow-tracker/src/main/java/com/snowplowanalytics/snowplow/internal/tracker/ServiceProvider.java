@@ -29,6 +29,8 @@ import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsCont
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.Protocol;
 
 import java.util.List;
 import java.util.Objects;
@@ -182,6 +184,9 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     private void stopServices() {
+        if (tracker != null) {
+            tracker.close();
+        }
         if (emitter != null) {
             emitter.shutdown();
         }
@@ -344,20 +349,15 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
     private Subject makeSubject() {
-        return new Subject.SubjectBuilder()
-                .context(context)
-                .subjectConfiguration(subjectConfigurationUpdate)
-                .build();
+        return new Subject(context, subjectConfigurationUpdate);
     }
 
     @NonNull
     private Emitter makeEmitter() {
         NetworkConfigurationInterface networkConfig = networkConfigurationUpdate;
         EmitterConfigurationInterface emitterConfig = emitterConfigurationUpdate;
-        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder(networkConfig.getEndpoint(), context)
+        Emitter.EmitterBuilder builder = new Emitter.EmitterBuilder()
                 .networkConnection(networkConfig.getNetworkConnection())
-                .method(networkConfig.getMethod())
-                .security(networkConfig.getProtocol())
                 .customPostPath(networkConfig.getCustomPostPath())
                 .client(networkConfig.getOkHttpClient())
                 .sendLimit(emitterConfig.getEmitRange())
@@ -367,7 +367,19 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .byteLimitGet(emitterConfig.getByteLimitGet())
                 .threadPoolSize(emitterConfig.getThreadPoolSize())
                 .callback(emitterConfig.getRequestCallback());
-        return builder.build();
+        HttpMethod method = networkConfig.getMethod();
+        if (method != null) {
+            builder.method(method);
+        }
+        Protocol protocol = networkConfig.getProtocol();
+        if (protocol != null) {
+            builder.security(protocol);
+        }
+        String endpoint = networkConfig.getEndpoint();
+        if (endpoint == null) {
+            endpoint = "";
+        }
+        return new Emitter(context, endpoint, builder);
     }
 
     @NonNull
@@ -403,7 +415,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                     gdprConfig.getDocumentVersion(),
                     gdprConfig.getDocumentDescription());
         }
-        Tracker tracker = builder.buildAndReset();
+        Tracker tracker = new Tracker(builder);
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
         }

@@ -17,17 +17,17 @@ import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 
-/// Attachment object that identify an attachment in the MessageNotification
+/** Attachment object that identify an attachment in the MessageNotification. */
 public class MessageNotificationAttachment extends HashMap<String, Object> {
 
-    public final static String PARAM_MESSAGENOTIFICATIONATTACHMENT_IDENTIFIER = "identifier";
-    public final static String PARAM_MESSAGENOTIFICATIONATTACHMENT_TYPE = "type";
-    public final static String PARAM_MESSAGENOTIFICATIONATTACHMENT_URL = "url";
+    public final static String PARAM_IDENTIFIER = "identifier";
+    public final static String PARAM_TYPE = "type";
+    public final static String PARAM_URL = "url";
 
-    /// Attachments added to the notification (they can be part of the data object).
+    /** Attachments added to the notification (they can be part of the data object). */
     public MessageNotificationAttachment(@NonNull String identifier, @NonNull String type, @NonNull String url) {
-        put(PARAM_MESSAGENOTIFICATIONATTACHMENT_IDENTIFIER, identifier);
-        put(PARAM_MESSAGENOTIFICATIONATTACHMENT_TYPE, type);
-        put(PARAM_MESSAGENOTIFICATIONATTACHMENT_URL, url);
+        put(PARAM_IDENTIFIER, identifier);
+        put(PARAM_TYPE, type);
+        put(PARAM_URL, url);
     }
 }

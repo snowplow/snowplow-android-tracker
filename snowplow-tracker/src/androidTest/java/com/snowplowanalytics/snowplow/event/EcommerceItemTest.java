@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,18 +22,14 @@ import java.util.Map;
 public class EcommerceItemTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        EcommerceTransactionItem ecommerceTransactionItem = EcommerceTransactionItem.builder()
-                .itemId("some item id")
-                .sku("some sku")
-                .price(123.456)
-                .quantity(1)
-                .build();
+        EcommerceTransactionItem ecommerceTransactionItem = new EcommerceTransactionItem("some sku", 123.456, 1)
+                .orderId("orderId");
 
         assertEquals("ti", ecommerceTransactionItem.getName());
         Map data = ecommerceTransactionItem.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("some item id", data.get(Parameters.TI_ITEM_ID));
+        assertEquals("orderId", data.get(Parameters.TI_ITEM_ID));
         assertEquals("some sku", data.get(Parameters.TI_ITEM_SKU));
         assertEquals("123.456", data.get(Parameters.TI_ITEM_PRICE));
         assertEquals("1", data.get(Parameters.TI_ITEM_QUANTITY));
@@ -41,20 +37,16 @@ public class EcommerceItemTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.TI_ITEM_CATEGORY));
         assertFalse(data.containsKey(Parameters.TI_ITEM_CURRENCY));
 
-        ecommerceTransactionItem = EcommerceTransactionItem.builder()
-                .itemId("some item id")
-                .sku("some sku")
-                .price(123.456)
-                .quantity(1)
+        ecommerceTransactionItem = new EcommerceTransactionItem("some sku", 123.456, 1)
                 .name("some name")
                 .category("some category")
                 .currency("EUR")
-                .build();
+                .orderId("orderId");
 
         data = ecommerceTransactionItem.getDataPayload();
 
         assertNotNull(data);
-        assertEquals("some item id", data.get(Parameters.TI_ITEM_ID));
+        assertEquals("orderId", data.get(Parameters.TI_ITEM_ID));
         assertEquals("some sku", data.get(Parameters.TI_ITEM_SKU));
         assertEquals("123.456", data.get(Parameters.TI_ITEM_PRICE));
         assertEquals("1", data.get(Parameters.TI_ITEM_QUANTITY));
@@ -66,45 +58,7 @@ public class EcommerceItemTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            EcommerceTransactionItem.builder().build();
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            EcommerceTransactionItem.builder().itemId("some item id").build();
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            EcommerceTransactionItem.builder().itemId("some item id").sku("some sku").build();
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            EcommerceTransactionItem.builder().itemId("some item id").sku("some sku").price(123.456)
-                    .build();
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            EcommerceTransactionItem.builder().itemId("item id").sku("").price(123.456)
-                    .quantity(1).build();
+            new EcommerceTransactionItem("", 123.456, 1);
         } catch (Exception e) {
             assertEquals("sku cannot be empty", e.getMessage());
             exception = true;

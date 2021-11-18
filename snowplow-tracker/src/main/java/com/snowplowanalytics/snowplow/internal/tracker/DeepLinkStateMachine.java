@@ -46,7 +46,7 @@ public class DeepLinkStateMachine implements StateMachineInterface {
     @NonNull
     @Override
     public List<String> subscribedEventSchemasForTransitions() {
-        return Arrays.asList(DeepLinkReceived.SCHEMA_DEEPLINKRECEIVED, TrackerConstants.SCHEMA_SCREEN_VIEW);
+        return Arrays.asList(DeepLinkReceived.SCHEMA, TrackerConstants.SCHEMA_SCREEN_VIEW);
     }
 
     @NonNull

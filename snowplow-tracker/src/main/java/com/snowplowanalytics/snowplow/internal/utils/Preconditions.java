@@ -92,6 +92,7 @@
 
 package com.snowplowanalytics.snowplow.internal.utils;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -118,7 +119,7 @@ public final class Preconditions {
      *     string using {@link String#valueOf(Object)}
      * @throws IllegalArgumentException if {@code expression} is false
      */
-    public static void checkArgument(boolean expression, Object errorMessage) {
+    public static void checkArgument(boolean expression, @Nullable Object errorMessage) {
         if (!expression) {
             throw new IllegalArgumentException(String.valueOf(errorMessage));
         }
@@ -131,7 +132,7 @@ public final class Preconditions {
      *     string using {@link String#valueOf(Object)}
      * @throws IllegalArgumentException
      */
-    public static void fail(Object errorMessage) {
+    public static void fail(@Nullable Object errorMessage) {
         throw new IllegalArgumentException(String.valueOf(errorMessage));
     }
 
@@ -160,7 +161,7 @@ public final class Preconditions {
      * @return the non-null reference that was validated
      * @throws NullPointerException if {@code reference} is null
      */
-    public static <T> T checkNotNull(T reference, Object errorMessage) {
+    public static <T> T checkNotNull(T reference, @Nullable Object errorMessage) {
         if (reference == null) {
             throw new NullPointerException(String.valueOf(errorMessage));
         }

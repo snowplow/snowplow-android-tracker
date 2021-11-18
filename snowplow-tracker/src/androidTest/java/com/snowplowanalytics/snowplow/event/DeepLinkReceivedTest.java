@@ -16,11 +16,9 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.payload.Payload;
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.MockEventStore;
 
 import org.junit.Before;
@@ -50,8 +48,8 @@ public class DeepLinkReceivedTest {
 
         Map<String, Object> payload = event.getDataPayload();
         assertNotNull(payload);
-        assertEquals("url", payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_URL));
-        assertEquals("referrer", payload.get(DeepLinkReceived.PARAM_DEEPLINKRECEIVED_REFERRER));
+        assertEquals("url", payload.get(DeepLinkReceived.PARAM_URL));
+        assertEquals("referrer", payload.get(DeepLinkReceived.PARAM_REFERRER));
     }
 
     @Test

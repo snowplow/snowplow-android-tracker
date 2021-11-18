@@ -103,14 +103,14 @@ public class StateManagerTest {
     public void testScreenStateMachine() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockEventStore eventStore = new MockEventStore();
-        Emitter emitter = new Emitter.EmitterBuilder("http://snowplow-fake-url.com", context)
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
                 .eventStore(eventStore)
-                .build();
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
+        );
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .screenContext(true)
                 .base64(false)
                 .level(LogLevel.VERBOSE)
-                .build();
+        );
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));

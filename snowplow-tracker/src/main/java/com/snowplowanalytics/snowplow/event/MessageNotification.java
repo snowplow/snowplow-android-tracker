@@ -23,27 +23,27 @@ import java.util.Map;
 /** Event that represents the reception of a push notification (or a locally generated one). */
 public class MessageNotification extends AbstractSelfDescribing {
 
-    public final static String SCHEMA_MESSAGENOTIFICATION = "iglu:com.snowplowanalytics.mobile/message_notification/jsonschema/1-0-0";
+    public final static String SCHEMA = "iglu:com.snowplowanalytics.mobile/message_notification/jsonschema/1-0-0";
 
-    public final static String PARAM_MESSAGENOTIFICATION_ACTION = "action";
-    public final static String PARAM_MESSAGENOTIFICATION_MESSAGENOTIFICATIONATTACHMENTS = "attachments";
-    public final static String PARAM_MESSAGENOTIFICATION_BODY = "body";
-    public final static String PARAM_MESSAGENOTIFICATION_BODYLOCARGS = "bodyLocArgs";
-    public final static String PARAM_MESSAGENOTIFICATION_BODYLOCKEY = "bodyLocKey";
-    public final static String PARAM_MESSAGENOTIFICATION_CATEGORY = "category";
-    public final static String PARAM_MESSAGENOTIFICATION_CONTENTAVAILABLE = "contentAvailable";
-    public final static String PARAM_MESSAGENOTIFICATION_GROUP = "group";
-    public final static String PARAM_MESSAGENOTIFICATION_ICON = "icon";
-    public final static String PARAM_MESSAGENOTIFICATION_NOTIFICATIONCOUNT = "notificationCount";
-    public final static String PARAM_MESSAGENOTIFICATION_NOTIFICATIONTIMESTAMP = "notificationTimestamp";
-    public final static String PARAM_MESSAGENOTIFICATION_SOUND = "sound";
-    public final static String PARAM_MESSAGENOTIFICATION_SUBTITLE = "subtitle";
-    public final static String PARAM_MESSAGENOTIFICATION_TAG = "tag";
-    public final static String PARAM_MESSAGENOTIFICATION_THREADIDENTIFIER = "threadIdentifier";
-    public final static String PARAM_MESSAGENOTIFICATION_TITLE = "title";
-    public final static String PARAM_MESSAGENOTIFICATION_TITLELOCARGS = "titleLocArgs";
-    public final static String PARAM_MESSAGENOTIFICATION_TITLELOCKEY = "titleLocKey";
-    public final static String PARAM_MESSAGENOTIFICATION_TRIGGER = "trigger";
+    public final static String PARAM_ACTION = "action";
+    public final static String PARAM_MESSAGENOTIFICATIONATTACHMENTS = "attachments";
+    public final static String PARAM_BODY = "body";
+    public final static String PARAM_BODYLOCARGS = "bodyLocArgs";
+    public final static String PARAM_BODYLOCKEY = "bodyLocKey";
+    public final static String PARAM_CATEGORY = "category";
+    public final static String PARAM_CONTENTAVAILABLE = "contentAvailable";
+    public final static String PARAM_GROUP = "group";
+    public final static String PARAM_ICON = "icon";
+    public final static String PARAM_NOTIFICATIONCOUNT = "notificationCount";
+    public final static String PARAM_NOTIFICATIONTIMESTAMP = "notificationTimestamp";
+    public final static String PARAM_SOUND = "sound";
+    public final static String PARAM_SUBTITLE = "subtitle";
+    public final static String PARAM_TAG = "tag";
+    public final static String PARAM_THREADIDENTIFIER = "threadIdentifier";
+    public final static String PARAM_TITLE = "title";
+    public final static String PARAM_TITLELOCARGS = "titleLocArgs";
+    public final static String PARAM_TITLELOCKEY = "titleLocKey";
+    public final static String PARAM_TRIGGER = "trigger";
 
     /** The action associated with the notification. */
     @Nullable
@@ -235,63 +235,63 @@ public class MessageNotification extends AbstractSelfDescribing {
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
-        payload.put(PARAM_MESSAGENOTIFICATION_TITLE, title);
-        payload.put(PARAM_MESSAGENOTIFICATION_BODY, body);
-        payload.put(PARAM_MESSAGENOTIFICATION_TRIGGER, trigger.name());
+        payload.put(PARAM_TITLE, title);
+        payload.put(PARAM_BODY, body);
+        payload.put(PARAM_TRIGGER, trigger.name());
         if (action != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_ACTION, action);
+            payload.put(PARAM_ACTION, action);
         }
         if (attachments != null && attachments.size() > 0) {
-            payload.put(PARAM_MESSAGENOTIFICATION_MESSAGENOTIFICATIONATTACHMENTS, attachments);
+            payload.put(PARAM_MESSAGENOTIFICATIONATTACHMENTS, attachments);
         }
         if (bodyLocArgs != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_BODYLOCARGS, bodyLocArgs);
+            payload.put(PARAM_BODYLOCARGS, bodyLocArgs);
         }
         if (bodyLocKey != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_BODYLOCKEY, bodyLocKey);
+            payload.put(PARAM_BODYLOCKEY, bodyLocKey);
         }
         if (category != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_CATEGORY, category);
+            payload.put(PARAM_CATEGORY, category);
         }
         if (contentAvailable != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_CONTENTAVAILABLE, contentAvailable);
+            payload.put(PARAM_CONTENTAVAILABLE, contentAvailable);
         }
         if (group != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_GROUP, group);
+            payload.put(PARAM_GROUP, group);
         }
         if (icon != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_ICON, icon);
+            payload.put(PARAM_ICON, icon);
         }
         if (notificationCount != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_NOTIFICATIONCOUNT, notificationCount);
+            payload.put(PARAM_NOTIFICATIONCOUNT, notificationCount);
         }
         if (notificationTimestamp != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_NOTIFICATIONTIMESTAMP, notificationTimestamp);
+            payload.put(PARAM_NOTIFICATIONTIMESTAMP, notificationTimestamp);
         }
         if (sound != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_SOUND, sound);
+            payload.put(PARAM_SOUND, sound);
         }
         if (subtitle != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_SUBTITLE, subtitle);
+            payload.put(PARAM_SUBTITLE, subtitle);
         }
         if (tag != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_TAG, tag);
+            payload.put(PARAM_TAG, tag);
         }
         if (threadIdentifier != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_THREADIDENTIFIER, threadIdentifier);
+            payload.put(PARAM_THREADIDENTIFIER, threadIdentifier);
         }
         if (titleLocArgs != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_TITLELOCARGS, titleLocArgs);
+            payload.put(PARAM_TITLELOCARGS, titleLocArgs);
         }
         if (titleLocKey != null) {
-            payload.put(PARAM_MESSAGENOTIFICATION_TITLELOCKEY, titleLocKey);
+            payload.put(PARAM_TITLELOCKEY, titleLocKey);
         }
         return payload;
     }
 
     @Override
     public @NonNull String getSchema() {
-        return SCHEMA_MESSAGENOTIFICATION;
+        return SCHEMA;
     }
 }
 

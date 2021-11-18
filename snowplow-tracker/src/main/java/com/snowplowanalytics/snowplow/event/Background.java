@@ -19,19 +19,20 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/** A background transition event. */
 public class Background extends AbstractSelfDescribing {
 
+    public final static String SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_background/jsonschema/1-0-0";
 
-    public final static String SCHEMA_BACKGROUND = "iglu:com.snowplowanalytics.snowplow/application_background/jsonschema/1-0-0";
+    public final static String PARAM_INDEX = "backgroundIndex";
 
-    public final static String PARAM_BACKGROUNDINDEX = "backgroundIndex";
-
-    /// It's the property for `backgroundIndex` JSON key
+    /** Index indicating the current transition. */
     @Nullable
     public Integer backgroundIndex;
 
     // Builder methods
 
+    /** Index indicating the current transition. */
     @NonNull
     public Background backgroundIndex(@Nullable Integer backgroundIndex) {
         this.backgroundIndex = backgroundIndex;
@@ -43,7 +44,7 @@ public class Background extends AbstractSelfDescribing {
     @NonNull
     @Override
     public String getSchema() {
-        return SCHEMA_BACKGROUND;
+        return SCHEMA;
     }
 
     @NonNull
@@ -51,7 +52,7 @@ public class Background extends AbstractSelfDescribing {
     public Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
         if (backgroundIndex != null) {
-            payload.put(PARAM_BACKGROUNDINDEX, backgroundIndex);
+            payload.put(PARAM_INDEX, backgroundIndex);
         }
         return payload;
     }
