@@ -1,4 +1,16 @@
 
+Version 3.0.0 (2021-11-23)
+--------------------------
+Fix Copyright notice in LICENSE file (#483)
+Remove v1 API (#484)
+Allow campaign enrichment with DeepLinkReceived events (#480)
+Add event for remote and local notifications (#478)
+Add memory, battery and storage info to mobile context (#476)
+Add convenient methods for DeepLinkReceived event (#474)
+Add lifecycle context to indicate app state when the event is tracked (#471)
+Capture campaign attribution data from deep links (#470)
+Add tracker state management (#468)
+
 Version 2.2.1 (2021-08-16)
 --------------------------
 Fix Session UserID not consistent among tracker instances (#466)
