@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -68,8 +68,14 @@ $(function() {
 <li>readCache()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_cache.html#aa13c37c7da2e60e6490cffa718e7ea54">com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationCache</a>
 </li>
+<li>readyForOutput
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_deep_link_state.html#a06a165e14d259e4d6d16ba9777145041">com.snowplowanalytics.snowplow.internal.tracker.DeepLinkState</a>
+</li>
 <li>referrer()
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html#a6dfe29ee3177dbb1bbf34c326c2e51bb">com.snowplowanalytics.snowplow.event.PageView</a>
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1entity_1_1_deep_link.html#a407d468f8c8a6e542732368414dc3577">com.snowplowanalytics.snowplow.entity.DeepLink</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html#af85ec64227aeb216f9841acaf394d3fd">com.snowplowanalytics.snowplow.event.DeepLinkReceived</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html#a6dfe29ee3177dbb1bbf34c326c2e51bb">com.snowplowanalytics.snowplow.event.PageView</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_deep_link_state.html#acbdf37265708415d683b8346b30a1814">com.snowplowanalytics.snowplow.internal.tracker.DeepLinkState</a>
 </li>
 <li>refresh()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a6fba9ba8efb5abbb5e49538bc46752d1">com.snowplowanalytics.snowplow.Snowplow</a>
@@ -109,6 +115,12 @@ $(function() {
 <li>removeObserver()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1utils_1_1_notification_center.html#a7d8436280e81a05587bef619e0331085">com.snowplowanalytics.snowplow.internal.utils.NotificationCenter</a>
 </li>
+<li>removeState()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_state.html#aa5570b20fb83cab423a58461e7781c13">com.snowplowanalytics.snowplow.internal.tracker.TrackerState</a>
+</li>
+<li>removeStateMachine()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_manager.html#a08209c6f483106556ac5f6e3110824c1">com.snowplowanalytics.snowplow.internal.tracker.StateManager</a>
+</li>
 <li>removeTracker()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#aa7f298a401d27cf6e88b45a09ca49670">com.snowplowanalytics.snowplow.Snowplow</a>
 </li>
@@ -117,7 +129,7 @@ $(function() {
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage_1_1_s_q_lite_event_store.html#ad4c6997dd3c733c96f90f44e02bf3476">com.snowplowanalytics.snowplow.internal.emitter.storage.SQLiteEventStore</a>
 </li>
 <li>Request()
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request.html#ae712abf8b008527ac8e3fb050d01771d">com.snowplowanalytics.snowplow.network.Request</a>
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request.html#af359a8cf2e28c5d26a18c0f09ad0e7e8">com.snowplowanalytics.snowplow.network.Request</a>
 </li>
 <li>requestCallback
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#af4bf4700b335ecf0ca99451818050734">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>
@@ -129,7 +141,6 @@ $(function() {
 : <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_gdpr_controller.html#af6956c80843709b2d0da263534b9d99e">com.snowplowanalytics.snowplow.controller.GdprController</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr_controller_impl.html#ab28ab9e4904d2b3eed9614e0cc3cb3ea">com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider.html#ab33151fa821ed267d2f7f56007758560">com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a214cffccf8fa4bdb773a36254cfb7a8e">com.snowplowanalytics.snowplow.internal.tracker.Tracker</a>
 </li>
 <li>RESOLUTION
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a27c9ba7af4396bdd61b282bdc2a8e0cd">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
@@ -142,9 +153,6 @@ $(function() {
 </li>
 <li>resumeEventTracking()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ae79c53eb18ed4a98d96849223ceadcf8">com.snowplowanalytics.snowplow.internal.tracker.Tracker</a>
-</li>
-<li>resumeHandler()
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_process_observer.html#a1e3b61b16900b98acff6ed232692b045">com.snowplowanalytics.snowplow.internal.session.ProcessObserver</a>
 </li>
 <li>resumeSessionChecking()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#af483c35a4b8687a9eb62e5564c7148a9">com.snowplowanalytics.snowplow.internal.tracker.Tracker</a>

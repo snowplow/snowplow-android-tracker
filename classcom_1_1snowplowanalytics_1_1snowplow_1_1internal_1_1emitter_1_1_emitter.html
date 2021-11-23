@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -83,6 +83,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a261e957d382fa5c1f579c9e3447acdda"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#a261e957d382fa5c1f579c9e3447acdda">Emitter</a> (@NonNull Context context, @NonNull String collectorUri, @Nullable EmitterBuilder builder)</td></tr>
+<tr class="separator:a261e957d382fa5c1f579c9e3447acdda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81de5a55ed05c4bc6aee0273e8508a87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#a81de5a55ed05c4bc6aee0273e8508a87">add</a> (final @NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1payload_1_1_payload.html">Payload</a> payload)</td></tr>
 <tr class="separator:a81de5a55ed05c4bc6aee0273e8508a87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0b8d200e751b39f496bc167a97046e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#aa0b8d200e751b39f496bc167a97046e3">flush</a> ()</td></tr>
@@ -152,10 +154,48 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ad1a54191b1b3e00555f93aaa96c13a82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Build an emitter object which controls the sending of events to the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> Collector. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>It will be removed in the next major version, please use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#af89187e4bfdb50510a0b39c1342fb5d6">Snowplow.setup</a> methods. </dd></dl>
+<div class="textblock"><p>Build an emitter object which controls the sending of events to the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> Collector. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00058">58</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00053">53</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a261e957d382fa5c1f579c9e3447acdda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a261e957d382fa5c1f579c9e3447acdda">&#9670;&nbsp;</a></span>Emitter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.internal.emitter.Emitter.Emitter </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull Context&#160;</td>
+          <td class="paramname"><em>context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@NonNull String&#160;</td>
+          <td class="paramname"><em>collectorUri</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@Nullable EmitterBuilder&#160;</td>
+          <td class="paramname"><em>builder</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Creates an emitter object </p>
+
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00295">295</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a81de5a55ed05c4bc6aee0273e8508a87"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81de5a55ed05c4bc6aee0273e8508a87">&#9670;&nbsp;</a></span>add()</h2>
 
@@ -179,7 +219,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00403">403</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00354">354</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -218,7 +258,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a list of ready to send requests </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00556">556</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00507">507</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -238,7 +278,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Attempts to start the emitter if it is not currently running. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00421">421</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00372">372</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -258,7 +298,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the buffer option selected for the emitter </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00830">830</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00781">781</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -278,7 +318,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the GET byte limit </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00875">875</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00826">826</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -298,7 +338,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the POST byte limit </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00889">889</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00840">840</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -318,7 +358,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the customPostPath </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00904">904</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00855">855</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -338,7 +378,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter status </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00674">674</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00625">625</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -358,7 +398,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter tick </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00853">853</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00804">804</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -378,7 +418,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter uri </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00799">799</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00750">750</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -398,7 +438,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitTimeout </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00911">911</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00862">862</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -418,7 +458,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the amount of times the event store can be empty before it is shutdown. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00861">861</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00812">812</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -438,7 +478,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter event store object </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00667">667</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00618">618</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -458,7 +498,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the Emitters request method </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00822">822</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00773">773</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -478,7 +518,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the NetworkConnection if it exists </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00919">919</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00870">870</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -498,7 +538,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the request callback method </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00807">807</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00758">758</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -518,7 +558,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the request security selected for the emitter </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00838">838</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00789">789</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -538,7 +578,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter send limit </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00868">868</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00819">819</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -558,7 +598,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the TLS versions accepted for the emitter </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00846">846</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00797">797</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -585,7 +625,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00691">691</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00642">642</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -611,7 +651,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00882">882</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00833">833</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -637,7 +677,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00896">896</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00847">847</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -664,7 +704,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00764">764</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00715">715</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -691,7 +731,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00746">746</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00697">697</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -718,7 +758,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00782">782</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00733">733</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -745,7 +785,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00710">710</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00661">661</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -765,7 +805,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00678">678</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00629">629</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -791,7 +831,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00814">814</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00765">765</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -818,7 +858,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00728">728</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00679">679</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -844,7 +884,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00701">701</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00652">652</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -864,7 +904,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Resets the <code>isRunning</code> truth to false and shutdown. </p>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00437">437</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00388">388</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>
@@ -891,7 +931,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00446">446</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_emitter_8java_source.html#l00397">397</a> of file <a class="el" href="_emitter_8java_source.html">Emitter.java</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -124,6 +124,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a68a897a768764bade8828f531dc70aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b614fb7aebf91b3a240597ed3a15441"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a6b614fb7aebf91b3a240597ed3a15441">setSessionContext</a> (boolean sessionContext)</td></tr>
 <tr class="separator:a6b614fb7aebf91b3a240597ed3a15441"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4bb0aef0a5cc6824ef45b25a2141b4d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#af4bb0aef0a5cc6824ef45b25a2141b4d">isDeepLinkContext</a> ()</td></tr>
+<tr class="separator:af4bb0aef0a5cc6824ef45b25a2141b4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dd65377c5ecf9140178801bbfc76cbf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a4dd65377c5ecf9140178801bbfc76cbf">setDeepLinkContext</a> (boolean deepLinkContext)</td></tr>
+<tr class="separator:a4dd65377c5ecf9140178801bbfc76cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add050d817905eb10f2a9d6e42ca3d8f3"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#add050d817905eb10f2a9d6e42ca3d8f3">isScreenContext</a> ()</td></tr>
 <tr class="separator:add050d817905eb10f2a9d6e42ca3d8f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc6e8daed7f2dcc81a5dc6d0dacaa754"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#acc6e8daed7f2dcc81a5dc6d0dacaa754">setScreenContext</a> (boolean screenContext)</td></tr>
@@ -295,6 +299,26 @@ Public Member Functions</h2></td></tr>
 <p>It indicates whether the JSON data in the payload should be base64 encoded. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a559f800a0bcc136998156e5ef0ed7fbc">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a8fc70ac6e8d9a4bf752bb08cc8713637">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a14c01f45408b938c4df6ab8819818ff0">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
+
+</div>
+</div>
+<a id="af4bb0aef0a5cc6824ef45b25a2141b4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4bb0aef0a5cc6824ef45b25a2141b4d">&#9670;&nbsp;</a></span>isDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.isDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether deepLink context is sent with all the ScreenView events. </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a47115fdc8fb363ab5dc55ec3f7587df5">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a7ca9a5f21acf027f2709d22439f8b84f">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a227a7a93773bd1bde1c909b2c87b256b">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
 
 </div>
 </div>
@@ -539,6 +563,27 @@ Public Member Functions</h2></td></tr>
 <p>It indicates whether the JSON data in the payload should be base64 encoded. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#aa890d16e2ce88c41efd3c1163c5dc9f9">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a81d311f16c9919cd5c0c51122b2ac6f1">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
+
+</div>
+</div>
+<a id="a4dd65377c5ecf9140178801bbfc76cbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dd65377c5ecf9140178801bbfc76cbf">&#9670;&nbsp;</a></span>setDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.setDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>deepLinkContext</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether deepLink context is sent with all the ScreenView events. </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a2eb6a8aedc228c7113c44bd956c9cf01">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a405cc3a9bcdd90987c43fed4c40aff34">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>.</p>
 
 </div>
 </div>

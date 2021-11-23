@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -67,7 +67,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -75,19 +74,14 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>SubjectBuilder</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a06b4644943690e4a9fe7a5c3449b9873"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a06b4644943690e4a9fe7a5c3449b9873">Subject</a> (@NonNull Context context, @Nullable <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html">SubjectConfigurationInterface</a> config)</td></tr>
+<tr class="separator:a06b4644943690e4a9fe7a5c3449b9873"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad491f06af58a259f2716c8bca4fb8461"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ad491f06af58a259f2716c8bca4fb8461">setDefaultScreenResolution</a> (@NonNull Context context)</td></tr>
 <tr class="separator:ad491f06af58a259f2716c8bca4fb8461"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71bcdbaae34b4b2a4cf452e2b6ab89d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a71bcdbaae34b4b2a4cf452e2b6ab89d4">setUserId</a> (@NonNull String userId)</td></tr>
 <tr class="separator:a71bcdbaae34b4b2a4cf452e2b6ab89d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d9a41c97f65d7e99b567cb2b91f1606"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a8d9a41c97f65d7e99b567cb2b91f1606">identifyUser</a> (@NonNull String userId)</td></tr>
-<tr class="separator:a8d9a41c97f65d7e99b567cb2b91f1606"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a103247897e01ddef503a86f7cee36bd9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a103247897e01ddef503a86f7cee36bd9">setScreenResolution</a> (int width, int height)</td></tr>
 <tr class="separator:a103247897e01ddef503a86f7cee36bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57d1018d2d3e39e243b85721e572e481"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a57d1018d2d3e39e243b85721e572e481">setViewPort</a> (int width, int height)</td></tr>
@@ -110,10 +104,41 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad955e11ce33afd1f49fce333ee894cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Provides <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">Subject</a> information for each event sent from the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000034">Deprecated:</a></b></dt><dd>It will be removed in the next major version, please use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#af89187e4bfdb50510a0b39c1342fb5d6">Snowplow.setup</a> methods. </dd></dl>
+<div class="textblock"><p>Provides <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">Subject</a> information for each event sent from the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00040">40</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00037">37</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a06b4644943690e4a9fe7a5c3449b9873"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06b4644943690e4a9fe7a5c3449b9873">&#9670;&nbsp;</a></span>Subject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.internal.tracker.Subject.Subject </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull Context&#160;</td>
+          <td class="paramname"><em>context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">@Nullable <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html">SubjectConfigurationInterface</a>&#160;</td>
+          <td class="paramname"><em>config</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00063">63</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad955e11ce33afd1f49fce333ee894cbf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad955e11ce33afd1f49fce333ee894cbf">&#9670;&nbsp;</a></span>getSubject()</h2>
 
@@ -130,34 +155,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the standard subject pairs </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00305">305</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
-
-</div>
-</div>
-<a id="a8d9a41c97f65d7e99b567cb2b91f1606"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d9a41c97f65d7e99b567cb2b91f1606">&#9670;&nbsp;</a></span>identifyUser()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.Subject.identifyUser </td>
-          <td>(</td>
-          <td class="paramtype">@NonNull String&#160;</td>
-          <td class="paramname"><em>userId</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sets the subjects userId </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000037">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#userId(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">userId</td><td>a user id string </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00193">193</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00236">236</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -177,15 +175,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>user defined color depth.</p>
-<p>Measure as an integer </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000040">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#colorDepth(Integer)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Measure as an integer </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">depth</td><td>the color depth </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00231">231</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00168">168</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -212,7 +209,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00166">166</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00114">114</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -231,15 +228,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted Domain User Id for the subject. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000046">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#domainUserId(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted Domain User Id for the subject. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">domainUserId</td><td>a domain user id </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00296">296</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00227">227</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -258,15 +254,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted ip address for the subject. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000043">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#ipAddress(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted ip address for the subject. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ipAddress</td><td>an ip address </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00263">263</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00197">197</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -285,15 +280,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted language for the subject. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000042">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#language(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted language for the subject. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">language</td><td>language setting </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00252">252</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00187">187</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -312,15 +306,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted Network User Id for the subject. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000045">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#networkUserId(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted Network User Id for the subject. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">networkUserId</td><td>a network user id </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00285">285</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00217">217</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -350,8 +343,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Sets a custom screen resolution based on user inputted width and height.</p>
-<p>Measured in pixels: 1920x1080 </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000038">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#screenResolution(Size)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Measured in pixels: 1920x1080 </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">width</td><td>the width of the screen </td></tr>
     <tr><td class="paramname">height</td><td>the height of the screen </td></tr>
@@ -359,7 +351,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00204">204</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00143">143</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -378,15 +370,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted timezone </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000041">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#timezone(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted timezone </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">timezone</td><td>a valid timezone </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00241">241</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00177">177</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -405,15 +396,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User inputted useragent for the subject. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000044">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#useragent(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>User inputted useragent for the subject. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">useragent</td><td>a useragent </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00274">274</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00207">207</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -432,15 +422,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets the subjects userId </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000036">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#userId(String)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Sets the subjects userId </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">userId</td><td>a user id string </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00183">183</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00130">130</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>
@@ -470,8 +459,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Sets the view port resolution</p>
-<p>Measured in pixels: 1280x1024 </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000039">Deprecated:</a></b></dt><dd>Use <a class="el" href="">SubjectConfiguration#screenViewPort(Size)</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Measured in pixels: 1280x1024 </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">width</td><td>the width of the viewport </td></tr>
     <tr><td class="paramname">height</td><td>the height of the viewport </td></tr>
@@ -479,7 +467,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00218">218</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00156">156</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -65,6 +65,9 @@ $(function() {
 <div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
 
 <h3><a id="index_b"></a>- b -</h3><ul>
+<li>backgroundIndex()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html#ae7f7711bf4bba6c1e257f9f5b281eec8">com.snowplowanalytics.snowplow.event.Background</a>
+</li>
 <li>backgroundTimeout
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_session_configuration.html#a24ae54b48f9c050598b7fc4ead2f5f97">com.snowplowanalytics.snowplow.configuration.SessionConfiguration</a>
 </li>
@@ -84,6 +87,12 @@ $(function() {
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html#a5ffef3ec012265a3834ac95d65fbb9cb">com.snowplowanalytics.snowplow.configuration.GdprConfiguration</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1gdpr_1_1_gdpr.html#a0be4264750d972edbebb08167cc090b1">com.snowplowanalytics.snowplow.internal.gdpr.Gdpr</a>
 </li>
+<li>BATTERY_LEVEL
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#abfdf3b6808dbf8db9780312a5b72fc16">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
+</li>
+<li>BATTERY_STATE
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a6eee214bbe34e584385ee0fcc798a173">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
+</li>
 <li>BEARING
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#ae1c1bc6077d744d7bb386df8d9b6f073">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
@@ -92,6 +101,15 @@ $(function() {
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#adef4641ce9c7e13a1307df8a8aa0844f">com.snowplowanalytics.snowplow.event.ConsentGranted</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#a324abcc60e4a637a3fe30c3085632b55">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>
 , <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_event.html#a8115e0f89bf356e6f95ef7c2f1e86f5d">com.snowplowanalytics.snowplow.event.Event</a>
+</li>
+<li>body
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a7735f293fb3bfb775abf81e99d493c55">com.snowplowanalytics.snowplow.event.MessageNotification</a>
+</li>
+<li>bodyLocArgs()
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a5514a2d0b285b20663a2b35a500464d2">com.snowplowanalytics.snowplow.event.MessageNotification</a>
+</li>
+<li>bodyLocKey
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#ad54ef9276992495ed02494834332c00f">com.snowplowanalytics.snowplow.event.MessageNotification</a>
 </li>
 <li>bufferOption
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a1cf48e080f46f83ced089f34f13a1506">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>
@@ -104,18 +122,6 @@ $(function() {
 </li>
 <li>build()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_schema_rule.html#a7f7fe19b8f6541b21128fcc3aece8900">com.snowplowanalytics.snowplow.internal.tracker.SchemaRule</a>
-</li>
-<li>builder()
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html#ac81ea4a86373b2dabc845471c47c280e">com.snowplowanalytics.snowplow.event.ConsentDocument</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#aecf280baeee2bc7a3437cd305e923ce1">com.snowplowanalytics.snowplow.event.ConsentGranted</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#a9d8e23b696540f2f58a865eca2c76ac9">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#aecef956851094324a49348f8f6b4081c">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction_item.html#a0ee71274ea484f180bd8b104541c2cbc">com.snowplowanalytics.snowplow.event.EcommerceTransactionItem</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html#a13db9de1f7e76e359994f8e5c202786d">com.snowplowanalytics.snowplow.event.PageView</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#a48944fb70a53d5e14a31a38e42c7defd">com.snowplowanalytics.snowplow.event.ScreenView</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html#aaa6c31ad0135d5a566165042ad6157a2">com.snowplowanalytics.snowplow.event.SelfDescribing</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html#abecd0d067730385e8043e63cc969edfd">com.snowplowanalytics.snowplow.event.Structured</a>
-, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#aca2bfb6fa018002eecd29388ab33676f">com.snowplowanalytics.snowplow.event.Timing</a>
 </li>
 <li>buildRequests()
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter.html#ad1a54191b1b3e00555f93aaa96c13a82">com.snowplowanalytics.snowplow.internal.emitter.Emitter</a>

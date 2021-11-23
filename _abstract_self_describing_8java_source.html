@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="_abstract_self_describing_8java.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This program is licensed to you under the Apache License Version 2.0,</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * and you may not use this file except in compliance with the Apache License Version 2.0.</span></div>
@@ -87,22 +87,16 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">import</span> androidx.annotation.NonNull;</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">import</span> com.snowplowanalytics.snowplow.payload.SelfDescribingJson;</div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">   18</a></span>&#160;<span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class </span><a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">AbstractSelfDescribing</a> <span class="keyword">extends</span> <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">AbstractEvent</a> {</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">   20</a></span>&#160;<span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class </span><a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">AbstractSelfDescribing</a> <span class="keyword">extends</span> <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">AbstractEvent</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">   20</a></span>&#160;    <span class="keyword">protected</span> <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">AbstractSelfDescribing</a>() { super(); }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">AbstractSelfDescribing</a>(Builder&lt;?&gt; builder) {</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        super(builder);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    }</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">   26</a></span>&#160;    <span class="keyword">protected</span> <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">AbstractSelfDescribing</a>() { super(); }</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#a2c397b0bd9b406fa6d5f6bea2838e63c">   31</a></span>&#160;    <span class="keyword">public</span> <span class="keyword">abstract</span> @NonNull String <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#a2c397b0bd9b406fa6d5f6bea2838e63c">getSchema</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">com.snowplowanalytics.snowplow.event.AbstractEvent</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_event_8java_source.html#l00038">AbstractEvent.java:38</a></div></div>
-<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">com.snowplowanalytics.snowplow.event.AbstractSelfDescribing</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_self_describing_8java_source.html#l00020">AbstractSelfDescribing.java:20</a></div></div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#a2c397b0bd9b406fa6d5f6bea2838e63c">   25</a></span>&#160;    <span class="keyword">public</span> <span class="keyword">abstract</span> @NonNull String <a class="code" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#a2c397b0bd9b406fa6d5f6bea2838e63c">getSchema</a>();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;}</div>
+<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">com.snowplowanalytics.snowplow.event.AbstractEvent</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_event_8java_source.html#l00033">AbstractEvent.java:33</a></div></div>
+<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html">com.snowplowanalytics.snowplow.event.AbstractSelfDescribing</a></div><div class="ttdef"><b>Definition:</b> <a href="_abstract_self_describing_8java_source.html#l00018">AbstractSelfDescribing.java:18</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing_html_a2c397b0bd9b406fa6d5f6bea2838e63c"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#a2c397b0bd9b406fa6d5f6bea2838e63c">com.snowplowanalytics.snowplow.event.AbstractSelfDescribing.getSchema</a></div><div class="ttdeci">abstract String getSchema()</div></div>
-<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing_html_af1a2c14b5636f1f13a126ef91fe475a8"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">com.snowplowanalytics.snowplow.event.AbstractSelfDescribing.AbstractSelfDescribing</a></div><div class="ttdeci">AbstractSelfDescribing()</div><div class="ttdef"><b>Definition:</b> <a href="_abstract_self_describing_8java_source.html#l00026">AbstractSelfDescribing.java:26</a></div></div>
+<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing_html_af1a2c14b5636f1f13a126ef91fe475a8"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">com.snowplowanalytics.snowplow.event.AbstractSelfDescribing.AbstractSelfDescribing</a></div><div class="ttdeci">AbstractSelfDescribing()</div><div class="ttdef"><b>Definition:</b> <a href="_abstract_self_describing_8java_source.html#l00020">AbstractSelfDescribing.java:20</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

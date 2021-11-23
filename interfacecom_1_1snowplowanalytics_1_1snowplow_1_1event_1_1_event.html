@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -86,13 +86,17 @@ Inheritance diagram for com.snowplowanalytics.snowplow.event.Event:</div>
 <area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction_item.html" alt="com.snowplowanalytics.snowplow.event.EcommerceTransactionItem" shape="rect" coords="406,224,802,248"/>
 <area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html" alt="com.snowplowanalytics.snowplow.event.PageView" shape="rect" coords="406,280,802,304"/>
 <area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html" alt="com.snowplowanalytics.snowplow.event.Structured" shape="rect" coords="406,336,802,360"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html" alt="com.snowplowanalytics.snowplow.event.ConsentDocument" shape="rect" coords="1218,168,1614,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html" alt="com.snowplowanalytics.snowplow.event.ConsentGranted" shape="rect" coords="1218,224,1614,248"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html" alt="com.snowplowanalytics.snowplow.event.ConsentWithdrawn" shape="rect" coords="1218,280,1614,304"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html" alt="com.snowplowanalytics.snowplow.event.ScreenView" shape="rect" coords="1218,336,1614,360"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html" alt="com.snowplowanalytics.snowplow.event.SelfDescribing" shape="rect" coords="1218,392,1614,416"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html" alt="com.snowplowanalytics.snowplow.event.Timing" shape="rect" coords="1218,448,1614,472"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html" alt="com.snowplowanalytics.snowplow.event.TrackerError" shape="rect" coords="1218,504,1614,528"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html" alt="com.snowplowanalytics.snowplow.event.Background" shape="rect" coords="1218,168,1614,192"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html" alt="com.snowplowanalytics.snowplow.event.ConsentDocument" shape="rect" coords="1218,224,1614,248"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html" alt="com.snowplowanalytics.snowplow.event.ConsentGranted" shape="rect" coords="1218,280,1614,304"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html" alt="com.snowplowanalytics.snowplow.event.ConsentWithdrawn" shape="rect" coords="1218,336,1614,360"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html" alt="com.snowplowanalytics.snowplow.event.DeepLinkReceived" shape="rect" coords="1218,392,1614,416"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_foreground.html" alt="com.snowplowanalytics.snowplow.event.Foreground" shape="rect" coords="1218,448,1614,472"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html" alt="com.snowplowanalytics.snowplow.event.MessageNotification" shape="rect" coords="1218,504,1614,528"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html" alt="com.snowplowanalytics.snowplow.event.ScreenView" shape="rect" coords="1218,560,1614,584"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html" alt="com.snowplowanalytics.snowplow.event.SelfDescribing" shape="rect" coords="1218,616,1614,640"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html" alt="com.snowplowanalytics.snowplow.event.Timing" shape="rect" coords="1218,672,1614,696"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html" alt="com.snowplowanalytics.snowplow.event.TrackerError" shape="rect" coords="1218,728,1614,752"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -129,8 +133,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Hook method called just before the event processing in order to execute special operations.</p>
-<p>@apiNote Internal use only - Don't use in production, it can change without notice. </p>
+<p>Hook method called just before the event processing in order to execute special operations. @apiNote Internal use only - Don't use in production, it can change without notice. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#a324abcc60e4a637a3fe30c3085632b55">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#adef4641ce9c7e13a1307df8a8aa0844f">com.snowplowanalytics.snowplow.event.ConsentGranted</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#afd773d148053b456d33534d5405ec845">com.snowplowanalytics.snowplow.event.AbstractEvent</a>.</p>
 
@@ -151,8 +154,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Hook method called just after the event processing in order to execute special operations.</p>
-<p>@apiNote Internal use only - Don't use in production, it can change without notice. </p>
+<p>Hook method called just after the event processing in order to execute special operations. @apiNote Internal use only - Don't use in production, it can change without notice. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#af8a22fc8ac54733250d59687e1d721f7">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#a386318f116bb402d7f1e0edbc2e383fb">com.snowplowanalytics.snowplow.event.AbstractEvent</a>.</p>
 
@@ -194,7 +196,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the event data payload </dd></dl>
 
-<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html#a7a99da326259b1448e5feaa79b7ae05a">com.snowplowanalytics.snowplow.event.TrackerError</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#a04e9b5f3d18356850b10964e67668ad2">com.snowplowanalytics.snowplow.event.Timing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html#aa771c7e7c6d6f373a793d715e8e6d29b">com.snowplowanalytics.snowplow.event.Structured</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html#a773247be691fad700548b74111423446">com.snowplowanalytics.snowplow.event.SelfDescribing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#a4799387a4410cf2e8a005fcf2537928f">com.snowplowanalytics.snowplow.event.ScreenView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html#a4e9caa9e4e8869a96e084058a4d57bf8">com.snowplowanalytics.snowplow.event.PageView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction_item.html#a1129061eb66dfd679ac6c712e7bee46c">com.snowplowanalytics.snowplow.event.EcommerceTransactionItem</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#a0b81cd7469bff737910f1602bd2f140b">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#a3c191b9f99bc33829bf2c4f12e0e273e">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#ad2f3ccead5fecbba870d3c49042b9eb9">com.snowplowanalytics.snowplow.event.ConsentGranted</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html#a3d40507373148b27223a113d4db1009e">com.snowplowanalytics.snowplow.event.ConsentDocument</a>.</p>
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html#a7a99da326259b1448e5feaa79b7ae05a">com.snowplowanalytics.snowplow.event.TrackerError</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#a04e9b5f3d18356850b10964e67668ad2">com.snowplowanalytics.snowplow.event.Timing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html#aa771c7e7c6d6f373a793d715e8e6d29b">com.snowplowanalytics.snowplow.event.Structured</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html#a773247be691fad700548b74111423446">com.snowplowanalytics.snowplow.event.SelfDescribing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#a4799387a4410cf2e8a005fcf2537928f">com.snowplowanalytics.snowplow.event.ScreenView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_page_view.html#a4e9caa9e4e8869a96e084058a4d57bf8">com.snowplowanalytics.snowplow.event.PageView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a420e430c607c773920f4fbf09dd6ec19">com.snowplowanalytics.snowplow.event.MessageNotification</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_foreground.html#ac05879a39f9f164f66bc49e1952886f1">com.snowplowanalytics.snowplow.event.Foreground</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction_item.html#a1129061eb66dfd679ac6c712e7bee46c">com.snowplowanalytics.snowplow.event.EcommerceTransactionItem</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#a0b81cd7469bff737910f1602bd2f140b">com.snowplowanalytics.snowplow.event.EcommerceTransaction</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html#ae709798c891a4ca7f8d78d6f1067b959">com.snowplowanalytics.snowplow.event.DeepLinkReceived</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#a3c191b9f99bc33829bf2c4f12e0e273e">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#ad2f3ccead5fecbba870d3c49042b9eb9">com.snowplowanalytics.snowplow.event.ConsentGranted</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html#a3d40507373148b27223a113d4db1009e">com.snowplowanalytics.snowplow.event.ConsentDocument</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html#ac399f51562978a1b20d67b0467965a93">com.snowplowanalytics.snowplow.event.Background</a>.</p>
 
 </div>
 </div>

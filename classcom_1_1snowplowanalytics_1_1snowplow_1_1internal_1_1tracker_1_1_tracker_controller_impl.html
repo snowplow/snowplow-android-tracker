@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -151,6 +151,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:abfdd7f6ad24eeeb9cdd3d5d6fe6b35dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31114e4af46949e9894559a3781aa493"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a31114e4af46949e9894559a3781aa493">setSessionContext</a> (boolean sessionContext)</td></tr>
 <tr class="separator:a31114e4af46949e9894559a3781aa493"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47115fdc8fb363ab5dc55ec3f7587df5"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a47115fdc8fb363ab5dc55ec3f7587df5">isDeepLinkContext</a> ()</td></tr>
+<tr class="separator:a47115fdc8fb363ab5dc55ec3f7587df5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2eb6a8aedc228c7113c44bd956c9cf01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a2eb6a8aedc228c7113c44bd956c9cf01">setDeepLinkContext</a> (boolean deepLinkContext)</td></tr>
+<tr class="separator:a2eb6a8aedc228c7113c44bd956c9cf01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4b000b472831808a48b05e17d07e490"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#ae4b000b472831808a48b05e17d07e490">isScreenContext</a> ()</td></tr>
 <tr class="separator:ae4b000b472831808a48b05e17d07e490"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5c0edf44149f46b4f9bf2f68fb2e72e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#af5c0edf44149f46b4f9bf2f68fb2e72e">setScreenContext</a> (boolean screenContext)</td></tr>
@@ -494,7 +498,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a41e5e4856b738a77cab8dda1c9c7a3bc">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00299">299</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00311">311</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -564,6 +568,28 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a id="a47115fdc8fb363ab5dc55ec3f7587df5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47115fdc8fb363ab5dc55ec3f7587df5">&#9670;&nbsp;</a></span>isDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl.isDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether deepLink context is sent with all the ScreenView events. </p>
+
+<p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#af4bb0aef0a5cc6824ef45b25a2141b4d">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00226">226</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+
+</div>
+</div>
 <a id="ad846139aa1f4632da56f7a055434d1d6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad846139aa1f4632da56f7a055434d1d6">&#9670;&nbsp;</a></span>isDiagnosticAutotracking()</h2>
 
@@ -582,7 +608,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a952bea9b9443f7bc4d57547aa87113e2">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00286">286</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00298">298</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -604,7 +630,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a37b8dfaee0d18810a7f070ce5f32f2f1">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00274">274</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00286">286</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -649,7 +675,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a3f68de3c5dac84b2a02616b384021260">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00262">262</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00274">274</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -671,7 +697,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#abc397375cdbfd1ad0b99bc9524d0c024">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00250">250</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00262">262</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -715,7 +741,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#add050d817905eb10f2a9d6e42ca3d8f3">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00226">226</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00238">238</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -737,7 +763,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#aba95db35bb3e1706f2a8ee1ea968df9a">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00238">238</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00250">250</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -898,6 +924,29 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a id="a2eb6a8aedc228c7113c44bd956c9cf01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2eb6a8aedc228c7113c44bd956c9cf01">&#9670;&nbsp;</a></span>setDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl.setDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>deepLinkContext</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether deepLink context is sent with all the ScreenView events. </p>
+
+<p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a4dd65377c5ecf9140178801bbfc76cbf">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00231">231</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+
+</div>
+</div>
 <a id="a42498a30974ed2ed85cc420cb073486c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a42498a30974ed2ed85cc420cb073486c">&#9670;&nbsp;</a></span>setDevicePlatform()</h2>
 
@@ -940,7 +989,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a07eb1e27fc414930898ae328c2c6a498">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00291">291</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00303">303</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -963,7 +1012,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#aac83efc98068b4fd5b9e179c3ce1c49f">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00279">279</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00291">291</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -1010,7 +1059,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#afb5be0b8865ef5d8c6934fdbb8994ad9">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00267">267</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00279">279</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -1033,7 +1082,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a61cc8c25e9d0f625ca798f45b82b3a7c">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00255">255</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00267">267</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -1125,7 +1174,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#acc6e8daed7f2dcc81a5dc6d0dacaa754">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00231">231</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00243">243</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -1148,7 +1197,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a2d7f13cb54c601679748d30181904129">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00243">243</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00255">255</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>
@@ -1194,7 +1243,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#afe55c71ab06e0b7dfc1ad68c8d2bf1e6">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00304">304</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_controller_impl_8java_source.html#l00316">316</a> of file <a class="el" href="_tracker_controller_impl_8java_source.html">TrackerControllerImpl.java</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -80,15 +80,19 @@ Inheritance diagram for com.snowplowanalytics.snowplow.event.AbstractSelfDescrib
  <div class="center">
   <img src="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.png" usemap="#com.snowplowanalytics.snowplow.event.AbstractSelfDescribing_map" alt=""/>
   <map id="com.snowplowanalytics.snowplow.event.AbstractSelfDescribing_map" name="com.snowplowanalytics.snowplow.event.AbstractSelfDescribing_map">
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html" alt="com.snowplowanalytics.snowplow.event.AbstractEvent" shape="rect" coords="1146,56,1518,80"/>
-<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_event.html" alt="com.snowplowanalytics.snowplow.event.Event" shape="rect" coords="1146,0,1518,24"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html" alt="com.snowplowanalytics.snowplow.event.ConsentDocument" shape="rect" coords="0,168,372,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html" alt="com.snowplowanalytics.snowplow.event.ConsentGranted" shape="rect" coords="382,168,754,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html" alt="com.snowplowanalytics.snowplow.event.ConsentWithdrawn" shape="rect" coords="764,168,1136,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html" alt="com.snowplowanalytics.snowplow.event.ScreenView" shape="rect" coords="1146,168,1518,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html" alt="com.snowplowanalytics.snowplow.event.SelfDescribing" shape="rect" coords="1528,168,1900,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html" alt="com.snowplowanalytics.snowplow.event.Timing" shape="rect" coords="1910,168,2282,192"/>
-<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html" alt="com.snowplowanalytics.snowplow.event.TrackerError" shape="rect" coords="2292,168,2664,192"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html" alt="com.snowplowanalytics.snowplow.event.AbstractEvent" shape="rect" coords="0,56,372,80"/>
+<area href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_event.html" alt="com.snowplowanalytics.snowplow.event.Event" shape="rect" coords="0,0,372,24"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html" alt="com.snowplowanalytics.snowplow.event.Background" shape="rect" coords="382,168,754,192"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html" alt="com.snowplowanalytics.snowplow.event.ConsentDocument" shape="rect" coords="382,224,754,248"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html" alt="com.snowplowanalytics.snowplow.event.ConsentGranted" shape="rect" coords="382,280,754,304"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html" alt="com.snowplowanalytics.snowplow.event.ConsentWithdrawn" shape="rect" coords="382,336,754,360"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html" alt="com.snowplowanalytics.snowplow.event.DeepLinkReceived" shape="rect" coords="382,392,754,416"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_foreground.html" alt="com.snowplowanalytics.snowplow.event.Foreground" shape="rect" coords="382,448,754,472"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html" alt="com.snowplowanalytics.snowplow.event.MessageNotification" shape="rect" coords="382,504,754,528"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html" alt="com.snowplowanalytics.snowplow.event.ScreenView" shape="rect" coords="382,560,754,584"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html" alt="com.snowplowanalytics.snowplow.event.SelfDescribing" shape="rect" coords="382,616,754,640"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html" alt="com.snowplowanalytics.snowplow.event.Timing" shape="rect" coords="382,672,754,696"/>
+<area href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html" alt="com.snowplowanalytics.snowplow.event.TrackerError" shape="rect" coords="382,728,754,752"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -117,21 +121,18 @@ Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:af1a2c14b5636f1f13a126ef91fe475a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_self_describing.html#af1a2c14b5636f1f13a126ef91fe475a8">AbstractSelfDescribing</a> ()</td></tr>
 <tr class="separator:af1a2c14b5636f1f13a126ef91fe475a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">com.snowplowanalytics.snowplow.event.AbstractEvent</a></td></tr>
-<tr class="memitem:a78acd710daa80a8fad80a1ad0b3de5ef inherit pro_methods_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#a78acd710daa80a8fad80a1ad0b3de5ef">AbstractEvent</a> ()</td></tr>
-<tr class="separator:a78acd710daa80a8fad80a1ad0b3de5ef inherit pro_methods_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html">com.snowplowanalytics.snowplow.event.AbstractEvent</a></td></tr>
-<tr class="memitem:a27c9352c8fbb3f2946feaade6275182b inherit pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memItemLeft" align="right" valign="top">final List&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1payload_1_1_self_describing_json.html">SelfDescribingJson</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#a27c9352c8fbb3f2946feaade6275182b">customContexts</a></td></tr>
+<tr class="memitem:a27c9352c8fbb3f2946feaade6275182b inherit pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memItemLeft" align="right" valign="top">final List&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1payload_1_1_self_describing_json.html">SelfDescribingJson</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#a27c9352c8fbb3f2946feaade6275182b">customContexts</a> = new LinkedList&lt;&gt;()</td></tr>
 <tr class="separator:a27c9352c8fbb3f2946feaade6275182b inherit pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae34680b93abc9d52817c29d9c5e323fa inherit pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event.html#ae34680b93abc9d52817c29d9c5e323fa">trueTimestamp</a></td></tr>
 <tr class="separator:ae34680b93abc9d52817c29d9c5e323fa inherit pub_attribs_classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_abstract_event"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="_abstract_self_describing_8java_source.html#l00020">20</a> of file <a class="el" href="_abstract_self_describing_8java_source.html">AbstractSelfDescribing.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_abstract_self_describing_8java_source.html#l00018">18</a> of file <a class="el" href="_abstract_self_describing_8java_source.html">AbstractSelfDescribing.java</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af1a2c14b5636f1f13a126ef91fe475a8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1a2c14b5636f1f13a126ef91fe475a8">&#9670;&nbsp;</a></span>AbstractSelfDescribing()</h2>
@@ -156,7 +157,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_abstract_self_describing_8java_source.html#l00026">26</a> of file <a class="el" href="_abstract_self_describing_8java_source.html">AbstractSelfDescribing.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_abstract_self_describing_8java_source.html#l00020">20</a> of file <a class="el" href="_abstract_self_describing_8java_source.html">AbstractSelfDescribing.java</a>.</p>
 
 </div>
 </div>
@@ -185,7 +186,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The schema of the event. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html#a0f23047698e996bd715daa2504a29876">com.snowplowanalytics.snowplow.event.TrackerError</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#ac2ba22ca2b8a00100eb64b3211ab7f1d">com.snowplowanalytics.snowplow.event.Timing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html#a7036bcc2f8c15d18b8b8fe093eb6aaf8">com.snowplowanalytics.snowplow.event.SelfDescribing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#aa3d97566865ff35fc177d9d243e94f47">com.snowplowanalytics.snowplow.event.ScreenView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#ab443a7fec17c0ab8fba069785c350b92">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#ad4f147317c5cfad0e7e9036538edf9a1">com.snowplowanalytics.snowplow.event.ConsentGranted</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html#a12b672dec306d4c8e41473f28a53f3a4">com.snowplowanalytics.snowplow.event.ConsentDocument</a>.</p>
+<p>Reimplemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_tracker_error.html#a0f23047698e996bd715daa2504a29876">com.snowplowanalytics.snowplow.event.TrackerError</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#ac2ba22ca2b8a00100eb64b3211ab7f1d">com.snowplowanalytics.snowplow.event.Timing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html#a7036bcc2f8c15d18b8b8fe093eb6aaf8">com.snowplowanalytics.snowplow.event.SelfDescribing</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html#aa3d97566865ff35fc177d9d243e94f47">com.snowplowanalytics.snowplow.event.ScreenView</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a61620733b313dee8e4cae13656205394">com.snowplowanalytics.snowplow.event.MessageNotification</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_foreground.html#a5694a3b5eaf329afc57046463363ba45">com.snowplowanalytics.snowplow.event.Foreground</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html#a2cfb63736784cf6fb11d371785f304a3">com.snowplowanalytics.snowplow.event.DeepLinkReceived</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html#ab443a7fec17c0ab8fba069785c350b92">com.snowplowanalytics.snowplow.event.ConsentWithdrawn</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html#ad4f147317c5cfad0e7e9036538edf9a1">com.snowplowanalytics.snowplow.event.ConsentGranted</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html#a12b672dec306d4c8e41473f28a53f3a4">com.snowplowanalytics.snowplow.event.ConsentDocument</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html#a6bdcec503200f43c4be74e42db1396d5">com.snowplowanalytics.snowplow.event.Background</a>.</p>
 
 </div>
 </div>

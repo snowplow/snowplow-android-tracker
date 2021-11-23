@@ -1,27 +1,8 @@
 var searchData=
 [
-  ['schemarule_2ejava_1095',['SchemaRule.java',['../_schema_rule_8java.html',1,'']]],
-  ['schemaruleset_2ejava_1096',['SchemaRuleSet.java',['../_schema_rule_set_8java.html',1,'']]],
-  ['screenstate_2ejava_1097',['ScreenState.java',['../_screen_state_8java.html',1,'']]],
-  ['screenview_2ejava_1098',['ScreenView.java',['../_screen_view_8java.html',1,'']]],
-  ['selfdescribing_2ejava_1099',['SelfDescribing.java',['../_self_describing_8java.html',1,'']]],
-  ['selfdescribingjson_2ejava_1100',['SelfDescribingJson.java',['../_self_describing_json_8java.html',1,'']]],
-  ['serviceprovider_2ejava_1101',['ServiceProvider.java',['../_service_provider_8java.html',1,'']]],
-  ['serviceproviderinterface_2ejava_1102',['ServiceProviderInterface.java',['../_service_provider_interface_8java.html',1,'']]],
-  ['session_2ejava_1103',['Session.java',['../_session_8java.html',1,'']]],
-  ['sessionconfiguration_2ejava_1104',['SessionConfiguration.java',['../_session_configuration_8java.html',1,'']]],
-  ['sessionconfigurationinterface_2ejava_1105',['SessionConfigurationInterface.java',['../_session_configuration_interface_8java.html',1,'']]],
-  ['sessionconfigurationupdate_2ejava_1106',['SessionConfigurationUpdate.java',['../_session_configuration_update_8java.html',1,'']]],
-  ['sessioncontroller_2ejava_1107',['SessionController.java',['../_session_controller_8java.html',1,'']]],
-  ['sessioncontrollerimpl_2ejava_1108',['SessionControllerImpl.java',['../_session_controller_impl_8java.html',1,'']]],
-  ['size_2ejava_1109',['Size.java',['../_size_8java.html',1,'']]],
-  ['snowplow_2ejava_1110',['Snowplow.java',['../_snowplow_8java.html',1,'']]],
-  ['sqliteeventstore_2ejava_1111',['SQLiteEventStore.java',['../_s_q_lite_event_store_8java.html',1,'']]],
-  ['structured_2ejava_1112',['Structured.java',['../_structured_8java.html',1,'']]],
-  ['subject_2ejava_1113',['Subject.java',['../_subject_8java.html',1,'']]],
-  ['subjectconfiguration_2ejava_1114',['SubjectConfiguration.java',['../_subject_configuration_8java.html',1,'']]],
-  ['subjectconfigurationinterface_2ejava_1115',['SubjectConfigurationInterface.java',['../_subject_configuration_interface_8java.html',1,'']]],
-  ['subjectconfigurationupdate_2ejava_1116',['SubjectConfigurationUpdate.java',['../_subject_configuration_update_8java.html',1,'']]],
-  ['subjectcontroller_2ejava_1117',['SubjectController.java',['../_subject_controller_8java.html',1,'']]],
-  ['subjectcontrollerimpl_2ejava_1118',['SubjectControllerImpl.java',['../_subject_controller_impl_8java.html',1,'']]]
+  ['readme_2emd_1244',['README.md',['../_r_e_a_d_m_e_8md.html',1,'']]],
+  ['remoteconfiguration_2ejava_1245',['RemoteConfiguration.java',['../_remote_configuration_8java.html',1,'']]],
+  ['request_2ejava_1246',['Request.java',['../_request_8java.html',1,'']]],
+  ['requestcallback_2ejava_1247',['RequestCallback.java',['../_request_callback_8java.html',1,'']]],
+  ['requestresult_2ejava_1248',['RequestResult.java',['../_request_result_8java.html',1,'']]]
 ];

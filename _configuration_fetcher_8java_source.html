@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -161,9 +161,13 @@ $(function() {
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    }</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">private</span> <span class="keywordtype">void</span> exceptionHandler(@Nullable Throwable t) {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        Logger.e(TAG, t.getMessage(), t);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        String message = t.getMessage();</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordflow">if</span> (message == <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            message = <span class="stringliteral">&quot;no message provided&quot;</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        Logger.e(TAG, message, t);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration.html">com.snowplowanalytics.snowplow.configuration.RemoteConfiguration</a></div><div class="ttdef"><b>Definition:</b> <a href="_remote_configuration_8java_source.html#l00015">RemoteConfiguration.java:15</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor.html">com.snowplowanalytics.snowplow.internal.emitter.Executor</a></div><div class="ttdef"><b>Definition:</b> <a href="_executor_8java_source.html#l00032">Executor.java:32</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor_html_a92083249fae2d9225a0df5dcd1880ea8"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_executor.html#a92083249fae2d9225a0df5dcd1880ea8">com.snowplowanalytics.snowplow.internal.emitter.Executor.execute</a></div><div class="ttdeci">static void execute(@Nullable String tag, @Nullable Runnable runnable)</div><div class="ttdef"><b>Definition:</b> <a href="_executor_8java_source.html#l00058">Executor.java:58</a></div></div>

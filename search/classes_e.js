@@ -1,27 +1,7 @@
 var searchData=
 [
-  ['schemarule_969',['SchemaRule',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_schema_rule.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['schemaruleset_970',['SchemaRuleSet',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1globalcontexts_1_1_schema_rule_set.html',1,'com::snowplowanalytics::snowplow::globalcontexts']]],
-  ['screenstate_971',['ScreenState',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_screen_state.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['screenview_972',['ScreenView',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_screen_view.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['selfdescribing_973',['SelfDescribing',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_self_describing.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['selfdescribingjson_974',['SelfDescribingJson',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1payload_1_1_self_describing_json.html',1,'com::snowplowanalytics::snowplow::payload']]],
-  ['serviceprovider_975',['ServiceProvider',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['serviceproviderinterface_976',['ServiceProviderInterface',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider_interface.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['session_977',['Session',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session.html',1,'com::snowplowanalytics::snowplow::internal::session']]],
-  ['sessionconfiguration_978',['SessionConfiguration',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_session_configuration.html',1,'com::snowplowanalytics::snowplow::configuration']]],
-  ['sessionconfigurationinterface_979',['SessionConfigurationInterface',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_interface.html',1,'com::snowplowanalytics::snowplow::internal::session']]],
-  ['sessionconfigurationupdate_980',['SessionConfigurationUpdate',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_configuration_update.html',1,'com::snowplowanalytics::snowplow::internal::session']]],
-  ['sessioncontroller_981',['SessionController',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_session_controller.html',1,'com::snowplowanalytics::snowplow::controller']]],
-  ['sessioncontrollerimpl_982',['SessionControllerImpl',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1session_1_1_session_controller_impl.html',1,'com::snowplowanalytics::snowplow::internal::session']]],
-  ['size_983',['Size',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1util_1_1_size.html',1,'com::snowplowanalytics::snowplow::util']]],
-  ['snowplow_984',['Snowplow',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html',1,'com::snowplowanalytics::snowplow']]],
-  ['sqliteeventstore_985',['SQLiteEventStore',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage_1_1_s_q_lite_event_store.html',1,'com::snowplowanalytics::snowplow::internal::emitter::storage']]],
-  ['structured_986',['Structured',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['subject_987',['Subject',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['subjectconfiguration_988',['SubjectConfiguration',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html',1,'com::snowplowanalytics::snowplow::configuration']]],
-  ['subjectconfigurationinterface_989',['SubjectConfigurationInterface',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_interface.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['subjectconfigurationupdate_990',['SubjectConfigurationUpdate',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]],
-  ['subjectcontroller_991',['SubjectController',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_subject_controller.html',1,'com::snowplowanalytics::snowplow::controller']]],
-  ['subjectcontrollerimpl_992',['SubjectControllerImpl',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html',1,'com::snowplowanalytics::snowplow::internal::tracker']]]
+  ['remoteconfiguration_1097',['RemoteConfiguration',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration.html',1,'com::snowplowanalytics::snowplow::configuration']]],
+  ['request_1098',['Request',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request.html',1,'com::snowplowanalytics::snowplow::network']]],
+  ['requestcallback_1099',['RequestCallback',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request_callback.html',1,'com::snowplowanalytics::snowplow::network']]],
+  ['requestresult_1100',['RequestResult',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_request_result.html',1,'com::snowplowanalytics::snowplow::network']]]
 ];

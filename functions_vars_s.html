@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -66,7 +66,11 @@ $(function() {
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>SCHEMA
-: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a9f4282e09489b30e38d0b56870d6ddf9">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_background.html#a2350876beea7620d734c8869bb4f668c">com.snowplowanalytics.snowplow.event.Background</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_deep_link_received.html#a003010c4841515fafeda77ed44bd1fc3">com.snowplowanalytics.snowplow.event.DeepLinkReceived</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_foreground.html#a1f9cc73a8c226efb17292aa4471e20a1">com.snowplowanalytics.snowplow.event.Foreground</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#ac8ce81cd3c7075d175ed29a56bbc847e">com.snowplowanalytics.snowplow.event.MessageNotification</a>
+, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a9f4282e09489b30e38d0b56870d6ddf9">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
 <li>schema
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html#ae31fe39d3bed6a1aabdfa4061dbf3152">com.snowplowanalytics.snowplow.internal.remoteconfiguration.FetchedConfigurationBundle</a>
@@ -89,11 +93,17 @@ $(function() {
 <li>SCHEMA_CONTEXTS
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a069eafe8d8e69aba84d3e4bad980c55e">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
 </li>
+<li>SCHEMA_DEEPLINK
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1entity_1_1_deep_link.html#ae37fb9b96462564a67b42d728ccb4fb3">com.snowplowanalytics.snowplow.entity.DeepLink</a>
+</li>
 <li>SCHEMA_DIAGNOSTIC_ERROR
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#af34481e96583e99c818d5b324be43cb4">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
 </li>
 <li>SCHEMA_GDPR
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a83a3f15633699df0ab617c65ff15b1df">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
+</li>
+<li>SCHEMA_LIFECYCLEENTITY
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1entity_1_1_lifecycle_entity.html#a83fb372b59e05fc6f176818400d8bec1">com.snowplowanalytics.snowplow.entity.LifecycleEntity</a>
 </li>
 <li>SCHEMA_PAYLOAD_DATA
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a6987209790f2f282183b581b9d8df765">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
@@ -218,6 +228,9 @@ $(function() {
 <li>SNOWPLOW_SESSION_VARS
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_tracker_constants.html#a80012590204885a495ecbe33b0a24604">com.snowplowanalytics.snowplow.internal.constants.TrackerConstants</a>
 </li>
+<li>sound
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#aedb5a3280467471f6556862c8c4e736b">com.snowplowanalytics.snowplow.event.MessageNotification</a>
+</li>
 <li>sourceConfig
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#aceb19560c5a2342989b8786a05283401">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>
 , <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_network_configuration_update.html#ab76ea59abc5f5cab798a4cc0e8ab0753">com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate</a>
@@ -234,6 +247,9 @@ $(function() {
 </li>
 <li>subjectConfiguration
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html#ac12ea9ea3a9d37c4ad406042fa5a12b1">com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationBundle</a>
+</li>
+<li>subtitle
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a15d5fc35a7bada4ec0595ff6a519e5b9">com.snowplowanalytics.snowplow.event.MessageNotification</a>
 </li>
 <li>SV_ID
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a8d7b5207331bb37121bc35df78567c15">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
@@ -255,6 +271,9 @@ $(function() {
 </li>
 <li>SV_TYPE
 : <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#ab7c73f8ba9e8efa78a61915541454377">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
+</li>
+<li>SYSTEM_AVAILABLE_MEMORY
+: <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a7ffd60fcf14964689b6915f341a2c9b0">com.snowplowanalytics.snowplow.internal.constants.Parameters</a>
 </li>
 </ul>
 </div><!-- contents -->

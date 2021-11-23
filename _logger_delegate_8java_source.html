@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -70,20 +70,35 @@ $(function() {
 <div class="title">LoggerDelegate.java</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="_logger_delegate_8java.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="keyword">package </span>com.snowplowanalytics.snowplow.tracker;</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">    3</a></span>&#160;<span class="keyword">public</span> <span class="keyword">interface </span><a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">LoggerDelegate</a> {</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a0f06333bc9694cfa4da4ce8d4629e442">   11</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a0f06333bc9694cfa4da4ce8d4629e442">error</a>(String tag, String msg);</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#af9b236b26c87ac2d682c4e950cac992d">   19</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#af9b236b26c87ac2d682c4e950cac992d">debug</a>(String tag, String msg);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#ab720e964982261e29e27281c77832412">   27</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#ab720e964982261e29e27281c77832412">verbose</a>(String tag, String msg);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
-<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">com.snowplowanalytics.snowplow.tracker.LoggerDelegate</a></div><div class="ttdef"><b>Definition:</b> <a href="_logger_delegate_8java_source.html#l00003">LoggerDelegate.java:3</a></div></div>
-<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_a0f06333bc9694cfa4da4ce8d4629e442"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a0f06333bc9694cfa4da4ce8d4629e442">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.error</a></div><div class="ttdeci">void error(String tag, String msg)</div></div>
-<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_ab720e964982261e29e27281c77832412"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#ab720e964982261e29e27281c77832412">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.verbose</a></div><div class="ttdeci">void verbose(String tag, String msg)</div></div>
-<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_af9b236b26c87ac2d682c4e950cac992d"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#af9b236b26c87ac2d682c4e950cac992d">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.debug</a></div><div class="ttdeci">void debug(String tag, String msg)</div></div>
+<a href="_logger_delegate_8java.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This program is licensed to you under the Apache License Version 2.0,</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * and you may not use this file except in compliance with the Apache License Version 2.0.</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> * Unless required by applicable law or agreed to in writing,</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * software distributed under the Apache License Version 2.0 is distributed on an</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">package </span>com.snowplowanalytics.snowplow.tracker;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">import</span> androidx.annotation.NonNull;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">   18</a></span>&#160;<span class="keyword">public</span> <span class="keyword">interface </span><a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">LoggerDelegate</a> {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#aa690ae5ba67feef203db5c2cd1feb7bd">   25</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#aa690ae5ba67feef203db5c2cd1feb7bd">error</a>(@NonNull String tag, @NonNull String msg);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a21bccf37e4b51cb3016c19731c7c4b61">   32</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a21bccf37e4b51cb3016c19731c7c4b61">debug</a>(@NonNull String tag, @NonNull String msg);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a4ac0f9002be938b5ff5d2c3852c902c2">   39</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a4ac0f9002be938b5ff5d2c3852c902c2">verbose</a>(@NonNull String tag, @NonNull String msg);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
+<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html">com.snowplowanalytics.snowplow.tracker.LoggerDelegate</a></div><div class="ttdef"><b>Definition:</b> <a href="_logger_delegate_8java_source.html#l00018">LoggerDelegate.java:18</a></div></div>
+<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_a21bccf37e4b51cb3016c19731c7c4b61"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a21bccf37e4b51cb3016c19731c7c4b61">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.debug</a></div><div class="ttdeci">void debug(@NonNull String tag, @NonNull String msg)</div></div>
+<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_a4ac0f9002be938b5ff5d2c3852c902c2"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#a4ac0f9002be938b5ff5d2c3852c902c2">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.verbose</a></div><div class="ttdeci">void verbose(@NonNull String tag, @NonNull String msg)</div></div>
+<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate_html_aa690ae5ba67feef203db5c2cd1feb7bd"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_logger_delegate.html#aa690ae5ba67feef203db5c2cd1feb7bd">com.snowplowanalytics.snowplow.tracker.LoggerDelegate.error</a></div><div class="ttdeci">void error(@NonNull String tag, @NonNull String msg)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

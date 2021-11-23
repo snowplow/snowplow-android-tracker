@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -69,7 +69,6 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">com.snowplowanalytics.snowplow.internal.tracker.Tracker Class Reference</div>  </div>
@@ -83,6 +82,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ac5d3e74b8918f439139cfc053c667361"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ac5d3e74b8918f439139cfc053c667361">Tracker</a> (@NonNull TrackerBuilder builder)</td></tr>
+<tr class="separator:ac5d3e74b8918f439139cfc053c667361"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54fcebf984927b4386890cd112d4fa16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a54fcebf984927b4386890cd112d4fa16">close</a> ()</td></tr>
+<tr class="separator:a54fcebf984927b4386890cd112d4fa16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67cc203bfdbd03ed8bfaf39aa861f618"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a67cc203bfdbd03ed8bfaf39aa861f618">track</a> (final @NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_event.html">Event</a> event)</td></tr>
 <tr class="separator:a67cc203bfdbd03ed8bfaf39aa861f618"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae79c53eb18ed4a98d96849223ceadcf8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ae79c53eb18ed4a98d96849223ceadcf8">resumeEventTracking</a> ()</td></tr>
@@ -107,10 +110,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0d83837f0fbdf9744414bf94b548cb8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c2200939dd5ee4ae508743c7dca0bb3"><td class="memItemLeft" align="right" valign="top">synchronized void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a3c2200939dd5ee4ae508743c7dca0bb3">setSessionContext</a> (boolean sessionContext)</td></tr>
 <tr class="separator:a3c2200939dd5ee4ae508743c7dca0bb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac19cc7926b79a3b3413f72d5ecfc135f"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ac19cc7926b79a3b3413f72d5ecfc135f">getSessionContext</a> ()</td></tr>
-<tr class="separator:ac19cc7926b79a3b3413f72d5ecfc135f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0963cda4fc849848456c7b5b0fa82157"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a0963cda4fc849848456c7b5b0fa82157">setPlatform</a> (@NonNull <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_device_platform.html">DevicePlatform</a> platform)</td></tr>
 <tr class="separator:a0963cda4fc849848456c7b5b0fa82157"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dc546908e1c7954961d41de08b1e268"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a1dc546908e1c7954961d41de08b1e268">setScreenContext</a> (boolean screenContext)</td></tr>
+<tr class="separator:a1dc546908e1c7954961d41de08b1e268"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d379a9586fbc7e59c521eacf2dd75bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a2d379a9586fbc7e59c521eacf2dd75bf">setDeepLinkContext</a> (boolean deepLinkContext)</td></tr>
+<tr class="separator:a2d379a9586fbc7e59c521eacf2dd75bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae91313523bb391fe4c85d3a76e28663"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#aae91313523bb391fe4c85d3a76e28663">getScreenContext</a> ()</td></tr>
+<tr class="separator:aae91313523bb391fe4c85d3a76e28663"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab221c02071dc3bd4078a45c24018d0f9"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ab221c02071dc3bd4078a45c24018d0f9">getDeepLinkContext</a> ()</td></tr>
+<tr class="separator:ab221c02071dc3bd4078a45c24018d0f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19cc7926b79a3b3413f72d5ecfc135f"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#ac19cc7926b79a3b3413f72d5ecfc135f">getSessionContext</a> ()</td></tr>
+<tr class="separator:ac19cc7926b79a3b3413f72d5ecfc135f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cad34cf02a63a326cccf15491464b5c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a7cad34cf02a63a326cccf15491464b5c">getTrackerVersion</a> ()</td></tr>
 <tr class="separator:a7cad34cf02a63a326cccf15491464b5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67d60de514dcc8858cdc62f4b78f37b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">Subject</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a67d60de514dcc8858cdc62f4b78f37b5">getSubject</a> ()</td></tr>
@@ -153,23 +164,39 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a63e81161be69c63b594d0da1c2dd6bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68e77a18b9bd070212044f62e1b63ae0"><td class="memItemLeft" align="right" valign="top">Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a68e77a18b9bd070212044f62e1b63ae0">getGlobalContextTags</a> ()</td></tr>
 <tr class="separator:a68e77a18b9bd070212044f62e1b63ae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a3b516980a801df9d7885061afe602f35"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a3b516980a801df9d7885061afe602f35">init</a> (@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> newTracker)</td></tr>
-<tr class="separator:a3b516980a801df9d7885061afe602f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a214cffccf8fa4bdb773a36254cfb7a8e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a214cffccf8fa4bdb773a36254cfb7a8e">reset</a> (@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> newTracker)</td></tr>
-<tr class="separator:a214cffccf8fa4bdb773a36254cfb7a8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add8b0070033f6017e13a149b70585a66"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#add8b0070033f6017e13a149b70585a66">instance</a> ()</td></tr>
-<tr class="separator:add8b0070033f6017e13a149b70585a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a282ca70acafd3f0cb613eafef94bb5f7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html#a282ca70acafd3f0cb613eafef94bb5f7">close</a> ()</td></tr>
-<tr class="separator:a282ca70acafd3f0cb613eafef94bb5f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Builds a <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> object which is used to send events to a <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> Collector. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000047">Deprecated:</a></b></dt><dd>It will be removed in the next major version, please use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html#a481d3b5346b91b0af22de6db75356972">Snowplow.createTracker</a> methods. </dd></dl>
+<div class="textblock"><p>Builds a <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> object which is used to send events to a <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> Collector. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00063">63</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00060">60</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ac5d3e74b8918f439139cfc053c667361"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5d3e74b8918f439139cfc053c667361">&#9670;&nbsp;</a></span>Tracker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.snowplowanalytics.snowplow.internal.tracker.Tracker.Tracker </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull TrackerBuilder&#160;</td>
+          <td class="paramname"><em>builder</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Creates a new <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">builder</td><td>The builder that constructs a tracker </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00468">468</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad662a7779a4c7cfe7bb7934925f1d49d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad662a7779a4c7cfe7bb7934925f1d49d">&#9670;&nbsp;</a></span>addGlobalContext()</h2>
 
@@ -196,34 +223,26 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01109">1109</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01116">1116</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
-<a id="a282ca70acafd3f0cb613eafef94bb5f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a282ca70acafd3f0cb613eafef94bb5f7">&#9670;&nbsp;</a></span>close()</h2>
+<a id="a54fcebf984927b4386890cd112d4fa16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54fcebf984927b4386890cd112d4fa16">&#9670;&nbsp;</a></span>close()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void com.snowplowanalytics.snowplow.internal.tracker.Tracker.close </td>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.Tracker.close </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00109">109</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00588">588</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -241,9 +260,9 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Disable GDPR context. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000050">Deprecated:</a></b></dt><dd>Use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprConfiguration</a> or <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprController</a> </dd></dl>
+<p>Disable GDPR context. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00910">910</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00883">883</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -293,9 +312,8 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000049">Deprecated:</a></b></dt><dd>Use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprConfiguration</a> or <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprController</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00901">901</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00876">876</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -315,7 +333,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>whether application lifecycle tracking is on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01087">1087</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01085">1085</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -335,7 +353,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers set Application ID </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01011">1011</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01009">1009</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -355,7 +373,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the application context setting of the tracker </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01030">1030</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01028">1028</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -375,7 +393,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>whether application crash tracking is on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01073">1073</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01071">1071</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -395,7 +413,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the base64 setting of the tracker </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01018">1018</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01016">1016</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -415,7 +433,27 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the state of data collection </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01061">1061</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01059">1059</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+
+</div>
+</div>
+<a id="ab221c02071dc3bd4078a45c24018d0f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab221c02071dc3bd4078a45c24018d0f9">&#9670;&nbsp;</a></span>getDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.tracker.Tracker.getDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Internal use only </p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00965">965</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -435,7 +473,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the emitter associated with the tracker </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00995">995</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00993">993</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -453,9 +491,8 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000051">Deprecated:</a></b></dt><dd>Use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprConfiguration</a> or <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_gdpr_configuration.html">GdprController</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00919">919</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00888">888</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -474,7 +511,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01130">1130</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01137">1137</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -494,7 +531,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the install tracking setting of the tracker </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01025">1025</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01023">1023</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -514,7 +551,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>whether application lifecycle tracking is on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01080">1080</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01078">1078</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -534,7 +571,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers logging level </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01046">1046</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01044">1044</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -554,7 +591,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers namespace </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01003">1003</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01001">1001</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -574,7 +611,27 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers device platform </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01038">1038</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01036">1036</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+
+</div>
+</div>
+<a id="aae91313523bb391fe4c85d3a76e28663"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae91313523bb391fe4c85d3a76e28663">&#9670;&nbsp;</a></span>getScreenContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.tracker.Tracker.getScreenContext </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Internal use only </p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00960">960</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -592,9 +649,9 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>screen state from tracker </dd></dl>
+<p>Internal use only </p><dl class="section return"><dt>Returns</dt><dd>screen state from tracker </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01095">1095</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01094">1094</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -614,7 +671,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers session object </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01054">1054</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01052">1052</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -633,7 +690,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00962">962</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00969">969</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -653,7 +710,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the trackers subject object </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00987">987</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00985">985</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -673,7 +730,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the amount of threads to use </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01068">1068</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01066">1066</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -693,62 +750,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the tracker version that was set </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00979">979</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
-
-</div>
-</div>
-<a id="a3b516980a801df9d7885061afe602f35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b516980a801df9d7885061afe602f35">&#9670;&nbsp;</a></span>init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> com.snowplowanalytics.snowplow.internal.tracker.Tracker.init </td>
-          <td>(</td>
-          <td class="paramtype">@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>&#160;</td>
-          <td class="paramname"><em>newTracker</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00073">73</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
-
-</div>
-</div>
-<a id="add8b0070033f6017e13a149b70585a66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add8b0070033f6017e13a149b70585a66">&#9670;&nbsp;</a></span>instance()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> com.snowplowanalytics.snowplow.internal.tracker.Tracker.instance </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00096">96</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00977">977</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -768,7 +770,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Stops event collection and ends all concurrent processes. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00854">854</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00831">831</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -788,7 +790,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Ends session checking. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00875">875</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00852">852</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -808,35 +810,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01122">1122</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
-
-</div>
-</div>
-<a id="a214cffccf8fa4bdb773a36254cfb7a8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a214cffccf8fa4bdb773a36254cfb7a8e">&#9670;&nbsp;</a></span>reset()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a> com.snowplowanalytics.snowplow.internal.tracker.Tracker.reset </td>
-          <td>(</td>
-          <td class="paramtype">@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>&#160;</td>
-          <td class="paramname"><em>newTracker</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00082">82</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01129">1129</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -856,7 +830,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Starts event collection processes again. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00843">843</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00820">820</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -876,7 +850,28 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Starts session checking. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00864">864</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00841">841</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+
+</div>
+</div>
+<a id="a2d379a9586fbc7e59c521eacf2dd75bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d379a9586fbc7e59c521eacf2dd75bf">&#9670;&nbsp;</a></span>setDeepLinkContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.Tracker.setDeepLinkContext </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>deepLinkContext</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Internal use only </p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00948">948</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -902,7 +897,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00936">936</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00904">904</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -922,7 +917,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01101">1101</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l01108">1108</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -948,7 +943,28 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00969">969</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00933">933</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+
+</div>
+</div>
+<a id="a1dc546908e1c7954961d41de08b1e268"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dc546908e1c7954961d41de08b1e268">&#9670;&nbsp;</a></span>setScreenContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.Tracker.setScreenContext </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>screenContext</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Internal use only </p>
+
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00938">938</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -974,7 +990,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00948">948</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00916">916</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -999,9 +1015,8 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000052">Deprecated:</a></b></dt><dd>Use <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html">com.snowplowanalytics.snowplow.configuration.SubjectConfiguration</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00929">929</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00897">897</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -1021,7 +1036,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Convenience function for starting a new session. </p>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00886">886</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00863">863</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
@@ -1048,7 +1063,7 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00638">638</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_tracker_8java_source.html#l00602">602</a> of file <a class="el" href="_tracker_8java_source.html">Tracker.java</a>.</p>
 
 </div>
 </div>
