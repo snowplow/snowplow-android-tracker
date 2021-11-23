@@ -89,6 +89,10 @@ public class ConfigurationFetcher {
     }
 
     private void exceptionHandler(@Nullable Throwable t) {
-        Logger.e(TAG, t.getMessage(), t);
+        String message = t.getMessage();
+        if (message == null) {
+            message = "no message provided";
+        }
+        Logger.e(TAG, message, t);
     }
 }

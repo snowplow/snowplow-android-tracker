@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,7 +21,6 @@ import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
-import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,128 +28,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/** A consent granted event. */
 public class ConsentGranted extends AbstractSelfDescribing {
 
+    /** Expiration of the consent. */
     @NonNull
     public final String expiry;
+    /** Identifier of the first document. */
     @NonNull
     public final String documentId;
+    /** Version of the first document. */
     @NonNull
     public final String documentVersion;
+    /** Name of the first document. */
     @Nullable
     public String documentName;
+    /** Description of the first document. */
     @Nullable
     public String documentDescription;
+    /** Other attached documents. */
     @NonNull
     public final List<ConsentDocument> consentDocuments = new LinkedList<>();
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private String expiry;
-        private String documentId;
-        private String documentVersion;
-        private String documentName;
-        private String documentDescription;
-        private List<ConsentDocument> consentDocuments = new LinkedList<>();
-
-        /**
-         * @param expiry Whether to withdraw consent for all consent documents
-         * @return itself
-         */
-        @NonNull
-        public T expiry(@NonNull String expiry) {
-            this.expiry = expiry;
-            return self();
-        }
-
-        /**
-         * @param id ID of the consent document
-         * @return itself
-         */
-        @NonNull
-        public T documentId(@NonNull String id) {
-            this.documentId = id;
-            return self();
-        }
-
-        /**
-         * @param version Version of the consent document
-         * @return itself
-         */
-        @NonNull
-        public T documentVersion(@NonNull String version) {
-            this.documentVersion = version;
-            return self();
-        }
-
-        /**
-         * @param name Name of the consent document
-         * @return itself
-         */
-        @NonNull
-        public T documentName(@NonNull String name) {
-            this.documentName = name;
-            return self();
-        }
-
-        /**
-         * @param description Description of the consent document
-         * @return itself
-         */
-        @NonNull
-        public T documentDescription(@NonNull String description) {
-            this.documentDescription = description;
-            return self();
-        }
-
-        /**
-         * @param documents Consent documents attached to consent granted event
-         * @return itself
-         */
-        @NonNull
-        public T consentDocuments(@NonNull List<ConsentDocument> documents) {
-            this.consentDocuments.addAll(documents);
-            return self();
-        }
-
-        @NonNull
-        public ConsentGranted build() {
-            return new ConsentGranted(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    protected ConsentGranted(@NonNull Builder<?> builder) {
-        super(builder);
-
-        // Precondition checks
-        Preconditions.checkNotNull(builder.expiry);
-        Preconditions.checkArgument(!builder.expiry.isEmpty(), "Expiry cannot be empty");
-
-        Preconditions.checkNotNull(builder.documentId);
-        Preconditions.checkArgument(!builder.documentId.isEmpty(), "Document ID cannot be empty");
-
-        Preconditions.checkNotNull(builder.documentVersion);
-        Preconditions.checkArgument(!builder.documentVersion.isEmpty(), "Document version cannot be empty");
-
-        this.expiry = builder.expiry;
-        this.documentId = builder.documentId;
-        this.documentVersion = builder.documentVersion;
-        this.consentDocuments.addAll(builder.consentDocuments);
-    }
-
+    /**
+     Creates a consent granted event with a first document.
+     @param expiry Consent expiration.
+     @param documentId Identifier of the first document.
+     @param documentVersion Version of the first document.
+     */
     public ConsentGranted(@NonNull String expiry, @NonNull String documentId, @NonNull String documentVersion) {
         Preconditions.checkNotNull(expiry);
         Preconditions.checkArgument(!expiry.isEmpty(), "Expiry cannot be empty");
@@ -165,18 +70,21 @@ public class ConsentGranted extends AbstractSelfDescribing {
 
     // Builder methods
 
+    /** Name of the first document. */
     @NonNull
     public ConsentGranted documentName(@Nullable String documentName) {
         this.documentName = documentName;
         return this;
     }
 
+    /** Description of the first document. */
     @NonNull
     public ConsentGranted documentDescription(@Nullable String documentDescription) {
         this.documentDescription = documentDescription;
         return this;
     }
 
+    /** Other attached documents. */
     @NonNull
     public ConsentGranted documents(@NonNull List<ConsentDocument> documents) {
         consentDocuments.clear();
@@ -186,11 +94,7 @@ public class ConsentGranted extends AbstractSelfDescribing {
 
     // Public methods
 
-    /**
-     * Returns a list of consent documents associated with the event.
-     *
-     * @return the consent documents
-     */
+    /** Returns a list of consent documents associated with the event. */
     public @NonNull List<ConsentDocument> getDocuments() {
         List<ConsentDocument> docs = new ArrayList<>();
         ConsentDocument doc = new ConsentDocument(documentId, documentVersion)
@@ -201,10 +105,12 @@ public class ConsentGranted extends AbstractSelfDescribing {
         return docs;
     }
 
+    // Tracker methods
+
     @Override
     public @NonNull Map<String, Object> getDataPayload() {
         HashMap<String,Object> payload = new HashMap<>();
-        if (expiry != null) payload.put(Parameters.CG_EXPIRY, expiry);
+        payload.put(Parameters.CG_EXPIRY, expiry);
         return payload;
     }
 

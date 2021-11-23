@@ -59,6 +59,7 @@ public class NetworkConfigurationUpdate implements NetworkConfigurationInterface
 
     public boolean customPostPathUpdated;
 
+    @Nullable
     public String getCustomPostPath() {
         return (sourceConfig == null || customPostPathUpdated) ? this.customPostPath : sourceConfig.customPostPath;
     }

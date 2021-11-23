@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -14,7 +14,6 @@
 package com.snowplowanalytics.snowplowtrackerdemo;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,11 +21,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
 
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Button;
@@ -35,10 +30,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.util.Consumer;
 
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
@@ -213,6 +213,7 @@ public class Demo extends Activity implements LoggerDelegate {
         String uri = _uriField.getText().toString();
         if (uri.isEmpty()) {
             updateLogger("URI field empty!");
+            return false;
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
         editor.putString("uri", uri).apply();
@@ -298,7 +299,7 @@ public class Demo extends Activity implements LoggerDelegate {
             return;
         }
         TrackerEvents.trackAll(tracker);
-        eventsCreated += 9;
+        eventsCreated += 11;
         final String made = "Made: " + eventsCreated;
         runOnUiThread(() -> _eventsCreated.setText(made));
     }
@@ -450,17 +451,17 @@ public class Demo extends Activity implements LoggerDelegate {
     /// - Implements LoggerDelegate
 
     @Override
-    public void error(@NonNull String tag, @Nullable String msg) {
+    public void error(@NonNull String tag, @NonNull String msg) {
         Log.e("[" + tag + "]", msg);
     }
 
     @Override
-    public void debug(@Nullable String tag, @Nullable String msg) {
+    public void debug(@NonNull String tag, @NonNull String msg) {
         Log.d("[" + tag + "]", msg);
     }
 
     @Override
-    public void verbose(@Nullable String tag, @Nullable String msg) {
+    public void verbose(@NonNull String tag, @NonNull String msg) {
         Log.v("[" + tag + "]", msg);
     }
 }

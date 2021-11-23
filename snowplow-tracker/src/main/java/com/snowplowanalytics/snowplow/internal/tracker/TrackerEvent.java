@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -37,17 +37,27 @@ public class TrackerEvent implements InspectableEvent {
     long timestamp;
     Long trueTimestamp;
     List<SelfDescribingJson> contexts;
+    TrackerStateSnapshot state;
 
     boolean isPrimitive;
     boolean isService;
 
     public TrackerEvent(@NonNull Event event) {
+        this(event, null);
+    }
+
+    public TrackerEvent(@NonNull Event event, @Nullable TrackerStateSnapshot state) {
         eventId = UUID.randomUUID();
         timestamp = System.currentTimeMillis();
 
         contexts = new ArrayList<>(event.getContexts());
         trueTimestamp = event.getTrueTimestamp();
         payload = new HashMap<>(event.getDataPayload());
+        if (state != null) {
+            this.state = state;
+        } else {
+            this.state = new TrackerState();
+        }
 
         isService = event instanceof TrackerError;
         if (event instanceof AbstractPrimitive) {
@@ -78,4 +88,25 @@ public class TrackerEvent implements InspectableEvent {
     public Map<String, Object> getPayload() {
         return payload;
     }
+
+    @NonNull
+    @Override
+    public TrackerStateSnapshot getState() {
+        return state;
+    }
+
+    @Override
+    public boolean addPayloadValues(@NonNull Map<String, Object> payloadAdding) {
+        boolean result = true;
+        for (Map.Entry<String, Object> entry : payloadAdding.entrySet()) {
+            String key = entry.getKey();
+            if (payload.get(key) == null) {
+                payload.put(key, entry.getValue());
+            } else {
+                result = false;
+            }
+        }
+        return result;
+    }
+
 }

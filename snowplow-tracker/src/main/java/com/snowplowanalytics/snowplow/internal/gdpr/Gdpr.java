@@ -21,7 +21,6 @@ public class Gdpr {
     public final String documentDescription;
 
     public Gdpr(@NonNull Basis basisForProcessing, @Nullable String documentId, @Nullable String documentVersion, @Nullable String documentDescription) {
-        Preconditions.checkArgument(basisForProcessing != null, "GDPR basisForProcessiong can't be null.");
         this.basisForProcessing = basisForProcessing;
         this.documentId = documentId;
         this.documentVersion = documentVersion;

@@ -29,17 +29,17 @@ public class GdprConfigurationUpdate extends GdprConfiguration {
         return (sourceConfig == null || gdprUpdated) ? super.basisForProcessing : sourceConfig.basisForProcessing;
     }
 
-    @Nullable
+    @NonNull
     public String getDocumentId() {
         return (sourceConfig == null || gdprUpdated) ? super.documentId : sourceConfig.documentId;
     }
 
-    @Nullable
+    @NonNull
     public String getDocumentVersion() {
         return (sourceConfig == null || gdprUpdated) ? super.documentVersion : sourceConfig.documentVersion;
     }
 
-    @Nullable
+    @NonNull
     public String getDocumentDescription() {
         return (sourceConfig == null || gdprUpdated) ? super.documentDescription : sourceConfig.documentDescription;
     }

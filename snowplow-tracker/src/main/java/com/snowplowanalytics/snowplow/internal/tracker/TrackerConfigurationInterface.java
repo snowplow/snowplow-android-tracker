@@ -110,6 +110,16 @@ public interface TrackerConfigurationInterface {
     void setSessionContext(boolean sessionContext);
 
     /**
+     * Whether deepLink context is sent with all the ScreenView events.
+     */
+    boolean isDeepLinkContext();
+
+    /**
+     * Whether deepLink context is sent with all the ScreenView events.
+     */
+    void setDeepLinkContext(boolean deepLinkContext);
+
+    /**
      * Whether screen context is sent with all the tracked events.
      */
     boolean isScreenContext();

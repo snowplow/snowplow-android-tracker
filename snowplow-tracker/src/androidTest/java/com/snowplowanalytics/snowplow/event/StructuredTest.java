@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,10 +22,7 @@ import java.util.Map;
 public class StructuredTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        Structured structured = Structured.builder()
-                .category("some category")
-                .action("some action")
-                .build();
+        Structured structured = new Structured("some category", "some action");
 
         assertEquals("se", structured.getName());
         Map data = structured.getDataPayload();
@@ -36,14 +33,11 @@ public class StructuredTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.SE_PROPERTY));
         assertFalse(data.containsKey(Parameters.SE_VALUE));
 
-        structured = Structured.builder()
-                .category("some category")
-                .action("some action")
+        structured = new Structured("some category", "some action")
                 .label("some label")
                 .property("some property")
-                .value(123.56700)
-                .trueTimestamp(123456789)
-                .build();
+                .value(123.56700);
+        structured.trueTimestamp(123456789L);
 
         data = structured.getDataPayload();
 
@@ -58,7 +52,7 @@ public class StructuredTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            Structured.builder().build();
+            new Structured(null, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -67,7 +61,7 @@ public class StructuredTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Structured.builder().category("category").build();
+            new Structured("category", null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -76,7 +70,7 @@ public class StructuredTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Structured.builder().category("").action("hello").build();
+            new Structured("", "hello");
         } catch (Exception e) {
             assertEquals("category cannot be empty", e.getMessage());
             exception = true;
@@ -85,7 +79,7 @@ public class StructuredTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Structured.builder().category("category").action("").build();
+            new Structured("category", "");
         } catch (Exception e) {
             assertEquals("action cannot be empty", e.getMessage());
             exception = true;

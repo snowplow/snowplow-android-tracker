@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -117,6 +117,12 @@ public class Parameters {
     public static final String OS_TYPE = "osType";
     public static final String NETWORK_TYPE = "networkType";
     public static final String NETWORK_TECHNOLOGY = "networkTechnology";
+    public static final String PHYSICAL_MEMORY = "physicalMemory";
+    public static final String SYSTEM_AVAILABLE_MEMORY = "systemAvailableMemory";
+    public static final String BATTERY_LEVEL = "batteryLevel";
+    public static final String BATTERY_STATE = "batteryState";
+    public static final String AVAILABLE_STORAGE = "availableStorage";
+    public static final String TOTAL_STORAGE = "totalStorage";
 
     // Geolocation context
     public static final String LATITUDE = "latitude";

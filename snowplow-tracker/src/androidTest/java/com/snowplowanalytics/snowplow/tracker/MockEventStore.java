@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MockEventStore implements EventStore {
-    private HashMap<Long, Payload> db = new HashMap<>();
-    private long lastInsertedRow = -1;
+    public HashMap<Long, Payload> db = new HashMap<>();
+    public long lastInsertedRow = -1;
 
     @Override
     public void add(@NonNull Payload payload) {

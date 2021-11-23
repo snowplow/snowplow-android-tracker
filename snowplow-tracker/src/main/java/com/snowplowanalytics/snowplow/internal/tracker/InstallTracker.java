@@ -20,18 +20,28 @@ import java.util.Map;
 import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.INSTALLED_BEFORE;
 import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.INSTALL_TIMESTAMP;
 
+/**
+ * Class used to keep track of install state of app.
+ * If a file does not exist, the tracker will send an `application_install` event.
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class InstallTracker {
-    /**
-     * Class used to keep track of install state of app.
-     * If a file does not exist, the tracker will send an `application_install` event.
-     */
     private static String TAG = InstallTracker.class.getSimpleName();
-    private Boolean isNewInstall;
 
+    private Boolean isNewInstall;
     private SharedPreferences sharedPreferences;
 
-    public InstallTracker(@NonNull Context context) {
+    private static InstallTracker sharedInstance;
+
+    @NonNull
+    public synchronized static InstallTracker getInstance(@NonNull Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new InstallTracker(context);
+        }
+        return sharedInstance;
+    }
+
+    private InstallTracker(@NonNull Context context) {
         new SharedPreferencesTask().execute(context);
     }
 

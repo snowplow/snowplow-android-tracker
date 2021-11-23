@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -24,13 +24,9 @@ import java.util.Map;
 public class ConsentGrantedTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        ConsentGranted event = ConsentGranted.builder()
+        ConsentGranted event = new ConsentGranted("expiration", "id", "v1.0")
                 .documentName("name")
-                .documentDescription("description")
-                .documentId("id")
-                .documentVersion("v1.0")
-                .expiry("expiration")
-                .build();
+                .documentDescription("description");
 
         Map<String, Object> data = event.getDataPayload();
 
@@ -38,27 +34,17 @@ public class ConsentGrantedTest extends AndroidTestCase {
         assertEquals("expiration", data.get(Parameters.CG_EXPIRY));
 
         List<ConsentDocument> documents = new LinkedList<>();
-        documents.add(ConsentDocument.builder()
+        documents.add(new ConsentDocument("granted context id 1", "granted context version 1")
                 .documentDescription("granted context desc 1")
-                .documentId("granted context id 1")
-                .documentName("granted context name 1")
-                .documentVersion("granted context version 1")
-                .build());
-        documents.add(ConsentDocument.builder()
+                .documentName("granted context name 1"));
+        documents.add(new ConsentDocument("granted context id 2", "granted context version 2")
                 .documentDescription("granted context desc 2")
-                .documentId("granted context id 2")
-                .documentName("granted context name 2")
-                .documentVersion("granted context version 2")
-                .build());
+                .documentName("granted context name 2"));
 
-        event = ConsentGranted.builder()
+        event = new ConsentGranted("expiration", "id", "v1.0")
                 .documentName("name")
                 .documentDescription("description")
-                .documentId("id")
-                .documentVersion("v1.0")
-                .expiry("expiration")
-                .consentDocuments(documents)
-                .build();
+                .documents(documents);
 
         data = event.getDataPayload();
 
@@ -69,7 +55,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            ConsentGranted.builder().build();
+            new ConsentGranted(null, null, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -78,7 +64,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
 
         exception = false;
         try {
-            ConsentGranted.builder().documentId("").documentVersion("test").expiry("").build();
+            new ConsentGranted("", "", "test");
         } catch (Exception e) {
             assertEquals("Expiry cannot be empty", e.getMessage());
             exception = true;
@@ -87,7 +73,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
 
         exception = false;
         try {
-            ConsentGranted.builder().documentId("").documentVersion("test").expiry("test").build();
+            new ConsentGranted("test", "", "test");
         } catch (Exception e) {
             assertEquals("Document ID cannot be empty", e.getMessage());
             exception = true;
@@ -96,7 +82,7 @@ public class ConsentGrantedTest extends AndroidTestCase {
 
         exception = false;
         try {
-            ConsentGranted.builder().documentId("test").documentVersion("").expiry("test").build();
+            new ConsentGranted("test", "test", "");
         } catch (Exception e) {
             assertEquals("Document version cannot be empty", e.getMessage());
             exception = true;

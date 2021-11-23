@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,55 +16,49 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.event.ScreenView;
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
     private static final String TAG = ActivityLifecycleHandler.class.getSimpleName();
-    private static List<SelfDescribingJson> contexts = new ArrayList<SelfDescribingJson>();
 
-    public ActivityLifecycleHandler(List<SelfDescribingJson> contexts) {
-        contexts = contexts;
+    private static ActivityLifecycleHandler sharedInstance;
+
+    @NonNull
+    public synchronized static ActivityLifecycleHandler getInstance(@NonNull Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new ActivityLifecycleHandler(context);
+        }
+        return sharedInstance;
     }
 
-    public ActivityLifecycleHandler() {}
-
-    public static void setContexts(List<SelfDescribingJson> contexts) {
-        contexts = contexts;
-    }
-
-    public static List<SelfDescribingJson> getLifecycleContexts() {
-        return contexts;
-    }
-
-    @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
+    private ActivityLifecycleHandler(@NonNull Context context) {
+        Application application = (Application) context.getApplicationContext();
+        application.registerActivityLifecycleCallbacks(this);
     }
 
     @Override
-    public void onActivityStarted(Activity activity) {
-
-    }
+    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {}
 
     @Override
-    public void onActivityResumed(Activity activity) {
+    public void onActivityStarted(@NonNull Activity activity) {}
+
+    @Override
+    public void onActivityResumed(@NonNull Activity activity) {
         Logger.d(TAG, "Auto screenview occurred - activity has resumed");
         try {
             ScreenView event = ScreenView.buildWithActivity(activity);
@@ -77,22 +71,14 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {
-
-    }
+    public void onActivityPaused(@NonNull Activity activity) {}
 
     @Override
-    public void onActivityStopped(Activity activity) {
-
-    }
+    public void onActivityStopped(@NonNull Activity activity) {}
 
     @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-    }
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @Nullable Bundle outState) {}
 
     @Override
-    public void onActivityDestroyed(Activity activity) {
-
-    }
+    public void onActivityDestroyed(@NonNull Activity activity) {}
 }

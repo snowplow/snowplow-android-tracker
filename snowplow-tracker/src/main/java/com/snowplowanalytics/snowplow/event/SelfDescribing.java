@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,67 +22,30 @@ import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
 import java.util.Map;
 
 /**
- * Constructs an SelfDescribing event object.
+ * A SelfDescribing event.
  */
 public class SelfDescribing extends AbstractSelfDescribing {
 
-    public static abstract class Builder<T extends Builder<T>> extends AbstractEvent.Builder<T> {
-
-        private SelfDescribingJson eventData;
-
-        /**
-         * @param eventData The properties of the event. Has two field:
-         *                  A "data" field containing the event properties and
-         *                  A "schema" field identifying the schema against which the data is validated
-         * @return itself
-         */
-        @NonNull
-        public T eventData(@NonNull SelfDescribingJson eventData) {
-            this.eventData = eventData;
-            return self();
-        }
-
-        @NonNull
-        public SelfDescribing build() {
-            return new SelfDescribing(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-        @NonNull
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
-    }
-
-    @NonNull
-    public static Builder<?> builder() {
-        return new Builder2();
-    }
-
-    protected SelfDescribing(@NonNull Builder<?> builder) {
-        super(builder);
-        Preconditions.checkNotNull(builder.eventData);
-        Map<String, Object> eventDataMap = builder.eventData.getMap();
-        Preconditions.checkNotNull(eventDataMap);
-        Map<String, Object> payload = (Map<String, Object>)eventDataMap.get(Parameters.DATA);
-        Preconditions.checkNotNull(payload);
-        this.payload = payload;
-        String schema = (String)eventDataMap.get(Parameters.SCHEMA);
-        Preconditions.checkNotNull(schema);
-        this.schema = schema;
-        this.eventData = builder.eventData;
-    }
-
+    /**
+     * The properties of the event. Has two field:
+     * * a "data" field containing the event properties,
+     * * a "schema" field identifying the schema against which the data is validated.
+     */
     @NonNull
     public final SelfDescribingJson eventData;
 
+    /** A "data" field containing the event properties. */
     @NonNull
     private final Map<String, Object> payload;
+    /** A "schema" field identifying the schema against which the data is validated. */
     @NonNull
     private final String schema;
 
+    /**
+     * Creates a SelfDescribing event.
+     * @param eventData The properties of the event. Has two field: a "data" field containing the event
+     *                  properties and a "schema" field identifying the schema against which the data is validated.
+     */
     public SelfDescribing(@NonNull SelfDescribingJson eventData) {
         Preconditions.checkNotNull(eventData);
         Map<String, Object> eventDataMap = eventData.getMap();
@@ -95,6 +58,19 @@ public class SelfDescribing extends AbstractSelfDescribing {
         this.schema = schema;
         this.eventData = eventData;
     }
+
+    /**
+     * Creates a SelfDescribing event.
+     * @param schema The schema against which the payload is validated.
+     * @param payload The event properties.
+     */
+    public SelfDescribing(@NonNull String schema, @NonNull Map<String, Object> payload) {
+        this.schema = schema;
+        this.payload = payload;
+        this.eventData = new SelfDescribingJson(schema, payload);
+    }
+
+    // Tracker methods
 
     @Override
     public @NonNull Map<String, Object> getDataPayload() {

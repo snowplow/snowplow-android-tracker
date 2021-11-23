@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,119 +15,79 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.annotation.TargetApi;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
+import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 
-
-import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ProcessObserver implements LifecycleObserver {
     private static final String TAG = ProcessObserver.class.getSimpleName();
-    private static boolean isInBackground = true;
-    private static final AtomicInteger foregroundIndex = new AtomicInteger(0);
-    private static final AtomicInteger backgroundIndex = new AtomicInteger(0);
-    private static boolean isHandlerPaused = false;
-    private static List<SelfDescribingJson> lifecycleContexts = null;
 
-    public ProcessObserver(@Nullable List<SelfDescribingJson> contexts) {
-        lifecycleContexts = contexts;
+    private enum InitializationState {
+        NONE,
+        IN_PROGRESS,
+        COMPLETE
     }
 
-    public ProcessObserver() {}
+    private static InitializationState initializationState = InitializationState.NONE;
 
-    public static void setLifecycleContexts(@Nullable List<SelfDescribingJson> contexts) {
-        lifecycleContexts = contexts;
+    public synchronized static void initialize(@NonNull Context context) {
+        if (initializationState == InitializationState.NONE) {
+            initializationState = InitializationState.IN_PROGRESS;
+            // addObserver must execute on the mainThread
+            Handler mainHandler = new Handler(context.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ProcessLifecycleOwner.get().getLifecycle().addObserver(new ProcessObserver());
+                        initializationState = InitializationState.COMPLETE;
+                    } catch (NoClassDefFoundError e) {
+                        initializationState = InitializationState.NONE;
+                        Logger.e(TAG,"Class 'ProcessLifecycleOwner' not found. The tracker can't track lifecycle events.");
+                    }
+                }
+            });
+        }
     }
 
-    @Nullable
-    public static List<SelfDescribingJson> getLifecycleContexts() {
-        return lifecycleContexts;
-    }
-
-    public static void pauseHandler() {
-        isHandlerPaused = true;
-    }
-
-    public static void resumeHandler() {
-        isHandlerPaused = false;
-    }
+    private ProcessObserver() {}
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    public static void onEnterForeground() {
-        if (isInBackground && !isHandlerPaused){
-            Logger.d(TAG, "Application is in the foreground");
-            isInBackground = false;
-
-            try {
-                Tracker tracker = Tracker.instance();
-                int index = foregroundIndex.addAndGet(1);
-
-                // Update Session
-                Session session = tracker.getSession();
-                if (session != null) {
-                    session.setIsBackground(false);
-                    session.setForegroundIndex(index);
-                }
-
-                // Send Foreground Event
-                if (tracker.getLifecycleEvents()) {
-                    Map<String, Object> data = new HashMap<>();
-                    Util.addToMap(Parameters.APP_FOREGROUND_INDEX, index, data);
-                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_FOREGOUND_SCHEMA, data))
-                            .contexts(lifecycleContexts)
-                    );
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
-            }
+    public void onEnterForeground() {
+        Logger.d(TAG, "App enter foreground");
+        try {
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("isForeground", Boolean.TRUE);
+            NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+        } catch (Exception e) {
+            Logger.e(TAG, "Method onEnterForeground raised an exception: %s", e);
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public static void onEnterBackground() {
-        if (!isHandlerPaused) {
-            Logger.d(TAG, "Application is in the background");
-            isInBackground = true;
-
-            try {
-                Tracker tracker = Tracker.instance();
-                int index = backgroundIndex.addAndGet(1);
-
-                // Update Session
-                Session session = tracker.getSession();
-                if (session != null) {
-                    session.setIsBackground(true);
-                    session.setBackgroundIndex(index);
-                }
-
-                // Send Background Event
-                if (tracker.getLifecycleEvents()) {
-                    Map<String, Object> data = new HashMap<>();
-                    Util.addToMap(Parameters.APP_BACKGROUND_INDEX, index, data);
-                    tracker.track(new SelfDescribing(new SelfDescribingJson(TrackerConstants.APPLICATION_BACKGROUND_SCHEMA, data))
-                            .contexts(lifecycleContexts)
-                    );
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);
-            }
+    public void onEnterBackground() {
+        Logger.d(TAG, "App enter background");
+        try {
+            Map<String, Object> notificationData = new HashMap<String, Object>();
+            notificationData.put("isForeground", Boolean.FALSE);
+            NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+        } catch (Exception e) {
+            Logger.e(TAG, "Method onEnterBackground raised an exception: %s", e);
         }
     }
 }

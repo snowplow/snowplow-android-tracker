@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -15,19 +15,18 @@ package com.snowplowanalytics.snowplow.event;
 
 import android.test.AndroidTestCase;
 
+import androidx.test.espresso.core.internal.deps.guava.collect.Lists;
+
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EcommerceTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        EcommerceTransaction ecommerceTransaction = EcommerceTransaction.builder()
-                .orderId("some order id")
-                .totalValue(123.456)
-                .items(new ArrayList<EcommerceTransactionItem>())
-                .build();
+        EcommerceTransaction ecommerceTransaction = new EcommerceTransaction("some order id", 123.456, new ArrayList<EcommerceTransactionItem>());
 
         assertEquals("tr", ecommerceTransaction.getName());
         Map data = ecommerceTransaction.getDataPayload();
@@ -43,25 +42,17 @@ public class EcommerceTest extends AndroidTestCase {
         assertFalse(data.containsKey(Parameters.TR_COUNTRY));
         assertFalse(data.containsKey(Parameters.TR_CURRENCY));
 
-        EcommerceTransactionItem ecommerceTransactionItem = EcommerceTransactionItem.builder()
-                .itemId("some item id")
-                .sku("some sku")
-                .price(123.456)
-                .quantity(1)
-                .build();
+        EcommerceTransactionItem ecommerceTransactionItem = new EcommerceTransactionItem("some sku", 123.456, 1);
+        List<EcommerceTransactionItem> items = Lists.newArrayList(ecommerceTransactionItem);
 
-        ecommerceTransaction = EcommerceTransaction.builder()
-                .orderId("some order id")
-                .totalValue(123.456)
+        ecommerceTransaction = new EcommerceTransaction("some order id", 123.456, items)
                 .affiliation("some affiliate")
                 .taxValue(50.6)
                 .shipping(10.0)
                 .city("Dijon")
                 .state("Bourgogne")
                 .country("France")
-                .currency("EUR")
-                .items(ecommerceTransactionItem)
-                .build();
+                .currency("EUR");
 
         data = ecommerceTransaction.getDataPayload();
 
@@ -80,7 +71,7 @@ public class EcommerceTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            EcommerceTransaction.builder().build();
+            new EcommerceTransaction(null, null, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -89,7 +80,7 @@ public class EcommerceTest extends AndroidTestCase {
 
         exception = false;
         try {
-            EcommerceTransaction.builder().orderId("some order id").build();
+            new EcommerceTransaction("some order id", null, new ArrayList<EcommerceTransactionItem>());
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -98,7 +89,7 @@ public class EcommerceTest extends AndroidTestCase {
 
         exception = false;
         try {
-            EcommerceTransaction.builder().orderId("some order id").totalValue(123.456).build();
+            new EcommerceTransaction("some order id", 123.456, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -107,8 +98,7 @@ public class EcommerceTest extends AndroidTestCase {
 
         exception = false;
         try {
-            EcommerceTransaction.builder().orderId("").totalValue(123.456)
-                    .items(new ArrayList<EcommerceTransactionItem>()).build();
+            new EcommerceTransaction("", 123.456, new ArrayList<EcommerceTransactionItem>());
         } catch (Exception e) {
             assertEquals("orderId cannot be empty", e.getMessage());
             exception = true;

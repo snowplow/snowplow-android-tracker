@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,12 +22,8 @@ import java.util.Map;
 public class TimingTest extends AndroidTestCase {
 
     public void testExpectedForm() {
-        Timing timing = Timing.builder()
-                .category("some category")
-                .timing(123456789)
-                .variable("some var")
-                .label("some label")
-                .build();
+        Timing timing = new Timing("some category", "some var", 123456789)
+                .label("some label");
 
         Map<String, Object> data = timing.getDataPayload();
 
@@ -37,11 +33,7 @@ public class TimingTest extends AndroidTestCase {
         assertEquals("some var", data.get(Parameters.UT_VARIABLE));
         assertEquals("some label", data.get(Parameters.UT_LABEL));
 
-        timing = Timing.builder()
-                .category("some category")
-                .timing(123456789)
-                .variable("some var")
-                .build();
+        timing = new Timing("some category", "some var", 123456789);
 
         data = timing.getDataPayload();
 
@@ -51,12 +43,8 @@ public class TimingTest extends AndroidTestCase {
         assertEquals("some var", data.get(Parameters.UT_VARIABLE));
         assertFalse(data.containsKey(Parameters.UT_LABEL));
 
-        timing = Timing.builder()
-                .category("some category")
-                .timing(123456789)
-                .variable("some var")
-                .label("")
-                .build();
+        timing = new Timing("some category", "some var", 123456789)
+                .label("");
 
         data = timing.getDataPayload();
 
@@ -66,12 +54,8 @@ public class TimingTest extends AndroidTestCase {
         assertEquals("some var", data.get(Parameters.UT_VARIABLE));
         assertFalse(data.containsKey(Parameters.UT_LABEL));
 
-        timing = Timing.builder()
-                .category("some category")
-                .timing(123456789)
-                .variable("some var")
-                .label(null)
-                .build();
+        timing = new Timing("some category", "some var", 123456789)
+                .label(null);
 
         data = timing.getDataPayload();
 
@@ -85,7 +69,7 @@ public class TimingTest extends AndroidTestCase {
     public void testBuilderFailures() {
         boolean exception = false;
         try {
-            Timing.builder().build();
+            new Timing(null, null, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -94,7 +78,7 @@ public class TimingTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Timing.builder().category("category").build();
+            new Timing("category", null, null);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -103,7 +87,7 @@ public class TimingTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Timing.builder().category("category").timing(123).build();
+            new Timing("category", null, 123);
         } catch (Exception e) {
             assertEquals(null, e.getMessage());
             exception = true;
@@ -112,7 +96,7 @@ public class TimingTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Timing.builder().category("").timing(123).variable("variable").build();
+            new Timing("", "variable", 123);
         } catch (Exception e) {
             assertEquals("category cannot be empty", e.getMessage());
             exception = true;
@@ -121,7 +105,7 @@ public class TimingTest extends AndroidTestCase {
 
         exception = false;
         try {
-            Timing.builder().category("category").timing(123).variable("").build();
+            new Timing("category", "", 123);
         } catch (Exception e) {
             assertEquals("variable cannot be empty", e.getMessage());
             exception = true;

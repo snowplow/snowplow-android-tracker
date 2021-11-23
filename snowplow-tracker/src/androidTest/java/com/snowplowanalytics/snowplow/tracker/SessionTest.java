@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,8 +18,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.event.Event;
-import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -68,7 +66,6 @@ public class SessionTest extends AndroidTestCase {
 
         Map<String, Object> sessionContext = getSessionContext(session,"event_1");
         assertNotNull(sessionContext.get(Parameters.SESSION_USER_ID));
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
         assertEquals(1, session.getSessionIndex());
         assertNotNull(sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
@@ -102,7 +99,7 @@ public class SessionTest extends AndroidTestCase {
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
         Session session = getSession(0, 15);
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
         String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
@@ -135,7 +132,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         String oldSessionId = sessionId;
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_2");
@@ -145,7 +142,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.setIsBackground(false);
+        session.updateLifecycleNotification(true);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_3");
@@ -155,7 +152,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.setIsBackground(true);
+        session.updateLifecycleNotification(false);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_4");
@@ -208,7 +205,7 @@ public class SessionTest extends AndroidTestCase {
         prefs.edit().clear().commit();
         prefs.edit().putString(Parameters.SESSION_USER_ID, UUID.randomUUID().toString()).commit();
 
-        Session session = new Session(600, 300, TimeUnit.SECONDS, getContext());
+        Session session = new Session(600, 300, TimeUnit.SECONDS, null, getContext());
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
@@ -241,17 +238,17 @@ public class SessionTest extends AndroidTestCase {
         cleanSharedPreferences(getContext(), "tracker1");
         cleanSharedPreferences(getContext(), "tracker2");
 
-        Emitter emitter = new Emitter.EmitterBuilder("", getContext()).build();
-        Tracker tracker1 = new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
+        Emitter emitter = new Emitter(getContext(), "", null);
+        Tracker tracker1 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
-        Tracker tracker2 = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        );
+        Tracker tracker2 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
+        );
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
@@ -276,11 +273,11 @@ public class SessionTest extends AndroidTestCase {
         String id2 = session2.getCurrentSessionId();
 
         // Recreate tracker2
-        Tracker tracker2b = new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
+        Tracker tracker2b = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
                 .sessionContext(true)
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
-                .build();
+        );
         tracker2b.getSession().getSessionContext("fake-id3");
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getPreviousSessionId();
@@ -298,8 +295,7 @@ public class SessionTest extends AndroidTestCase {
                 .edit()
                 .clear()
                 .commit();
-        Session session = new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, getContext());
-        return session;
+        return new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, null, getContext());
     }
 
     private Map<String, Object> getSessionContext(Session session, String eventId) {
