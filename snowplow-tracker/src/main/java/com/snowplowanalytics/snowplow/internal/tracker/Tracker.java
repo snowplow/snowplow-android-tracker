@@ -575,7 +575,7 @@ public class Tracker {
         if (lifecycleEvents) {
             ProcessObserver.initialize(context);
             // Initialize LifecycleStateMachine for lifecycle entities
-            stateManager.addStateMachine(new LifecycleStateMachine(), "Lifecycle");
+            stateManager.addOrReplaceStateMachine(new LifecycleStateMachine(), "Lifecycle");
         }
     }
 
@@ -938,7 +938,7 @@ public class Tracker {
     public void setScreenContext(boolean screenContext) {
         this.screenContext = screenContext;
         if (screenContext) {
-            stateManager.addStateMachine(new ScreenStateMachine(), "ScreenContext");
+            stateManager.addOrReplaceStateMachine(new ScreenStateMachine(), "ScreenContext");
         } else {
             stateManager.removeStateMachine("ScreenContext");
         }
@@ -948,7 +948,7 @@ public class Tracker {
     public void setDeepLinkContext(boolean deepLinkContext) {
         this.deepLinkContext = deepLinkContext;
         if (this.deepLinkContext) {
-            stateManager.addStateMachine(new DeepLinkStateMachine(), "DeepLinkContext");
+            stateManager.addOrReplaceStateMachine(new DeepLinkStateMachine(), "DeepLinkContext");
         } else {
             stateManager.removeStateMachine("DeepLinkContext");
         }

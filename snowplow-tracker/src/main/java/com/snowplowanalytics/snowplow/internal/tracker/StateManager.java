@@ -22,7 +22,10 @@ public class StateManager {
     final TrackerState trackerState = new TrackerState();
 
 
-    public synchronized void addStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
+    public synchronized void addOrReplaceStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
+        if (identifierToStateMachine.containsKey(identifier)) {
+            removeStateMachine(identifier);
+        }
         identifierToStateMachine.put(identifier, stateMachine);
         stateMachineToIdentifier.put(stateMachine, identifier);
         addToSchemaRegistry(eventSchemaToStateMachine, stateMachine.subscribedEventSchemasForTransitions(), stateMachine);
