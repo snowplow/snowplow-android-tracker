@@ -185,6 +185,38 @@ public class StateManagerTest {
         List<SelfDescribingJson> entities = stateManager.entitiesForProcessedEvent(e);
         assertEquals(1, entities.size());
     }
+
+    @Test
+    public void testReplacingStateMachineDoesntResetTrackerState() {
+        StateManager stateManager = new StateManager();
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+        stateManager.trackerStateForProcessedEvent(new SelfDescribing("inc", new HashMap() {{ put("value", 1); }}));
+        State state1 = stateManager.trackerState.getState("identifier");
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+        State state2 = stateManager.trackerState.getState("identifier");
+
+        assertNotNull(state1);
+        assertSame(state1, state2);
+    }
+
+    @Test
+    public void testReplacingStateMachineWithDifferentOneResetsTrackerState() {
+        class MockStateMachine1 extends MockStateMachine {}
+        class MockStateMachine2 extends MockStateMachine {}
+
+        StateManager stateManager = new StateManager();
+        stateManager.addOrReplaceStateMachine(new MockStateMachine1(), "identifier");
+        stateManager.trackerStateForProcessedEvent(new SelfDescribing("inc", new HashMap() {{ put("value", 1); }}));
+        State state1 = stateManager.trackerState.getState("identifier");
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine2(), "identifier");
+        State state2 = stateManager.trackerState.getState("identifier");
+
+        assertNotNull(state1);
+        assertNotSame(state1, state2);
+    }
 }
 
 // Mock classes

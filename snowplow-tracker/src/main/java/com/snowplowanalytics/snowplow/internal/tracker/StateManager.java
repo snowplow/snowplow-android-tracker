@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class StateManager {
 
@@ -23,7 +24,11 @@ public class StateManager {
 
 
     public synchronized void addOrReplaceStateMachine(@NonNull StateMachineInterface stateMachine, @NonNull String identifier) {
-        if (identifierToStateMachine.containsKey(identifier)) {
+        StateMachineInterface previousStateMachine = identifierToStateMachine.get(identifier);
+        if (previousStateMachine != null) {
+            if (Objects.equals(stateMachine.getClass(), previousStateMachine.getClass())) {
+                return;
+            }
             removeStateMachine(identifier);
         }
         identifierToStateMachine.put(identifier, stateMachine);
