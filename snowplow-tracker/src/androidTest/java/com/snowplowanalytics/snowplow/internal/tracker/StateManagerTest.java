@@ -36,7 +36,7 @@ public class StateManagerTest {
     @Test
     public void testStateManager() {
         StateManager stateManager = new StateManager();
-        stateManager.addStateMachine(new MockStateMachine(), "identifier");
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
 
         SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
         SelfDescribing eventDec = new SelfDescribing("dec", new HashMap() {{ put("value", 2); }});
@@ -86,7 +86,7 @@ public class StateManagerTest {
     @Test
     public void testAddRemoveStateMachine() {
         StateManager stateManager = new StateManager();
-        stateManager.addStateMachine(new MockStateMachine(), "identifier");
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
         stateManager.removeStateMachine("identifier");
 
         SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
@@ -156,6 +156,66 @@ public class StateManagerTest {
         eventStore.removeAllEvents();
         entities = (String) payload.getMap().get("co");
         assertTrue(entities.contains("screen2"));
+    }
+
+    @Test
+    public void testAllowsMultipleStateMachines() throws InterruptedException {
+        StateManager stateManager = new StateManager();
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier1");
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier2");
+
+        SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
+        TrackerStateSnapshot trackerState = stateManager.trackerStateForProcessedEvent(eventInc);
+
+        InspectableEvent e = new TrackerEvent(eventInc, trackerState);
+        List<SelfDescribingJson> entities = stateManager.entitiesForProcessedEvent(e);
+        assertEquals(2, entities.size());
+    }
+
+    @Test
+    public void testDoesntDuplicateStateFromStateMachinesWithSameId() throws InterruptedException {
+        StateManager stateManager = new StateManager();
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+
+        SelfDescribing eventInc = new SelfDescribing("inc", new HashMap() {{ put("value", 1); }});
+        TrackerStateSnapshot trackerState = stateManager.trackerStateForProcessedEvent(eventInc);
+
+        InspectableEvent e = new TrackerEvent(eventInc, trackerState);
+        List<SelfDescribingJson> entities = stateManager.entitiesForProcessedEvent(e);
+        assertEquals(1, entities.size());
+    }
+
+    @Test
+    public void testReplacingStateMachineDoesntResetTrackerState() {
+        StateManager stateManager = new StateManager();
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+        stateManager.trackerStateForProcessedEvent(new SelfDescribing("inc", new HashMap() {{ put("value", 1); }}));
+        State state1 = stateManager.trackerState.getState("identifier");
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine(), "identifier");
+        State state2 = stateManager.trackerState.getState("identifier");
+
+        assertNotNull(state1);
+        assertSame(state1, state2);
+    }
+
+    @Test
+    public void testReplacingStateMachineWithDifferentOneResetsTrackerState() {
+        class MockStateMachine1 extends MockStateMachine {}
+        class MockStateMachine2 extends MockStateMachine {}
+
+        StateManager stateManager = new StateManager();
+        stateManager.addOrReplaceStateMachine(new MockStateMachine1(), "identifier");
+        stateManager.trackerStateForProcessedEvent(new SelfDescribing("inc", new HashMap() {{ put("value", 1); }}));
+        State state1 = stateManager.trackerState.getState("identifier");
+
+        stateManager.addOrReplaceStateMachine(new MockStateMachine2(), "identifier");
+        State state2 = stateManager.trackerState.getState("identifier");
+
+        assertNotNull(state1);
+        assertNotSame(state1, state2);
     }
 }
 
