@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Snowplow Android Tracker
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.0.1</span>
    </div>
   </td>
  </tr>
@@ -76,8 +76,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aadc4515f713bb993c37b57b7cfc6229b"><td class="memItemLeft" align="right" valign="top">synchronized void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_manager.html#aadc4515f713bb993c37b57b7cfc6229b">addStateMachine</a> (@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_machine_interface.html">StateMachineInterface</a> stateMachine, @NonNull String identifier)</td></tr>
-<tr class="separator:aadc4515f713bb993c37b57b7cfc6229b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8737a2e55f4f5930ac55d69599f75b5"><td class="memItemLeft" align="right" valign="top">synchronized void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_manager.html#ad8737a2e55f4f5930ac55d69599f75b5">addOrReplaceStateMachine</a> (@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_machine_interface.html">StateMachineInterface</a> stateMachine, @NonNull String identifier)</td></tr>
+<tr class="separator:ad8737a2e55f4f5930ac55d69599f75b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08209c6f483106556ac5f6e3110824c1"><td class="memItemLeft" align="right" valign="top">synchronized boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_manager.html#a08209c6f483106556ac5f6e3110824c1">removeStateMachine</a> (@NonNull String identifier)</td></tr>
 <tr class="separator:a08209c6f483106556ac5f6e3110824c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f146d4d6051cc7ce1ca017e20519d53"><td class="memItemLeft" align="right" valign="top">synchronized boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_manager.html#a7f146d4d6051cc7ce1ca017e20519d53">addPayloadValuesToEvent</a> (@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_inspectable_event.html">InspectableEvent</a> event)</td></tr>
@@ -85,36 +85,16 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00015">15</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00016">16</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7f146d4d6051cc7ce1ca017e20519d53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f146d4d6051cc7ce1ca017e20519d53">&#9670;&nbsp;</a></span>addPayloadValuesToEvent()</h2>
+<a id="ad8737a2e55f4f5930ac55d69599f75b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8737a2e55f4f5930ac55d69599f75b5">&#9670;&nbsp;</a></span>addOrReplaceStateMachine()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">synchronized boolean com.snowplowanalytics.snowplow.internal.tracker.StateManager.addPayloadValuesToEvent </td>
-          <td>(</td>
-          <td class="paramtype">@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_inspectable_event.html">InspectableEvent</a>&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00102">102</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
-
-</div>
-</div>
-<a id="aadc4515f713bb993c37b57b7cfc6229b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadc4515f713bb993c37b57b7cfc6229b">&#9670;&nbsp;</a></span>addStateMachine()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">synchronized void com.snowplowanalytics.snowplow.internal.tracker.StateManager.addStateMachine </td>
+          <td class="memname">synchronized void com.snowplowanalytics.snowplow.internal.tracker.StateManager.addOrReplaceStateMachine </td>
           <td>(</td>
           <td class="paramtype">@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_state_machine_interface.html">StateMachineInterface</a>&#160;</td>
           <td class="paramname"><em>stateMachine</em>, </td>
@@ -133,7 +113,27 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00025">25</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00026">26</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
+
+</div>
+</div>
+<a id="a7f146d4d6051cc7ce1ca017e20519d53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f146d4d6051cc7ce1ca017e20519d53">&#9670;&nbsp;</a></span>addPayloadValuesToEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">synchronized boolean com.snowplowanalytics.snowplow.internal.tracker.StateManager.addPayloadValuesToEvent </td>
+          <td>(</td>
+          <td class="paramtype">@NonNull <a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_inspectable_event.html">InspectableEvent</a>&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00110">110</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
 
 </div>
 </div>
@@ -153,7 +153,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00033">33</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_state_manager_8java_source.html#l00041">41</a> of file <a class="el" href="_state_manager_8java_source.html">StateManager.java</a>.</p>
 
 </div>
 </div>
