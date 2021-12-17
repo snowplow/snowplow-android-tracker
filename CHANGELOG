@@ -1,3 +1,6 @@
+Version 3.0.1 (2021-12-17)
+--------------------------
+Do not allow multiple state machines with the same ID (#489)
 
 Version 3.0.0 (2021-11-23)
 --------------------------
