@@ -98,7 +98,6 @@ public class PlatformContext {
         Util.addToMap(Parameters.DEVICE_MODEL, deviceInfoMonitor.getDeviceModel(), pairs);
         Util.addToMap(Parameters.DEVICE_MANUFACTURER, deviceInfoMonitor.getDeviceVendor(), pairs);
         Util.addToMap(Parameters.CARRIER, deviceInfoMonitor.getCarrier(context), pairs);
-        Util.addToMap(Parameters.ANDROID_IDFA, deviceInfoMonitor.getAndroidIdfa(context), pairs);
         Util.addToMap(Parameters.PHYSICAL_MEMORY, deviceInfoMonitor.getPhysicalMemory(context), pairs);
         Util.addToMap(Parameters.TOTAL_STORAGE, deviceInfoMonitor.getTotalStorage(), pairs);
 
@@ -108,6 +107,11 @@ public class PlatformContext {
 
     private void setEphemeralPlatformDict() {
         lastUpdatedEphemeralPlatformDict = System.currentTimeMillis();
+
+        Object currentIdfa = pairs.get(Parameters.ANDROID_IDFA);
+        if (currentIdfa == null || currentIdfa.toString().isEmpty()) {
+            Util.addToMap(Parameters.ANDROID_IDFA, deviceInfoMonitor.getAndroidIdfa(context), pairs);
+        }
 
         Pair<String, Integer> batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(context);
         if (batteryInfo != null) {

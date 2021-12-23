@@ -132,6 +132,28 @@ public class PlatformContextTest {
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage"));
     }
 
+    @Test
+    public void doesntUpdateIdfaIfNotNull() {
+        MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
+        PlatformContext platformContext = new PlatformContext(0, 1, deviceInfoMonitor, getContext());
+        assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+        platformContext.getMobileContext();
+        assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+    }
+
+    @Test
+    public void updatesIdfaIfEmptyOrNull() {
+        MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
+        deviceInfoMonitor.customIdfa = "";
+        PlatformContext platformContext = new PlatformContext(0, 1, deviceInfoMonitor, getContext());
+        assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+        deviceInfoMonitor.customIdfa = null;
+        platformContext.getMobileContext();
+        assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+        platformContext.getMobileContext();
+        assertEquals(3, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+    }
+
     // --- PRIVATE
 
     private Context getContext() {
