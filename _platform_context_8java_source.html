@@ -156,39 +156,35 @@ $(function() {
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        Util.addToMap(Parameters.DEVICE_MODEL, deviceInfoMonitor.getDeviceModel(), pairs);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        Util.addToMap(Parameters.DEVICE_MANUFACTURER, deviceInfoMonitor.getDeviceVendor(), pairs);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        Util.addToMap(Parameters.CARRIER, deviceInfoMonitor.getCarrier(context), pairs);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        Util.addToMap(Parameters.PHYSICAL_MEMORY, deviceInfoMonitor.getPhysicalMemory(context), pairs);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        Util.addToMap(Parameters.TOTAL_STORAGE, deviceInfoMonitor.getTotalStorage(), pairs);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        setEphemeralPlatformDict();</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        setEphemeralNetworkDict();</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">private</span> <span class="keywordtype">void</span> setEphemeralPlatformDict() {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        lastUpdatedEphemeralPlatformDict = System.currentTimeMillis();</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        Object currentIdfa = pairs.get(Parameters.ANDROID_IDFA);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">if</span> (currentIdfa == <span class="keyword">null</span> || currentIdfa.toString().isEmpty()) {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            Util.addToMap(Parameters.ANDROID_IDFA, deviceInfoMonitor.getAndroidIdfa(context), pairs);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        Pair&lt;String, Integer&gt; batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(context);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordflow">if</span> (batteryInfo != <span class="keyword">null</span>) {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            Util.addToMap(Parameters.BATTERY_STATE, batteryInfo.first, pairs);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            Util.addToMap(Parameters.BATTERY_LEVEL, batteryInfo.second, pairs);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        Util.addToMap(Parameters.SYSTEM_AVAILABLE_MEMORY, deviceInfoMonitor.getSystemAvailableMemory(context), pairs);</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        Util.addToMap(Parameters.AVAILABLE_STORAGE, deviceInfoMonitor.getAvailableStorage(), pairs);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keyword">private</span> <span class="keywordtype">void</span> setEphemeralNetworkDict() {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        lastUpdatedEphemeralNetworkDict = System.currentTimeMillis();</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        NetworkInfo networkInfo = deviceInfoMonitor.getNetworkInfo(context);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        Util.addToMap(Parameters.NETWORK_TECHNOLOGY, deviceInfoMonitor.getNetworkTechnology(networkInfo), pairs);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        Util.addToMap(Parameters.NETWORK_TYPE, deviceInfoMonitor.getNetworkType(networkInfo), pairs);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        Util.addToMap(Parameters.ANDROID_IDFA, deviceInfoMonitor.getAndroidIdfa(context), pairs);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        Util.addToMap(Parameters.PHYSICAL_MEMORY, deviceInfoMonitor.getPhysicalMemory(context), pairs);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        Util.addToMap(Parameters.TOTAL_STORAGE, deviceInfoMonitor.getTotalStorage(), pairs);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        setEphemeralPlatformDict();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        setEphemeralNetworkDict();</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">private</span> <span class="keywordtype">void</span> setEphemeralPlatformDict() {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        lastUpdatedEphemeralPlatformDict = System.currentTimeMillis();</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        Pair&lt;String, Integer&gt; batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(context);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">if</span> (batteryInfo != <span class="keyword">null</span>) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            Util.addToMap(Parameters.BATTERY_STATE, batteryInfo.first, pairs);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            Util.addToMap(Parameters.BATTERY_LEVEL, batteryInfo.second, pairs);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        }</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        Util.addToMap(Parameters.SYSTEM_AVAILABLE_MEMORY, deviceInfoMonitor.getSystemAvailableMemory(context), pairs);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        Util.addToMap(Parameters.AVAILABLE_STORAGE, deviceInfoMonitor.getAvailableStorage(), pairs);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keyword">private</span> <span class="keywordtype">void</span> setEphemeralNetworkDict() {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        lastUpdatedEphemeralNetworkDict = System.currentTimeMillis();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        NetworkInfo networkInfo = deviceInfoMonitor.getNetworkInfo(context);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        Util.addToMap(Parameters.NETWORK_TECHNOLOGY, deviceInfoMonitor.getNetworkTechnology(networkInfo), pairs);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        Util.addToMap(Parameters.NETWORK_TYPE, deviceInfoMonitor.getNetworkType(networkInfo), pairs);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;}</div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html">com.snowplowanalytics.snowplow.internal.constants.Parameters</a></div><div class="ttdef"><b>Definition:</b> <a href="_parameters_8java_source.html#l00020">Parameters.java:20</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters_html_a4e926f9976ef42199e5d8acbd9e4031e"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a4e926f9976ef42199e5d8acbd9e4031e">com.snowplowanalytics.snowplow.internal.constants.Parameters.DEVICE_MODEL</a></div><div class="ttdeci">static final String DEVICE_MODEL</div><div class="ttdef"><b>Definition:</b> <a href="_parameters_8java_source.html#l00114">Parameters.java:114</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters_html_a8866fc08b101e5f41861567161c876ee"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a8866fc08b101e5f41861567161c876ee">com.snowplowanalytics.snowplow.internal.constants.Parameters.OS_VERSION</a></div><div class="ttdeci">static final String OS_VERSION</div><div class="ttdef"><b>Definition:</b> <a href="_parameters_8java_source.html#l00116">Parameters.java:116</a></div></div>
