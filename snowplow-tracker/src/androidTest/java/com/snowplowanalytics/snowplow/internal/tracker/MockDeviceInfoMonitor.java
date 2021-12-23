@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class MockDeviceInfoMonitor extends DeviceInfoMonitor {
     @NonNull private Map<String, Integer> methodAccessCounts = new HashMap<String, Integer>();
+    @Nullable public String customIdfa = "XJKLJSALFKJ";
 
     @NonNull
     @Override
@@ -67,7 +68,7 @@ public class MockDeviceInfoMonitor extends DeviceInfoMonitor {
     @Override
     public String getAndroidIdfa(@NonNull Context context) {
         increaseMethodAccessCount("getAndroidIdfa");
-        return "XJKLJSALFKJ";
+        return customIdfa;
     }
 
     @NonNull

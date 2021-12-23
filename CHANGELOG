@@ -1,3 +1,7 @@
+Version 3.0.2 (2021-12-23)
+--------------------------
+Fix updating IDFA during app runtime (#492)
+
 Version 3.0.1 (2021-12-17)
 --------------------------
 Do not allow multiple state machines with the same ID (#489)
