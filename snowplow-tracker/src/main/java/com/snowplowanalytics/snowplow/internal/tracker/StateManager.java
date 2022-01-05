@@ -55,9 +55,10 @@ public class StateManager {
     synchronized TrackerStateSnapshot trackerStateForProcessedEvent(@NonNull Event event) {
         if (event instanceof AbstractSelfDescribing) {
             AbstractSelfDescribing sdEvent = (AbstractSelfDescribing) event;
-            List<StateMachineInterface> stateMachines = eventSchemaToStateMachine.get(sdEvent.getSchema());
-            if (stateMachines == null) {
-                stateMachines = new LinkedList<>();
+            List<StateMachineInterface> stateMachines = new LinkedList<>();
+            List<StateMachineInterface> stateMachinesForSchema = eventSchemaToStateMachine.get(sdEvent.getSchema());
+            if (stateMachinesForSchema != null) {
+                stateMachines.addAll(stateMachinesForSchema);
             }
             List<StateMachineInterface> stateMachinesGeneral = eventSchemaToStateMachine.get("*");
             if (stateMachinesGeneral != null) {
@@ -88,9 +89,10 @@ public class StateManager {
     @NonNull
     synchronized List<SelfDescribingJson> entitiesForProcessedEvent(@NonNull InspectableEvent event) {
         List<SelfDescribingJson> result = new LinkedList<>();
-        List<StateMachineInterface> stateMachines = eventSchemaToEntitiesGenerator.get(event.getSchema());
-        if (stateMachines == null) {
-            stateMachines = new LinkedList<>();
+        List<StateMachineInterface> stateMachines = new LinkedList<>();
+        List<StateMachineInterface> stateMachinesForSchema = eventSchemaToEntitiesGenerator.get(event.getSchema());
+        if (stateMachinesForSchema != null) {
+            stateMachines.addAll(stateMachinesForSchema);
         }
         List<StateMachineInterface> stateMachinesGeneral = eventSchemaToEntitiesGenerator.get("*");
         if (stateMachinesGeneral != null) {
@@ -109,9 +111,10 @@ public class StateManager {
 
     public synchronized boolean addPayloadValuesToEvent(@NonNull InspectableEvent event) {
         int failures = 0;
-        List<StateMachineInterface> stateMachines = eventSchemaToPayloadUpdater.get(event.getSchema());
-        if (stateMachines == null) {
-            stateMachines = new LinkedList<>();
+        List<StateMachineInterface> stateMachines = new LinkedList<>();
+        List<StateMachineInterface> stateMachinesForSchema = eventSchemaToPayloadUpdater.get(event.getSchema());
+        if (stateMachinesForSchema != null) {
+            stateMachines.addAll(stateMachinesForSchema);
         }
         List<StateMachineInterface> stateMachinesGeneral = eventSchemaToPayloadUpdater.get("*");
         if (stateMachinesGeneral != null) {
