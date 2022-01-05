@@ -1,3 +1,7 @@
+Version 3.0.3 (2022-01-05)
+--------------------------
+Fix multiple ScreenContexts on ScreenView events (#495)
+
 Version 3.0.2 (2021-12-23)
 --------------------------
 Fix updating IDFA during app runtime (#492)
