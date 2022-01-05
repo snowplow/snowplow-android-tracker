@@ -129,6 +129,7 @@ public class StateManagerTest {
         entities = (String) payload.getMap().get("co");
         assertNotNull(entities);
         assertTrue(entities.contains("screen1"));
+        assertEquals(1, entities.split("screen1", -1).length - 1);
 
         tracker.track(new Timing("category", "variable", 123));
         Thread.sleep(1000);
@@ -137,6 +138,7 @@ public class StateManagerTest {
         eventStore.removeAllEvents();
         entities = (String) payload.getMap().get("co");
         assertTrue(entities.contains("screen1"));
+        assertEquals(1, entities.split("screen1", -1).length - 1);
 
         tracker.track(new ScreenView("screen2"));
         Thread.sleep(1000);
@@ -145,6 +147,7 @@ public class StateManagerTest {
         eventStore.removeAllEvents();
         entities = (String) payload.getMap().get("co");
         assertTrue(entities.contains("screen2"));
+        assertEquals(1, entities.split("screen2", -1).length - 1);
         String eventPayload = (String) payload.getMap().get("ue_pr");
         assertTrue(eventPayload.contains("screen1"));
         assertTrue(eventPayload.contains("screen2"));
@@ -156,6 +159,16 @@ public class StateManagerTest {
         eventStore.removeAllEvents();
         entities = (String) payload.getMap().get("co");
         assertTrue(entities.contains("screen2"));
+        assertEquals(1, entities.split("screen2", -1).length - 1);
+
+        tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertTrue(entities.contains("screen2"));
+        assertEquals(1, entities.split("screen2", -1).length - 1);
     }
 
     @Test
