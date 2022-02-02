@@ -44,19 +44,20 @@ public class SessionTest extends AndroidTestCase {
 
     public void testSessionInit() {
         Session session = getSession(600, 300);
+        SessionState sessionState = session.getState();
 
         assertNotNull(session);
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
-        assertEquals("LOCAL_STORAGE", session.getSessionStorage());
-        assertNull(session.getPreviousSessionId());
+        assertNull(sessionState);
         assertNotNull(session.getUserId());
-        assertNull(session.getFirstId());
 
         SelfDescribingJson sdj = session.getSessionContext("first-id-1");
-        assertEquals("first-id-1", session.getFirstId());
+        sessionState = session.getState();
+        assertNotNull(sessionState);
+        assertEquals("first-id-1", sessionState.getFirstEventId());
         sdj = session.getSessionContext("second-id-2");
-        assertEquals("first-id-1", session.getFirstId());
+        assertEquals("first-id-1", sessionState.getFirstEventId());
 
         assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.getMap().get("schema"));
     }
@@ -208,12 +209,10 @@ public class SessionTest extends AndroidTestCase {
         Session session = new Session(600, 300, TimeUnit.SECONDS, null, getContext());
 
         assertNotNull(session);
+        assertNull(session.getState());
         assertEquals(600000, session.getForegroundTimeout());
         assertEquals(300000, session.getBackgroundTimeout());
-        assertEquals("LOCAL_STORAGE", session.getSessionStorage());
-        assertNull(session.getPreviousSessionId());
         assertNotNull(session.getUserId());
-        assertNull(session.getFirstId());
     }
 
     public void testStartNewSessionRenewTheSession() throws InterruptedException {
@@ -256,7 +255,7 @@ public class SessionTest extends AndroidTestCase {
         session2.getSessionContext("fake-id1");
 
         long initialValue1 = session1.getSessionIndex();
-        String id1 = session1.getCurrentSessionId();
+        String id1 = session1.getState().getSessionId();
         long initialValue2 = session2.getSessionIndex();
 
         // Retrigger session in tracker1
@@ -270,7 +269,7 @@ public class SessionTest extends AndroidTestCase {
         // Check sessions have the correct state
         assertEquals(0, session1.getSessionIndex() - initialValue1);
         assertEquals(1, session2.getSessionIndex() - initialValue2);
-        String id2 = session2.getCurrentSessionId();
+        String id2 = session2.getState().getSessionId();
 
         // Recreate tracker2
         Tracker tracker2b = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
@@ -280,7 +279,7 @@ public class SessionTest extends AndroidTestCase {
         );
         tracker2b.getSession().getSessionContext("fake-id3");
         long initialValue2b = tracker2b.getSession().getSessionIndex();
-        String previousId2b = tracker2b.getSession().getPreviousSessionId();
+        String previousId2b = tracker2b.getSession().getState().getPreviousSessionId();
 
         // Check the new tracker session gets the data from the old tracker2 session
         assertEquals(initialValue2 + 2, initialValue2b);

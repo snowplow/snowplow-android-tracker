@@ -67,7 +67,7 @@ public class SessionControllerImpl extends Controller implements SessionControll
             Logger.track(TAG, "Attempt to access SessionController fields when disabled");
             return "";
         }
-        return session.getCurrentSessionId();
+        return session.getState().getSessionId();
     }
 
     @NonNull

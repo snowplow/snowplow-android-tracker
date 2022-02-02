@@ -47,6 +47,7 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM = "tr";
     public static final String EVENT_ECOMM_ITEM = "ti";
 
+    public static final String SESSION_STATE = "session_state";
     public static final String SNOWPLOW_SESSION_VARS = "snowplow_session_vars";
     public static final String SNOWPLOW_GENERAL_VARS = "snowplow_general_vars";
     public static final String INSTALLATION_USER_ID = "SPInstallationUserId";
