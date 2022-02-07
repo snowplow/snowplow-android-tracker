@@ -20,6 +20,7 @@ import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
@@ -67,11 +68,13 @@ public class Session {
     private long foregroundTimeout;
     private long backgroundTimeout;
 
-    // Transition callbacks
+    // Callbacks
     private Runnable foregroundTransitionCallback = null;
     private Runnable backgroundTransitionCallback = null;
     private Runnable foregroundTimeoutCallback = null;
     private Runnable backgroundTimeoutCallback = null;
+    @Nullable
+    public Consumer<SessionState> onSessionUpdate;
 
     // Session values persistence
     private SharedPreferences sharedPreferences;
@@ -212,12 +215,29 @@ public class Session {
             storage = state.getStorage();
         }
         state = new SessionState(eventId, currentSessionId, previousSessionId, sessionIndex, userId, storage);
+        storeSessionState(state);
+        callOnSessionUpdateCallback(state);
+    }
 
+    private void storeSessionState(SessionState state) {
         JSONObject jsonObject = new JSONObject(state.getSessionValues());
         String jsonString = jsonObject.toString();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(TrackerConstants.SESSION_STATE, jsonString);
         editor.apply();
+    }
+
+    private void callOnSessionUpdateCallback(SessionState state) {
+        if (onSessionUpdate != null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    onSessionUpdate.accept(state);
+                }
+            });
+            thread.setDaemon(true);
+            thread.start();
+        }
     }
 
     private void executeEventCallback(Runnable callback) {
