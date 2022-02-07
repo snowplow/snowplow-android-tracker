@@ -61,6 +61,7 @@ import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
@@ -265,9 +266,16 @@ public class Demo extends Activity implements LoggerDelegate {
                 .installAutotracking(true)
                 .diagnosticAutotracking(true);
         SessionConfiguration sessionConfiguration = new SessionConfiguration(
-                new TimeMeasure(60, TimeUnit.SECONDS),
+                new TimeMeasure(6, TimeUnit.SECONDS),
                 new TimeMeasure(30, TimeUnit.SECONDS)
-        );
+        )
+                .onSessionUpdate(state -> updateLogger(
+                        "Session: " + state.getSessionId()
+                                + "\r\nprevious: " + state.getPreviousSessionId()
+                                + "\r\neventId: " + state.getFirstEventId()
+                                + "\r\nindex: " + state.getSessionIndex()
+                                + "\r\nuserId: " + state.getUserId()
+                ));
         GdprConfiguration gdprConfiguration = new GdprConfiguration(
                 Basis.CONSENT,
                 "someId",
@@ -421,7 +429,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 boolean isRunning = e.isSending();
                 long dbSize = e.getDbCount();
                 SessionController session = tracker.getSession();
-                int sessionIndex = session != null ? -1 : session.getSessionIndex();
+                int sessionIndex = session == null ? -1 : session.getSessionIndex();
                 updateEmitterStats(isOnline, isRunning, dbSize, sessionIndex);
             }
         }, 1, 1, TimeUnit.SECONDS);
