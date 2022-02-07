@@ -155,8 +155,11 @@ public class Session {
 
     private synchronized static String retrieveUserId(Context context, SessionState state) {
         String userId = state != null ? state.getUserId() : Util.getUUIDString();
-        // Get or Set the Session UserID
-        //$ Specify why this mess with the userId
+        // With v2 we designed a new identifier: Installation ID.
+        // It should be created by the tracker at first execution and it should be constant until the app deletion.
+        // It behaves as the SessionUserID but it should be available even if the session context is disabled.
+        // At the moment we store it separately from the session in order to fully implement it in one of the
+        // future versions.
         SharedPreferences generalPref = context.getSharedPreferences(TrackerConstants.SNOWPLOW_GENERAL_VARS, Context.MODE_PRIVATE);
         String storedUserId = generalPref.getString(TrackerConstants.INSTALLATION_USER_ID, null);
         if (storedUserId != null) {
@@ -182,7 +185,6 @@ public class Session {
                 Logger.d(TAG, "Update session information.");
                 updateSession(eventId);
 
-                //$ Refactor these callbacks
                 if (isBackground.get()) { // timed out in background
                     this.executeEventCallback(backgroundTimeoutCallback);
                 } else { // timed out in foreground
