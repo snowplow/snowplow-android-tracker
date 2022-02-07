@@ -1,8 +1,11 @@
 package com.snowplowanalytics.snowplow.configuration;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import org.json.JSONObject;
@@ -38,6 +41,12 @@ public class SessionConfiguration implements SessionConfigurationInterface, Conf
      */
     @NonNull
     public TimeMeasure backgroundTimeout;
+
+    /**
+     * The callback called everytime the session is updated.
+     */
+    @Nullable
+    public Consumer<SessionState> onSessionUpdate;
 
     // Constructors
 
@@ -85,6 +94,34 @@ public class SessionConfiguration implements SessionConfigurationInterface, Conf
     @Override
     public void setBackgroundTimeout(@NonNull TimeMeasure backgroundTimeout) {
         this.backgroundTimeout = backgroundTimeout;
+    }
+
+    /**
+     * @see #onSessionUpdate
+     */
+    @Nullable
+    @Override
+    public Consumer<SessionState> getOnSessionUpdate() {
+        return onSessionUpdate;
+    }
+
+    /**
+     * @see #onSessionUpdate
+     */
+    @Override
+    public void setOnSessionUpdate(@Nullable Consumer<SessionState> onSessionUpdate) {
+        this.onSessionUpdate = onSessionUpdate;
+    }
+
+    // Builders
+
+    /**
+     * @see #onSessionUpdate
+     */
+    @NonNull
+    public SessionConfiguration onSessionUpdate(@Nullable Consumer<SessionState> onSessionUpdate) {
+        this.onSessionUpdate = onSessionUpdate;
+        return this;
     }
 
     // Copyable

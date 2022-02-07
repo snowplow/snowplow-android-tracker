@@ -3,12 +3,14 @@ package com.snowplowanalytics.snowplow.internal.session;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.internal.Controller;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.concurrent.TimeUnit;
@@ -155,6 +157,33 @@ public class SessionControllerImpl extends Controller implements SessionControll
         getDirtyConfig().backgroundTimeout = backgroundTimeout;
         getDirtyConfig().backgroundTimeoutUpdated = true;
         session.setBackgroundTimeout(backgroundTimeout.convert(TimeUnit.MILLISECONDS));
+    }
+
+    /**
+     * The callback called everytime the session is updated.
+     */
+    @Nullable
+    @Override
+    public Consumer<SessionState> getOnSessionUpdate() {
+        Session session = getSession();
+        if (session == null) {
+            Logger.track(TAG, "Attempt to access SessionController fields when disabled");
+            return null;
+        }
+        return session.onSessionUpdate;
+    }
+
+    /**
+     * The callback called everytime the session is updated.
+     */
+    @Override
+    public void setOnSessionUpdate(@Nullable Consumer<SessionState> onSessionUpdate) {
+        Session session = getSession();
+        if (session == null) {
+            Logger.track(TAG, "Attempt to access SessionController fields when disabled");
+            return;
+        }
+        session.onSessionUpdate = onSessionUpdate;
     }
 
     // Service method
