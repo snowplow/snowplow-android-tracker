@@ -129,7 +129,8 @@ public class SessionConfiguration implements SessionConfigurationInterface, Conf
     @Override
     @NonNull
     public Configuration copy() {
-        return new SessionConfiguration(foregroundTimeout, backgroundTimeout);
+        return new SessionConfiguration(foregroundTimeout, backgroundTimeout)
+                .onSessionUpdate(onSessionUpdate);
     }
 
     // JSON Formatter
