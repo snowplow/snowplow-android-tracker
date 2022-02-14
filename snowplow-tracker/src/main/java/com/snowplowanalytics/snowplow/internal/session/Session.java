@@ -20,14 +20,20 @@ import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,13 +56,9 @@ public class Session {
 
     // Session Variables
     private String userId;
-    private String currentSessionId = null;
-    private String previousSessionId;
-    private int sessionIndex = 0;
     private int backgroundIndex = 0;
     private int foregroundIndex = 0;
-    private final String sessionStorage = "LOCAL_STORAGE";
-    private String firstId = null;
+    private SessionState state = null;
 
     // Variables to control Session Updates
     private final AtomicBoolean isBackground = new AtomicBoolean(false);
@@ -66,12 +68,15 @@ public class Session {
     private long foregroundTimeout;
     private long backgroundTimeout;
 
-    // Transition callbacks
+    // Callbacks
     private Runnable foregroundTransitionCallback = null;
     private Runnable backgroundTransitionCallback = null;
     private Runnable foregroundTimeoutCallback = null;
     private Runnable backgroundTimeoutCallback = null;
+    @Nullable
+    public Consumer<SessionState> onSessionUpdate;
 
+    // Session values persistence
     private SharedPreferences sharedPreferences;
 
     /**
@@ -123,45 +128,50 @@ public class Session {
 
         StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
         try {
-            sharedPreferences = getSessionFromSharedPreferences(context, sessionVarsName);
-            if (sharedPreferences != null) {
-                userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, Util.getUUIDString());
-                currentSessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
-                sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
-            } else {
-                Map<String, Object> sessionInfo = getSessionFromFile(context);
-                if (sessionInfo != null) {
+            Map<String, Object> sessionInfo = getSessionMapFromLegacyTrackerV3(context, sessionVarsName);
+            if (sessionInfo == null) {
+                sessionInfo = getSessionMapFromLegacyTrackerV2(context, sessionVarsName);
+                if (sessionInfo == null) {
                     try {
-                        userId = sessionInfo.get(Parameters.SESSION_USER_ID).toString();
-                        currentSessionId = sessionInfo.get(Parameters.SESSION_ID).toString();
-                        sessionIndex = (int) sessionInfo.get(Parameters.SESSION_INDEX);
+                        sessionInfo = getSessionMapFromLegacyTrackerV1(context);
                     } catch (Exception e) {
                         Logger.track(TAG, String.format("Exception occurred retrieving session info from file: %s", e), e);
-                        userId = Util.getUUIDString();
                     }
-                } else {
-                    userId = Util.getUUIDString();
                 }
             }
-            // Force sharedPreferences to be the correct one.
-            sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
+            if (sessionInfo == null) {
+                Logger.track(TAG, "No previous session info available");
+            } else {
+                state = SessionState.build(sessionInfo);
+            }
+            userId = retrieveUserId(context, state);
+            sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
             lastSessionCheck = System.currentTimeMillis();
         } finally {
             StrictMode.setThreadPolicy(oldPolicy);
         }
+        Logger.v(TAG, "Tracker Session Object created.");
+    }
 
-        // Get or Set the Session UserID
+    private synchronized static String retrieveUserId(Context context, SessionState state) {
+        String userId = state != null ? state.getUserId() : Util.getUUIDString();
+        // Session_UserID is available only if the session context is enabled.
+        // In a future version we would like to make it available even if the session context is disabled.
+        // For this reason, we store the Session_UserID in a separate storage (decoupled by session values)
+        // calling it Installation_UserID in order to remark that it isn't related to the session context.
+        // Although, for legacy, we need to copy its value in the Session_UserID of the session context
+        // as the session context schema (and related data modelling) requires it.
+        // For further details: https://discourse.snowplowanalytics.com/t/rfc-mobile-trackers-v2-0
         SharedPreferences generalPref = context.getSharedPreferences(TrackerConstants.SNOWPLOW_GENERAL_VARS, Context.MODE_PRIVATE);
         String storedUserId = generalPref.getString(TrackerConstants.INSTALLATION_USER_ID, null);
         if (storedUserId != null) {
             userId = storedUserId;
-        } else if (userId != null) {
+        } else {
             generalPref.edit()
                     .putString(TrackerConstants.INSTALLATION_USER_ID, userId)
                     .commit();
         }
-
-        Logger.v(TAG, "Tracker Session Object created.");
+        return userId;
     }
 
     /**
@@ -172,25 +182,20 @@ public class Session {
     @NonNull
     public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId) {
         Logger.v(TAG, "Getting session context...");
-        if (!isSessionCheckerEnabled) {
-            return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, getSessionValues());
-        }
-        if (shouldUpdateSession()) {
-            Logger.d(TAG, "Update session information.");
-            updateSession(eventId);
-        }
-        lastSessionCheck = System.currentTimeMillis();
-        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, getSessionValues());
-    }
+        if (isSessionCheckerEnabled) {
+            if (shouldUpdateSession()) {
+                Logger.d(TAG, "Update session information.");
+                updateSession(eventId);
 
-    private void executeEventCallback(Runnable callback) {
-        if (callback != null) {
-            try {
-                callback.run();
-            } catch (Exception e) {
-                Logger.e(TAG, "Session event callback failed");
+                if (isBackground.get()) { // timed out in background
+                    this.executeEventCallback(backgroundTimeoutCallback);
+                } else { // timed out in foreground
+                    this.executeEventCallback(foregroundTimeoutCallback);
+                }
             }
+            lastSessionCheck = System.currentTimeMillis();
         }
+        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, state.getSessionValues());
     }
 
     private boolean shouldUpdateSession() {
@@ -204,31 +209,48 @@ public class Session {
 
     private synchronized void updateSession(String eventId) {
         isNewSession.set(false);
-        firstId = eventId;
-        previousSessionId = this.currentSessionId;
-        currentSessionId = Util.getUUIDString();
-        sessionIndex++;
-
-        Logger.d(TAG, "Session information is updated:");
-        Logger.d(TAG, " + Session ID: %s", currentSessionId);
-        Logger.d(TAG, " + Previous Session ID: %s", previousSessionId);
-        Logger.d(TAG, " + Session Index: %s", sessionIndex);
-
-        boolean isBackground = this.isBackground.get();
-
-        if (isBackground) { // timed out in background
-            this.executeEventCallback(backgroundTimeoutCallback);
-        } else { // timed out in foreground
-            this.executeEventCallback(foregroundTimeoutCallback);
+        String currentSessionId = Util.getUUIDString();
+        int sessionIndex = 1;
+        String previousSessionId = null;
+        String storage = "LOCAL_STORAGE";
+        if (state != null) {
+            sessionIndex = state.getSessionIndex() + 1;
+            previousSessionId = state.getSessionId();
+            storage = state.getStorage();
         }
+        state = new SessionState(eventId, currentSessionId, previousSessionId, sessionIndex, userId, storage);
+        storeSessionState(state);
+        callOnSessionUpdateCallback(state);
+    }
 
+    private void storeSessionState(SessionState state) {
+        JSONObject jsonObject = new JSONObject(state.getSessionValues());
+        String jsonString = jsonObject.toString();
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Parameters.SESSION_ID, currentSessionId);
-        editor.putString(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
-        editor.putInt(Parameters.SESSION_INDEX, sessionIndex);
-        editor.putString(Parameters.SESSION_FIRST_ID, firstId);
-        editor.putString(Parameters.SESSION_STORAGE, sessionStorage);
+        editor.putString(TrackerConstants.SESSION_STATE, jsonString);
         editor.apply();
+    }
+
+    private void callOnSessionUpdateCallback(SessionState state) {
+        if (onSessionUpdate != null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    onSessionUpdate.accept(state);
+                }
+            });
+            thread.setDaemon(true);
+            thread.start();
+        }
+    }
+
+    private void executeEventCallback(Runnable callback) {
+        if (callback == null) return;
+        try {
+            callback.run();
+        } catch (Exception e) {
+            Logger.e(TAG, "Session event callback failed");
+        }
     }
 
     public void startNewSession() {
@@ -293,46 +315,74 @@ public class Session {
     }
 
     /**
-     * Returns the values for the session context.
-     * @return a map containing all session values
-     */
-    @NonNull
-    public Map<String, Object> getSessionValues() {
-        Map<String, Object> sessionValues = new HashMap<>();
-        sessionValues.put(Parameters.SESSION_USER_ID,this.userId);
-        sessionValues.put(Parameters.SESSION_ID, this.currentSessionId);
-        sessionValues.put(Parameters.SESSION_PREVIOUS_ID, this.previousSessionId);
-        sessionValues.put(Parameters.SESSION_INDEX, this.sessionIndex);
-        sessionValues.put(Parameters.SESSION_STORAGE, this.sessionStorage);
-        sessionValues.put(Parameters.SESSION_FIRST_ID, this.firstId);
-        return sessionValues;
-    }
-
-    /**
      * Gets the session information from a file.
      *
      * @return a map or null.
      */
     @Nullable
-    private Map<String, Object> getSessionFromFile(@NonNull Context context) {
-        return FileStore.getMapFromFile(
+    private Map<String, Object> getSessionMapFromLegacyTrackerV1(@NonNull Context context) {
+        Map<String, Object> sessionMap = FileStore.getMapFromFile(
                 TrackerConstants.SNOWPLOW_SESSION_VARS,
                 context);
+        sessionMap.put(Parameters.SESSION_FIRST_ID, "");
+        sessionMap.put(Parameters.SESSION_PREVIOUS_ID, null);
+        sessionMap.put(Parameters.SESSION_STORAGE, "LOCAL_STORAGE");
+        return sessionMap;
     }
 
     @Nullable
-    private SharedPreferences getSessionFromSharedPreferences(@NonNull Context context, @NonNull String sessionVarsName) {
+    private Map<String, Object> getSessionMapFromLegacyTrackerV2(@NonNull Context context, @NonNull String sessionVarsName) {
         StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
         try {
             SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
-            if (sharedPreferences.contains(Parameters.SESSION_ID)) {
-                return sharedPreferences;
-            } else {
+            if (!sharedPreferences.contains(Parameters.SESSION_ID)) {
                 sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE);
-                if (sharedPreferences.contains(Parameters.SESSION_ID)) {
-                    return sharedPreferences;
+                if (!sharedPreferences.contains(Parameters.SESSION_ID)) {
+                    return null;
                 }
             }
+            // Create map used as initial session state
+            Map<String, Object> sessionMap = new HashMap<>();
+            String sessionId = sharedPreferences.getString(Parameters.SESSION_ID, null);
+            if (sessionId == null) return null;
+            sessionMap.put(Parameters.SESSION_ID, sessionId);
+
+            String userId = sharedPreferences.getString(Parameters.SESSION_USER_ID, null);
+            if (userId == null) return null;
+            sessionMap.put(Parameters.SESSION_USER_ID, userId);
+
+            int sessionIndex = sharedPreferences.getInt(Parameters.SESSION_INDEX, 0);
+            sessionMap.put(Parameters.SESSION_INDEX, sessionIndex);
+
+            sessionMap.put(Parameters.SESSION_FIRST_ID, "");
+            sessionMap.put(Parameters.SESSION_PREVIOUS_ID, null);
+            sessionMap.put(Parameters.SESSION_STORAGE, "LOCAL_STORAGE");
+            return sessionMap;
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
+        }
+    }
+
+    @Nullable
+    private Map<String, Object> getSessionMapFromLegacyTrackerV3(@NonNull Context context, @NonNull String sessionVarsName) {
+        StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE);
+            if (!sharedPreferences.contains(TrackerConstants.SESSION_STATE)) {
+                return null;
+            }
+            Map<String, Object> sessionMap = new HashMap<>();
+            String jsonString = sharedPreferences.getString(TrackerConstants.SESSION_STATE, null);
+            JSONObject jsonObject = new JSONObject(jsonString);
+            Iterator<String> iterator = jsonObject.keys();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Object value = jsonObject.get(key);
+                sessionMap.put(key, value);
+            }
+            return sessionMap;
+        } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             StrictMode.setThreadPolicy(oldPolicy);
         }
@@ -342,8 +392,8 @@ public class Session {
     /**
      * @return the session index
      */
-    public int getSessionIndex() {
-        return this.sessionIndex;
+    public int getSessionIndex() { //$ to remove
+        return this.state.getSessionIndex();
     }
 
     /**
@@ -355,35 +405,11 @@ public class Session {
     }
 
     /**
-     * @return the current session id
-     */
-    @NonNull
-    public String getCurrentSessionId() {
-        return this.currentSessionId;
-    }
-
-    /**
-     * @return the previous session id or an empty String
+     * @return the session state
      */
     @Nullable
-    public String getPreviousSessionId() {
-        return this.previousSessionId;
-    }
-
-    /**
-     * @return the session storage type
-     */
-    @NonNull
-    public String getSessionStorage() {
-        return this.sessionStorage;
-    }
-
-    /**
-     * @return the first event id
-     */
-    @Nullable
-    public String getFirstId() {
-        return this.firstId;
+    public SessionState getState() {
+        return state;
     }
 
     /**

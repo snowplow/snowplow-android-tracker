@@ -1,7 +1,10 @@
 package com.snowplowanalytics.snowplow.internal.session;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 public interface SessionConfigurationInterface {
@@ -35,4 +38,15 @@ public interface SessionConfigurationInterface {
      * background.
      */
     void setBackgroundTimeout(@NonNull TimeMeasure backgroundTimeout);
+
+    /**
+     * The callback called everytime the session is updated.
+     */
+    @Nullable
+    Consumer<SessionState> getOnSessionUpdate();
+
+    /**
+     * The callback called everytime the session is updated.
+     */
+    void setOnSessionUpdate(@Nullable Consumer<SessionState> onSessionUpdate);
 }
