@@ -396,22 +396,23 @@ public class Tracker {
         @Override
         public void apply(@NonNull Map<String, Object> data) {
             Session session = getSession();
-            if (lifecycleEvents && session != null) {
-                Boolean isForeground = (Boolean) data.get("isForeground");
-                if (isForeground == null) {
-                    return;
-                }
-                int index = session.updateLifecycleNotification(isForeground);
-                // If index is -1 means that the lifecycle is not changed so don't need to send a lifecycle event.
-                if (index == -1) {
-                    return;
-                }
-                if (isForeground) {
-                    track(new Foreground().foregroundIndex(index));
-                } else {
-                    track(new Background().backgroundIndex(index));
-                }
+            if (session == null || !lifecycleEvents) {
+                return;
             }
+            Boolean isForeground = (Boolean) data.get("isForeground");
+            if (isForeground == null) {
+                return;
+            }
+            if (session.isBackground() == !isForeground) {
+                // if the new lifecycle state confirms the session state, there isn't any lifecycle transition
+                return;
+            }
+            if (isForeground) {
+                track(new Foreground().foregroundIndex(session.getForegroundIndex() + 1));
+            } else {
+                track(new Background().backgroundIndex(session.getBackgroundIndex() + 1));
+            }
+            session.setBackground(!isForeground);
         }
     };
     private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
@@ -605,12 +606,14 @@ public class Tracker {
         }
         event.beginProcessing(this);
         TrackerStateSnapshot stateSnapshot;
+        TrackerEvent trackerEvent;
         synchronized (this) {
             stateSnapshot = stateManager.trackerStateForProcessedEvent(event);
+            trackerEvent = new TrackerEvent(event, stateSnapshot);
+            workaroundForIncoherentSessionContext(trackerEvent);
         }
         boolean reportsOnDiagnostic = !(event instanceof TrackerError);
         Executor.execute(reportsOnDiagnostic, TAG, () -> {
-            TrackerEvent trackerEvent = new TrackerEvent(event, stateSnapshot);
             transformEvent(trackerEvent);
             Payload payload = payloadWithEvent(trackerEvent);
             Logger.v(TAG, "Adding new payload to event storage: %s", payload);
@@ -698,6 +701,30 @@ public class Tracker {
         }
     }
 
+    /*
+     The session context should be computed as part of `addBasicContextsToContexts` but that method
+     is executed in a separate thread. At the moment, the Session management is performed by the legacy
+     solution that doesn't make use of the tracker state snapshot (taken as soon as the event is tracked)
+     needed to keep a coherent state between events tracked in sequence but processed in parallel.
+     Due to this parallel processing the session context could be incoherent with the event sequence.
+     This limit is a serious problem when we process lifecycle events because the `application_background`
+     event should be checked with the session foreground timeout and the `application_foreground` event
+     should be checked with the session background timeout. Without a coherent session management it's
+     impossible to grant this behaviour causing serious issues on the calculation of the session expiring.
+     */
+    private void workaroundForIncoherentSessionContext(@NonNull TrackerEvent event) {
+        if (!event.isService && sessionContext) {
+            String eventId = event.eventId.toString();
+            Session sessionManager = trackerSession;
+            if (sessionManager == null) {
+                Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
+                return;
+            }
+            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId);
+            event.contexts.add(sessionContextJson);
+        }
+    }
+
     private void addBasicContextsToContexts(@NonNull List<SelfDescribingJson> contexts, @NonNull TrackerEvent event) {
         if (applicationContext) {
             contexts.add(Util.getApplicationContext(this.context));
@@ -709,18 +736,6 @@ public class Tracker {
 
         if (event.isService) {
             return;
-        }
-
-        if (sessionContext) {
-            String eventId = event.eventId.toString();
-            if (trackerSession != null) {
-                synchronized (trackerSession) {
-                    SelfDescribingJson sessionContextJson = trackerSession.getSessionContext(eventId);
-                    contexts.add(sessionContextJson);
-                }
-            } else {
-                Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
-            }
         }
 
         if (geoLocationContext) {

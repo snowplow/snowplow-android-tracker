@@ -18,14 +18,17 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.snowplow.event.Foreground;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.internal.session.FileStore;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +68,7 @@ public class SessionTest extends AndroidTestCase {
     public void testFirstSession() {
         Session session = getSession(3, 3);
 
-        Map<String, Object> sessionContext = getSessionContext(session,"event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
         assertNotNull(sessionContext.get(Parameters.SESSION_USER_ID));
         assertEquals(1, session.getSessionIndex());
         assertNotNull(sessionContext.get(Parameters.SESSION_INDEX));
@@ -73,11 +76,11 @@ public class SessionTest extends AndroidTestCase {
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
-    public void testEventsOnSameSession() throws InterruptedException {
+    public void testForegroundEventsOnSameSession() throws InterruptedException {
         Session session = getSession(15, 0);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -85,14 +88,14 @@ public class SessionTest extends AndroidTestCase {
         Thread.sleep(100);
 
         sessionContext = getSessionContext(session, "event_2");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
+        assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
         Thread.sleep(15100);
 
         sessionContext = getSessionContext(session, "event_3");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
@@ -100,10 +103,10 @@ public class SessionTest extends AndroidTestCase {
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
         Session session = getSession(0, 15);
 
-        session.updateLifecycleNotification(false);
+        session.setBackground(true);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -112,14 +115,14 @@ public class SessionTest extends AndroidTestCase {
 
         sessionContext = getSessionContext(session, "event_2");
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_ID));
+        assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
         Thread.sleep(15100);
 
         sessionContext = getSessionContext(session, "event_3");
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
@@ -127,37 +130,37 @@ public class SessionTest extends AndroidTestCase {
         Session session = getSession(1, 1);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         String oldSessionId = sessionId;
 
-        session.updateLifecycleNotification(false);
+        session.setBackground(true);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_2");
-        sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
-        assertEquals(oldSessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
+        assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.updateLifecycleNotification(true);
+        session.setBackground(false);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_3");
-        sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
-        assertEquals(oldSessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
+        assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(3, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
         oldSessionId = sessionId;
 
-        session.updateLifecycleNotification(false);
+        session.setBackground(true);
         Thread.sleep(1100);
 
         sessionContext = getSessionContext(session, "event_4");
-        assertEquals(oldSessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(4, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_4", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
@@ -166,8 +169,8 @@ public class SessionTest extends AndroidTestCase {
         Session session = getSession(1, 1);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        Integer oldSessionIndex = (Integer)sessionContext.get(Parameters.SESSION_INDEX);
-        String prevSessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        Integer oldSessionIndex = (Integer) sessionContext.get(Parameters.SESSION_INDEX);
+        String prevSessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
         session.setIsSuspended(true);
@@ -175,23 +178,94 @@ public class SessionTest extends AndroidTestCase {
 
         sessionContext = getSessionContext(session, "event_2");
         assertEquals(oldSessionIndex, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals(prevSessionId, (String)sessionContext.get(Parameters.SESSION_ID));
+        assertEquals(prevSessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
-        prevSessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        prevSessionId = (String) sessionContext.get(Parameters.SESSION_ID);
 
         session.setIsSuspended(false);
 
         sessionContext = getSessionContext(session, "event_3");
         assertEquals(oldSessionIndex + 1, sessionContext.get(Parameters.SESSION_INDEX));
-        assertEquals(prevSessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals(prevSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
+    }
+
+    public void testBackgroundTimeBiggerThanBackgroundTimeoutCausesNewSession() throws InterruptedException {
+        cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker");
+
+        Emitter emitter = new Emitter(getContext(), "", null);
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker", "app", getContext())
+                .sessionContext(true)
+                .lifecycleEvents(true)
+                .foregroundTimeout(100)
+                .backgroundTimeout(2)
+        );
+        Session session = tracker.getSession();
+
+        getSessionContext(session, "event_1");
+        SessionState sessionState = session.getState();
+        assertNotNull(sessionState);
+        assertEquals(1, sessionState.getSessionIndex());
+        assertEquals("event_1", sessionState.getFirstEventId());
+        String oldSessionId = sessionState.getSessionId();
+
+        Thread.sleep(1000); // Smaller than background timeout
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("isForeground", Boolean.FALSE);
+        NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+
+        Thread.sleep(3000); // Bigger than background timeout
+        notificationData = new HashMap<>();
+        notificationData.put("isForeground", Boolean.TRUE);
+        NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+
+        sessionState = session.getState();
+        assertEquals(2, sessionState.getSessionIndex());
+        assertEquals(oldSessionId, sessionState.getPreviousSessionId());
+        assertFalse(session.isBackground());
+    }
+
+    public void testBackgroundTimeSmallerThanBackgroundTimeoutDoesntCauseNewSession() throws InterruptedException {
+        cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker");
+
+        Emitter emitter = new Emitter(getContext(), "", null);
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker", "app", getContext())
+                .sessionContext(true)
+                .lifecycleEvents(true)
+                .foregroundTimeout(100)
+                .backgroundTimeout(2)
+        );
+        Session session = tracker.getSession();
+
+        getSessionContext(session, "event_1");
+        SessionState sessionState = session.getState();
+        assertNotNull(sessionState);
+        assertEquals(1, sessionState.getSessionIndex());
+        assertEquals("event_1", sessionState.getFirstEventId());
+        String oldSessionId = sessionState.getSessionId();
+
+
+        Thread.sleep(3000); // Bigger than background timeout
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("isForeground", Boolean.FALSE);
+        NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+
+        Thread.sleep(1000); // Smaller than background timeout
+        notificationData = new HashMap<>();
+        notificationData.put("isForeground", Boolean.TRUE);
+        NotificationCenter.postNotification("SnowplowLifecycleTracking", notificationData);
+
+        sessionState = session.getState();
+        assertEquals(1, sessionState.getSessionIndex());
+        assertEquals(oldSessionId, sessionState.getSessionId());
+        assertFalse(session.isBackground());
     }
 
     public void testNoEventsForLongTimeDontIncreaseSessionIndexMultipleTimes() throws InterruptedException {
         Session session = getSession(1, 1);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        Integer oldSessionIndex = (Integer)sessionContext.get(Parameters.SESSION_INDEX);
+        Integer oldSessionIndex = (Integer) sessionContext.get(Parameters.SESSION_INDEX);
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
         Thread.sleep(4000);
@@ -219,7 +293,7 @@ public class SessionTest extends AndroidTestCase {
         Session session = getSession(3, 3);
 
         Map<String, Object> sessionContext = getSessionContext(session, "event_1");
-        String sessionId = (String)sessionContext.get(Parameters.SESSION_ID);
+        String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -228,14 +302,14 @@ public class SessionTest extends AndroidTestCase {
         session.startNewSession();
 
         sessionContext = getSessionContext(session, "event_2");
-        assertEquals(sessionId, (String)sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
+        assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
 
     public void testMultipleTrackersUpdateDifferentSessions() throws InterruptedException {
-        cleanSharedPreferences(getContext(), "tracker1");
-        cleanSharedPreferences(getContext(), "tracker2");
+        cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker1");
+        cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker2");
 
         Emitter emitter = new Emitter(getContext(), "", null);
         Tracker tracker1 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
@@ -298,7 +372,7 @@ public class SessionTest extends AndroidTestCase {
     }
 
     private Map<String, Object> getSessionContext(Session session, String eventId) {
-        return (Map<String, Object>)session.getSessionContext(eventId).getMap().get(Parameters.DATA);
+        return (Map<String, Object>) session.getSessionContext(eventId).getMap().get(Parameters.DATA);
     }
 
     private void cleanSharedPreferences(Context context, String sharedPreferencesName) {
@@ -306,15 +380,10 @@ public class SessionTest extends AndroidTestCase {
         if (Build.VERSION.SDK_INT >= 24) {
             context.deleteSharedPreferences(sharedPreferencesName);
         } else {
-            SharedPreferences.Editor editor =
-                    context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).edit();
-            editor.remove(Parameters.SESSION_USER_ID);
-            editor.remove(Parameters.SESSION_ID);
-            editor.remove(Parameters.SESSION_PREVIOUS_ID);
-            editor.remove(Parameters.SESSION_INDEX);
-            editor.remove(Parameters.SESSION_FIRST_ID);
-            editor.remove(Parameters.SESSION_STORAGE);
-            editor.commit();
+            context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .commit();
         }
     }
 }

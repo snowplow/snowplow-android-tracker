@@ -258,22 +258,17 @@ public class Session {
     }
 
     /**
-     * Updates the session with information about lifecycle tracking.
+     * Updates the session timeout and the indexes.
      * Note: Internal use only.
-     * @param isForeground whether or not the application moved to foreground.
-     * @return foreground or background index. Returns -1 if the lifecycle state is not changed.
+     * @param isBackground whether or not the application moved to background.
      */
-    public synchronized int updateLifecycleNotification(boolean isForeground) {
-        boolean toBackground = !isForeground;
-        // if the new lifecycle state confirms the session state, there isn't any lifecycle transition
-        if (isBackground.get() == toBackground) {
-            return -1;
+    public void setBackground(boolean isBackground) {
+        if (!this.isBackground.compareAndSet(!isBackground, isBackground)) {
+            return;
         }
-        Logger.d(TAG, "Application is in the background: %s", toBackground);
-        isBackground.set(toBackground);
 
-        if (!toBackground) {
-            Logger.d(TAG, "Application moved to foreground, starting session checking...");
+        if (!isBackground) {
+            Logger.d(TAG, "Application moved to foreground");
             this.executeEventCallback(this.foregroundTransitionCallback);
             try {
                 setIsSuspended(false);
@@ -281,12 +276,10 @@ public class Session {
                 Logger.e(TAG, "Could not resume checking as tracker not setup. Exception: %s", e);
             }
             foregroundIndex++;
-            return foregroundIndex;
         } else {
             Logger.d(TAG, "Application moved to background");
             this.executeEventCallback(this.backgroundTransitionCallback);
             backgroundIndex++;
-            return backgroundIndex;
         }
     }
 
@@ -306,11 +299,11 @@ public class Session {
         isSessionCheckerEnabled = !isSuspended;
     }
 
-    int getBackgroundIndex() {
+    public int getBackgroundIndex() {
         return backgroundIndex;
     }
 
-    int getForegroundIndex() {
+    public int getForegroundIndex() {
         return foregroundIndex;
     }
 
