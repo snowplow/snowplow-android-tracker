@@ -79,6 +79,7 @@ public class Emitter {
     private int emptyCount;
 
     private AtomicBoolean isRunning = new AtomicBoolean(false);
+    private AtomicBoolean isEmittingPaused = new AtomicBoolean(false);
 
     /**
      * Builder for the Emitter.
@@ -383,6 +384,22 @@ public class Emitter {
     }
 
     /**
+     * Pause emitting events.
+     */
+    public void pauseEmit() {
+        isEmittingPaused.set(true);
+    }
+
+    /**
+     * Resume emitting events and attempt to emit any queued events.
+     */
+    public void resumeEmit() {
+        if (isEmittingPaused.compareAndSet(true, false)) {
+            flush();
+        }
+    }
+
+    /**
      * Resets the `isRunning` truth to false and shutdown.
      */
     public void shutdown() {
@@ -415,6 +432,7 @@ public class Emitter {
      * Attempts to send events in the database to
      * a collector.
      *
+     * - If the emitter is paused, it will not send
      * - If the emitter is not online it will not send
      * - If the emitter is online but there are no events:
      *   + Increment empty counter until emptyLimit reached
@@ -427,6 +445,11 @@ public class Emitter {
      */
     @SuppressWarnings("all")
     private void attemptEmit() {
+        if (isEmittingPaused.get()) {
+            Logger.d(TAG, "Emitter paused.");
+            isRunning.compareAndSet(true, false);
+            return;
+        }
         if (!Util.isOnline(this.context)) {
             Logger.d(TAG, "Emitter loop stopping: emitter offline.");
             isRunning.compareAndSet(true, false);

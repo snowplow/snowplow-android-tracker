@@ -13,6 +13,8 @@ public class EmitterConfigurationUpdate extends EmitterConfiguration {
     @Nullable
     public EmitterConfiguration sourceConfig;
 
+    public boolean isPaused;
+
     @Nullable
     public EventStore getEventStore() {
         return (sourceConfig == null) ? null : sourceConfig.eventStore;

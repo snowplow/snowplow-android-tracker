@@ -349,6 +349,32 @@ public class EmitterTest extends AndroidTestCase {
         emitter.flush();
     }
 
+    public void testPauseAndResumeEmittingEvents() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, true);
+        Emitter emitter = getEmitter(networkConnection, Single);
+
+        emitter.pauseEmit();
+        emitter.add(generatePayloads(1).get(0));
+
+        Thread.sleep(1000);
+
+        assertEquals(false, emitter.getEmitterStatus());
+        assertEquals(0, networkConnection.sendingCount());
+        assertEquals(0, networkConnection.previousResults.size());
+        assertEquals(1, emitter.getEventStore().getSize());
+
+        emitter.resumeEmit();
+
+        for (int i = 0; i < 10 && networkConnection.sendingCount() < 1; i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(1, networkConnection.previousResults.size());
+        assertEquals(1, networkConnection.previousResults.get(0).size());
+        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertEquals(0, emitter.getEventStore().getSize());
+    }
+
     // Emitter Builder
 
     public Emitter getEmitter(NetworkConnection networkConnection, BufferOption option) {
