@@ -373,6 +373,8 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(1, networkConnection.previousResults.get(0).size());
         assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
         assertEquals(0, emitter.getEventStore().getSize());
+
+        emitter.flush();
     }
 
     // Emitter Builder
