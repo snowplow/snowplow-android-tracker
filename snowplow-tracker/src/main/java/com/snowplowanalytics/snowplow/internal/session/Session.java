@@ -56,15 +56,15 @@ public class Session {
 
     // Session Variables
     private String userId;
-    private int backgroundIndex = 0;
-    private int foregroundIndex = 0;
+    private volatile int backgroundIndex = 0;
+    private volatile int foregroundIndex = 0;
     private SessionState state = null;
 
     // Variables to control Session Updates
     private final AtomicBoolean isBackground = new AtomicBoolean(false);
     private long lastSessionCheck;
     private final AtomicBoolean isNewSession = new AtomicBoolean(true);
-    private boolean isSessionCheckerEnabled;
+    private volatile boolean isSessionCheckerEnabled;
     private long foregroundTimeout;
     private long backgroundTimeout;
 
