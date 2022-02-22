@@ -428,6 +428,9 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (sessionConfigurationUpdate.isPaused) {
             tracker.pauseSessionChecking();
         }
+        if (emitterConfigurationUpdate.isPaused) {
+            emitter.pauseEmit();
+        }
         Session session = tracker.getSession();
         if (session != null) {
             Consumer<SessionState> onSessionUpdate = sessionConfigurationUpdate.getOnSessionUpdate();
