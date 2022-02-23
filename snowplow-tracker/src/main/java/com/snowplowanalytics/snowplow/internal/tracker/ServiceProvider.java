@@ -388,6 +388,9 @@ public class ServiceProvider implements ServiceProviderInterface {
     @NonNull
     private Tracker makeTracker() {
         Emitter emitter = getEmitter();
+        if (emitterConfigurationUpdate.isPaused) {
+            emitter.pauseEmit();
+        }
         Subject subject = getSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
@@ -427,9 +430,6 @@ public class ServiceProvider implements ServiceProviderInterface {
         }
         if (sessionConfigurationUpdate.isPaused) {
             tracker.pauseSessionChecking();
-        }
-        if (emitterConfigurationUpdate.isPaused) {
-            emitter.pauseEmit();
         }
         Session session = tracker.getSession();
         if (session != null) {
