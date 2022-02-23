@@ -382,15 +382,16 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (endpoint == null) {
             endpoint = "";
         }
-        return new Emitter(context, endpoint, builder);
+        Emitter emitter = new Emitter(context, endpoint, builder);
+        if (emitterConfigurationUpdate.isPaused) {
+            emitter.pauseEmit();
+        }
+        return emitter;
     }
 
     @NonNull
     private Tracker makeTracker() {
         Emitter emitter = getEmitter();
-        if (emitterConfigurationUpdate.isPaused) {
-            emitter.pauseEmit();
-        }
         Subject subject = getSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
