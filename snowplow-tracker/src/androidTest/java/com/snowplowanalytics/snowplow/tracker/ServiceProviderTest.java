@@ -56,6 +56,12 @@ public class ServiceProviderTest extends AndroidTestCase {
         assertFalse(provider.getEmitter().getEmitterStatus());
         assertEquals(0, networkConnection.sendingCount());
 
+        // resume emitting
+        provider.getEmitterController().resume();
+        for (int i = 0; i < 10 && networkConnection.sendingCount() < 1; i++) {
+            Thread.sleep(600);
+        }
+        assertEquals(1, networkConnection.sendingCount());
         provider.getEmitter().flush();
     }
 }
