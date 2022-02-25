@@ -71,10 +71,10 @@ limitations under the License.
 [release-image]: https://img.shields.io/github/v/release/snowplow/snowplow-android-tracker?sort=semver
 [releases]: https://github.com/snowplow/snowplow-android-tracker/releases
 
-[setup-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v2-0/quick-start-guide/#tab-android-tracker
+[setup-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v3-0/quick-start-guide/#tab-android-tracker
 [setup-docs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/setup.png
 
-[tech-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v2-0/introduction/
+[tech-docs]: https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/mobile-trackers/mobile-trackers-v3-0/introduction/
 [tech-docs-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/techdocs.png
 
 [api-docs]: https://snowplow.github.io/snowplow-android-tracker/
