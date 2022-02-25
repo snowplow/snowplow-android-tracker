@@ -42,7 +42,7 @@ An example of app instrumented with the Android Tracker can be found in the [sno
 
 ## Copyright and license
 
-The Snowplow Android Tracker is copyright 2015-2021 Snowplow Analytics Ltd.
+The Snowplow Android Tracker is copyright 2015-2022 Snowplow Analytics Ltd.
 
 Licensed under the **[Apache License, Version 2.0][license]** (the "License");
 you may not use this software except in compliance with the License.
