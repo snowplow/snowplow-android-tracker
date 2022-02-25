@@ -382,7 +382,11 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (endpoint == null) {
             endpoint = "";
         }
-        return new Emitter(context, endpoint, builder);
+        Emitter emitter = new Emitter(context, endpoint, builder);
+        if (emitterConfigurationUpdate.isPaused) {
+            emitter.pauseEmit();
+        }
+        return emitter;
     }
 
     @NonNull
