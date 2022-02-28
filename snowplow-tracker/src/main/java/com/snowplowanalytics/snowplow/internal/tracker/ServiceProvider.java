@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
@@ -26,11 +27,13 @@ import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
+import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationInterface;
 import com.snowplowanalytics.snowplow.internal.session.SessionConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 
 import java.util.List;
 import java.util.Objects;
@@ -379,7 +382,11 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (endpoint == null) {
             endpoint = "";
         }
-        return new Emitter(context, endpoint, builder);
+        Emitter emitter = new Emitter(context, endpoint, builder);
+        if (emitterConfigurationUpdate.isPaused) {
+            emitter.pauseEmit();
+        }
+        return emitter;
     }
 
     @NonNull
@@ -424,6 +431,13 @@ public class ServiceProvider implements ServiceProviderInterface {
         }
         if (sessionConfigurationUpdate.isPaused) {
             tracker.pauseSessionChecking();
+        }
+        Session session = tracker.getSession();
+        if (session != null) {
+            Consumer<SessionState> onSessionUpdate = sessionConfigurationUpdate.getOnSessionUpdate();
+            if (onSessionUpdate != null) {
+                session.onSessionUpdate = onSessionUpdate;
+            }
         }
         return tracker;
     }

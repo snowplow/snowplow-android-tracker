@@ -112,6 +112,18 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
         return getEmitter().getEmitterStatus();
     }
 
+    @Override
+    public void pause() {
+        getDirtyConfig().isPaused = true;
+        getEmitter().pauseEmit();
+    }
+
+    @Override
+    public void resume() {
+        getDirtyConfig().isPaused = false;
+        getEmitter().resumeEmit();
+    }
+
     // Private methods
 
     @NonNull

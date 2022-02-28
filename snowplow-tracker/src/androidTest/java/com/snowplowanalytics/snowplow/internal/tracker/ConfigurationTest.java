@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -16,8 +17,10 @@ import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
+import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
@@ -39,6 +42,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -108,6 +113,96 @@ public class ConfigurationTest {
         trackerConfiguration.sessionContext = false;
         tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNull(tracker.getSession());
+    }
+
+    @Test
+    public void sessionConfigurationCallback() throws InterruptedException {
+        final Object expectation = new Object();
+        AtomicBoolean callbackExecuted = new AtomicBoolean(false);
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        // Remove stored session data
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS + "_namespace", Context.MODE_PRIVATE);
+        sharedPreferences.edit().remove(TrackerConstants.SESSION_STATE).commit();
+
+        // Configure tracker
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid")
+                .sessionContext(true);
+        SessionConfiguration sessionConfiguration = new SessionConfiguration(
+                new TimeMeasure(100, TimeUnit.SECONDS),
+                new TimeMeasure(100, TimeUnit.SECONDS))
+                .onSessionUpdate(sessionState -> {
+                    assertEquals(1, sessionState.getSessionIndex());
+                    assertNull(sessionState.getPreviousSessionId());
+                    callbackExecuted.set(true);
+                    synchronized (expectation) {
+                        expectation.notify();
+                    }
+                });
+
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, sessionConfiguration);
+        tracker.track(new Timing("cat", "var", 123));
+
+        synchronized (expectation) {
+            expectation.wait(10000);
+        }
+        assertTrue(callbackExecuted.get());
+    }
+
+    @Test
+    public void sessionConfigurationCallbackAfterNewSession() throws InterruptedException {
+        final Object expectation1 = new Object();
+        final Object expectation2 = new Object();
+        AtomicBoolean callbackExecuted = new AtomicBoolean(false);
+        AtomicReference<String> sessionId = new AtomicReference<>(null);
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        // Remove stored session data
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS + "_namespace", Context.MODE_PRIVATE);
+        sharedPreferences.edit().remove(TrackerConstants.SESSION_STATE).commit();
+
+        // Configure tracker
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid")
+                .sessionContext(true);
+        SessionConfiguration sessionConfiguration = new SessionConfiguration(
+                new TimeMeasure(100, TimeUnit.SECONDS),
+                new TimeMeasure(100, TimeUnit.SECONDS))
+                .onSessionUpdate(sessionState -> {
+                    if (sessionState.getSessionIndex() == 1) {
+                        assertNull(sessionState.getPreviousSessionId());
+                        sessionId.set(sessionState.getSessionId());
+                        synchronized (expectation1) {
+                            expectation1.notify();
+                        }
+                    } else {
+                        assertEquals(2, sessionState.getSessionIndex());
+                        assertEquals(sessionId.get(), sessionState.getPreviousSessionId());
+                        callbackExecuted.set(true);
+                        synchronized (expectation2) {
+                            expectation2.notify();
+                        }
+                    }
+                });
+
+        TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, sessionConfiguration);
+        tracker.track(new Timing("cat", "var", 123));
+        synchronized (expectation1) {
+            // This delay is needed because the session manager doesn't manage correclty the sequence of the events
+            // in a multithreading model when the throughput is high.
+            // TODO: To fix this issue we have to refactor the session manager to work like ScreenStateMachine where
+            // it correctly manage the state attached to the tracked events.
+            expectation1.wait(3000);
+        }
+
+        tracker.getSession().startNewSession();
+
+        tracker.track(new Timing("cat", "var", 123));
+        synchronized (expectation2) {
+            expectation2.wait(3000);
+        }
+        assertTrue(callbackExecuted.get());
     }
 
     // TODO: Flaky test to fix

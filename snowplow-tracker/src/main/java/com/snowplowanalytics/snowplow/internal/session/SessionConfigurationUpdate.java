@@ -2,8 +2,11 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
+import com.snowplowanalytics.snowplow.network.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.concurrent.TimeUnit;
@@ -21,6 +24,11 @@ public class SessionConfigurationUpdate extends SessionConfiguration {
 
     public SessionConfigurationUpdate(@NonNull TimeMeasure foregroundTimeout, @NonNull TimeMeasure backgroundTimeout) {
         super(foregroundTimeout, backgroundTimeout);
+    }
+
+    @Nullable
+    public Consumer<SessionState> getOnSessionUpdate() {
+        return (sourceConfig == null) ? null : sourceConfig.getOnSessionUpdate();
     }
 
     // foregroundTimeout flag

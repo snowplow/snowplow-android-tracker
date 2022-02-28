@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -47,6 +47,7 @@ public class TrackerConstants {
     public static final String EVENT_ECOMM = "tr";
     public static final String EVENT_ECOMM_ITEM = "ti";
 
+    public static final String SESSION_STATE = "session_state";
     public static final String SNOWPLOW_SESSION_VARS = "snowplow_session_vars";
     public static final String SNOWPLOW_GENERAL_VARS = "snowplow_general_vars";
     public static final String INSTALLATION_USER_ID = "SPInstallationUserId";

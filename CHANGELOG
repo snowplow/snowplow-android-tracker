@@ -1,3 +1,11 @@
+Version 3.1.0 (2022-02-25)
+--------------------------
+Update copyright headers to 2022 (#502)
+Update links to v3 docs in README (#498)
+Add pause and resume to EmitterController (#505)
+Check session for background event using foreground timeout (#499)
+Add session callback (#500)
+
 Version 3.0.3 (2022-01-05)
 --------------------------
 Fix multiple ScreenContexts on ScreenView events (#495)

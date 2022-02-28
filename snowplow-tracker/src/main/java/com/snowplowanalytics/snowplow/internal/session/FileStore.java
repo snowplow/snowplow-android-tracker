@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2015-2021 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -16,11 +16,13 @@ package com.snowplowanalytics.snowplow.internal.session;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,7 +51,7 @@ public class FileStore {
      * @param context The android context object
      * @return success statement
      */
-    public static boolean saveMapToFile(String filename, Map objects, Context context) {
+    public static boolean saveMapToFile(@NonNull String filename, @NonNull Map objects, @NonNull Context context) {
         FileOutputStream fos;
         try {
             Logger.d(TAG, "Attempting to save: %s", objects);
@@ -74,11 +76,14 @@ public class FileStore {
      * @return the map of vars or null
      */
     @Nullable
-    public static Map<String, Object> getMapFromFile(String filename, Context context) {
-        FileInputStream fis;
+    public synchronized static Map<String, Object> getMapFromFile(@NonNull String filename, @NonNull Context context) {
         try {
+            File file = context.getFileStreamPath(filename);
+            if (file == null || !file.exists()) {
+                return null;
+            }
             Logger.d(TAG, "Attempting to retrieve map from: %s", filename);
-            fis = context.openFileInput(filename);
+            FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Map<String, Object> varsMap = (HashMap<String, Object>) ois.readObject();
             ois.close();
@@ -97,7 +102,7 @@ public class FileStore {
      * @param context The android context object
      * @return the success of the operation
      */
-    public static boolean deleteFile(String filename, Context context) {
+    public static boolean deleteFile(@NonNull String filename, @NonNull Context context) {
         boolean isSuccess = context.deleteFile(filename);
         Logger.d(TAG, "Deleted %s from internal storage: %s", filename, isSuccess);
         return isSuccess;
