@@ -377,6 +377,18 @@ public class EmitterTest extends AndroidTestCase {
         emitter.flush();
     }
 
+    public void testUpdatesNetworkConnectionWhileRunning() throws InterruptedException {
+        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
+                .eventStore(new MockEventStore()));
+
+        emitter.flush();
+        Thread.sleep(100);
+        assertTrue(emitter.getEmitterStatus()); // is running
+        emitter.setEmitterUri("new.uri"); // update while running
+        assertTrue(emitter.getEmitterStatus()); // is running
+        assertTrue(emitter.getEmitterUri().contains("new.uri"));
+    }
+
     // Emitter Builder
 
     public Emitter getEmitter(NetworkConnection networkConnection, BufferOption option) {

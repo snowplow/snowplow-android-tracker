@@ -40,6 +40,7 @@ import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.OkHttpClient;
 
@@ -74,7 +75,7 @@ public class Emitter {
     private OkHttpClient client;
 
     private boolean isCustomNetworkConnection;
-    private NetworkConnection networkConnection;
+    private final AtomicReference<NetworkConnection> networkConnection = new AtomicReference<NetworkConnection>();
     private EventStore eventStore;
     private int emptyCount;
 
@@ -323,16 +324,16 @@ public class Emitter {
                 endpoint = protocol + endpoint;
             }
             this.uri = endpoint;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
                     .emitTimeout(builder.emitTimeout)
                     .customPostPath(builder.customPostPath)
                     .client(builder.client)
-                    .build();
+                    .build());
         } else {
             isCustomNetworkConnection = true;
-            this.networkConnection = builder.networkConnection;
+            setNetworkConnection(builder.networkConnection);
         }
 
         if (builder.threadPoolSize > 2) {
@@ -357,7 +358,7 @@ public class Emitter {
             eventStore.add(payload);
             if (isRunning.compareAndSet(false, true)) {
                 try {
-                    attemptEmit();
+                    attemptEmit(getNetworkConnection());
                 } catch (Throwable t) {
                     isRunning.set(false);
                     Logger.e(TAG, "Received error during emission process: %s", t);
@@ -374,7 +375,7 @@ public class Emitter {
         Executor.execute(TAG, () -> {
             if (isRunning.compareAndSet(false, true)) {
                 try {
-                    attemptEmit();
+                    attemptEmit(getNetworkConnection());
                 } catch (Throwable t) {
                     isRunning.set(false);
                     Logger.e(TAG, "Received error during emission process: %s", t);
@@ -444,7 +445,7 @@ public class Emitter {
      *   + Otherwise will attempt to emit again
      */
     @SuppressWarnings("all")
-    private void attemptEmit() {
+    private void attemptEmit(NetworkConnection networkConnection) {
         if (isEmittingPaused.get()) {
             Logger.d(TAG, "Emitter paused.");
             isRunning.compareAndSet(true, false);
@@ -468,7 +469,7 @@ public class Emitter {
             } catch (InterruptedException e) {
                 Logger.e(TAG, "Emitter thread sleep interrupted: " + e.toString());
             }
-            attemptEmit();
+            attemptEmit(getNetworkConnection()); // at this point we update network connection since it might be outdated after sleep
             return;
         }
         emptyCount = 0;
@@ -512,7 +513,7 @@ public class Emitter {
             Logger.e(TAG, "Emitter loop stopping: failures.");
             isRunning.compareAndSet(true, false);
         } else {
-            attemptEmit();
+            attemptEmit(networkConnection);
         }
     }
 
@@ -530,7 +531,7 @@ public class Emitter {
     protected List<Request> buildRequests(@NonNull List<EmitterEvent> events) {
         List<Request> requests = new ArrayList<>();
         String sendingTime = Util.getTimestamp();
-        HttpMethod httpMethod = networkConnection.getHttpMethod();
+        HttpMethod httpMethod = getNetworkConnection().getHttpMethod();
 
         if (httpMethod == GET) {
             for (EmitterEvent event : events) {
@@ -599,7 +600,7 @@ public class Emitter {
      * @return weather the payload bundle exceeds the maximum size allowed.
      */
     private boolean isOversize(@NonNull Payload payload, @NonNull List<Payload> previousPaylods) {
-        long byteLimit = networkConnection.getHttpMethod() == GET ? byteLimitGet : byteLimitPost;
+        long byteLimit = getNetworkConnection().getHttpMethod() == GET ? byteLimitGet : byteLimitPost;
         return isOversize(payload, byteLimit, previousPaylods);
     }
 
@@ -682,15 +683,15 @@ public class Emitter {
      * @param method the HttpMethod
      */
     public void setHttpMethod(@NonNull HttpMethod method) {
-        if (!isCustomNetworkConnection && !isRunning.get()) {
+        if (!isCustomNetworkConnection) {
             this.httpMethod = method;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
-                    .build();
+                    .build());
         }
     }
 
@@ -700,15 +701,15 @@ public class Emitter {
      * @param security the Protocol
      */
     public void setRequestSecurity(@NonNull Protocol security) {
-        if (!isCustomNetworkConnection && !isRunning.get()) {
+        if (!isCustomNetworkConnection) {
             this.requestSecurity = security;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
-                    .build();
+                    .build());
         }
     }
 
@@ -718,15 +719,17 @@ public class Emitter {
      * @param uri new Emitter URI
      */
     public void setEmitterUri(@NonNull String uri) {
-        if (!isCustomNetworkConnection && !isRunning.get()) {
+        if (!isCustomNetworkConnection) {
             this.uri = uri;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
-                    .build();
+                    .build());
+        } else {
+            System.out.println("Failed to set emitter uri");
         }
     }
 
@@ -736,15 +739,15 @@ public class Emitter {
      * @param customPostPath new Emitter custom Post path
      */
     public void setCustomPostPath(@Nullable String customPostPath) {
-        if (!isCustomNetworkConnection && !isRunning.get()) {
+        if (!isCustomNetworkConnection) {
             this.customPostPath = customPostPath;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
-                    .build();
+                    .build());
         }
     }
 
@@ -754,15 +757,15 @@ public class Emitter {
      * @param emitTimeout new Emitter timeout
      */
     public void setEmitTimeout(int emitTimeout) {
-        if (!isCustomNetworkConnection && !isRunning.get()) {
+        if (!isCustomNetworkConnection) {
             this.emitTimeout = emitTimeout;
-            this.networkConnection = new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
-                    .build();
+                    .build());
         }
     }
 
@@ -771,7 +774,7 @@ public class Emitter {
      */
     @NonNull
     public String getEmitterUri() {
-        return networkConnection.getUri().toString();
+        return getNetworkConnection().getUri().toString();
     }
 
     /**
@@ -891,6 +894,10 @@ public class Emitter {
      */
     @Nullable
     public NetworkConnection getNetworkConnection() {
-        return this.networkConnection;
+        return this.networkConnection.get();
+    }
+
+    private void setNetworkConnection(@NonNull NetworkConnection networkConnection) {
+        this.networkConnection.set(networkConnection);
     }
 }
