@@ -475,7 +475,7 @@ public class Emitter {
         emptyCount = 0;
 
         List<EmitterEvent> events = eventStore.getEmittableEvents(sendLimit);
-        List<Request> requests = buildRequests(events);
+        List<Request> requests = buildRequests(events, networkConnection.getHttpMethod());
         List<RequestResult> results = networkConnection.sendRequests(requests);
 
         Logger.v(TAG, "Processing emitter results.");
@@ -508,12 +508,12 @@ public class Emitter {
 
         if (failureCount > 0 && successCount == 0) {
             if (Util.isOnline(this.context)) {
-                Logger.e(TAG, "Ensure collector path is valid: %s", getEmitterUri());
+                Logger.e(TAG, "Ensure collector path is valid: %s", networkConnection.getUri());
             }
             Logger.e(TAG, "Emitter loop stopping: failures.");
             isRunning.compareAndSet(true, false);
         } else {
-            attemptEmit(networkConnection);
+            attemptEmit(getNetworkConnection()); // refresh network connection for next emit
         }
     }
 
@@ -528,16 +528,15 @@ public class Emitter {
      * @return a list of ready to send requests
      */
     @NonNull
-    protected List<Request> buildRequests(@NonNull List<EmitterEvent> events) {
+    protected List<Request> buildRequests(@NonNull List<EmitterEvent> events, HttpMethod httpMethod) {
         List<Request> requests = new ArrayList<>();
         String sendingTime = Util.getTimestamp();
-        HttpMethod httpMethod = getNetworkConnection().getHttpMethod();
 
         if (httpMethod == GET) {
             for (EmitterEvent event : events) {
                 Payload payload = event.payload;
                 addSendingTimeToPayload(payload, sendingTime);
-                boolean isOversize = isOversize(payload);
+                boolean isOversize = isOversize(payload, httpMethod);
                 Request request = new Request(payload, event.eventId, isOversize);
                 requests.add(request);
             }
@@ -552,11 +551,11 @@ public class Emitter {
                     Long eventId = event.eventId;
                     addSendingTimeToPayload(payload, sendingTime);
 
-                    if (isOversize(payload)) {
+                    if (isOversize(payload, httpMethod)) {
                         Request request = new Request(payload, eventId, true);
                         requests.add(request);
 
-                    } else if (isOversize(payload, postPayloadMaps)) {
+                    } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
                         Request request = new Request(postPayloadMaps, reqEventIds);
                         requests.add(request);
 
@@ -587,20 +586,22 @@ public class Emitter {
     /**
      * Calculate if the payload exceeds the maximum amount of bytes allowed on configuration.
      * @param payload to send.
+     * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
      * @return weather the payload exceeds the maximum size allowed.
      */
-    private boolean isOversize(@NonNull Payload payload) {
-        return isOversize(payload, new ArrayList<>());
+    private boolean isOversize(@NonNull Payload payload, HttpMethod httpMethod) {
+        return isOversize(payload, new ArrayList<>(), httpMethod);
     }
 
     /**
      * Calculate if the payload bundle exceeds the maximum amount of bytes allowed on configuration.
      * @param payload to add om the payload bundle.
      * @param previousPaylods already in the payload bundle.
+     * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
      * @return weather the payload bundle exceeds the maximum size allowed.
      */
-    private boolean isOversize(@NonNull Payload payload, @NonNull List<Payload> previousPaylods) {
-        long byteLimit = getNetworkConnection().getHttpMethod() == GET ? byteLimitGet : byteLimitPost;
+    private boolean isOversize(@NonNull Payload payload, @NonNull List<Payload> previousPaylods, HttpMethod httpMethod) {
+        long byteLimit = httpMethod == GET ? byteLimitGet : byteLimitPost;
         return isOversize(payload, byteLimit, previousPaylods);
     }
 
