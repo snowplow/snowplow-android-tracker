@@ -206,9 +206,9 @@ public class EmitterTest extends AndroidTestCase {
 
         assertTrue(emitter.getEmitterStatus());
         emitter.setHttpMethod(POST);
-        assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setEmitterUri("com/foo");
-        assertEquals("https://com.acme/i", emitter.getEmitterUri());
+        assertEquals("https://com.acme/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
+        emitter.setEmitterUri("com.foo");
+        assertEquals("https://com.foo/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setBufferOption(DefaultGroup);
         assertEquals(HeavyGroup, emitter.getBufferOption());
 

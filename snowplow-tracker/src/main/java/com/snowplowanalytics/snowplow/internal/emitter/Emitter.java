@@ -728,8 +728,6 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .build());
-        } else {
-            System.out.println("Failed to set emitter uri");
         }
     }
 
