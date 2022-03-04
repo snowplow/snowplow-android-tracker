@@ -525,6 +525,7 @@ public class Emitter {
      *
      * @param events a list of EmittableEvents pulled
      *               from the database.
+     * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
      * @return a list of ready to send requests
      */
     @NonNull
