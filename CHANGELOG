@@ -1,3 +1,7 @@
+Version 3.1.1 (2022-03-09)
+--------------------------
+Enable updating collector endpoint while Emitter is running (#508)
+
 Version 3.1.0 (2022-02-25)
 --------------------------
 Update copyright headers to 2022 (#502)
