@@ -206,9 +206,9 @@ public class EmitterTest extends AndroidTestCase {
 
         assertTrue(emitter.getEmitterStatus());
         emitter.setHttpMethod(POST);
-        assertEquals("https://com.acme/i", emitter.getEmitterUri());
-        emitter.setEmitterUri("com/foo");
-        assertEquals("https://com.acme/i", emitter.getEmitterUri());
+        assertEquals("https://com.acme/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
+        emitter.setEmitterUri("com.foo");
+        assertEquals("https://com.foo/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
         emitter.setBufferOption(DefaultGroup);
         assertEquals(HeavyGroup, emitter.getBufferOption());
 
@@ -375,6 +375,18 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(0, emitter.getEventStore().getSize());
 
         emitter.flush();
+    }
+
+    public void testUpdatesNetworkConnectionWhileRunning() throws InterruptedException {
+        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
+                .eventStore(new MockEventStore()));
+
+        emitter.flush();
+        Thread.sleep(100);
+        assertTrue(emitter.getEmitterStatus()); // is running
+        emitter.setEmitterUri("new.uri"); // update while running
+        assertTrue(emitter.getEmitterStatus()); // is running
+        assertTrue(emitter.getEmitterUri().contains("new.uri"));
     }
 
     // Emitter Builder
