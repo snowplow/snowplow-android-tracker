@@ -20,10 +20,16 @@ import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.snowplowanalytics.snowplow.Snowplow;
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 
 import org.junit.Before;
@@ -54,27 +60,28 @@ public class LoggingTest {
 
     MockLoggerDelegate mockLoggerDelegate;
     Emitter emitter;
-    Subject subject;
     Tracker tracker;
+    NetworkConfiguration networkConfig;
 
     @Before
     public void setUp() throws Exception {
         mockLoggerDelegate = new MockLoggerDelegate();
-
         emitter = new Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
         );
+        networkConfig = new NetworkConfiguration("http://localhost", HttpMethod.POST);
     }
 
     // Tests
 
-    @Test
-    public void testVerboseLogsShownWhenVerboseSet() {
+    // The Emitter logs at error level during failed attempts to send, but it's difficult to delay JUnit long enough to reach that point
+    // Therefore these tests look at verbose and debug logging only
 
+    @Test
+    public void VerboseLogsShownWhenVerboseSet() {
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
-                .level(LogLevel.VERBOSE)
                 .sessionContext(true)
-                .trackerDiagnostic(true)
+                .level(LogLevel.VERBOSE)
                 .loggerDelegate(mockLoggerDelegate)
         );
 
@@ -83,15 +90,72 @@ public class LoggingTest {
     }
 
     @Test
-    public void testDebugLogsShownWhenDebugSet() {
+    public void VerboseLogsWithTrackerConfig() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("appId")
+                .logLevel(LogLevel.VERBOSE)
+                .loggerDelegate(mockLoggerDelegate)
+                .sessionContext(true);
+
+        Snowplow.createTracker(ApplicationProvider.getApplicationContext(),
+                "appTracker",
+                networkConfig,
+                trackerConfig);
+
+        assertTrue(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
+        assertTrue(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
+    }
+
+    @Test
+    public void DebugLogsShownWhenDebugSet() {
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
-                .level(LogLevel.VERBOSE)
                 .sessionContext(true)
-                .trackerDiagnostic(true)
+                .level(LogLevel.DEBUG)
                 .loggerDelegate(mockLoggerDelegate)
         );
 
         assertTrue(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
+        assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
+    }
+
+    @Test
+    public void DebugLogsWithTrackerConfig() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("appId")
+                .logLevel(LogLevel.DEBUG)
+                .loggerDelegate(mockLoggerDelegate)
+                .sessionContext(true);
+
+        Snowplow.createTracker(ApplicationProvider.getApplicationContext(),
+                "appTracker",
+                networkConfig,
+                trackerConfig);
+
+        assertTrue(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
+        assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
+    }
+
+    @Test
+    public void LoggingOffByDefault() {
+        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
+                .sessionContext(true)
+                .loggerDelegate(mockLoggerDelegate)
+        );
+
+        assertFalse(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
+        assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
+    }
+
+    @Test
+    public void LoggingOffByDefaultWithConfig() {
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("appId")
+                .loggerDelegate(mockLoggerDelegate)
+                .sessionContext(true);
+
+        Snowplow.createTracker(ApplicationProvider.getApplicationContext(),
+                "appTracker",
+                networkConfig,
+                trackerConfig);
+
+        assertFalse(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
         assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
     }
 }

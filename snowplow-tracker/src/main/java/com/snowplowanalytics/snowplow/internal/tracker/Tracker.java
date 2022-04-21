@@ -515,8 +515,9 @@ public class Tracker {
             if (level == LogLevel.OFF) {
                 level = LogLevel.ERROR;
             }
-            Logger.updateLogLevel(level);
         }
+
+        Logger.updateLogLevel(level);
 
         // When session context is enabled
         if (this.sessionContext) {
