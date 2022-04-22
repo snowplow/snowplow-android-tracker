@@ -164,7 +164,6 @@ public class EventSendingTest extends AndroidTestCase {
                 .sessionContext(true)
                 .mobileContext(true)
                 .geoLocationContext(false)
-                .trackerDiagnostic(true)
         );
         emitter.getEventStore().removeAllEvents();
         return tracker;

@@ -23,11 +23,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
-import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.internal.tracker.Subject;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 
