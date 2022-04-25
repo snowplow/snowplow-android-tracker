@@ -511,10 +511,8 @@ public class Tracker {
             }
         }
 
-        if (trackerDiagnostic) {
-            if (level == LogLevel.OFF) {
-                level = LogLevel.ERROR;
-            }
+        if (trackerDiagnostic && (level == LogLevel.OFF)) {
+            level = LogLevel.ERROR;
         }
 
         Logger.updateLogLevel(level);
