@@ -17,6 +17,16 @@ import java.util.Map;
 
 public class LifecycleStateMachine implements StateMachineInterface {
 
+    /*
+     States: Visible, NotVisible
+     Events: FG (Foreground), BG (Background)
+     Transitions:
+      - Visible (BG) NotVisible
+      - NotVisible (FG) Visible
+     Entity Generation:
+      - Visible, NotVisible
+     */
+
     @NonNull
     @Override
     public List<String> subscribedEventSchemasForTransitions() {
