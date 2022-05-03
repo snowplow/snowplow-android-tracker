@@ -80,6 +80,9 @@ import static com.snowplowanalytics.snowplow.internal.utils.Util.addToMap;
  */
 public class Demo extends Activity implements LoggerDelegate {
 
+    // Example schema for global contexts
+    final String SCHEMA_IDENTIFY = "iglu:com.snowplowanalytics.snowplow/identify/jsonschema/1-0-0";
+
     private Button _startButton, _tabButton;
     private EditText _uriField;
     private RadioGroup _type, _remoteConfig, _collection;
@@ -284,9 +287,9 @@ public class Demo extends Activity implements LoggerDelegate {
         );
         GlobalContextsConfiguration gcConfiguration = new GlobalContextsConfiguration(null);
         Map<String, Object> pairs = new HashMap<>();
-        addToMap(Parameters.APP_VERSION, "0.3.0", pairs);
-        addToMap(Parameters.APP_BUILD, "3", pairs);
-        gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION, pairs))));
+        addToMap("id", "snowplow", pairs);
+        addToMap("email", "info@snowplowanalytics.com", pairs);
+        gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs))));
 
         Snowplow.createTracker(getApplicationContext(),
                 namespace,
