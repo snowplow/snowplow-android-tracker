@@ -1,3 +1,9 @@
+Version 3.1.2 (2022-05-25)
+--------------------------
+Set log level without trackerDiagnostic (#441)
+Attach LifecycleEntity before the first Background event (#512)
+Attach different entity in demo global context (#514)
+
 Version 3.1.1 (2022-03-09)
 --------------------------
 Enable updating collector endpoint while Emitter is running (#508)
