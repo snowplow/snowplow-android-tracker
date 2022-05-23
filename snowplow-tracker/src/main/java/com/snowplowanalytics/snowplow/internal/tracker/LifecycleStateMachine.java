@@ -17,6 +17,16 @@ import java.util.Map;
 
 public class LifecycleStateMachine implements StateMachineInterface {
 
+    /*
+     States: Visible, NotVisible
+     Events: FG (Foreground), BG (Background)
+     Transitions:
+      - Visible (BG) NotVisible
+      - NotVisible (FG) Visible
+     Entity Generation:
+      - Visible, NotVisible
+     */
+
     @NonNull
     @Override
     public List<String> subscribedEventSchemasForTransitions() {
@@ -52,7 +62,8 @@ public class LifecycleStateMachine implements StateMachineInterface {
     @Nullable
     @Override
     public List<SelfDescribingJson> entities(@NonNull InspectableEvent event, @Nullable State state) {
-        if (state == null) return null;
+        if (state == null) return Collections.singletonList(new LifecycleEntity(true));
+
         LifecycleState s = (LifecycleState) state;
         return Collections.singletonList(new LifecycleEntity(s.isForeground).index(s.index));
     }
