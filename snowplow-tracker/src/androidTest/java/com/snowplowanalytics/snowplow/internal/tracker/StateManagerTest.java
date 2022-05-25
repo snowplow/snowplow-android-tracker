@@ -5,7 +5,10 @@ import androidx.annotation.Nullable;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.snowplow.event.Background;
+import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.Event;
+import com.snowplowanalytics.snowplow.event.Foreground;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.Timing;
@@ -169,6 +172,132 @@ public class StateManagerTest {
         entities = (String) payload.getMap().get("co");
         assertTrue(entities.contains("screen2"));
         assertEquals(1, entities.split("screen2", -1).length - 1);
+    }
+
+    @Test
+    public void testLifecycleStateMachine() throws InterruptedException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        MockEventStore eventStore = new MockEventStore();
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
+                .eventStore(eventStore)
+        );
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .lifecycleEvents(true)
+        );
+
+        // Send events
+        tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        Payload payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        String entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        assertTrue(entities.contains("\"isVisible\":true"));
+        assertEquals(1, entities.split("isVisible", -1).length - 1);
+
+        tracker.track(new Background());
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        assertTrue(entities.contains("\"isVisible\":false"));
+        assertEquals(1, entities.split("isVisible", -1).length - 1);
+
+        tracker.track(new ScreenView("screen1"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        System.out.println(entities);
+        assertTrue(entities.contains("\"isVisible\":false"));
+        assertEquals(1, entities.split("isVisible", -1).length - 1);
+
+        tracker.track(new Foreground().foregroundIndex(9));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        System.out.println(entities);
+        assertTrue(entities.contains("\"isVisible\":true"));
+        assertTrue(entities.contains("\"index\":9"));
+        assertEquals(1, entities.split("isVisible", -1).length - 1);
+
+        tracker.track(new ScreenView("screen1"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        System.out.println(entities);
+        assertTrue(entities.contains("\"isVisible\":true"));
+        assertTrue(entities.contains("\"index\":9"));
+        assertEquals(1, entities.split("isVisible", -1).length - 1);
+    }
+
+    @Test
+    public void testDeepLinkStateMachine() throws InterruptedException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        MockEventStore eventStore = new MockEventStore();
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
+                .eventStore(eventStore)
+        );
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
+                .base64(false)
+                .deepLinkContext(true)
+        );
+
+        // Send events
+        tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        Payload payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        String entities = (String) payload.getMap().get("co");
+        assertNull(entities);
+
+        tracker.track(new DeepLinkReceived("http://www.homepage.com"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNull(entities);
+
+        tracker.track(new ScreenView("screen1"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNotNull(entities);
+        assertTrue(entities.contains("www.homepage.com"));
+        assertEquals(1, entities.split("url", -1).length - 1);
+
+        tracker.track(new Timing("category", "variable", 123));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNull(entities);
+
+        tracker.track(new ScreenView("screen2"));
+        Thread.sleep(1000);
+        if (eventStore.lastInsertedRow == -1) fail();
+        payload = eventStore.db.get(eventStore.lastInsertedRow);
+        eventStore.removeAllEvents();
+        entities = (String) payload.getMap().get("co");
+        assertNull(entities);
     }
 
     @Test

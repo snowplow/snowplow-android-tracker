@@ -511,12 +511,11 @@ public class Tracker {
             }
         }
 
-        if (trackerDiagnostic) {
-            if (level == LogLevel.OFF) {
-                level = LogLevel.ERROR;
-            }
-            Logger.updateLogLevel(level);
+        if (trackerDiagnostic && (level == LogLevel.OFF)) {
+            level = LogLevel.ERROR;
         }
+
+        Logger.updateLogLevel(level);
 
         // When session context is enabled
         if (this.sessionContext) {
