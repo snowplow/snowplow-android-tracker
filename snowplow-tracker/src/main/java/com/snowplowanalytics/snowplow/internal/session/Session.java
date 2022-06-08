@@ -180,12 +180,12 @@ public class Session {
      * @return a SelfDescribingJson containing the session context
      */
     @NonNull
-    public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId) {
+    public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId, long eventTimestamp) {
         Logger.v(TAG, "Getting session context...");
         if (isSessionCheckerEnabled) {
             if (shouldUpdateSession()) {
                 Logger.d(TAG, "Update session information.");
-                updateSession(eventId);
+                updateSession(eventId, eventTimestamp);
 
                 if (isBackground.get()) { // timed out in background
                     this.executeEventCallback(backgroundTimeoutCallback);
@@ -193,6 +193,7 @@ public class Session {
                     this.executeEventCallback(foregroundTimeoutCallback);
                 }
             }
+            state.incrementEventIndex();
             lastSessionCheck = System.currentTimeMillis();
         }
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, state.getSessionValues());
@@ -207,10 +208,13 @@ public class Session {
         return now < lastSessionCheck || now - lastSessionCheck > timeout;
     }
 
-    private synchronized void updateSession(String eventId) {
+    private synchronized void updateSession(String eventId, long eventTimestamp) {
         isNewSession.set(false);
         String currentSessionId = Util.getUUIDString();
+        String eventTimestampDateTime = Util.getDateTimeFromTimestamp(eventTimestamp);
+
         int sessionIndex = 1;
+        int eventIndex = 0;
         String previousSessionId = null;
         String storage = "LOCAL_STORAGE";
         if (state != null) {
@@ -218,7 +222,7 @@ public class Session {
             previousSessionId = state.getSessionId();
             storage = state.getStorage();
         }
-        state = new SessionState(eventId, currentSessionId, previousSessionId, sessionIndex, userId, storage);
+        state = new SessionState(eventId, eventTimestampDateTime, currentSessionId, previousSessionId, sessionIndex, eventIndex, userId, storage);
         storeSessionState(state);
         callOnSessionUpdateCallback(state);
     }

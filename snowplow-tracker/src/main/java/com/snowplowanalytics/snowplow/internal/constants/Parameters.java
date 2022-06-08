@@ -138,8 +138,10 @@ public class Parameters {
     public static final String SESSION_ID = "sessionId";
     public static final String SESSION_PREVIOUS_ID = "previousSessionId";
     public static final String SESSION_INDEX = "sessionIndex";
+    public static final String SESSION_EVENT_INDEX = "eventIndex";
     public static final String SESSION_STORAGE = "storageMechanism";
     public static final String SESSION_FIRST_ID = "firstEventId";
+    public static final String SESSION_FIRST_TIMESTAMP = "firstEventTimestamp";
 
     // Screen Context
     public static final String SCREEN_NAME = "name";

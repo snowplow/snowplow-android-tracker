@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.State;
 
 import java.util.HashMap;
@@ -13,41 +14,50 @@ public class SessionState implements State {
 
     @NonNull
     private final String firstEventId;
-    @Nullable
-    private final String previousSessionId;
+    @NonNull
+    private final String firstEventTimestamp;
     @NonNull
     private final String sessionId;
+    @Nullable
+    private final String previousSessionId;
     private final int sessionIndex;
-    @NonNull
-    private final String storage;
+    private volatile int eventIndex;
     @NonNull
     private final String userId;
+    @NonNull
+    private final String storage;
 
     @NonNull
     private Map<String, Object> sessionContext;
 
     public SessionState(
             @NonNull String firstEventId,
+            @NonNull String firstEventTimestamp,
             @NonNull String currentSessionId,
             @Nullable String previousSessionId, //$ On iOS it has to be set nullable on constructor
             int sessionIndex,
+            int eventIndex,
             @NonNull String userId,
             @NonNull String storage
     ) {
         this.firstEventId = firstEventId;
+        this.firstEventTimestamp = firstEventTimestamp;
         this.sessionId = currentSessionId;
         this.previousSessionId = previousSessionId;
         this.sessionIndex = sessionIndex;
+        this.eventIndex = eventIndex;
         this.userId = userId;
         this.storage = storage;
 
         sessionContext = new HashMap<String, Object>();
-        sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
-        sessionContext.put(Parameters.SESSION_ID, sessionId);
         sessionContext.put(Parameters.SESSION_FIRST_ID, firstEventId);
+        sessionContext.put(Parameters.SESSION_FIRST_TIMESTAMP, firstEventTimestamp);
+        sessionContext.put(Parameters.SESSION_ID, sessionId);
+        sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
         sessionContext.put(Parameters.SESSION_INDEX, sessionIndex); //$ should be Number?!
-        sessionContext.put(Parameters.SESSION_STORAGE, storage);
+        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
         sessionContext.put(Parameters.SESSION_USER_ID, userId);
+        sessionContext.put(Parameters.SESSION_STORAGE, storage);
     }
 
     @Nullable
@@ -55,6 +65,10 @@ public class SessionState implements State {
         Object value = storedState.get(Parameters.SESSION_FIRST_ID);
         if (!(value instanceof String)) return null;
         String firstEventId = (String) value;
+
+        value = storedState.get(Parameters.SESSION_FIRST_TIMESTAMP);
+        if (!(value instanceof Long)) return null;
+        String firstEventTimestamp = (String) value;
 
         value = storedState.get(Parameters.SESSION_ID);
         if (!(value instanceof String)) return null;
@@ -70,6 +84,10 @@ public class SessionState implements State {
         if (!(value instanceof Integer)) return null;
         int sessionIndex = (Integer) value;
 
+        value = storedState.get(Parameters.SESSION_EVENT_INDEX);
+        if (!(value instanceof Integer)) return null;
+        int eventIndex = (Integer) value;
+
         value = storedState.get(Parameters.SESSION_USER_ID);
         if (!(value instanceof String)) return null;
         String userId = (String) value;
@@ -78,7 +96,13 @@ public class SessionState implements State {
         if (!(value instanceof String)) return null;
         String storage = (String) value;
 
-        return new SessionState(firstEventId, sessionId, previousSessionId, sessionIndex, userId, storage);
+        return new SessionState(firstEventId, firstEventTimestamp, sessionId, previousSessionId, sessionIndex, eventIndex, userId, storage);
+    }
+
+    public void incrementEventIndex() {
+        Logger.d("SessionState ❌", "incrementEventIndex called. EventIndex is: " + eventIndex);
+        eventIndex += 1;
+        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
     }
 
     // Getters
@@ -86,6 +110,11 @@ public class SessionState implements State {
     @NonNull
     public String getFirstEventId() {
         return firstEventId;
+    }
+
+    @NonNull
+    public String getFirstEventTimestamp() {
+        return firstEventTimestamp;
     }
 
     @Nullable
@@ -101,6 +130,8 @@ public class SessionState implements State {
     public int getSessionIndex() {
         return sessionIndex;
     }
+
+    public int getEventIndex() { return eventIndex; }
 
     @NonNull
     public String getStorage() {

@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.integration;
 
+import static org.junit.Assert.assertNotEquals;
+
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -21,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.TestUtils;
+import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
@@ -48,11 +51,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,6 +144,91 @@ public class EventSendingTest extends AndroidTestCase {
         killMockServer(mockServer);
     }
 
+    public void testSessionContext() throws Exception {
+        MockWebServer mockServer = getMockServer(14);
+        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
+
+
+        EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD");
+        List<EcommerceTransactionItem> items = new LinkedList<>();
+        items.add(item);
+
+        tracker.track(new ScreenView("screenName_1"));
+        tracker.track(new Structured("category_1", "action_1"));
+        tracker.track(new EcommerceTransaction("order-1", 42.50, items));
+        tracker.startNewSession();
+        Thread.sleep(1000);
+        tracker.track(new Structured("category_2", "action_2"));
+        tracker.track(new Structured("category_3", "action_3"));
+
+        waitForTracker(tracker);
+
+        LinkedList<RecordedRequest> requests = getRequests(mockServer, 6);
+
+        JSONObject screenViewSessionData = null;
+        JSONObject structSessionData_1 = null;
+        JSONObject transactionSessionData = null;
+        JSONObject transactionItemSessionData = null;
+        JSONObject structSessionData_2 = null;
+        JSONObject structSessionData_3 = null;
+
+        for (RecordedRequest request : requests) {
+            JSONObject data = new JSONObject(request.getBody().readUtf8()).getJSONArray("data").getJSONObject(0);
+            String eventType = (String) data.get("e");
+            JSONArray contexts = new JSONObject((String) data.get("co")).getJSONArray("data");
+
+            switch (eventType) {
+                case "ue" : screenViewSessionData = getSessionData(contexts);
+                    break;
+                case "se" :
+                    String category = (String) data.get("se_ca");
+                    if (category.equals("category_1")) {
+                        structSessionData_1 = getSessionData(contexts);
+                    } else if (category.equals("category_2"))  {
+                        structSessionData_2 = getSessionData(contexts);
+                    } else {
+                        structSessionData_3 = getSessionData(contexts);
+                    }
+                    break;
+                case "tr" : transactionSessionData = getSessionData(contexts);
+                    break;
+                case "ti" : transactionItemSessionData = getSessionData(contexts);
+                    break;
+                default : break;
+            }
+
+        }
+
+        Logger.d("test ❗️", String.valueOf(screenViewSessionData));
+        Logger.d("test ❗❗️", String.valueOf(structSessionData_1));
+        Logger.d("test ❗❗❗️", String.valueOf(transactionSessionData));
+        Logger.d("test ❗x❗️", String.valueOf(structSessionData_2));
+        Logger.d("test ❗x❗x️❗", String.valueOf(structSessionData_3));
+
+//        Thread.sleep(500);
+
+        assertEquals(1, screenViewSessionData.get("sessionIndex"));
+        assertEquals(2, structSessionData_2.get("sessionIndex"));
+
+        assertEquals(screenViewSessionData.get("firstEventId"), structSessionData_1.get("firstEventId"));
+        assertNotEquals(screenViewSessionData.get("firstEventId"), structSessionData_2.get("firstEventId"));
+        assertEquals(structSessionData_2.get("firstEventId"), structSessionData_3.get("firstEventId"));
+
+        assertEquals(1, screenViewSessionData.get("eventIndex"));
+        assertEquals(2, structSessionData_1.get("eventIndex"));
+        assertEquals(3, transactionSessionData.get("eventIndex"));
+        assertEquals(1, structSessionData_2.get("eventIndex"));
+        assertEquals(2, structSessionData_3.get("eventIndex"));
+
+        assertEquals(screenViewSessionData.get("firstEventTimestamp"), structSessionData_1.get("firstEventTimestamp"));
+        assertNotEquals(screenViewSessionData.get("firstEventTimestamp"), structSessionData_2.get("firstEventTimestamp"));
+        assertEquals(structSessionData_2.get("firstEventTimestamp"), structSessionData_3.get("firstEventTimestamp"));
+
+        assertEquals(structSessionData_1.get("sessionId"), structSessionData_2.get("previousSessionId"));
+
+        killMockServer(mockServer);
+    }
+
     // Helpers
 
     @NonNull
@@ -222,6 +312,27 @@ public class EventSendingTest extends AndroidTestCase {
         }
         Thread.sleep(500);
         tracker.pauseEventTracking();
+    }
+
+    public Map<String, JSONArray> getContextsFromTrackedEvent(RecordedRequest request) throws Exception {
+        JSONObject data = new JSONObject(request.getBody().readUtf8()).getJSONArray("data").getJSONObject(0);
+        JSONArray contexts = new JSONObject((String) data.get("co")).getJSONArray("data");
+        String eventType = (String) data.get("e");
+
+        return Collections.singletonMap(eventType, contexts);
+    }
+
+    public JSONObject getSessionData(JSONArray contexts) throws JSONException {
+        for (int i = 0; i < contexts.length(); i++) {
+            String sessionSchema = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2";
+            JSONObject context = (JSONObject) contexts.get(i);
+            String schema = (String) context.get("schema");
+
+            if (schema.equals(sessionSchema)) {
+                return (JSONObject) context.get("data");
+            }
+        }
+        return null;
     }
 
     // Event Validation
