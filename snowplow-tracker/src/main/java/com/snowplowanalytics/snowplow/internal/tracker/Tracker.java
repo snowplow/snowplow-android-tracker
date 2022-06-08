@@ -721,6 +721,7 @@ public class Tracker {
                 return;
             }
             SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp);
+            Logger.d("Tracker ❗️", String.valueOf(sessionContextJson));
             event.contexts.add(sessionContextJson);
         }
     }

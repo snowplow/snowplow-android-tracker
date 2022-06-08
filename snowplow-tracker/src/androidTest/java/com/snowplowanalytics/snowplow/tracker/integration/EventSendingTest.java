@@ -148,14 +148,8 @@ public class EventSendingTest extends AndroidTestCase {
         MockWebServer mockServer = getMockServer(14);
         Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
 
-
-        EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD");
-        List<EcommerceTransactionItem> items = new LinkedList<>();
-        items.add(item);
-
         tracker.track(new ScreenView("screenName_1"));
         tracker.track(new Structured("category_1", "action_1"));
-        tracker.track(new EcommerceTransaction("order-1", 42.50, items));
         tracker.startNewSession();
         Thread.sleep(1000);
         tracker.track(new Structured("category_2", "action_2"));
@@ -163,12 +157,10 @@ public class EventSendingTest extends AndroidTestCase {
 
         waitForTracker(tracker);
 
-        LinkedList<RecordedRequest> requests = getRequests(mockServer, 6);
+        LinkedList<RecordedRequest> requests = getRequests(mockServer, 4);
 
         JSONObject screenViewSessionData = null;
         JSONObject structSessionData_1 = null;
-        JSONObject transactionSessionData = null;
-        JSONObject transactionItemSessionData = null;
         JSONObject structSessionData_2 = null;
         JSONObject structSessionData_3 = null;
 
@@ -190,10 +182,6 @@ public class EventSendingTest extends AndroidTestCase {
                         structSessionData_3 = getSessionData(contexts);
                     }
                     break;
-                case "tr" : transactionSessionData = getSessionData(contexts);
-                    break;
-                case "ti" : transactionItemSessionData = getSessionData(contexts);
-                    break;
                 default : break;
             }
 
@@ -201,7 +189,6 @@ public class EventSendingTest extends AndroidTestCase {
 
         Logger.d("test ❗️", String.valueOf(screenViewSessionData));
         Logger.d("test ❗❗️", String.valueOf(structSessionData_1));
-        Logger.d("test ❗❗❗️", String.valueOf(transactionSessionData));
         Logger.d("test ❗x❗️", String.valueOf(structSessionData_2));
         Logger.d("test ❗x❗x️❗", String.valueOf(structSessionData_3));
 
@@ -216,7 +203,6 @@ public class EventSendingTest extends AndroidTestCase {
 
         assertEquals(1, screenViewSessionData.get("eventIndex"));
         assertEquals(2, structSessionData_1.get("eventIndex"));
-        assertEquals(3, transactionSessionData.get("eventIndex"));
         assertEquals(1, structSessionData_2.get("eventIndex"));
         assertEquals(2, structSessionData_3.get("eventIndex"));
 

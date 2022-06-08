@@ -9,6 +9,7 @@ import com.snowplowanalytics.snowplow.internal.tracker.State;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SessionState implements State {
 
@@ -21,7 +22,7 @@ public class SessionState implements State {
     @Nullable
     private final String previousSessionId;
     private final int sessionIndex;
-    private volatile int eventIndex;
+    private AtomicInteger eventIndex;
     @NonNull
     private final String userId;
     @NonNull
@@ -45,7 +46,7 @@ public class SessionState implements State {
         this.sessionId = currentSessionId;
         this.previousSessionId = previousSessionId;
         this.sessionIndex = sessionIndex;
-        this.eventIndex = eventIndex;
+        this.eventIndex = new AtomicInteger(eventIndex);
         this.userId = userId;
         this.storage = storage;
 
@@ -55,7 +56,7 @@ public class SessionState implements State {
         sessionContext.put(Parameters.SESSION_ID, sessionId);
         sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
         sessionContext.put(Parameters.SESSION_INDEX, sessionIndex); //$ should be Number?!
-        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
+        sessionContext.put(Parameters.SESSION_EVENT_INDEX, this.eventIndex.get());
         sessionContext.put(Parameters.SESSION_USER_ID, userId);
         sessionContext.put(Parameters.SESSION_STORAGE, storage);
     }
@@ -100,9 +101,8 @@ public class SessionState implements State {
     }
 
     public void incrementEventIndex() {
-        Logger.d("SessionState ❌", "incrementEventIndex called. EventIndex is: " + eventIndex);
-        eventIndex += 1;
-        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
+        Logger.d("SessionState ❌", "incrementEventIndex called. EventIndex is: " + eventIndex.get());
+        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex.incrementAndGet());
     }
 
     // Getters
@@ -131,7 +131,7 @@ public class SessionState implements State {
         return sessionIndex;
     }
 
-    public int getEventIndex() { return eventIndex; }
+    public int getEventIndex() { return eventIndex.get(); }
 
     @NonNull
     public String getStorage() {
