@@ -22,7 +22,6 @@ public class SessionState implements State {
     @Nullable
     private final String previousSessionId;
     private final int sessionIndex;
-    private AtomicInteger eventIndex;
     @NonNull
     private final String userId;
     @NonNull
@@ -37,7 +36,6 @@ public class SessionState implements State {
             @NonNull String currentSessionId,
             @Nullable String previousSessionId, //$ On iOS it has to be set nullable on constructor
             int sessionIndex,
-            int eventIndex,
             @NonNull String userId,
             @NonNull String storage
     ) {
@@ -46,7 +44,6 @@ public class SessionState implements State {
         this.sessionId = currentSessionId;
         this.previousSessionId = previousSessionId;
         this.sessionIndex = sessionIndex;
-        this.eventIndex = new AtomicInteger(eventIndex);
         this.userId = userId;
         this.storage = storage;
 
@@ -56,7 +53,6 @@ public class SessionState implements State {
         sessionContext.put(Parameters.SESSION_ID, sessionId);
         sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
         sessionContext.put(Parameters.SESSION_INDEX, sessionIndex); //$ should be Number?!
-        sessionContext.put(Parameters.SESSION_EVENT_INDEX, this.eventIndex.get());
         sessionContext.put(Parameters.SESSION_USER_ID, userId);
         sessionContext.put(Parameters.SESSION_STORAGE, storage);
     }
@@ -85,10 +81,6 @@ public class SessionState implements State {
         if (!(value instanceof Integer)) return null;
         int sessionIndex = (Integer) value;
 
-        value = storedState.get(Parameters.SESSION_EVENT_INDEX);
-        if (!(value instanceof Integer)) return null;
-        int eventIndex = (Integer) value;
-
         value = storedState.get(Parameters.SESSION_USER_ID);
         if (!(value instanceof String)) return null;
         String userId = (String) value;
@@ -97,12 +89,7 @@ public class SessionState implements State {
         if (!(value instanceof String)) return null;
         String storage = (String) value;
 
-        return new SessionState(firstEventId, firstEventTimestamp, sessionId, previousSessionId, sessionIndex, eventIndex, userId, storage);
-    }
-
-    public void incrementEventIndex() {
-        Logger.d("SessionState ❌", "incrementEventIndex called. EventIndex is: " + eventIndex.get());
-        sessionContext.put(Parameters.SESSION_EVENT_INDEX, eventIndex.incrementAndGet());
+        return new SessionState(firstEventId, firstEventTimestamp, sessionId, previousSessionId, sessionIndex, userId, storage);
     }
 
     // Getters
@@ -130,8 +117,6 @@ public class SessionState implements State {
     public int getSessionIndex() {
         return sessionIndex;
     }
-
-    public int getEventIndex() { return eventIndex.get(); }
 
     @NonNull
     public String getStorage() {

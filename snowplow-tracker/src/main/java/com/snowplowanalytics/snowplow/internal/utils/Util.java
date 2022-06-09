@@ -66,7 +66,7 @@ public class Util {
     }
 
     public static String getDateTimeFromTimestamp(long timestamp) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date date = new Date(timestamp);
         return dateFormat.format(date);
     }

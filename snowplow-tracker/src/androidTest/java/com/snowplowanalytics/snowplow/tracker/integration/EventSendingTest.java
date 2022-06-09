@@ -174,12 +174,16 @@ public class EventSendingTest extends AndroidTestCase {
                     break;
                 case "se" :
                     String category = (String) data.get("se_ca");
-                    if (category.equals("category_1")) {
-                        structSessionData_1 = getSessionData(contexts);
-                    } else if (category.equals("category_2"))  {
-                        structSessionData_2 = getSessionData(contexts);
-                    } else {
-                        structSessionData_3 = getSessionData(contexts);
+                    switch (category) {
+                        case "category_1":
+                            structSessionData_1 = getSessionData(contexts);
+                            break;
+                        case "category_2":
+                            structSessionData_2 = getSessionData(contexts);
+                            break;
+                        case "category_3":
+                            structSessionData_3 = getSessionData(contexts);
+                            break;
                     }
                     break;
                 default : break;
@@ -190,7 +194,7 @@ public class EventSendingTest extends AndroidTestCase {
         Logger.d("test ❗️", String.valueOf(screenViewSessionData));
         Logger.d("test ❗❗️", String.valueOf(structSessionData_1));
         Logger.d("test ❗x❗️", String.valueOf(structSessionData_2));
-        Logger.d("test ❗x❗x️❗", String.valueOf(structSessionData_3));
+        Logger.d("test ❗xx️❗", String.valueOf(structSessionData_3));
 
 //        Thread.sleep(500);
 

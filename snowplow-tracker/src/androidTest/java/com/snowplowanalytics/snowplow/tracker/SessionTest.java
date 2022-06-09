@@ -62,12 +62,10 @@ public class SessionTest extends AndroidTestCase {
         assertNotNull(sessionState);
         assertEquals("first-id-1", sessionState.getFirstEventId());
         assertEquals(timestampDateTime, sessionState.getFirstEventTimestamp());
-        assertEquals(1, sessionState.getEventIndex());
 
         session.getSessionContext("second-id-2", timestamp + 10000);
         assertEquals("first-id-1", sessionState.getFirstEventId());
         assertEquals(timestampDateTime, sessionState.getFirstEventTimestamp());
-        assertEquals(2, sessionState.getEventIndex());
 
         assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.getMap().get("schema"));
     }
@@ -85,7 +83,7 @@ public class SessionTest extends AndroidTestCase {
 
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
         assertEquals("LOCAL_STORAGE", sessionContext.get(Parameters.SESSION_STORAGE));
     }
 
@@ -98,7 +96,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(100);
 
@@ -107,7 +105,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(15100);
 
@@ -116,7 +114,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals("2009-02-13T23:31:41Z", sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
     }
 
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
@@ -130,7 +128,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(100);
 
@@ -139,7 +137,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(15100);
 
@@ -148,7 +146,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals("2009-02-13T23:31:41Z", sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
     }
 
     public void testMixedEventsOnManySessions() throws InterruptedException {
@@ -160,7 +158,7 @@ public class SessionTest extends AndroidTestCase {
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
         assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
-        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+//        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
         String oldSessionId = sessionId;
 
         session.setBackground(true);
