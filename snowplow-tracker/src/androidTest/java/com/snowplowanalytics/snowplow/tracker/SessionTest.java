@@ -357,11 +357,13 @@ public class SessionTest extends AndroidTestCase {
         long initialValue2 = session2.getSessionIndex();
 
         // Retrigger session in tracker1
+        // The timeout is 20s, this sleep is only 2s - it's still the same session
         Thread.sleep(2000);
         session1.getSessionContext("fake-id2", timestamp);
         Thread.sleep(18000);
 
         // Retrigger timedout session in tracker2
+        // 20s has passed. Session must be updated, increasing the sessionIndex by 1
         session2.getSessionContext("fake-id2", timestamp);
 
         // Check sessions have the correct state
