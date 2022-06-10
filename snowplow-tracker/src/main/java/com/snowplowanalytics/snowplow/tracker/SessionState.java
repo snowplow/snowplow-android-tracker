@@ -4,12 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.State;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SessionState implements State {
 
@@ -28,7 +26,7 @@ public class SessionState implements State {
     private final String storage;
 
     @NonNull
-    private Map<String, Object> sessionContext;
+    private final Map<String, Object> sessionContext;
 
     public SessionState(
             @NonNull String firstEventId,
@@ -47,7 +45,7 @@ public class SessionState implements State {
         this.userId = userId;
         this.storage = storage;
 
-        sessionContext = new HashMap<String, Object>();
+        sessionContext = new HashMap<>();
         sessionContext.put(Parameters.SESSION_FIRST_ID, firstEventId);
         sessionContext.put(Parameters.SESSION_FIRST_TIMESTAMP, firstEventTimestamp);
         sessionContext.put(Parameters.SESSION_ID, sessionId);

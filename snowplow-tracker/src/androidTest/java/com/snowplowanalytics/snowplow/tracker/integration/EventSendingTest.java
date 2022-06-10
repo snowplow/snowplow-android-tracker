@@ -23,7 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.TestUtils;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.tracker.Subject;
@@ -57,7 +56,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -158,7 +156,6 @@ public class EventSendingTest extends AndroidTestCase {
         waitForTracker(tracker);
 
         LinkedList<RecordedRequest> requests = getRequests(mockServer, 4);
-
         JSONObject screenViewSessionData = null;
         JSONObject structSessionData_1 = null;
         JSONObject structSessionData_2 = null;
@@ -190,13 +187,6 @@ public class EventSendingTest extends AndroidTestCase {
             }
 
         }
-
-        Logger.d("test ❗️", String.valueOf(screenViewSessionData));
-        Logger.d("test ❗❗️", String.valueOf(structSessionData_1));
-        Logger.d("test ❗x❗️", String.valueOf(structSessionData_2));
-        Logger.d("test ❗xx️❗", String.valueOf(structSessionData_3));
-
-//        Thread.sleep(500);
 
         assertEquals(1, screenViewSessionData.get("sessionIndex"));
         assertEquals(2, structSessionData_2.get("sessionIndex"));
@@ -302,14 +292,6 @@ public class EventSendingTest extends AndroidTestCase {
         }
         Thread.sleep(500);
         tracker.pauseEventTracking();
-    }
-
-    public Map<String, JSONArray> getContextsFromTrackedEvent(RecordedRequest request) throws Exception {
-        JSONObject data = new JSONObject(request.getBody().readUtf8()).getJSONArray("data").getJSONObject(0);
-        JSONArray contexts = new JSONObject((String) data.get("co")).getJSONArray("data");
-        String eventType = (String) data.get("e");
-
-        return Collections.singletonMap(eventType, contexts);
     }
 
     public JSONObject getSessionData(JSONArray contexts) throws JSONException {

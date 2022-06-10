@@ -46,16 +46,16 @@ import java.util.UUID;
 public class TrackerEvents {
 
     public static void trackAll(@NonNull TrackerController tracker) {
-//        trackDeepLink(tracker);
+        trackDeepLink(tracker);
         trackPageView(tracker);
         trackStructuredEvent(tracker);
-//        trackScreenView(tracker);
-//        trackTimings(tracker);
-//        trackUnstructuredEvent(tracker);
-//        trackEcommerceEvent(tracker);
-//        trackConsentGranted(tracker);
-//        trackConsentWithdrawn(tracker);
-//        trackMessageNotification(tracker);
+        trackScreenView(tracker);
+        trackTimings(tracker);
+        trackUnstructuredEvent(tracker);
+        trackEcommerceEvent(tracker);
+        trackConsentGranted(tracker);
+        trackConsentWithdrawn(tracker);
+        trackMessageNotification(tracker);
     }
     
     private static void trackDeepLink(TrackerController tracker) {

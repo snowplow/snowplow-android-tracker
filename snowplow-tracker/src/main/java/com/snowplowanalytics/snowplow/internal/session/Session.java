@@ -201,7 +201,10 @@ public class Session {
 
         Map<String, Object> sessionValues = state.getSessionValues();
         sessionValues.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
-        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionValues);
+        Map<String, Object> sessionCopy = new HashMap<>();
+        sessionCopy.putAll(sessionValues);
+
+        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
     }
 
     private boolean shouldUpdateSession() {
