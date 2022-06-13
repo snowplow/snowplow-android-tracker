@@ -204,7 +204,7 @@ public class Session {
         Map<String, Object> sessionCopy = new HashMap<>();
         sessionCopy.putAll(sessionValues);
 
-        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionValues);
+        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
     }
 
     private boolean shouldUpdateSession() {
