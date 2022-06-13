@@ -106,7 +106,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendGet() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.GET);
+        Tracker tracker = getTracker("namespace", getMockServerURI(mockServer), HttpMethod.GET);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -125,7 +125,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendPost() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
+        Tracker tracker = getTracker("namespace", getMockServerURI(mockServer), HttpMethod.POST);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -144,7 +144,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSessionContext() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
+        Tracker tracker = getTracker("namespaceSessionTest", getMockServerURI(mockServer), HttpMethod.POST);
 
         tracker.track(new ScreenView("screenName_1"));
         tracker.track(new Structured("category_1", "action_1"));
@@ -212,8 +212,7 @@ public class EventSendingTest extends AndroidTestCase {
     // Helpers
 
     @NonNull
-    public Tracker getTracker(String uri, HttpMethod method) {
-        String namespace = "myNamespace";
+    public Tracker getTracker(String namespace, String uri, HttpMethod method) {
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
         Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
