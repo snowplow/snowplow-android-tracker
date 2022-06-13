@@ -15,7 +15,7 @@ public class UtilTest extends AndroidTestCase {
 
     public void testGetDateTimeFromTimestamp() {
         long timestamp = 1653923456266L;
-        assertEquals("2022-05-30T16:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+        assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
     }
 
     public void testBase64Encode() {
