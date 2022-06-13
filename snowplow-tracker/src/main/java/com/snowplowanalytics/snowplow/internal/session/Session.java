@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Component that generate a Session context
@@ -200,9 +199,9 @@ public class Session {
         eventIndex += 1;
 
         Map<String, Object> sessionValues = state.getSessionValues();
-        sessionValues.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
         Map<String, Object> sessionCopy = new HashMap<>();
         sessionCopy.putAll(sessionValues);
+        sessionCopy.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
 
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
     }
