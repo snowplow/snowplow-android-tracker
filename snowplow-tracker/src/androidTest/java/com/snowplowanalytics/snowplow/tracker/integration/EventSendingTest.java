@@ -106,7 +106,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendGet() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker("namespace", getMockServerURI(mockServer), HttpMethod.GET);
+        Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.GET);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -125,7 +125,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendPost() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker("namespace", getMockServerURI(mockServer), HttpMethod.POST);
+        Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.POST);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
