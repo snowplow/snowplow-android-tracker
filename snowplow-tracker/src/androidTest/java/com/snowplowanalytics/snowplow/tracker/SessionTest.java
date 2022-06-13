@@ -349,8 +349,8 @@ public class SessionTest extends AndroidTestCase {
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
-        session1.getSessionContext("fake-id1", timestamp);
-        session2.getSessionContext("fake-id1", timestamp);
+        session1.getSessionContext("session1-fake-id1", timestamp);
+        session2.getSessionContext("session2-fake-id1", timestamp);
 
         long initialValue1 = session1.getSessionIndex();
         String id1 = session1.getState().getSessionId();
@@ -359,12 +359,12 @@ public class SessionTest extends AndroidTestCase {
         // Retrigger session in tracker1
         // The timeout is 20s, this sleep is only 2s - it's still the same session
         Thread.sleep(2000);
-        session1.getSessionContext("fake-id2", timestamp);
-        Thread.sleep(18000);
+        session1.getSessionContext("session1-fake-id2", timestamp);
 
         // Retrigger timedout session in tracker2
-        // 20s has passed. Session must be updated, increasing the sessionIndex by 1
-        session2.getSessionContext("fake-id2", timestamp);
+        // 20s has then passed. Session must be updated, increasing the sessionIndex by 1
+        Thread.sleep(18000);
+        session2.getSessionContext("session2-fake-id2", timestamp);
 
         // Check sessions have the correct state
         assertEquals(0, session1.getSessionIndex() - initialValue1);
@@ -377,7 +377,7 @@ public class SessionTest extends AndroidTestCase {
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
         );
-        tracker2b.getSession().getSessionContext("fake-id3", timestamp);
+        tracker2b.getSession().getSessionContext("session2b-fake-id3", timestamp);
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getState().getPreviousSessionId();
 

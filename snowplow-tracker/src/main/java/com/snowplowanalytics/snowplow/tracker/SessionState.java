@@ -62,7 +62,7 @@ public class SessionState implements State {
         String firstEventId = (String) value;
 
         value = storedState.get(Parameters.SESSION_FIRST_TIMESTAMP);
-        if (!(value instanceof Long)) return null;
+        if (!(value instanceof String)) return null;
         String firstEventTimestamp = (String) value;
 
         value = storedState.get(Parameters.SESSION_ID);
