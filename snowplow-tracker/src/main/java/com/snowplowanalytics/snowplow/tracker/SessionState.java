@@ -13,21 +13,24 @@ public class SessionState implements State {
 
     @NonNull
     private final String firstEventId;
-    @Nullable
-    private final String previousSessionId;
+    @NonNull
+    private final String firstEventTimestamp;
     @NonNull
     private final String sessionId;
+    @Nullable
+    private final String previousSessionId;
     private final int sessionIndex;
     @NonNull
-    private final String storage;
-    @NonNull
     private final String userId;
+    @NonNull
+    private final String storage;
 
     @NonNull
-    private Map<String, Object> sessionContext;
+    private final Map<String, Object> sessionContext;
 
     public SessionState(
             @NonNull String firstEventId,
+            @NonNull String firstEventTimestamp,
             @NonNull String currentSessionId,
             @Nullable String previousSessionId, //$ On iOS it has to be set nullable on constructor
             int sessionIndex,
@@ -35,19 +38,21 @@ public class SessionState implements State {
             @NonNull String storage
     ) {
         this.firstEventId = firstEventId;
+        this.firstEventTimestamp = firstEventTimestamp;
         this.sessionId = currentSessionId;
         this.previousSessionId = previousSessionId;
         this.sessionIndex = sessionIndex;
         this.userId = userId;
         this.storage = storage;
 
-        sessionContext = new HashMap<String, Object>();
-        sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
-        sessionContext.put(Parameters.SESSION_ID, sessionId);
+        sessionContext = new HashMap<>();
         sessionContext.put(Parameters.SESSION_FIRST_ID, firstEventId);
+        sessionContext.put(Parameters.SESSION_FIRST_TIMESTAMP, firstEventTimestamp);
+        sessionContext.put(Parameters.SESSION_ID, sessionId);
+        sessionContext.put(Parameters.SESSION_PREVIOUS_ID, previousSessionId);
         sessionContext.put(Parameters.SESSION_INDEX, sessionIndex); //$ should be Number?!
-        sessionContext.put(Parameters.SESSION_STORAGE, storage);
         sessionContext.put(Parameters.SESSION_USER_ID, userId);
+        sessionContext.put(Parameters.SESSION_STORAGE, storage);
     }
 
     @Nullable
@@ -55,6 +60,10 @@ public class SessionState implements State {
         Object value = storedState.get(Parameters.SESSION_FIRST_ID);
         if (!(value instanceof String)) return null;
         String firstEventId = (String) value;
+
+        value = storedState.get(Parameters.SESSION_FIRST_TIMESTAMP);
+        if (!(value instanceof String)) return null;
+        String firstEventTimestamp = (String) value;
 
         value = storedState.get(Parameters.SESSION_ID);
         if (!(value instanceof String)) return null;
@@ -78,7 +87,7 @@ public class SessionState implements State {
         if (!(value instanceof String)) return null;
         String storage = (String) value;
 
-        return new SessionState(firstEventId, sessionId, previousSessionId, sessionIndex, userId, storage);
+        return new SessionState(firstEventId, firstEventTimestamp, sessionId, previousSessionId, sessionIndex, userId, storage);
     }
 
     // Getters
@@ -86,6 +95,11 @@ public class SessionState implements State {
     @NonNull
     public String getFirstEventId() {
         return firstEventId;
+    }
+
+    @NonNull
+    public String getFirstEventTimestamp() {
+        return firstEventTimestamp;
     }
 
     @Nullable

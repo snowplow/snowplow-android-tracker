@@ -714,12 +714,13 @@ public class Tracker {
     private void workaroundForIncoherentSessionContext(@NonNull TrackerEvent event) {
         if (!event.isService && sessionContext) {
             String eventId = event.eventId.toString();
+            long eventTimestamp = event.timestamp;
             Session sessionManager = trackerSession;
             if (sessionManager == null) {
                 Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
                 return;
             }
-            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId);
+            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp);
             event.contexts.add(sessionContextJson);
         }
     }
