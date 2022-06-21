@@ -24,6 +24,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -189,9 +192,43 @@ public class OkHttpNetworkConnection implements NetworkConnection {
                     .sslSocketFactory(tlsArguments.getSslSocketFactory(), tlsArguments.getTrustManager())
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(15, TimeUnit.SECONDS)
+                    .cookieJar(new CookieJar())
                     .build();
         } else {
             client = builder.client;
+        }
+    }
+
+    public static Cookie createNonPersistentCookie() {
+        return new Cookie.Builder()
+                .domain("0674-82-26-43-253.ngrok.io")
+                .path("/")
+                .name("cookie-name")
+                .value("cookie-value")
+//                .httpOnly()
+//                .secure()
+                .build();
+    }
+
+    private class CookieJar implements okhttp3.CookieJar {
+        private final HashMap<String, List<Cookie>> cookieStore = new HashMap<>();
+
+        @NonNull
+        @Override
+        public List<Cookie> loadForRequest(@NonNull HttpUrl httpUrl) {
+            Logger.d(TAG, "🍪 in loadForRequest");
+
+//            ArrayList<Cookie> fakeCookies = new ArrayList<>();
+//            fakeCookies.add(createNonPersistentCookie());
+            List<Cookie> cookies = cookieStore.get(httpUrl.host());
+            Logger.d(TAG, "🍪 " + cookieStore);
+            return cookies != null ? cookies : new ArrayList<>();
+        }
+
+        @Override
+        public void saveFromResponse(@NonNull HttpUrl httpUrl, @NonNull List<Cookie> cookies) {
+            Logger.d(TAG, "🍪 got cookies: " + cookies);
+            cookieStore.put(httpUrl.host(), cookies);
         }
     }
 

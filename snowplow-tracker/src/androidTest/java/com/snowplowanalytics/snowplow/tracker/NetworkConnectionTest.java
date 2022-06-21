@@ -18,7 +18,15 @@ import android.test.AndroidTestCase;
 
 import androidx.annotation.NonNull;
 
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
+import com.snowplowanalytics.snowplow.event.ScreenView;
+import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.snowplow.internal.tracker.Subject;
+import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
+import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.network.Request;
@@ -215,6 +223,48 @@ public class NetworkConnectionTest extends AndroidTestCase {
                         .method(POST)
                         .build();
         assertTrue(connection.getUri().toString().startsWith("http://acme.test.url.com"));
+    }
+
+    public void testCookieJar() throws InterruptedException {
+
+        Emitter emitter = new Emitter(getContext(), "0674-82-26-43-253.ngrok.io", new Emitter.EmitterBuilder()
+                .option(BufferOption.Single)
+                .method(HttpMethod.GET)
+                .security(Protocol.HTTPS)
+                .tick(0)
+                .emptyLimit(0)
+        );
+
+        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.DEBUG)
+        );
+
+        tracker.track(new ScreenView("cookie_test_1"));
+        Thread.sleep(1000);
+        tracker.track(new Structured("cookie_test_2", "action_1"));
+
+
+
+        int counter = 0;
+        while (!tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        counter = 0;
+        while (tracker.getEmitter().getEmitterStatus()) {
+            Thread.sleep(500);
+            counter++;
+            if (counter > 10) {
+                return;
+            }
+        }
+        Thread.sleep(500);
+        tracker.pauseEventTracking();
+
     }
 
 
