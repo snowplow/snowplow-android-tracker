@@ -18,15 +18,8 @@ import android.test.AndroidTestCase;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.event.ScreenView;
-import com.snowplowanalytics.snowplow.event.Structured;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.internal.tracker.Subject;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.network.CollectorCookieJar;
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
-import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.network.Request;
@@ -38,6 +31,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -52,14 +46,13 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
-import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
 
 public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testGetRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
                         .method(GET)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
                         .emitTimeout(10)
@@ -86,7 +79,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
     public void testGetRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
                         .method(GET)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
                         .emitTimeout(10)
@@ -111,7 +104,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
     public void testPostRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
                         .method(POST)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
                         .emitTimeout(10)
@@ -142,7 +135,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
     public void testPostRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
                         .method(POST)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
                         .emitTimeout(10)
@@ -180,7 +173,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         MockWebServer mockServer = getMockServer(200);
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer))
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
                         .method(GET)
                         .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
                         .emitTimeout(10)
@@ -203,7 +196,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testFreeEndpoint_GetHttpsUrl() {
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("acme.test.url.com")
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("acme.test.url.com", getContext())
                         .method(POST)
                         .build();
         assertTrue(connection.getUri().toString().startsWith("https://acme.test.url.com"));
@@ -211,7 +204,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testHttpsEndpoint_GetHttpsUrl() {
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("https://acme.test.url.com")
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("https://acme.test.url.com", getContext())
                         .method(POST)
                         .build();
         assertTrue(connection.getUri().toString().startsWith("https://acme.test.url.com"));
@@ -219,54 +212,41 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
     public void testHttpEndpoint_GetHttpUrl() {
         OkHttpNetworkConnection connection =
-                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("http://acme.test.url.com")
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("http://acme.test.url.com", getContext())
                         .method(POST)
                         .build();
         assertTrue(connection.getUri().toString().startsWith("http://acme.test.url.com"));
     }
 
-    public void testCookieJar() throws InterruptedException {
+    public void testRequestWithCookies() throws IOException, InterruptedException {
+        MockWebServer mockServer = new MockWebServer();
+        mockServer.start();
 
-        Emitter emitter = new Emitter(getContext(), "0674-82-26-43-253.ngrok.io", new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-                .method(HttpMethod.GET)
-                .security(Protocol.HTTPS)
-                .tick(0)
-                .emptyLimit(0)
+        mockServer.enqueue(
+                new MockResponse().addHeader("Set-Cookie", "sp=test")
         );
 
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.DEBUG)
-        );
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
+                        .method(POST)
+                        .tls(EnumSet.of(TLSVersion.TLSv1_1, TLSVersion.TLSv1_2))
+                        .emitTimeout(10)
+                        .build();
 
-        tracker.track(new ScreenView("cookie_test_1"));
-        Thread.sleep(1000);
-        tracker.track(new Structured("cookie_test_2", "action_1"));
+        Payload payload = new TrackerPayload();
+        payload.add("key", "value");
 
+        connection.sendRequests(Arrays.asList(new Request(payload, 1)));
+        mockServer.takeRequest(60, TimeUnit.SECONDS);
 
+        connection.sendRequests(Arrays.asList(new Request(payload, 2)));
 
-        int counter = 0;
-        while (!tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        counter = 0;
-        while (tracker.getEmitter().getEmitterStatus()) {
-            Thread.sleep(500);
-            counter++;
-            if (counter > 10) {
-                return;
-            }
-        }
-        Thread.sleep(500);
-        tracker.pauseEventTracking();
+        RecordedRequest req = mockServer.takeRequest(60, TimeUnit.SECONDS);
+        assertEquals("sp=test", req.getHeader("Cookie"));
 
+        mockServer.shutdown();
+        new CollectorCookieJar(getContext()).clear();
     }
-
 
     // Service methods
 

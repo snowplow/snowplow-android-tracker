@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 
 /**
@@ -54,6 +55,11 @@ public class NetworkConfiguration implements NetworkConfigurationInterface, Conf
      */
     @Nullable
     public OkHttpClient okHttpClient;
+
+    /**
+     * @see #okHttpCookieJar(CookieJar)
+     */
+    public CookieJar okHttpCookieJar;
 
     // Constructors
 
@@ -162,6 +168,12 @@ public class NetworkConfiguration implements NetworkConfigurationInterface, Conf
         return okHttpClient;
     }
 
+    @Override
+    @Nullable
+    public CookieJar getOkHttpCookieJar() {
+        return okHttpCookieJar;
+    }
+
     // Builder methods
 
     /**
@@ -191,6 +203,16 @@ public class NetworkConfiguration implements NetworkConfigurationInterface, Conf
     @NonNull
     public NetworkConfiguration okHttpClient(@NonNull OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
+        return this;
+    }
+
+    /**
+     * An OkHttp cookie jar to override the default cookie jar that stores cookies in SharedPreferences.
+     * The cookie jar will be ignored in case custom `okHttpClient` is configured.
+     */
+    @NonNull
+    public NetworkConfiguration okHttpCookieJar(@NonNull CookieJar okHttpCookieJar) {
+        this.okHttpCookieJar = okHttpCookieJar;
         return this;
     }
 

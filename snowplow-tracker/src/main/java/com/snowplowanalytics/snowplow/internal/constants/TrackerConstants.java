@@ -54,4 +54,6 @@ public class TrackerConstants {
 
     public static final String INSTALLED_BEFORE = "installed_before";
     public static final String INSTALL_TIMESTAMP = "install_timestamp";
+
+    public static final String COOKIE_PERSISTANCE = "cookie_persistance";
 }
