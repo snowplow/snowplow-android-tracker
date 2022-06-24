@@ -369,7 +369,8 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .byteLimitPost(emitterConfig.getByteLimitPost())
                 .byteLimitGet(emitterConfig.getByteLimitGet())
                 .threadPoolSize(emitterConfig.getThreadPoolSize())
-                .callback(emitterConfig.getRequestCallback());
+                .callback(emitterConfig.getRequestCallback())
+                .customRetryForStatusCodes(emitterConfig.getCustomRetryForStatusCodes());
         HttpMethod method = networkConfig.getMethod();
         if (method != null) {
             builder.method(method);

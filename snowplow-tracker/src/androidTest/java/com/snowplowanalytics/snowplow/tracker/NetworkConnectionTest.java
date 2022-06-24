@@ -69,7 +69,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         // Check successful result
         RequestResult result = results.get(0);
-        assertTrue(result.getSuccess());
+        assertTrue(result.isSuccessful());
         assertEquals(1, result.getEventIds().get(0).longValue());
 
         mockServer.shutdown();
@@ -94,7 +94,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         // Check unsuccessful result
         RequestResult result = results.get(0);
-        assertFalse(result.getSuccess());
+        assertFalse(result.isSuccessful());
         assertEquals(1, result.getEventIds().get(0).longValue());
 
         mockServer.shutdown();
@@ -125,7 +125,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         // Check successful result
         RequestResult result = results.get(0);
-        assertTrue(result.getSuccess());
+        assertTrue(result.isSuccessful());
         assertEquals(1, result.getEventIds().get(0).longValue());
 
         mockServer.shutdown();
@@ -151,7 +151,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         // Check unsuccessful result
         RequestResult result = results.get(0);
-        assertFalse(result.getSuccess());
+        assertFalse(result.isSuccessful());
         assertEquals(1, result.getEventIds().get(0).longValue());
 
         mockServer.shutdown();

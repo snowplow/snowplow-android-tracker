@@ -36,7 +36,7 @@ public class ServiceProviderTest extends AndroidTestCase {
         trackerConfig.lifecycleAutotracking = false;
         trackerConfig.screenViewAutotracking = false;
         trackerConfig.diagnosticAutotracking = false;
-        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, true);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
         networkConfig.networkConnection = networkConnection;
         List<Configuration> configurations = new ArrayList<>();
         configurations.add(trackerConfig);

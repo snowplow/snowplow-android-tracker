@@ -243,11 +243,9 @@ public class OkHttpNetworkConnection implements NetworkConnection {
 
             Request request = requests.get(i);
             List<Long> eventIds = request.emitterEventIds;
+            results.add(new RequestResult(code, request.oversize, eventIds));
             if (request.oversize) {
                 Logger.track(TAG, "Request is oversized for emitter event IDs: %s", eventIds.toString());
-                results.add(new RequestResult(true, eventIds));
-            } else {
-                results.add(new RequestResult(isSuccessfulSend(code), eventIds));
             }
         }
         return results;

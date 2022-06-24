@@ -35,8 +35,10 @@ import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,7 +80,7 @@ public class Emitter {
     private final AtomicReference<NetworkConnection> networkConnection = new AtomicReference<NetworkConnection>();
     private EventStore eventStore;
     private int emptyCount;
-
+    private final AtomicReference<Map<Integer, Boolean>> customRetryForStatusCodes = new AtomicReference<>();
     private AtomicBoolean isRunning = new AtomicBoolean(false);
     private AtomicBoolean isEmittingPaused = new AtomicBoolean(false);
 
@@ -103,6 +105,7 @@ public class Emitter {
         @Nullable String customPostPath = null; //Optional
         @Nullable NetworkConnection networkConnection = null; // Optional
         @Nullable EventStore eventStore = null; // Optional
+        @Nullable Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
 
         /**
          * @param networkConnection The component in charge for sending events to the collector.
@@ -289,6 +292,17 @@ public class Emitter {
             this.threadPoolSize = threadPoolSize;
             return this;
         }
+
+        /**
+         * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
+         * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder customRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+            this.customRetryForStatusCodes = customRetryForStatusCodes;
+            return this;
+        }
     }
 
     /**
@@ -339,6 +353,8 @@ public class Emitter {
         if (builder.threadPoolSize > 2) {
             Executor.setThreadCount(builder.threadPoolSize);
         }
+
+        setCustomRetryForStatusCodes(builder.customRetryForStatusCodes);
 
         Logger.v(TAG, "Emitter created successfully!");
     }
@@ -481,32 +497,39 @@ public class Emitter {
         Logger.v(TAG, "Processing emitter results.");
 
         int successCount = 0;
-        int failureCount = 0;
+        int failedWillRetryCount = 0;
+        int failedWontRetryCount = 0;
         List<Long> removableEvents = new ArrayList<>();
 
         for (RequestResult res : results) {
-            if (res.getSuccess()) {
+            if (res.isSuccessful()) {
                 removableEvents.addAll(res.getEventIds());
                 successCount += res.getEventIds().size();
-            } else {
-                failureCount += res.getEventIds().size();
+            } else if (res.shouldRetry(customRetryForStatusCodes.get())) {
+                failedWillRetryCount += res.getEventIds().size();
                 Logger.e(TAG, "Request sending failed but we will retry later.");
+            } else {
+                failedWontRetryCount += res.getEventIds().size();
+                removableEvents.addAll(res.getEventIds());
+                Logger.e(TAG, String.format("Sending events to Collector failed with status %d. Events will be dropped.", res.getStatusCode()));
             }
         }
         eventStore.removeEvents(removableEvents);
 
+        int allFailureCount = failedWillRetryCount + failedWontRetryCount;
+
         Logger.d(TAG, "Success Count: %s", successCount);
-        Logger.d(TAG, "Failure Count: %s", failureCount);
+        Logger.d(TAG, "Failure Count: %s", allFailureCount);
 
         if (requestCallback != null) {
-            if (failureCount != 0) {
-                requestCallback.onFailure(successCount, failureCount);
+            if (allFailureCount != 0) {
+                requestCallback.onFailure(successCount, allFailureCount);
             } else {
                 requestCallback.onSuccess(successCount);
             }
         }
 
-        if (failureCount > 0 && successCount == 0) {
+        if (failedWillRetryCount > 0 && successCount == 0) {
             if (Util.isOnline(this.context)) {
                 Logger.e(TAG, "Ensure collector path is valid: %s", networkConnection.getUri());
             }
@@ -899,5 +922,16 @@ public class Emitter {
 
     private void setNetworkConnection(@NonNull NetworkConnection networkConnection) {
         this.networkConnection.set(networkConnection);
+    }
+
+    @NonNull
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return customRetryForStatusCodes.get();
+    }
+
+    public void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes.set(
+                customRetryForStatusCodes == null ? new HashMap<>() : customRetryForStatusCodes
+        );
     }
 }

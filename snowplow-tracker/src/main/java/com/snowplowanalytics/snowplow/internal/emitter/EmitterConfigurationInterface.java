@@ -7,6 +7,8 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
+import java.util.Map;
+
 public interface EmitterConfigurationInterface {
 
     /**
@@ -74,4 +76,17 @@ public interface EmitterConfigurationInterface {
      * Callback called for each request performed by the tracker to the collector.
      */
     void setRequestCallback(@Nullable RequestCallback requestCallback);
+
+    /**
+     * Custom retry rules for HTTP status codes returned from the Collector.
+     * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false for not retry).
+     */
+    @Nullable
+    Map<Integer, Boolean> getCustomRetryForStatusCodes();
+
+    /**
+     * Custom retry rules for HTTP status codes returned from the Collector.
+     * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false for not retry).
+     */
+    void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes);
 }

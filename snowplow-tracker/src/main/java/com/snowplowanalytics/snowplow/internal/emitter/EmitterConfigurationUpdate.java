@@ -8,6 +8,8 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
+import java.util.Map;
+
 public class EmitterConfigurationUpdate extends EmitterConfiguration {
 
     @Nullable
@@ -64,5 +66,13 @@ public class EmitterConfigurationUpdate extends EmitterConfiguration {
 
     public long getByteLimitPost() {
         return (sourceConfig == null || byteLimitPostUpdated) ? super.byteLimitPost : sourceConfig.byteLimitPost;
+    }
+
+    // customRetryForStatusCodes flag
+
+    public boolean customRetryForStatusCodesUpdated;
+
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return (sourceConfig == null || customRetryForStatusCodesUpdated) ? super.customRetryForStatusCodes : sourceConfig.customRetryForStatusCodes;
     }
 }

@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MockNetworkConnection implements NetworkConnection {
-    public boolean successfulConnection;
+    public int statusCode;
     public HttpMethod httpMethod;
 
     public final List<List<RequestResult>> previousResults = new ArrayList<>();
 
-    public MockNetworkConnection(HttpMethod httpMethod, boolean successfulConnection) {
+    public MockNetworkConnection(HttpMethod httpMethod, int statusCode) {
         this.httpMethod = httpMethod;
-        this.successfulConnection = successfulConnection;
+        this.statusCode = statusCode;
     }
 
     public int sendingCount() {
@@ -33,9 +33,8 @@ class MockNetworkConnection implements NetworkConnection {
     public List<RequestResult> sendRequests(@NonNull List<Request> requests) {
         List<RequestResult> requestResults = new ArrayList<>(requests.size());
         for (Request request : requests) {
-            boolean isSuccessful = request.oversize || successfulConnection;
-            RequestResult result = new RequestResult(isSuccessful, request.emitterEventIds);
-            Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, Boolean.valueOf(isSuccessful).toString());
+            RequestResult result = new RequestResult(statusCode, request.oversize, request.emitterEventIds);
+            Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, Boolean.valueOf(result.isSuccessful()).toString());
             requestResults.add(result);
         }
         previousResults.add(requestResults);
