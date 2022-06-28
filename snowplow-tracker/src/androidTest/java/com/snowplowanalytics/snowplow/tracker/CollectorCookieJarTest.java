@@ -1,6 +1,18 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.test.AndroidTestCase;
+import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.COOKIE_PERSISTANCE;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.snowplowanalytics.snowplow.network.CollectorCookieJar;
 
@@ -10,22 +22,27 @@ import java.util.List;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
-public class CollectorCookieJarTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class CollectorCookieJarTest {
     Cookie cookie1 = new Cookie.Builder()
             .name("sp")
             .value("xxx")
             .domain("acme.test.url.com")
             .build();
 
+    @Test
     public void testNoCookiesAtStartup() {
-        CollectorCookieJar cookieJar = new CollectorCookieJar(getContext());
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        CollectorCookieJar cookieJar = new CollectorCookieJar(context);
 
         List<Cookie> cookies1 = cookieJar.loadForRequest(HttpUrl.parse("http://acme.test.url.com"));
         assertTrue(cookies1.isEmpty());
     }
 
+    @Test
     public void testReturnsCookiesAfterSetInResponse() {
-        CollectorCookieJar cookieJar = new CollectorCookieJar(getContext());
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        CollectorCookieJar cookieJar = new CollectorCookieJar(context);
 
         ArrayList<Cookie> requestCookies = new ArrayList<Cookie>();
         requestCookies.add(cookie1);
@@ -41,8 +58,10 @@ public class CollectorCookieJarTest extends AndroidTestCase {
         cookieJar.clear();
     }
 
+    @Test
     public void testDoesntReturnCookiesForDifferentDomain() {
-        CollectorCookieJar cookieJar = new CollectorCookieJar(getContext());
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        CollectorCookieJar cookieJar = new CollectorCookieJar(context);
 
         ArrayList<Cookie> requestCookies = new ArrayList<Cookie>();
         requestCookies.add(cookie1);
@@ -67,7 +86,7 @@ public class CollectorCookieJarTest extends AndroidTestCase {
                 requestCookies
         );
 
-        CollectorCookieJar cookieJar2 = new CollectorCookieJar(getContext());
+        CollectorCookieJar cookieJar2 = new CollectorCookieJar(context);
 
         List<Cookie> cookies2 = cookieJar2.loadForRequest(HttpUrl.parse("http://acme.test.url.com"));
         assertFalse(cookies2.isEmpty());
