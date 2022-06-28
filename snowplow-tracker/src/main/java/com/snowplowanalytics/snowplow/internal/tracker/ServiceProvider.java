@@ -363,6 +363,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .networkConnection(networkConfig.getNetworkConnection())
                 .customPostPath(networkConfig.getCustomPostPath())
                 .client(networkConfig.getOkHttpClient())
+                .cookieJar(networkConfig.getOkHttpCookieJar())
                 .sendLimit(emitterConfig.getEmitRange())
                 .option(emitterConfig.getBufferOption())
                 .eventStore(emitterConfig.getEventStore())

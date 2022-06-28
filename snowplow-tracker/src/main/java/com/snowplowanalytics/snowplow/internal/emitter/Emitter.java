@@ -44,6 +44,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 
 import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
@@ -75,6 +77,7 @@ public class Emitter {
     private TimeUnit timeUnit;
     private String customPostPath;
     private OkHttpClient client;
+    private CookieJar cookieJar;
 
     private boolean isCustomNetworkConnection;
     private final AtomicReference<NetworkConnection> networkConnection = new AtomicReference<NetworkConnection>();
@@ -102,6 +105,7 @@ public class Emitter {
         int threadPoolSize = 2; // Optional
         @NonNull TimeUnit timeUnit = TimeUnit.SECONDS;
         @Nullable OkHttpClient client = null; //Optional
+        @Nullable CookieJar cookieJar = null; // Optional
         @Nullable String customPostPath = null; //Optional
         @Nullable NetworkConnection networkConnection = null; // Optional
         @Nullable EventStore eventStore = null; // Optional
@@ -274,6 +278,18 @@ public class Emitter {
         }
 
         /**
+         * @param cookieJar An OkHttp cookie jar to override the default cookie jar that stores
+         *                  cookies in SharedPreferences. The cookie jar will be ignored in case
+         *                  custom `client` is configured.
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder cookieJar(@Nullable CookieJar cookieJar) {
+            this.cookieJar = cookieJar;
+            return this;
+        }
+
+        /**
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
@@ -338,12 +354,13 @@ public class Emitter {
                 endpoint = protocol + endpoint;
             }
             this.uri = endpoint;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint, context)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
                     .emitTimeout(builder.emitTimeout)
                     .customPostPath(builder.customPostPath)
                     .client(builder.client)
+                    .cookieJar(builder.cookieJar)
                     .build());
         } else {
             isCustomNetworkConnection = true;
@@ -710,12 +727,13 @@ public class Emitter {
     public void setHttpMethod(@NonNull HttpMethod method) {
         if (!isCustomNetworkConnection) {
             this.httpMethod = method;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -728,12 +746,13 @@ public class Emitter {
     public void setRequestSecurity(@NonNull Protocol security) {
         if (!isCustomNetworkConnection) {
             this.requestSecurity = security;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -746,12 +765,13 @@ public class Emitter {
     public void setEmitterUri(@NonNull String uri) {
         if (!isCustomNetworkConnection) {
             this.uri = uri;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -764,12 +784,13 @@ public class Emitter {
     public void setCustomPostPath(@Nullable String customPostPath) {
         if (!isCustomNetworkConnection) {
             this.customPostPath = customPostPath;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -782,12 +803,13 @@ public class Emitter {
     public void setEmitTimeout(int emitTimeout) {
         if (!isCustomNetworkConnection) {
             this.emitTimeout = emitTimeout;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }

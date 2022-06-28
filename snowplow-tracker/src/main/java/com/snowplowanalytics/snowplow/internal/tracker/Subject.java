@@ -210,8 +210,8 @@ public class Subject {
     }
 
     /**
-     * User inputted Network User Id for the
-     * subject.
+     * User inputted Network User ID for the subject.
+     * This overrides the network user ID set by the Collector in response Cookies.
      * @param networkUserId a network user id
      */
     public void setNetworkUserId(@NonNull String networkUserId) {

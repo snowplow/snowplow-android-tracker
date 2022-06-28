@@ -1,5 +1,6 @@
 package com.snowplowanalytics.snowplow.network;
 
+import android.content.Context;
 import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Build;
@@ -24,6 +25,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -57,17 +60,20 @@ public class OkHttpNetworkConnection implements NetworkConnection {
      */
     public static class OkHttpNetworkConnectionBuilder {
         final String uri; // Required
+        Context context; // Required
         HttpMethod httpMethod = POST; // Optional
         EnumSet<TLSVersion> tlsVersions = EnumSet.of(TLSVersion.TLSv1_2); // Optional
         private int emitTimeout = 5; // Optional
         OkHttpClient client = null; //Optional
+        CookieJar cookieJar = null; // Optional
         String customPostPath = null; //Optional
 
         /**
          * @param uri The uri of the collector
          */
-        public OkHttpNetworkConnectionBuilder(@NonNull String uri) {
+        public OkHttpNetworkConnectionBuilder(@NonNull String uri, @NonNull Context context) {
             this.uri = uri;
+            this.context = context;
         }
 
         /**
@@ -120,6 +126,18 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         @NonNull
         public OkHttpNetworkConnectionBuilder client(@Nullable OkHttpClient client) {
             this.client = client;
+            return this;
+        }
+
+        /**
+         * @param cookieJar An OkHttp cookie jar to override the default cookie jar that stores
+         *                  cookies in SharedPreferences. The cookie jar will be ignored in case
+         *                  custom `client` is configured.
+         * @return itself
+         */
+        @NonNull
+        public OkHttpNetworkConnectionBuilder cookieJar(@Nullable CookieJar cookieJar) {
+            this.cookieJar = cookieJar;
             return this;
         }
 
@@ -189,6 +207,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
                     .sslSocketFactory(tlsArguments.getSslSocketFactory(), tlsArguments.getTrustManager())
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(15, TimeUnit.SECONDS)
+                    .cookieJar(builder.cookieJar == null ? new CollectorCookieJar(builder.context) : builder.cookieJar)
                     .build();
         } else {
             client = builder.client;
