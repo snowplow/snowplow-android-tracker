@@ -18,7 +18,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.event.Foreground;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.session.Session;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
@@ -36,6 +35,9 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertNotEquals;
 
 public class SessionTest extends AndroidTestCase {
+
+    long timestamp = 1234567891012L;
+    String timestampDateTime = "2009-02-13T23:31:31.012Z";
 
     @Override
     protected void setUp() throws Exception {
@@ -55,12 +57,15 @@ public class SessionTest extends AndroidTestCase {
         assertNull(sessionState);
         assertNotNull(session.getUserId());
 
-        SelfDescribingJson sdj = session.getSessionContext("first-id-1");
+        SelfDescribingJson sdj = session.getSessionContext("first-id-1", timestamp);
         sessionState = session.getState();
         assertNotNull(sessionState);
         assertEquals("first-id-1", sessionState.getFirstEventId());
-        sdj = session.getSessionContext("second-id-2");
+        assertEquals(timestampDateTime, sessionState.getFirstEventTimestamp());
+
+        session.getSessionContext("second-id-2", timestamp + 10000);
         assertEquals("first-id-1", sessionState.getFirstEventId());
+        assertEquals(timestampDateTime, sessionState.getFirstEventTimestamp());
 
         assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.getMap().get("schema"));
     }
@@ -68,36 +73,48 @@ public class SessionTest extends AndroidTestCase {
     public void testFirstSession() {
         Session session = getSession(3, 3);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         assertNotNull(sessionContext.get(Parameters.SESSION_USER_ID));
+        assertNotNull(sessionContext.get(Parameters.SESSION_ID));
+
         assertEquals(1, session.getSessionIndex());
         assertNotNull(sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
+
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
+        assertEquals("LOCAL_STORAGE", sessionContext.get(Parameters.SESSION_STORAGE));
     }
 
     public void testForegroundEventsOnSameSession() throws InterruptedException {
         Session session = getSession(15, 0);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(100);
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp + 5000);
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(15100);
 
-        sessionContext = getSessionContext(session, "event_3");
+        sessionContext = getSessionContext(session, "event_3", timestamp + 10000);
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals("2009-02-13T23:31:41.012Z", sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
     }
 
     public void testBackgroundEventsOnSameSession() throws InterruptedException {
@@ -105,41 +122,48 @@ public class SessionTest extends AndroidTestCase {
 
         session.setBackground(true);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(100);
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp + 5000);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(2, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
 
         Thread.sleep(15100);
 
-        sessionContext = getSessionContext(session, "event_3");
+        sessionContext = getSessionContext(session, "event_3", timestamp + 10000);
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals("2009-02-13T23:31:41.012Z", sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
+        assertEquals(1, sessionContext.get(Parameters.SESSION_EVENT_INDEX));
     }
 
     public void testMixedEventsOnManySessions() throws InterruptedException {
         Session session = getSession(1, 1);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
+        assertEquals(timestampDateTime, sessionContext.get(Parameters.SESSION_FIRST_TIMESTAMP));
         String oldSessionId = sessionId;
 
         session.setBackground(true);
         Thread.sleep(1100);
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp + 10000);
         sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
@@ -149,7 +173,7 @@ public class SessionTest extends AndroidTestCase {
         session.setBackground(false);
         Thread.sleep(1100);
 
-        sessionContext = getSessionContext(session, "event_3");
+        sessionContext = getSessionContext(session, "event_3", timestamp + 20000);
         sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(3, sessionContext.get(Parameters.SESSION_INDEX));
@@ -159,7 +183,7 @@ public class SessionTest extends AndroidTestCase {
         session.setBackground(true);
         Thread.sleep(1100);
 
-        sessionContext = getSessionContext(session, "event_4");
+        sessionContext = getSessionContext(session, "event_4", timestamp + 30000);
         assertEquals(oldSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(4, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_4", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -168,7 +192,7 @@ public class SessionTest extends AndroidTestCase {
     public void testTimeoutSessionWhenPauseAndResume() throws InterruptedException {
         Session session = getSession(1, 1);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         Integer oldSessionIndex = (Integer) sessionContext.get(Parameters.SESSION_INDEX);
         String prevSessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -176,7 +200,7 @@ public class SessionTest extends AndroidTestCase {
         session.setIsSuspended(true);
         Thread.sleep(2000);
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp);
         assertEquals(oldSessionIndex, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(prevSessionId, (String) sessionContext.get(Parameters.SESSION_ID));
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -184,7 +208,7 @@ public class SessionTest extends AndroidTestCase {
 
         session.setIsSuspended(false);
 
-        sessionContext = getSessionContext(session, "event_3");
+        sessionContext = getSessionContext(session, "event_3", timestamp);
         assertEquals(oldSessionIndex + 1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals(prevSessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals("event_3", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -202,7 +226,7 @@ public class SessionTest extends AndroidTestCase {
         );
         Session session = tracker.getSession();
 
-        getSessionContext(session, "event_1");
+        getSessionContext(session, "event_1", timestamp);
         SessionState sessionState = session.getState();
         assertNotNull(sessionState);
         assertEquals(1, sessionState.getSessionIndex());
@@ -237,7 +261,7 @@ public class SessionTest extends AndroidTestCase {
         );
         Session session = tracker.getSession();
 
-        getSessionContext(session, "event_1");
+        getSessionContext(session, "event_1", timestamp);
         SessionState sessionState = session.getState();
         assertNotNull(sessionState);
         assertEquals(1, sessionState.getSessionIndex());
@@ -264,13 +288,13 @@ public class SessionTest extends AndroidTestCase {
     public void testNoEventsForLongTimeDontIncreaseSessionIndexMultipleTimes() throws InterruptedException {
         Session session = getSession(1, 1);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         Integer oldSessionIndex = (Integer) sessionContext.get(Parameters.SESSION_INDEX);
         assertEquals("event_1", sessionContext.get(Parameters.SESSION_FIRST_ID));
 
         Thread.sleep(4000);
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp);
         assertEquals(oldSessionIndex + 1, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
     }
@@ -292,7 +316,7 @@ public class SessionTest extends AndroidTestCase {
     public void testStartNewSessionRenewTheSession() throws InterruptedException {
         Session session = getSession(3, 3);
 
-        Map<String, Object> sessionContext = getSessionContext(session, "event_1");
+        Map<String, Object> sessionContext = getSessionContext(session, "event_1", timestamp);
         String sessionId = (String) sessionContext.get(Parameters.SESSION_ID);
         assertNotNull(sessionId);
         assertEquals(1, sessionContext.get(Parameters.SESSION_INDEX));
@@ -301,7 +325,7 @@ public class SessionTest extends AndroidTestCase {
         Thread.sleep(200);
         session.startNewSession();
 
-        sessionContext = getSessionContext(session, "event_2");
+        sessionContext = getSessionContext(session, "event_2", timestamp);
         assertEquals(sessionId, (String) sessionContext.get(Parameters.SESSION_PREVIOUS_ID));
         assertEquals(2, sessionContext.get(Parameters.SESSION_INDEX));
         assertEquals("event_2", sessionContext.get(Parameters.SESSION_FIRST_ID));
@@ -325,20 +349,22 @@ public class SessionTest extends AndroidTestCase {
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
-        session1.getSessionContext("fake-id1");
-        session2.getSessionContext("fake-id1");
+        session1.getSessionContext("session1-fake-id1", timestamp);
+        session2.getSessionContext("session2-fake-id1", timestamp);
 
         long initialValue1 = session1.getSessionIndex();
         String id1 = session1.getState().getSessionId();
         long initialValue2 = session2.getSessionIndex();
 
         // Retrigger session in tracker1
+        // The timeout is 20s, this sleep is only 2s - it's still the same session
         Thread.sleep(2000);
-        session1.getSessionContext("fake-id2");
-        Thread.sleep(18000);
+        session1.getSessionContext("session1-fake-id2", timestamp);
 
         // Retrigger timedout session in tracker2
-        session2.getSessionContext("fake-id2");
+        // 20s has then passed. Session must be updated, increasing the sessionIndex by 1
+        Thread.sleep(18000);
+        session2.getSessionContext("session2-fake-id2", timestamp);
 
         // Check sessions have the correct state
         assertEquals(0, session1.getSessionIndex() - initialValue1);
@@ -351,7 +377,7 @@ public class SessionTest extends AndroidTestCase {
                 .foregroundTimeout(20)
                 .backgroundTimeout(20)
         );
-        tracker2b.getSession().getSessionContext("fake-id3");
+        tracker2b.getSession().getSessionContext("session2b-fake-id3", timestamp);
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getState().getPreviousSessionId();
 
@@ -371,8 +397,8 @@ public class SessionTest extends AndroidTestCase {
         return new Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, null, getContext());
     }
 
-    private Map<String, Object> getSessionContext(Session session, String eventId) {
-        return (Map<String, Object>) session.getSessionContext(eventId).getMap().get(Parameters.DATA);
+    private Map<String, Object> getSessionContext(Session session, String eventId, long eventTimestamp) {
+        return (Map<String, Object>) session.getSessionContext(eventId, eventTimestamp).getMap().get(Parameters.DATA);
     }
 
     private void cleanSharedPreferences(Context context, String sharedPreferencesName) {

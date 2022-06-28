@@ -363,13 +363,15 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .networkConnection(networkConfig.getNetworkConnection())
                 .customPostPath(networkConfig.getCustomPostPath())
                 .client(networkConfig.getOkHttpClient())
+                .cookieJar(networkConfig.getOkHttpCookieJar())
                 .sendLimit(emitterConfig.getEmitRange())
                 .option(emitterConfig.getBufferOption())
                 .eventStore(emitterConfig.getEventStore())
                 .byteLimitPost(emitterConfig.getByteLimitPost())
                 .byteLimitGet(emitterConfig.getByteLimitGet())
                 .threadPoolSize(emitterConfig.getThreadPoolSize())
-                .callback(emitterConfig.getRequestCallback());
+                .callback(emitterConfig.getRequestCallback())
+                .customRetryForStatusCodes(emitterConfig.getCustomRetryForStatusCodes());
         HttpMethod method = networkConfig.getMethod();
         if (method != null) {
             builder.method(method);

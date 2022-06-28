@@ -12,6 +12,8 @@ import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 
+import java.util.Map;
+
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class EmitterControllerImpl extends Controller implements EmitterController {
     private final static String TAG = EmitterControllerImpl.class.getSimpleName();
@@ -95,6 +97,17 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
     @Override
     public void setRequestCallback(@Nullable RequestCallback requestCallback) {
         getEmitter().setRequestCallback(requestCallback);
+    }
+
+    @Nullable
+    @Override
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return getEmitter().getCustomRetryForStatusCodes();
+    }
+
+    @Override
+    public void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+        getEmitter().setCustomRetryForStatusCodes(customRetryForStatusCodes);
     }
 
     @Override

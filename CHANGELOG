@@ -1,3 +1,11 @@
+Version 3.2.0 (2022-06-28)
+--------------------------
+Add eventIndex and firstEventTimestamp properties to client sessions (#517)
+Add a customizable set of failure HTTP status codes for which collector requests should not be retried (#518)
+Add support for storing cookies in NetworkConnection (#519)
+Update Android target SDK version to 31 (#526)
+Bump okhttp3 to 4.10.0, play-services-analytics to 18.0.1, and gson to 2.9.0 (#520)
+
 Version 3.1.2 (2022-05-25)
 --------------------------
 Set log level without trackerDiagnostic (#441)

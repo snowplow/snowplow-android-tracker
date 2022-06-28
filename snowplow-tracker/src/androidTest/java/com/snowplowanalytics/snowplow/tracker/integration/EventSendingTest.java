@@ -13,6 +13,8 @@
 
 package com.snowplowanalytics.snowplow.tracker.integration;
 
+import static org.junit.Assert.assertNotEquals;
+
 import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -48,6 +50,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -103,7 +106,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendGet() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.GET);
+        Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.GET);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -122,7 +125,7 @@ public class EventSendingTest extends AndroidTestCase {
 
     public void testSendPost() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker(getMockServerURI(mockServer), HttpMethod.POST);
+        Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.POST);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -139,11 +142,77 @@ public class EventSendingTest extends AndroidTestCase {
         killMockServer(mockServer);
     }
 
+    public void testSessionContext() throws Exception {
+        MockWebServer mockServer = getMockServer(14);
+        Tracker tracker = getTracker("namespaceSessionTest", getMockServerURI(mockServer), HttpMethod.POST);
+
+        tracker.track(new ScreenView("screenName_1"));
+        tracker.track(new Structured("category_1", "action_1"));
+        tracker.startNewSession();
+        Thread.sleep(1000);
+        tracker.track(new Structured("category_2", "action_2"));
+        tracker.track(new Structured("category_3", "action_3"));
+
+        waitForTracker(tracker);
+
+        LinkedList<RecordedRequest> requests = getRequests(mockServer, 4);
+        JSONObject screenViewSessionData = null;
+        JSONObject structSessionData_1 = null;
+        JSONObject structSessionData_2 = null;
+        JSONObject structSessionData_3 = null;
+
+        for (RecordedRequest request : requests) {
+            JSONObject data = new JSONObject(request.getBody().readUtf8()).getJSONArray("data").getJSONObject(0);
+            String eventType = (String) data.get("e");
+            JSONArray contexts = new JSONObject((String) data.get("co")).getJSONArray("data");
+
+            switch (eventType) {
+                case "ue" : screenViewSessionData = getSessionData(contexts);
+                    break;
+                case "se" :
+                    String category = (String) data.get("se_ca");
+                    switch (category) {
+                        case "category_1":
+                            structSessionData_1 = getSessionData(contexts);
+                            break;
+                        case "category_2":
+                            structSessionData_2 = getSessionData(contexts);
+                            break;
+                        case "category_3":
+                            structSessionData_3 = getSessionData(contexts);
+                            break;
+                    }
+                    break;
+                default : break;
+            }
+
+        }
+
+        assertEquals(1, screenViewSessionData.get("sessionIndex"));
+        assertEquals(2, structSessionData_2.get("sessionIndex"));
+
+        assertEquals(screenViewSessionData.get("firstEventId"), structSessionData_1.get("firstEventId"));
+        assertNotEquals(screenViewSessionData.get("firstEventId"), structSessionData_2.get("firstEventId"));
+        assertEquals(structSessionData_2.get("firstEventId"), structSessionData_3.get("firstEventId"));
+
+        assertEquals(1, screenViewSessionData.get("eventIndex"));
+        assertEquals(2, structSessionData_1.get("eventIndex"));
+        assertEquals(1, structSessionData_2.get("eventIndex"));
+        assertEquals(2, structSessionData_3.get("eventIndex"));
+
+        assertEquals(screenViewSessionData.get("firstEventTimestamp"), structSessionData_1.get("firstEventTimestamp"));
+        assertNotEquals(screenViewSessionData.get("firstEventTimestamp"), structSessionData_2.get("firstEventTimestamp"));
+        assertEquals(structSessionData_2.get("firstEventTimestamp"), structSessionData_3.get("firstEventTimestamp"));
+
+        assertEquals(structSessionData_1.get("sessionId"), structSessionData_2.get("previousSessionId"));
+
+        killMockServer(mockServer);
+    }
+
     // Helpers
 
     @NonNull
-    public Tracker getTracker(String uri, HttpMethod method) {
-        String namespace = "myNamespace";
+    public Tracker getTracker(String namespace, String uri, HttpMethod method) {
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
         Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
@@ -222,6 +291,19 @@ public class EventSendingTest extends AndroidTestCase {
         }
         Thread.sleep(500);
         tracker.pauseEventTracking();
+    }
+
+    public JSONObject getSessionData(JSONArray contexts) throws JSONException {
+        for (int i = 0; i < contexts.length(); i++) {
+            String sessionSchema = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2";
+            JSONObject context = (JSONObject) contexts.get(i);
+            String schema = (String) context.get("schema");
+
+            if (schema.equals(sessionSchema)) {
+                return (JSONObject) context.get("data");
+            }
+        }
+        return null;
     }
 
     // Event Validation

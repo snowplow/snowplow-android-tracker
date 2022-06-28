@@ -35,13 +35,17 @@ import com.snowplowanalytics.snowplow.network.RequestResult;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 
 import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
@@ -73,12 +77,13 @@ public class Emitter {
     private TimeUnit timeUnit;
     private String customPostPath;
     private OkHttpClient client;
+    private CookieJar cookieJar;
 
     private boolean isCustomNetworkConnection;
     private final AtomicReference<NetworkConnection> networkConnection = new AtomicReference<NetworkConnection>();
     private EventStore eventStore;
     private int emptyCount;
-
+    private final AtomicReference<Map<Integer, Boolean>> customRetryForStatusCodes = new AtomicReference<>();
     private AtomicBoolean isRunning = new AtomicBoolean(false);
     private AtomicBoolean isEmittingPaused = new AtomicBoolean(false);
 
@@ -100,9 +105,11 @@ public class Emitter {
         int threadPoolSize = 2; // Optional
         @NonNull TimeUnit timeUnit = TimeUnit.SECONDS;
         @Nullable OkHttpClient client = null; //Optional
+        @Nullable CookieJar cookieJar = null; // Optional
         @Nullable String customPostPath = null; //Optional
         @Nullable NetworkConnection networkConnection = null; // Optional
         @Nullable EventStore eventStore = null; // Optional
+        @Nullable Map<Integer, Boolean> customRetryForStatusCodes = null; // Optional
 
         /**
          * @param networkConnection The component in charge for sending events to the collector.
@@ -271,6 +278,18 @@ public class Emitter {
         }
 
         /**
+         * @param cookieJar An OkHttp cookie jar to override the default cookie jar that stores
+         *                  cookies in SharedPreferences. The cookie jar will be ignored in case
+         *                  custom `client` is configured.
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder cookieJar(@Nullable CookieJar cookieJar) {
+            this.cookieJar = cookieJar;
+            return this;
+        }
+
+        /**
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
@@ -287,6 +306,17 @@ public class Emitter {
         @NonNull
         public EmitterBuilder threadPoolSize(int threadPoolSize) {
             this.threadPoolSize = threadPoolSize;
+            return this;
+        }
+
+        /**
+         * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
+         * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder customRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+            this.customRetryForStatusCodes = customRetryForStatusCodes;
             return this;
         }
     }
@@ -324,12 +354,13 @@ public class Emitter {
                 endpoint = protocol + endpoint;
             }
             this.uri = endpoint;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(endpoint, context)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
                     .emitTimeout(builder.emitTimeout)
                     .customPostPath(builder.customPostPath)
                     .client(builder.client)
+                    .cookieJar(builder.cookieJar)
                     .build());
         } else {
             isCustomNetworkConnection = true;
@@ -339,6 +370,8 @@ public class Emitter {
         if (builder.threadPoolSize > 2) {
             Executor.setThreadCount(builder.threadPoolSize);
         }
+
+        setCustomRetryForStatusCodes(builder.customRetryForStatusCodes);
 
         Logger.v(TAG, "Emitter created successfully!");
     }
@@ -481,32 +514,39 @@ public class Emitter {
         Logger.v(TAG, "Processing emitter results.");
 
         int successCount = 0;
-        int failureCount = 0;
+        int failedWillRetryCount = 0;
+        int failedWontRetryCount = 0;
         List<Long> removableEvents = new ArrayList<>();
 
         for (RequestResult res : results) {
-            if (res.getSuccess()) {
+            if (res.isSuccessful()) {
                 removableEvents.addAll(res.getEventIds());
                 successCount += res.getEventIds().size();
-            } else {
-                failureCount += res.getEventIds().size();
+            } else if (res.shouldRetry(customRetryForStatusCodes.get())) {
+                failedWillRetryCount += res.getEventIds().size();
                 Logger.e(TAG, "Request sending failed but we will retry later.");
+            } else {
+                failedWontRetryCount += res.getEventIds().size();
+                removableEvents.addAll(res.getEventIds());
+                Logger.e(TAG, String.format("Sending events to Collector failed with status %d. Events will be dropped.", res.getStatusCode()));
             }
         }
         eventStore.removeEvents(removableEvents);
 
+        int allFailureCount = failedWillRetryCount + failedWontRetryCount;
+
         Logger.d(TAG, "Success Count: %s", successCount);
-        Logger.d(TAG, "Failure Count: %s", failureCount);
+        Logger.d(TAG, "Failure Count: %s", allFailureCount);
 
         if (requestCallback != null) {
-            if (failureCount != 0) {
-                requestCallback.onFailure(successCount, failureCount);
+            if (allFailureCount != 0) {
+                requestCallback.onFailure(successCount, allFailureCount);
             } else {
                 requestCallback.onSuccess(successCount);
             }
         }
 
-        if (failureCount > 0 && successCount == 0) {
+        if (failedWillRetryCount > 0 && successCount == 0) {
             if (Util.isOnline(this.context)) {
                 Logger.e(TAG, "Ensure collector path is valid: %s", networkConnection.getUri());
             }
@@ -687,12 +727,13 @@ public class Emitter {
     public void setHttpMethod(@NonNull HttpMethod method) {
         if (!isCustomNetworkConnection) {
             this.httpMethod = method;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -705,12 +746,13 @@ public class Emitter {
     public void setRequestSecurity(@NonNull Protocol security) {
         if (!isCustomNetworkConnection) {
             this.requestSecurity = security;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -723,12 +765,13 @@ public class Emitter {
     public void setEmitterUri(@NonNull String uri) {
         if (!isCustomNetworkConnection) {
             this.uri = uri;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -741,12 +784,13 @@ public class Emitter {
     public void setCustomPostPath(@Nullable String customPostPath) {
         if (!isCustomNetworkConnection) {
             this.customPostPath = customPostPath;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -759,12 +803,13 @@ public class Emitter {
     public void setEmitTimeout(int emitTimeout) {
         if (!isCustomNetworkConnection) {
             this.emitTimeout = emitTimeout;
-            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri)
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
                     .emitTimeout(emitTimeout)
                     .customPostPath(customPostPath)
                     .client(client)
+                    .cookieJar(cookieJar)
                     .build());
         }
     }
@@ -899,5 +944,16 @@ public class Emitter {
 
     private void setNetworkConnection(@NonNull NetworkConnection networkConnection) {
         this.networkConnection.set(networkConnection);
+    }
+
+    @NonNull
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return customRetryForStatusCodes.get();
+    }
+
+    public void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes.set(
+                customRetryForStatusCodes == null ? new HashMap<>() : customRetryForStatusCodes
+        );
     }
 }

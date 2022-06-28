@@ -8,6 +8,8 @@ import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInter
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 
+import java.util.Map;
+
 /**
  * It allows the tracker configuration from the emission perspective.
  * The EmitterConfiguration can be used to setup details about how the tracker should treat the events
@@ -52,6 +54,12 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
      */
     @Nullable
     public EventStore eventStore;
+
+    /**
+     * @see #customRetryForStatusCodes(Map)
+     */
+    @Nullable
+    public Map<Integer, Boolean> customRetryForStatusCodes;
 
     // Constructor
 
@@ -141,6 +149,16 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         this.requestCallback = requestCallback;
     }
 
+    @Nullable
+    @Override
+    public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
+        return customRetryForStatusCodes;
+    }
+
+    @Override
+    public void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes = customRetryForStatusCodes;
+    }
 
     // Builders
 
@@ -209,6 +227,16 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         return this;
     }
 
+    /**
+     * Custom retry rules for HTTP status codes returned from the Collector.
+     * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false for not retry).
+     */
+    @NonNull
+    public EmitterConfiguration customRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes) {
+        this.customRetryForStatusCodes = customRetryForStatusCodes;
+        return this;
+    }
+
     // Copyable
 
     @Override
@@ -222,6 +250,7 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         copy.byteLimitPost = byteLimitPost;
         copy.eventStore = eventStore;
         copy.requestCallback = requestCallback;
+        copy.customRetryForStatusCodes = customRetryForStatusCodes;
         return copy;
     }
 }

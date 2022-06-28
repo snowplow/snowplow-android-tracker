@@ -6,6 +6,7 @@ import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.network.Protocol;
 
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 
 public interface NetworkConfigurationInterface {
@@ -30,4 +31,7 @@ public interface NetworkConfigurationInterface {
 
     @Nullable
     OkHttpClient getOkHttpClient();
+
+    @Nullable
+    CookieJar getOkHttpCookieJar();
 }

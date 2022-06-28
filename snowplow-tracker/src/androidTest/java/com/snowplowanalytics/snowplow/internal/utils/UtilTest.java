@@ -13,6 +13,11 @@ public class UtilTest extends AndroidTestCase {
         assertEquals(13, Util.getTimestamp().length());
     }
 
+    public void testGetDateTimeFromTimestamp() {
+        long timestamp = 1653923456266L;
+        assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+    }
+
     public void testBase64Encode() {
         assertEquals("Zm9v", Util.base64Encode("foo"));
     }

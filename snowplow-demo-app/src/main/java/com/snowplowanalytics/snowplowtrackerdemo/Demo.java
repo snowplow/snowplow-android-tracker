@@ -51,17 +51,15 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.snowplow.internal.utils.Util;
-import com.snowplowanalytics.snowplow.tracker.SessionState;
 import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
@@ -250,6 +248,7 @@ public class Demo extends Activity implements LoggerDelegate {
         NetworkConfiguration networkConfiguration = new NetworkConfiguration(uri, method);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .requestCallback(getRequestCallback())
+                .bufferOption(BufferOption.DefaultGroup)
                 .threadPoolSize(20)
                 .emitRange(500)
                 .byteLimitPost(52000);

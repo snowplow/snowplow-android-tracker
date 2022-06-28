@@ -39,9 +39,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -60,6 +63,13 @@ public class Util {
     @NonNull
     public static String getTimestamp() {
         return Long.toString(System.currentTimeMillis());
+    }
+
+    public static String getDateTimeFromTimestamp(long timestamp) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = new Date(timestamp);
+        return dateFormat.format(date);
     }
 
     /**

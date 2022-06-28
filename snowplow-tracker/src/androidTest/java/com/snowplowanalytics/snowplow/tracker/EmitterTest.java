@@ -32,7 +32,9 @@ import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.snowplowanalytics.snowplow.emitter.BufferOption.DefaultGroup;
@@ -249,7 +251,7 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitSingleGetEventWithSuccess() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,true);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,200);
         Emitter emitter = getEmitter(networkConnection, Single);
 
         emitter.add(generatePayloads(1).get(0));
@@ -260,14 +262,14 @@ public class EmitterTest extends AndroidTestCase {
 
         assertEquals(1, networkConnection.previousResults.size());
         assertEquals(1, networkConnection.previousResults.get(0).size());
-        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertTrue(networkConnection.previousResults.get(0).get(0).isSuccessful());
         assertEquals(0, emitter.getEventStore().getSize());
 
         emitter.flush();
     }
 
     public void testEmitSingleGetEventWithNoSuccess() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,false);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,500);
         Emitter emitter = getEmitter(networkConnection, Single);
 
         emitter.add(generatePayloads(1).get(0));
@@ -278,14 +280,14 @@ public class EmitterTest extends AndroidTestCase {
 
         assertEquals(1, networkConnection.previousResults.size());
         assertEquals(1, networkConnection.previousResults.get(0).size());
-        assertFalse(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertFalse(networkConnection.previousResults.get(0).get(0).isSuccessful());
         assertEquals(1, emitter.getEventStore().getSize());
 
         emitter.flush();
     }
 
     public void testEmitTwoGetEventsWithSuccess() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,true);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,200);
         Emitter emitter = getEmitter(networkConnection, Single);
 
         for (Payload payload : generatePayloads(2)) {
@@ -300,7 +302,7 @@ public class EmitterTest extends AndroidTestCase {
         int totEvents = 0;
         for (List<RequestResult> results : networkConnection.previousResults) {
             for (RequestResult result : results) {
-                assertTrue(result.getSuccess());
+                assertTrue(result.isSuccessful());
                 totEvents += result.getEventIds().size();
             }
         }
@@ -310,7 +312,7 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitTwoGetEventsWithNoSuccess() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,false);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,500);
         Emitter emitter = getEmitter(networkConnection, Single);
 
         for (Payload payload : generatePayloads(2)) {
@@ -324,7 +326,7 @@ public class EmitterTest extends AndroidTestCase {
         assertEquals(2, emitter.getEventStore().getSize());
         for (List<RequestResult> results : networkConnection.previousResults) {
             for (RequestResult result : results) {
-                assertFalse(result.getSuccess());
+                assertFalse(result.isSuccessful());
             }
         }
         // Can't check the total number of events sent as the Emitter stops to send if a request fails.
@@ -333,7 +335,7 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testEmitSinglePostEventWithSuccess() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, true);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
         Emitter emitter = getEmitter(networkConnection, Single);
         emitter.add(generatePayloads(1).get(0));
 
@@ -343,14 +345,14 @@ public class EmitterTest extends AndroidTestCase {
 
         assertEquals(1, networkConnection.previousResults.size());
         assertEquals(1, networkConnection.previousResults.get(0).size());
-        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertTrue(networkConnection.previousResults.get(0).get(0).isSuccessful());
         assertEquals(0, emitter.getEventStore().getSize());
 
         emitter.flush();
     }
 
     public void testPauseAndResumeEmittingEvents() throws InterruptedException {
-        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, true);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
         Emitter emitter = getEmitter(networkConnection, Single);
 
         emitter.pauseEmit();
@@ -371,7 +373,7 @@ public class EmitterTest extends AndroidTestCase {
 
         assertEquals(1, networkConnection.previousResults.size());
         assertEquals(1, networkConnection.previousResults.get(0).size());
-        assertTrue(networkConnection.previousResults.get(0).get(0).getSuccess());
+        assertTrue(networkConnection.previousResults.get(0).get(0).isSuccessful());
         assertEquals(0, emitter.getEventStore().getSize());
 
         emitter.flush();
@@ -387,6 +389,49 @@ public class EmitterTest extends AndroidTestCase {
         emitter.setEmitterUri("new.uri"); // update while running
         assertTrue(emitter.getEmitterStatus()); // is running
         assertTrue(emitter.getEmitterUri().contains("new.uri"));
+    }
+
+    public void testRemovesEventsFromQueueOnNoRetryStatus() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,403);
+        Emitter emitter = getEmitter(networkConnection, Single);
+
+        emitter.add(generatePayloads(1).get(0));
+
+        for (int i = 0; i < 10 && (networkConnection.sendingCount() < 1 || emitter.getEmitterStatus()); i++) {
+            Thread.sleep(600);
+        }
+
+        assertEquals(1, networkConnection.previousResults.size());
+        assertFalse(networkConnection.previousResults.get(0).get(0).isSuccessful());
+        assertEquals(0, emitter.getEventStore().getSize());
+
+        emitter.flush();
+    }
+
+    public void testFollowCustomRetryRules() throws InterruptedException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,500);
+        Emitter emitter = getEmitter(networkConnection, Single);
+
+        Map<Integer, Boolean> customRules = new HashMap<>();
+        customRules.put(403, true);
+        customRules.put(500, false);
+        emitter.setCustomRetryForStatusCodes(customRules);
+
+        // no events in queue since they were dropped because retrying is disabled for 500
+        emitter.add(generatePayloads(1).get(0));
+
+        Thread.sleep(1000);
+
+        networkConnection.statusCode = 403;
+
+        emitter.add(generatePayloads(1).get(0));
+
+        Thread.sleep(1000);
+
+        // event still in queue because retrying is enabled for 403
+        assertEquals(1, emitter.getEventStore().getSize());
+
+        emitter.flush();
     }
 
     // Emitter Builder

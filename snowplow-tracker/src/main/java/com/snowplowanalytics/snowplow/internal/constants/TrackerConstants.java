@@ -31,7 +31,7 @@ public class TrackerConstants {
     public static final String SCHEMA_CONSENT_DOCUMENT = "iglu:com.snowplowanalytics.snowplow/consent_document/jsonschema/1-0-0";
     public static final String GEOLOCATION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0";
     public static final String MOBILE_SCHEMA = "iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-2";
-    public static final String SESSION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-1";
+    public static final String SESSION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2";
     public static final String APPLICATION_ERROR_SCHEMA = "iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-0";
     public static final String SCHEMA_SCREEN = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-0-0";
     public static final String SCHEMA_APPLICATION_INSTALL = "iglu:com.snowplowanalytics.mobile/application_install/jsonschema/1-0-0";
@@ -54,4 +54,6 @@ public class TrackerConstants {
 
     public static final String INSTALLED_BEFORE = "installed_before";
     public static final String INSTALL_TIMESTAMP = "install_timestamp";
+
+    public static final String COOKIE_PERSISTANCE = "cookie_persistance";
 }
