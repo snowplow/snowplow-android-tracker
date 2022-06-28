@@ -5,7 +5,8 @@ var searchData=
   ['lifecycleautotracking_2',['lifecycleAutotracking',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#aa88f7f2a1da6fe44fb07eb03c3670375',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
   ['lifecycleentity_3',['LifecycleEntity',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1entity_1_1_lifecycle_entity.html#a203564701956ae170d1d4fff196c3753',1,'com::snowplowanalytics::snowplow::entity::LifecycleEntity']]],
   ['lifecyclestate_4',['LifecycleState',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_lifecycle_state.html#ad94531798c28eaff7000e373efa1ee51',1,'com::snowplowanalytics::snowplow::internal::tracker::LifecycleState']]],
-  ['loggerdelegate_5',['loggerDelegate',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a20660014d4fdf1a349baa9562d5c650c',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
-  ['loglevel_6',['logLevel',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#abd22783650fd13e88e1b3c1e1378723c',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
-  ['loglevel_7',['LogLevel',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_log_level.html#a451e3c8677fd194146dcc3a6a95931bd',1,'com::snowplowanalytics::snowplow::tracker::LogLevel']]]
+  ['loadforrequest_5',['loadForRequest',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1network_1_1_collector_cookie_jar.html#afed204e0b38393130ec4e87774a24d57',1,'com::snowplowanalytics::snowplow::network::CollectorCookieJar']]],
+  ['loggerdelegate_6',['loggerDelegate',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a20660014d4fdf1a349baa9562d5c650c',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
+  ['loglevel_7',['LogLevel',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1tracker_1_1_log_level.html#a451e3c8677fd194146dcc3a6a95931bd',1,'com::snowplowanalytics::snowplow::tracker::LogLevel']]],
+  ['loglevel_8',['logLevel',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#abd22783650fd13e88e1b3c1e1378723c',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]]
 ];

@@ -1,8 +1,8 @@
 var searchData=
 [
   ['table_5fevents_0',['TABLE_EVENTS',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1storage_1_1_event_store_helper.html#a55e632604559ed4fd9e4022332574247',1,'com::snowplowanalytics::snowplow::internal::emitter::storage::EventStoreHelper']]],
-  ['tag_1',['tag',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#acb613bf60df2f7fff5b9977e9d9aba21',1,'com::snowplowanalytics::snowplow::event::MessageNotification']]],
-  ['tag_2',['TAG',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a3138d5c3035045d4c708fca4b09d73fb',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
+  ['tag_1',['TAG',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a3138d5c3035045d4c708fca4b09d73fb',1,'com::snowplowanalytics::snowplow::configuration::TrackerConfiguration']]],
+  ['tag_2',['tag',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#acb613bf60df2f7fff5b9977e9d9aba21',1,'com::snowplowanalytics::snowplow::event::MessageNotification']]],
   ['taxvalue_3',['taxValue',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_ecommerce_transaction.html#aac5583c97794820e707f507919386ef2',1,'com::snowplowanalytics::snowplow::event::EcommerceTransaction']]],
   ['threadidentifier_4',['threadIdentifier',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_message_notification.html#a6d7594466f588139333feb5b50944955',1,'com::snowplowanalytics::snowplow::event::MessageNotification']]],
   ['threadpoolsize_5',['threadPoolSize',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a73d8b1f788bf376276e0962228726560',1,'com::snowplowanalytics::snowplow::configuration::EmitterConfiguration']]],
