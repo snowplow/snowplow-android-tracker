@@ -63,6 +63,7 @@ public class CollectorCookieJar implements okhttp3.CookieJar {
     }
 
     private void loadFromSharedPreferences() {
+        List<String> cookiesToRemove = new ArrayList<>();
         for (Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
             String serializedCookie = (String) entry.getValue();
 
@@ -74,7 +75,16 @@ public class CollectorCookieJar implements okhttp3.CookieJar {
                 CollectorCookie cookie = new CollectorCookie(serializedCookie);
                 cookies.add(cookie);
             } catch (JSONException ignored) {
+                cookiesToRemove.add(entry.getKey());
             }
+        }
+
+        if (!cookiesToRemove.isEmpty()) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            for (String cookie : cookiesToRemove) {
+                editor.remove(cookie);
+            }
+            editor.apply();
         }
     }
 

@@ -76,8 +76,10 @@ public class CollectorCookieJarTest {
         cookieJar.clear();
     }
 
+    @Test
     public void testMaintainsCookiesAcrossJarInstances() {
-        CollectorCookieJar cookieJar1 = new CollectorCookieJar(getContext());
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        CollectorCookieJar cookieJar1 = new CollectorCookieJar(context);
 
         ArrayList<Cookie> requestCookies = new ArrayList<Cookie>();
         requestCookies.add(cookie1);
@@ -92,5 +94,16 @@ public class CollectorCookieJarTest {
         assertFalse(cookies2.isEmpty());
 
         cookieJar1.clear();
+    }
+
+    @Test
+    public void testRemovesInvalidCookies() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_PERSISTANCE, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("x", "y").apply();
+        assertEquals(1, sharedPreferences.getAll().size());
+
+        new CollectorCookieJar(context);
+        assertEquals(0, sharedPreferences.getAll().size());
     }
 }
