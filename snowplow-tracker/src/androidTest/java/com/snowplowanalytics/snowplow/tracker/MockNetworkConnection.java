@@ -17,6 +17,7 @@ class MockNetworkConnection implements NetworkConnection {
     public int statusCode;
     public HttpMethod httpMethod;
 
+    public final List<List<Request>> previousRequests = new ArrayList<>();
     public final List<List<RequestResult>> previousResults = new ArrayList<>();
 
     public MockNetworkConnection(HttpMethod httpMethod, int statusCode) {
@@ -37,6 +38,7 @@ class MockNetworkConnection implements NetworkConnection {
             Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, Boolean.valueOf(result.isSuccessful()).toString());
             requestResults.add(result);
         }
+        previousRequests.add(requests);
         previousResults.add(requestResults);
         return requestResults;
     }

@@ -8,6 +8,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Demo">
 
+    <EditText
+        android:id="@+id/uri_field3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_weight="23"
+        android:hint="@string/uri_hint"
+        android:inputType="textUri"
+        android:paddingStart="5dp"
+        android:paddingLeft="5dp"
+        android:paddingEnd="5dp"
+        android:textSize="13sp" />
+
     <TextView
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -221,15 +236,15 @@
             android:id="@+id/metrics"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/log_output"
             android:layout_toEndOf="@+id/log_output"
+            android:layout_toRightOf="@+id/log_output"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/emitter_statistics"
                 android:textColor="@android:color/black"
@@ -240,8 +255,8 @@
                 android:id="@+id/created_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/created_events"
                 android:textColor="@android:color/black"
@@ -251,8 +266,8 @@
                 android:id="@+id/sent_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/sent_events"
                 android:textColor="@android:color/black"
@@ -262,8 +277,8 @@
                 android:id="@+id/online_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/online_status"
                 android:textColor="@android:color/black"
@@ -273,8 +288,8 @@
                 android:id="@+id/emitter_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/emitter_status"
                 android:textColor="@android:color/black"
@@ -284,8 +299,8 @@
                 android:id="@+id/database_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/database_size"
                 android:textColor="@android:color/black"
@@ -295,12 +310,46 @@
                 android:id="@+id/session_index"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
                 android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/session_index"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/emitter_statistics"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Web view:" />
+
+            <EditText
+                android:id="@+id/web_view_uri_field"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Web view URI"
+                android:inputType="textPersonName"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btn_load_webview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Load WebView" />
+
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </LinearLayout>
 
     </RelativeLayout>
