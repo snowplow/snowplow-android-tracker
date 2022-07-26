@@ -33,7 +33,7 @@ public class ConfigurationProvider {
 
     public ConfigurationProvider(@NonNull RemoteConfiguration remoteConfiguration, @Nullable List<ConfigurationBundle> defaultBundles) {
         this.remoteConfiguration = remoteConfiguration;
-        this.cache = new ConfigurationCache();
+        this.cache = new ConfigurationCache(remoteConfiguration);
         if (defaultBundles != null) {
             FetchedConfigurationBundle bundle = new FetchedConfigurationBundle("1.0");
             bundle.configurationVersion = Integer.MIN_VALUE;
