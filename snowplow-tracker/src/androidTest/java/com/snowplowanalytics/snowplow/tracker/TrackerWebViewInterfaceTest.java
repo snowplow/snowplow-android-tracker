@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import android.util.Base64;
 import java.util.Map;
 
 @RunWith(AndroidJUnit4.class)
@@ -53,6 +52,7 @@ public class TrackerWebViewInterfaceTest {
         TrackerConfiguration trackerConfig = new TrackerConfiguration("app1");
         trackerConfig.sessionContext = false;
         trackerConfig.platformContext = false;
+        trackerConfig.base64encoding = false;
 
         String trackerNamespace = String.valueOf(Math.random());
         Snowplow.removeAllTrackers();
@@ -121,8 +121,7 @@ public class TrackerWebViewInterfaceTest {
         assertEquals(1, networkConnection.sendingCount());
         assertEquals(1, networkConnection.previousRequests.get(0).size());
         Request request = networkConnection.previousRequests.get(0).get(0);
-        String encodedContext = (String) request.payload.getMap().get("cx");
-        JSONObject parsedEntity = decodeJSONFromBase64(encodedContext)
+        JSONObject parsedEntity = new JSONObject((String) request.payload.getMap().get("co"))
                 .getJSONArray("data")
                 .getJSONObject(0);
         assertEquals("http://context-schema.com", parsedEntity.getString("schema"));
@@ -133,10 +132,6 @@ public class TrackerWebViewInterfaceTest {
 
     private Context getContext() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
-    }
-
-    private JSONObject decodeJSONFromBase64(String encoded) throws JSONException {
-        return new JSONObject(new String(Base64.decode(encoded, Base64.NO_WRAP)));
     }
 
 }
