@@ -54,4 +54,16 @@ class MockNetworkConnection implements NetworkConnection {
     public Uri getUri() {
         return Uri.parse("http://fake-url.com");
     }
+
+    public List<Request> getAllRequests() {
+        List<Request> flattened = new ArrayList<>();
+        for (List<Request> requests : previousRequests) {
+            flattened.addAll(requests);
+        }
+        return flattened;
+    }
+
+    public int countRequests() {
+        return getAllRequests().size();
+    }
 }

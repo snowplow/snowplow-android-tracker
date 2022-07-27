@@ -72,13 +72,12 @@ public class TrackerWebViewInterfaceTest {
                 "cat", "act", "lbl", "prop", 10.0, null, null
         );
 
-        for (int i = 0; i < 10 && (networkConnection.sendingCount() == 0); i++) {
+        for (int i = 0; i < 10 && (networkConnection.countRequests() == 0); i++) {
             Thread.sleep(1000);
         }
 
-        assertEquals(1, networkConnection.sendingCount());
-        assertEquals(1, networkConnection.previousRequests.get(0).size());
-        Request request = networkConnection.previousRequests.get(0).get(0);
+        assertEquals(1, networkConnection.countRequests());
+        Request request = networkConnection.getAllRequests().get(0);
         Map payload = request.payload.getMap();
         assertEquals("cat", payload.get("se_ca"));
         assertEquals("act", payload.get("se_ac"));
@@ -98,12 +97,11 @@ public class TrackerWebViewInterfaceTest {
         webInterface.trackPageView("http://localhost", null, null, null, new String[]{"ns2"});
 
         // wait and check for the event
-        for (int i = 0; i < 10 && (networkConnection2.sendingCount() == 0); i++) {
+        for (int i = 0; i < 10 && (networkConnection2.countRequests() == 0); i++) {
             Thread.sleep(1000);
         }
-        assertEquals(0, networkConnection.sendingCount());
-        assertEquals(1, networkConnection2.previousRequests.size());
-        assertEquals(1, networkConnection2.previousRequests.get(0).size());
+        assertEquals(0, networkConnection.countRequests());
+        assertEquals(1, networkConnection2.countRequests());
     }
 
     @Test
@@ -114,13 +112,12 @@ public class TrackerWebViewInterfaceTest {
                 "[{\"schema\":\"http://context-schema.com\",\"data\":{\"a\":\"b\"}}]",
                 null);
 
-        for (int i = 0; i < 10 && (networkConnection.sendingCount() == 0); i++) {
+        for (int i = 0; i < 10 && (networkConnection.countRequests() == 0); i++) {
             Thread.sleep(1000);
         }
 
-        assertEquals(1, networkConnection.sendingCount());
-        assertEquals(1, networkConnection.previousRequests.get(0).size());
-        Request request = networkConnection.previousRequests.get(0).get(0);
+        assertEquals(1, networkConnection.countRequests());
+        Request request = networkConnection.getAllRequests().get(0);
         JSONObject parsedEntity = new JSONObject((String) request.payload.getMap().get("co"))
                 .getJSONArray("data")
                 .getJSONObject(0);
