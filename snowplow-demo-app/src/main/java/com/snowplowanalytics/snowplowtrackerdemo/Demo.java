@@ -39,6 +39,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 
 import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
@@ -53,6 +54,7 @@ import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
+import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationState;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
@@ -223,13 +225,17 @@ public class Demo extends Activity implements LoggerDelegate {
                 _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(uri, method);
-        Snowplow.setup(getApplicationContext(), remoteConfig, null, new Consumer<List<String>>() {
-            @Override
-            public void accept(List<String> strings) {
-                updateLogger("Created namespaces: " + strings);
-                Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
-                callbackTrackerReady.accept(true);
+        Snowplow.setup(getApplicationContext(), remoteConfig, null, configurationPair -> {
+            List<String> namespaces = configurationPair.first;
+            updateLogger("Created namespaces: " + namespaces);
+            switch (configurationPair.second) {
+                case CACHED:
+                    updateLogger("Configuration retrieved from cache");
+                case FETCHED:
+                    updateLogger("Configuration fetched from remote endpoint");
             }
+            Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
+            callbackTrackerReady.accept(true);
         });
         return true;
     }
