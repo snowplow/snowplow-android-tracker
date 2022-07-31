@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow;
 
 import android.content.Context;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import com.snowplowanalytics.snowplow.internal.remoteconfiguration.Configuration
 import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationProvider;
 import com.snowplowanalytics.snowplow.internal.remoteconfiguration.FetchedConfigurationBundle;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
+import com.snowplowanalytics.snowplow.internal.tracker.TrackerWebViewInterface;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 import java.util.ArrayList;
@@ -278,6 +280,14 @@ public class Snowplow {
     @NonNull
     public static Set<String> getInstancedTrackerNamespaces() {
         return serviceProviderInstances.keySet();
+    }
+
+    /**
+     * Add a JavaScript interface to the Web view that listens for events tracked using the Snowplow library for Web views.
+     * @param webView Web view instance in which to subscribe for events
+     */
+    public static void subscribeToWebViewEvents(@NonNull WebView webView) {
+        webView.addJavascriptInterface(new TrackerWebViewInterface(), TrackerWebViewInterface.TAG);
     }
 
     // Private methods
