@@ -6,6 +6,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
@@ -14,6 +15,7 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationBundle;
 import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationProvider;
+import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationState;
 import com.snowplowanalytics.snowplow.internal.remoteconfiguration.FetchedConfigurationBundle;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerWebViewInterface;
@@ -66,19 +68,20 @@ public class Snowplow {
      * @param context The Android app context.
      * @param remoteConfiguration The remote configuration used to indicate where to download the configuration from.
      * @param defaultBundles The default configuration passed by default in case there isn't a cached version and it's able to download a new one.
-     * @param onSuccess The callback called when a configuration (cached or downloaded) is set It passes the list of the namespaces associated
-     *                  to the created trackers.
+     * @param onSuccess The callback called when a configuration (cached or downloaded) is set.
+     *                  It passes a pair object with the list of the namespaces associated
+     *                  to the created trackers and the state of the configuration – whether it was
+     *                  retrieved from cache or fetched over the network.
      */
-    public static void setup(@NonNull Context context, @NonNull RemoteConfiguration remoteConfiguration, @Nullable List<ConfigurationBundle> defaultBundles, @Nullable Consumer<List<String>> onSuccess) {
+    public static void setup(@NonNull Context context, @NonNull RemoteConfiguration remoteConfiguration, @Nullable List<ConfigurationBundle> defaultBundles, @Nullable Consumer<Pair<List<String>, ConfigurationState>> onSuccess) {
         configurationProvider = new ConfigurationProvider(remoteConfiguration, defaultBundles);
-        configurationProvider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                List<ConfigurationBundle> bundles = fetchedConfigurationBundle.configurationBundle;
-                List<String> namespaces = createTracker(context, bundles);
-                if (onSuccess != null) {
-                    onSuccess.accept(namespaces);
-                }
+        configurationProvider.retrieveConfiguration(context, false, fetchedConfigurationPair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = fetchedConfigurationPair.first;
+            ConfigurationState configurationState = fetchedConfigurationPair.second;
+            List<ConfigurationBundle> bundles = fetchedConfigurationBundle.configurationBundle;
+            List<String> namespaces = createTracker(context, bundles);
+            if (onSuccess != null) {
+                onSuccess.accept(new Pair<>(namespaces, configurationState));
             }
         });
     }
@@ -100,19 +103,20 @@ public class Snowplow {
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
-     * @param onSuccess The callback called when a configuration (cached or downloaded) is set It passes the list of the namespaces associated
-     *                  to the created trackers.
+     * @param onSuccess The callback called when a configuration (cached or downloaded) is set.
+     *                  It passes a pair object with the list of the namespaces associated
+     *                  to the created trackers and the state of the configuration – whether it was
+     *                  retrieved from cache or fetched over the network.
      */
-    public static void refresh(@NonNull Context context, @Nullable Consumer<List<String>> onSuccess) {
+    public static void refresh(@NonNull Context context, @Nullable Consumer<Pair<List<String>, ConfigurationState>> onSuccess) {
         if (configurationProvider == null) return;
-        configurationProvider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                List<ConfigurationBundle> bundles = fetchedConfigurationBundle.configurationBundle;
-                List<String> namespaces = createTracker(context, bundles);
-                if (onSuccess != null) {
-                    onSuccess.accept(namespaces);
-                }
+        configurationProvider.retrieveConfiguration(context, true, fetchedConfigurationPair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = fetchedConfigurationPair.first;
+            ConfigurationState configurationState = fetchedConfigurationPair.second;
+            List<ConfigurationBundle> bundles = fetchedConfigurationBundle.configurationBundle;
+            List<String> namespaces = createTracker(context, bundles);
+            if (onSuccess != null) {
+                onSuccess.accept(new Pair<>(namespaces, configurationState));
             }
         });
     }
