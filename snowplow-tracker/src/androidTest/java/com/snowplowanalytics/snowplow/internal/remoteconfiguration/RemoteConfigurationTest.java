@@ -5,6 +5,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 import androidx.test.espresso.core.internal.deps.guava.collect.Lists;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -93,14 +94,11 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                assertNotNull(fetchedConfigurationBundle);
-                assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        new ConfigurationFetcher(context, remoteConfig, fetchedConfigurationBundle -> {
+            assertNotNull(fetchedConfigurationBundle);
+            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
 
@@ -146,13 +144,10 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
         AtomicBoolean expectationNotified = new AtomicBoolean(false);
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        ConfigurationFetcher fetcher = new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                expectationNotified.set(true);
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        new ConfigurationFetcher(context, remoteConfig, fetchedConfigurationBundle -> {
+            expectationNotified.set(true);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -175,12 +170,7 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, false, pair -> fail());
         synchronized (expectation) {
             expectation.wait(5000);
         }
@@ -200,12 +190,7 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, false, pair -> fail());
         synchronized (expectation) {
             expectation.wait(5000);
         }
@@ -233,15 +218,14 @@ public class RemoteConfigurationTest {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    fail();
-                }
-                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
-                    i[0]++;
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            assertEquals(ConfigurationState.CACHED, pair.second);
+            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                fail();
+            }
+            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+                i[0]++;
             }
         });
         synchronized (expectation) {
@@ -272,15 +256,17 @@ public class RemoteConfigurationTest {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    i[0]++;
-                }
-                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
-                    i[0]++;
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            assertEquals(
+                    i[0] == 0 ? ConfigurationState.CACHED : ConfigurationState.FETCHED,
+                    pair.second
+            );
+            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                i[0]++;
+            }
+            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+                i[0]++;
             }
         });
         synchronized (expectation) {
@@ -311,12 +297,10 @@ public class RemoteConfigurationTest {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            assertEquals(ConfigurationState.CACHED, pair.second);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -331,12 +315,7 @@ public class RemoteConfigurationTest {
 
         // test
         final Object expectation2 = new Object();
-        provider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, true, pair -> fail());
         synchronized (expectation2) {
             expectation2.wait(5000);
         }
@@ -364,12 +343,9 @@ public class RemoteConfigurationTest {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -385,14 +361,13 @@ public class RemoteConfigurationTest {
         // test
         final Object expectation2 = new Object();
         final int[] j = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    j[0]++;
-                    synchronized (expectation2) {
-                        expectation2.notify();
-                    }
+        provider.retrieveConfiguration(context, true, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                j[0]++;
+                assertEquals(ConfigurationState.FETCHED, pair.second);
+                synchronized (expectation2) {
+                    expectation2.notify();
                 }
             }
         });
