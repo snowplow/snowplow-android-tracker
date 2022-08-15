@@ -15,13 +15,13 @@ import java.util.Objects;
 public class RemoteConfiguration implements Configuration {
 
     /**
-     * URL (without schema/protocol) used to send events to the collector.
+     * URL of the remote configuration.
      */
     @NonNull
     public final String endpoint;
 
     /**
-     * Method used to send events to the collector.
+     * The method used to send the requests (GET or POST).
      */
     @NonNull
     public final HttpMethod method;
