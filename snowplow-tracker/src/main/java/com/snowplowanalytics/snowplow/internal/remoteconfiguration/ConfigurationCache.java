@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,6 +21,12 @@ public class ConfigurationCache {
     private String cacheFilePath;
     @Nullable
     private FetchedConfigurationBundle configuration;
+    @NonNull
+    private RemoteConfiguration remoteConfiguration;
+
+    public ConfigurationCache(@NonNull RemoteConfiguration remoteConfiguration) {
+        this.remoteConfiguration = remoteConfiguration;
+    }
 
     @Nullable
     public synchronized FetchedConfigurationBundle readCache(@NonNull Context context) {
@@ -51,7 +59,8 @@ public class ConfigurationCache {
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
-        cacheFilePath = cacheDir.getAbsolutePath() + File.separator + "remoteConfig.data";
+        String fileName = "remoteConfig-" + remoteConfiguration.endpoint.hashCode() + ".data";
+        cacheFilePath = cacheDir.getAbsolutePath() + File.separator + fileName;
         return cacheFilePath;
     }
 
