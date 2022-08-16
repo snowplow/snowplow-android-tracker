@@ -17,12 +17,15 @@ public class UtilTest extends AndroidTestCase {
     public void testGetDateTimeFromTimestamp() {
         long timestamp = 1653923456266L;
         assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+    }
 
+    public void testDateTimeProducesExpectedNumerals() {
+        long timestamp = 1660643130123L;
         Locale defaultLocale = Locale.getDefault();
 
         // set locale to one where different numerals are used (Egypt - arabic)
         Locale.setDefault(new Locale("ar", "EG"));
-        assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+        assertEquals("2022-08-16T10:45:30.123Z", Util.getDateTimeFromTimestamp(timestamp));
 
         // restore original locale
         Locale.setDefault(defaultLocale);
