@@ -25,7 +25,7 @@ public class UtilTest extends AndroidTestCase {
 
         // set locale to one where different numerals are used (Egypt - arabic)
         Locale.setDefault(new Locale("ar", "EG"));
-        assertEquals("2022-08-16T10:45:30.123Z", Util.getDateTimeFromTimestamp(timestamp));
+        assertEquals("2022-08-16T09:45:30.123Z", Util.getDateTimeFromTimestamp(timestamp));
 
         // restore original locale
         Locale.setDefault(defaultLocale);
