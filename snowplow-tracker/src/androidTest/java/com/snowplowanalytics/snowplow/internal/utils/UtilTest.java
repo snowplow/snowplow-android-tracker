@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class UtilTest extends AndroidTestCase {
@@ -16,6 +17,15 @@ public class UtilTest extends AndroidTestCase {
     public void testGetDateTimeFromTimestamp() {
         long timestamp = 1653923456266L;
         assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+
+        Locale defaultLocale = Locale.getDefault();
+
+        // set locale to one where different numerals are used (Egypt - arabic)
+        Locale.setDefault(new Locale("ar", "EG"));
+        assertEquals("2022-05-30T15:10:56.266Z", Util.getDateTimeFromTimestamp(timestamp));
+
+        // restore original locale
+        Locale.setDefault(defaultLocale);
     }
 
     public void testBase64Encode() {
