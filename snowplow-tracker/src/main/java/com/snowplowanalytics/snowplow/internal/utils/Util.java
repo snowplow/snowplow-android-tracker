@@ -69,10 +69,8 @@ public class Util {
 
     public static String getDateTimeFromTimestamp(long timestamp) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", new Locale("en"));
-
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date(timestamp);
-        System.out.println(date + "❗️️❗");
         return dateFormat.format(date);
     }
 
