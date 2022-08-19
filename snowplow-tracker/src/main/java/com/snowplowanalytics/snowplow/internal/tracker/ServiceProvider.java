@@ -371,7 +371,8 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .byteLimitGet(emitterConfig.getByteLimitGet())
                 .threadPoolSize(emitterConfig.getThreadPoolSize())
                 .callback(emitterConfig.getRequestCallback())
-                .customRetryForStatusCodes(emitterConfig.getCustomRetryForStatusCodes());
+                .customRetryForStatusCodes(emitterConfig.getCustomRetryForStatusCodes())
+                .serverAnonymisation(emitterConfig.isServerAnonymisation());
         HttpMethod method = networkConfig.getMethod();
         if (method != null) {
             builder.method(method);
@@ -415,7 +416,8 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .applicationCrash(trackerConfig.isExceptionAutotracking())
                 .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking())
                 .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
-                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS));
+                .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS))
+                .userAnonymisation(trackerConfig.isUserAnonymisation());
         GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();
         if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(

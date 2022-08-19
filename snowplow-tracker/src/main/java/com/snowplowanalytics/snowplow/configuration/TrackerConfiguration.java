@@ -93,6 +93,10 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      */
     public boolean diagnosticAutotracking;
     /**
+     * @see #userAnonymisation(boolean)
+     */
+    public boolean userAnonymisation;
+    /**
      * @see #trackerVersionSuffix(String)
      */
     @Nullable
@@ -265,6 +269,16 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     @Override
+    public boolean isUserAnonymisation() {
+        return userAnonymisation;
+    }
+
+    @Override
+    public void setUserAnonymisation(boolean userAnonymisation) {
+        this.userAnonymisation = userAnonymisation;
+    }
+
+    @Override
     @Nullable
     public String getTrackerVersionSuffix() {
         return trackerVersionSuffix;
@@ -295,6 +309,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
      *         installAutotracking = true;
      *         exceptionAutotracking = true;
      *         diagnosticAutotracking = false;
+     *         userAnonymisation = false;
      * @param appId Identifier of the app.
      */
     public TrackerConfiguration(@NonNull String appId) {
@@ -317,6 +332,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         installAutotracking = true;
         exceptionAutotracking = true;
         diagnosticAutotracking = false;
+        userAnonymisation = false;
     }
 
     // Builder methods
@@ -470,6 +486,15 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     /**
+     * Whether to anonymise client-side user identifiers in session and platform context entities
+     */
+    @NonNull
+    public TrackerConfiguration userAnonymisation(boolean userAnonymisation) {
+        this.userAnonymisation = userAnonymisation;
+        return this;
+    }
+
+    /**
      * Decorate the v_tracker field in the tracker protocol.
      * @note Do not use. Internal use only.
      */
@@ -502,6 +527,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         copy.installAutotracking = installAutotracking;
         copy.exceptionAutotracking = exceptionAutotracking;
         copy.diagnosticAutotracking = diagnosticAutotracking;
+        copy.userAnonymisation = userAnonymisation;
         copy.trackerVersionSuffix = trackerVersionSuffix;
         return copy;
     }
@@ -530,5 +556,6 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
         installAutotracking = jsonObject.optBoolean("installAutotracking", installAutotracking);
         exceptionAutotracking = jsonObject.optBoolean("exceptionAutotracking", exceptionAutotracking);
         diagnosticAutotracking = jsonObject.optBoolean("diagnosticAutotracking", diagnosticAutotracking);
+        userAnonymisation = jsonObject.optBoolean("userAnonymisation", userAnonymisation);
     }
 }

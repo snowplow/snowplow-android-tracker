@@ -51,6 +51,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     private final HttpMethod httpMethod;
     private final int emitTimeout;
     private final String customPostPath;
+    private final boolean serverAnonymisation;
 
     private OkHttpClient client;
     private Uri.Builder uriBuilder;
@@ -67,6 +68,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         OkHttpClient client = null; //Optional
         CookieJar cookieJar = null; // Optional
         String customPostPath = null; //Optional
+        boolean serverAnonymisation = false; // Optional
 
         /**
          * @param uri The uri of the collector
@@ -152,6 +154,16 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         }
 
         /**
+         * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+         * @return itself
+         */
+        @NonNull
+        public OkHttpNetworkConnectionBuilder serverAnonymisation(@Nullable boolean serverAnonymisation) {
+            this.serverAnonymisation = serverAnonymisation;
+            return this;
+        }
+
+        /**
          * Creates a new OkHttpNetworkConnection
          *
          * @return a new OkHttpNetworkConnection object
@@ -187,6 +199,7 @@ public class OkHttpNetworkConnection implements NetworkConnection {
         httpMethod = builder.httpMethod;
         emitTimeout = builder.emitTimeout;
         customPostPath = builder.customPostPath;
+        serverAnonymisation = builder.serverAnonymisation;
 
         TLSArguments tlsArguments = new TLSArguments(builder.tlsVersions);
         String protocolString = protocol == Protocol.HTTP ? "http://" : "https://";
@@ -291,11 +304,14 @@ public class OkHttpNetworkConnection implements NetworkConnection {
 
         // Build the request
         String reqUrl = uriBuilder.build().toString();
-        return new okhttp3.Request.Builder()
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
                 .url(reqUrl)
                 .header("User-Agent", userAgent)
-                .get()
-                .build();
+                .get();
+        if (serverAnonymisation) {
+            builder.header("SP-Anonymous", "*");
+        }
+        return builder.build();
     }
 
     /**
@@ -308,11 +324,14 @@ public class OkHttpNetworkConnection implements NetworkConnection {
     private okhttp3.Request buildPostRequest(Request request, String userAgent) {
         String reqUrl = uriBuilder.build().toString();
         RequestBody reqBody = RequestBody.create(JSON, request.payload.toString());
-        return new okhttp3.Request.Builder()
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
                 .url(reqUrl)
                 .header("User-Agent", userAgent)
-                .post(reqBody)
-                .build();
+                .post(reqBody);
+        if (serverAnonymisation) {
+            builder.header("SP-Anonymous", "*");
+        }
+        return builder.build();
     }
 
     /**

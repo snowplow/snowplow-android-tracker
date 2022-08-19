@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -181,7 +182,7 @@ public class Session {
      * @return a SelfDescribingJson containing the session context
      */
     @NonNull
-    public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId, long eventTimestamp) {
+    public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId, long eventTimestamp, boolean userAnonymisation) {
         Logger.v(TAG, "Getting session context...");
         if (isSessionCheckerEnabled) {
             if (shouldUpdateSession()) {
@@ -199,9 +200,11 @@ public class Session {
         eventIndex += 1;
 
         Map<String, Object> sessionValues = state.getSessionValues();
-        Map<String, Object> sessionCopy = new HashMap<>();
-        sessionCopy.putAll(sessionValues);
+        Map<String, Object> sessionCopy = new HashMap<>(sessionValues);
         sessionCopy.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
+        if (userAnonymisation) {
+            sessionCopy.put(Parameters.SESSION_USER_ID, new UUID(0, 0).toString());
+        }
 
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
     }

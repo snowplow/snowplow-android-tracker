@@ -61,6 +61,11 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
     @Nullable
     public Map<Integer, Boolean> customRetryForStatusCodes;
 
+    /**
+     * @see #serverAnonymisation(boolean)
+     */
+    public boolean serverAnonymisation;
+
     // Constructor
 
     /**
@@ -71,6 +76,7 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
      *         threadPoolSize = 15;
      *         byteLimitGet = 40000;
      *         byteLimitPost = 40000;
+     *         serverAnonymisation = false;
      */
     public EmitterConfiguration() {
         bufferOption = BufferOption.Single;
@@ -78,6 +84,7 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         threadPoolSize = 15;
         byteLimitGet = 40000;
         byteLimitPost = 40000;
+        serverAnonymisation = false;
     }
 
     // Getters and Setters
@@ -160,6 +167,16 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         this.customRetryForStatusCodes = customRetryForStatusCodes;
     }
 
+    @Override
+    public boolean isServerAnonymisation() {
+        return serverAnonymisation;
+    }
+
+    @Override
+    public void setServerAnonymisation(boolean serverAnonymisation) {
+        this.serverAnonymisation = serverAnonymisation;
+    }
+
     // Builders
 
     /**
@@ -237,6 +254,15 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         return this;
     }
 
+    /**
+     * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    @NonNull
+    public EmitterConfiguration serverAnonymisation(boolean serverAnonymisation) {
+        this.serverAnonymisation = serverAnonymisation;
+        return this;
+    }
+
     // Copyable
 
     @Override
@@ -251,6 +277,7 @@ public class EmitterConfiguration implements Configuration, EmitterConfiguration
         copy.eventStore = eventStore;
         copy.requestCallback = requestCallback;
         copy.customRetryForStatusCodes = customRetryForStatusCodes;
+        copy.serverAnonymisation = serverAnonymisation;
         return copy;
     }
 }

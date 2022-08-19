@@ -66,7 +66,7 @@ public class PlatformContext {
     }
 
     @Nullable
-    public SelfDescribingJson getMobileContext() {
+    public SelfDescribingJson getMobileContext(boolean userAnonymisation) {
         updateEphemeralDictsIfNecessary();
 
         if (Util.mapHasKeys(pairs,
@@ -74,7 +74,13 @@ public class PlatformContext {
                 Parameters.OS_VERSION,
                 Parameters.DEVICE_MANUFACTURER,
                 Parameters.DEVICE_MODEL)) {
-            return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
+            if (userAnonymisation && pairs.containsKey(Parameters.ANDROID_IDFA)) {
+                Map<String, Object> copy = new HashMap<>(pairs);
+                copy.remove(Parameters.ANDROID_IDFA);
+                return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, copy);
+            } else {
+                return new SelfDescribingJson(TrackerConstants.MOBILE_SCHEMA, pairs);
+            }
         } else {
             return null;
         }

@@ -111,6 +111,18 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
     }
 
     @Override
+    public boolean isServerAnonymisation() {
+        return getEmitter().getServerAnonymisation();
+    }
+
+    @Override
+    public void setServerAnonymisation(boolean serverAnonymisation) {
+        getDirtyConfig().serverAnonymisation = serverAnonymisation;
+        getDirtyConfig().serverAnonymisationUpdated = true;
+        getEmitter().setServerAnonymisation(serverAnonymisation);
+    }
+
+    @Override
     public long getDbCount() {
         EventStore eventStore = getEmitter().getEventStore();
         if (eventStore == null) {
