@@ -15,18 +15,16 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.test.AndroidTestCase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -36,14 +34,15 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.tracker.MockEventStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import java.util.UUID;
@@ -53,15 +52,21 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class TrackerTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class TrackerTest {
 
     private static Tracker tracker;
 
-    @Override
-    protected synchronized void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public synchronized void setUp() throws Exception {
         try {
             if (tracker == null) return;
             Emitter emitter = tracker.getEmitter();
@@ -117,8 +122,13 @@ public class TrackerTest extends AndroidTestCase {
         return tracker;
     }
 
+    private Context getContext() {
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
+    }
+
     // Tests
 
+    @Test
     public void testSetValues() {
         Tracker tracker = getTracker(true);
         assertEquals("myNamespace", tracker.getNamespace());
@@ -135,6 +145,7 @@ public class TrackerTest extends AndroidTestCase {
         assertTrue(tracker.getApplicationContext());
     }
 
+    @Test
     public void testEmitterUpdate() {
         Tracker tracker = getTracker();
         assertNotNull(tracker.getEmitter());
@@ -143,6 +154,7 @@ public class TrackerTest extends AndroidTestCase {
         assertNotNull(tracker.getEmitter());
     }
 
+    @Test
     public void testSubjectUpdate() {
         Tracker tracker = getTracker();
         assertNotNull(tracker.getSubject());
@@ -151,6 +163,7 @@ public class TrackerTest extends AndroidTestCase {
         assertNull(tracker.getSubject());
     }
 
+    @Test
     public void testPlatformUpdate() {
         Tracker tracker = getTracker();
         assertEquals(DevicePlatform.InternetOfThings, tracker.getPlatform());
@@ -159,6 +172,7 @@ public class TrackerTest extends AndroidTestCase {
         assertEquals(DevicePlatform.Mobile, tracker.getPlatform());
     }
 
+    @Test
     public void testDataCollectionSwitch() {
         Tracker tracker = getTracker();
         assertTrue(tracker.getDataCollection());
@@ -174,6 +188,7 @@ public class TrackerTest extends AndroidTestCase {
         assertTrue(tracker.getDataCollection());
     }
 
+    @Test
     public void testTrackEventMultipleTimes() {
         Timing event = new Timing("category", "variable", 100);
         UUID id1 = new TrackerEvent(event).eventId;
@@ -181,6 +196,7 @@ public class TrackerTest extends AndroidTestCase {
         assertNotEquals(id1, id2);
     }
 
+    @Test
     public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
         Executor.setThreadCount(30);
         Executor.shutdown();
@@ -246,6 +262,7 @@ public class TrackerTest extends AndroidTestCase {
         mockWebServer.shutdown();
     }
 
+    @Test
     public void testTrackWithNoContext() throws Exception {
         Executor.setThreadCount(30);
         Executor.shutdown();
@@ -308,6 +325,7 @@ public class TrackerTest extends AndroidTestCase {
         mockWebServer.shutdown();
     }
 
+    @Test
     public void testTrackWithoutDataCollection() throws Exception {
         Executor.setThreadCount(30);
         Executor.shutdown();
@@ -342,6 +360,7 @@ public class TrackerTest extends AndroidTestCase {
         mockWebServer.shutdown();
     }
 
+    @Test
     public void testTrackWithSession() throws Exception {
         Executor.setThreadCount(30);
         Executor.shutdown();
@@ -377,6 +396,7 @@ public class TrackerTest extends AndroidTestCase {
         mockWebServer.shutdown();
     }
 
+    @Test
     public void testTrackScreenView() {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
@@ -423,6 +443,7 @@ public class TrackerTest extends AndroidTestCase {
         tracker.track(screenView);
     }
 
+    @Test
     public void testTrackUncaughtException() {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
@@ -453,6 +474,7 @@ public class TrackerTest extends AndroidTestCase {
         );
     }
 
+    @Test
     public void testExceptionHandler() {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);

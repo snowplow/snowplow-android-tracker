@@ -89,6 +89,7 @@ public class Tracker {
         boolean activityTracking = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
+        boolean userAnonymisation = false; // Optional
         @Nullable Gdpr gdpr = null; // Optional
         @Nullable String trackerVersionSuffix = null; // Optional
 
@@ -338,6 +339,16 @@ public class Tracker {
         }
 
         /**
+         * @param userAnonymisation whether to anonymise client-side user identifiers in session and platform context entities
+         * @return itself
+         */
+        @NonNull
+        public TrackerBuilder userAnonymisation(@NonNull Boolean userAnonymisation) {
+            this.userAnonymisation = userAnonymisation;
+            return this;
+        }
+
+        /**
          * Internal use only.
          * Decorate the `tv` (tracker version) field in the tracker protocol.
          */
@@ -375,6 +386,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
+    boolean userAnonymisation;
     String trackerVersionSuffix;
 
     private boolean deepLinkContext;
@@ -498,6 +510,7 @@ public class Tracker {
         this.timeUnit = builder.timeUnit;
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
+        this.userAnonymisation = builder.userAnonymisation;
 
         this.platformContext = new PlatformContext(this.context);
 
@@ -720,7 +733,7 @@ public class Tracker {
                 Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
                 return;
             }
-            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp);
+            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation);
             event.contexts.add(sessionContextJson);
         }
     }
@@ -731,7 +744,7 @@ public class Tracker {
         }
 
         if (mobileContext) {
-            contexts.add(platformContext.getMobileContext());
+            contexts.add(platformContext.getMobileContext(userAnonymisation));
         }
 
         if (event.isService) {
@@ -801,7 +814,7 @@ public class Tracker {
 
         // Add Mobile Context
         if (this.mobileContext) {
-            contexts.add(platformContext.getMobileContext());
+            contexts.add(platformContext.getMobileContext(userAnonymisation));
         }
 
         // Add application context

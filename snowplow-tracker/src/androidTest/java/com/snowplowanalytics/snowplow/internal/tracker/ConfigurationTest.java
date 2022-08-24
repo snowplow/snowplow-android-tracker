@@ -1,5 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
+import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -21,16 +23,22 @@ import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.Executor;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
+import com.snowplowanalytics.snowplow.network.Request;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
 import com.snowplowanalytics.snowplow.tracker.MockEventStore;
+import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection;
 import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +58,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import junit.framework.TestCase;
 
 @RunWith(AndroidJUnit4.class)
 public class ConfigurationTest {
@@ -414,5 +424,56 @@ public class ConfigurationTest {
         String contexts = (String) payload.getMap().get("co");
         assertTrue(contexts.contains("value1"));
         assertTrue(contexts.contains("value2"));
+    }
+
+    @Test
+    public void activatesServerAnonymisationInEmitter() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        NetworkConfiguration networkConfig = new NetworkConfiguration("example.com");
+        EmitterConfiguration emitterConfig = new EmitterConfiguration();
+        emitterConfig.serverAnonymisation(true);
+
+        TrackerController tracker = Snowplow.createTracker(context, String.valueOf(Math.random()), networkConfig, emitterConfig);
+        assertTrue(tracker.getEmitter().isServerAnonymisation());
+    }
+
+    @Test
+    public void anonymisesUserIdentifiersIfAnonymousUserTracking() throws InterruptedException, JSONException {
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,200);
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        NetworkConfiguration networkConfig = new NetworkConfiguration(networkConnection);
+        TrackerConfiguration trackerConfig = new TrackerConfiguration("app1");
+        trackerConfig.userAnonymisation = true;
+        trackerConfig.sessionContext = true;
+        trackerConfig.platformContext = true;
+        trackerConfig.base64encoding = false;
+
+        Snowplow.removeAllTrackers();
+        TrackerController tracker = Snowplow.createTracker(context, String.valueOf(Math.random()), networkConfig, trackerConfig);
+        assertTrue(tracker.isUserAnonymisation());
+
+        tracker.track(new Structured("category", "action"));
+
+        for (int i = 0; i < 10 && (networkConnection.countRequests() == 0); i++) {
+            Thread.sleep(1000);
+        }
+
+        TestCase.assertEquals(1, networkConnection.countRequests());
+        Request request = networkConnection.getAllRequests().get(0);
+        JSONArray entities = new JSONObject((String) request.payload.getMap().get("co"))
+                .getJSONArray("data");
+        JSONObject sessionContext = null;
+        JSONObject platformContext = null;
+        for (int i = 0; i < entities.length(); i++) {
+            if (entities.getJSONObject(i).getString("schema").equals(TrackerConstants.SESSION_SCHEMA)) {
+                sessionContext = entities.getJSONObject(i).getJSONObject("data");
+            } else if (entities.getJSONObject(i).getString("schema").equals(TrackerConstants.MOBILE_SCHEMA)) {
+                platformContext = entities.getJSONObject(i).getJSONObject("data");
+            }
+        }
+
+        assertEquals("00000000-0000-0000-0000-000000000000", sessionContext.getString("userId"));
+        assertFalse(platformContext.has("androidIdfa"));
     }
 }

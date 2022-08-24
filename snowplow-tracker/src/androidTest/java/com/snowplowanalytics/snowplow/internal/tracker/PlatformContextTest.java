@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.internal.tracker;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -39,7 +40,7 @@ public class PlatformContextTest {
     @Test
     public void addsNotMockedMobileContext() {
         PlatformContext platformContext = new PlatformContext(getContext());
-        SelfDescribingJson sdj = platformContext.getMobileContext();
+        SelfDescribingJson sdj = platformContext.getMobileContext(false);
         assertNotNull(sdj);
 
         Map<String, Object> sdjMap = sdj.getMap();
@@ -58,7 +59,7 @@ public class PlatformContextTest {
     public void addsAllMockedInfo() {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
-        SelfDescribingJson sdj = platformContext.getMobileContext();
+        SelfDescribingJson sdj = platformContext.getMobileContext(false);
         Map<String, Object> sdjMap = sdj.getMap();
         Map sdjData = (Map) sdjMap.get("data");
         assertEquals("Android", sdjData.get(Parameters.OS_TYPE));
@@ -83,7 +84,7 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
     }
@@ -94,7 +95,7 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(1000, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel"));
     }
@@ -105,7 +106,7 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
     }
@@ -116,7 +117,7 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(0, 1000, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkTechnology"));
     }
@@ -127,7 +128,7 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType"));
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage"));
     }
@@ -137,7 +138,7 @@ public class PlatformContextTest {
         MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
         PlatformContext platformContext = new PlatformContext(0, 1, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
     }
 
@@ -148,10 +149,22 @@ public class PlatformContextTest {
         PlatformContext platformContext = new PlatformContext(0, 1, deviceInfoMonitor, getContext());
         assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
         deviceInfoMonitor.customIdfa = null;
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
-        platformContext.getMobileContext();
+        platformContext.getMobileContext(false);
         assertEquals(3, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa"));
+    }
+
+    @Test
+    public void anonymisesUserIdentifiers() {
+        MockDeviceInfoMonitor deviceInfoMonitor = new MockDeviceInfoMonitor();
+        PlatformContext platformContext = new PlatformContext(0, 0, deviceInfoMonitor, getContext());
+        SelfDescribingJson sdj = platformContext.getMobileContext(true);
+        Map<String, Object> sdjMap = sdj.getMap();
+        Map sdjData = (Map) sdjMap.get("data");
+
+        assertEquals("Android", sdjData.get(Parameters.OS_TYPE));
+        assertNull(sdjData.get(Parameters.ANDROID_IDFA));
     }
 
     // --- PRIVATE

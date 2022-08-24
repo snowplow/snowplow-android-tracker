@@ -157,6 +157,14 @@ public class TrackerConfigurationUpdate extends TrackerConfiguration {
         return (sourceConfig == null || diagnosticAutotrackingUpdated) ? super.diagnosticAutotracking : sourceConfig.diagnosticAutotracking;
     }
 
+    // userAnonymisation flag
+
+    public boolean userAnonymisationUpdated;
+
+    public boolean isUserAnonymisation() {
+        return (sourceConfig == null || userAnonymisationUpdated) ? super.userAnonymisation : sourceConfig.userAnonymisation;
+    }
+
     // trackerVersionSuffix flag
 
     public boolean trackerVersionSuffixUpdated;

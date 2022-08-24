@@ -78,6 +78,7 @@ public class Emitter {
     private String customPostPath;
     private OkHttpClient client;
     private CookieJar cookieJar;
+    private boolean serverAnonymisation;
 
     private boolean isCustomNetworkConnection;
     private final AtomicReference<NetworkConnection> networkConnection = new AtomicReference<NetworkConnection>();
@@ -103,6 +104,7 @@ public class Emitter {
         long byteLimitPost = 40000; // Optional
         private int emitTimeout = 5; // Optional
         int threadPoolSize = 2; // Optional
+        boolean serverAnonymisation = false; // Optional
         @NonNull TimeUnit timeUnit = TimeUnit.SECONDS;
         @Nullable OkHttpClient client = null; //Optional
         @Nullable CookieJar cookieJar = null; // Optional
@@ -319,6 +321,17 @@ public class Emitter {
             this.customRetryForStatusCodes = customRetryForStatusCodes;
             return this;
         }
+
+        /**
+         * Ignored if using a custom network connection.
+         * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+         * @return itself
+         */
+        @NonNull
+        public EmitterBuilder serverAnonymisation(boolean serverAnonymisation) {
+            this.serverAnonymisation = serverAnonymisation;
+            return this;
+        }
     }
 
     /**
@@ -342,6 +355,7 @@ public class Emitter {
         this.timeUnit = builder.timeUnit;
         this.client = builder.client;
         this.eventStore = builder.eventStore;
+        this.serverAnonymisation = builder.serverAnonymisation;
 
         this.uri = collectorUri;
         this.httpMethod = builder.httpMethod;
@@ -361,6 +375,7 @@ public class Emitter {
                     .customPostPath(builder.customPostPath)
                     .client(builder.client)
                     .cookieJar(builder.cookieJar)
+                    .serverAnonymisation(builder.serverAnonymisation)
                     .build());
         } else {
             isCustomNetworkConnection = true;
@@ -734,6 +749,7 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build());
         }
     }
@@ -753,6 +769,7 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build());
         }
     }
@@ -772,6 +789,7 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build());
         }
     }
@@ -791,6 +809,7 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build());
         }
     }
@@ -810,6 +829,28 @@ public class Emitter {
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
+                    .build());
+        }
+    }
+
+    /**
+     * Updates the server anonymisation setting for the Emitter.
+     * Ignored if using a custom network connection.
+     *
+     * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    public void setServerAnonymisation(boolean serverAnonymisation) {
+        if (!isCustomNetworkConnection) {
+            this.serverAnonymisation = serverAnonymisation;
+            setNetworkConnection(new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(uri, context)
+                    .method(httpMethod)
+                    .tls(tlsVersions)
+                    .emitTimeout(emitTimeout)
+                    .customPostPath(customPostPath)
+                    .client(client)
+                    .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build());
         }
     }
@@ -932,6 +973,13 @@ public class Emitter {
      */
     public int getEmitTimeout() {
         return this.emitTimeout;
+    }
+
+    /**
+     * @return whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    public boolean getServerAnonymisation() {
+        return this.serverAnonymisation;
     }
 
     /**

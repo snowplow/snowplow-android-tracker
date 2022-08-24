@@ -306,6 +306,18 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
         getTracker().trackerDiagnostic = diagnosticAutotracking;
     }
 
+    @Override
+    public boolean isUserAnonymisation() {
+        return getTracker().userAnonymisation;
+    }
+
+    @Override
+    public void setUserAnonymisation(boolean userAnonymisation) {
+        getDirtyConfig().userAnonymisation = userAnonymisation;
+        getDirtyConfig().userAnonymisationUpdated = true;
+        getTracker().userAnonymisation = userAnonymisation;
+    }
+
     @Nullable
     @Override
     public String getTrackerVersionSuffix() {
