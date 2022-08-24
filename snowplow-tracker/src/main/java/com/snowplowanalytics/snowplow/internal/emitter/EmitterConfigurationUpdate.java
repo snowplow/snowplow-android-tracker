@@ -75,4 +75,12 @@ public class EmitterConfigurationUpdate extends EmitterConfiguration {
     public Map<Integer, Boolean> getCustomRetryForStatusCodes() {
         return (sourceConfig == null || customRetryForStatusCodesUpdated) ? super.customRetryForStatusCodes : sourceConfig.customRetryForStatusCodes;
     }
+
+    // serverAnonymisation flag
+
+    public boolean serverAnonymisationUpdated;
+
+    public boolean isServerAnonymisation() {
+        return (sourceConfig == null || serverAnonymisationUpdated) ? super.serverAnonymisation : sourceConfig.serverAnonymisation;
+    }
 }

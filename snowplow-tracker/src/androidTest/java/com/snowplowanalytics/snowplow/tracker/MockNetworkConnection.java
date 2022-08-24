@@ -13,7 +13,7 @@ import com.snowplowanalytics.snowplow.network.RequestResult;
 import java.util.ArrayList;
 import java.util.List;
 
-class MockNetworkConnection implements NetworkConnection {
+public class MockNetworkConnection implements NetworkConnection {
     public int statusCode;
     public HttpMethod httpMethod;
 
