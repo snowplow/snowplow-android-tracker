@@ -74,8 +74,8 @@ public class Tracker {
         DevicePlatform devicePlatform = DevicePlatform.Mobile; // Optional
         LogLevel logLevel = LogLevel.OFF; // Optional
         boolean sessionContext = false; // Optional
-        long foregroundTimeout = 600; // Optional - 10 minutes
-        long backgroundTimeout = 300; // Optional - 5 minutes
+        long foregroundTimeout = 1800; // Optional - 30 minutes
+        long backgroundTimeout = 1800; // Optional - 30 minutes
         @NonNull Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
         int threadCount = 10; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
