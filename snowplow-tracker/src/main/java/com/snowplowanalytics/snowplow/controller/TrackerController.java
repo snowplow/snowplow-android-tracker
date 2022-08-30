@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface;
 import com.snowplowanalytics.snowplow.event.Event;
 
+import java.util.UUID;
+
 public interface TrackerController extends TrackerConfigurationInterface {
 
     /** Version of the tracker. */
@@ -75,8 +77,9 @@ public interface TrackerController extends TrackerConfigurationInterface {
      * Track the event.
      * The tracker will take care to process and send the event assigning `event_id` and `device_timestamp`.
      * @param event The event to track.
+     * @return The event ID or null in case tracking is paused
      */
-    void track(@NonNull Event event);
+    UUID track(@NonNull Event event);
 
     /**
      * Pause the tracker.

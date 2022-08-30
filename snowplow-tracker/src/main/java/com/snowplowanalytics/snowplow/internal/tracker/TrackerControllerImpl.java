@@ -19,6 +19,8 @@ import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.event.Event;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
+import java.util.UUID;
+
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class TrackerControllerImpl extends Controller implements TrackerController {
 
@@ -86,8 +88,8 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     }
 
     @Override
-    public void track(@NonNull Event event) {
-        getTracker().track(event);
+    public UUID track(@NonNull Event event) {
+        return getTracker().track(event);
     }
 
     @NonNull

@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -475,5 +476,27 @@ public class ConfigurationTest {
 
         assertEquals("00000000-0000-0000-0000-000000000000", sessionContext.getString("userId"));
         assertFalse(platformContext.has("androidIdfa"));
+    }
+
+    @Test
+    public void trackerReturnsTrackedEventId() throws InterruptedException, JSONException {
+        // Setup tracker
+        MockNetworkConnection networkConnection = new MockNetworkConnection(GET,200);
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        NetworkConfiguration networkConfig = new NetworkConfiguration(networkConnection);
+        Snowplow.removeAllTrackers();
+        TrackerController tracker = Snowplow.createTracker(context, String.valueOf(Math.random()), networkConfig);
+
+        // Track event
+        UUID eventId = tracker.track(new Structured("category", "action"));
+        for (int i = 0; i < 10 && (networkConnection.countRequests() == 0); i++) {
+            Thread.sleep(1000);
+        }
+        TestCase.assertEquals(1, networkConnection.countRequests());
+        Request request = networkConnection.getAllRequests().get(0);
+
+        // Check eid field
+        String trackedEventId = (String) request.payload.getMap().get("eid");
+        assertEquals(eventId.toString(), trackedEventId);
     }
 }
