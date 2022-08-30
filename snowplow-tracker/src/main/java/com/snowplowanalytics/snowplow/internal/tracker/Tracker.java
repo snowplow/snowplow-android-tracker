@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -611,10 +612,11 @@ public class Tracker {
      * the Tracker can encounter.
      *
      * @param event the event to track
+     * @return The event ID or null in case tracking is paused
      */
-    public void track(final @NonNull Event event) {
+    public UUID track(final @NonNull Event event) {
         if (!dataCollection.get()) {
-            return;
+            return null;
         }
         event.beginProcessing(this);
         TrackerStateSnapshot stateSnapshot;
@@ -632,6 +634,7 @@ public class Tracker {
             this.emitter.add(payload);
             event.endProcessing(this);
         });
+        return trackerEvent.eventId;
     }
 
     private void transformEvent(@NonNull TrackerEvent event) {

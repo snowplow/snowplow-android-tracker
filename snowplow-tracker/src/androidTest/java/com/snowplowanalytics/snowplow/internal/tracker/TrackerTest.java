@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
@@ -240,7 +241,7 @@ public class TrackerTest {
 
         SelfDescribing sdEvent = new SelfDescribing(sdj);
 
-        tracker.track(sdEvent);
+        UUID eventId = tracker.track(sdEvent);
         RecordedRequest req = mockWebServer.takeRequest(60, TimeUnit.SECONDS);
         assertNotNull(req);
         int reqCount = mockWebServer.getRequestCount();
@@ -258,6 +259,7 @@ public class TrackerTest {
 
         assertEquals("ue", event.getString(Parameters.EVENT));
         assertFalse(event.has(Parameters.UNSTRUCTURED_ENCODED));
+        assertEquals(eventId.toString(), event.getString(Parameters.EID));
 
         mockWebServer.shutdown();
     }
@@ -351,7 +353,8 @@ public class TrackerTest {
         );
 
         tracker.pauseEventTracking();
-        tracker.track(new ScreenView("name"));
+        UUID eventId = tracker.track(new ScreenView("name"));
+        assertNull(eventId);
         RecordedRequest req = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
 
         assertEquals(0, tracker.getEmitter().getEventStore().getSize());
@@ -430,7 +433,7 @@ public class TrackerTest {
         // Send screenView
         ScreenView screenView = new ScreenView("screen1");
         String screenId = (String) screenView.getDataPayload().get("id");
-        tracker.track(screenView);
+        UUID eventId1 = tracker.track(screenView);
 
         screenStateMapWrapper = tracker.getScreenState().getCurrentScreen(true).getMap();
         screenStateMap = (Map<String, Object>) screenStateMapWrapper.get(Parameters.DATA);
@@ -440,7 +443,9 @@ public class TrackerTest {
         // Send another screenView
         screenView = new ScreenView("screen2");
         String screenId1 = (String) screenView.getDataPayload().get("id");
-        tracker.track(screenView);
+        UUID eventId2 = tracker.track(screenView);
+
+        assertNotEquals(eventId1.toString(), eventId2.toString());
     }
 
     @Test
