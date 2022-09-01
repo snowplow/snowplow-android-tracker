@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 
 import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration;
 
@@ -33,7 +34,7 @@ public class ConfigurationProvider {
 
     public ConfigurationProvider(@NonNull RemoteConfiguration remoteConfiguration, @Nullable List<ConfigurationBundle> defaultBundles) {
         this.remoteConfiguration = remoteConfiguration;
-        this.cache = new ConfigurationCache();
+        this.cache = new ConfigurationCache(remoteConfiguration);
         if (defaultBundles != null) {
             FetchedConfigurationBundle bundle = new FetchedConfigurationBundle("1.0");
             bundle.configurationVersion = Integer.MIN_VALUE;
@@ -42,14 +43,15 @@ public class ConfigurationProvider {
         }
     }
 
-    public synchronized void retrieveConfiguration(@NonNull Context context, boolean onlyRemote, @NonNull Consumer<FetchedConfigurationBundle> onFetchCallback) {
+    public synchronized void retrieveConfiguration(@NonNull Context context, boolean onlyRemote, @NonNull Consumer<Pair<FetchedConfigurationBundle, ConfigurationState>> onFetchCallback) {
         if (!onlyRemote) {
             if (cacheBundle == null) {
                 cacheBundle = cache.readCache(context);
             }
-            FetchedConfigurationBundle retrievedBundle = cacheBundle != null ? cacheBundle : defaultBundle;
-            if (retrievedBundle != null) {
-                onFetchCallback.accept(retrievedBundle);
+            if (cacheBundle != null) {
+                onFetchCallback.accept(new Pair<>(cacheBundle, ConfigurationState.CACHED));
+            } else if (defaultBundle != null) {
+                onFetchCallback.accept(new Pair<>(defaultBundle, ConfigurationState.DEFAULT));
             }
         }
         fetcher = new ConfigurationFetcher(context, remoteConfiguration, new Consumer<FetchedConfigurationBundle>() {
@@ -64,7 +66,7 @@ public class ConfigurationProvider {
                     }
                     cache.writeCache(context, fetchedConfigurationBundle);
                     cacheBundle = fetchedConfigurationBundle;
-                    onFetchCallback.accept(fetchedConfigurationBundle);
+                    onFetchCallback.accept(new Pair<>(fetchedConfigurationBundle, ConfigurationState.FETCHED));
                 }
             }
         });

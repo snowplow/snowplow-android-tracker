@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -74,8 +75,8 @@ public class Tracker {
         DevicePlatform devicePlatform = DevicePlatform.Mobile; // Optional
         LogLevel logLevel = LogLevel.OFF; // Optional
         boolean sessionContext = false; // Optional
-        long foregroundTimeout = 600; // Optional - 10 minutes
-        long backgroundTimeout = 300; // Optional - 5 minutes
+        long foregroundTimeout = 1800; // Optional - 30 minutes
+        long backgroundTimeout = 1800; // Optional - 30 minutes
         @NonNull Runnable[] sessionCallbacks = new Runnable[]{}; // Optional
         int threadCount = 10; // Optional
         TimeUnit timeUnit = TimeUnit.SECONDS; // Optional
@@ -89,6 +90,7 @@ public class Tracker {
         boolean activityTracking = false; // Optional
         boolean installTracking = false; // Optional
         boolean applicationContext = false; // Optional
+        boolean userAnonymisation = false; // Optional
         @Nullable Gdpr gdpr = null; // Optional
         @Nullable String trackerVersionSuffix = null; // Optional
 
@@ -338,6 +340,16 @@ public class Tracker {
         }
 
         /**
+         * @param userAnonymisation whether to anonymise client-side user identifiers in session and platform context entities
+         * @return itself
+         */
+        @NonNull
+        public TrackerBuilder userAnonymisation(@NonNull Boolean userAnonymisation) {
+            this.userAnonymisation = userAnonymisation;
+            return this;
+        }
+
+        /**
          * Internal use only.
          * Decorate the `tv` (tracker version) field in the tracker protocol.
          */
@@ -375,6 +387,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
+    boolean userAnonymisation;
     String trackerVersionSuffix;
 
     private boolean deepLinkContext;
@@ -498,6 +511,7 @@ public class Tracker {
         this.timeUnit = builder.timeUnit;
         this.foregroundTimeout = builder.foregroundTimeout;
         this.backgroundTimeout = builder.backgroundTimeout;
+        this.userAnonymisation = builder.userAnonymisation;
 
         this.platformContext = new PlatformContext(this.context);
 
@@ -598,10 +612,11 @@ public class Tracker {
      * the Tracker can encounter.
      *
      * @param event the event to track
+     * @return The event ID or null in case tracking is paused
      */
-    public void track(final @NonNull Event event) {
+    public UUID track(final @NonNull Event event) {
         if (!dataCollection.get()) {
-            return;
+            return null;
         }
         event.beginProcessing(this);
         TrackerStateSnapshot stateSnapshot;
@@ -619,6 +634,7 @@ public class Tracker {
             this.emitter.add(payload);
             event.endProcessing(this);
         });
+        return trackerEvent.eventId;
     }
 
     private void transformEvent(@NonNull TrackerEvent event) {
@@ -720,7 +736,7 @@ public class Tracker {
                 Logger.track(TAG, "Session not ready or method getHasLoadedFromFile returned false with eventId: %s", eventId);
                 return;
             }
-            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp);
+            SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation);
             event.contexts.add(sessionContextJson);
         }
     }
@@ -731,7 +747,7 @@ public class Tracker {
         }
 
         if (mobileContext) {
-            contexts.add(platformContext.getMobileContext());
+            contexts.add(platformContext.getMobileContext(userAnonymisation));
         }
 
         if (event.isService) {
@@ -801,7 +817,7 @@ public class Tracker {
 
         // Add Mobile Context
         if (this.mobileContext) {
-            contexts.add(platformContext.getMobileContext());
+            contexts.add(platformContext.getMobileContext(userAnonymisation));
         }
 
         // Add application context

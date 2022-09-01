@@ -182,6 +182,16 @@ public interface TrackerConfigurationInterface {
     void setDiagnosticAutotracking(boolean diagnosticAutotracking);
 
     /**
+     * Whether to anonymise client-side user identifiers in session and platform context entities
+     */
+    boolean isUserAnonymisation();
+
+    /**
+     * Whether to anonymise client-side user identifiers in session and platform context entities
+     */
+    void setUserAnonymisation(boolean userAnonymisation);
+
+    /**
      * Decorate the v_tracker field in the tracker protocol.
      *
      * @note Do not use. Internal use only.

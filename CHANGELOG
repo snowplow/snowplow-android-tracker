@@ -1,3 +1,12 @@
+Version 4.0.0 (2022-09-01)
+--------------------------
+Add interface to subscribe for events tracked in Web views (#531)
+Add anonymous tracking features (#540)
+Return tracked event ID from the track method (#544)
+Extend the onSuccess callback when setting up remote configuration to pass configuration state (#694)
+Do not resume remote configuration from cache in case it has different endpoint (#533)
+Fix default session timeout values to 30 minutes everywhere (#542)
+
 Version 3.2.1 (2022-08-17)
 --------------------------
 Ensure english numerals are used in datetimes (#537)

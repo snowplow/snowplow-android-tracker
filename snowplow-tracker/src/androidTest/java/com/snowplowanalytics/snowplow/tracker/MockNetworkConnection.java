@@ -13,10 +13,11 @@ import com.snowplowanalytics.snowplow.network.RequestResult;
 import java.util.ArrayList;
 import java.util.List;
 
-class MockNetworkConnection implements NetworkConnection {
+public class MockNetworkConnection implements NetworkConnection {
     public int statusCode;
     public HttpMethod httpMethod;
 
+    public final List<List<Request>> previousRequests = new ArrayList<>();
     public final List<List<RequestResult>> previousResults = new ArrayList<>();
 
     public MockNetworkConnection(HttpMethod httpMethod, int statusCode) {
@@ -37,6 +38,7 @@ class MockNetworkConnection implements NetworkConnection {
             Logger.v("MockNetworkConnection", "Sent: %s with success: %s", request.emitterEventIds, Boolean.valueOf(result.isSuccessful()).toString());
             requestResults.add(result);
         }
+        previousRequests.add(requests);
         previousResults.add(requestResults);
         return requestResults;
     }
@@ -51,5 +53,17 @@ class MockNetworkConnection implements NetworkConnection {
     @Override
     public Uri getUri() {
         return Uri.parse("http://fake-url.com");
+    }
+
+    public List<Request> getAllRequests() {
+        List<Request> flattened = new ArrayList<>();
+        for (List<Request> requests : previousRequests) {
+            flattened.addAll(requests);
+        }
+        return flattened;
+    }
+
+    public int countRequests() {
+        return getAllRequests().size();
     }
 }

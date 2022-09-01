@@ -89,4 +89,14 @@ public interface EmitterConfigurationInterface {
      * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false for not retry).
      */
     void setCustomRetryForStatusCodes(@Nullable Map<Integer, Boolean> customRetryForStatusCodes);
+
+    /**
+     * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    boolean isServerAnonymisation();
+
+    /**
+     * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    void setServerAnonymisation(boolean serverAnonymisation);
 }

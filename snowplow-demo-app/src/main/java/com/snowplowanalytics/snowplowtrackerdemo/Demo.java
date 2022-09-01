@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
@@ -39,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 
 import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
@@ -53,6 +55,7 @@ import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
+import com.snowplowanalytics.snowplow.internal.remoteconfiguration.ConfigurationState;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
@@ -81,12 +84,13 @@ public class Demo extends Activity implements LoggerDelegate {
     // Example schema for global contexts
     final String SCHEMA_IDENTIFY = "iglu:com.snowplowanalytics.snowplow/identify/jsonschema/1-0-0";
 
-    private Button _startButton, _tabButton;
-    private EditText _uriField;
+    private Button _startButton, _tabButton, _loadWebViewButton;
+    private EditText _uriField, _webViewUriField;
     private RadioGroup _type, _remoteConfig, _collection;
     private RadioButton _radioGet, _radioRemoteConfig;
     private TextView _logOutput, _eventsCreated, _eventsSent, _emitterOnline, _emitterStatus,
             _databaseSize, _sessionIndex;
+    private WebView _webView;
 
     private int eventsCreated = 0;
     private int eventsSent = 0;
@@ -117,6 +121,9 @@ public class Demo extends Activity implements LoggerDelegate {
         _emitterStatus = (TextView)findViewById(R.id.emitter_status);
         _databaseSize  = (TextView)findViewById(R.id.database_size);
         _sessionIndex  = (TextView)findViewById(R.id.session_index);
+        _webViewUriField = (EditText)findViewById(R.id.web_view_uri_field);
+        _webView       = (WebView) findViewById(R.id.web_view);
+        _loadWebViewButton = (Button)findViewById(R.id.btn_load_webview);
 
         _logOutput.setMovementMethod(new ScrollingMovementMethod());
         _logOutput.setText("");
@@ -124,10 +131,15 @@ public class Demo extends Activity implements LoggerDelegate {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String uri = sharedPreferences.getString("uri", "");
         _uriField.setText(uri);
+        String webViewUri = sharedPreferences.getString("webViewUri", "");
+        _webViewUriField.setText(webViewUri);
+
+        _webView.getSettings().setJavaScriptEnabled(true);
 
         // Setup Listeners
         setupTrackerListener();
         setupTabListener();
+        setupWebViewListener();
     }
 
     @Override
@@ -200,6 +212,22 @@ public class Demo extends Activity implements LoggerDelegate {
         });
     }
 
+    private void setupWebViewListener() {
+        _loadWebViewButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String uri = _webViewUriField.getText().toString();
+                if (uri.isEmpty()) {
+                    updateLogger("Web view URI is empty!");
+                } else {
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                    editor.putString("webViewUri", uri).apply();
+
+                    _webView.loadUrl(uri);
+                }
+            }
+        });
+    }
+
     // Configuration
 
     private void setupTracker(@NonNull Consumer<Boolean> callbackTrackerReady) {
@@ -223,13 +251,17 @@ public class Demo extends Activity implements LoggerDelegate {
                 _radioGet.getId() ? HttpMethod.GET : HttpMethod.POST;
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(uri, method);
-        Snowplow.setup(getApplicationContext(), remoteConfig, null, new Consumer<List<String>>() {
-            @Override
-            public void accept(List<String> strings) {
-                updateLogger("Created namespaces: " + strings);
-                Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
-                callbackTrackerReady.accept(true);
+        Snowplow.setup(getApplicationContext(), remoteConfig, null, configurationPair -> {
+            List<String> namespaces = configurationPair.first;
+            updateLogger("Created namespaces: " + namespaces);
+            switch (configurationPair.second) {
+                case CACHED:
+                    updateLogger("Configuration retrieved from cache");
+                case FETCHED:
+                    updateLogger("Configuration fetched from remote endpoint");
             }
+            Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
+            callbackTrackerReady.accept(true);
         });
         return true;
     }
@@ -299,6 +331,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 gdprConfiguration,
                 gcConfiguration
         );
+        Snowplow.subscribeToWebViewEvents(_webView);
         return true;
     }
 

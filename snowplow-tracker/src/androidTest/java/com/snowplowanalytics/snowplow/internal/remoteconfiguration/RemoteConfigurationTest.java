@@ -5,6 +5,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 import androidx.test.espresso.core.internal.deps.guava.collect.Lists;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -93,14 +94,11 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
 
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                assertNotNull(fetchedConfigurationBundle);
-                assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        new ConfigurationFetcher(context, remoteConfig, fetchedConfigurationBundle -> {
+            assertNotNull(fetchedConfigurationBundle);
+            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
 
@@ -119,11 +117,12 @@ public class RemoteConfigurationTest {
         expected.configurationVersion = 12;
         expected.configurationBundle = Lists.newArrayList(bundle);
 
-        ConfigurationCache cache = new ConfigurationCache();
+        RemoteConfiguration remoteConfiguration = new RemoteConfiguration("http://example.com", HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfiguration);
         cache.clearCache(context);
         cache.writeCache(context, expected);
 
-        cache = new ConfigurationCache();
+        cache = new ConfigurationCache(remoteConfiguration);
         FetchedConfigurationBundle config = cache.readCache(context);
 
         assertEquals(expected.configurationVersion, config.configurationVersion);
@@ -146,13 +145,10 @@ public class RemoteConfigurationTest {
         final Object expectation = new Object();
         AtomicBoolean expectationNotified = new AtomicBoolean(false);
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
-        ConfigurationFetcher fetcher = new ConfigurationFetcher(context, remoteConfig, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                expectationNotified.set(true);
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        new ConfigurationFetcher(context, remoteConfig, fetchedConfigurationBundle -> {
+            expectationNotified.set(true);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -166,21 +162,16 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_notDownloading_fails() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
-        cache.clearCache(context);
         MockWebServer mockWebServer = getMockServer(500, "{}");
         String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
+        cache.clearCache(context);
 
         // test
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, false, pair -> fail());
         synchronized (expectation) {
             expectation.wait(5000);
         }
@@ -191,21 +182,16 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_downloadOfWrongSchema_fails() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
-        cache.clearCache(context);
         MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}");
         String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
+        cache.clearCache(context);
 
         // test
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, false, pair -> fail());
         synchronized (expectation) {
             expectation.wait(5000);
         }
@@ -216,7 +202,10 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_downloadSameConfigVersionThanCached_dontUpdate() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}");
+        String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
         cache.clearCache(context);
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
@@ -225,23 +214,19 @@ public class RemoteConfigurationTest {
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
-        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}");
-        String endpoint = getMockServerURI(mockWebServer);
 
         // test
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    fail();
-                }
-                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
-                    i[0]++;
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            assertEquals(ConfigurationState.CACHED, pair.second);
+            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                fail();
+            }
+            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+                i[0]++;
             }
         });
         synchronized (expectation) {
@@ -255,7 +240,10 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_downloadHigherConfigVersionThanCached_doUpdate() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
+        String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
         cache.clearCache(context);
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
@@ -264,23 +252,22 @@ public class RemoteConfigurationTest {
         cached.configurationVersion = 1;
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
-        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}");
-        String endpoint = getMockServerURI(mockWebServer);
 
         // test
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    i[0]++;
-                }
-                if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
-                    i[0]++;
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            assertEquals(
+                    i[0] == 0 ? ConfigurationState.CACHED : ConfigurationState.FETCHED,
+                    pair.second
+            );
+            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                i[0]++;
+            }
+            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+                i[0]++;
             }
         });
         synchronized (expectation) {
@@ -294,7 +281,10 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_justRefresh_downloadSameConfigVersionThanCached_dontUpdate() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
+        MockWebServer mockWebServer = getMockServer(404, "{}");
+        String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
         cache.clearCache(context);
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
@@ -304,19 +294,13 @@ public class RemoteConfigurationTest {
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
 
-        MockWebServer mockWebServer = getMockServer(404, "{}");
-        String endpoint = getMockServerURI(mockWebServer);
-
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            assertEquals(ConfigurationState.CACHED, pair.second);
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -331,12 +315,7 @@ public class RemoteConfigurationTest {
 
         // test
         final Object expectation2 = new Object();
-        provider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                fail();
-            }
-        });
+        provider.retrieveConfiguration(context, true, pair -> fail());
         synchronized (expectation2) {
             expectation2.wait(5000);
         }
@@ -347,7 +326,10 @@ public class RemoteConfigurationTest {
     public void testConfigurationProvider_justRefresh_downloadHigherConfigVersionThanCached_doUpdate() throws IOException, InterruptedException {
         // prepare test
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ConfigurationCache cache = new ConfigurationCache();
+        MockWebServer mockWebServer = getMockServer(404, "{}");
+        String endpoint = getMockServerURI(mockWebServer);
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(remoteConfig);
         cache.clearCache(context);
 
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
@@ -357,19 +339,12 @@ public class RemoteConfigurationTest {
         cached.configurationBundle = Lists.newArrayList(bundle);
         cache.writeCache(context, cached);
 
-        MockWebServer mockWebServer = getMockServer(404, "{}");
-        String endpoint = getMockServerURI(mockWebServer);
-
         final Object expectation = new Object();
-        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
         final int[] i = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, false, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                synchronized (expectation) {
-                    expectation.notify();
-                }
+        provider.retrieveConfiguration(context, false, pair -> {
+            synchronized (expectation) {
+                expectation.notify();
             }
         });
         synchronized (expectation) {
@@ -385,14 +360,13 @@ public class RemoteConfigurationTest {
         // test
         final Object expectation2 = new Object();
         final int[] j = {0}; // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(context, true, new Consumer<FetchedConfigurationBundle>() {
-            @Override
-            public void accept(FetchedConfigurationBundle fetchedConfigurationBundle) {
-                if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
-                    j[0]++;
-                    synchronized (expectation2) {
-                        expectation2.notify();
-                    }
+        provider.retrieveConfiguration(context, true, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+                j[0]++;
+                assertEquals(ConfigurationState.FETCHED, pair.second);
+                synchronized (expectation2) {
+                    expectation2.notify();
                 }
             }
         });
@@ -400,6 +374,45 @@ public class RemoteConfigurationTest {
             expectation2.wait(5000);
         }
         assertEquals(1, j[0]);
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void testDoesntUseCachedConfigurationIfDifferentRemoteEndpoint() throws IOException, InterruptedException {
+        // prepare test
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        RemoteConfiguration cachedRemoteConfig = new RemoteConfiguration("http://cache.example.com", HttpMethod.GET);
+        ConfigurationCache cache = new ConfigurationCache(cachedRemoteConfig);
+        cache.clearCache(context);
+
+        // write configuration (version 2) to cache
+        ConfigurationBundle bundle = new ConfigurationBundle("namespace");
+        bundle.networkConfiguration = new NetworkConfiguration("endpoint");
+        FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
+        cached.configurationVersion = 2;
+        cached.configurationBundle = Lists.newArrayList(bundle);
+        cache.writeCache(context, cached);
+
+        // stub request for configuration (return version 1)
+        MockWebServer mockWebServer = getMockServer(200, "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}");
+        String endpoint = getMockServerURI(mockWebServer);
+
+        // retrieve remote configuration
+        RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
+        ConfigurationProvider provider = new ConfigurationProvider(remoteConfig);
+        final int[] numCallbackCalls = {0};
+        final Object expectation = new Object();
+        provider.retrieveConfiguration(context, true, pair -> {
+            FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
+            numCallbackCalls[0]++;
+            // should be the non-cache configuration (version 1)
+            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0", fetchedConfigurationBundle.schema);
+            assertEquals(1, fetchedConfigurationBundle.configurationVersion);
+        });
+        synchronized (expectation) {
+            expectation.wait(5000);
+        }
+        assertEquals(1, numCallbackCalls[0]);
         mockWebServer.shutdown();
     }
 

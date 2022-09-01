@@ -14,9 +14,11 @@
 package com.snowplowanalytics.snowplow.tracker;
 
 import android.annotation.SuppressLint;
-import android.test.AndroidTestCase;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.network.CollectorCookieJar;
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
@@ -28,6 +30,15 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,8 +58,10 @@ import okhttp3.mockwebserver.RecordedRequest;
 import static com.snowplowanalytics.snowplow.network.HttpMethod.GET;
 import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 
-public class NetworkConnectionTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class NetworkConnectionTest {
 
+    @Test
     public void testGetRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
         OkHttpNetworkConnection connection =
@@ -76,6 +89,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    @Test
     public void testGetRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
         OkHttpNetworkConnection connection =
@@ -101,6 +115,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    @Test
     public void testPostRequestWithSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(200);
         OkHttpNetworkConnection connection =
@@ -132,6 +147,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    @Test
     public void testPostRequestWithNoSuccess() throws IOException, InterruptedException {
         MockWebServer mockServer = getMockServer(404);
         OkHttpNetworkConnection connection =
@@ -158,6 +174,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    @Test
     public void testCustomClientIsUsed() throws IOException, InterruptedException {
         AtomicBoolean hasClientBeenUsed = new AtomicBoolean(false);
         OkHttpClient client = new OkHttpClient.Builder()
@@ -194,6 +211,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         mockServer.shutdown();
     }
 
+    @Test
     public void testFreeEndpoint_GetHttpsUrl() {
         OkHttpNetworkConnection connection =
                 new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("acme.test.url.com", getContext())
@@ -202,6 +220,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         assertTrue(connection.getUri().toString().startsWith("https://acme.test.url.com"));
     }
 
+    @Test
     public void testHttpsEndpoint_GetHttpsUrl() {
         OkHttpNetworkConnection connection =
                 new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("https://acme.test.url.com", getContext())
@@ -210,6 +229,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         assertTrue(connection.getUri().toString().startsWith("https://acme.test.url.com"));
     }
 
+    @Test
     public void testHttpEndpoint_GetHttpUrl() {
         OkHttpNetworkConnection connection =
                 new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder("http://acme.test.url.com", getContext())
@@ -218,6 +238,7 @@ public class NetworkConnectionTest extends AndroidTestCase {
         assertTrue(connection.getUri().toString().startsWith("http://acme.test.url.com"));
     }
 
+    @Test
     public void testRequestWithCookies() throws IOException, InterruptedException {
         MockWebServer mockServer = new MockWebServer();
         mockServer.start();
@@ -246,6 +267,69 @@ public class NetworkConnectionTest extends AndroidTestCase {
 
         mockServer.shutdown();
         new CollectorCookieJar(getContext()).clear();
+    }
+
+    @Test
+    public void testDoesntAddHeaderWithoutServerAnonymisation() throws IOException, InterruptedException {
+        MockWebServer mockServer = getMockServer(200);
+
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
+                        .method(POST)
+                        .serverAnonymisation(false)
+                        .build();
+
+        Payload payload = new TrackerPayload();
+        payload.add("key", "value");
+
+        connection.sendRequests(Arrays.asList(new Request(payload, 2)));
+
+        RecordedRequest req = mockServer.takeRequest(60, TimeUnit.SECONDS);
+        assertNull(req.getHeader("SP-Anonymous"));
+
+        mockServer.shutdown();
+    }
+
+    @Test
+    public void testAddsHeaderForServerAnonymisationForPostRequest() throws IOException, InterruptedException {
+        MockWebServer mockServer = getMockServer(200);
+
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
+                        .method(POST)
+                        .serverAnonymisation(true)
+                        .build();
+
+        Payload payload = new TrackerPayload();
+        payload.add("key", "value");
+
+        connection.sendRequests(Arrays.asList(new Request(payload, 2)));
+
+        RecordedRequest req = mockServer.takeRequest(60, TimeUnit.SECONDS);
+        assertEquals("*", req.getHeader("SP-Anonymous"));
+
+        mockServer.shutdown();
+    }
+
+    @Test
+    public void testAddsHeaderForServerAnonymisationForGetRequest() throws IOException, InterruptedException {
+        MockWebServer mockServer = getMockServer(200);
+
+        OkHttpNetworkConnection connection =
+                new OkHttpNetworkConnection.OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer), getContext())
+                        .method(GET)
+                        .serverAnonymisation(true)
+                        .build();
+
+        Payload payload = new TrackerPayload();
+        payload.add("key", "value");
+
+        connection.sendRequests(Arrays.asList(new Request(payload, 2)));
+
+        RecordedRequest req = mockServer.takeRequest(60, TimeUnit.SECONDS);
+        assertEquals("*", req.getHeader("SP-Anonymous"));
+
+        mockServer.shutdown();
     }
 
     // Service methods
@@ -293,5 +377,10 @@ public class NetworkConnectionTest extends AndroidTestCase {
             return String.format("http://%s:%d", mockServer.getHostName(), mockServer.getPort());
         }
         return null;
+    }
+
+
+    private Context getContext() {
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 }
