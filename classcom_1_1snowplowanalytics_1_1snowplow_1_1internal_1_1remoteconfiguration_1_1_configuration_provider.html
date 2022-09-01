@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;3.2.1</span>
+   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.0.0</span>
    </div>
   </td>
  </tr>
@@ -79,13 +79,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a09e8f527e11c73fd6832d56813bea0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaad645d0f2a9c5ead4015fbaa5d15239"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_provider.html#aaad645d0f2a9c5ead4015fbaa5d15239">ConfigurationProvider</a> (@NonNull <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_remote_configuration.html">RemoteConfiguration</a> remoteConfiguration, @Nullable List&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_bundle.html">ConfigurationBundle</a> &gt; defaultBundles)</td></tr>
 <tr class="separator:aaad645d0f2a9c5ead4015fbaa5d15239"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0620d787b0f1eab5f641aedf61ad5864"><td class="memItemLeft" align="right" valign="top">synchronized void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_provider.html#a0620d787b0f1eab5f641aedf61ad5864">retrieveConfiguration</a> (@NonNull Context context, boolean onlyRemote, @NonNull Consumer&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html">FetchedConfigurationBundle</a> &gt; onFetchCallback)</td></tr>
-<tr class="separator:a0620d787b0f1eab5f641aedf61ad5864"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6de0686531b1d735637b470edb6a5d4b"><td class="memItemLeft" align="right" valign="top">synchronized void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_provider.html#a6de0686531b1d735637b470edb6a5d4b">retrieveConfiguration</a> (@NonNull Context context, boolean onlyRemote, @NonNull Consumer&lt; Pair&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html">FetchedConfigurationBundle</a>, <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_state.html">ConfigurationState</a> &gt; &gt; onFetchCallback)</td></tr>
+<tr class="separator:a6de0686531b1d735637b470edb6a5d4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >This class fetch a configuration from a remote source otherwise it provides a cached configuration. It can manage multiple sources and multiple caches. </p>
 
-<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00017">17</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00018">18</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a09e8f527e11c73fd6832d56813bea0eb" name="a09e8f527e11c73fd6832d56813bea0eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a09e8f527e11c73fd6832d56813bea0eb">&#9670;&nbsp;</a></span>ConfigurationProvider() <span class="overload">[1/2]</span></h2>
@@ -103,7 +103,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00030">30</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00031">31</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
 
 </div>
 </div>
@@ -133,13 +133,13 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00034">34</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00035">35</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a0620d787b0f1eab5f641aedf61ad5864" name="a0620d787b0f1eab5f641aedf61ad5864"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0620d787b0f1eab5f641aedf61ad5864">&#9670;&nbsp;</a></span>retrieveConfiguration()</h2>
+<a id="a6de0686531b1d735637b470edb6a5d4b" name="a6de0686531b1d735637b470edb6a5d4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6de0686531b1d735637b470edb6a5d4b">&#9670;&nbsp;</a></span>retrieveConfiguration()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -159,7 +159,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">@NonNull Consumer&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html">FetchedConfigurationBundle</a> &gt;&#160;</td>
+          <td class="paramtype">@NonNull Consumer&lt; Pair&lt; <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_fetched_configuration_bundle.html">FetchedConfigurationBundle</a>, <a class="el" href="enumcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_state.html">ConfigurationState</a> &gt; &gt;&#160;</td>
           <td class="paramname"><em>onFetchCallback</em>&#160;</td>
         </tr>
         <tr>
@@ -170,7 +170,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00045">45</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_configuration_provider_8java_source.html#l00046">46</a> of file <a class="el" href="_configuration_provider_8java_source.html">ConfigurationProvider.java</a>.</p>
 
 </div>
 </div>

@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;3.2.1</span>
+   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.0.0</span>
    </div>
   </td>
  </tr>
@@ -151,6 +151,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a952bea9b9443f7bc4d57547aa87113e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07eb1e27fc414930898ae328c2c6a498"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a07eb1e27fc414930898ae328c2c6a498">setDiagnosticAutotracking</a> (boolean diagnosticAutotracking)</td></tr>
 <tr class="separator:a07eb1e27fc414930898ae328c2c6a498"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e232f22e9c6d44cb52048bf5728d652"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a2e232f22e9c6d44cb52048bf5728d652">isUserAnonymisation</a> ()</td></tr>
+<tr class="separator:a2e232f22e9c6d44cb52048bf5728d652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a017dd1d509b0fd15a8af60af1d060b17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a017dd1d509b0fd15a8af60af1d060b17">setUserAnonymisation</a> (boolean userAnonymisation)</td></tr>
+<tr class="separator:a017dd1d509b0fd15a8af60af1d060b17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41e5e4856b738a77cab8dda1c9c7a3bc"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#a41e5e4856b738a77cab8dda1c9c7a3bc">getTrackerVersionSuffix</a> ()</td></tr>
 <tr class="separator:a41e5e4856b738a77cab8dda1c9c7a3bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe55c71ab06e0b7dfc1ad68c8d2bf1e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_interface.html#afe55c71ab06e0b7dfc1ad68c8d2bf1e6">setTrackerVersionSuffix</a> (@Nullable String trackerVersionSuffix)</td></tr>
@@ -499,6 +503,26 @@ Public Member Functions</h2></td></tr>
 <p >Whether session context is sent with all the tracked events. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#ac4e57781045c742c4b6f37ddacca6bb1">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a890a3f693abf7f3c396b92787d1802cb">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#abfdd7f6ad24eeeb9cdd3d5d6fe6b35dc">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>.</p>
+
+</div>
+</div>
+<a id="a2e232f22e9c6d44cb52048bf5728d652" name="a2e232f22e9c6d44cb52048bf5728d652"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e232f22e9c6d44cb52048bf5728d652">&#9670;&nbsp;</a></span>isUserAnonymisation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.isUserAnonymisation </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Whether to anonymise client-side user identifiers in session and platform context entities </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a2a87b8f0b9f719a40e704fbb10e8a640">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_configuration_update.html#a5898cb20d9089465d622d86d6db681dd">com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#abc604d12eaf0f4fc16e9a75839a14575">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>.</p>
 
 </div>
 </div>
@@ -857,6 +881,27 @@ Public Member Functions</h2></td></tr>
 <p >Decorate the v_tracker field in the tracker protocol. </p><dl class="section note"><dt>Note</dt><dd>Do not use. Internal use only. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#a11423f823081a01934a3e05cea5ffa0e">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a08e365ba37b2e63838ca4c8fe8489bc8">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>.</p>
+
+</div>
+</div>
+<a id="a017dd1d509b0fd15a8af60af1d060b17" name="a017dd1d509b0fd15a8af60af1d060b17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a017dd1d509b0fd15a8af60af1d060b17">&#9670;&nbsp;</a></span>setUserAnonymisation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.tracker.TrackerConfigurationInterface.setUserAnonymisation </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>userAnonymisation</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Whether to anonymise client-side user identifiers in session and platform context entities </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_tracker_configuration.html#ab9e8eb22cc382d92ab0d1387ad1bc747">com.snowplowanalytics.snowplow.configuration.TrackerConfiguration</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker_controller_impl.html#a88bc028959150e9bd33a522286465357">com.snowplowanalytics.snowplow.internal.tracker.TrackerControllerImpl</a>.</p>
 
 </div>
 </div>

@@ -7,9 +7,10 @@ var searchData=
   ['configurationcache_4',['ConfigurationCache',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_cache.html',1,'com::snowplowanalytics::snowplow::internal::remoteconfiguration']]],
   ['configurationfetcher_5',['ConfigurationFetcher',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_fetcher.html',1,'com::snowplowanalytics::snowplow::internal::remoteconfiguration']]],
   ['configurationprovider_6',['ConfigurationProvider',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_provider.html',1,'com::snowplowanalytics::snowplow::internal::remoteconfiguration']]],
-  ['consentdocument_7',['ConsentDocument',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['consentgranted_8',['ConsentGranted',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['consentwithdrawn_9',['ConsentWithdrawn',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html',1,'com::snowplowanalytics::snowplow::event']]],
-  ['contextgenerator_10',['ContextGenerator',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1globalcontexts_1_1_context_generator.html',1,'com::snowplowanalytics::snowplow::globalcontexts']]],
-  ['controller_11',['Controller',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1_controller.html',1,'com::snowplowanalytics::snowplow::internal']]]
+  ['configurationstate_7',['ConfigurationState',['../enumcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1remoteconfiguration_1_1_configuration_state.html',1,'com::snowplowanalytics::snowplow::internal::remoteconfiguration']]],
+  ['consentdocument_8',['ConsentDocument',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_document.html',1,'com::snowplowanalytics::snowplow::event']]],
+  ['consentgranted_9',['ConsentGranted',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_granted.html',1,'com::snowplowanalytics::snowplow::event']]],
+  ['consentwithdrawn_10',['ConsentWithdrawn',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_consent_withdrawn.html',1,'com::snowplowanalytics::snowplow::event']]],
+  ['contextgenerator_11',['ContextGenerator',['../interfacecom_1_1snowplowanalytics_1_1snowplow_1_1globalcontexts_1_1_context_generator.html',1,'com::snowplowanalytics::snowplow::globalcontexts']]],
+  ['controller_12',['Controller',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1_controller.html',1,'com::snowplowanalytics::snowplow::internal']]]
 ];

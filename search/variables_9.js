@@ -1,8 +1,8 @@
 var searchData=
 [
   ['label_0',['label',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_timing.html#ae4cd69d57b98051cc374ce7e45033885',1,'com.snowplowanalytics.snowplow.event.Timing.label()'],['../classcom_1_1snowplowanalytics_1_1snowplow_1_1event_1_1_structured.html#a0fa11599fd88e53df03ba0169049d0c7',1,'com.snowplowanalytics.snowplow.event.Structured.label()']]],
-  ['language_1',['LANGUAGE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#acf8452e2651b21bad5186d0f07e72737',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],
-  ['language_2',['language',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a3680c6d6f25fe0a4a452ecea2315c783',1,'com::snowplowanalytics::snowplow::configuration::SubjectConfiguration']]],
+  ['language_1',['language',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_subject_configuration.html#a3680c6d6f25fe0a4a452ecea2315c783',1,'com::snowplowanalytics::snowplow::configuration::SubjectConfiguration']]],
+  ['language_2',['LANGUAGE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#acf8452e2651b21bad5186d0f07e72737',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],
   ['languageupdated_3',['languageUpdated',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_configuration_update.html#a9d8ec9ea668c4dc501e1d0ca33b56d79',1,'com::snowplowanalytics::snowplow::internal::tracker::SubjectConfigurationUpdate']]],
   ['latitude_4',['LATITUDE',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#ab7b572e27dcb0db6c397aeb395300517',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],
   ['latlong_5faccuracy_5',['LATLONG_ACCURACY',['../classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1constants_1_1_parameters.html#a5b644a12bf35d7d36ebc8712b2d8fcc6',1,'com::snowplowanalytics::snowplow::internal::constants::Parameters']]],

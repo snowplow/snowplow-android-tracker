@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;3.2.1</span>
+   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.0.0</span>
    </div>
   </td>
  </tr>
@@ -115,6 +115,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6bebe63ec50aeb71067611b742fdb597"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56808b1951b761a1e390a98919855a7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#a56808b1951b761a1e390a98919855a7a">setCustomRetryForStatusCodes</a> (@Nullable Map&lt; Integer, Boolean &gt; customRetryForStatusCodes)</td></tr>
 <tr class="separator:a56808b1951b761a1e390a98919855a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addb4fd28b1aabc86c46cf790b56ec743"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#addb4fd28b1aabc86c46cf790b56ec743">isServerAnonymisation</a> ()</td></tr>
+<tr class="separator:addb4fd28b1aabc86c46cf790b56ec743"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af99d2592e16785b8aea4c1e12ecb3e86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_interface.html#af99d2592e16785b8aea4c1e12ecb3e86">setServerAnonymisation</a> (boolean serverAnonymisation)</td></tr>
+<tr class="separator:af99d2592e16785b8aea4c1e12ecb3e86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -280,6 +284,26 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="addb4fd28b1aabc86c46cf790b56ec743" name="addb4fd28b1aabc86c46cf790b56ec743"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addb4fd28b1aabc86c46cf790b56ec743">&#9670;&nbsp;</a></span>isServerAnonymisation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface.isServerAnonymisation </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Whether to anonymise server-side user identifiers including the <code>network_userid</code> and <code>user_ipaddress</code> </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#af0fc0dc1686fd00d3cac92c77d9fcf1d">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>, <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_configuration_update.html#aad8101c29824822169509804aac12627">com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#aaa29df9137571892a5e239bdf240718d">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>.</p>
+
+</div>
+</div>
 <a id="a8c7f1e7a00bf2d8951efe59324797980" name="a8c7f1e7a00bf2d8951efe59324797980"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8c7f1e7a00bf2d8951efe59324797980">&#9670;&nbsp;</a></span>setBufferOption()</h2>
 
@@ -403,6 +427,27 @@ Public Member Functions</h2></td></tr>
 <p >Callback called for each request performed by the tracker to the collector. </p>
 
 <p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a01a4402c91ba79ccee27ac08b4fadccb">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#af9c6afb8129c363b796694b17886d764">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>.</p>
+
+</div>
+</div>
+<a id="af99d2592e16785b8aea4c1e12ecb3e86" name="af99d2592e16785b8aea4c1e12ecb3e86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af99d2592e16785b8aea4c1e12ecb3e86">&#9670;&nbsp;</a></span>setServerAnonymisation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationInterface.setServerAnonymisation </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>serverAnonymisation</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Whether to anonymise server-side user identifiers including the <code>network_userid</code> and <code>user_ipaddress</code> </p>
+
+<p>Implemented in <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1configuration_1_1_emitter_configuration.html#a32ae111a816011f7287b47db950fbfa5">com.snowplowanalytics.snowplow.configuration.EmitterConfiguration</a>, and <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1emitter_1_1_emitter_controller_impl.html#a0808f3789832b584080b3248c7457e3a">com.snowplowanalytics.snowplow.internal.emitter.EmitterControllerImpl</a>.</p>
 
 </div>
 </div>
