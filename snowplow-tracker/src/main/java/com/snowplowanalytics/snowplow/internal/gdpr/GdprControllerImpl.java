@@ -98,7 +98,7 @@ public class GdprControllerImpl extends Controller implements GdprController {
 
     @NonNull
     private Tracker getTracker() {
-        return serviceProvider.getTracker();
+        return serviceProvider.getOrMakeTracker();
     }
 
     @NonNull

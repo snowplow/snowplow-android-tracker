@@ -24,6 +24,8 @@ import java.util.UUID;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class TrackerControllerImpl extends Controller implements TrackerController {
 
+    private final static String TAG = TrackerControllerImpl.class.getSimpleName();
+
     // Constructors
 
     public TrackerControllerImpl(@NonNull ServiceProvider serviceProvider) {
@@ -35,36 +37,36 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     @Nullable
     @Override
     public NetworkController getNetwork() {
-        return serviceProvider.getNetworkController();
+        return serviceProvider.getOrMakeNetworkController();
     }
 
     @Override
     @NonNull
     public EmitterController getEmitter() {
-        return serviceProvider.getEmitterController();
+        return serviceProvider.getOrMakeEmitterController();
     }
 
     @Override
     @NonNull
     public SubjectController getSubject() {
-        return serviceProvider.getSubjectController();
+        return serviceProvider.getOrMakeSubjectController();
     }
 
     @Override
     @NonNull
     public GdprController getGdpr() {
-        return serviceProvider.getGdprController();
+        return serviceProvider.getOrMakeGdprController();
     }
 
     @NonNull
     @Override
     public GlobalContextsController getGlobalContexts() {
-        return serviceProvider.getGlobalContextsController();
+        return serviceProvider.getOrMakeGlobalContextsController();
     }
 
     @NonNull
     public SessionControllerImpl getSessionController() {
-        return serviceProvider.getSessionController();
+        return serviceProvider.getOrMakeSessionController();
     }
 
     @Nullable
@@ -88,7 +90,7 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     }
 
     @Override
-    public UUID track(@NonNull Event event) {
+    public @Nullable UUID track(@NonNull Event event) {
         return getTracker().track(event);
     }
 
@@ -335,7 +337,10 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @NonNull
     private Tracker getTracker() {
-        return serviceProvider.getTracker();
+        if (!serviceProvider.isTrackerInitialized()) {
+            getLoggerDelegate().error(TAG, "Recreating tracker instance after it was removed. This will not be supported in future versions.");
+        }
+        return serviceProvider.getOrMakeTracker();
     }
 
     @NonNull
