@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 /**
  * Entry point to instance a new Snowplow tracker.
@@ -193,7 +192,7 @@ public class Snowplow {
             serviceProvider = new ServiceProvider(context, namespace, network, Arrays.asList(configurations));
             registerInstance(serviceProvider);
         }
-        return serviceProvider.getTrackerController();
+        return serviceProvider.getOrMakeTrackerController();
     }
 
     /**
@@ -205,7 +204,7 @@ public class Snowplow {
     @Nullable
     public static TrackerController getDefaultTracker() {
         ServiceProvider serviceProvider = defaultServiceProvider;
-        return serviceProvider == null ? null : serviceProvider.getTrackerController();
+        return serviceProvider == null ? null : serviceProvider.getOrMakeTrackerController();
     }
 
     /**
@@ -220,7 +219,7 @@ public class Snowplow {
         if (serviceProvider == null) {
             return null;
         }
-        return serviceProvider.getTrackerController();
+        return serviceProvider.getOrMakeTrackerController();
     }
 
     /**

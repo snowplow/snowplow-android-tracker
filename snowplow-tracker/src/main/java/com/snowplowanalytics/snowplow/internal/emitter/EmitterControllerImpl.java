@@ -23,7 +23,7 @@ public class EmitterControllerImpl extends Controller implements EmitterControll
     }
 
     private Emitter getEmitter() {
-        return serviceProvider.getTracker().getEmitter();
+        return serviceProvider.getOrMakeTracker().getEmitter();
     }
 
     // Getters and Setters
