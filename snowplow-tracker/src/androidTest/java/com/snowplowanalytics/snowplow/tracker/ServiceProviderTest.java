@@ -15,20 +15,34 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 
-import android.test.AndroidTestCase;
+import androidx.annotation.NonNull;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
+import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceProviderTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class ServiceProviderTest {
 
+    @Test
     public void testUpdatingConfigurationRetainsPausedEmitter() throws InterruptedException {
         NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme", POST);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("appId");
@@ -43,7 +57,7 @@ public class ServiceProviderTest extends AndroidTestCase {
         ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, configurations);
 
         // pause emitter
-        provider.getEmitterController().pause();
+        provider.getOrMakeEmitterController().pause();
 
         // refresh configuration
         List<Configuration> configurationUpdates = new ArrayList<Configuration>();
@@ -51,17 +65,54 @@ public class ServiceProviderTest extends AndroidTestCase {
         provider.reset(configurationUpdates);
 
         // track event and check that emitter is paused
-        provider.getTrackerController().track(new Structured("cat", "act"));
+        provider.getOrMakeTrackerController().track(new Structured("cat", "act"));
         Thread.sleep(1000);
-        assertFalse(provider.getEmitter().getEmitterStatus());
+        assertFalse(provider.getOrMakeEmitter().getEmitterStatus());
         assertEquals(0, networkConnection.sendingCount());
 
         // resume emitting
-        provider.getEmitterController().resume();
+        provider.getOrMakeEmitterController().resume();
         for (int i = 0; i < 10 && networkConnection.sendingCount() < 1; i++) {
             Thread.sleep(600);
         }
         assertEquals(1, networkConnection.sendingCount());
-        provider.getEmitter().flush();
+        provider.getOrMakeEmitter().flush();
+    }
+
+    @Test
+    public void testLogsErrorWhenAccessingShutDownTracker() {
+        NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme", POST);
+        MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
+        networkConfig.networkConnection = networkConnection;
+        ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, new ArrayList<>());
+
+        // listen for the error log
+        TrackerController tracker = provider.getOrMakeTrackerController();
+        final boolean[] loggedError = {false};
+        tracker.setLoggerDelegate(new LoggerDelegate() {
+            @Override
+            public void error(@NonNull String tag, @NonNull String msg) {
+                if (msg.contains("Recreating tracker instance")) {
+                    loggedError[0] = true;
+                }
+            }
+
+            @Override
+            public void debug(@NonNull String tag, @NonNull String msg) {
+            }
+
+            @Override
+            public void verbose(@NonNull String tag, @NonNull String msg) {
+            }
+        });
+
+        // shutting down and accessing the tracker should log the error
+        provider.shutdown();
+        tracker.getNamespace();
+        assertTrue(loggedError[0]);
+    }
+
+    private Context getContext() {
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 }

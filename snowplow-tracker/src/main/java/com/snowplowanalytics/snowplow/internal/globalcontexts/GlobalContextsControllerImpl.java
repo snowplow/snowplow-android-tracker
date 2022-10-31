@@ -10,8 +10,6 @@ import com.snowplowanalytics.snowplow.internal.Controller;
 import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -41,6 +39,6 @@ public class GlobalContextsControllerImpl extends Controller implements GlobalCo
     // Private methods
 
     private Tracker getTracker() {
-        return serviceProvider.getTracker();
+        return serviceProvider.getOrMakeTracker();
     }
 }

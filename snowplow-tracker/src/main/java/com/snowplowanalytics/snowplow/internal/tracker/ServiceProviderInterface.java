@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.internal.tracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
 import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate;
@@ -21,36 +22,39 @@ public interface ServiceProviderInterface {
     // Internal services
 
     @NonNull
-    Tracker getTracker();
+    Boolean isTrackerInitialized();
 
     @NonNull
-    Emitter getEmitter();
+    Tracker getOrMakeTracker();
 
     @NonNull
-    Subject getSubject();
+    Emitter getOrMakeEmitter();
+
+    @NonNull
+    Subject getOrMakeSubject();
 
     // Controllers
 
     @NonNull
-    TrackerControllerImpl getTrackerController();
+    TrackerControllerImpl getOrMakeTrackerController();
 
     @NonNull
-    EmitterControllerImpl getEmitterController();
+    EmitterControllerImpl getOrMakeEmitterController();
 
     @NonNull
-    NetworkControllerImpl getNetworkController();
+    NetworkControllerImpl getOrMakeNetworkController();
 
     @NonNull
-    GdprControllerImpl getGdprController();
+    GdprControllerImpl getOrMakeGdprController();
 
     @NonNull
-    GlobalContextsControllerImpl getGlobalContextsController();
+    GlobalContextsControllerImpl getOrMakeGlobalContextsController();
 
     @NonNull
-    SubjectControllerImpl getSubjectController();
+    SubjectControllerImpl getOrMakeSubjectController();
 
     @NonNull
-    SessionControllerImpl getSessionController();
+    SessionControllerImpl getOrMakeSessionController();
 
     // Configuration Updates
 
