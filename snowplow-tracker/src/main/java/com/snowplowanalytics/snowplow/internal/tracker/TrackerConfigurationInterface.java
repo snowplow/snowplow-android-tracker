@@ -182,12 +182,12 @@ public interface TrackerConfigurationInterface {
     void setDiagnosticAutotracking(boolean diagnosticAutotracking);
 
     /**
-     * Whether to anonymise client-side user identifiers in session and platform context entities
+     * Whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
      */
     boolean isUserAnonymisation();
 
     /**
-     * Whether to anonymise client-side user identifiers in session and platform context entities
+     * Whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
      */
     void setUserAnonymisation(boolean userAnonymisation);
 

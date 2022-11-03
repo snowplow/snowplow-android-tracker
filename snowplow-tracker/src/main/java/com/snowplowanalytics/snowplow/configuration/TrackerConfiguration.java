@@ -486,7 +486,7 @@ public class TrackerConfiguration implements TrackerConfigurationInterface, Conf
     }
 
     /**
-     * Whether to anonymise client-side user identifiers in session and platform context entities
+     * Whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
      */
     @NonNull
     public TrackerConfiguration userAnonymisation(boolean userAnonymisation) {
