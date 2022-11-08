@@ -4,7 +4,7 @@ The Snowplow Android Tracker is maintained by the Engineering team at Snowplow A
 
 We are extremely grateful for all contributions we receive, whether that is reporting an issue or a change to the code which can be made in the form of a pull request.
 
-For support requests, please use our community support Discourse forum: https://discourse.snowplowanalytics.com/.
+For support requests, please use our community support Discourse forum: https://discourse.snowplow.io/.
 
 ## Setting up an Environment
 
@@ -16,7 +16,7 @@ You should ensure you are comfortable building and testing the existing release 
 
 ### Creating an issue
 
-The project contains an issue template which should help guiding you through the process. However, please keep in mind that support requests should go to our Discourse forum: https://discourse.snowplowanalytics.com/ and not GitHub issues.
+The project contains an issue template which should help guiding you through the process. However, please keep in mind that support requests should go to our Discourse forum: https://discourse.snowplow.io/ and not GitHub issues.
 
 It's also a good idea to log an issue before starting to work on a pull request to discuss it with the maintainers. A pull request is just one solution to a problem and it is often a good idea to talk about the problem with the maintainers first.
 
@@ -75,6 +75,6 @@ The @snowplowcla bot will guide you through the process.
 
 ### Community support requests
 
-Please do not log an issue if you are asking for support, all of our community support requests go through our Discourse forum: https://discourse.snowplowanalytics.com/.
+Please do not log an issue if you are asking for support, all of our community support requests go through our Discourse forum: https://discourse.snowplow.io/.
 
 Posting your problem there ensures more people will see it and you should get support faster than creating a new issue on GitHub. Please do create a new issue on GitHub if you think you've found a bug though!
