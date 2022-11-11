@@ -171,7 +171,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 if (sessionController != null) {
                     sessionController.pause();
                 }
-                String url = "https://snowplowanalytics.com/";
+                String url = "https://snowplow.io/";
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(Demo.this, Uri.parse(url));
@@ -319,7 +319,7 @@ public class Demo extends Activity implements LoggerDelegate {
         GlobalContextsConfiguration gcConfiguration = new GlobalContextsConfiguration(null);
         Map<String, Object> pairs = new HashMap<>();
         addToMap("id", "snowplow", pairs);
-        addToMap("email", "info@snowplowanalytics.com", pairs);
+        addToMap("email", "info@snowplow.io", pairs);
         gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs))));
 
         Snowplow.createTracker(getApplicationContext(),

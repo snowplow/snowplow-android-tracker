@@ -45,7 +45,7 @@ public class RemoteConfigurationTest {
         String config = "{\"$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\","
                 + "\"configurationVersion\":12,\"configurationBundle\": ["
                 + "{\"namespace\": \"default1\","
-                + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplowanalytics.com\",\"method\":\"get\"},"
+                + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplow.io\",\"method\":\"get\"},"
                 + "\"trackerConfiguration\": {\"applicationContext\":false,\"screenContext\":false},"
                 + "\"sessionConfiguration\": {\"backgroundTimeout\":60,\"foregroundTimeout\":60}"
                 + "},"
