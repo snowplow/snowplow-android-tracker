@@ -59,8 +59,8 @@ public class TrackerEvents {
     }
     
     private static void trackDeepLink(TrackerController tracker) {
-        DeepLinkReceived event = new DeepLinkReceived("http://snowplowanalytics.com/path?param=value&param2=value2")
-                .referrer("http://snowplowanalytics.com/path?param=value&param2=value2");
+        DeepLinkReceived event = new DeepLinkReceived("http://snowplow.io/path?param=value&param2=value2")
+                .referrer("http://snowplow.io/path?param=value&param2=value2");
         tracker.track(event);
     }
 
