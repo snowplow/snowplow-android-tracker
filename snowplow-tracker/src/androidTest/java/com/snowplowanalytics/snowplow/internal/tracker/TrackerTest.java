@@ -514,7 +514,7 @@ public class TrackerTest {
     }
 
     @Test
-    public void testChangeUserAnonymisation() {
+    public void testStartsNewSessionWhenChangingAnonymousTracking() {
         Emitter emitter = new Emitter(getContext(), "fake-uri", new Emitter.EmitterBuilder()
                 .option(BufferOption.Single)
         );
