@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.entity.DeepLink;
 import com.snowplowanalytics.snowplow.event.Background;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.Foreground;
@@ -663,6 +664,10 @@ public class Tracker {
         addGlobalContextsToContexts(contexts, event);
         addStateMachineEntitiesToContexts(contexts, event);
         wrapContextsToPayload(payload, contexts);
+        if (!event.isPrimitive) {
+            // TODO: To remove when Atomic table refactoring is finished
+            workaroundForCampaignAttributionEnrichment(payload, event, contexts);
+        }
         return payload;
     }
 
@@ -689,8 +694,6 @@ public class Tracker {
     private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
 
-        workaroundForCampaignAttributionEnrichment(payload, event); // TODO: To remove when Atomic table refactoring is finished
-
         SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
         HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
         unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
@@ -701,19 +704,33 @@ public class Tracker {
     /*
      This is needed because the campaign-attribution-enrichment (in the pipeline) is able to parse
      the `url` and `referrer` only if they are part of a PageView event.
-     The PageView event is an atomic event but the DeepLinkReceived is a SelfDescribing event.
+     The PageView event is an atomic event but the DeepLinkReceived and ScreenView are SelfDescribing events.
      For this reason we copy these two fields in the atomic fields in order to let the enrichment
      to process correctly the fields even if the event is not a PageView and it's a SelfDescribing event.
      This is a hack that should be removed once the atomic event table is dismissed and all the events
      will be SelfDescribing.
     */
-    private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event) {
+    private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event, List<SelfDescribingJson> contexts) {
+        String url = null;
+        String referrer = null;
+
         if (event.schema.equals(DeepLinkReceived.SCHEMA) && event.payload != null) {
-            String url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
-            String referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
-            payload.add(Parameters.PAGE_URL, url);
-            payload.add(Parameters.PAGE_REFR, referrer);
+            url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
+            referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
         }
+        else if (event.schema.equals(TrackerConstants.SCHEMA_SCREEN_VIEW) && contexts != null) {
+            for (SelfDescribingJson entity : contexts) {
+                if (entity instanceof DeepLink) {
+                    DeepLink deepLink = (DeepLink) entity;
+                    url = deepLink.getUrl();
+                    referrer = deepLink.getReferrer();
+                    break;
+                }
+            }
+        }
+
+        if (url != null) { payload.add(Parameters.PAGE_URL, url); }
+        if (referrer != null) { payload.add(Parameters.PAGE_REFR, referrer); }
     }
 
     /*
