@@ -41,7 +41,7 @@ public class SubjectTest {
 
     @Test
     public void testGetSubjectStandardPairs() throws Exception {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         Map<String, String> standardPairs = subject.getSubject(false);
 
         assertTrue(standardPairs.containsKey("tz"));
@@ -51,70 +51,70 @@ public class SubjectTest {
 
     @Test
     public void testSetUserId() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setUserId("newUserId");
         assertEquals("newUserId", subject.getSubject(false).get("uid"));
     }
 
     @Test
     public void testSetScreenRes() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setScreenResolution(3000,1000);
         assertEquals("3000x1000", subject.getSubject(false).get("res"));
     }
 
     @Test
     public void testSetViewPort() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setViewPort(3000,1000);
         assertEquals("3000x1000", subject.getSubject(false).get("vp"));
     }
 
     @Test
     public void testSetColorDepth() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setColorDepth(1000);
         assertEquals("1000", subject.getSubject(false).get("cd"));
     }
 
     @Test
     public void testSetTimezone() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setTimezone("fake/timezone");
         assertEquals("fake/timezone", subject.getSubject(false).get("tz"));
     }
 
     @Test
     public void testSetLanguage() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setLanguage("French");
         assertEquals("French", subject.getSubject(false).get("lang"));
     }
 
     @Test
     public void testSetIpAddress() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setIpAddress("127.0.0.1");
         assertEquals("127.0.0.1", subject.getSubject(false).get("ip"));
     }
 
     @Test
     public void testSetUseragent() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setUseragent("Agent");
         assertEquals("Agent", subject.getSubject(false).get("ua"));
     }
 
     @Test
     public void testSetNetworkUID() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setNetworkUserId("nuid-test");
         assertEquals("nuid-test", subject.getSubject(false).get("tnuid"));
     }
 
     @Test
     public void testSetDomainUID() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setDomainUserId("duid-test");
         assertEquals("duid-test", subject.getSubject(false).get("duid"));
     }
@@ -132,7 +132,7 @@ public class SubjectTest {
 
     @Test
     public void testAnonymisesUserIdentifiers() {
-        Subject subject = getSubject();
+        Subject subject = createSubject();
         subject.setUserId("uid-test");
         subject.setDomainUserId("duid-test");
         subject.setNetworkUserId("nuid-test");
@@ -145,7 +145,7 @@ public class SubjectTest {
 
     // Helper Methods
 
-    private Subject getSubject() {
+    private Subject createSubject() {
         Logger.updateLogLevel(LogLevel.DEBUG);
         return new Subject(getContext(), null);
     }
