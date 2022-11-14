@@ -188,6 +188,7 @@ public interface TrackerConfigurationInterface {
 
     /**
      * Whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
+     * Setting this property on a running tracker instance starts a new session (if sessions are tracked).
      */
     void setUserAnonymisation(boolean userAnonymisation);
 

@@ -312,14 +312,14 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @Override
     public boolean isUserAnonymisation() {
-        return getTracker().userAnonymisation;
+        return getTracker().isUserAnonymisation();
     }
 
     @Override
     public void setUserAnonymisation(boolean userAnonymisation) {
         getDirtyConfig().userAnonymisation = userAnonymisation;
         getDirtyConfig().userAnonymisationUpdated = true;
-        getTracker().userAnonymisation = userAnonymisation;
+        getTracker().setUserAnonymisation(userAnonymisation);
     }
 
     @Nullable

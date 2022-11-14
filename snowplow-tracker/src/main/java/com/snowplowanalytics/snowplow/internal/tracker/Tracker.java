@@ -345,6 +345,7 @@ public class Tracker {
          */
         @NonNull
         public TrackerBuilder userAnonymisation(@NonNull Boolean userAnonymisation) {
+            boolean changedUserAnonymisation = this.userAnonymisation != userAnonymisation;
             this.userAnonymisation = userAnonymisation;
             return this;
         }
@@ -387,7 +388,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
-    boolean userAnonymisation;
+    private boolean userAnonymisation;
     String trackerVersionSuffix;
 
     private boolean deepLinkContext;
@@ -985,6 +986,16 @@ public class Tracker {
         }
     }
 
+    /** Internal use only */
+    public void setUserAnonymisation(boolean userAnonymisation) {
+        if (this.userAnonymisation != userAnonymisation) {
+            this.userAnonymisation = userAnonymisation;
+            if (trackerSession != null) {
+                trackerSession.startNewSession();
+            }
+        }
+    }
+
     // --- Getters
 
     /** Internal use only */
@@ -997,8 +1008,14 @@ public class Tracker {
         return deepLinkContext;
     }
 
+    /** Internal use only */
     public boolean getSessionContext() {
         return sessionContext;
+    }
+
+    /** Internal use only */
+    public boolean isUserAnonymisation() {
+        return userAnonymisation;
     }
 
     /**
