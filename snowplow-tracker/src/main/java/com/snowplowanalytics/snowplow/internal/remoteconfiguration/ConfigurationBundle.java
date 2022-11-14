@@ -35,7 +35,7 @@ public class ConfigurationBundle implements Configuration {
         this(namespace, null);
     }
 
-    ConfigurationBundle(@NonNull String namespace, @Nullable NetworkConfiguration networkConfiguration) {
+    public ConfigurationBundle(@NonNull String namespace, @Nullable NetworkConfiguration networkConfiguration) {
         this.namespace = namespace;
         this.networkConfiguration = networkConfiguration;
     }
