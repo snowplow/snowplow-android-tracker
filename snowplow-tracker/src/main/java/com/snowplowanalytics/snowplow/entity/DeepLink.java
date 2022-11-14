@@ -44,5 +44,15 @@ public class DeepLink extends SelfDescribingJson {
         setData(parameters);
         return this;
     }
+
+    @Nullable
+    public String getUrl() {
+        return (String) parameters.get(PARAM_DEEPLINK_URL);
+    }
+
+    @Nullable
+    public String getReferrer() {
+        return (String) parameters.get(PARAM_DEEPLINK_REFERRER);
+    }
 }
 
