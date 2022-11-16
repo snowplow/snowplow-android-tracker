@@ -230,10 +230,19 @@ public class Subject {
     }
 
     /**
+     * @param userAnonymisation Whether to anonymize user identifiers
      * @return the standard subject pairs
      */
     @NonNull
-    public Map<String, String> getSubject() {
+    public Map<String, String> getSubject(boolean userAnonymisation) {
+        if (userAnonymisation) {
+            Map<String, String> pairsCopy = new HashMap<>(standardPairs);
+            pairsCopy.remove(Parameters.UID);
+            pairsCopy.remove(Parameters.DOMAIN_UID);
+            pairsCopy.remove(Parameters.NETWORK_UID);
+            pairsCopy.remove(Parameters.IP_ADDRESS);
+            return pairsCopy;
+        }
         return this.standardPairs;
     }
 }

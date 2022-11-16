@@ -204,6 +204,7 @@ public class Session {
         sessionCopy.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
         if (userAnonymisation) {
             sessionCopy.put(Parameters.SESSION_USER_ID, new UUID(0, 0).toString());
+            sessionCopy.put(Parameters.SESSION_PREVIOUS_ID, null);
         }
 
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
