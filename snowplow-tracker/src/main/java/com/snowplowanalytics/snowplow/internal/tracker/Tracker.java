@@ -341,11 +341,12 @@ public class Tracker {
         }
 
         /**
-         * @param userAnonymisation whether to anonymise client-side user identifiers in session and platform context entities
+         * @param userAnonymisation whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
          * @return itself
          */
         @NonNull
         public TrackerBuilder userAnonymisation(@NonNull Boolean userAnonymisation) {
+            boolean changedUserAnonymisation = this.userAnonymisation != userAnonymisation;
             this.userAnonymisation = userAnonymisation;
             return this;
         }
@@ -388,7 +389,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
-    boolean userAnonymisation;
+    private boolean userAnonymisation;
     String trackerVersionSuffix;
 
     private boolean deepLinkContext;
@@ -681,7 +682,7 @@ public class Tracker {
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject(userAnonymisation)));
         }
         payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
     }
@@ -829,7 +830,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject(userAnonymisation)));
         }
 
         // Add Mobile Context
@@ -1002,6 +1003,16 @@ public class Tracker {
         }
     }
 
+    /** Internal use only */
+    public void setUserAnonymisation(boolean userAnonymisation) {
+        if (this.userAnonymisation != userAnonymisation) {
+            this.userAnonymisation = userAnonymisation;
+            if (trackerSession != null) {
+                trackerSession.startNewSession();
+            }
+        }
+    }
+
     // --- Getters
 
     /** Internal use only */
@@ -1014,8 +1025,14 @@ public class Tracker {
         return deepLinkContext;
     }
 
+    /** Internal use only */
     public boolean getSessionContext() {
         return sessionContext;
+    }
+
+    /** Internal use only */
+    public boolean isUserAnonymisation() {
+        return userAnonymisation;
     }
 
     /**

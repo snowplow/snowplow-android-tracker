@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
+import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -509,6 +510,39 @@ public class TrackerTest {
         );
 
         handler1.uncaughtException(Thread.currentThread(), new Throwable("Illegal State Exception has been thrown!"));
+    }
+
+    @Test
+    public void testStartsNewSessionWhenChangingAnonymousTracking() {
+        Emitter emitter = new Emitter(getContext(), "fake-uri", new Emitter.EmitterBuilder()
+                .option(BufferOption.Single)
+        );
+        emitter.pauseEmit();
+
+        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "ns", "myAppId", getContext())
+                .base64(false)
+                .level(LogLevel.VERBOSE)
+                .sessionContext(true)
+                .installTracking(false)
+                .applicationCrash(false)
+                .screenviewEvents(false)
+                .foregroundTimeout(5)
+                .backgroundTimeout(5)
+                .timeUnit(TimeUnit.SECONDS)
+        );
+
+        tracker.track(new Structured("c", "a"));
+        String sessionIdStart = tracker.getSession().getState().getSessionId();
+
+        tracker.setUserAnonymisation(true);
+        tracker.track(new Structured("c", "a"));
+        String sessionIdAnonymous = tracker.getSession().getState().getSessionId();
+        assertNotEquals(sessionIdStart, sessionIdAnonymous);
+
+        tracker.setUserAnonymisation(false);
+        tracker.track(new Structured("c", "a"));
+        String sessionIdNotAnonymous = tracker.getSession().getState().getSessionId();
+        assertNotEquals(sessionIdAnonymous, sessionIdNotAnonymous);
     }
 
     public static class TestExceptionHandler implements Thread.UncaughtExceptionHandler {
