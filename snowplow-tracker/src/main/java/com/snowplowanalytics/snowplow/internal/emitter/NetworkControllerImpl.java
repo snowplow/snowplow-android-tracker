@@ -10,7 +10,6 @@ import com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
-import com.snowplowanalytics.snowplow.network.Protocol;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class NetworkControllerImpl extends Controller implements NetworkController {
@@ -76,7 +75,7 @@ public class NetworkControllerImpl extends Controller implements NetworkControll
     // Private methods
 
     private Emitter getEmitter() {
-        return serviceProvider.getEmitter();
+        return serviceProvider.getOrMakeEmitter();
     }
 
     private NetworkConfigurationUpdate getDirtyConfig() {

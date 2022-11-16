@@ -2,13 +2,14 @@ package com.snowplowanalytics.snowplow.util;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * It represents time durations and provides utility methods to convert across time units.
  */
-public class TimeMeasure {
+public class TimeMeasure implements Serializable {
 
     /** Time duration at the selected TimeUnit. */
     public final long value;

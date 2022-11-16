@@ -163,7 +163,7 @@ public class Session {
         // calling it Installation_UserID in order to remark that it isn't related to the session context.
         // Although, for legacy, we need to copy its value in the Session_UserID of the session context
         // as the session context schema (and related data modelling) requires it.
-        // For further details: https://discourse.snowplowanalytics.com/t/rfc-mobile-trackers-v2-0
+        // For further details: https://discourse.snowplow.io/t/rfc-mobile-trackers-v2-0
         SharedPreferences generalPref = context.getSharedPreferences(TrackerConstants.SNOWPLOW_GENERAL_VARS, Context.MODE_PRIVATE);
         String storedUserId = generalPref.getString(TrackerConstants.INSTALLATION_USER_ID, null);
         if (storedUserId != null) {
@@ -204,6 +204,7 @@ public class Session {
         sessionCopy.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
         if (userAnonymisation) {
             sessionCopy.put(Parameters.SESSION_USER_ID, new UUID(0, 0).toString());
+            sessionCopy.put(Parameters.SESSION_PREVIOUS_ID, null);
         }
 
         return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);

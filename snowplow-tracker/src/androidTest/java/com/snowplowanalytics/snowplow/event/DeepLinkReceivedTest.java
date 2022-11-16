@@ -27,6 +27,8 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -86,5 +88,59 @@ public class DeepLinkReceivedTest {
         String referrer = (String)payload.getMap().get(Parameters.PAGE_REFR);
         assertEquals("url", url);
         assertEquals("referrer", referrer);
+    }
+
+    @Test
+    public void testDeepLinkContextAndAtomicPropertiesAddedToScreenView() throws InterruptedException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        // Prepare DeepLinkReceived event
+        DeepLinkReceived event = new DeepLinkReceived("the_url")
+                .referrer("the_referrer");
+
+        // Prepare Screen View event
+        ScreenView screenView = new ScreenView("SV");
+
+        // Setup tracker
+        TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appId")
+                .base64encoding(false)
+                .installAutotracking(false);
+        MockEventStore eventStore = new MockEventStore();
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
+                .eventStore(eventStore)
+                .threadPoolSize(10);
+        TrackerController trackerController = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration, emitterConfiguration);
+
+        // Track events
+        trackerController.track(event);
+        UUID screenViewEventId = trackerController.track(screenView);
+        for (int i=0; eventStore.getSize() < 2 && i < 10; i++) {
+            Thread.sleep(1000);
+        }
+        List<EmitterEvent> events = eventStore.getEmittableEvents(10);
+        eventStore.removeAllEvents();
+        assertEquals(2, events.size());
+
+        Map screenViewPayload = null;
+        for (EmitterEvent emitterEvent : events) {
+            if (Objects.equals(emitterEvent.payload.getMap().get("eid"), screenViewEventId.toString())) {
+                screenViewPayload = emitterEvent.payload.getMap();
+                break;
+            }
+        }
+        assertNotNull(screenViewPayload);
+
+        // Check the DeepLink context entity properties
+        String screenViewContext = (String) screenViewPayload.get(Parameters.CONTEXT);
+        assertNotNull(screenViewContext);
+        assertTrue(screenViewContext.contains("\"referrer\":\"the_referrer\""));
+        assertTrue(screenViewContext.contains("\"url\":\"the_url\""));
+
+        // Check url and referrer fields for atomic table
+        String url = (String)screenViewPayload.get(Parameters.PAGE_URL);
+        String referrer = (String)screenViewPayload.get(Parameters.PAGE_REFR);
+        assertEquals("the_url", url);
+        assertEquals("the_referrer", referrer);
     }
 }

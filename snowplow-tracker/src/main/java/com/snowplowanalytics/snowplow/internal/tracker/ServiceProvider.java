@@ -23,7 +23,6 @@ import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationInter
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.emitter.NetworkControllerImpl;
 import com.snowplowanalytics.snowplow.internal.gdpr.Gdpr;
-import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationInterface;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprConfigurationUpdate;
 import com.snowplowanalytics.snowplow.internal.gdpr.GdprControllerImpl;
 import com.snowplowanalytics.snowplow.internal.globalcontexts.GlobalContextsControllerImpl;
@@ -125,7 +124,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (trackerConfigurationUpdate.sourceConfig == null) {
             trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         }
-        getTracker(); // Build tracker to initialize NotificationCenter receivers
+        getOrMakeTracker(); // Build tracker to initialize NotificationCenter receivers
     }
 
     public void reset(@NonNull List<Configuration> configurations) {
@@ -133,7 +132,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         resetConfigurationUpdates();
         processConfigurations(configurations);
         resetServices();
-        getTracker();
+        getOrMakeTracker();
     }
 
     public void shutdown() {
@@ -233,7 +232,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     // Getters
 
     @NonNull
-    public Subject getSubject() {
+    @Override
+    public Subject getOrMakeSubject() {
         if (subject == null) {
             subject = makeSubject();
         }
@@ -241,7 +241,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public Emitter getEmitter() {
+    @Override
+    public Emitter getOrMakeEmitter() {
         if (emitter == null) {
             emitter = makeEmitter();
         }
@@ -249,7 +250,14 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public Tracker getTracker() {
+    @Override
+    public Boolean isTrackerInitialized() {
+        return tracker != null;
+    }
+
+    @NonNull
+    @Override
+    public Tracker getOrMakeTracker() {
         if (tracker == null) {
             tracker = makeTracker();
         }
@@ -257,7 +265,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public TrackerControllerImpl getTrackerController() {
+    @Override
+    public TrackerControllerImpl getOrMakeTrackerController() {
         if (trackerController == null) {
             trackerController = makeTrackerController();
         }
@@ -265,7 +274,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public SessionControllerImpl getSessionController() {
+    @Override
+    public SessionControllerImpl getOrMakeSessionController() {
         if (sessionController == null) {
             sessionController = makeSessionController();
         }
@@ -273,7 +283,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public EmitterControllerImpl getEmitterController() {
+    @Override
+    public EmitterControllerImpl getOrMakeEmitterController() {
         if (emitterController == null) {
             emitterController = makeEmitterController();
         }
@@ -281,7 +292,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public GdprControllerImpl getGdprController() {
+    @Override
+    public GdprControllerImpl getOrMakeGdprController() {
         if (gdprController == null) {
             gdprController = makeGdprController();
         }
@@ -289,7 +301,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public GlobalContextsControllerImpl getGlobalContextsController() {
+    @Override
+    public GlobalContextsControllerImpl getOrMakeGlobalContextsController() {
         if (globalContextsController == null) {
             globalContextsController = makeGlobalContextsController();
         }
@@ -297,7 +310,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public SubjectControllerImpl getSubjectController() {
+    @Override
+    public SubjectControllerImpl getOrMakeSubjectController() {
         if (subjectController == null) {
             subjectController = makeSubjectController();
         }
@@ -305,7 +319,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     }
 
     @NonNull
-    public NetworkControllerImpl getNetworkController() {
+    @Override
+    public NetworkControllerImpl getOrMakeNetworkController() {
         if (networkController == null) {
             networkController = makeNetworkController();
         }
@@ -330,14 +345,14 @@ public class ServiceProvider implements ServiceProviderInterface {
         return subjectConfigurationUpdate;
     }
 
-    @Override
     @NonNull
+    @Override
     public EmitterConfigurationUpdate getEmitterConfigurationUpdate() {
         return emitterConfigurationUpdate;
     }
 
-    @Override
     @NonNull
+    @Override
     public SessionConfigurationUpdate getSessionConfigurationUpdate() {
         return sessionConfigurationUpdate;
     }
@@ -394,8 +409,8 @@ public class ServiceProvider implements ServiceProviderInterface {
 
     @NonNull
     private Tracker makeTracker() {
-        Emitter emitter = getEmitter();
-        Subject subject = getSubject();
+        Emitter emitter = getOrMakeEmitter();
+        Subject subject = getOrMakeSubject();
         TrackerConfigurationInterface trackerConfig = getTrackerConfigurationUpdate();
         SessionConfigurationInterface sessionConfig = getSessionConfigurationUpdate();
         Tracker.TrackerBuilder builder = new Tracker.TrackerBuilder(emitter, namespace, trackerConfig.getAppId(), context)
@@ -464,7 +479,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     @NonNull
     private GdprControllerImpl makeGdprController() {
         GdprControllerImpl controller = new GdprControllerImpl(this);
-        Gdpr gdpr = getTracker().getGdprContext();
+        Gdpr gdpr = getOrMakeTracker().getGdprContext();
         if (gdpr != null) {
             controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
         }

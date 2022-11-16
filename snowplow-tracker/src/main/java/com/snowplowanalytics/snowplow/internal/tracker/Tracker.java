@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.snowplowanalytics.snowplow.entity.DeepLink;
 import com.snowplowanalytics.snowplow.event.Background;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.Foreground;
@@ -340,11 +341,12 @@ public class Tracker {
         }
 
         /**
-         * @param userAnonymisation whether to anonymise client-side user identifiers in session and platform context entities
+         * @param userAnonymisation whether to anonymise client-side user identifiers in session (userId, previousSessionId), subject (userId, networkUserId, domainUserId, ipAddress) and platform context entities (IDFA)
          * @return itself
          */
         @NonNull
         public TrackerBuilder userAnonymisation(@NonNull Boolean userAnonymisation) {
+            boolean changedUserAnonymisation = this.userAnonymisation != userAnonymisation;
             this.userAnonymisation = userAnonymisation;
             return this;
         }
@@ -387,7 +389,7 @@ public class Tracker {
     boolean installTracking;
     boolean activityTracking;
     boolean applicationContext;
-    boolean userAnonymisation;
+    private boolean userAnonymisation;
     String trackerVersionSuffix;
 
     private boolean deepLinkContext;
@@ -663,6 +665,10 @@ public class Tracker {
         addGlobalContextsToContexts(contexts, event);
         addStateMachineEntitiesToContexts(contexts, event);
         wrapContextsToPayload(payload, contexts);
+        if (!event.isPrimitive) {
+            // TODO: To remove when Atomic table refactoring is finished
+            workaroundForCampaignAttributionEnrichment(payload, event, contexts);
+        }
         return payload;
     }
 
@@ -676,7 +682,7 @@ public class Tracker {
         payload.add(Parameters.NAMESPACE, this.namespace);
         payload.add(Parameters.TRACKER_VERSION, this.trackerVersion);
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject(userAnonymisation)));
         }
         payload.add(Parameters.PLATFORM, this.devicePlatform.getValue());
     }
@@ -689,8 +695,6 @@ public class Tracker {
     private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
 
-        workaroundForCampaignAttributionEnrichment(payload, event); // TODO: To remove when Atomic table refactoring is finished
-
         SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
         HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
         unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
@@ -701,19 +705,33 @@ public class Tracker {
     /*
      This is needed because the campaign-attribution-enrichment (in the pipeline) is able to parse
      the `url` and `referrer` only if they are part of a PageView event.
-     The PageView event is an atomic event but the DeepLinkReceived is a SelfDescribing event.
+     The PageView event is an atomic event but the DeepLinkReceived and ScreenView are SelfDescribing events.
      For this reason we copy these two fields in the atomic fields in order to let the enrichment
      to process correctly the fields even if the event is not a PageView and it's a SelfDescribing event.
      This is a hack that should be removed once the atomic event table is dismissed and all the events
      will be SelfDescribing.
     */
-    private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event) {
+    private void workaroundForCampaignAttributionEnrichment(@NonNull Payload payload, @NonNull TrackerEvent event, List<SelfDescribingJson> contexts) {
+        String url = null;
+        String referrer = null;
+
         if (event.schema.equals(DeepLinkReceived.SCHEMA) && event.payload != null) {
-            String url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
-            String referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
-            payload.add(Parameters.PAGE_URL, url);
-            payload.add(Parameters.PAGE_REFR, referrer);
+            url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
+            referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
         }
+        else if (event.schema.equals(TrackerConstants.SCHEMA_SCREEN_VIEW) && contexts != null) {
+            for (SelfDescribingJson entity : contexts) {
+                if (entity instanceof DeepLink) {
+                    DeepLink deepLink = (DeepLink) entity;
+                    url = deepLink.getUrl();
+                    referrer = deepLink.getReferrer();
+                    break;
+                }
+            }
+        }
+
+        if (url != null) { payload.add(Parameters.PAGE_URL, url); }
+        if (referrer != null) { payload.add(Parameters.PAGE_REFR, referrer); }
     }
 
     /*
@@ -812,7 +830,7 @@ public class Tracker {
 
         // If there is a subject present for the Tracker add it
         if (this.subject != null) {
-            payload.addMap(new HashMap<>(this.subject.getSubject()));
+            payload.addMap(new HashMap<>(this.subject.getSubject(userAnonymisation)));
         }
 
         // Add Mobile Context
@@ -985,6 +1003,16 @@ public class Tracker {
         }
     }
 
+    /** Internal use only */
+    public void setUserAnonymisation(boolean userAnonymisation) {
+        if (this.userAnonymisation != userAnonymisation) {
+            this.userAnonymisation = userAnonymisation;
+            if (trackerSession != null) {
+                trackerSession.startNewSession();
+            }
+        }
+    }
+
     // --- Getters
 
     /** Internal use only */
@@ -997,8 +1025,14 @@ public class Tracker {
         return deepLinkContext;
     }
 
+    /** Internal use only */
     public boolean getSessionContext() {
         return sessionContext;
+    }
+
+    /** Internal use only */
+    public boolean isUserAnonymisation() {
+        return userAnonymisation;
     }
 
     /**

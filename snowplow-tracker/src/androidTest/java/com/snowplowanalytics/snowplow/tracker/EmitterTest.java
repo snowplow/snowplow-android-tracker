@@ -175,7 +175,7 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testUpdatingEmitterSettings() throws InterruptedException {
-        String uri = "snowplowanalytics.com";
+        String uri = "snowplow.io";
         Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
                 .option(Single)
                 .method(POST)

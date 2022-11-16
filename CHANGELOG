@@ -1,3 +1,12 @@
+Version 4.1.0 (2022-11-16)
+--------------------------
+Anonymise previous session ID and user identifiers in subject when user anonymisation is enabled (#549)
+Add DeepLink entity referrer and url to atomic properties in ScreenView events (#553)
+Fix serialization of session timeouts in remote configuration cache (#547)
+Expose public constructor for ConfigurationBundle (#550)
+Log an error when recreating tracker after being removed (#548)
+Fix links in README (#557)
+
 Version 4.0.0 (2022-09-01)
 --------------------------
 Add interface to subscribe for events tracked in Web views (#531)

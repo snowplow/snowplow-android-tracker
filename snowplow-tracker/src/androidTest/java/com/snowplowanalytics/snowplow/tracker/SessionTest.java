@@ -410,11 +410,14 @@ public class SessionTest {
     }
 
     @Test
-    public void testAnonymisesUserIdentifiers() {
+    public void testAnonymisesUserAndPreviousSessionIdentifiers() {
         Session session = new Session(600, 300, TimeUnit.SECONDS, null, getContext());
-        Map<String, Object> context = getSessionContext(session, "eid", 1000, true);
+        getSessionContext(session, "eid1", 1000, false);
+        session.startNewSession(); // so that a reference to previous session is created
+        Map<String, Object> context = getSessionContext(session, "eid2", 1001, true);
 
         assertEquals("00000000-0000-0000-0000-000000000000", context.get(Parameters.SESSION_USER_ID));
+        assertNull(context.get(Parameters.SESSION_PREVIOUS_ID));
     }
 
     // Private methods
