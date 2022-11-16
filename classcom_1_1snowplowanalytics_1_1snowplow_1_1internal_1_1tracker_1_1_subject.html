@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.0.0</span>
+   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.1.0</span>
    </div>
   </td>
  </tr>
@@ -99,8 +99,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac79d917b12c1c866590ccb191c6b429c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19588a2521804c113dede54ffefaad0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a19588a2521804c113dede54ffefaad0f">setDomainUserId</a> (@NonNull String domainUserId)</td></tr>
 <tr class="separator:a19588a2521804c113dede54ffefaad0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac822fc5dc36e0666e44e93b979e93b89"><td class="memItemLeft" align="right" valign="top">Map&lt; String, String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ac822fc5dc36e0666e44e93b979e93b89">getSubject</a> ()</td></tr>
-<tr class="separator:ac822fc5dc36e0666e44e93b979e93b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27fa88e335350de25fe487b248ed9781"><td class="memItemLeft" align="right" valign="top">Map&lt; String, String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#a27fa88e335350de25fe487b248ed9781">getSubject</a> (boolean userAnonymisation)</td></tr>
+<tr class="separator:a27fa88e335350de25fe487b248ed9781"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Provides <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">Subject</a> information for each event sent from the <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1_snowplow.html">Snowplow</a> <a class="el" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_tracker.html">Tracker</a>. </p>
@@ -138,8 +138,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ac822fc5dc36e0666e44e93b979e93b89" name="ac822fc5dc36e0666e44e93b979e93b89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac822fc5dc36e0666e44e93b979e93b89">&#9670;&nbsp;</a></span>getSubject()</h2>
+<a id="a27fa88e335350de25fe487b248ed9781" name="a27fa88e335350de25fe487b248ed9781"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27fa88e335350de25fe487b248ed9781">&#9670;&nbsp;</a></span>getSubject()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -147,14 +147,21 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">Map&lt; String, String &gt; com.snowplowanalytics.snowplow.internal.tracker.Subject.getSubject </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>userAnonymisation</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">userAnonymisation</td><td>Whether to anonymize user identifiers </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the standard subject pairs </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00236">236</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_subject_8java_source.html#l00237">237</a> of file <a class="el" href="_subject_8java_source.html">Subject.java</a>.</p>
 
 </div>
 </div>

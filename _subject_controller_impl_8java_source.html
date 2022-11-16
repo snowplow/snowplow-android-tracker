@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.0.0</span>
+   <div id="projectname">Snowplow Android Tracker<span id="projectnumber">&#160;4.1.0</span>
    </div>
   </td>
  </tr>
@@ -223,7 +223,7 @@ $(function() {
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    <span class="comment">// Private methods</span></div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keyword">private</span> <a class="code hl_class" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">Subject</a> getSubject() {</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        <span class="keywordflow">return</span> serviceProvider.<a class="code hl_function" href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ac822fc5dc36e0666e44e93b979e93b89">getSubject</a>();</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        <span class="keywordflow">return</span> serviceProvider.getOrMakeSubject();</div>
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    }</div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keyword">private</span> SubjectConfigurationUpdate getDirtyConfig() {</div>
@@ -254,10 +254,9 @@ $(function() {
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl_html_adc7a9cc8b56dc23130935de700be0cdd"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#adc7a9cc8b56dc23130935de700be0cdd">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl.setDomainUserId</a></div><div class="ttdeci">void setDomainUserId(@Nullable String domainUserId)</div><div class="ttdef"><b>Definition:</b> <a href="_subject_controller_impl_8java_source.html#l00055">SubjectControllerImpl.java:55</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl_html_afa4557e77a051d9256864527ec30d6ee"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_controller_impl.html#afa4557e77a051d9256864527ec30d6ee">com.snowplowanalytics.snowplow.internal.tracker.SubjectControllerImpl.SubjectControllerImpl</a></div><div class="ttdeci">SubjectControllerImpl(@NonNull ServiceProviderInterface serviceProvider)</div><div class="ttdef"><b>Definition:</b> <a href="_subject_controller_impl_8java_source.html#l00016">SubjectControllerImpl.java:16</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html">com.snowplowanalytics.snowplow.internal.tracker.Subject</a></div><div class="ttdef"><b>Definition:</b> <a href="_subject_8java_source.html#l00037">Subject.java:37</a></div></div>
-<div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject_html_ac822fc5dc36e0666e44e93b979e93b89"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_subject.html#ac822fc5dc36e0666e44e93b979e93b89">com.snowplowanalytics.snowplow.internal.tracker.Subject.getSubject</a></div><div class="ttdeci">Map&lt; String, String &gt; getSubject()</div><div class="ttdef"><b>Definition:</b> <a href="_subject_8java_source.html#l00236">Subject.java:236</a></div></div>
 <div class="ttc" id="aclasscom_1_1snowplowanalytics_1_1snowplow_1_1util_1_1_size_html"><div class="ttname"><a href="classcom_1_1snowplowanalytics_1_1snowplow_1_1util_1_1_size.html">com.snowplowanalytics.snowplow.util.Size</a></div><div class="ttdef"><b>Definition:</b> <a href="_size_8java_source.html#l00003">Size.java:3</a></div></div>
 <div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_subject_controller_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1controller_1_1_subject_controller.html">com.snowplowanalytics.snowplow.controller.SubjectController</a></div><div class="ttdef"><b>Definition:</b> <a href="_subject_controller_8java_source.html#l00005">SubjectController.java:5</a></div></div>
-<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider_interface_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider_interface.html">com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface</a></div><div class="ttdef"><b>Definition:</b> <a href="_service_provider_interface_8java_source.html#l00016">ServiceProviderInterface.java:16</a></div></div>
+<div class="ttc" id="ainterfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider_interface_html"><div class="ttname"><a href="interfacecom_1_1snowplowanalytics_1_1snowplow_1_1internal_1_1tracker_1_1_service_provider_interface.html">com.snowplowanalytics.snowplow.internal.tracker.ServiceProviderInterface</a></div><div class="ttdef"><b>Definition:</b> <a href="_service_provider_interface_8java_source.html#l00017">ServiceProviderInterface.java:17</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
