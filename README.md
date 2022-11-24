@@ -26,7 +26,7 @@ A [demo app](https://github.com/snowplow/snowplow-android-tracker/tree/master/sn
 
 An example of app instrumented with the Android Tracker can be found in the [snowplow-android-tracker-examples](https://github.com/snowplow-incubator/snowplow-android-tracker-examples) repository.
 
-### Instrument the iOS Tracker
+### Instrument the Android Tracker
 
 | Technical Docs                      | Setup Guide                           | API Docs                            |
 |-------------------------------------|---------------------------------------|-------------------------------------|
