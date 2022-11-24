@@ -2,4 +2,4 @@ include ':snowplow-tracker'
 include ':snowplow-demo-java'
 include ':snowplow-demo-kotlin'
 
-project(":snowplow-tracker").name = "snowplow-android-tracker"
+project(":snowplow-tracker").name = "snowplow-kotlin-android-tracker"

@@ -28,10 +28,9 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel
  */
 class MainActivity : Activity() {
     private var _liteBtn: Button? = null
-    private val repoUrl = "https://github.com/snowplow/snowplow-android-tracker"
-    private val integrationUrl = "https://github.com/snowplow/snowplow/wiki/Android-Integration"
-    private val techDocsUrl = "https://github.com/snowplow/snowplow/wiki/Android-Tracker"
-    private val setupGuideUrl = "https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup"
+    private val repoUrl = "https://github.com/snowplow-incubator/snowplow-kotlin-android-tracker"
+    private val snowplowDocsUrl = "https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers"
+    private val techDocsUrl = "https://snowplow.github.io/snowplow-android-tracker"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +46,12 @@ class MainActivity : Activity() {
         // Setup Hyperlinks
 
         val link1 = findViewById<View>(R.id.link_tech_docs) as TextView
-        val linkText1 = "- <a href='$techDocsUrl'>Technical Documentation</a>"
+        val linkText1 = "- <a href='$techDocsUrl'>API Documentation</a>"
         link1.text = Html.fromHtml(linkText1, 0)
         link1.movementMethod = LinkMovementMethod.getInstance()
 
-        val link2 = findViewById<View>(R.id.link_integration) as TextView
-        val linkText2 = "- <a href='$integrationUrl'>Integration Examples</a>"
+        val link2 = findViewById<View>(R.id.link_docs) as TextView
+        val linkText2 = "- <a href='$snowplowDocsUrl'>Documentation</a>"
         link2.text = Html.fromHtml(linkText2, 0)
         link2.movementMethod = LinkMovementMethod.getInstance()
 
@@ -61,9 +60,5 @@ class MainActivity : Activity() {
         link3.text = Html.fromHtml(linkText3, 0)
         link3.movementMethod = LinkMovementMethod.getInstance()
 
-        val link4 = findViewById<View>(R.id.link_setup_guide) as TextView
-        val linkText4 = "- <a href='$setupGuideUrl'>Setup Guide</a>"
-        link4.text = Html.fromHtml(linkText4, 0)
-        link4.movementMethod = LinkMovementMethod.getInstance()
     }
 }

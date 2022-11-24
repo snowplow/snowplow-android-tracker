@@ -8,9 +8,8 @@
         endpoint you will enter on the demo page.
     </string>
     <string name="link_header">Useful Links:</string>
-    <string name="link_tech_docs">- Technical Documentation</string>
-    <string name="link_integration">- Integration Examples</string>
-    <string name="link_setup_guide">- Setup Guide</string>
+    <string name="link_tech_docs">- API Documentation</string>
+    <string name="link_docs">- Documentation</string>
     <string name="link_repo">- Github Repository</string>
 
     <string name="main_demo_button">Tracker Demo</string>

@@ -35,10 +35,9 @@ public class MainActivity extends Activity {
 
     private Button _liteBtn;
 
-    private final String repo_url = "https://github.com/snowplow/snowplow-android-tracker";
-    private final String integration_url = "https://github.com/snowplow/snowplow/wiki/Android-Integration";
-    private final String tech_docs_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker";
-    private final String setup_guide_url = "https://github.com/snowplow/snowplow/wiki/Android-Tracker-Setup";
+    private final String repo_url = "https://github.com/snowplow-incubator/snowplow-kotlin-android-tracker";
+    private final String tech_docs_url = "https://snowplow.github.io/snowplow-android-tracker";
+    private final String snowplow_docs_url = "https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,22 +58,17 @@ public class MainActivity extends Activity {
         // Setup Hyperlinks
 
         TextView link1 = (TextView) findViewById(R.id.link_tech_docs);
-        String linkText1 = "- <a href='" + tech_docs_url + "'>Technical Documentation</a>";
+        String linkText1 = "- <a href='" + tech_docs_url + "'>API Documentation</a>";
         link1.setText(Html.fromHtml(linkText1));
         link1.setMovementMethod(LinkMovementMethod.getInstance());
-
-        TextView link2 = (TextView) findViewById(R.id.link_integration);
-        String linkText2 = "- <a href='" + integration_url + "'>Integration Examples</a>";
-        link2.setText(Html.fromHtml(linkText2));
-        link2.setMovementMethod(LinkMovementMethod.getInstance());
 
         TextView link3 = (TextView) findViewById(R.id.link_repo);
         String linkText3 = "- <a href='" + repo_url + "'>Github Repository</a>";
         link3.setText(Html.fromHtml(linkText3));
         link3.setMovementMethod(LinkMovementMethod.getInstance());
 
-        TextView link4 = (TextView) findViewById(R.id.link_setup_guide);
-        String linkText4 = "- <a href='" + setup_guide_url + "'>Setup Guide</a>";
+        TextView link4 = (TextView) findViewById(R.id.link_docs);
+        String linkText4 = "- <a href='" + snowplow_docs_url + "'>Documentation</a>";
         link4.setText(Html.fromHtml(linkText4));
         link4.setMovementMethod(LinkMovementMethod.getInstance());
     }

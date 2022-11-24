@@ -45,7 +45,7 @@ android {
 dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':snowplow-android-tracker')
+    implementation project(':snowplow-kotlin-android-tracker')
     implementation 'androidx.browser:browser:1.4.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
