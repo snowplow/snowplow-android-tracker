@@ -1,6 +1,6 @@
 # Android Analytics for Snowplow
 
-[![actively-maintained]][tracker-classificiation]
+[![actively-maintained]][tracker-classification]
 [![Build Status][gh-actions-image]][gh-actions]
 [![Coverage Status][coveralls-image]][coveralls]
 [![Release][release-image]][releases]
@@ -59,7 +59,7 @@ limitations under the License.
 [docs]: https://docs.snowplow.io/
 [mobile-docs]: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/
 
-[gh-actions]: https://github.com/snowplow/snowplow-objc-tracker/actions
+[gh-actions]: https://github.com/snowplow/snowplow-android-tracker/actions
 [gh-actions-image]: https://github.com/snowplow/snowplow-android-tracker/workflows/Build/badge.svg
 
 [coveralls]: https://coveralls.io/github/snowplow/snowplow-android-tracker?branch=master
@@ -81,5 +81,5 @@ limitations under the License.
 
 [contributing-image]: https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[tracker-classificiation]: https://github.com/snowplow/snowplow/wiki/Tracker-Maintenance-Classification
+[tracker-classification]: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/tracker-maintenance-classification/
 [actively-maintained]: https://img.shields.io/static/v1?style=flat&label=Snowplow&message=Actively%20Maintained&color=6638b8&labelColor=9ba0aa&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAeFBMVEVMaXGXANeYANeXANZbAJmXANeUANSQAM+XANeMAMpaAJhZAJeZANiXANaXANaOAM2WANVnAKWXANZ9ALtmAKVaAJmXANZaAJlXAJZdAJxaAJlZAJdbAJlbAJmQAM+UANKZANhhAJ+EAL+BAL9oAKZnAKVjAKF1ALNBd8J1AAAAKHRSTlMAa1hWXyteBTQJIEwRgUh2JjJon21wcBgNfmc+JlOBQjwezWF2l5dXzkW3/wAAAHpJREFUeNokhQOCA1EAxTL85hi7dXv/E5YPCYBq5DeN4pcqV1XbtW/xTVMIMAZE0cBHEaZhBmIQwCFofeprPUHqjmD/+7peztd62dWQRkvrQayXkn01f/gWp2CrxfjY7rcZ5V7DEMDQgmEozFpZqLUYDsNwOqbnMLwPAJEwCopZxKttAAAAAElFTkSuQmCC
