@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.event;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
 
 import java.util.Map;
 

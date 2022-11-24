@@ -13,14 +13,24 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import com.snowplowanalytics.core.constants.Parameters;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Map;
 
-public class StructuredTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class StructuredTest {
 
+    @Test
     public void testExpectedForm() {
         Structured structured = new Structured("some category", "some action");
 
@@ -49,26 +59,9 @@ public class StructuredTest extends AndroidTestCase {
         assertEquals("123.567", data.get(Parameters.SE_VALUE));
     }
 
+    @Test
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new Structured(null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            new Structured("category", null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new Structured("", "hello");
         } catch (Exception e) {

@@ -13,20 +13,33 @@
 
 package com.snowplowanalytics.snowplow.payload;
 
-import android.test.AndroidTestCase;
 import android.util.Base64;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TrackerPayloadTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import com.snowplowanalytics.core.utils.Util;
+
+@RunWith(AndroidJUnit4.class)
+public class TrackerPayloadTest {
 
     TrackerPayload payload;
 
+    @Before
     public void setUp() {
         payload = new TrackerPayload();
     }
@@ -39,6 +52,7 @@ public class TrackerPayloadTest extends AndroidTestCase {
         return map;
     }
 
+    @Test
     public void testAddKeyWhenValue() {
         payload.add("a", "string");
         assertEquals("string", payload.getMap().get("a"));
@@ -46,6 +60,7 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertEquals(123, payload.getMap().get("a"));
     }
 
+    @Test
     public void testNotAddKeyWhenNullOrEmptyValue() {
         payload.add("a", null);
         assertFalse(payload.getMap().containsKey("a"));
@@ -53,6 +68,7 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertFalse(payload.getMap().containsKey("a"));
     }
 
+    @Test
     public void testRemoveKeyWhenNullOrEmptyValue() {
         payload.add("a", "string");
         payload.add("a", "");
@@ -61,7 +77,8 @@ public class TrackerPayloadTest extends AndroidTestCase {
         payload.add("a", null);
         assertFalse(payload.getMap().containsKey("a"));
     }
-    
+
+    @Test
     public void testAddMapWithoutNullValueEntries() {
         Map<String,Object> testMap = new HashMap<String,Object>(createTestMap());
         payload.addMap(testMap);
@@ -70,6 +87,7 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertFalse(payload.getMap().containsKey("c"));
     }
 
+    @Test
     public void testDontCrashWhenAddNullMap() {
         payload.addMap(null);
         assertTrue(payload.getMap().isEmpty());
@@ -77,6 +95,7 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertTrue(payload.getMap().isEmpty());
     }
 
+    @Test
     public void testAddSimpleMapBase64NoEncode() throws JSONException {
         payload.addMap(createTestMap(), false, "enc", "no_enc");
         Map<String, Object> map = payload.getMap();
@@ -88,9 +107,10 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertEquals(JSONObject.NULL, json.get("c"));
     }
 
+    @Test
     public void testAddMapBase64Encoded() throws JSONException {
         payload.addMap(createTestMap(), true, "enc", "no_enc");
-        Map<String, Object> map = payload.getMap();
+        Map<String, String> map = Util.objectMapToString(payload.getMap());
         assertFalse(map.containsKey("no_enc"));
         String base64Json = (String) payload.getMap().get("enc");
         String jsonString = "";
@@ -106,12 +126,14 @@ public class TrackerPayloadTest extends AndroidTestCase {
         assertEquals(JSONObject.NULL, json.get("c"));
     }
 
+    @Test
     public void testSimplePayloadToString() throws JSONException {
         payload.add("a", "string");
         JSONObject map = new JSONObject(payload.toString());
         assertEquals("string", map.getString("a"));
     }
 
+    @Test
     public void testComplexPayloadToString() throws JSONException {
         payload.add("a", createTestMap());
         JSONObject map = new JSONObject(payload.toString());

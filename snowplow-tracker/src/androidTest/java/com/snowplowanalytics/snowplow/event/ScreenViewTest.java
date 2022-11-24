@@ -13,15 +13,25 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.snowplowanalytics.core.constants.Parameters;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class ScreenViewTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class ScreenViewTest {
 
+    @Test
     public void testExpectedForm() {
         ScreenView screenView = new ScreenView("name");
 
@@ -39,14 +49,5 @@ public class ScreenViewTest extends AndroidTestCase {
         assertNotNull(data);
         assertEquals(id.toString(), data.get(Parameters.SV_ID));
         assertEquals("name", data.get(Parameters.SV_NAME));
-    }
-
-    public void testBuilderFailures() {
-        try {
-            new ScreenView(null, UUID.randomUUID());
-            fail();
-        } catch (Exception e) {
-            assertNull(e.getMessage());
-        }
     }
 }

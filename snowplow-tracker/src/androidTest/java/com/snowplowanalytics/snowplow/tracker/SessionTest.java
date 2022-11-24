@@ -17,14 +17,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.internal.session.Session;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
-import com.snowplowanalytics.snowplow.internal.utils.NotificationCenter;
+import com.snowplowanalytics.core.emitter.Emitter;
+import com.snowplowanalytics.core.session.Session;
+import com.snowplowanalytics.core.constants.Parameters;
+import com.snowplowanalytics.core.constants.TrackerConstants;
+import com.snowplowanalytics.core.tracker.Tracker;
+import com.snowplowanalytics.core.utils.NotificationCenter;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
-import com.snowplowanalytics.snowplow.internal.session.FileStore;
+import com.snowplowanalytics.core.session.FileStore;
 
 import java.util.HashMap;
 import java.util.Map;

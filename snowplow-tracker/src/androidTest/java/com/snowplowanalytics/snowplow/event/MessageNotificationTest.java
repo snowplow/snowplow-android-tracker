@@ -18,7 +18,7 @@ public class MessageNotificationTest {
 
     @Test
     public void testExpectedForm() {
-        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.push)
+        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.PUSH)
                 .notificationTimestamp("2020-12-31T15:59:60-08:00")
                 .action("action")
                 .bodyLocKey("loc key")
@@ -32,7 +32,7 @@ public class MessageNotificationTest {
         assertNotNull(payload);
         assertEquals("title", payload.get(MessageNotification.PARAM_TITLE));
         assertEquals("body", payload.get(MessageNotification.PARAM_BODY));
-        assertEquals("push", payload.get(MessageNotification.PARAM_TRIGGER));
+        assertEquals("PUSH", payload.get(MessageNotification.PARAM_TRIGGER));
         assertEquals("2020-12-31T15:59:60-08:00", payload.get(MessageNotification.PARAM_NOTIFICATIONTIMESTAMP));
         assertEquals("action", payload.get(MessageNotification.PARAM_ACTION));
         assertEquals("loc key", payload.get(MessageNotification.PARAM_BODYLOCKEY));

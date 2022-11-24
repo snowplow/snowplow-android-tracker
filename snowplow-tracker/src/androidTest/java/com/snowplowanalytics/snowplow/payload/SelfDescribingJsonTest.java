@@ -13,34 +13,44 @@
 
 package com.snowplowanalytics.snowplow.payload;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class SelfDescribingJsonTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class SelfDescribingJsonTest {
 
     private final String testSchema = "org.test.scheme";
     private HashMap<String, Object> testMap;
     private List<Object> testList;
 
+    @Before
     public void setUp() {
         testMap = new HashMap<>();
         testList = new ArrayList<>();
     }
 
+    @Test
     public void testFailures() {
         boolean exception = false;
         try {
             new SelfDescribingJson(null);
         } catch (Exception e) {
-            assertEquals("schema cannot be null", e.getMessage());
+            if (e.getMessage() != null) {
+                assertTrue(e.getMessage().startsWith("Parameter specified as non-null is null"));
+            }
             exception = true;
         }
         assertTrue(exception);
@@ -55,6 +65,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertTrue(exception);
     }
 
+    @Test
     public void testCreateWithSchemaOnly() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema);
 
@@ -67,6 +78,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(0, d.length());
     }
 
+    @Test
     public void testCreateWithOurEmptyMap() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testMap);
 
@@ -79,6 +91,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(0, d.length());
     }
 
+    @Test
     public void testCreateWithSimpleMap() throws JSONException {
         testMap.put("alpha", "beta");
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testMap);
@@ -93,7 +106,8 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("beta", d.getString("alpha"));
     }
 
-    public void testCreateWithEmtpyList() throws JSONException {
+    @Test
+    public void testCreateWithEmptyList() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
 
         // {"schema":"org.test.scheme","data":[]}
@@ -105,6 +119,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(0, d.length());
     }
 
+    @Test
     public void testCreateWithSimpleList() throws JSONException {
         testList.add("delta");
         SelfDescribingJson json = new SelfDescribingJson(testSchema, testList);
@@ -119,6 +134,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("delta", d.get(0));
     }
 
+    @Test
     public void testCreateWithNestedList() throws JSONException {
         List<String> testInnerList = new ArrayList<>();
         testInnerList.add("gamma");
@@ -139,6 +155,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("epsilon", innerList.get(1));
     }
 
+    @Test
     public void testCreateWithListOfMaps() throws JSONException {
         testMap.put("a", "b");
         testList.add(testMap);
@@ -158,6 +175,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("b", innerListMap2.getString("a"));
     }
 
+    @Test
     public void testCreateWithSelfDescribingJson() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema, new SelfDescribingJson(testSchema, testMap));
 
@@ -171,7 +189,8 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         JSONObject innerData = innerMap.getJSONObject("data");
         assertEquals(0, innerData.length());
     }
-    
+
+    @Test
     public void testCreateWithSelfDescribingJsonWithMore() throws JSONException {
         testMap.put("a", "b");
         testMap.put("c", "d");
@@ -190,6 +209,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("d", innerData.getString("c"));
     }
 
+    @Test
     public void testCreateThenSetSelfDescribingJson() throws JSONException {
         SelfDescribingJson json = new SelfDescribingJson(testSchema);
         json.setData(new SelfDescribingJson(testSchema, testMap));
@@ -205,6 +225,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals(0, innerData.length());
     }
 
+    @Test
     public void testCreateWithTrackerPayload() throws JSONException {
         TrackerPayload payload = new TrackerPayload();
         testMap.put("a", "b");
@@ -220,6 +241,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("b", innerMap.getString("a"));
     }
 
+    @Test
     public void testCreateThenSetTrackerPayload() throws JSONException {
         TrackerPayload payload = new TrackerPayload();
         testMap.put("a", "b");
@@ -236,6 +258,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("b", innerMap.getString("a"));
     }
 
+    @Test
     public void testSetNullValues() {
         SelfDescribingJson json = new SelfDescribingJson(testSchema);
         assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
@@ -247,6 +270,7 @@ public class SelfDescribingJsonTest extends AndroidTestCase {
         assertEquals("{\"schema\":\"org.test.scheme\",\"data\":{}}", json.toString());
     }
 
+    @Test
     public void testGetByteSize() {
         TrackerPayload payload = new TrackerPayload();
         testMap.put("a", "b");

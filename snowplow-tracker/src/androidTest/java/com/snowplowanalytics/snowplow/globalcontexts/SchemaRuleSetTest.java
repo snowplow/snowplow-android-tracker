@@ -2,7 +2,7 @@ package com.snowplowanalytics.snowplow.globalcontexts;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.snowplowanalytics.snowplow.internal.tracker.SchemaRule;
+import com.snowplowanalytics.core.tracker.SchemaRule;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

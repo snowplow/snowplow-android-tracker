@@ -20,8 +20,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.internal.tracker.Subject;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.core.tracker.Subject;
+import com.snowplowanalytics.core.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 import static org.junit.Assert.assertNull;
