@@ -124,7 +124,7 @@ public class TrackerEvents {
     }
 
     private static void trackMessageNotification(TrackerController tracker) {
-        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.PUSH)
+        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.push)
                 .notificationTimestamp("2021-10-18T10:16:08.008Z")
                 .category("category")
                 .action("action")

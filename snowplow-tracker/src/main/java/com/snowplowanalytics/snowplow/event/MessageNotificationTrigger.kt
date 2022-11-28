@@ -14,5 +14,10 @@ package com.snowplowanalytics.snowplow.event
 
 /** Trigger that caused the message notification.  */
 enum class MessageNotificationTrigger {
-    PUSH, LOCATION, CALENDAR, TIME_INTERVAL, OTHER
+    // these are in lowercase to match the message_notification schema
+    push, 
+    location, 
+    calendar, 
+    timeInterval, 
+    other
 }

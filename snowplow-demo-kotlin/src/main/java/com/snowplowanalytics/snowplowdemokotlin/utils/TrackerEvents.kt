@@ -124,7 +124,7 @@ object TrackerEvents {
     }
 
     private fun trackMessageNotification(tracker: TrackerController) {
-        val event = MessageNotification("title", "body", MessageNotificationTrigger.PUSH)
+        val event = MessageNotification("title", "body", MessageNotificationTrigger.push)
             .notificationTimestamp("2021-10-18T10:16:08.008Z")
             .category("category")
             .action("action")

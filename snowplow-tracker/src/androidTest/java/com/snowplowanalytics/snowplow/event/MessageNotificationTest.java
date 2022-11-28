@@ -18,7 +18,7 @@ public class MessageNotificationTest {
 
     @Test
     public void testExpectedForm() {
-        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.PUSH)
+        MessageNotification event = new MessageNotification("title", "body", MessageNotificationTrigger.push)
                 .notificationTimestamp("2020-12-31T15:59:60-08:00")
                 .action("action")
                 .bodyLocKey("loc key")
