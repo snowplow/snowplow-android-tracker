@@ -32,7 +32,7 @@ public class MessageNotificationTest {
         assertNotNull(payload);
         assertEquals("title", payload.get(MessageNotification.PARAM_TITLE));
         assertEquals("body", payload.get(MessageNotification.PARAM_BODY));
-        assertEquals("PUSH", payload.get(MessageNotification.PARAM_TRIGGER));
+        assertEquals("push", payload.get(MessageNotification.PARAM_TRIGGER));
         assertEquals("2020-12-31T15:59:60-08:00", payload.get(MessageNotification.PARAM_NOTIFICATIONTIMESTAMP));
         assertEquals("action", payload.get(MessageNotification.PARAM_ACTION));
         assertEquals("loc key", payload.get(MessageNotification.PARAM_BODYLOCKEY));
