@@ -28,7 +28,7 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel
  */
 class MainActivity : Activity() {
     private var _liteBtn: Button? = null
-    private val repoUrl = "https://github.com/snowplow-incubator/snowplow-kotlin-android-tracker"
+    private val repoUrl = "https://github.com/snowplow-incubator/snowplow-android-tracker"
     private val snowplowDocsUrl = "https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers"
     private val techDocsUrl = "https://snowplow.github.io/snowplow-android-tracker"
 

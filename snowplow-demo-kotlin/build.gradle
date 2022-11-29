@@ -38,7 +38,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.6.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':snowplow-kotlin-android-tracker')
+    implementation project(':snowplow-android-tracker')
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.browser:browser:1.3.0'
 }

@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 
     private Button _liteBtn;
 
-    private final String repo_url = "https://github.com/snowplow-incubator/snowplow-kotlin-android-tracker";
+    private final String repo_url = "https://github.com/snowplow-incubator/snowplow-android-tracker";
     private final String tech_docs_url = "https://snowplow.github.io/snowplow-android-tracker";
     private final String snowplow_docs_url = "https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers";
 
