@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplow.internal.utils;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.session.FileStore;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.core.session.FileStore;
+import com.snowplowanalytics.core.tracker.Logger;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
 import java.util.HashMap;

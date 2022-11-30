@@ -20,10 +20,11 @@ import android.test.AndroidTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.snowplowanalytics.core.emitter.storage.EventStoreHelper;
+import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;

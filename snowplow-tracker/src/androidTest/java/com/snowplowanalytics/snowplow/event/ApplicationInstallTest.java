@@ -1,7 +1,6 @@
 package com.snowplowanalytics.snowplow.event;
 
 import android.content.Context;
-import android.test.AndroidTestCase;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -12,8 +11,8 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.internal.emitter.Executor;
+import com.snowplowanalytics.core.constants.TrackerConstants;
+import com.snowplowanalytics.core.emitter.Executor;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
@@ -23,12 +22,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
-public class ApplicationInstallTest extends AndroidTestCase {
+public class ApplicationInstallTest {
 
     @Before
     public void setUp() throws Exception {
@@ -48,7 +49,7 @@ public class ApplicationInstallTest extends AndroidTestCase {
         SelfDescribingJson installEvent = new SelfDescribingJson(TrackerConstants.SCHEMA_APPLICATION_INSTALL);
         SelfDescribing event = new SelfDescribing(installEvent);
         long currentTimestamp = 12345L;
-        event.trueTimestamp = currentTimestamp;
+        event.setTrueTimestamp(currentTimestamp);
 
         // Setup tracker
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appId")

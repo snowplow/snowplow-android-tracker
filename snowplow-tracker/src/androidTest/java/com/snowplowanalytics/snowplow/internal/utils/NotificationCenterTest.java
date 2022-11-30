@@ -3,6 +3,8 @@ package com.snowplowanalytics.snowplow.internal.utils;
 import androidx.annotation.NonNull;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.snowplowanalytics.core.utils.NotificationCenter;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

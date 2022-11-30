@@ -17,7 +17,7 @@ import android.test.AndroidTestCase;
 
 import androidx.test.espresso.core.internal.deps.guava.collect.Lists;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,33 +70,6 @@ public class EcommerceTest extends AndroidTestCase {
 
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new EcommerceTransaction(null, null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            new EcommerceTransaction("some order id", null, new ArrayList<EcommerceTransactionItem>());
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            new EcommerceTransaction("some order id", 123.456, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new EcommerceTransaction("", 123.456, new ArrayList<EcommerceTransactionItem>());
         } catch (Exception e) {

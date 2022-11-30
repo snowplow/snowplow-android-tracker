@@ -1,0 +1,5 @@
+package com.snowplowanalytics.snowplow.controller
+
+import com.snowplowanalytics.core.globalcontexts.GlobalContextsConfigurationInterface
+
+interface GlobalContextsController : GlobalContextsConfigurationInterface
