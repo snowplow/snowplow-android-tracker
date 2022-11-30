@@ -13,16 +13,25 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
-
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ConsentGrantedTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(AndroidJUnit4.class)
+public class ConsentGrantedTest {
+
+    @Test
     public void testExpectedForm() {
         ConsentGranted event = new ConsentGranted("expiration", "id", "v1.0")
                 .documentName("name")
@@ -52,17 +61,9 @@ public class ConsentGrantedTest extends AndroidTestCase {
         assertEquals("expiration", data.get(Parameters.CG_EXPIRY));
     }
 
+    @Test
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new ConsentGranted(null, null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new ConsentGranted("", "", "test");
         } catch (Exception e) {

@@ -24,8 +24,8 @@ import com.snowplowanalytics.snowplow.Snowplow;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.internal.tracker.Tracker;
+import com.snowplowanalytics.core.emitter.Emitter;
+import com.snowplowanalytics.core.tracker.Tracker;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 
 

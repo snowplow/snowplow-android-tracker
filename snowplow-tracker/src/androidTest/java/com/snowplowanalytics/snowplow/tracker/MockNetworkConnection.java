@@ -4,7 +4,7 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
+import com.snowplowanalytics.core.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.network.Request;

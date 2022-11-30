@@ -17,18 +17,17 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
+import com.snowplowanalytics.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
-import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+import com.snowplowanalytics.core.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.network.Request;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 import com.snowplowanalytics.snowplow.network.RequestResult;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -486,4 +485,3 @@ class BrokenNetworkConnection implements NetworkConnection {
         throw new UnsupportedOperationException("Broken NetworkConnection");
     }
 }
-

@@ -23,8 +23,9 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.core.constants.Parameters;
+import com.snowplowanalytics.core.constants.TrackerConstants;
+import com.snowplowanalytics.core.tracker.PlatformContext;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import org.junit.Test;

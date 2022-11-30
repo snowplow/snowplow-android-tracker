@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import static com.snowplowanalytics.snowplow.internal.constants.TrackerConstants.COOKIE_PERSISTANCE;
+import static com.snowplowanalytics.core.constants.TrackerConstants.COOKIE_PERSISTANCE;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;

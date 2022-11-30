@@ -23,7 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.snowplowanalytics.snowplow.network.CollectorCookieJar;
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection;
 import com.snowplowanalytics.snowplow.network.RequestResult;
-import com.snowplowanalytics.snowplow.internal.emitter.TLSVersion;
+import com.snowplowanalytics.core.emitter.TLSVersion;
 import com.snowplowanalytics.snowplow.network.Request;
 import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;

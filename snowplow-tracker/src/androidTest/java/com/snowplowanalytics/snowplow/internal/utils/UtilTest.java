@@ -2,6 +2,8 @@ package com.snowplowanalytics.snowplow.internal.utils;
 
 import android.test.AndroidTestCase;
 
+import com.snowplowanalytics.core.utils.Util;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -13,16 +13,25 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ConsentWithdrawnTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class ConsentWithdrawnTest {
 
+    @Test
     public void testExpectedForm() {
         ConsentWithdrawn event = new ConsentWithdrawn(false, "id", "v1.0")
                 .documentName("name")
@@ -52,17 +61,9 @@ public class ConsentWithdrawnTest extends AndroidTestCase {
         assertEquals(false, data.get(Parameters.CW_ALL));
     }
 
+    @Test
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new ConsentWithdrawn(false, null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new ConsentWithdrawn(false, "", "test");
         } catch (Exception e) {

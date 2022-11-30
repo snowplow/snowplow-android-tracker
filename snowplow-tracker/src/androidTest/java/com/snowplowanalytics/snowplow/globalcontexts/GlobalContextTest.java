@@ -17,12 +17,10 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.event.Timing;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
-import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
-import com.snowplowanalytics.snowplow.internal.tracker.TrackerEvent;
+import com.snowplowanalytics.core.tracker.TrackerEvent;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
-import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import org.junit.Test;

@@ -13,14 +13,24 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
-public class PageViewTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class PageViewTest {
 
+    @Test
     public void testExpectedForm() {
         PageView pageView = new PageView("http://com.acme/foo/bar");
 
@@ -44,17 +54,9 @@ public class PageViewTest extends AndroidTestCase {
         assertEquals("http://refr.com", data.get(Parameters.PAGE_REFR));
     }
 
+    @Test
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new PageView(null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new PageView("");
         } catch (Exception e) {
