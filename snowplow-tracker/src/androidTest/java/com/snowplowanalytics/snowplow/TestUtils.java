@@ -3,9 +3,9 @@ package com.snowplowanalytics.snowplow;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.core.constants.Parameters;
+import com.snowplowanalytics.core.constants.TrackerConstants;
+import com.snowplowanalytics.core.utils.Util;
 
 public class TestUtils {
 

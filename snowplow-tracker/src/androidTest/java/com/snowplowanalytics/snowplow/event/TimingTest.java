@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.event;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.constants.Parameters;
 
 import java.util.Map;
 
@@ -68,33 +68,6 @@ public class TimingTest extends AndroidTestCase {
 
     public void testBuilderFailures() {
         boolean exception = false;
-        try {
-            new Timing(null, null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            new Timing("category", null, null);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
-        try {
-            new Timing("category", null, 123);
-        } catch (Exception e) {
-            assertEquals(null, e.getMessage());
-            exception = true;
-        }
-        assertTrue(exception);
-
-        exception = false;
         try {
             new Timing("", "variable", 123);
         } catch (Exception e) {

@@ -24,8 +24,8 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.event.Structured;
-import com.snowplowanalytics.snowplow.internal.emitter.EmitterConfigurationUpdate;
-import com.snowplowanalytics.snowplow.internal.tracker.ServiceProvider;
+import com.snowplowanalytics.core.emitter.EmitterConfigurationUpdate;
+import com.snowplowanalytics.core.tracker.ServiceProvider;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

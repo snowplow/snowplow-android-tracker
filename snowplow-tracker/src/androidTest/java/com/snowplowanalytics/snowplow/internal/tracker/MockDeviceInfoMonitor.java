@@ -20,7 +20,7 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.snowplowanalytics.snowplow.internal.utils.DeviceInfoMonitor;
+import com.snowplowanalytics.core.utils.DeviceInfoMonitor;
 
 import java.util.HashMap;
 import java.util.Map;

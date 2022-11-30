@@ -2,7 +2,7 @@ package com.snowplowanalytics.snowplow.tracker;
 
 import android.test.AndroidTestCase;
 
-import com.snowplowanalytics.snowplow.internal.emitter.Executor;
+import com.snowplowanalytics.core.emitter.Executor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;

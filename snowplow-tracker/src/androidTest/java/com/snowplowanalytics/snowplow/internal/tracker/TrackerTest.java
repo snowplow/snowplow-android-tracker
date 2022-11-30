@@ -22,15 +22,20 @@ import androidx.annotation.Nullable;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.core.tracker.ExceptionHandler;
+import com.snowplowanalytics.core.tracker.ScreenState;
+import com.snowplowanalytics.core.tracker.Subject;
+import com.snowplowanalytics.core.tracker.Tracker;
+import com.snowplowanalytics.core.tracker.TrackerEvent;
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.Structured;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
-import com.snowplowanalytics.snowplow.internal.emitter.Executor;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
+import com.snowplowanalytics.core.emitter.Emitter;
+import com.snowplowanalytics.core.emitter.Executor;
+import com.snowplowanalytics.core.constants.Parameters;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Timing;
@@ -199,8 +204,8 @@ public class TrackerTest {
 
     @Test
     public void testTrackSelfDescribingEvent() throws JSONException, IOException, InterruptedException {
-        Executor.setThreadCount(30);
-        Executor.shutdown();
+//        Executor.setThreadCount(30);
+//        Executor.shutdown();
 
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);

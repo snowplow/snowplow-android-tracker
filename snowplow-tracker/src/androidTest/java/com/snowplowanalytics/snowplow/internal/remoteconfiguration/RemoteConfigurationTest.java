@@ -4,12 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
-import androidx.core.util.Consumer;
-import androidx.core.util.Pair;
 import androidx.test.espresso.core.internal.deps.guava.collect.Lists;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle;
+import com.snowplowanalytics.core.remoteconfiguration.ConfigurationCache;
+import com.snowplowanalytics.core.remoteconfiguration.ConfigurationFetcher;
+import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider;
+import com.snowplowanalytics.snowplow.configuration.ConfigurationState;
+import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
 import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;

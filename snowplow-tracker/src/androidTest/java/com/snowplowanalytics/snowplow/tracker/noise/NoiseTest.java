@@ -16,17 +16,17 @@ package com.snowplowanalytics.snowplow.tracker.noise;
 import android.test.AndroidTestCase;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import com.snowplowanalytics.snowplow.internal.emitter.Executor;
-import com.snowplowanalytics.snowplow.internal.constants.Parameters;
-import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
+import com.snowplowanalytics.core.emitter.Executor;
+import com.snowplowanalytics.core.constants.Parameters;
+import com.snowplowanalytics.core.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
-import com.snowplowanalytics.snowplow.internal.session.FileStore;
+import com.snowplowanalytics.core.session.FileStore;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.snowplow.internal.tracker.Logger;
-import com.snowplowanalytics.snowplow.internal.utils.Preconditions;
-import com.snowplowanalytics.snowplow.internal.utils.Util;
+import com.snowplowanalytics.core.tracker.Logger;
+import com.snowplowanalytics.core.utils.Preconditions;
+import com.snowplowanalytics.core.utils.Util;
 
 import java.lang.reflect.Constructor;
 
