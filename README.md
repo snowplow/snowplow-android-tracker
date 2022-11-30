@@ -22,7 +22,7 @@ With this tracker you can collect event data from your applications, games or fr
 
 ### Demo apps using the Snowplow Android Tracker
 
-A [demo app](https://github.com/snowplow/snowplow-android-tracker/tree/master/snowplow-demo-app), written in Java, is part of this repository.
+Two demo apps are included in this repository: one in [Java](https://github.com/snowplow/snowplow-android-tracker/tree/next/snowplow-demo-java), one in [Kotlin](https://github.com/snowplow/snowplow-android-tracker/tree/next/snowplow-demo-kotlin).
 
 
 ### Instrument the Kotlin Android Tracker
