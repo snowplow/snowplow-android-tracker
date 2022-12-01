@@ -8,152 +8,63 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
 /**
  * It allows the tracker configuration from the emission perspective.
  * The EmitterConfiguration can be used to setup details about how the tracker should treat the events
- * to emit to the collector.
+ * to emit to the collector.     
+ * 
+ * Default values:
+ * bufferOption = BufferOption.Single;
+ * emitRange = 150;
+ * threadPoolSize = 15;
+ * byteLimitGet = 40000;
+ * byteLimitPost = 40000;
+ * serverAnonymisation = false;
  */
 open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     /**
      * @see .bufferOption
      */
-    @JvmField
-    var bufferOption: BufferOption
+    override var bufferOption: BufferOption = BufferOption.Single
 
     /**
      * @see .emitRange
      */
-    @JvmField
-    var emitRange: Int
+    override var emitRange: Int = 150
 
     /**
      * @see .threadPoolSize
      */
-    @JvmField
-    var threadPoolSize: Int
+    override var threadPoolSize: Int = 15
 
     /**
      * @see .byteLimitGet
      */
-    @JvmField
-    var byteLimitGet: Long
+    override var byteLimitGet: Long = 40000
 
     /**
      * @see .byteLimitPost
      */
-    @JvmField
-    var byteLimitPost: Long
+    override var byteLimitPost: Long = 40000
 
     /**
      * @see .requestCallback
      */
-    @JvmField
-    var requestCallback: RequestCallback? = null
+    override var requestCallback: RequestCallback? = null
 
     /**
      * @see .eventStore
      */
-    @JvmField
-    var eventStore: EventStore? = null
+    override var eventStore: EventStore? = null
 
     /**
      * @see .customRetryForStatusCodes
      */
-    @JvmField
-    var customRetryForStatusCodes: Map<Int, Boolean>? = null
+    override var customRetryForStatusCodes: Map<Int, Boolean>? = null
 
     /**
      * @see .serverAnonymisation
      */
-    @JvmField
-    var serverAnonymisation: Boolean
+    override var serverAnonymisation: Boolean = false
     
-    // Constructor
-    /**
-     * It sets a default EmitterConfiguration.
-     * Default values:
-     * bufferOption = BufferOption.Single;
-     * emitRange = 150;
-     * threadPoolSize = 15;
-     * byteLimitGet = 40000;
-     * byteLimitPost = 40000;
-     * serverAnonymisation = false;
-     */
-    init {
-        bufferOption = BufferOption.Single
-        emitRange = 150
-        threadPoolSize = 15
-        byteLimitGet = 40000
-        byteLimitPost = 40000
-        serverAnonymisation = false
-    }
-
-    // Getters and Setters
-    override fun getEventStore(): EventStore? {
-        return eventStore
-    }
-
-    override fun getBufferOption(): BufferOption {
-        return bufferOption
-    }
-
-    override fun setBufferOption(bufferOption: BufferOption) {
-        this.bufferOption = bufferOption
-    }
-
-    override fun getEmitRange(): Int {
-        return emitRange
-    }
-
-    override fun setEmitRange(emitRange: Int) {
-        this.emitRange = emitRange
-    }
-
-    override fun getThreadPoolSize(): Int {
-        return threadPoolSize
-    }
-
-    fun setThreadPoolSize(threadPoolSize: Int) {
-        this.threadPoolSize = threadPoolSize
-    }
-
-    override fun getByteLimitGet(): Long {
-        return byteLimitGet
-    }
-
-    override fun setByteLimitGet(byteLimitGet: Long) {
-        this.byteLimitGet = byteLimitGet
-    }
-
-    override fun getByteLimitPost(): Long {
-        return byteLimitPost
-    }
-
-    override fun setByteLimitPost(byteLimitPost: Long) {
-        this.byteLimitPost = byteLimitPost
-    }
-
-    override fun getRequestCallback(): RequestCallback? {
-        return requestCallback
-    }
-
-    override fun setRequestCallback(requestCallback: RequestCallback?) {
-        this.requestCallback = requestCallback
-    }
-
-    override fun getCustomRetryForStatusCodes(): Map<Int, Boolean>? {
-        return customRetryForStatusCodes
-    }
-
-    override fun setCustomRetryForStatusCodes(customRetryForStatusCodes: Map<Int, Boolean>?) {
-        this.customRetryForStatusCodes = customRetryForStatusCodes
-    }
-
-    override fun isServerAnonymisation(): Boolean {
-        return serverAnonymisation
-    }
-
-    override fun setServerAnonymisation(serverAnonymisation: Boolean) {
-        this.serverAnonymisation = serverAnonymisation
-    }
-    
+        
     // Builders
     
     /**

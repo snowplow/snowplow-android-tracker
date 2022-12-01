@@ -10,20 +10,18 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.core.emitter
 
-package com.snowplowanalytics.core.emitter;
-
-import androidx.annotation.RestrictTo;
+import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public enum TLSVersion {
+enum class TLSVersion {
     /**
      * Accepted versions of TLS to be used by emitter.
      */
-    TLSv1_1,
-    TLSv1_2;
+    TLSv1_1, TLSv1_2;
 
-    public String toString() {
-        return name().replace("_", ".");
+    override fun toString(): String {
+        return name.replace("_", ".")
     }
 }

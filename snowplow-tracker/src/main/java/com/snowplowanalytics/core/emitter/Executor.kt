@@ -10,29 +10,24 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.core.emitter
 
-package com.snowplowanalytics.core.emitter;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-
-import com.snowplowanalytics.core.tracker.Logger;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import androidx.annotation.RestrictTo
+import com.snowplowanalytics.core.emitter.Executor.ExceptionHandler
+import com.snowplowanalytics.core.tracker.Logger
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 /**
  * Static Class which holds the logic for controlling
  * the Thread Pool for the Classic Tracker.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class Executor {
-
-    private static ExecutorService executor;
-    private static int threadCount = 2; // Minimum amount of threads.
+object Executor {
+    private var executor: ExecutorService? = null
+    private var threadCount = 2 // Minimum amount of threads.
 
     /**
      * If the executor is null creates a
@@ -40,11 +35,12 @@ public class Executor {
      *
      * @return the executor
      */
-    private synchronized static ExecutorService getExecutor() {
+    @Synchronized
+    private fun getExecutor(): ExecutorService? {
         if (executor == null) {
-            executor = Executors.newScheduledThreadPool(threadCount);
+            executor = Executors.newScheduledThreadPool(threadCount)
         }
-        return executor;
+        return executor
     }
 
     /**
@@ -52,11 +48,11 @@ public class Executor {
      * Errors are logged but not tracked with the diagnostic feature.
      *
      * @param tag string indicating the source of the runnable for logging purposes in case of
-     *            exceptions raised by the runnable
+     * exceptions raised by the runnable
      * @param runnable the runnable to be queued
      */
-    public static void execute(@Nullable String tag, @Nullable Runnable runnable) {
-        execute(false, tag, runnable);
+    fun execute(tag: String?, runnable: Runnable?) {
+        execute(false, tag, runnable)
     }
 
     /**
@@ -64,27 +60,23 @@ public class Executor {
      *
      * @param reportsOnDiagnostic weather or not the error has to be tracked with diagnostic feature
      * @param tag string indicating the source of the runnable for logging purposes in case of
-     *            exceptions raised by the runnable
+     * exceptions raised by the runnable
      * @param runnable the runnable to be queued
      */
-    public static void execute(boolean reportsOnDiagnostic, @Nullable String tag, @Nullable Runnable runnable) {
-        final String loggerTag;
-        if (tag == null) {
-            loggerTag = "Source not provided";
-        } else {
-            loggerTag = tag;
-        }
-        execute(runnable, t -> {
-            String message = t.getLocalizedMessage();
+    fun execute(reportsOnDiagnostic: Boolean, tag: String?, runnable: Runnable?) {
+        val loggerTag: String
+        loggerTag = tag ?: "Source not provided"
+        execute(runnable, ExceptionHandler { t: Throwable ->
+            var message = t.localizedMessage
             if (message == null) {
-                message = "No message provided.";
+                message = "No message provided."
             }
             if (reportsOnDiagnostic) {
-                Logger.track(loggerTag, message, t);
+                Logger.track(loggerTag, message, t)
             } else {
-                Logger.e(loggerTag, message, t);
+                Logger.e(loggerTag, message, t)
             }
-        });
+        })
     }
 
     /**
@@ -93,24 +85,19 @@ public class Executor {
      * @param runnable the runnable to be queued
      * @param exceptionHandler the handler of exception raised by the runnable
      */
-    public static void execute(@Nullable Runnable runnable, @Nullable ExceptionHandler exceptionHandler) {
-        ExecutorService executor = getExecutor();
+    @JvmStatic
+    fun execute(runnable: Runnable?, exceptionHandler: ExceptionHandler?) {
+        val executor = getExecutor()
         try {
-            executor.execute(() -> {
+            executor!!.execute {
                 try {
-                    if (runnable != null) {
-                        runnable.run();
-                    }
-                } catch (Throwable t) {
-                    if (exceptionHandler != null) {
-                        exceptionHandler.handle(t);
-                    }
+                    runnable?.run()
+                } catch (t: Throwable) {
+                    exceptionHandler?.handle(t)
                 }
-            });
-        } catch (Exception e) {
-            if (exceptionHandler != null) {
-                exceptionHandler.handle(e);
             }
+        } catch (e: Exception) {
+            exceptionHandler?.handle(e)
         }
     }
 
@@ -121,24 +108,23 @@ public class Executor {
      * @param callable the callable to be queued
      * @return the future object to be queried
      */
-    @NonNull
-    public static Future<?> futureCallable(@NonNull Callable<?> callable) {
-        return getExecutor().submit(callable);
+    fun futureCallable(callable: Callable<*>): Future<*> {
+        return getExecutor()!!.submit(callable)
     }
 
     /**
      * Shuts the executor service down and resets
      * the executor to a null state.
      */
-    @Nullable
-    public static ExecutorService shutdown() {
+    @JvmStatic
+    fun shutdown(): ExecutorService? {
         if (executor != null) {
-            executor.shutdown();
-            ExecutorService es = executor;
-            executor = null;
-            return es;
+            executor!!.shutdown()
+            val es = executor
+            executor = null
+            return es
         }
-        return null;
+        return null
     }
 
     /**
@@ -151,21 +137,21 @@ public class Executor {
      *
      * @param count the thread count
      */
-    public static void setThreadCount(final int count) {
+    @JvmStatic
+    fun setThreadCount(count: Int) {
         if (count >= 2) {
-            threadCount = count;
+            threadCount = count
         }
     }
 
-    public static int getThreadCount() {
-        return threadCount;
+    fun getThreadCount(): Int {
+        return threadCount
     }
 
     /**
      * Handle exceptions raised by a Runnable
      */
-    @FunctionalInterface
-    public interface ExceptionHandler {
-        void handle(@Nullable Throwable t);
+    fun interface ExceptionHandler {
+        fun handle(t: Throwable?)
     }
 }
