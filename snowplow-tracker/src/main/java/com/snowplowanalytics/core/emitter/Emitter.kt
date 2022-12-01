@@ -49,7 +49,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      */
     var requestCallback: RequestCallback?
     private var httpMethod: HttpMethod
-    private var bufferOption: BufferOption
+    var bufferOption: BufferOption
     private var requestSecurity: Protocol
 
     /**
@@ -96,7 +96,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     private var customPostPath: String?
     private val client: OkHttpClient?
     private val cookieJar: CookieJar? = null
-    private var serverAnonymisation: Boolean
+    var serverAnonymisation: Boolean
     private var isCustomNetworkConnection = false
     private val networkConnection = AtomicReference<NetworkConnection>()
 
@@ -106,7 +106,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     var eventStore: EventStore?
         private set
     private var emptyCount = 0
-    private val customRetryForStatusCodes = AtomicReference<Map<Int, Boolean>>()
+    val customRetryForStatusCodes = AtomicReference<Map<Int, Boolean>>()
     private val isRunning = AtomicBoolean(false)
     private val isEmittingPaused = AtomicBoolean(false)
 

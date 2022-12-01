@@ -13,83 +13,63 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), EmitterController {
+    
     private val emitter: Emitter
-        private get() = serviceProvider.orMakeTracker.emitter
+        get() = serviceProvider.orMakeTracker.emitter
+    
+    override val eventStore: EventStore?
+        get() = emitter.eventStore
 
-    // Getters and Setters
-    override fun getEventStore(): EventStore? {
-        return emitter.eventStore
-    }
+    override var bufferOption: BufferOption
+        get() = emitter.bufferOption
+        set(bufferOption) {
+            dirtyConfig.bufferOption = bufferOption
+            dirtyConfig.bufferOptionUpdated = true
+            emitter.bufferOption = bufferOption
+        }
 
-    override fun getBufferOption(): BufferOption {
-        return emitter.bufferOption
-    }
+    override var emitRange: Int
+        get() = emitter.sendLimit
+        set(emitRange) {
+            dirtyConfig.emitRange = emitRange
+            dirtyConfig.emitRangeUpdated = true
+            emitter.sendLimit = emitRange
+        }
 
-    override fun setBufferOption(bufferOption: BufferOption) {
-        dirtyConfig.bufferOption = bufferOption
-        dirtyConfig.bufferOptionUpdated = true
-        emitter.bufferOption = bufferOption
-    }
+    override val threadPoolSize: Int
+        get() = Executor.getThreadCount()
+    
+    override var byteLimitGet: Long
+        get() = emitter.byteLimitGet
+        set(byteLimitGet) {
+            dirtyConfig.byteLimitGet = byteLimitGet
+            dirtyConfig.byteLimitGetUpdated = true
+            emitter.byteLimitGet = byteLimitGet
+        }
+    
+    override var byteLimitPost: Long
+        get() = emitter.byteLimitPost
+        set(byteLimitPost) {
+            dirtyConfig.byteLimitPost = byteLimitPost
+            dirtyConfig.byteLimitPostUpdated = true
+            emitter.byteLimitPost = byteLimitPost
+        }
 
-    override fun getEmitRange(): Int {
-        return emitter.sendLimit
-    }
+    override var requestCallback: RequestCallback?
+        get() = emitter.requestCallback
+        set(requestCallback) { emitter.requestCallback = requestCallback }
+    
+    override var customRetryForStatusCodes: Map<Int, Boolean>?
+        get() = emitter.customRetryForStatusCodes as Map<Int, Boolean>?
+        set(customRetryForStatusCodes) { emitter.setCustomRetryForStatusCodes(customRetryForStatusCodes) }
 
-    override fun setEmitRange(emitRange: Int) {
-        dirtyConfig.emitRange = emitRange
-        dirtyConfig.emitRangeUpdated = true
-        emitter.sendLimit = emitRange
-    }
-
-    override fun getThreadPoolSize(): Int {
-        return Executor.getThreadCount()
-    }
-
-    override fun getByteLimitGet(): Long {
-        return emitter.byteLimitGet
-    }
-
-    override fun setByteLimitGet(byteLimitGet: Long) {
-        dirtyConfig.byteLimitGet = byteLimitGet
-        dirtyConfig.byteLimitGetUpdated = true
-        emitter.byteLimitGet = byteLimitGet
-    }
-
-    override fun getByteLimitPost(): Long {
-        return emitter.byteLimitPost
-    }
-
-    override fun setByteLimitPost(byteLimitPost: Long) {
-        dirtyConfig.byteLimitPost = byteLimitPost
-        dirtyConfig.byteLimitPostUpdated = true
-        emitter.byteLimitPost = byteLimitPost
-    }
-
-    override fun getRequestCallback(): RequestCallback? {
-        return emitter.requestCallback
-    }
-
-    override fun setRequestCallback(requestCallback: RequestCallback?) {
-        emitter.requestCallback = requestCallback
-    }
-
-    override fun getCustomRetryForStatusCodes(): Map<Int?, Boolean?>? {
-        return emitter.customRetryForStatusCodes
-    }
-
-    override fun setCustomRetryForStatusCodes(customRetryForStatusCodes: Map<Int, Boolean>?) {
-        emitter.setCustomRetryForStatusCodes(customRetryForStatusCodes)
-    }
-
-    override fun isServerAnonymisation(): Boolean {
-        return emitter.serverAnonymisation
-    }
-
-    override fun setServerAnonymisation(serverAnonymisation: Boolean) {
-        dirtyConfig.serverAnonymisation = serverAnonymisation
-        dirtyConfig.serverAnonymisationUpdated = true
-        emitter.serverAnonymisation = serverAnonymisation
-    }
+    override var serverAnonymisation: Boolean
+        get() = emitter.serverAnonymisation
+        set(serverAnonymisation) {
+            dirtyConfig.serverAnonymisation = serverAnonymisation
+            dirtyConfig.serverAnonymisationUpdated = true
+            emitter.serverAnonymisation = serverAnonymisation
+        }
 
     override val dbCount: Long
         get() {
@@ -100,6 +80,7 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
             }
             return eventStore.size
         }
+    
     override val isSending: Boolean
         get() = emitter.emitterStatus
 
@@ -114,7 +95,7 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
     }
 
     // Private methods
-    val dirtyConfig: EmitterConfigurationUpdate
+    private val dirtyConfig: EmitterConfigurationUpdate
         get() = serviceProvider.emitterConfigurationUpdate
 
     companion object {
