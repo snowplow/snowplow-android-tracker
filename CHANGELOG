@@ -1,3 +1,7 @@
+Version 4.1.1 (2022-12-02)
+--------------------------
+Hardcode the anonymised session user ID (#567)  
+
 Version 4.1.0 (2022-11-16)
 --------------------------
 Anonymise previous session ID and user identifiers in subject when user anonymisation is enabled (#549)
