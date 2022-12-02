@@ -203,7 +203,7 @@ public class Session {
         Map<String, Object> sessionCopy = new HashMap<>(sessionValues);
         sessionCopy.put(Parameters.SESSION_EVENT_INDEX, eventIndex);
         if (userAnonymisation) {
-            sessionCopy.put(Parameters.SESSION_USER_ID, new UUID(0, 0).toString());
+            sessionCopy.put(Parameters.SESSION_USER_ID, "00000000-0000-0000-0000-000000000000");
             sessionCopy.put(Parameters.SESSION_PREVIOUS_ID, null);
         }
 
