@@ -13,7 +13,6 @@
 package com.snowplowanalytics.core.emitter
 
 import androidx.annotation.RestrictTo
-import com.snowplowanalytics.core.emitter.Executor.ExceptionHandler
 import com.snowplowanalytics.core.tracker.Logger
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -27,7 +26,25 @@ import java.util.concurrent.Future
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object Executor {
     private var executor: ExecutorService? = null
-    private var threadCount = 2 // Minimum amount of threads.
+    
+    
+    var threadCount = 2 // Minimum amount of threads.
+
+    /**
+     * Changes the amount of threads the
+     * scheduler will be able to use.
+     *
+     * NOTE: This can only be set before the
+     * scheduler is first accessed, after this
+     * point the function will not effect anything.
+     *
+     * @param count the thread count
+     */
+    fun threadCount(count: Int) {
+        if (count >= 2) {
+            threadCount = count
+        }
+    }
 
     /**
      * If the executor is null creates a
@@ -36,11 +53,11 @@ object Executor {
      * @return the executor
      */
     @Synchronized
-    private fun getExecutor(): ExecutorService? {
+    private fun getExecutor(): ExecutorService {
         if (executor == null) {
             executor = Executors.newScheduledThreadPool(threadCount)
         }
-        return executor
+        return executor!!
     }
 
     /**
@@ -64,10 +81,9 @@ object Executor {
      * @param runnable the runnable to be queued
      */
     fun execute(reportsOnDiagnostic: Boolean, tag: String?, runnable: Runnable?) {
-        val loggerTag: String
-        loggerTag = tag ?: "Source not provided"
-        execute(runnable, ExceptionHandler { t: Throwable ->
-            var message = t.localizedMessage
+        val loggerTag: String = tag ?: "Source not provided"
+        execute(runnable) { t: Throwable? ->
+            var message = t?.localizedMessage
             if (message == null) {
                 message = "No message provided."
             }
@@ -76,7 +92,7 @@ object Executor {
             } else {
                 Logger.e(loggerTag, message, t)
             }
-        })
+        }
     }
 
     /**
@@ -89,7 +105,7 @@ object Executor {
     fun execute(runnable: Runnable?, exceptionHandler: ExceptionHandler?) {
         val executor = getExecutor()
         try {
-            executor!!.execute {
+            executor.execute {
                 try {
                     runnable?.run()
                 } catch (t: Throwable) {
@@ -109,14 +125,13 @@ object Executor {
      * @return the future object to be queried
      */
     fun futureCallable(callable: Callable<*>): Future<*> {
-        return getExecutor()!!.submit(callable)
+        return getExecutor().submit(callable)
     }
 
     /**
      * Shuts the executor service down and resets
      * the executor to a null state.
      */
-    @JvmStatic
     fun shutdown(): ExecutorService? {
         if (executor != null) {
             executor!!.shutdown()
@@ -125,27 +140,6 @@ object Executor {
             return es
         }
         return null
-    }
-
-    /**
-     * Changes the amount of threads the
-     * scheduler will be able to use.
-     *
-     * NOTE: This can only be set before the
-     * scheduler is first accessed, after this
-     * point the function will not effect anything.
-     *
-     * @param count the thread count
-     */
-    @JvmStatic
-    fun setThreadCount(count: Int) {
-        if (count >= 2) {
-            threadCount = count
-        }
-    }
-
-    fun getThreadCount(): Int {
-        return threadCount
     }
 
     /**

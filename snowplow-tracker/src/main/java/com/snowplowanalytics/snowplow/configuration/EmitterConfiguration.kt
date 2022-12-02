@@ -62,7 +62,7 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     /**
      * @see .serverAnonymisation
      */
-    override var serverAnonymisation: Boolean = false
+    override var isServerAnonymisation: Boolean = false
     
         
     // Builders
@@ -138,7 +138,7 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
      */
     fun serverAnonymisation(serverAnonymisation: Boolean): EmitterConfiguration {
-        this.serverAnonymisation = serverAnonymisation
+        this.isServerAnonymisation = serverAnonymisation
         return this
     }
 
@@ -153,6 +153,6 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
             .eventStore(eventStore)
             .requestCallback(requestCallback)
             .customRetryForStatusCodes(customRetryForStatusCodes)
-            .serverAnonymisation(serverAnonymisation)
+            .serverAnonymisation(isServerAnonymisation)
     }
 }

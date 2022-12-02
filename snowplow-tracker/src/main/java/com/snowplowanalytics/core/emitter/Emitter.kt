@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) {
     private val TAG = Emitter::class.java.simpleName
+    
     private val context: Context
     /**
      * @return the request callback method
@@ -48,14 +49,14 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      * @param requestCallback the callback request
      */
     var requestCallback: RequestCallback?
-    private var httpMethod: HttpMethod
+    var httpMethod: HttpMethod
     var bufferOption: BufferOption
     private var requestSecurity: Protocol
 
     /**
      * @return the TLS versions accepted for the emitter
      */
-    val tlsVersions: EnumSet<TLSVersion>
+    private val tlsVersions: EnumSet<TLSVersion>
     private var uri: String
     private var namespace: String? = null
 
@@ -69,36 +70,31 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      * before it is shutdown.
      */
     val emptyLimit: Int
-    /**
-     * @return the emitter send limit
-     */
+
     /**
      * Sets the maximum amount of events to grab for an emit attempt.
      * @param sendLimit The maximum possible amount of events.
      */
     var sendLimit: Int
-    /**
-     * @return the GET byte limit
-     */
+
     /**
      * @param byteLimitGet Set the GET byte limit
      */
     var byteLimitGet: Long
-    /**
-     * @return the POST byte limit
-     */
+
     /**
      * @param byteLimitPost Set the POST byte limit
      */
     var byteLimitPost: Long
-    private var emitTimeout: Int
+    var emitTimeout: Int
     private val timeUnit: TimeUnit
-    private var customPostPath: String?
+    var customPostPath: String?
     private val client: OkHttpClient?
     private val cookieJar: CookieJar? = null
     var serverAnonymisation: Boolean
     private var isCustomNetworkConnection = false
-    private val networkConnection = AtomicReference<NetworkConnection>()
+    val networkConnection = AtomicReference<NetworkConnection>()
+//        get() = field.get()
 
     /**
      * @return the emitter event store object
@@ -339,11 +335,10 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      * Creates an emitter object
      */
     init {
-        var builder = builder
         this.context = context
-        if (builder == null) {
-            builder = EmitterBuilder()
-        }
+        val builder = builder ?: EmitterBuilder()
+
+        uri = collectorUri
         requestCallback = builder.requestCallback
         bufferOption = builder.bufferOption
         requestSecurity = builder.requestSecurity
@@ -358,9 +353,9 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         client = builder.client
         eventStore = builder.eventStore
         serverAnonymisation = builder.serverAnonymisation
-        uri = collectorUri
         httpMethod = builder.httpMethod
         customPostPath = builder.customPostPath
+        
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false
             var endpoint = collectorUri
@@ -386,12 +381,15 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             setNetworkConnection(builder.networkConnection!!)
         }
         if (builder.threadPoolSize > 2) {
-            Executor.setThreadCount(builder.threadPoolSize)
+            Executor.threadCount(builder.threadPoolSize)
         }
+        
         setCustomRetryForStatusCodes(builder.customRetryForStatusCodes)
         Logger.v(TAG, "Emitter created successfully!")
     }
+    
     // --- Controls
+    
     /**
      * Adds a payload to the EventStore and
      * then attempts to start the emitter
@@ -462,6 +460,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     fun shutdown(timeout: Long): Boolean {
         Logger.d(TAG, "Shutting down emitter.")
         isRunning.compareAndSet(true, false)
+        
         val es = Executor.shutdown()
         return if (es == null || timeout <= 0) {
             true
@@ -476,8 +475,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     }
 
     /**
-     * Attempts to send events in the database to
-     * a collector.
+     * Attempts to send events in the database to a collector.
      *
      * - If the emitter is paused, it will not send
      * - If the emitter is not online it will not send
@@ -517,15 +515,19 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             attemptEmit(getNetworkConnection()) // at this point we update network connection since it might be outdated after sleep
             return
         }
+        
         emptyCount = 0
         val events = eventStore!!.getEmittableEvents(sendLimit)
         val requests = buildRequests(events, networkConnection!!.httpMethod)
         val results = networkConnection.sendRequests(requests)
+        
         Logger.v(TAG, "Processing emitter results.")
+        
         var successCount = 0
         var failedWillRetryCount = 0
         var failedWontRetryCount = 0
         val removableEvents: MutableList<Long?> = ArrayList()
+        
         for (res in results) {
             if (res.isSuccessful) {
                 removableEvents.addAll(res.eventIds)
@@ -546,9 +548,11 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             }
         }
         eventStore!!.removeEvents(removableEvents)
+        
         val allFailureCount = failedWillRetryCount + failedWontRetryCount
         Logger.d(TAG, "Success Count: %s", successCount)
         Logger.d(TAG, "Failure Count: %s", allFailureCount)
+        
         if (requestCallback != null) {
             if (allFailureCount != 0) {
                 requestCallback!!.onFailure(successCount, allFailureCount)
@@ -578,12 +582,13 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
      * @return a list of ready to send requests
      */
-    protected fun buildRequests(
+    private fun buildRequests(
         events: List<EmitterEvent?>,
         httpMethod: HttpMethod
     ): List<Request> {
         val requests: MutableList<Request> = ArrayList()
         val sendingTime = Util.getTimestamp()
+        
         if (httpMethod === HttpMethod.GET) {
             for (event in events) {
                 val payload = event!!.payload
@@ -595,19 +600,21 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         } else {
             var i = 0
             while (i < events.size) {
-                var reqEventIds: MutableList<Long?> = ArrayList()
+                var reqEventIds: MutableList<Long> = ArrayList()
                 var postPayloadMaps: MutableList<Payload> = ArrayList()
+                
                 var j = i
                 while (j < i + bufferOption.code && j < events.size) {
                     val event = events[j]
                     val payload = event!!.payload
                     val eventId = event.eventId
                     addSendingTimeToPayload(payload, sendingTime)
+                    
                     if (isOversize(payload, httpMethod)) {
                         val request = Request(payload, eventId, true)
                         requests.add(request)
                     } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
-                        val request: Request = Request(postPayloadMaps, reqEventIds)
+                        val request = Request(postPayloadMaps, reqEventIds)
                         requests.add(request)
 
                         // Clear collections and build a new POST
@@ -625,8 +632,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
                 }
 
                 // Check if all payloads have been processed
-                if (!postPayloadMaps.isEmpty()) {
-                    val request: Request = Request(postPayloadMaps, reqEventIds)
+                if (postPayloadMaps.isNotEmpty()) {
+                    val request = Request(postPayloadMaps, reqEventIds)
                     requests.add(request)
                 }
                 i += bufferOption.code
@@ -639,7 +646,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      * Calculate if the payload exceeds the maximum amount of bytes allowed on configuration.
      * @param payload to send.
      * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
-     * @return weather the payload exceeds the maximum size allowed.
+     * @return whether the payload exceeds the maximum size allowed.
      */
     private fun isOversize(payload: Payload, httpMethod: HttpMethod): Boolean {
         return isOversize(payload, ArrayList(), httpMethod)
@@ -648,40 +655,42 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     /**
      * Calculate if the payload bundle exceeds the maximum amount of bytes allowed on configuration.
      * @param payload to add om the payload bundle.
-     * @param previousPaylods already in the payload bundle.
+     * @param previousPayloads already in the payload bundle.
      * @param httpMethod HTTP method to use (passed in order to ensure consistency within attemptEmit)
-     * @return weather the payload bundle exceeds the maximum size allowed.
+     * @return whether the payload bundle exceeds the maximum size allowed.
      */
     private fun isOversize(
         payload: Payload,
-        previousPaylods: List<Payload>,
+        previousPayloads: List<Payload>,
         httpMethod: HttpMethod
     ): Boolean {
         val byteLimit = if (httpMethod === HttpMethod.GET) byteLimitGet else byteLimitPost
-        return isOversize(payload, byteLimit, previousPaylods)
+        return isOversize(payload, byteLimit, previousPayloads)
     }
 
     /**
      * Calculate if the payload bundle exceeds the maximum amount of bytes allowed on configuration.
      * @param payload to add om the payload bundle.
      * @param byteLimit maximum amount of bytes allowed.
-     * @param previousPaylods already in the payload bundle.
-     * @return weather the payload bundle exceeds the maximum size allowed.
+     * @param previousPayloads already in the payload bundle.
+     * @return whether the payload bundle exceeds the maximum size allowed.
      */
     private fun isOversize(
         payload: Payload,
         byteLimit: Long,
-        previousPaylods: List<Payload>
+        previousPayloads: List<Payload>
     ): Boolean {
         var totalByteSize = payload.byteSize
-        for (previousPayload in previousPaylods) {
+        for (previousPayload in previousPayloads) {
             totalByteSize += previousPayload.byteSize
         }
         val wrapperBytes =
-            if (previousPaylods.size > 0) previousPaylods.size + POST_WRAPPER_BYTES else 0
+            if (previousPayloads.isNotEmpty()) previousPayloads.size + POST_WRAPPER_BYTES else 0
         return totalByteSize + wrapperBytes > byteLimit
     }
+    
     // Request Builders
+    
     /**
      * Adds the Sending Time (stm) field
      * to each event payload.
@@ -692,7 +701,9 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     private fun addSendingTimeToPayload(payload: Payload, timestamp: String) {
         payload.add(Parameters.SENT_TIMESTAMP, timestamp)
     }
+    
     // Setters, Getters and Checkers
+    
     /**
      * @return the emitter status
      */

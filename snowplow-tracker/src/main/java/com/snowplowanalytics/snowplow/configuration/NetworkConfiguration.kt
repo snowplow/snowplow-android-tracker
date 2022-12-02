@@ -3,7 +3,6 @@ package com.snowplowanalytics.snowplow.configuration
 import android.net.Uri
 import com.snowplowanalytics.core.emitter.NetworkConfigurationInterface
 import com.snowplowanalytics.core.tracker.Logger
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.NetworkConnection
 import com.snowplowanalytics.snowplow.network.Protocol
@@ -17,48 +16,46 @@ import java.util.*
  * allowing the tracker to be able to send events to the Snowplow collector.
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
-    private var endpoint: String? = null
-    private var method: HttpMethod? = null
-    private var protocol: Protocol? = null
+    /**
+     * @return URL (without schema/protocol) used to send events to the collector.
+     */
+    override var endpoint: String? = null
+
+    /**
+     * @return Method used to send events to the collector.
+     */
+    override var method: HttpMethod? = null
+
+    /**
+     * @return Protocol used to send events to the collector.
+     */
+    override var protocol: Protocol? = null
 
     /**
      * @see .NetworkConfiguration
      */
-    @JvmField
-    var networkConnection: NetworkConnection? = null
-
+    override var networkConnection: NetworkConnection? = null
+    
     /**
      * @see .customPostPath
      */
-    @JvmField
-    var customPostPath: String? = null
+    override var customPostPath: String? = null
 
     /**
      * @see .timeout
      */
-    @JvmField
-    var timeout: Int? = null
+    override var timeout: Int? = null
 
     /**
      * @see .okHttpClient
      */
-    @JvmField
-    var okHttpClient: OkHttpClient? = null
+    override var okHttpClient: OkHttpClient? = null
 
     /**
      * @see .okHttpCookieJar
      */
-    @JvmField
-    var okHttpCookieJar: CookieJar? = null
-    
-    /**
-     * @param endpoint URL of the collector that is going to receive the events tracked by the tracker.
-     * The URL can include the schema/protocol (e.g.: `http://collector-url.com`).
-     * In case the URL doesn't include the schema/protocol, the HTTPS protocol is
-     * automatically selected.
-     * @param method The method used to send the requests (GET or POST).
-     */
-    
+    override var okHttpCookieJar: CookieJar? = null
+
     // Constructors
     
     /**
@@ -66,6 +63,7 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
      * The URL can include the schema/protocol (e.g.: `http://collector-url.com`).
      * In case the URL doesn't include the schema/protocol, the HTTPS protocol is
      * automatically selected.
+     * @param method The method used to send the requests (GET or POST).
      */
     @JvmOverloads
     constructor(endpoint: String, method: HttpMethod = HttpMethod.POST) {
@@ -101,50 +99,8 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     constructor(networkConnection: NetworkConnection) {
         this.networkConnection = networkConnection
     }
-    
-    // Getters
-    
-    /**
-     * @return URL (without schema/protocol) used to send events to the collector.
-     */
-    override fun getEndpoint(): String? {
-        return endpoint
-    }
 
-    /**
-     * @return Method used to send events to the collector.
-     */
-    override fun getMethod(): HttpMethod? {
-        return method
-    }
 
-    /**
-     * @return Protocol used to send events to the collector.
-     */
-    override fun getProtocol(): Protocol? {
-        return protocol
-    }
-
-    override fun getCustomPostPath(): String? {
-        return customPostPath
-    }
-
-    override fun getTimeout(): Int? {
-        return timeout
-    }
-
-    override fun getNetworkConnection(): NetworkConnection? {
-        return networkConnection
-    }
-
-    override fun getOkHttpClient(): OkHttpClient? {
-        return okHttpClient
-    }
-
-    override fun getOkHttpCookieJar(): CookieJar? {
-        return okHttpCookieJar
-    }
-    
     // Builder methods
     
     /**

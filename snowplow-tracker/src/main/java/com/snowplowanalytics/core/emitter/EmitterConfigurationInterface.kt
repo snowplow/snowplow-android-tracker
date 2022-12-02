@@ -51,5 +51,5 @@ interface EmitterConfigurationInterface {
     /**
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
      */
-    var serverAnonymisation: Boolean
+    var isServerAnonymisation: Boolean
 }

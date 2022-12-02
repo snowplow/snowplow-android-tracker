@@ -22,23 +22,24 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
+/**
+ * Builds an object to store arguments to pass to TLS connection configuration.
+ *
+ * @param tlsVersions Accepted TLS versions for connections
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
     /**
      * @return the trust manager argument
      */
-    var trustManager: X509TrustManager? = null
+    private var trustManager: X509TrustManager? = null
 
     /**
      * @return the ssl socket factory argument
      */
-    var sslSocketFactory: SSLSocketFactory? = null
+    private var sslSocketFactory: SSLSocketFactory? = null
 
-    /**
-     * Builds an object to store arguments to pass to TLS connection configuration.
-     *
-     * @param versions Accepted TLS versions for connections
-     */
+    
     init {
         try {
             val trustManagerFactory = TrustManagerFactory.getInstance(
@@ -46,12 +47,14 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
             )
             trustManagerFactory.init(null as KeyStore?)
             val trustManagers = trustManagerFactory.trustManagers
+            
             check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
                 ("Unexpected default trust managers:"
                         + Arrays.toString(trustManagers))
             }
+            
             trustManager = trustManagers[0] as X509TrustManager
-            sslSocketFactory = TLSSocketFactory(tlsVersions)
+            sslSocketFactory = TLSSocketFactory(versions)
         } catch (e: KeyStoreException) {
             e.printStackTrace()
         } catch (e: NoSuchAlgorithmException) {
@@ -67,10 +70,8 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
     val versions: Array<String?>
         get() {
             val acceptedVersions = arrayOfNulls<String>(tlsVersions.size)
-            var i = 0
-            for (version in tlsVersions) {
+            for ((i, version) in tlsVersions.withIndex()) {
                 acceptedVersions[i] = version.toString()
-                i++
             }
             return acceptedVersions
         }

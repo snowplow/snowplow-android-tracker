@@ -2,7 +2,6 @@ package com.snowplowanalytics.core.emitter
 
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
-import com.snowplowanalytics.core.emitter.EmitterControllerImpl
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.controller.EmitterController
@@ -37,7 +36,7 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         }
 
     override val threadPoolSize: Int
-        get() = Executor.getThreadCount()
+        get() = Executor.threadCount
     
     override var byteLimitGet: Long
         get() = emitter.byteLimitGet
@@ -63,10 +62,10 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.customRetryForStatusCodes as Map<Int, Boolean>?
         set(customRetryForStatusCodes) { emitter.setCustomRetryForStatusCodes(customRetryForStatusCodes) }
 
-    override var serverAnonymisation: Boolean
+    override var isServerAnonymisation: Boolean
         get() = emitter.serverAnonymisation
         set(serverAnonymisation) {
-            dirtyConfig.serverAnonymisation = serverAnonymisation
+            dirtyConfig.isServerAnonymisation = serverAnonymisation
             dirtyConfig.serverAnonymisationUpdated = true
             emitter.serverAnonymisation = serverAnonymisation
         }

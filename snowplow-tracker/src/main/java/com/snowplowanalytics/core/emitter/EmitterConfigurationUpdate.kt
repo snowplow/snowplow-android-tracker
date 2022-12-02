@@ -56,7 +56,7 @@ class EmitterConfigurationUpdate : EmitterConfiguration() {
     // serverAnonymisation flag
     var serverAnonymisationUpdated = false
     fun serverAnonymisation(): Boolean {
-        return if (sourceConfig == null || serverAnonymisationUpdated) super.serverAnonymisation else sourceConfig!!.serverAnonymisation
+        return if (sourceConfig == null || serverAnonymisationUpdated) super.isServerAnonymisation else sourceConfig!!.isServerAnonymisation
     }
 
 
