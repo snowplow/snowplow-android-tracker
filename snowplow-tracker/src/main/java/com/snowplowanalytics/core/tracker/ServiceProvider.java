@@ -33,7 +33,6 @@ import com.snowplowanalytics.core.session.SessionControllerImpl;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.snowplow.tracker.SessionState;
-import com.snowplowanalytics.snowplow.util.TimeMeasure;
 
 import java.util.List;
 import java.util.Objects;
@@ -437,10 +436,10 @@ public class ServiceProvider implements ServiceProviderInterface {
         GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();
         if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(
-                    gdprConfig.getBasisForProcessing(),
-                    gdprConfig.getDocumentId(),
-                    gdprConfig.getDocumentVersion(),
-                    gdprConfig.getDocumentDescription());
+                    gdprConfig.basisForProcessing(),
+                    gdprConfig.documentId(),
+                    gdprConfig.documentVersion(),
+                    gdprConfig.documentDescription());
         }
         Tracker tracker = new Tracker(builder);
         if (globalContextsConfiguration != null) {
@@ -482,7 +481,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         GdprControllerImpl controller = new GdprControllerImpl(this);
         Gdpr gdpr = getOrMakeTracker().getGdprContext();
         if (gdpr != null) {
-            controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
+            controller.reset(gdpr.getBasisForProcessing(), gdpr.getDocumentId(), gdpr.getDocumentVersion(), gdpr.getDocumentDescription());
         }
         return controller;
     }

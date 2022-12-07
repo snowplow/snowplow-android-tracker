@@ -36,6 +36,7 @@ object Executor {
          *
          * @param count the thread count
          */
+        @JvmStatic
         set(count) {
             if (count >= 2) {
                 field = count
@@ -49,6 +50,7 @@ object Executor {
      * @return the executor
      */
     @Synchronized
+    @JvmStatic
     private fun getExecutor(): ExecutorService {
         if (executor == null) {
             executor = Executors.newScheduledThreadPool(threadCount)
@@ -122,6 +124,7 @@ object Executor {
      * @param callable the callable to be queued
      * @return the future object to be queried
      */
+    @JvmStatic
     fun futureCallable(callable: Callable<*>): Future<*> {
         return getExecutor().submit(callable)
     }
@@ -130,6 +133,7 @@ object Executor {
      * Shuts the executor service down and resets
      * the executor to a null state.
      */
+    @JvmStatic
     fun shutdown(): ExecutorService? {
         if (executor != null) {
             executor!!.shutdown()
