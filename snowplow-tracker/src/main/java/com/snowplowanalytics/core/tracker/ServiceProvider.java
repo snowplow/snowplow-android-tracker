@@ -443,7 +443,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         }
         Tracker tracker = new Tracker(builder);
         if (globalContextsConfiguration != null) {
-            tracker.setGlobalContextGenerators(globalContextsConfiguration.contextGenerators);
+            tracker.setGlobalContextGenerators(globalContextsConfiguration.getContextGenerators());
         }
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking();

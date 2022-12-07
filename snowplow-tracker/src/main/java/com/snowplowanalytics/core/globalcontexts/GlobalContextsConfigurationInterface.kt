@@ -1,19 +1,12 @@
-package com.snowplowanalytics.core.globalcontexts;
+package com.snowplowanalytics.core.globalcontexts
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 
-import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
-
-import java.util.Set;
-
-public interface GlobalContextsConfigurationInterface {
-
+interface GlobalContextsConfigurationInterface {
     /**
      * @return Set of tags associated to added GlobalContexts.
      */
-    @NonNull
-    Set<String> getTags();
+    val tags: Set<String?>
 
     /**
      * Add a GlobalContext generator to the configuration of the tracker.
@@ -21,13 +14,12 @@ public interface GlobalContextsConfigurationInterface {
      * @param contextGenerator The GlobalContext generator.
      * @return Whether the adding operation has succeeded.
      */
-    boolean add(@NonNull String tag, @NonNull GlobalContext contextGenerator);
+    fun add(tag: String, contextGenerator: GlobalContext): Boolean
 
     /**
      * Remove a GlobalContext generator from the configuration of the tracker.
      * @param tag The label identifying the generator in the tracker.
-     * @return Whether the removing operation has succeded.
+     * @return Whether the removing operation has succeeded.
      */
-    @Nullable
-    GlobalContext remove(@NonNull String tag);
+    fun remove(tag: String): GlobalContext?
 }

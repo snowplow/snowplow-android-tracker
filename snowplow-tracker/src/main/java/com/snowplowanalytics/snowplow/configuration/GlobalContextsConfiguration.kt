@@ -9,8 +9,13 @@ import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalContext>?) :
     Configuration, GlobalContextsConfigurationInterface {
     
-    @JvmField
     val contextGenerators: MutableMap<String, GlobalContext>
+
+    /**
+     * Set of tags associated with added GlobalContexts.
+     */
+    override val tags: Set<String?>
+        get() = contextGenerators.keys
     
     // Constructors
     
@@ -25,12 +30,6 @@ class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalCo
     
     // Methods
     
-    /**
-     * @return Set of tags associated to added GlobalContexts.
-     */
-    override fun getTags(): Set<String> {
-        return contextGenerators.keys
-    }
 
     /**
      * Add a GlobalContext generator to the configuration of the tracker.
