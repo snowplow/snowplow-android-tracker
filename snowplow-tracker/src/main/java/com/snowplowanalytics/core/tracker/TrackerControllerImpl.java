@@ -37,36 +37,36 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     @Nullable
     @Override
     public NetworkController getNetwork() {
-        return serviceProvider.getOrMakeNetworkController();
+        return this.getServiceProvider().getOrMakeNetworkController();
     }
 
     @Override
     @NonNull
     public EmitterController getEmitter() {
-        return serviceProvider.getOrMakeEmitterController();
+        return this.getServiceProvider().getOrMakeEmitterController();
     }
 
     @Override
     @NonNull
     public SubjectController getSubject() {
-        return serviceProvider.getOrMakeSubjectController();
+        return this.getServiceProvider().getOrMakeSubjectController();
     }
 
     @Override
     @NonNull
     public GdprController getGdpr() {
-        return serviceProvider.getOrMakeGdprController();
+        return this.getServiceProvider().getOrMakeGdprController();
     }
 
     @NonNull
     @Override
     public GlobalContextsController getGlobalContexts() {
-        return serviceProvider.getOrMakeGlobalContextsController();
+        return this.getServiceProvider().getOrMakeGlobalContextsController();
     }
 
     @NonNull
     public SessionControllerImpl getSessionController() {
-        return serviceProvider.getOrMakeSessionController();
+        return this.getServiceProvider().getOrMakeSessionController();
     }
 
     @Nullable
@@ -337,14 +337,14 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
 
     @NonNull
     private Tracker getTracker() {
-        if (!serviceProvider.isTrackerInitialized()) {
+        if (!this.getServiceProvider().isTrackerInitialized()) {
             getLoggerDelegate().error(TAG, "Recreating tracker instance after it was removed. This will not be supported in future versions.");
         }
-        return serviceProvider.getOrMakeTracker();
+        return this.getServiceProvider().getOrMakeTracker();
     }
 
     @NonNull
     private TrackerConfigurationUpdate getDirtyConfig() {
-        return serviceProvider.getTrackerConfigurationUpdate();
+        return this.getServiceProvider().getTrackerConfigurationUpdate();
     }
 }

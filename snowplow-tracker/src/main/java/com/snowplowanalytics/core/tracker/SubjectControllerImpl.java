@@ -152,10 +152,10 @@ public class SubjectControllerImpl extends Controller implements SubjectControll
     // Private methods
 
     private Subject getSubject() {
-        return serviceProvider.getOrMakeSubject();
+        return this.getServiceProvider().getOrMakeSubject();
     }
 
     private SubjectConfigurationUpdate getDirtyConfig() {
-        return serviceProvider.getSubjectConfigurationUpdate();
+        return this.getServiceProvider().getSubjectConfigurationUpdate();
     }
 }

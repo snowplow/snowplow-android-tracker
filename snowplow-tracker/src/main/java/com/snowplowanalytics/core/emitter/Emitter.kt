@@ -42,89 +42,253 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     private val TAG = Emitter::class.java.simpleName
     
     private val context: Context
-    /**
-     * @return the request callback method
-     */
-    /**
-     * @param requestCallback the callback request
-     */
-    var requestCallback: RequestCallback?
-    var httpMethod: HttpMethod
-    var bufferOption: BufferOption
-    private var requestSecurity: Protocol
+    private var uri: String
+    private var isCustomNetworkConnection = false
+    private var emptyCount = 0
+    private val timeUnit: TimeUnit
+    private val client: OkHttpClient?
+    private val cookieJar: CookieJar? = null
+    private val isRunning = AtomicBoolean(false)
+    private val isEmittingPaused = AtomicBoolean(false)
 
+    /**
+     * The emitter event store object
+     */
+    var eventStore: EventStore?
+        private set
+    
     /**
      * @return the TLS versions accepted for the emitter
      */
-    private val tlsVersions: EnumSet<TLSVersion>
-    private var uri: String
-    private var namespace: String? = null
+    val tlsVersions: EnumSet<TLSVersion>
 
     /**
-     * @return the emitter tick
+     * The emitter tick
      */
     val emitterTick: Int
 
     /**
-     * @return the amount of times the event store can be empty
-     * before it is shutdown.
+     * The amount of times the event store can be empty before it is shut down.
      */
     val emptyLimit: Int
 
     /**
-     * Sets the maximum amount of events to grab for an emit attempt.
-     * @param sendLimit The maximum possible amount of events.
+     * The maximum amount of events to grab for an emit attempt.
      */
     var sendLimit: Int
 
     /**
-     * @param byteLimitGet Set the GET byte limit
+     * The GET byte limit
      */
     var byteLimitGet: Long
 
     /**
-     * @param byteLimitPost Set the POST byte limit
+     * The POST byte limit
      */
     var byteLimitPost: Long
-    var emitTimeout: Int
-    private val timeUnit: TimeUnit
-    var customPostPath: String?
-    private val client: OkHttpClient?
-    private val cookieJar: CookieJar? = null
-    var serverAnonymisation: Boolean
-    private var isCustomNetworkConnection = false
-    val networkConnection = AtomicReference<NetworkConnection>()
-//        get() = field.get()
 
     /**
-     * @return the emitter event store object
+     * @return the request callback method
      */
-    var eventStore: EventStore?
-        private set
-    private var emptyCount = 0
-    val customRetryForStatusCodes = AtomicReference<Map<Int, Boolean>>()
-    private val isRunning = AtomicBoolean(false)
-    private val isEmittingPaused = AtomicBoolean(false)
+    var requestCallback: RequestCallback?
 
+    /**
+     * The emitter status
+     */
+    val emitterStatus: Boolean
+        get() = isRunning.get()
+
+    /**
+     * The URI for the Emitter
+     */
+    var emitterUri: String
+        get() = networkConnection?.uri.toString()
+        set(uri) {
+            if (!isCustomNetworkConnection) {
+                this.uri = uri
+                networkConnection =
+                    OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(emitTimeout)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+            }
+        }
+
+    /**
+     * The Emitters request method
+     */
+    var httpMethod: HttpMethod = EmitterDefaults.httpMethod
+        /**
+         * Sets the HttpMethod for the Emitter
+         * @param value the HttpMethod
+         */
+        set(value) {
+            if (!isCustomNetworkConnection) {
+                field = value
+                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(emitTimeout)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+                
+            }
+        }
+
+    /**
+     * The buffer option selected for the emitter
+     */
+    var bufferOption: BufferOption = EmitterDefaults.bufferOption
+        /**
+         * Whether the buffer should send events instantly or after the buffer has reached
+         * its limit. By default, this is set to BufferOption Default.
+         *
+         * @param option Set the BufferOption enum to Instant to send events upon creation.
+         */
+        set(option) {
+            if (!isRunning.get()) {
+                field = option
+            }
+        }
+
+    /**
+     * The request security selected for the emitter
+     */
+    var requestSecurity: Protocol = EmitterDefaults.requestSecurity
+        /**
+         * Sets the Protocol for the Emitter
+         * @param security the Protocol
+         */
+        set(security) {
+            if (!isCustomNetworkConnection) {
+                field = security
+                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(emitTimeout)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+                
+            }
+        }
+
+    var namespace: String? = null
+        set(namespace) {
+            field = namespace
+            if (eventStore == null) {
+                eventStore = namespace?.let { SQLiteEventStore(context, it) }
+            }
+        }
+
+    /**
+     * The timeout for the Emitter
+     */
+    var emitTimeout: Int = EmitterDefaults.emitTimeout
+        set(emitTimeout) {
+            if (!isCustomNetworkConnection) {
+                field = emitTimeout
+                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(emitTimeout)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+                
+            }
+        }
+    
+    /**
+     * The customPostPath for the Emitter
+     */
+    var customPostPath: String? = null
+        set(customPostPath) {
+            if (!isCustomNetworkConnection) {
+                field = customPostPath
+                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(emitTimeout)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+                
+            }
+        }
+    
+    private val _networkConnection = AtomicReference<NetworkConnection>()
+    /**
+     * The NetworkConnection if it exists
+     */
+    var networkConnection: NetworkConnection?
+        get() = _networkConnection.get()
+        private set(value) { _networkConnection.set(value) }
+
+    /**
+     * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+     */
+    var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
+        /**
+         * Updates the server anonymisation setting for the Emitter.
+         * Ignored if using a custom network connection.
+         * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+         */
+        set(serverAnonymisation) {
+            if (!isCustomNetworkConnection) {
+                field = serverAnonymisation
+                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                    .method(httpMethod)
+                    .tls(tlsVersions)
+                    .emitTimeout(emitTimeout)
+                    .customPostPath(customPostPath)
+                    .client(client)
+                    .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
+                    .build()
+            }
+        }
+
+    private val _customRetryForStatusCodes = AtomicReference<Map<Int, Boolean>>()
+    var customRetryForStatusCodes: Map<Int, Boolean>?
+        get() = _customRetryForStatusCodes.get()
+        set(value) {
+            _customRetryForStatusCodes.set(value ?: HashMap())
+        }
+    
     /**
      * Builder for the Emitter.
      */
     class EmitterBuilder {
         var requestCallback: RequestCallback? = null // Optional
-        var httpMethod = HttpMethod.POST // Optional
-        var bufferOption = BufferOption.DefaultGroup // Optional
-        var requestSecurity = Protocol.HTTP // Optional
-        var tlsVersions = EnumSet.of(TLSVersion.TLSv1_2) // Optional
-        var emitterTick = 5 // Optional
-        var sendLimit = 250 // Optional
-        var emptyLimit = 5 // Optional
-        var byteLimitGet: Long = 40000 // Optional
-        var byteLimitPost: Long = 40000 // Optional
-        var emitTimeout = 5 // Optional
-        var threadPoolSize = 2 // Optional
-        var serverAnonymisation = false // Optional
-        var timeUnit = TimeUnit.SECONDS
-        var client: OkHttpClient? = null //Optional
+        var httpMethod = EmitterDefaults.httpMethod // Optional
+        var bufferOption = EmitterDefaults.bufferOption // Optional
+        var requestSecurity = EmitterDefaults.requestSecurity // Optional
+        var tlsVersions = EmitterDefaults.tlsVersions // Optional
+        var emitterTick = EmitterDefaults.emitterTick // Optional
+        var sendLimit = EmitterDefaults.sendLimit // Optional
+        var emptyLimit = EmitterDefaults.emptyLimit // Optional
+        var byteLimitGet = EmitterDefaults.byteLimitGet // Optional
+        var byteLimitPost = EmitterDefaults.byteLimitPost // Optional
+        var emitTimeout = EmitterDefaults.emitTimeout // Optional
+        var threadPoolSize = EmitterDefaults.threadPoolSize // Optional
+        var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
+        var timeUnit = EmitterDefaults.timeUnit
+        var client: OkHttpClient? = null // Optional
         var cookieJar: CookieJar? = null // Optional
         var customPostPath: String? = null //Optional
         var networkConnection: NetworkConnection? = null // Optional
@@ -272,8 +436,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
 
         /**
          * @param client An OkHttp client that will be used in the emitter, you can provide your
-         * own if you want to share your Singleton client's interceptors, connection pool etc..
-         * ,otherwise a new one is created.
+         * own if you want to share your Singleton client's interceptors, connection pool etc.,
+         * otherwise a new one is created.
          * @return itself
          */
         fun client(client: OkHttpClient?): EmitterBuilder {
@@ -355,7 +519,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         serverAnonymisation = builder.serverAnonymisation
         httpMethod = builder.httpMethod
         customPostPath = builder.customPostPath
-        
+        customRetryForStatusCodes = builder.customRetryForStatusCodes
+
         if (builder.networkConnection == null) {
             isCustomNetworkConnection = false
             var endpoint = collectorUri
@@ -365,8 +530,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
                 endpoint = protocol + endpoint
             }
             uri = endpoint
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(endpoint, context)
+            networkConnection = OkHttpNetworkConnectionBuilder(endpoint, context)
                     .method(builder.httpMethod)
                     .tls(builder.tlsVersions)
                     .emitTimeout(builder.emitTimeout)
@@ -375,16 +539,15 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
                     .cookieJar(builder.cookieJar)
                     .serverAnonymisation(builder.serverAnonymisation)
                     .build()
-            )
         } else {
             isCustomNetworkConnection = true
-            setNetworkConnection(builder.networkConnection!!)
-        }
-        if (builder.threadPoolSize > 2) {
-            Executor.threadCount(builder.threadPoolSize)
+            networkConnection = builder.networkConnection!!
         }
         
-        setCustomRetryForStatusCodes(builder.customRetryForStatusCodes)
+        if (builder.threadPoolSize > 2) {
+            Executor.threadCount = builder.threadPoolSize
+        }
+        
         Logger.v(TAG, "Emitter created successfully!")
     }
     
@@ -403,7 +566,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             eventStore!!.add(payload)
             if (isRunning.compareAndSet(false, true)) {
                 try {
-                    attemptEmit(getNetworkConnection())
+                    attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
                     Logger.e(TAG, "Received error during emission process: %s", t)
@@ -420,7 +583,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         Executor.execute(TAG) {
             if (isRunning.compareAndSet(false, true)) {
                 try {
-                    attemptEmit(getNetworkConnection())
+                    attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
                     Logger.e(TAG, "Received error during emission process: %s", t)
@@ -512,7 +675,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             } catch (e: InterruptedException) {
                 Logger.e(TAG, "Emitter thread sleep interrupted: $e")
             }
-            attemptEmit(getNetworkConnection()) // at this point we update network connection since it might be outdated after sleep
+            attemptEmit(networkConnection) // at this point we update network connection since it might be outdated after sleep
             return
         }
         
@@ -532,7 +695,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             if (res.isSuccessful) {
                 removableEvents.addAll(res.eventIds)
                 successCount += res.eventIds.size
-            } else if (res.shouldRetry(customRetryForStatusCodes.get())) {
+            } else if (customRetryForStatusCodes?.let { res.shouldRetry(it) } == true) {
                 failedWillRetryCount += res.eventIds.size
                 Logger.e(TAG, "Request sending failed but we will retry later.")
             } else {
@@ -567,7 +730,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             Logger.e(TAG, "Emitter loop stopping: failures.")
             isRunning.compareAndSet(true, false)
         } else {
-            attemptEmit(getNetworkConnection()) // refresh network connection for next emit
+            attemptEmit(networkConnection) // refresh network connection for next emit
         }
     }
 
@@ -702,233 +865,6 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         payload.add(Parameters.SENT_TIMESTAMP, timestamp)
     }
     
-    // Setters, Getters and Checkers
-    
-    /**
-     * @return the emitter status
-     */
-    val emitterStatus: Boolean
-        get() = isRunning.get()
-
-    fun setNamespace(namespace: String) {
-        this.namespace = namespace
-        if (eventStore == null) {
-            eventStore = SQLiteEventStore(context, namespace)
-        }
-    }
-
-    /**
-     * Sets whether the buffer should send events instantly or after the buffer has reached
-     * it's limit. By default, this is set to BufferOption Default.
-     *
-     * @param option Set the BufferOption enum to Instant send events upon creation.
-     */
-    fun setBufferOption(option: BufferOption) {
-        if (!isRunning.get()) {
-            bufferOption = option
-        }
-    }
-
-    /**
-     * Sets the HttpMethod for the Emitter
-     *
-     * @param method the HttpMethod
-     */
-    fun setHttpMethod(method: HttpMethod) {
-        if (!isCustomNetworkConnection) {
-            httpMethod = method
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
-            )
-        }
-    }
-
-    /**
-     * Sets the Protocol for the Emitter
-     *
-     * @param security the Protocol
-     */
-    fun setRequestSecurity(security: Protocol) {
-        if (!isCustomNetworkConnection) {
-            requestSecurity = security
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
-            )
-        }
-    }
-
-    /**
-     * Updates the custom Post path for the Emitter
-     *
-     * @param customPostPath new Emitter custom Post path
-     */
-    fun setCustomPostPath(customPostPath: String?) {
-        if (!isCustomNetworkConnection) {
-            this.customPostPath = customPostPath
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
-            )
-        }
-    }
-
-    /**
-     * Updates the timeout for the Emitter
-     *
-     * @param emitTimeout new Emitter timeout
-     */
-    fun setEmitTimeout(emitTimeout: Int) {
-        if (!isCustomNetworkConnection) {
-            this.emitTimeout = emitTimeout
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
-            )
-        }
-    }
-
-    /**
-     * Updates the server anonymisation setting for the Emitter.
-     * Ignored if using a custom network connection.
-     *
-     * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
-     */
-    fun setServerAnonymisation(serverAnonymisation: Boolean) {
-        if (!isCustomNetworkConnection) {
-            this.serverAnonymisation = serverAnonymisation
-            setNetworkConnection(
-                OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
-            )
-        }
-    }
-    /**
-     * @return the emitter uri
-     */
-    /**
-     * Updates the URI for the Emitter
-     *
-     * @param uri new Emitter URI
-     */
-    var emitterUri: String
-        get() = getNetworkConnection()!!.uri.toString()
-        set(uri) {
-            if (!isCustomNetworkConnection) {
-                this.uri = uri
-                setNetworkConnection(
-                    OkHttpNetworkConnectionBuilder(uri, context)
-                        .method(httpMethod)
-                        .tls(tlsVersions)
-                        .emitTimeout(emitTimeout)
-                        .customPostPath(customPostPath)
-                        .client(client)
-                        .cookieJar(cookieJar)
-                        .serverAnonymisation(serverAnonymisation)
-                        .build()
-                )
-            }
-        }
-
-    /**
-     * @return the Emitters request method
-     */
-    fun getHttpMethod(): HttpMethod {
-        return httpMethod
-    }
-
-    /**
-     * @return the buffer option selected for the emitter
-     */
-    fun getBufferOption(): BufferOption {
-        return bufferOption
-    }
-
-    /**
-     * @return the request security selected for the emitter
-     */
-    fun getRequestSecurity(): Protocol {
-        return requestSecurity
-    }
-
-    /**
-     * @return the customPostPath
-     */
-    fun getCustomPostPath(): String? {
-        return customPostPath
-    }
-
-    /**
-     * @return the emitTimeout
-     */
-    fun getEmitTimeout(): Int {
-        return emitTimeout
-    }
-
-    /**
-     * @return whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
-     */
-    fun getServerAnonymisation(): Boolean {
-        return serverAnonymisation
-    }
-
-    /**
-     * @return the NetworkConnection if it exists
-     */
-    fun getNetworkConnection(): NetworkConnection? {
-        return networkConnection.get()
-    }
-
-    private fun setNetworkConnection(networkConnection: NetworkConnection) {
-        this.networkConnection.set(networkConnection)
-    }
-
-    fun getCustomRetryForStatusCodes(): Map<Int, Boolean> {
-        return customRetryForStatusCodes.get()
-    }
-
-    fun setCustomRetryForStatusCodes(customRetryForStatusCodes: Map<Int, Boolean>?) {
-        this.customRetryForStatusCodes.set(
-            customRetryForStatusCodes ?: HashMap()
-        )
-    }
-
     companion object {
         private const val POST_WRAPPER_BYTES =
             88 // "schema":"iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-3","data":[]

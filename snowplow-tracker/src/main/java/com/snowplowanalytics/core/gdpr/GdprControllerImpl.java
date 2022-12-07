@@ -98,11 +98,11 @@ public class GdprControllerImpl extends Controller implements GdprController {
 
     @NonNull
     private Tracker getTracker() {
-        return serviceProvider.getOrMakeTracker();
+        return this.getServiceProvider().getOrMakeTracker();
     }
 
     @NonNull
     private GdprConfigurationUpdate getDirtyConfig() {
-        return serviceProvider.getGdprConfigurationUpdate();
+        return this.getServiceProvider().getGdprConfigurationUpdate();
     }
 }

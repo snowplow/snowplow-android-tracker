@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.emitter.TLSArguments
 import com.snowplowanalytics.core.emitter.TLSVersion
@@ -47,13 +48,13 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         val uri: String,
         val context: Context
     ) {
-        var httpMethod = HttpMethod.POST // Optional
-        var tlsVersions = EnumSet.of(TLSVersion.TLSv1_2) // Optional
-        var emitTimeout = 5 // Optional
+        var httpMethod = EmitterDefaults.httpMethod // Optional
+        var tlsVersions = EmitterDefaults.tlsVersions // Optional
+        var emitTimeout = EmitterDefaults.emitTimeout // Optional
         var client: OkHttpClient? = null // Optional
         var cookieJar: CookieJar? = null // Optional
         var customPostPath: String? = null //Optional
-        var serverAnonymisation = false // Optional
+        var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
 
         /**
          * @param httpMethod The method by which requests are emitted
@@ -182,7 +183,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         // Configure with external OkHttpClient
         client = if (builder.client == null) {
             OkHttpClient.Builder()
-                .sslSocketFactory(tlsArguments.sslSocketFactory, tlsArguments.trustManager)
+                .sslSocketFactory(tlsArguments.sslSocketFactory!!, tlsArguments.trustManager!!)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
                 .cookieJar(builder.cookieJar ?: CollectorCookieJar(builder.context))

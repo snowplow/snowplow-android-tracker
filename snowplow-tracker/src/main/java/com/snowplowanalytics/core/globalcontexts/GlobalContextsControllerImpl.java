@@ -39,6 +39,6 @@ public class GlobalContextsControllerImpl extends Controller implements GlobalCo
     // Private methods
 
     private Tracker getTracker() {
-        return serviceProvider.getOrMakeTracker();
+        return this.getServiceProvider().getOrMakeTracker();
     }
 }

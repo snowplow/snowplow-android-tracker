@@ -119,7 +119,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         sessionConfigurationUpdate = new SessionConfigurationUpdate();
         gdprConfigurationUpdate = new GdprConfigurationUpdate();
         // Process configurations
-        networkConfigurationUpdate.sourceConfig = networkConfiguration;
+        networkConfigurationUpdate.setSourceConfig(networkConfiguration);
         trackerConfiguration = new TrackerConfiguration(appId);
         processConfigurations(configurations);
         if (trackerConfigurationUpdate.sourceConfig == null) {
@@ -156,7 +156,7 @@ public class ServiceProvider implements ServiceProviderInterface {
     private void processConfigurations(@NonNull List<Configuration> configurations) {
         for (Configuration configuration : configurations) {
             if (configuration instanceof NetworkConfiguration) {
-                networkConfigurationUpdate.sourceConfig = (NetworkConfiguration)configuration;
+                networkConfigurationUpdate.setSourceConfig((NetworkConfiguration) configuration);
                 continue;
             }
             if (configuration instanceof TrackerConfiguration) {
@@ -172,7 +172,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof EmitterConfiguration) {
-                emitterConfigurationUpdate.sourceConfig = (EmitterConfiguration)configuration;
+                emitterConfigurationUpdate.setSourceConfig((EmitterConfiguration) configuration);
                 continue;
             }
             if (configuration instanceof GdprConfiguration) {
@@ -216,7 +216,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         // Set a default trackerConfiguration to reset to default if not passed.
         trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         subjectConfigurationUpdate.sourceConfig = null;
-        emitterConfigurationUpdate.sourceConfig = null;
+        emitterConfigurationUpdate.setSourceConfig(null);
         sessionConfigurationUpdate.sourceConfig = null;
         gdprConfigurationUpdate.sourceConfig = null;
     }
@@ -402,7 +402,7 @@ public class ServiceProvider implements ServiceProviderInterface {
             endpoint = "";
         }
         Emitter emitter = new Emitter(context, endpoint, builder);
-        if (emitterConfigurationUpdate.isPaused) {
+        if (emitterConfigurationUpdate.isPaused()) {
             emitter.pauseEmit();
         }
         return emitter;

@@ -196,16 +196,16 @@ public class SessionControllerImpl extends Controller implements SessionControll
 
     @NonNull
     private Tracker getTracker() {
-        return serviceProvider.getOrMakeTracker();
+        return this.getServiceProvider().getOrMakeTracker();
     }
 
     @Nullable
     private Session getSession() {
-        return serviceProvider.getOrMakeTracker().getSession();
+        return this.getServiceProvider().getOrMakeTracker().getSession();
     }
 
     @NonNull
     private SessionConfigurationUpdate getDirtyConfig() {
-        return serviceProvider.getSessionConfigurationUpdate();
+        return this.getServiceProvider().getSessionConfigurationUpdate();
     }
 }

@@ -32,12 +32,12 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
     /**
      * @return the trust manager argument
      */
-    private var trustManager: X509TrustManager? = null
+    var trustManager: X509TrustManager? = null
 
     /**
      * @return the ssl socket factory argument
      */
-    private var sslSocketFactory: SSLSocketFactory? = null
+    var sslSocketFactory: SSLSocketFactory? = null
 
     
     init {

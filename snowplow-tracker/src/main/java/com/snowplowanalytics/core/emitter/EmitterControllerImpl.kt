@@ -59,8 +59,8 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         set(requestCallback) { emitter.requestCallback = requestCallback }
     
     override var customRetryForStatusCodes: Map<Int, Boolean>?
-        get() = emitter.customRetryForStatusCodes as Map<Int, Boolean>?
-        set(customRetryForStatusCodes) { emitter.setCustomRetryForStatusCodes(customRetryForStatusCodes) }
+        get() = emitter.customRetryForStatusCodes
+        set(customRetryForStatusCodes) { emitter.customRetryForStatusCodes = customRetryForStatusCodes }
 
     override var isServerAnonymisation: Boolean
         get() = emitter.serverAnonymisation

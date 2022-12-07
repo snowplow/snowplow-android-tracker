@@ -27,24 +27,20 @@ import java.util.concurrent.Future
 object Executor {
     private var executor: ExecutorService? = null
     
-    
     var threadCount = 2 // Minimum amount of threads.
-
-    /**
-     * Changes the amount of threads the
-     * scheduler will be able to use.
-     *
-     * NOTE: This can only be set before the
-     * scheduler is first accessed, after this
-     * point the function will not effect anything.
-     *
-     * @param count the thread count
-     */
-    fun threadCount(count: Int) {
-        if (count >= 2) {
-            threadCount = count
+        /**
+         * Changes the amount of threads the scheduler will be able to use.
+         *
+         * NOTE: This can only be set before the scheduler is first accessed, 
+         * after this point it will not effect anything.
+         *
+         * @param count the thread count
+         */
+        set(count) {
+            if (count >= 2) {
+                field = count
+            }
         }
-    }
 
     /**
      * If the executor is null creates a
@@ -68,6 +64,7 @@ object Executor {
      * exceptions raised by the runnable
      * @param runnable the runnable to be queued
      */
+    @JvmStatic
     fun execute(tag: String?, runnable: Runnable?) {
         execute(false, tag, runnable)
     }
@@ -80,6 +77,7 @@ object Executor {
      * exceptions raised by the runnable
      * @param runnable the runnable to be queued
      */
+    @JvmStatic
     fun execute(reportsOnDiagnostic: Boolean, tag: String?, runnable: Runnable?) {
         val loggerTag: String = tag ?: "Source not provided"
         execute(runnable) { t: Throwable? ->
