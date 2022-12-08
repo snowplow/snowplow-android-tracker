@@ -51,7 +51,7 @@ public class ServiceProviderTest {
         trackerConfig.screenViewAutotracking = false;
         trackerConfig.diagnosticAutotracking = false;
         MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
-        networkConfig.networkConnection = networkConnection;
+        networkConfig.setNetworkConnection(networkConnection);
         List<Configuration> configurations = new ArrayList<>();
         configurations.add(trackerConfig);
         ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, configurations);
@@ -83,7 +83,7 @@ public class ServiceProviderTest {
     public void testLogsErrorWhenAccessingShutDownTracker() {
         NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme", POST);
         MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
-        networkConfig.networkConnection = networkConnection;
+        networkConfig.setNetworkConnection(networkConnection);
         ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, new ArrayList<>());
 
         // listen for the error log

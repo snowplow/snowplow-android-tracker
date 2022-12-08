@@ -63,7 +63,7 @@ object Snowplow {
     fun setup(
         context: Context,
         remoteConfiguration: RemoteConfiguration,
-        defaultBundles: List<ConfigurationBundle?>?,
+        defaultBundles: MutableList<ConfigurationBundle>?,
         onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
     ) {
         configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles)

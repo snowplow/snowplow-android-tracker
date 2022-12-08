@@ -61,13 +61,13 @@ public class RemoteConfigurationTest {
 
         FetchedConfigurationBundle fetchedConfigurationBundle = new FetchedConfigurationBundle(context, json);
         assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
-                fetchedConfigurationBundle.schema);
+                fetchedConfigurationBundle.getSchema());
 
-        assertEquals(12, fetchedConfigurationBundle.configurationVersion);
-        assertEquals(2, fetchedConfigurationBundle.configurationBundle.size());
+        assertEquals(12, fetchedConfigurationBundle.getConfigurationVersion());
+        assertEquals(2, fetchedConfigurationBundle.getConfigurationBundle().size());
 
         // Regular setup
-        ConfigurationBundle configurationBundle = fetchedConfigurationBundle.configurationBundle.get(0);
+        ConfigurationBundle configurationBundle = fetchedConfigurationBundle.getConfigurationBundle().get(0);
         assertEquals("default1", configurationBundle.namespace);
         assertNotNull(configurationBundle.networkConfiguration);
         assertNotNull(configurationBundle.trackerConfiguration);
@@ -81,7 +81,7 @@ public class RemoteConfigurationTest {
         assertEquals(60, sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
 
         // Regular setup without NetworkConfiguration
-        configurationBundle = fetchedConfigurationBundle.configurationBundle.get(1);
+        configurationBundle = fetchedConfigurationBundle.getConfigurationBundle().get(1);
         assertEquals("default2", configurationBundle.namespace);
         assertNull(configurationBundle.networkConfiguration);
         assertNotNull(configurationBundle.subjectConfiguration);
@@ -100,7 +100,7 @@ public class RemoteConfigurationTest {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(endpoint, HttpMethod.GET);
         new ConfigurationFetcher(context, remoteConfig, fetchedConfigurationBundle -> {
             assertNotNull(fetchedConfigurationBundle);
-            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.schema);
+            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0", fetchedConfigurationBundle.getSchema());
             synchronized (expectation) {
                 expectation.notify();
             }
@@ -118,8 +118,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("test");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle expected = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        expected.configurationVersion = 12;
-        expected.configurationBundle = Lists.newArrayList(bundle);
+        expected.setConfigurationVersion(12);
+        expected.setConfigurationBundle(Lists.newArrayList(bundle));
 
         RemoteConfiguration remoteConfiguration = new RemoteConfiguration("http://example.com", HttpMethod.GET);
         ConfigurationCache cache = new ConfigurationCache(remoteConfiguration);
@@ -129,11 +129,11 @@ public class RemoteConfigurationTest {
         cache = new ConfigurationCache(remoteConfiguration);
         FetchedConfigurationBundle config = cache.readCache(context);
 
-        assertEquals(expected.configurationVersion, config.configurationVersion);
-        assertEquals(expected.schema, config.schema);
-        assertEquals(expected.configurationBundle.size(), config.configurationBundle.size());
-        ConfigurationBundle expectedBundle = expected.configurationBundle.get(0);
-        ConfigurationBundle configBundle = config.configurationBundle.get(0);
+        assertEquals(expected.getConfigurationVersion(), config.getConfigurationVersion());
+        assertEquals(expected.getSchema(), config.getSchema());
+        assertEquals(expected.getConfigurationBundle().size(), config.getConfigurationBundle().size());
+        ConfigurationBundle expectedBundle = expected.getConfigurationBundle().get(0);
+        ConfigurationBundle configBundle = config.getConfigurationBundle().get(0);
         assertEquals(expectedBundle.networkConfiguration.getEndpoint(), configBundle.networkConfiguration.getEndpoint());
         assertNull(configBundle.trackerConfiguration);
     }
@@ -215,8 +215,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        cached.configurationVersion = 1;
-        cached.configurationBundle = Lists.newArrayList(bundle);
+        cached.setConfigurationVersion(1);
+        cached.setConfigurationBundle(Lists.newArrayList(bundle));
         cache.writeCache(context, cached);
 
         // test
@@ -226,10 +226,10 @@ public class RemoteConfigurationTest {
         provider.retrieveConfiguration(context, false, pair -> {
             FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
             assertEquals(ConfigurationState.CACHED, pair.second);
-            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+            if (i[0] == 1 || fetchedConfigurationBundle.getSchema().equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                 fail();
             }
-            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+            if (i[0] == 0 && fetchedConfigurationBundle.getSchema().equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
                 i[0]++;
             }
         });
@@ -253,8 +253,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        cached.configurationVersion = 1;
-        cached.configurationBundle = Lists.newArrayList(bundle);
+        cached.setConfigurationVersion(1);
+        cached.setConfigurationBundle(Lists.newArrayList(bundle));
         cache.writeCache(context, cached);
 
         // test
@@ -267,10 +267,10 @@ public class RemoteConfigurationTest {
                     i[0] == 0 ? ConfigurationState.CACHED : ConfigurationState.FETCHED,
                     pair.second
             );
-            if (i[0] == 1 || fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+            if (i[0] == 1 || fetchedConfigurationBundle.getSchema().equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                 i[0]++;
             }
-            if (i[0] == 0 && fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
+            if (i[0] == 0 && fetchedConfigurationBundle.getSchema().equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")) {
                 i[0]++;
             }
         });
@@ -294,8 +294,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        cached.configurationVersion = 1;
-        cached.configurationBundle = Lists.newArrayList(bundle);
+        cached.setConfigurationVersion(1);
+        cached.setConfigurationBundle(Lists.newArrayList(bundle));
         cache.writeCache(context, cached);
 
         final Object expectation = new Object();
@@ -339,8 +339,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        cached.configurationVersion = 1;
-        cached.configurationBundle = Lists.newArrayList(bundle);
+        cached.setConfigurationVersion(1);
+        cached.setConfigurationBundle(Lists.newArrayList(bundle));
         cache.writeCache(context, cached);
 
         final Object expectation = new Object();
@@ -366,7 +366,7 @@ public class RemoteConfigurationTest {
         final int[] j = {0}; // Needed to make it accessible inside the closure.
         provider.retrieveConfiguration(context, true, pair -> {
             FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
-            if (fetchedConfigurationBundle.schema.equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
+            if (fetchedConfigurationBundle.getSchema().equals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0")) {
                 j[0]++;
                 assertEquals(ConfigurationState.FETCHED, pair.second);
                 synchronized (expectation2) {
@@ -393,8 +393,8 @@ public class RemoteConfigurationTest {
         ConfigurationBundle bundle = new ConfigurationBundle("namespace");
         bundle.networkConfiguration = new NetworkConfiguration("endpoint");
         FetchedConfigurationBundle cached = new FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0");
-        cached.configurationVersion = 2;
-        cached.configurationBundle = Lists.newArrayList(bundle);
+        cached.setConfigurationVersion(2);
+        cached.setConfigurationBundle(Lists.newArrayList(bundle));
         cache.writeCache(context, cached);
 
         // stub request for configuration (return version 1)
@@ -410,8 +410,8 @@ public class RemoteConfigurationTest {
             FetchedConfigurationBundle fetchedConfigurationBundle = pair.first;
             numCallbackCalls[0]++;
             // should be the non-cache configuration (version 1)
-            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0", fetchedConfigurationBundle.schema);
-            assertEquals(1, fetchedConfigurationBundle.configurationVersion);
+            assertEquals("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0", fetchedConfigurationBundle.getSchema());
+            assertEquals(1, fetchedConfigurationBundle.getConfigurationVersion());
         });
         synchronized (expectation) {
             expectation.wait(5000);
