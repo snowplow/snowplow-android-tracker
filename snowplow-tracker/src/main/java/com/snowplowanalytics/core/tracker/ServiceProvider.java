@@ -167,7 +167,7 @@ public class ServiceProvider implements ServiceProviderInterface {
                 continue;
             }
             if (configuration instanceof SessionConfiguration) {
-                sessionConfigurationUpdate.sourceConfig = (SessionConfiguration)configuration;
+                sessionConfigurationUpdate.setSourceConfig((SessionConfiguration) configuration);
                 continue;
             }
             if (configuration instanceof EmitterConfiguration) {
@@ -216,7 +216,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         trackerConfigurationUpdate.sourceConfig = new TrackerConfiguration(appId);
         subjectConfigurationUpdate.sourceConfig = null;
         emitterConfigurationUpdate.setSourceConfig(null);
-        sessionConfigurationUpdate.sourceConfig = null;
+        sessionConfigurationUpdate.setSourceConfig(null);
         gdprConfigurationUpdate.sourceConfig = null;
     }
 
@@ -448,14 +448,14 @@ public class ServiceProvider implements ServiceProviderInterface {
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking();
         }
-        if (sessionConfigurationUpdate.isPaused) {
+        if (sessionConfigurationUpdate.isPaused()) {
             tracker.pauseSessionChecking();
         }
         Session session = tracker.getSession();
         if (session != null) {
-            Consumer<SessionState> onSessionUpdate = sessionConfigurationUpdate.getOnSessionUpdate();
+            Consumer<SessionState> onSessionUpdate = sessionConfigurationUpdate.onSessionUpdate();
             if (onSessionUpdate != null) {
-                session.onSessionUpdate = onSessionUpdate;
+                session.setOnSessionUpdate(onSessionUpdate);
             }
         }
         return tracker;
