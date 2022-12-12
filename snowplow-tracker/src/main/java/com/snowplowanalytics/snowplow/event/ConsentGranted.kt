@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Tracker
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
 
@@ -55,9 +54,10 @@ class ConsentGranted(expiry: String, documentId: String, documentVersion: String
      * Creates a consent granted event with a first document.
      */
     init {
-        Preconditions.checkArgument(expiry.isNotEmpty(), "Expiry cannot be empty")
-        Preconditions.checkArgument(documentId.isNotEmpty(), "Document ID cannot be empty")
-        Preconditions.checkArgument(documentVersion.isNotEmpty(), "Document version cannot be empty")
+        require(expiry.isNotEmpty()) { "Expiry cannot be empty" }
+        require(documentId.isNotEmpty()) { "Document ID cannot be empty" }
+        require(documentVersion.isNotEmpty()) { "Document version cannot be empty" }
+        
         this.expiry = expiry
         this.documentId = documentId
         this.documentVersion = documentVersion

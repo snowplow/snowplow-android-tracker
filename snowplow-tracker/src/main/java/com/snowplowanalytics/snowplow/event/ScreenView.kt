@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Logger
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.core.utils.Util
 import java.util.*
 
@@ -73,9 +72,10 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
     var activityTag: String? = null
     
     init {
-        Preconditions.checkArgument(name.isNotEmpty(), "Name cannot be empty.")
+        require(name.isNotEmpty()) { "Name cannot be empty" }
+
         this.name = name
-        id = screenId?.toString() ?: Util.getUUIDString()
+        id = screenId?.toString() ?: Util.uUIDString
     }
     
     // Builder methods

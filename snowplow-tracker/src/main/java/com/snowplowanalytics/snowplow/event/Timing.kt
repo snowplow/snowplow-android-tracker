@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** A timing event.  */
 class Timing(category: String, variable: String, timing: Int) : AbstractSelfDescribing() {
@@ -28,8 +27,9 @@ class Timing(category: String, variable: String, timing: Int) : AbstractSelfDesc
     var label: String? = null
 
     init {
-        Preconditions.checkArgument(category.isNotEmpty(), "category cannot be empty")
-        Preconditions.checkArgument(variable.isNotEmpty(), "variable cannot be empty")
+        require(category.isNotEmpty()) { "category cannot be empty" }
+        require(variable.isNotEmpty()) { "variable cannot be empty" }
+        
         this.category = category
         this.variable = variable
         this.timing = timing

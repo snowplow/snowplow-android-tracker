@@ -750,7 +750,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         httpMethod: HttpMethod
     ): List<Request> {
         val requests: MutableList<Request> = ArrayList()
-        val sendingTime = Util.getTimestamp()
+        val sendingTime = Util.timestamp
         
         if (httpMethod === HttpMethod.GET) {
             for (event in events) {

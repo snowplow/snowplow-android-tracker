@@ -25,7 +25,6 @@ import com.snowplowanalytics.snowplow.network.Protocol;
 import com.snowplowanalytics.core.session.FileStore;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.core.tracker.Logger;
-import com.snowplowanalytics.core.utils.Preconditions;
 import com.snowplowanalytics.core.utils.Util;
 
 import java.lang.reflect.Constructor;
@@ -42,7 +41,6 @@ public class NoiseTest extends AndroidTestCase {
 
     public void testPrivateConstructor() {
         NoiseTest.superficialPrivateConstructorCodeCoverage(Logger.class);
-        NoiseTest.superficialPrivateConstructorCodeCoverage(Preconditions.class);
         NoiseTest.superficialPrivateConstructorCodeCoverage(FileStore.class);
         NoiseTest.superficialPrivateConstructorCodeCoverage(Util.class);
         NoiseTest.superficialPrivateConstructorCodeCoverage(Executor.class);

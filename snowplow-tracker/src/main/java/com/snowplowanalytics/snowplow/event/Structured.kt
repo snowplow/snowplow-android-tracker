@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** A Structured event.  */
 class Structured(category: String, action: String) : AbstractPrimitive() {
@@ -30,8 +29,9 @@ class Structured(category: String, action: String) : AbstractPrimitive() {
     var value: Double? = null
 
     init {
-        Preconditions.checkArgument(category.isNotEmpty(), "category cannot be empty")
-        Preconditions.checkArgument(action.isNotEmpty(), "action cannot be empty")
+        require(category.isNotEmpty()) { "category cannot be empty" }
+        require(action.isNotEmpty()) { "action cannot be empty" }
+        
         this.category = category
         this.action = action
     }

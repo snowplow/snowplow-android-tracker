@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Tracker
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** An ecommerce event. 
  * @param orderId Identifier of the order.
@@ -72,7 +71,8 @@ class EcommerceTransaction(
      * Creates an ecommerce event.
      */
     init {
-        Preconditions.checkArgument(orderId.isNotEmpty(), "orderId cannot be empty")
+        require(orderId.isNotEmpty()) { "orderId cannot be empty" }
+        
         this.orderId = orderId
         this.totalValue = totalValue
         this.items = ArrayList(items)

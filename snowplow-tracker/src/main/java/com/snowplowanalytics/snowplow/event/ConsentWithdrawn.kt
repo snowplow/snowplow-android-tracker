@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Tracker
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
 
@@ -55,8 +54,9 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
      * Creates a consent withdrawn event.
      */
     init {
-        Preconditions.checkArgument(documentId.isNotEmpty(), "Document ID cannot be empty")
-        Preconditions.checkArgument(documentVersion.isNotEmpty(), "Document version cannot be empty")
+        require(documentId.isNotEmpty()) { "Document ID cannot be empty" }
+        require(documentVersion.isNotEmpty()) { "Document version cannot be empty" }
+        
         this.all = all
         this.documentId = documentId
         this.documentVersion = documentVersion

@@ -179,7 +179,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     @Synchronized
     private fun updateSession(eventId: String, eventTimestamp: Long) {
         isNewSession.set(false)
-        val currentSessionId = Util.getUUIDString()
+        val currentSessionId = Util.uUIDString
         val eventTimestampDateTime = Util.getDateTimeFromTimestamp(eventTimestamp)
         
         var sessionIndex = 1
@@ -409,7 +409,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
 
         @Synchronized
         private fun retrieveUserId(context: Context, state: SessionState?): String {
-            var userId: String = state?.userId ?: Util.getUUIDString()
+            var userId: String = state?.userId ?: Util.uUIDString
             
             // Session_UserID is available only if the session context is enabled.
             // In a future version we would like to make it available even if the session context is disabled.

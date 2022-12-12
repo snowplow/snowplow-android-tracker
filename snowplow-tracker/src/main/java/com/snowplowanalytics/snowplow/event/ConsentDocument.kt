@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** A consent document event.  
  * @param documentId identifier of the document.
@@ -41,8 +40,9 @@ class ConsentDocument(documentId: String, documentVersion: String) : AbstractSel
      * Create a consent document event.
      */
     init {
-        Preconditions.checkArgument(documentId.isNotEmpty(), "Document ID cannot be empty")
-        Preconditions.checkArgument(documentVersion.isNotEmpty(), "Document version cannot be empty")
+        require(documentId.isNotEmpty()) { "Document ID cannot be empty" }
+        require(documentVersion.isNotEmpty()) { "Document version cannot be empty" }
+
         this.documentId = documentId
         this.documentVersion = documentVersion
     }

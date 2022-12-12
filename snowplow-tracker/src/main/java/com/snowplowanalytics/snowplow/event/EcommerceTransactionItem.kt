@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** An ecommerce item event.  
  * @param sku Stock Keeping Unit of the item.
@@ -54,7 +53,8 @@ class EcommerceTransactionItem(sku: String, price: Double, quantity: Int) : Abst
      * Creates an ecommerce item event.
      */
     init {
-        Preconditions.checkArgument(sku.isNotEmpty(), "sku cannot be empty")
+        require(sku.isNotEmpty()) { "sku cannot be empty" }
+        
         this.sku = sku
         this.price = price
         this.quantity = quantity

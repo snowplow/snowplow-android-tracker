@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
