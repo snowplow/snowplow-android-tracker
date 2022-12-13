@@ -410,7 +410,7 @@ public class Tracker {
 
     private final NotificationCenter.FunctionalObserver receiveLifecycleNotification = new NotificationCenter.FunctionalObserver() {
         @Override
-        public void apply(@NonNull Map<String, Object> data) {
+        public void apply(@NonNull Map<String, ?> data) {
             Session session = getSession();
             if (session == null || !lifecycleEvents) {
                 return;
@@ -433,7 +433,7 @@ public class Tracker {
     };
     private final NotificationCenter.FunctionalObserver receiveScreenViewNotification = new NotificationCenter.FunctionalObserver() {
         @Override
-        public void apply(@NonNull Map<String, Object> data) {
+        public void apply(@NonNull Map<String, ?> data) {
             if (activityTracking) {
                 Event event = (Event) data.get("event");
                 if (event != null) {
@@ -444,7 +444,7 @@ public class Tracker {
     };
     private final NotificationCenter.FunctionalObserver receiveInstallNotification = new NotificationCenter.FunctionalObserver() {
         @Override
-        public void apply(@NonNull Map<String, Object> data) {
+        public void apply(@NonNull Map<String, ?> data) {
             if (installTracking) {
                 Event event = (Event) data.get("event");
                 if (event != null) {
@@ -455,7 +455,7 @@ public class Tracker {
     };
     private final NotificationCenter.FunctionalObserver receiveDiagnosticNotification = new NotificationCenter.FunctionalObserver() {
         @Override
-        public void apply(@NonNull Map<String, Object> data) {
+        public void apply(@NonNull Map<String, ?> data) {
             if (trackerDiagnostic) {
                 Event event = (Event) data.get("event");
                 if (event != null) {
@@ -466,7 +466,7 @@ public class Tracker {
     };
     private final NotificationCenter.FunctionalObserver receiveCrashReportingNotification = new NotificationCenter.FunctionalObserver() {
         @Override
-        public void apply(@NonNull Map<String, Object> data) {
+        public void apply(@NonNull Map<String, ?> data) {
             if (applicationCrash) {
                 Event event = (Event) data.get("event");
                 if (event != null) {

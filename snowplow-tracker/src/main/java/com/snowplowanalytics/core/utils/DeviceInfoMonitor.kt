@@ -61,10 +61,12 @@ open class DeviceInfoMonitor {
                 "com.google.android.gms.ads.identifier.AdvertisingIdClient",
                 "getAdvertisingIdInfo", arrayOf(Context::class.java), context
             )
-            val limitedTracking = invokeInstanceMethod(
-                advertisingInfoObject,
-                "isLimitAdTrackingEnabled", null
-            ) as Boolean
+            val limitedTracking = advertisingInfoObject?.let {
+                invokeInstanceMethod(
+                    it,
+                    "isLimitAdTrackingEnabled", null
+                )
+            } as Boolean
             if (limitedTracking) {
                 ""
             } else invokeInstanceMethod(advertisingInfoObject, "getId", null) as String
@@ -206,7 +208,7 @@ open class DeviceInfoMonitor {
         private fun invokeInstanceMethod(
             instance: Any, methodName: String,
             cArgs: Array<Class<*>>?, vararg args: Any
-        ): Any {
+        ): Any? {
             val classObject: Class<*> = instance.javaClass
             return invokeMethod(classObject, methodName, instance, cArgs, *args)
         }
@@ -226,7 +228,7 @@ open class DeviceInfoMonitor {
         private fun invokeStaticMethod(
             className: String, methodName: String,
             cArgs: Array<Class<*>>, vararg args: Any
-        ): Any {
+        ): Any? {
             val classObject = Class.forName(className)
             return invokeMethod(classObject, methodName, null, cArgs, *args)
         }
@@ -246,8 +248,12 @@ open class DeviceInfoMonitor {
         private fun invokeMethod(
             classObject: Class<*>, methodName: String, instance: Any?,
             cArgs: Array<Class<*>>?, vararg args: Any
-        ): Any {
-            val methodObject = classObject.getMethod(methodName, *cArgs)
+        ): Any? {
+            val methodObject = if (cArgs == null) {
+                classObject.getMethod(methodName)
+            } else {
+                classObject.getMethod(methodName, *cArgs)
+            }
             return methodObject.invoke(instance, *args)
         }
     }

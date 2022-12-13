@@ -286,7 +286,7 @@ class Demo : Activity(), LoggerDelegate {
             "this is a demo document description"
         )
         val gcConfiguration = GlobalContextsConfiguration(null)
-        val pairs: Map<String, Any> = HashMap()
+        val pairs: MutableMap<String, Any> = HashMap()
         Util.addToMap("id", "snowplow", pairs)
         Util.addToMap("email", "info@snowplow.io", pairs)
         gcConfiguration.add(

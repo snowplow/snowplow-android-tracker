@@ -289,7 +289,7 @@ object Util {
      * @return the byte array or null
      */
     @JvmStatic
-    fun serialize(map: Map<String?, String?>): ByteArray? {
+    fun serialize(map: Map<String, String>): ByteArray? {
         var newByteArray: ByteArray? = null
         try {
             val memOut = ByteArrayOutputStream()
