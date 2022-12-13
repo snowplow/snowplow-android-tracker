@@ -52,6 +52,8 @@ class ActivityLifecycleHandler private constructor(context: Context) :
     companion object {
         private val TAG = ActivityLifecycleHandler::class.java.simpleName
         private var sharedInstance: ActivityLifecycleHandler? = null
+        
+        @JvmStatic
         @Synchronized
         fun getInstance(context: Context): ActivityLifecycleHandler {
             if (sharedInstance == null) {
