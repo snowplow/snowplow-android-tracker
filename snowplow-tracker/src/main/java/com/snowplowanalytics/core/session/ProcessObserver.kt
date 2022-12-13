@@ -30,8 +30,8 @@ class ProcessObserver private constructor() : DefaultLifecycleObserver {
         NONE, IN_PROGRESS, COMPLETE
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onEnterForeground() {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         Logger.d(TAG, "App enter foreground")
         try {
             val notificationData: MutableMap<String, Any> = HashMap()
@@ -42,8 +42,8 @@ class ProcessObserver private constructor() : DefaultLifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onEnterBackground() {
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
         Logger.d(TAG, "App enter background")
         try {
             val notificationData: MutableMap<String, Any> = HashMap()
