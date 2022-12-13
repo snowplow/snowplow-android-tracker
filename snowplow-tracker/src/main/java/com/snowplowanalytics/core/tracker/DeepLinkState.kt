@@ -10,23 +10,8 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.core.tracker
 
-package com.snowplowanalytics.core.tracker;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-public class DeepLinkState implements State {
-
-    @NonNull
-    public final String url;
-    @Nullable
-    public final String referrer;
-
-    public boolean readyForOutput = false;
-
-    public DeepLinkState(@NonNull String url, @Nullable String referrer) {
-        this.url = url;
-        this.referrer = referrer;
-    }
+class DeepLinkState(val url: String, val referrer: String?) : State {
+    var readyForOutput = false
 }
