@@ -31,8 +31,8 @@ public class NotificationCenterTest {
         // Add observer
         NotificationCenter.addObserver("notification", new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[0] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[0] = (Map<String, Object>) data;
             }
         });
 
@@ -53,8 +53,8 @@ public class NotificationCenterTest {
         // Add observer
         NotificationCenter.FunctionalObserver observer = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[0] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[0] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.addObserver("notification", observer);
@@ -79,20 +79,20 @@ public class NotificationCenterTest {
         // Add observer
         NotificationCenter.FunctionalObserver observer0 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[0] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[0] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer1 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[1] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[1] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer2 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[2] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[2] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.addObserver("notification", observer0);
@@ -121,38 +121,38 @@ public class NotificationCenterTest {
         // Add observers
         NotificationCenter.FunctionalObserver observer0 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[0] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[0] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer1 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[1] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[1] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer2 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[2] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[2] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer3 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[3] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[3] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer4 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[4] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[4] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.FunctionalObserver observer5 = new NotificationCenter.FunctionalObserver() {
             @Override
-            public void apply(@NonNull Map<String, Object> data) {
-                testResult[5] = data;
+            public void apply(@NonNull Map<String, ?> data) {
+                testResult[5] = (Map<String, Object>) data;
             }
         };
         NotificationCenter.addObserver("notification1", observer0);

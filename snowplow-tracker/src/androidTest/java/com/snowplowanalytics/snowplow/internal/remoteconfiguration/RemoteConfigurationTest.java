@@ -78,7 +78,7 @@ public class RemoteConfigurationTest {
         TrackerConfiguration trackerConfiguration = configurationBundle.trackerConfiguration;
         assertFalse(trackerConfiguration.applicationContext);
         SessionConfiguration sessionConfiguration = configurationBundle.sessionConfiguration;
-        assertEquals(60, sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS));
+        assertEquals(60, sessionConfiguration.getForegroundTimeout().convert(TimeUnit.SECONDS));
 
         // Regular setup without NetworkConfiguration
         configurationBundle = fetchedConfigurationBundle.getConfigurationBundle().get(1);
