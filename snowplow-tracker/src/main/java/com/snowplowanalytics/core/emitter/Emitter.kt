@@ -13,6 +13,8 @@
 package com.snowplowanalytics.core.emitter
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
@@ -33,64 +35,97 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
 
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
  */
-class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) {
+@RequiresApi(Build.VERSION_CODES.N)
+class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>) {
     private val TAG = Emitter::class.java.simpleName
-    
-    private val context: Context
-    private var uri: String
-    private var isCustomNetworkConnection = false
-    private var emptyCount = 0
-    private val timeUnit: TimeUnit
-    private val client: OkHttpClient?
-    private val cookieJar: CookieJar? = null
+
+    private var builderFinished = false
     private val isRunning = AtomicBoolean(false)
     private val isEmittingPaused = AtomicBoolean(false)
+    private var isCustomNetworkConnection = false
+    
+    private val context: Context
+    private lateinit var uri: String
+    private var emptyCount = 0
+    
+    var timeUnit: TimeUnit = EmitterDefaults.timeUnit
+        set(unit) {
+            if (!builderFinished) {
+                field = unit
+            }
+        }
 
+    var cookieJar: CookieJar? = null
+        set(cookieJar) {
+            if (!builderFinished) {
+                field = cookieJar
+            }
+        }
+    
+    var threadPoolSize = EmitterDefaults.threadPoolSize
+        set(poolSize) {
+            if (!builderFinished) {
+                field = poolSize
+            }
+        }
+
+    var client: OkHttpClient? = null
+        set(client) {
+            if (!builderFinished) {
+                field = client
+            }
+        }
+    
     /**
      * The emitter event store object
      */
-    var eventStore: EventStore?
-        private set
+    var eventStore: EventStore? = null
+        set(eventStore) {
+            if (!builderFinished) {
+                field = eventStore
+            }
+        }
     
     /**
      * @return the TLS versions accepted for the emitter
      */
-    val tlsVersions: EnumSet<TLSVersion>
+    var tlsVersions: EnumSet<TLSVersion> = EmitterDefaults.tlsVersions
 
     /**
      * The emitter tick
      */
-    val emitterTick: Int
+    var emitterTick: Int = EmitterDefaults.emitterTick
 
     /**
      * The amount of times the event store can be empty before it is shut down.
      */
-    val emptyLimit: Int
+    var emptyLimit: Int = EmitterDefaults.emptyLimit
 
     /**
      * The maximum amount of events to grab for an emit attempt.
      */
-    var sendLimit: Int
+    var sendLimit: Int = EmitterDefaults.sendLimit
 
     /**
      * The GET byte limit
      */
-    var byteLimitGet: Long
+    var byteLimitGet: Long = EmitterDefaults.byteLimitGet
 
     /**
      * The POST byte limit
      */
-    var byteLimitPost: Long
+    var byteLimitPost: Long = EmitterDefaults.byteLimitPost
 
     /**
      * @return the request callback method
      */
-    var requestCallback: RequestCallback?
+    var requestCallback: RequestCallback? = null
 
     /**
      * The emitter status
@@ -104,8 +139,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     var emitterUri: String
         get() = networkConnection?.uri.toString()
         set(uri) {
-            if (!isCustomNetworkConnection) {
-                this.uri = uri
+            this.uri = uri
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection =
                     OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
@@ -125,11 +160,11 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
     var httpMethod: HttpMethod = EmitterDefaults.httpMethod
         /**
          * Sets the HttpMethod for the Emitter
-         * @param value the HttpMethod
+         * @param method the HttpMethod
          */
-        set(value) {
-            if (!isCustomNetworkConnection) {
-                field = value
+        set(method) {
+            field = method
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
@@ -168,8 +203,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
          * @param security the Protocol
          */
         set(security) {
-            if (!isCustomNetworkConnection) {
-                field = security
+            field = security
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
@@ -196,8 +231,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      */
     var emitTimeout: Int = EmitterDefaults.emitTimeout
         set(emitTimeout) {
-            if (!isCustomNetworkConnection) {
-                field = emitTimeout
+            field = emitTimeout
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
@@ -216,8 +251,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      */
     var customPostPath: String? = null
         set(customPostPath) {
-            if (!isCustomNetworkConnection) {
-                field = customPostPath
+            field = customPostPath
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
@@ -237,7 +272,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
      */
     var networkConnection: NetworkConnection?
         get() = _networkConnection.get()
-        private set(value) { _networkConnection.set(value) }
+        set(value) { _networkConnection.set(value) }
 
     /**
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
@@ -249,8 +284,8 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
          * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
          */
         set(serverAnonymisation) {
-            if (!isCustomNetworkConnection) {
-                field = serverAnonymisation
+            field = serverAnonymisation
+            if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
@@ -269,285 +304,45 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
         set(value) {
             _customRetryForStatusCodes.set(value ?: HashMap())
         }
+
+
     
-    /**
-     * Builder for the Emitter.
-     */
-    class EmitterBuilder {
-        var requestCallback: RequestCallback? = null // Optional
-        var httpMethod = EmitterDefaults.httpMethod // Optional
-        var bufferOption = EmitterDefaults.bufferOption // Optional
-        var requestSecurity = EmitterDefaults.requestSecurity // Optional
-        var tlsVersions = EmitterDefaults.tlsVersions // Optional
-        var emitterTick = EmitterDefaults.emitterTick // Optional
-        var sendLimit = EmitterDefaults.sendLimit // Optional
-        var emptyLimit = EmitterDefaults.emptyLimit // Optional
-        var byteLimitGet = EmitterDefaults.byteLimitGet // Optional
-        var byteLimitPost = EmitterDefaults.byteLimitPost // Optional
-        var emitTimeout = EmitterDefaults.emitTimeout // Optional
-        var threadPoolSize = EmitterDefaults.threadPoolSize // Optional
-        var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
-        var timeUnit = EmitterDefaults.timeUnit
-        var client: OkHttpClient? = null // Optional
-        var cookieJar: CookieJar? = null // Optional
-        var customPostPath: String? = null //Optional
-        var networkConnection: NetworkConnection? = null // Optional
-        var eventStore: EventStore? = null // Optional
-        var customRetryForStatusCodes: Map<Int, Boolean>? = null // Optional
 
-        /**
-         * @param networkConnection The component in charge for sending events to the collector.
-         * @return itself
-         */
-        fun networkConnection(networkConnection: NetworkConnection?): EmitterBuilder {
-            this.networkConnection = networkConnection
-            return this
-        }
-
-        /**
-         * @param eventStore The component in charge for persisting events before sending.
-         * @return itself
-         */
-        fun eventStore(eventStore: EventStore?): EmitterBuilder {
-            this.eventStore = eventStore
-            return this
-        }
-
-        /**
-         * @param httpMethod The method by which requests are emitted
-         * @return itself
-         */
-        fun method(httpMethod: HttpMethod): EmitterBuilder {
-            this.httpMethod = httpMethod
-            return this
-        }
-
-        /**
-         * @param option the buffer option for the emitter
-         * @return itself
-         */
-        fun option(option: BufferOption): EmitterBuilder {
-            bufferOption = option
-            return this
-        }
-
-        /**
-         * @param protocol the security chosen for requests
-         * @return itself
-         */
-        fun security(protocol: Protocol): EmitterBuilder {
-            requestSecurity = protocol
-            return this
-        }
-
-        /**
-         * @param version the TLS version allowed for requests
-         * @return itself
-         */
-        fun tls(version: TLSVersion): EmitterBuilder {
-            tlsVersions = EnumSet.of(version)
-            return this
-        }
-
-        /**
-         * @param versions the TLS versions allowed for requests
-         * @return itself
-         */
-        fun tls(versions: EnumSet<TLSVersion>): EmitterBuilder {
-            tlsVersions = versions
-            return this
-        }
-
-        /**
-         * @param requestCallback Request callback function
-         * @return itself
-         */
-        fun callback(requestCallback: RequestCallback?): EmitterBuilder {
-            this.requestCallback = requestCallback
-            return this
-        }
-
-        /**
-         * @param emitterTick The tick count between emitter attempts
-         * @return itself
-         */
-        fun tick(emitterTick: Int): EmitterBuilder {
-            this.emitterTick = emitterTick
-            return this
-        }
-
-        /**
-         * @param sendLimit The maximum amount of events to grab for an emit attempt
-         * @return itself
-         */
-        fun sendLimit(sendLimit: Int): EmitterBuilder {
-            this.sendLimit = sendLimit
-            return this
-        }
-
-        /**
-         * @param emptyLimit The amount of emitter ticks that are performed before we shut down
-         * due to the database being empty.
-         * @return itself
-         */
-        fun emptyLimit(emptyLimit: Int): EmitterBuilder {
-            this.emptyLimit = emptyLimit
-            return this
-        }
-
-        /**
-         * @param byteLimitGet The maximum amount of bytes allowed to be sent in a payload
-         * in a GET request.
-         * @return itself
-         */
-        fun byteLimitGet(byteLimitGet: Long): EmitterBuilder {
-            this.byteLimitGet = byteLimitGet
-            return this
-        }
-
-        /**
-         * @param byteLimitPost The maximum amount of bytes allowed to be sent in a payload
-         * in a POST request.
-         * @return itself
-         */
-        fun byteLimitPost(byteLimitPost: Long): EmitterBuilder {
-            this.byteLimitPost = byteLimitPost
-            return this
-        }
-
-        /**
-         * @param emitTimeout The maximum timeout for emitting events. If emit time exceeds this value
-         * TimeOutException will be thrown
-         * @return itself
-         */
-        fun emitTimeout(emitTimeout: Int): EmitterBuilder {
-            this.emitTimeout = emitTimeout
-            return this
-        }
-
-        /**
-         * @param timeUnit a valid TimeUnit
-         * @return itself
-         */
-        fun timeUnit(timeUnit: TimeUnit): EmitterBuilder {
-            this.timeUnit = timeUnit
-            return this
-        }
-
-        /**
-         * @param client An OkHttp client that will be used in the emitter, you can provide your
-         * own if you want to share your Singleton client's interceptors, connection pool etc.,
-         * otherwise a new one is created.
-         * @return itself
-         */
-        fun client(client: OkHttpClient?): EmitterBuilder {
-            this.client = client
-            return this
-        }
-
-        /**
-         * @param cookieJar An OkHttp cookie jar to override the default cookie jar that stores
-         * cookies in SharedPreferences. The cookie jar will be ignored in case
-         * custom `client` is configured.
-         * @return itself
-         */
-        fun cookieJar(cookieJar: CookieJar?): EmitterBuilder {
-            this.cookieJar = cookieJar
-            return this
-        }
-
-        /**
-         * @param customPostPath A custom path that is used on the endpoint to send requests.
-         * @return itself
-         */
-        fun customPostPath(customPostPath: String?): EmitterBuilder {
-            this.customPostPath = customPostPath
-            return this
-        }
-
-        /**
-         * @param threadPoolSize The number of threads available for the tracker's operations.
-         * @return itself
-         */
-        fun threadPoolSize(threadPoolSize: Int): EmitterBuilder {
-            this.threadPoolSize = threadPoolSize
-            return this
-        }
-
-        /**
-         * Set custom retry rules for HTTP status codes received in emit responses from the Collector.
-         * @param customRetryForStatusCodes Mapping of integers (status codes) to booleans (true for retry and false for not retry)
-         * @return itself
-         */
-        fun customRetryForStatusCodes(customRetryForStatusCodes: Map<Int, Boolean>?): EmitterBuilder {
-            this.customRetryForStatusCodes = customRetryForStatusCodes
-            return this
-        }
-
-        /**
-         * Ignored if using a custom network connection.
-         * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
-         * @return itself
-         */
-        fun serverAnonymisation(serverAnonymisation: Boolean): EmitterBuilder {
-            this.serverAnonymisation = serverAnonymisation
-            return this
-        }
-    }
+    
 
     /**
      * Creates an emitter object
      */
     init {
         this.context = context
-        val builder = builder ?: EmitterBuilder()
+        builder.accept(this)
 
-        uri = collectorUri
-        requestCallback = builder.requestCallback
-        bufferOption = builder.bufferOption
-        requestSecurity = builder.requestSecurity
-        tlsVersions = builder.tlsVersions
-        emitterTick = builder.emitterTick
-        emptyLimit = builder.emptyLimit
-        sendLimit = builder.sendLimit
-        byteLimitGet = builder.byteLimitGet
-        byteLimitPost = builder.byteLimitPost
-        emitTimeout = builder.emitTimeout
-        timeUnit = builder.timeUnit
-        client = builder.client
-        eventStore = builder.eventStore
-        serverAnonymisation = builder.serverAnonymisation
-        httpMethod = builder.httpMethod
-        customPostPath = builder.customPostPath
-        customRetryForStatusCodes = builder.customRetryForStatusCodes
-
-        if (builder.networkConnection == null) {
+        if (networkConnection == null) {
             isCustomNetworkConnection = false
             var endpoint = collectorUri
             if (!endpoint.startsWith("http")) {
                 val protocol =
-                    if (builder.requestSecurity === Protocol.HTTPS) "https://" else "http://"
+                    if (requestSecurity === Protocol.HTTPS) "https://" else "http://"
                 endpoint = protocol + endpoint
             }
             uri = endpoint
             networkConnection = OkHttpNetworkConnectionBuilder(endpoint, context)
-                    .method(builder.httpMethod)
-                    .tls(builder.tlsVersions)
-                    .emitTimeout(builder.emitTimeout)
-                    .customPostPath(builder.customPostPath)
-                    .client(builder.client)
-                    .cookieJar(builder.cookieJar)
-                    .serverAnonymisation(builder.serverAnonymisation)
+                    .method(httpMethod)
+                    .tls(tlsVersions)
+                    .emitTimeout(emitTimeout)
+                    .customPostPath(customPostPath)
+                    .client(client)
+                    .cookieJar(cookieJar)
+                    .serverAnonymisation(serverAnonymisation)
                     .build()
         } else {
             isCustomNetworkConnection = true
-            networkConnection = builder.networkConnection!!
         }
         
-        if (builder.threadPoolSize > 2) {
-            Executor.threadCount = builder.threadPoolSize
+        if (threadPoolSize > 2) {
+            Executor.threadCount = threadPoolSize
         }
-        
+        builderFinished = true
         Logger.v(TAG, "Emitter created successfully!")
     }
     
@@ -851,9 +646,7 @@ class Emitter(context: Context, collectorUri: String, builder: EmitterBuilder?) 
             if (previousPayloads.isNotEmpty()) previousPayloads.size + POST_WRAPPER_BYTES else 0
         return totalByteSize + wrapperBytes > byteLimit
     }
-    
-    // Request Builders
-    
+
     /**
      * Adds the Sending Time (stm) field
      * to each event payload.

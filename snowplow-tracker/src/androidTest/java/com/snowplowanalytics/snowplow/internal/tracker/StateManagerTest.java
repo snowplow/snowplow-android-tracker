@@ -34,10 +34,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.Assert.*;
 
 import android.content.Context;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 @RunWith(AndroidJUnit4.class)
 public class StateManagerTest {
@@ -112,9 +117,8 @@ public class StateManagerTest {
     public void testScreenStateMachine() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockEventStore eventStore = new MockEventStore();
-        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
-                .eventStore(eventStore)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
         Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .screenContext(true)
                 .base64(false)
@@ -184,9 +188,8 @@ public class StateManagerTest {
     public void testLifecycleStateMachine() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockEventStore eventStore = new MockEventStore();
-        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
-                .eventStore(eventStore)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
         Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .base64(false)
                 .level(LogLevel.VERBOSE)
@@ -254,9 +257,8 @@ public class StateManagerTest {
     public void testDeepLinkStateMachine() throws InterruptedException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         MockEventStore eventStore = new MockEventStore();
-        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", new Emitter.EmitterBuilder()
-                .eventStore(eventStore)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
+        Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
         Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
                 .base64(false)
                 .deepLinkContext(true)

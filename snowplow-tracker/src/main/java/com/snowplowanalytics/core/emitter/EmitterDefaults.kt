@@ -11,7 +11,7 @@ object EmitterDefaults {
     var httpMethod = HttpMethod.POST
     var bufferOption = BufferOption.DefaultGroup
     var requestSecurity = Protocol.HTTP
-    var tlsVersions = EnumSet.of(TLSVersion.TLSv1_2)
+    var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
     var emitterTick = 5
     var sendLimit = 250
     var emptyLimit = 5

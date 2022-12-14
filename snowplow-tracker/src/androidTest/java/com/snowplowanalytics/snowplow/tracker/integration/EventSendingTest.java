@@ -45,6 +45,8 @@ import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -61,6 +63,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class EventSendingTest extends AndroidTestCase {
 
@@ -215,13 +218,15 @@ public class EventSendingTest extends AndroidTestCase {
     public Tracker getTracker(String namespace, String uri, HttpMethod method) {
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-                .method(method)
-                .security(Protocol.HTTP)
-                .tick(0)
-                .emptyLimit(0)
-        );
+        Consumer<Emitter> builder = (emitter -> {
+            emitter.setBufferOption(BufferOption.Single);
+            emitter.setHttpMethod(method);
+            emitter.setRequestSecurity(Protocol.HTTP);
+            emitter.setEmitterTick(0);
+            emitter.setEmptyLimit(0);
+        });
+
+        Emitter emitter = new Emitter(getContext(), uri, (Function1<? super Emitter, Unit>) builder  );
 
         Subject subject = new Subject(getContext(), null);
 

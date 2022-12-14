@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static com.snowplowanalytics.snowplow.emitter.BufferOption.DefaultGroup;
 import static com.snowplowanalytics.snowplow.emitter.BufferOption.HeavyGroup;
@@ -49,46 +50,42 @@ public class EmitterTest extends AndroidTestCase {
     // Builder Tests
 
     public void testHttpMethodSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .method(GET)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setHttpMethod(GET));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(GET, emitter.getHttpMethod());
 
-        emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .method(POST)
-        );
+        builder = (emitter1 -> emitter1.setHttpMethod(POST));
+        emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(POST, emitter.getHttpMethod());
     }
 
     public void testBufferOptionSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .option(Single)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(Single));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(Single, emitter.getBufferOption());
 
-        emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .option(DefaultGroup)
-        );
+        builder = (emitter1 -> emitter1.setBufferOption(Single));
+        emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(DefaultGroup, emitter.getBufferOption());
 
-        emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .option(HeavyGroup)
-        );
+        builder = (emitter2 -> emitter2.setBufferOption(Single));
+        emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(HeavyGroup, emitter.getBufferOption());
     }
 
     public void testCallbackSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .callback(new RequestCallback() {
-            @Override
-            public void onSuccess(int successCount) {
-            }
+        Consumer<Emitter> builder = (emitter -> emitter.setRequestCallback(
+                new RequestCallback() {
+                    @Override
+                    public void onSuccess(int successCount) {
+                    }
 
-            @Override
-            public void onFailure(int successCount, int failureCount) {
-            }
-        })
-        );
+                    @Override
+                    public void onFailure(int successCount, int failureCount) {
+                    }
+                }
+        ));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
 
         assertNotNull(emitter.getRequestCallback());
     }
@@ -96,97 +93,95 @@ public class EmitterTest extends AndroidTestCase {
     public void testUriSet() {
         String uri = "com.acme";
 
-        Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .method(GET)
-                .security(HTTP)
-                .option(Single)
-        );
+        Consumer<Emitter> builder = (emitter -> {
+            emitter.setBufferOption(Single);
+            emitter.setHttpMethod(GET);
+            emitter.setRequestSecurity(HTTP);
+        });
+        Emitter emitter = new Emitter(getContext(), uri, builder);
         assertEquals("http://" + uri + "/i", emitter.getEmitterUri());
 
-        emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .method(POST)
-                .security(HTTP)
-                .option(DefaultGroup)
-        );
+        builder = (emitter1 -> {
+            emitter1.setBufferOption(DefaultGroup);
+            emitter1.setHttpMethod(POST);
+            emitter1.setRequestSecurity(HTTP);
+        });
+        emitter = new Emitter(getContext(), uri, builder);
         assertEquals("http://" + uri + "/com.snowplowanalytics.snowplow/tp2",
                 emitter.getEmitterUri());
 
-        emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .method(GET)
-                .security(HTTPS)
-                .option(DefaultGroup)
-        );
+        builder = (emitter2 -> {
+            emitter2.setBufferOption(DefaultGroup);
+            emitter2.setHttpMethod(GET);
+            emitter2.setRequestSecurity(HTTPS);
+        });
+        emitter = new Emitter(getContext(), uri, builder);
         assertEquals("https://" + uri + "/i", emitter.getEmitterUri());
 
-        emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .method(POST)
-                .security(HTTPS)
-                .option(DefaultGroup)
-        );
+        builder = (emitter3 -> {
+            emitter3.setBufferOption(DefaultGroup);
+            emitter3.setHttpMethod(POST);
+            emitter3.setRequestSecurity(HTTPS);
+        });
+        emitter = new Emitter(getContext(), uri, builder);
         assertEquals("https://" + uri + "/com.snowplowanalytics.snowplow/tp2", emitter.getEmitterUri());
     }
 
     public void testSecuritySet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .security(HTTP)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setRequestSecurity(HTTP));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(HTTP, emitter.getRequestSecurity());
 
-        emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .security(HTTPS)
-        );
+        builder = (emitter1 -> emitter1.setRequestSecurity(HTTPS));
+        emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(Protocol.HTTPS, emitter.getRequestSecurity());
     }
 
     public void testTickSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .tick(0)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setEmitterTick(0));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(0, emitter.getEmitterTick());
     }
 
     public void testEmptyLimitSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .emptyLimit(0)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setEmptyLimit(0));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(0, emitter.getEmptyLimit());
     }
 
     public void testSendLimitSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .sendLimit(200)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setSendLimit(200));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(200, emitter.getSendLimit());
     }
 
     public void testByteLimitGetSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .byteLimitGet(20000)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setByteLimitGet(20000));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(20000, emitter.getByteLimitGet());
     }
 
     public void testByteLimitPostSet() {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .byteLimitPost(25000)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setByteLimitPost(25000));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
         assertEquals(25000, emitter.getByteLimitPost());
     }
 
     public void testUpdatingEmitterSettings() throws InterruptedException {
         String uri = "snowplow.io";
-        Emitter emitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .option(Single)
-                .method(POST)
-                .security(HTTP)
-                .tick(250)
-                .emptyLimit(5)
-                .sendLimit(200)
-                .byteLimitGet(20000)
-                .byteLimitPost(25000)
-                .timeUnit(TimeUnit.MILLISECONDS)
-                .eventStore(new MockEventStore())
-        );
+        Consumer<Emitter> builder = (emitter -> {
+            emitter.setBufferOption(Single);
+            emitter.setHttpMethod(POST);
+            emitter.setRequestSecurity(HTTP);
+            emitter.setEmitterTick(250);
+            emitter.setEmptyLimit(5);
+            emitter.setSendLimit(200);
+            emitter.setByteLimitGet(20000);
+            emitter.setByteLimitPost(25000);
+            emitter.setEventStore(new MockEventStore());
+            emitter.setTimeUnit(TimeUnit.MILLISECONDS);
+        });
+        Emitter emitter = new Emitter(getContext(), uri, builder);
 
         assertFalse(emitter.getEmitterStatus());
         assertEquals(Single, emitter.getBufferOption());
@@ -215,19 +210,20 @@ public class EmitterTest extends AndroidTestCase {
 
         emitter.shutdown();
 
-        Emitter customPathEmitter = new Emitter(getContext(), uri, new Emitter.EmitterBuilder()
-                .option(Single)
-                .method(POST)
-                .security(HTTP)
-                .tick(250)
-                .emptyLimit(5)
-                .sendLimit(200)
-                .byteLimitGet(20000)
-                .byteLimitPost(25000)
-                .timeUnit(TimeUnit.MILLISECONDS)
-                .customPostPath("com.acme.company/tpx")
-                .eventStore(new MockEventStore())
-        );
+        builder = (emitter1 -> {
+            emitter1.setBufferOption(Single);
+            emitter1.setHttpMethod(POST);
+            emitter1.setRequestSecurity(HTTP);
+            emitter1.setEmitterTick(250);
+            emitter1.setEmptyLimit(5);
+            emitter1.setSendLimit(200);
+            emitter1.setByteLimitGet(20000);
+            emitter1.setByteLimitPost(25000);
+            emitter1.setEventStore(new MockEventStore());
+            emitter1.setTimeUnit(TimeUnit.MILLISECONDS);
+            emitter1.setCustomPostPath("com.acme.company/tpx");
+        });
+        Emitter customPathEmitter = new Emitter(getContext(), uri, builder);
         assertEquals("com.acme.company/tpx", customPathEmitter.getCustomPostPath());
         assertEquals("http://" + uri + "/com.acme.company/tpx", customPathEmitter.getEmitterUri());
 
@@ -379,8 +375,8 @@ public class EmitterTest extends AndroidTestCase {
     }
 
     public void testUpdatesNetworkConnectionWhileRunning() throws InterruptedException {
-        Emitter emitter = new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .eventStore(new MockEventStore()));
+        Consumer<Emitter> builder = (emitter -> emitter.setEventStore(new MockEventStore()));
+        Emitter emitter = new Emitter(getContext(), "com.acme", builder);
 
         emitter.flush();
         Thread.sleep(100);
@@ -436,18 +432,21 @@ public class EmitterTest extends AndroidTestCase {
     // Emitter Builder
 
     public Emitter getEmitter(NetworkConnection networkConnection, BufferOption option) {
-        return new Emitter(getContext(), "com.acme", new Emitter.EmitterBuilder()
-                .networkConnection(networkConnection)
-                .option(option)
-                .tick(0)
-                .emptyLimit(0)
-                .sendLimit(200)
-                .byteLimitGet(20000)
-                .byteLimitPost(25000)
-                .timeUnit(TimeUnit.SECONDS)
-                .tls(EnumSet.of(TLSVersion.TLSv1_2))
-                .eventStore(new MockEventStore())
-        );
+        Consumer<Emitter> builder = (emitter -> {
+            emitter.setNetworkConnection(networkConnection);
+            
+            emitter.setBufferOption(option);
+            emitter.setEmitterTick(0);
+            emitter.setEmptyLimit(0);
+            emitter.setSendLimit(200);
+            emitter.setByteLimitGet(20000);
+            emitter.setByteLimitPost(25000);
+            emitter.setEventStore(new MockEventStore());
+            emitter.setTimeUnit(TimeUnit.SECONDS);
+            emitter.setTlsVersions(EnumSet.of(TLSVersion.TLSv1_2));
+            
+        });
+        return new Emitter(getContext(), "com.acme", builder);
     }
 
     // Service methods

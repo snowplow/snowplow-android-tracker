@@ -49,7 +49,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         val context: Context
     ) {
         var httpMethod = EmitterDefaults.httpMethod // Optional
-        var tlsVersions = EmitterDefaults.tlsVersions // Optional
+        var tlsVersions: EnumSet<TLSVersion> = EmitterDefaults.tlsVersions // Optional
         var emitTimeout = EmitterDefaults.emitTimeout // Optional
         var client: OkHttpClient? = null // Optional
         var cookieJar: CookieJar? = null // Optional

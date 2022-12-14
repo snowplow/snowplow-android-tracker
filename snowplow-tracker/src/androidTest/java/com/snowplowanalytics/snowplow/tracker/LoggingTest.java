@@ -33,6 +33,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+
 @RunWith(AndroidJUnit4.class)
 public class LoggingTest {
 
@@ -63,9 +69,9 @@ public class LoggingTest {
     @Before
     public void setUp() throws Exception {
         mockLoggerDelegate = new MockLoggerDelegate();
-        emitter = new Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-        );
+        
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
+        emitter = new Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", builder);
         networkConfig = new NetworkConfiguration("http://localhost", HttpMethod.POST);
     }
 

@@ -21,7 +21,7 @@ import java.util.concurrent.Future
 
 /**
  * Static Class which holds the logic for controlling
- * the Thread Pool for the Classic Tracker.
+ * the Thread Pool for the Tracker.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object Executor {

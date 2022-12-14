@@ -19,6 +19,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -53,7 +54,10 @@ import java.util.Map;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -101,11 +105,11 @@ public class TrackerTest {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter(getContext(), "testUrl", new Emitter.EmitterBuilder()
-                .tick(0)
-                .emptyLimit(0)
-        );
-
+        Consumer<Emitter> builder = (emitter -> {
+            emitter.setEmitterTick(0);
+            emitter.setEmptyLimit(0);
+        });
+        Emitter emitter = new Emitter(getContext(), "testUrl", builder);
         Subject subject = new Subject(getContext(), null);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
@@ -213,10 +217,10 @@ public class TrackerTest {
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
+        Consumer<Emitter> builder = (emitterArg -> emitterArg.setBufferOption(BufferOption.Single));
+        
         try {
-            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
-                    .option(BufferOption.Single)
-            );
+            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception on Emitter creation");
@@ -280,10 +284,9 @@ public class TrackerTest {
         MockWebServer mockWebServer = getMockServer(1);
 
         Emitter emitter = null;
+        Consumer<Emitter> builder = (emitterArg -> emitterArg.setBufferOption(BufferOption.Single));
         try {
-            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
-                    .option(BufferOption.Single)
-            );
+            emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception on Emitter creation");
@@ -342,9 +345,8 @@ public class TrackerTest {
 
         MockWebServer mockWebServer = getMockServer(1);
 
-        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
+        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -378,9 +380,8 @@ public class TrackerTest {
 
         MockWebServer mockWebServer = getMockServer(1);
 
-        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
+        Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -409,9 +410,8 @@ public class TrackerTest {
         String namespace = "myNamespace";
         TestUtils.createSessionSharedPreferences(getContext(), namespace);
 
-        Emitter emitter = new Emitter(getContext(), "fake-uri", new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
+        Emitter emitter = new Emitter(getContext(), "fake-uri", builder);
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
                 .base64(false)
@@ -519,9 +519,8 @@ public class TrackerTest {
 
     @Test
     public void testStartsNewSessionWhenChangingAnonymousTracking() {
-        Emitter emitter = new Emitter(getContext(), "fake-uri", new Emitter.EmitterBuilder()
-                .option(BufferOption.Single)
-        );
+        Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
+        Emitter emitter = new Emitter(getContext(), "fake-uri", builder);
         emitter.pauseEmit();
 
         tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "ns", "myAppId", getContext())
@@ -532,6 +531,7 @@ public class TrackerTest {
                 .applicationCrash(false)
                 .screenviewEvents(false)
                 .foregroundTimeout(5)
+                .backgroundTimeout(5)
                 .backgroundTimeout(5)
                 .timeUnit(TimeUnit.SECONDS)
         );
