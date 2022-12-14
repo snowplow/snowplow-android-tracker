@@ -226,7 +226,7 @@ public class EventSendingTest extends AndroidTestCase {
             emitter.setEmptyLimit(0);
         });
 
-        Emitter emitter = new Emitter(getContext(), uri, (Function1<? super Emitter, Unit>) builder  );
+        Emitter emitter = new Emitter(getContext(), uri, builder);
 
         Subject subject = new Subject(getContext(), null);
 
