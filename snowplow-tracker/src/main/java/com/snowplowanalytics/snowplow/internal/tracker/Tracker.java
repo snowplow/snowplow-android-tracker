@@ -94,6 +94,7 @@ public class Tracker {
         boolean userAnonymisation = false; // Optional
         @Nullable Gdpr gdpr = null; // Optional
         @Nullable String trackerVersionSuffix = null; // Optional
+        @Nullable String focalMeterEndpoint = null; // Optional
 
         /**
          * @param emitter Emitter to which events will be sent
@@ -360,6 +361,16 @@ public class Tracker {
             this.trackerVersionSuffix = trackerVersionSuffix;
             return this;
         }
+
+        /**
+         * Internal use only.
+         * Set the Kantar endpoint for FocalMeter integration.
+         */
+        @NonNull
+        public TrackerBuilder focalMeterEndpoint(@Nullable String focalMeterEndpoint) {
+            this.focalMeterEndpoint = focalMeterEndpoint;
+            return this;
+        }
     }
 
     // ----
@@ -404,6 +415,9 @@ public class Tracker {
 
     @NonNull
     private final PlatformContext platformContext;
+
+    @Nullable
+    private String focalMeterEndpoint;
 
     private final Map<String, GlobalContext> globalContextGenerators = Collections.synchronizedMap(new HashMap<>());
 
@@ -519,6 +533,7 @@ public class Tracker {
 
         setScreenContext(builder.screenContext);
         setDeepLinkContext(builder.deepLinkContext);
+        setFocalMeterEndpoint(builder.focalMeterEndpoint);
 
         if (trackerVersionSuffix != null) {
             String suffix = trackerVersionSuffix.replaceAll("[^A-Za-z0-9.-]", "");
@@ -1013,6 +1028,16 @@ public class Tracker {
         }
     }
 
+    /** Internal use only */
+    public void setFocalMeterEndpoint(@Nullable String endpoint) {
+        focalMeterEndpoint = endpoint;
+        if (endpoint == null) {
+            stateManager.removeStateMachine("FocalMeter");
+        } else {
+            stateManager.addOrReplaceStateMachine(new FocalMeterStateMachine(endpoint), "FocalMeter");
+        }
+    }
+
     // --- Getters
 
     /** Internal use only */
@@ -1166,6 +1191,11 @@ public class Tracker {
             return (ScreenState) state;
         }
         return null;
+    }
+
+    @Nullable
+    public String getFocalMeterEndpoint() {
+        return focalMeterEndpoint;
     }
 
     // --- Global contexts

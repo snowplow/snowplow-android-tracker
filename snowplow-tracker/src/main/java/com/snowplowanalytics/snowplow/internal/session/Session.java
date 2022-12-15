@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 
+import com.snowplowanalytics.snowplow.entity.ClientSessionEntity;
 import com.snowplowanalytics.snowplow.internal.constants.Parameters;
 import com.snowplowanalytics.snowplow.internal.constants.TrackerConstants;
 import com.snowplowanalytics.snowplow.internal.tracker.Logger;
@@ -207,7 +208,7 @@ public class Session {
             sessionCopy.put(Parameters.SESSION_PREVIOUS_ID, null);
         }
 
-        return new SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy);
+        return new ClientSessionEntity(sessionCopy);
     }
 
     private boolean shouldUpdateSession() {

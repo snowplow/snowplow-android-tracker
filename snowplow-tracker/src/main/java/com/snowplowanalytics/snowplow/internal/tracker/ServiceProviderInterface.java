@@ -56,6 +56,9 @@ public interface ServiceProviderInterface {
     @NonNull
     SessionControllerImpl getOrMakeSessionController();
 
+    @NonNull
+    FocalMeterControllerImpl getOrMakeFocalMeterController();
+
     // Configuration Updates
 
     @NonNull

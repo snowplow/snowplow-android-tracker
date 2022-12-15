@@ -9,6 +9,7 @@ import androidx.core.util.Consumer;
 
 import com.snowplowanalytics.snowplow.configuration.Configuration;
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
+import com.snowplowanalytics.snowplow.configuration.FocalMeterConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GdprConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
@@ -71,6 +72,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     private GdprControllerImpl gdprController;
     @Nullable
     private GlobalContextsControllerImpl globalContextsController;
+    @Nullable
+    private FocalMeterControllerImpl focalMeterController;
 
     // Original configurations
     @NonNull
@@ -85,6 +88,8 @@ public class ServiceProvider implements ServiceProviderInterface {
     private GdprConfiguration gdprConfiguration;
     @Nullable
     private GlobalContextsConfiguration globalContextsConfiguration;
+    @Nullable
+    private FocalMeterConfiguration focalMeterConfiguration;
 
     // Configuration updates
     @NonNull
@@ -182,6 +187,9 @@ public class ServiceProvider implements ServiceProviderInterface {
                 globalContextsConfiguration = (GlobalContextsConfiguration)configuration;
                 continue;
             }
+            if (configuration instanceof FocalMeterConfiguration) {
+                focalMeterConfiguration = (FocalMeterConfiguration)configuration;
+            }
         }
     }
 
@@ -208,6 +216,7 @@ public class ServiceProvider implements ServiceProviderInterface {
         globalContextsController = null;
         subjectController = null;
         networkController = null;
+        focalMeterController = null;
     }
 
     private void resetConfigurationUpdates() {
@@ -298,6 +307,15 @@ public class ServiceProvider implements ServiceProviderInterface {
             gdprController = makeGdprController();
         }
         return gdprController;
+    }
+
+    @NonNull
+    @Override
+    public FocalMeterControllerImpl getOrMakeFocalMeterController() {
+        if (focalMeterController == null) {
+            focalMeterController = makeFocalMeterController();
+        }
+        return focalMeterController;
     }
 
     @NonNull
@@ -433,6 +451,9 @@ public class ServiceProvider implements ServiceProviderInterface {
                 .backgroundTimeout(sessionConfig.getBackgroundTimeout().convert(TimeUnit.SECONDS))
                 .foregroundTimeout(sessionConfig.getForegroundTimeout().convert(TimeUnit.SECONDS))
                 .userAnonymisation(trackerConfig.isUserAnonymisation());
+        if (focalMeterConfiguration != null) {
+            builder.focalMeterEndpoint(focalMeterConfiguration.getKantarEndpoint());
+        }
         GdprConfigurationUpdate gdprConfig = getGdprConfigurationUpdate();
         if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(
@@ -484,6 +505,11 @@ public class ServiceProvider implements ServiceProviderInterface {
             controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
         }
         return controller;
+    }
+
+    @NonNull
+    private FocalMeterControllerImpl makeFocalMeterController() {
+        return new FocalMeterControllerImpl(this);
     }
 
     @NonNull

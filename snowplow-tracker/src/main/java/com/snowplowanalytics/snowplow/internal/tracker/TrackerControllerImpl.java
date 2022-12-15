@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.snowplowanalytics.snowplow.controller.EmitterController;
+import com.snowplowanalytics.snowplow.controller.FocalMeterController;
 import com.snowplowanalytics.snowplow.controller.GdprController;
 import com.snowplowanalytics.snowplow.controller.GlobalContextsController;
 import com.snowplowanalytics.snowplow.controller.NetworkController;
@@ -73,6 +74,11 @@ public class TrackerControllerImpl extends Controller implements TrackerControll
     public SessionController getSession() {
         SessionControllerImpl sessionController = getSessionController();
         return sessionController.isEnabled() ? sessionController : null;
+    }
+
+    @NonNull
+    public FocalMeterController getFocalMeter() {
+        return serviceProvider.getOrMakeFocalMeterController();
     }
 
     // Control methods

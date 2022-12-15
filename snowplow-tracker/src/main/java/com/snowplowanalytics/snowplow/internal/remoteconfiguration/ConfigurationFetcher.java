@@ -38,25 +38,20 @@ public class ConfigurationFetcher {
     public ConfigurationFetcher(@NonNull Context context, @NonNull RemoteConfiguration remoteConfiguration, @NonNull Consumer<FetchedConfigurationBundle> onFetchCallback) {
         this.remoteConfiguration = remoteConfiguration;
         this.onFetchCallback = onFetchCallback;
-        Executor.execute(getRunnable(context), (Throwable t) -> {
-            exceptionHandler(t);
-        });
+        Executor.execute(getRunnable(context), this::exceptionHandler);
     }
 
     // Private methods
 
     private Runnable getRunnable(Context context) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ResponseBody body = performRequest(context, remoteConfiguration.endpoint);
-                    if (body != null) {
-                        resolveRequest(context, body, onFetchCallback);
-                    }
-                } catch (Exception e) {
-                    Logger.e(TAG, "Unable to get remote configuration: "+e.getMessage(), e);
+        return () -> {
+            try {
+                ResponseBody body = performRequest(context, remoteConfiguration.endpoint);
+                if (body != null) {
+                    resolveRequest(context, body, onFetchCallback);
                 }
+            } catch (Exception e) {
+                Logger.e(TAG, "Unable to get remote configuration: "+e.getMessage(), e);
             }
         };
     }
