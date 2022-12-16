@@ -28,6 +28,6 @@ class TrackerState : TrackerStateSnapshot {
     // Implements TrackerStateSnapshot
     override fun getState(stateIdentifier: String): State? {
         val stateFuture = getStateFuture(stateIdentifier) ?: return null
-        return stateFuture.state
+        return stateFuture.state()
     }
 }
