@@ -42,7 +42,7 @@ import java.util.function.Consumer
  * sending of events to the Snowplow Collector.
  */
 @RequiresApi(Build.VERSION_CODES.N)
-class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>) {
+class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>? = null) {
     private val TAG = Emitter::class.java.simpleName
 
     private var builderFinished = false
@@ -305,17 +305,12 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
             _customRetryForStatusCodes.set(value ?: HashMap())
         }
 
-
-    
-
-    
-
     /**
      * Creates an emitter object
      */
     init {
         this.context = context
-        builder.accept(this)
+        builder?.accept(this)
 
         if (networkConnection == null) {
             isCustomNetworkConnection = false
