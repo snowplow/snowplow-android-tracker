@@ -101,9 +101,10 @@ public class FocalMeterStateMachine implements StateMachineInterface {
                 Logger.e(TAG, "Failed to parse Kantar endpoint URL", endpoint);
                 return;
             }
+            String userId = entity.getUserId();
             HttpUrl.Builder urlBuilder = url.newBuilder();
             urlBuilder.addQueryParameter("vendor", "snowplow");
-            urlBuilder.addQueryParameter("cs_fpid", entity.getUserId());
+            urlBuilder.addQueryParameter("cs_fpid", userId);
             urlBuilder.addQueryParameter("c12", "not_set");
             url = urlBuilder.build();
 
@@ -118,7 +119,9 @@ public class FocalMeterStateMachine implements StateMachineInterface {
 
             try {
                 Response resp = client.newCall(request).execute();
-                if (!resp.isSuccessful()) {
+                if (resp.isSuccessful()) {
+                    Logger.d(TAG, "Request to Kantar endpoint sent with user ID: " + userId);
+                } else {
                     Logger.e(TAG, "Request to Kantar endpoint was not successful");
                 }
             } catch (IOException e) {
