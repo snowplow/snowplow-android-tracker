@@ -72,8 +72,6 @@ public class ServiceProvider implements ServiceProviderInterface {
     private GdprControllerImpl gdprController;
     @Nullable
     private GlobalContextsControllerImpl globalContextsController;
-    @Nullable
-    private FocalMeterControllerImpl focalMeterController;
 
     // Original configurations
     @NonNull
@@ -216,7 +214,6 @@ public class ServiceProvider implements ServiceProviderInterface {
         globalContextsController = null;
         subjectController = null;
         networkController = null;
-        focalMeterController = null;
     }
 
     private void resetConfigurationUpdates() {
@@ -307,15 +304,6 @@ public class ServiceProvider implements ServiceProviderInterface {
             gdprController = makeGdprController();
         }
         return gdprController;
-    }
-
-    @NonNull
-    @Override
-    public FocalMeterControllerImpl getOrMakeFocalMeterController() {
-        if (focalMeterController == null) {
-            focalMeterController = makeFocalMeterController();
-        }
-        return focalMeterController;
     }
 
     @NonNull
@@ -505,11 +493,6 @@ public class ServiceProvider implements ServiceProviderInterface {
             controller.reset(gdpr.basisForProcessing, gdpr.documentId, gdpr.documentVersion, gdpr.documentDescription);
         }
         return controller;
-    }
-
-    @NonNull
-    private FocalMeterControllerImpl makeFocalMeterController() {
-        return new FocalMeterControllerImpl(this);
     }
 
     @NonNull
