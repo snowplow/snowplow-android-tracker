@@ -125,48 +125,7 @@ open class TrackerConfiguration(
      */
     override var trackerVersionSuffix: String? = null
     
-    // Constructors
-    
-    /**
-     * It sets a default TrackerConfiguration.
-     * Default values:
-     * devicePlatform = DevicePlatform.Mobile;
-     * base64encoding = true;
-     * logLevel = LogLevel.OFF;
-     * loggerDelegate = null;
-     * sessionContext = true;
-     * applicationContext = true;
-     * platformContext = true;
-     * geoLocationContext = false;
-     * screenContext = true;
-     * deepLinkContext = true;
-     * screenViewAutotracking = true;
-     * lifecycleAutotracking = false;
-     * installAutotracking = true;
-     * exceptionAutotracking = true;
-     * diagnosticAutotracking = false;
-     * userAnonymisation = false;
-     * @param appId Identifier of the app.
-     */
-    init {
-        devicePlatform = DevicePlatform.Mobile
-        base64encoding = true
-        logLevel = LogLevel.OFF
-        loggerDelegate = null
-        sessionContext = true
-        applicationContext = true
-        platformContext = true
-        geoLocationContext = false
-        deepLinkContext = true
-        screenContext = true
-        screenViewAutotracking = true
-        lifecycleAutotracking = false
-        installAutotracking = true
-        exceptionAutotracking = true
-        diagnosticAutotracking = false
-        userAnonymisation = false
-    }
-    
+
     // Builder methods
     
     /**

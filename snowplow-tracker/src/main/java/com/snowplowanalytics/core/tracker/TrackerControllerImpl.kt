@@ -3,7 +3,6 @@ package com.snowplowanalytics.core.tracker
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.session.SessionControllerImpl
-import com.snowplowanalytics.core.tracker.TrackerControllerImpl
 import com.snowplowanalytics.snowplow.controller.*
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.tracker.BuildConfig
@@ -16,7 +15,7 @@ import java.util.*
 class TrackerControllerImpl  // Constructors
     (serviceProvider: ServiceProvider) : Controller(serviceProvider), TrackerController {
     // Sub-controllers
-    override val network: NetworkController?
+    override val network: NetworkController
         get() = serviceProvider.orMakeNetworkController
     override val emitter: EmitterController
         get() = serviceProvider.orMakeEmitterController
@@ -203,7 +202,7 @@ class TrackerControllerImpl  // Constructors
 
     // Private methods
     private val tracker: Tracker
-        private get() {
+        get() {
             if (!serviceProvider.isTrackerInitialized) {
                 loggerDelegate!!.error(
                     TAG,
@@ -213,7 +212,7 @@ class TrackerControllerImpl  // Constructors
             return serviceProvider.orMakeTracker
         }
     private val dirtyConfig: TrackerConfigurationUpdate
-        private get() = serviceProvider.trackerConfigurationUpdate
+        get() = serviceProvider.trackerConfigurationUpdate
 
     companion object {
         private val TAG = TrackerControllerImpl::class.java.simpleName

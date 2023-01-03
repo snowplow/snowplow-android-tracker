@@ -1,8 +1,6 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.emitter.*
 import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
@@ -14,7 +12,6 @@ import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.core.tracker.Tracker.TrackerBuilder
 import com.snowplowanalytics.snowplow.configuration.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ServiceProvider(
@@ -285,7 +282,6 @@ class ServiceProvider(
         return Subject(context, subjectConfigurationUpdate)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun makeEmitter(): Emitter {
         val networkConfig: NetworkConfigurationInterface = networkConfigurationUpdate
         val emitterConfig: EmitterConfigurationInterface = emitterConfigurationUpdate
@@ -325,23 +321,23 @@ class ServiceProvider(
         val builder = TrackerBuilder(emitter, namespace, trackerConfig.appId, context)
             .subject(subject)
             .trackerVersionSuffix(trackerConfig.trackerVersionSuffix)
-            .base64(trackerConfig.isBase64encoding)
+            .base64(trackerConfig.base64encoding)
             .level(trackerConfig.logLevel)
             .loggerDelegate(trackerConfig.loggerDelegate)
             .platform(trackerConfig.devicePlatform)
-            .sessionContext(trackerConfig.isSessionContext)
-            .applicationContext(trackerConfig.isApplicationContext)
-            .mobileContext(trackerConfig.isPlatformContext)
-            .deepLinkContext(trackerConfig.isDeepLinkContext)
-            .screenContext(trackerConfig.isScreenContext)
-            .screenviewEvents(trackerConfig.isScreenViewAutotracking)
-            .lifecycleEvents(trackerConfig.isLifecycleAutotracking)
-            .installTracking(trackerConfig.isInstallAutotracking)
-            .applicationCrash(trackerConfig.isExceptionAutotracking)
-            .trackerDiagnostic(trackerConfig.isDiagnosticAutotracking)
+            .sessionContext(trackerConfig.sessionContext)
+            .applicationContext(trackerConfig.applicationContext)
+            .mobileContext(trackerConfig.platformContext)
+            .deepLinkContext(trackerConfig.deepLinkContext)
+            .screenContext(trackerConfig.screenContext)
+            .screenviewEvents(trackerConfig.screenViewAutotracking)
+            .lifecycleEvents(trackerConfig.lifecycleAutotracking)
+            .installTracking(trackerConfig.installAutotracking)
+            .applicationCrash(trackerConfig.exceptionAutotracking)
+            .trackerDiagnostic(trackerConfig.diagnosticAutotracking)
             .backgroundTimeout(sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS))
             .foregroundTimeout(sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS))
-            .userAnonymisation(trackerConfig.isUserAnonymisation)
+            .userAnonymisation(trackerConfig.userAnonymisation)
         val gdprConfig = getGdprConfigurationUpdate()
         if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(
