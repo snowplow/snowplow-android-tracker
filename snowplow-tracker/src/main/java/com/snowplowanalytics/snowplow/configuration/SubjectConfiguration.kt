@@ -14,62 +14,52 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
     /**
      * @see .userId
      */
-    @JvmField
-    var userId: String? = null
+    override var userId: String? = null
 
     /**
      * @see .networkUserId
      */
-    @JvmField
-    var networkUserId: String? = null
+    override var networkUserId: String? = null
 
     /**
      * @see .domainUserId
      */
-    @JvmField
-    var domainUserId: String? = null
+    override var domainUserId: String? = null
 
     /**
      * @see .useragent
      */
-    @JvmField
-    var useragent: String? = null
+    override var useragent: String? = null
 
     /**
      * @see .ipAddress
      */
-    @JvmField
-    var ipAddress: String? = null
+    override var ipAddress: String? = null
 
     /**
      * @see .timezone
      */
-    @JvmField
-    var timezone: String? = null
+    override var timezone: String? = null
 
     /**
      * @see .language
      */
-    @JvmField
-    var language: String? = null
+    override var language: String? = null
 
     /**
      * @see .screenResolution
      */
-    @JvmField
-    var screenResolution: Size? = null
+    override var screenResolution: Size? = null
 
     /**
      * @see .screenViewPort
      */
-    @JvmField
-    var screenViewPort: Size? = null
+    override var screenViewPort: Size? = null
 
     /**
      * @see .colorDepth
      */
-    @JvmField
-    var colorDepth: Int? = null
+    override var colorDepth: Int? = null
     
     // Builder methods
     
@@ -157,87 +147,6 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
     fun colorDepth(colorDepth: Int?): SubjectConfiguration {
         this.colorDepth = colorDepth
         return this
-    }
-
-    // Getters and Setters
-    override fun getUserId(): String? {
-        return userId
-    }
-
-    override fun setUserId(userId: String?) {
-        this.userId = userId
-    }
-
-    override fun getNetworkUserId(): String? {
-        return networkUserId
-    }
-
-    override fun setNetworkUserId(networkUserId: String?) {
-        this.networkUserId = networkUserId
-    }
-
-    override fun getDomainUserId(): String? {
-        return domainUserId
-    }
-
-    override fun setDomainUserId(domainUserId: String?) {
-        this.domainUserId = domainUserId
-    }
-
-    override fun getUseragent(): String? {
-        return useragent
-    }
-
-    override fun setUseragent(useragent: String?) {
-        this.useragent = useragent
-    }
-
-    override fun getIpAddress(): String? {
-        return ipAddress
-    }
-
-    override fun setIpAddress(ipAddress: String?) {
-        this.ipAddress = ipAddress
-    }
-
-    override fun getTimezone(): String? {
-        return timezone
-    }
-
-    override fun setTimezone(timezone: String?) {
-        this.timezone = timezone
-    }
-
-    override fun getLanguage(): String? {
-        return language
-    }
-
-    override fun setLanguage(language: String?) {
-        this.language = language
-    }
-
-    override fun getScreenResolution(): Size? {
-        return screenResolution
-    }
-
-    override fun setScreenResolution(screenResolution: Size?) {
-        this.screenResolution = screenResolution
-    }
-
-    override fun getScreenViewPort(): Size? {
-        return screenViewPort
-    }
-
-    override fun setScreenViewPort(screenViewPort: Size?) {
-        this.screenViewPort = screenViewPort
-    }
-
-    override fun getColorDepth(): Int? {
-        return colorDepth
-    }
-
-    override fun setColorDepth(colorDepth: Int?) {
-        this.colorDepth = colorDepth
     }
 
     // Copyable
