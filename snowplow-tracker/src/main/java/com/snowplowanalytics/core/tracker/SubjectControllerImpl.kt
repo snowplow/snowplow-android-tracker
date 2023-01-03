@@ -16,6 +16,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.userIdUpdated = true
             subject.setUserId(userId!!)
         }
+    
     override var networkUserId: String?
         get() = subject.networkUserId
         set(networkUserId) {
@@ -23,6 +24,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.networkUserIdUpdated = true
             subject.setNetworkUserId(networkUserId!!)
         }
+    
     override var domainUserId: String?
         get() = subject.domainUserId
         set(domainUserId) {
@@ -30,6 +32,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.domainUserIdUpdated = true
             subject.setDomainUserId(domainUserId!!)
         }
+    
     override var useragent: String?
         get() = subject.useragent
         set(useragent) {
@@ -37,6 +40,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.useragentUpdated = true
             subject.setUseragent(useragent!!)
         }
+    
     override var ipAddress: String?
         get() = subject.ipAddress
         set(ipAddress) {
@@ -44,6 +48,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.ipAddressUpdated = true
             subject.setIpAddress(ipAddress!!)
         }
+    
     override var timezone: String?
         get() = subject.timezone
         set(timezone) {
@@ -51,6 +56,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.timezoneUpdated = true
             subject.setTimezone(timezone!!)
         }
+    
     override var language: String?
         get() = subject.language
         set(language) {
@@ -58,6 +64,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.languageUpdated = true
             subject.setLanguage(language!!)
         }
+    
     override var screenResolution: Size?
         get() = subject.screenResolution
         set(screenResolution) {
@@ -65,6 +72,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.screenResolutionUpdated = true
             subject.setScreenResolution(screenResolution!!.width, screenResolution.height)
         }
+    
     override var screenViewPort: Size?
         get() = subject.screenViewPort
         set(screenViewPort) {
@@ -72,6 +80,7 @@ class SubjectControllerImpl  // Constructors
             dirtyConfig.screenViewPortUpdated = true
             subject.setViewPort(screenViewPort!!.width, screenViewPort.height)
         }
+    
     override var colorDepth: Int?
         get() = subject.colorDepth
         set(colorDepth) {
@@ -82,7 +91,7 @@ class SubjectControllerImpl  // Constructors
 
     // Private methods
     private val subject: Subject
-        private get() = serviceProvider.orMakeSubject
+        get() = serviceProvider.orMakeSubject
     private val dirtyConfig: SubjectConfigurationUpdate
-        private get() = serviceProvider.subjectConfigurationUpdate
+        get() = serviceProvider.subjectConfigurationUpdate
 }

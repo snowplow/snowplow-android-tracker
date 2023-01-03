@@ -12,262 +12,118 @@ import java.util.*
  * This class represents the configuration of the tracker and the core tracker properties.
  * The TrackerConfiguration can be used to setup the tracker behaviour indicating what should be
  * tracked in term of automatic tracking and contexts/entities to track with the events.
- */
+ *
+ * Default values:
+ * devicePlatform = DevicePlatform.Mobile;
+ * base64encoding = true;
+ * logLevel = LogLevel.OFF;
+ * loggerDelegate = null;
+ * sessionContext = true;
+ * applicationContext = true;
+ * platformContext = true;
+ * geoLocationContext = false;
+ * screenContext = true;
+ * deepLinkContext = true;
+ * screenViewAutotracking = true;
+ * lifecycleAutotracking = false;
+ * installAutotracking = true;
+ * exceptionAutotracking = true;
+ * diagnosticAutotracking = false;
+ * userAnonymisation = false;
+ * 
+ * @param appId Identifier of the app.
+*/
 open class TrackerConfiguration(
     /**
      * @see .appId
      */
-    @JvmField
-    var appId: String
+    override var appId: String
 ) : TrackerConfigurationInterface, Configuration {
     
     /**
      * @see .devicePlatform
      */
-    @JvmField
-    var devicePlatform: DevicePlatform
+    override var devicePlatform: DevicePlatform = DevicePlatform.Mobile
 
     /**
      * @see .base64encoding
      */
-    @JvmField
-    var base64encoding: Boolean
+    override var base64encoding: Boolean = true
 
     /**
      * @see .logLevel
      */
-    @JvmField
-    var logLevel: LogLevel
+    override var logLevel: LogLevel = LogLevel.OFF
 
     /**
      * @see .loggerDelegate
      */
-    @JvmField
-    var loggerDelegate: LoggerDelegate?
-
-    /**
-     * @see .applicationContext
-     */
-    @JvmField
-    var applicationContext: Boolean
-
-    /**
-     * @see .platformContext
-     */
-    @JvmField
-    var platformContext: Boolean
-
-    /**
-     * @see .geoLocationContext
-     */
-    @JvmField
-    var geoLocationContext: Boolean
+    override var loggerDelegate: LoggerDelegate? = null
 
     /**
      * @see .sessionContext
      */
-    @JvmField
-    var sessionContext: Boolean
+    override var sessionContext: Boolean = true
+
+    /**
+     * @see .applicationContext
+     */
+    override var applicationContext: Boolean = true
+
+    /**
+     * @see .platformContext
+     */
+    override var platformContext: Boolean = true
+
+    /**
+     * @see .geoLocationContext
+     */
+    override var geoLocationContext: Boolean = false
 
     /**
      * @see .deepLinkContext
      */
-    @JvmField
-    var deepLinkContext: Boolean
+    override var deepLinkContext: Boolean = true
 
     /**
      * @see .screenContext
      */
-    @JvmField
-    var screenContext: Boolean
+    override var screenContext: Boolean = true
 
     /**
      * @see .screenViewAutotracking
      */
-    @JvmField
-    var screenViewAutotracking: Boolean
+    override var screenViewAutotracking: Boolean = true
 
     /**
      * @see .lifecycleAutotracking
      */
-    @JvmField
-    var lifecycleAutotracking: Boolean
+    override var lifecycleAutotracking: Boolean = false
 
     /**
      * @see .installAutotracking
      */
-    @JvmField
-    var installAutotracking: Boolean
+    override var installAutotracking: Boolean = true
 
     /**
      * @see .exceptionAutotracking
      */
-    @JvmField
-    var exceptionAutotracking: Boolean
+    override var exceptionAutotracking: Boolean = true
 
     /**
      * @see .diagnosticAutotracking
      */
-    @JvmField
-    var diagnosticAutotracking: Boolean
+    override var diagnosticAutotracking: Boolean = false
 
     /**
      * @see .userAnonymisation
      */
-    @JvmField
-    var userAnonymisation: Boolean
+    override var userAnonymisation: Boolean = false
 
     /**
      * @see .trackerVersionSuffix
      */
-    @JvmField
-    var trackerVersionSuffix: String? = null
-
-    // Getters and Setters
-    
-    override fun getAppId(): String {
-        return appId
-    }
-
-    override fun setAppId(appId: String) {
-        this.appId = appId
-    }
-
-    override fun getDevicePlatform(): DevicePlatform {
-        return devicePlatform
-    }
-
-    override fun setDevicePlatform(devicePlatform: DevicePlatform) {
-        this.devicePlatform = devicePlatform
-    }
-
-    override fun isBase64encoding(): Boolean {
-        return base64encoding
-    }
-
-    override fun setBase64encoding(base64encoding: Boolean) {
-        this.base64encoding = base64encoding
-    }
-
-    override fun getLogLevel(): LogLevel {
-        return logLevel
-    }
-
-    override fun setLogLevel(logLevel: LogLevel) {
-        this.logLevel = logLevel
-    }
-
-    override fun getLoggerDelegate(): LoggerDelegate? {
-        return loggerDelegate
-    }
-
-    override fun setLoggerDelegate(loggerDelegate: LoggerDelegate?) {
-        this.loggerDelegate = loggerDelegate
-    }
-
-    override fun isApplicationContext(): Boolean {
-        return applicationContext
-    }
-
-    override fun setApplicationContext(applicationContext: Boolean) {
-        this.applicationContext = applicationContext
-    }
-
-    override fun isPlatformContext(): Boolean {
-        return platformContext
-    }
-
-    override fun setPlatformContext(platformContext: Boolean) {
-        this.platformContext = platformContext
-    }
-
-    override fun isGeoLocationContext(): Boolean {
-        return geoLocationContext
-    }
-
-    override fun setGeoLocationContext(geoLocationContext: Boolean) {
-        this.geoLocationContext = geoLocationContext
-    }
-
-    override fun isSessionContext(): Boolean {
-        return sessionContext
-    }
-
-    override fun setSessionContext(sessionContext: Boolean) {
-        this.sessionContext = sessionContext
-    }
-
-    override fun isDeepLinkContext(): Boolean {
-        return deepLinkContext
-    }
-
-    override fun setDeepLinkContext(deepLinkContext: Boolean) {
-        this.deepLinkContext = deepLinkContext
-    }
-
-    override fun isScreenContext(): Boolean {
-        return screenContext
-    }
-
-    override fun setScreenContext(screenContext: Boolean) {
-        this.screenContext = screenContext
-    }
-
-    override fun isScreenViewAutotracking(): Boolean {
-        return screenViewAutotracking
-    }
-
-    override fun setScreenViewAutotracking(screenViewAutotracking: Boolean) {
-        this.screenViewAutotracking = screenViewAutotracking
-    }
-
-    override fun isLifecycleAutotracking(): Boolean {
-        return lifecycleAutotracking
-    }
-
-    override fun setLifecycleAutotracking(lifecycleAutotracking: Boolean) {
-        this.lifecycleAutotracking = lifecycleAutotracking
-    }
-
-    override fun isInstallAutotracking(): Boolean {
-        return installAutotracking
-    }
-
-    override fun setInstallAutotracking(installAutotracking: Boolean) {
-        this.installAutotracking = installAutotracking
-    }
-
-    override fun isExceptionAutotracking(): Boolean {
-        return exceptionAutotracking
-    }
-
-    override fun setExceptionAutotracking(exceptionAutotracking: Boolean) {
-        this.exceptionAutotracking = exceptionAutotracking
-    }
-
-    override fun isDiagnosticAutotracking(): Boolean {
-        return diagnosticAutotracking
-    }
-
-    override fun setDiagnosticAutotracking(diagnosticAutotracking: Boolean) {
-        this.diagnosticAutotracking = diagnosticAutotracking
-    }
-
-    override fun isUserAnonymisation(): Boolean {
-        return userAnonymisation
-    }
-
-    override fun setUserAnonymisation(userAnonymisation: Boolean) {
-        this.userAnonymisation = userAnonymisation
-    }
-
-    override fun getTrackerVersionSuffix(): String? {
-        return trackerVersionSuffix
-    }
-
-    override fun setTrackerVersionSuffix(trackerVersionSuffix: String?) {
-        this.trackerVersionSuffix = trackerVersionSuffix
-    }
+    override var trackerVersionSuffix: String? = null
     
     // Constructors
     
