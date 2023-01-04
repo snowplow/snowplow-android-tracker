@@ -200,7 +200,7 @@ object Snowplow {
                 ServiceProvider(context, namespace, network, listOf(*configurations))
             registerInstance(serviceProvider)
         }
-        return serviceProvider.orMakeTrackerController
+        return serviceProvider.orMakeTrackerController()
     }
 
     /**
@@ -212,7 +212,7 @@ object Snowplow {
     @JvmStatic
     val defaultTracker: TrackerController?
         get() {
-            return defaultServiceProvider?.orMakeTrackerController
+            return defaultServiceProvider?.orMakeTrackerController()
         }
 
     /**
@@ -225,7 +225,7 @@ object Snowplow {
     @Synchronized
     fun getTracker(namespace: String): TrackerController? {
         val serviceProvider = serviceProviderInstances[namespace] ?: return null
-        return serviceProvider.orMakeTrackerController
+        return serviceProvider.orMakeTrackerController()
     }
 
     /**

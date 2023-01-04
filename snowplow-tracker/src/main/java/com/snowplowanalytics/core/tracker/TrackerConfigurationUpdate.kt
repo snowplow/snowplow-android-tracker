@@ -10,8 +10,8 @@ class TrackerConfigurationUpdate : TrackerConfiguration {
     var sourceConfig: TrackerConfiguration? = null
     var isPaused = false
 
-    constructor(appId: String) : super(appId) {}
-    constructor(appId: String, jsonObject: JSONObject) : super(appId, jsonObject) {}
+    constructor(appId: String) : super(appId)
+    constructor(appId: String, jsonObject: JSONObject) : super(appId, jsonObject)
 
     // appId flag
     var appIdUpdated = false

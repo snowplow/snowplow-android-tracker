@@ -48,7 +48,7 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
 
     // Private methods
     private val emitter: Emitter
-        get() = serviceProvider.orMakeEmitter
+        get() = serviceProvider.orMakeEmitter()
     
     private val dirtyConfig: NetworkConfigurationUpdate
         get() = serviceProvider.networkConfigurationUpdate

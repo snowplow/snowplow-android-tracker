@@ -16,13 +16,14 @@ import java.util.concurrent.TimeUnit
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ServiceProvider(
     context: Context,
-    namespace: String,
+    override val namespace: String,
     networkConfiguration: NetworkConfiguration,
     configurations: List<Configuration>
 ) : ServiceProviderInterface {
     private val context: Context
-    private val namespace: String
     private val appId: String
+    override val isTrackerInitialized: Boolean
+        get() = tracker != null
 
     // Internal services
     private var tracker: Tracker? = null
@@ -47,16 +48,15 @@ class ServiceProvider(
     private var globalContextsConfiguration: GlobalContextsConfiguration? = null
 
     // Configuration updates
-    private var trackerConfigurationUpdate: TrackerConfigurationUpdate
-    private var networkConfigurationUpdate: NetworkConfigurationUpdate
-    private var subjectConfigurationUpdate: SubjectConfigurationUpdate
-    private var emitterConfigurationUpdate: EmitterConfigurationUpdate
-    private var sessionConfigurationUpdate: SessionConfigurationUpdate
-    private var gdprConfigurationUpdate: GdprConfigurationUpdate
+    override lateinit var trackerConfigurationUpdate: TrackerConfigurationUpdate
+    override lateinit var networkConfigurationUpdate: NetworkConfigurationUpdate
+    override lateinit var subjectConfigurationUpdate: SubjectConfigurationUpdate
+    override lateinit var emitterConfigurationUpdate: EmitterConfigurationUpdate
+    override lateinit var sessionConfigurationUpdate: SessionConfigurationUpdate
+    override lateinit var gdprConfigurationUpdate: GdprConfigurationUpdate
 
     init {
         // Initialization
-        this.namespace = namespace
         this.context = context
         appId = context.packageName
         
@@ -72,10 +72,11 @@ class ServiceProvider(
         networkConfigurationUpdate.sourceConfig = networkConfiguration
         trackerConfiguration = TrackerConfiguration(appId)
         processConfigurations(configurations)
+        
         if (trackerConfigurationUpdate.sourceConfig == null) {
             trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
         }
-        orMakeTracker // Build tracker to initialize NotificationCenter receivers
+        orMakeTracker() // Build tracker to initialize NotificationCenter receivers
     }
 
     fun reset(configurations: List<Configuration>) {
@@ -83,7 +84,7 @@ class ServiceProvider(
         resetConfigurationUpdates()
         processConfigurations(configurations)
         resetServices()
-        orMakeTracker
+        orMakeTracker()
     }
 
     fun shutdown() {
@@ -94,10 +95,6 @@ class ServiceProvider(
         resetServices()
         resetControllers()
         initializeConfigurationUpdates()
-    }
-
-    override fun getNamespace(): String {
-        return namespace
     }
 
     // Private methods
@@ -179,102 +176,75 @@ class ServiceProvider(
     }
 
     // Getters
-    override fun getOrMakeSubject(): Subject {
+    override fun orMakeSubject(): Subject {
         if (subject == null) {
             subject = makeSubject()
         }
         return subject!!
     }
 
-    override fun getOrMakeEmitter(): Emitter {
+    override fun orMakeEmitter(): Emitter {
         if (emitter == null) {
             emitter = makeEmitter()
         }
         return emitter!!
     }
+    
 
-    override fun isTrackerInitialized(): Boolean {
-        return tracker != null
-    }
-
-    override fun getOrMakeTracker(): Tracker {
+    override fun orMakeTracker(): Tracker {
         if (tracker == null) {
             tracker = makeTracker()
         }
         return tracker!!
     }
 
-    override fun getOrMakeTrackerController(): TrackerControllerImpl {
+    override fun orMakeTrackerController(): TrackerControllerImpl {
         if (trackerController == null) {
             trackerController = makeTrackerController()
         }
         return trackerController!!
     }
 
-    override fun getOrMakeSessionController(): SessionControllerImpl {
+    override fun orMakeSessionController(): SessionControllerImpl {
         if (sessionController == null) {
             sessionController = makeSessionController()
         }
         return sessionController!!
     }
 
-    override fun getOrMakeEmitterController(): EmitterControllerImpl {
+    override fun orMakeEmitterController(): EmitterControllerImpl {
         if (emitterController == null) {
             emitterController = makeEmitterController()
         }
         return emitterController!!
     }
 
-    override fun getOrMakeGdprController(): GdprControllerImpl {
+    override fun orMakeGdprController(): GdprControllerImpl {
         if (gdprController == null) {
             gdprController = makeGdprController()
         }
         return gdprController!!
     }
 
-    override fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl {
+    override fun orMakeGlobalContextsController(): GlobalContextsControllerImpl {
         if (globalContextsController == null) {
             globalContextsController = makeGlobalContextsController()
         }
         return globalContextsController!!
     }
 
-    override fun getOrMakeSubjectController(): SubjectControllerImpl {
+    override fun orMakeSubjectController(): SubjectControllerImpl {
         if (subjectController == null) {
             subjectController = makeSubjectController()
         }
         return subjectController!!
     }
 
-    override fun getOrMakeNetworkController(): NetworkControllerImpl {
+    override fun orMakeNetworkController(): NetworkControllerImpl {
         if (networkController == null) {
             networkController = makeNetworkController()
         }
         return networkController!!
-    }
-
-    override fun getTrackerConfigurationUpdate(): TrackerConfigurationUpdate {
-        return trackerConfigurationUpdate
-    }
-
-    override fun getNetworkConfigurationUpdate(): NetworkConfigurationUpdate {
-        return networkConfigurationUpdate
-    }
-
-    override fun getSubjectConfigurationUpdate(): SubjectConfigurationUpdate {
-        return subjectConfigurationUpdate
-    }
-
-    override fun getEmitterConfigurationUpdate(): EmitterConfigurationUpdate {
-        return emitterConfigurationUpdate
-    }
-
-    override fun getSessionConfigurationUpdate(): SessionConfigurationUpdate {
-        return sessionConfigurationUpdate
-    }
-
-    override fun getGdprConfigurationUpdate(): GdprConfigurationUpdate {
-        return gdprConfigurationUpdate
     }
 
     // Factories
@@ -314,10 +284,10 @@ class ServiceProvider(
     }
 
     private fun makeTracker(): Tracker {
-        val emitter = orMakeEmitter
-        val subject = orMakeSubject
-        val trackerConfig: TrackerConfigurationInterface = getTrackerConfigurationUpdate()
-        val sessionConfig: SessionConfigurationInterface = getSessionConfigurationUpdate()
+        val emitter = orMakeEmitter()
+        val subject = orMakeSubject()
+        val trackerConfig: TrackerConfigurationInterface = trackerConfigurationUpdate
+        val sessionConfig: SessionConfigurationInterface = sessionConfigurationUpdate
         val builder = TrackerBuilder(emitter, namespace, trackerConfig.appId, context)
             .subject(subject)
             .trackerVersionSuffix(trackerConfig.trackerVersionSuffix)
@@ -338,7 +308,7 @@ class ServiceProvider(
             .backgroundTimeout(sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS))
             .foregroundTimeout(sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS))
             .userAnonymisation(trackerConfig.userAnonymisation)
-        val gdprConfig = getGdprConfigurationUpdate()
+        val gdprConfig = gdprConfigurationUpdate
         if (gdprConfig.sourceConfig != null) {
             builder.gdprContext(
                 gdprConfig.basisForProcessing(),
@@ -381,7 +351,7 @@ class ServiceProvider(
 
     private fun makeGdprController(): GdprControllerImpl {
         val controller = GdprControllerImpl(this)
-        val gdpr = orMakeTracker.gdprContext
+        val gdpr = orMakeTracker().gdprContext
         if (gdpr != null) {
             controller.reset(
                 gdpr.basisForProcessing,

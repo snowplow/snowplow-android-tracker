@@ -57,7 +57,7 @@ public class ServiceProviderTest {
         ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, configurations);
 
         // pause emitter
-        provider.getOrMakeEmitterController().pause();
+        provider.orMakeEmitterController().pause();
 
         // refresh configuration
         List<Configuration> configurationUpdates = new ArrayList<Configuration>();
@@ -65,18 +65,18 @@ public class ServiceProviderTest {
         provider.reset(configurationUpdates);
 
         // track event and check that emitter is paused
-        provider.getOrMakeTrackerController().track(new Structured("cat", "act"));
+        provider.orMakeTrackerController().track(new Structured("cat", "act"));
         Thread.sleep(1000);
-        assertFalse(provider.getOrMakeEmitter().getEmitterStatus());
+        assertFalse(provider.orMakeEmitter().getEmitterStatus());
         assertEquals(0, networkConnection.sendingCount());
 
         // resume emitting
-        provider.getOrMakeEmitterController().resume();
+        provider.orMakeEmitterController().resume();
         for (int i = 0; i < 10 && networkConnection.sendingCount() < 1; i++) {
             Thread.sleep(600);
         }
         assertEquals(1, networkConnection.sendingCount());
-        provider.getOrMakeEmitter().flush();
+        provider.orMakeEmitter().flush();
     }
 
     @Test
@@ -87,7 +87,7 @@ public class ServiceProviderTest {
         ServiceProvider provider = new ServiceProvider(getContext(), "ns", networkConfig, new ArrayList<>());
 
         // listen for the error log
-        TrackerController tracker = provider.getOrMakeTrackerController();
+        TrackerController tracker = provider.orMakeTrackerController();
         final boolean[] loggedError = {false};
         tracker.setLoggerDelegate(new LoggerDelegate() {
             @Override
