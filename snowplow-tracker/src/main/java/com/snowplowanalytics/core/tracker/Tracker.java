@@ -642,8 +642,8 @@ public class Tracker {
 
     private void transformEvent(@NonNull TrackerEvent event) {
         // Application_install event needs the timestamp to the real installation event.
-        if (event.schema != null
-                && event.schema.equals(TrackerConstants.SCHEMA_APPLICATION_INSTALL)
+        if (event.getSchema() != null
+                && event.getSchema().equals(TrackerConstants.SCHEMA_APPLICATION_INSTALL)
                 && event.trueTimestamp != null)
         {
             event.timestamp = event.trueTimestamp;
@@ -661,7 +661,7 @@ public class Tracker {
         } else {
             addSelfDescribingPropertiesToPayload(payload, event);
         }
-        List<SelfDescribingJson> contexts = event.contexts;
+        List<SelfDescribingJson> contexts = (List<SelfDescribingJson>) event.contexts;
         addBasicContextsToContexts(contexts, event);
         addGlobalContextsToContexts(contexts, event);
         addStateMachineEntitiesToContexts(contexts, event);
@@ -689,14 +689,14 @@ public class Tracker {
     }
 
     private void addPrimitivePropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
-        payload.add(Parameters.EVENT, event.eventName);
+        payload.add(Parameters.EVENT, event.getName());
         payload.addMap(event.payload);
     }
 
     private void addSelfDescribingPropertiesToPayload(@NonNull Payload payload, @NonNull TrackerEvent event) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED);
 
-        SelfDescribingJson data = new SelfDescribingJson(event.schema, event.payload);
+        SelfDescribingJson data = new SelfDescribingJson(event.getSchema(), event.payload);
         HashMap<String, Object> unstructuredEventPayload = new HashMap<>();
         unstructuredEventPayload.put(Parameters.SCHEMA, TrackerConstants.SCHEMA_UNSTRUCT_EVENT);
         unstructuredEventPayload.put(Parameters.DATA, data.getMap());
@@ -716,11 +716,11 @@ public class Tracker {
         String url = null;
         String referrer = null;
 
-        if (event.schema.equals(DeepLinkReceived.schema) && event.payload != null) {
+        if (event.getSchema().equals(DeepLinkReceived.schema) && event.payload != null) {
             url = (String)event.payload.get(DeepLinkReceived.PARAM_URL);
             referrer = (String)event.payload.get(DeepLinkReceived.PARAM_REFERRER);
         }
-        else if (event.schema.equals(TrackerConstants.SCHEMA_SCREEN_VIEW) && contexts != null) {
+        else if (event.getSchema().equals(TrackerConstants.SCHEMA_SCREEN_VIEW) && contexts != null) {
             for (SelfDescribingJson entity : contexts) {
                 if (entity instanceof DeepLink) {
                     DeepLink deepLink = (DeepLink) entity;
