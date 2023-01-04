@@ -19,8 +19,8 @@ import org.json.JSONObject
 object JsonUtils {
     @JvmStatic
     @Throws(JSONException::class)
-    fun jsonToMap(json: JSONObject): Map<String?, Any?> {
-        var items: Map<String?, Any?> = HashMap()
+    fun jsonToMap(json: JSONObject): Map<String, Any?> {
+        var items: Map<String, Any?> = HashMap()
         if (json !== JSONObject.NULL) {
             items = toMap(json)
         }
@@ -28,8 +28,8 @@ object JsonUtils {
     }
 
     @Throws(JSONException::class)
-    private fun toMap(`object`: JSONObject): Map<String?, Any?> {
-        val map: MutableMap<String?, Any?> = HashMap()
+    private fun toMap(`object`: JSONObject): Map<String, Any?> {
+        val map: MutableMap<String, Any?> = HashMap()
         val keysItr = `object`.keys()
         while (keysItr.hasNext()) {
             val key = keysItr.next()
