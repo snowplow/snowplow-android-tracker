@@ -51,7 +51,7 @@ class TrackerControllerImpl  // Constructors
     override val version: String
         get() = BuildConfig.TRACKER_LABEL
     override val isTracking: Boolean
-        get() = tracker.getDataCollection()
+        get() = tracker.dataCollection
 
     // Getters and Setters
     override val namespace: String
@@ -66,11 +66,11 @@ class TrackerControllerImpl  // Constructors
         }
     
     override var devicePlatform: DevicePlatform
-        get() = tracker.devicePlatform
+        get() = tracker.platform
         set(devicePlatform) {
             dirtyConfig.devicePlatform = devicePlatform
             dirtyConfig.devicePlatformUpdated = true
-            tracker.devicePlatform = devicePlatform
+            tracker.platform = devicePlatform
         }
     
     override var base64encoding: Boolean
@@ -82,11 +82,11 @@ class TrackerControllerImpl  // Constructors
         }
     
     override var logLevel: LogLevel
-        get() = tracker.level
+        get() = tracker.logLevel
         set(logLevel) {
             dirtyConfig.logLevel = logLevel
             dirtyConfig.logLevelUpdated = true
-            tracker.level = logLevel
+            tracker.logLevel = logLevel
         }
     
     override var loggerDelegate: LoggerDelegate?
@@ -106,11 +106,11 @@ class TrackerControllerImpl  // Constructors
         }
     
     override var platformContext: Boolean
-        get() = tracker.mobileContext
+        get() = tracker.platformContextEnabled
         set(platformContext) {
             dirtyConfig.platformContext = platformContext
             dirtyConfig.platformContextUpdated = true
-            tracker.mobileContext = platformContext
+            tracker.platformContextEnabled = platformContext
         }
     
     override var geoLocationContext: Boolean
@@ -146,51 +146,51 @@ class TrackerControllerImpl  // Constructors
         }
     
     override var screenViewAutotracking: Boolean
-        get() = tracker.activityTracking
+        get() = tracker.screenViewAutotracking
         set(screenViewAutotracking) {
             dirtyConfig.screenViewAutotracking = screenViewAutotracking
             dirtyConfig.screenViewAutotrackingUpdated = true
-            tracker.activityTracking = screenViewAutotracking
+            tracker.screenViewAutotracking = screenViewAutotracking
         }
     
     override var lifecycleAutotracking: Boolean
-        get() = tracker.lifecycleEvents
+        get() = tracker.lifecycleAutotracking
         set(lifecycleAutotracking) {
             dirtyConfig.lifecycleAutotracking = lifecycleAutotracking
             dirtyConfig.lifecycleAutotrackingUpdated = true
-            tracker.lifecycleEvents = lifecycleAutotracking
+            tracker.lifecycleAutotracking = lifecycleAutotracking
         }
     
     override var installAutotracking: Boolean
-        get() = tracker.installTracking
+        get() = tracker.installAutotracking
         set(installAutotracking) {
             dirtyConfig.installAutotracking = installAutotracking
             dirtyConfig.installAutotrackingUpdated = true
-            tracker.installTracking = installAutotracking
+            tracker.installAutotracking = installAutotracking
         }
     
     override var exceptionAutotracking: Boolean
-        get() = tracker.applicationCrash
+        get() = tracker.exceptionAutotracking
         set(exceptionAutotracking) {
             dirtyConfig.exceptionAutotracking = exceptionAutotracking
             dirtyConfig.exceptionAutotrackingUpdated = true
-            tracker.applicationCrash = exceptionAutotracking
+            tracker.exceptionAutotracking = exceptionAutotracking
         }
     
     override var diagnosticAutotracking: Boolean
-        get() = tracker.trackerDiagnostic
+        get() = tracker.diagnosticAutotracking
         set(diagnosticAutotracking) {
             dirtyConfig.diagnosticAutotracking = diagnosticAutotracking
             dirtyConfig.diagnosticAutotrackingUpdated = true
-            tracker.trackerDiagnostic = diagnosticAutotracking
+            tracker.diagnosticAutotracking = diagnosticAutotracking
         }
     
     override var userAnonymisation: Boolean
-        get() = tracker.isUserAnonymisation
+        get() = tracker.userAnonymisation
         set(userAnonymisation) {
             dirtyConfig.userAnonymisation = userAnonymisation
             dirtyConfig.userAnonymisationUpdated = true
-            tracker.isUserAnonymisation = userAnonymisation
+            tracker.userAnonymisation = userAnonymisation
         }
 
     // The trackerVersionSuffix shouldn't be updated.

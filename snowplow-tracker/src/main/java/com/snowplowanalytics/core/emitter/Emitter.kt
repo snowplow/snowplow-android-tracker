@@ -41,7 +41,6 @@ import java.util.function.Consumer
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
  */
-@RequiresApi(Build.VERSION_CODES.N)
 class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>? = null) {
     private val TAG = Emitter::class.java.simpleName
 

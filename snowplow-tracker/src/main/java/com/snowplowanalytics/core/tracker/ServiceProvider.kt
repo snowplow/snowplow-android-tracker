@@ -3,13 +3,13 @@ package com.snowplowanalytics.core.tracker
 import android.content.Context
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.emitter.*
+import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.session.SessionConfigurationInterface
 import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
-import com.snowplowanalytics.core.tracker.Tracker.TrackerBuilder
 import com.snowplowanalytics.snowplow.configuration.*
 import java.util.concurrent.TimeUnit
 
@@ -288,36 +288,40 @@ class ServiceProvider(
         val subject = orMakeSubject()
         val trackerConfig: TrackerConfigurationInterface = trackerConfigurationUpdate
         val sessionConfig: SessionConfigurationInterface = sessionConfigurationUpdate
-        val builder = TrackerBuilder(emitter, namespace, trackerConfig.appId, context)
-            .subject(subject)
-            .trackerVersionSuffix(trackerConfig.trackerVersionSuffix)
-            .base64(trackerConfig.base64encoding)
-            .level(trackerConfig.logLevel)
-            .loggerDelegate(trackerConfig.loggerDelegate)
-            .platform(trackerConfig.devicePlatform)
-            .sessionContext(trackerConfig.sessionContext)
-            .applicationContext(trackerConfig.applicationContext)
-            .mobileContext(trackerConfig.platformContext)
-            .deepLinkContext(trackerConfig.deepLinkContext)
-            .screenContext(trackerConfig.screenContext)
-            .screenviewEvents(trackerConfig.screenViewAutotracking)
-            .lifecycleEvents(trackerConfig.lifecycleAutotracking)
-            .installTracking(trackerConfig.installAutotracking)
-            .applicationCrash(trackerConfig.exceptionAutotracking)
-            .trackerDiagnostic(trackerConfig.diagnosticAutotracking)
-            .backgroundTimeout(sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS))
-            .foregroundTimeout(sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS))
-            .userAnonymisation(trackerConfig.userAnonymisation)
         val gdprConfig = gdprConfigurationUpdate
-        if (gdprConfig.sourceConfig != null) {
-            builder.gdprContext(
+
+        val builder = { tracker: Tracker ->
+            tracker.subject = subject
+            tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
+            tracker.base64Encoded = trackerConfig.base64encoding
+            tracker.platform = trackerConfig.devicePlatform
+            tracker.logLevel = trackerConfig.logLevel
+            tracker.loggerDelegate = trackerConfig.loggerDelegate
+            tracker.sessionContext = trackerConfig.sessionContext
+            tracker.applicationContext = trackerConfig.applicationContext
+            tracker.platformContextEnabled = trackerConfig.platformContext
+            tracker.geoLocationContext = trackerConfig.geoLocationContext
+            tracker.deepLinkContext = trackerConfig.deepLinkContext
+            tracker.screenContext = trackerConfig.screenContext
+            tracker.screenViewAutotracking = trackerConfig.screenViewAutotracking
+            tracker.lifecycleAutotracking = trackerConfig.lifecycleAutotracking
+            tracker.installAutotracking = trackerConfig.installAutotracking
+            tracker.exceptionAutotracking = trackerConfig.exceptionAutotracking
+            tracker.diagnosticAutotracking = trackerConfig.diagnosticAutotracking
+            tracker.userAnonymisation = trackerConfig.userAnonymisation
+            tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
+
+            gdprConfig.sourceConfig?.let { tracker.gdprContext = Gdpr(
                 gdprConfig.basisForProcessing(),
                 gdprConfig.documentId(),
                 gdprConfig.documentVersion(),
-                gdprConfig.documentDescription()
-            )
+                gdprConfig.documentDescription()) }
+
+            tracker.backgroundTimeout = sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS)
+            tracker.foregroundTimeout = sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS)
         }
-        val tracker = Tracker(builder)
+        
+        val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration!!.contextGenerators)
         }

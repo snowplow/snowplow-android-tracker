@@ -19,7 +19,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -56,8 +55,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -149,7 +146,7 @@ public class TrackerTest {
         assertNotNull(tracker.getSubject());
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
-        assertFalse(tracker.getApplicationCrash());
+        assertFalse(tracker.getExceptionAutotracking());
         assertTrue(tracker.getLifecycleEvents());
         assertTrue(tracker.getInstallTracking());
         assertTrue(tracker.getApplicationContext());
@@ -477,7 +474,7 @@ public class TrackerTest {
                 .applicationCrash(true)
         );
 
-        assertTrue(tracker.getApplicationCrash());
+        assertTrue(tracker.getExceptionAutotracking());
         assertEquals(
                 ExceptionHandler.class,
                 Thread.getDefaultUncaughtExceptionHandler().getClass()
