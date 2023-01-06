@@ -59,6 +59,16 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private val context: Context
     private val stateManager = StateManager()
+    fun getScreenState(): ScreenState? {
+        val state = stateManager.trackerState.getState("ScreenContext")
+            ?: // Legacy initialization
+            return ScreenState()
+
+        return if (state is ScreenState) {
+            state
+        } else null
+    }
+    
     private var trackerVersion = BuildConfig.TRACKER_LABEL
         set(base64) {
             if (!builderFinished) {
@@ -126,37 +136,37 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         }
 
     var exceptionAutotracking: Boolean = TrackerDefaults.exceptionAutotracking
-        set(autotracking) {
+        set(willTrack) {
             if (!builderFinished) {
-                field = autotracking
+                field = willTrack
             }
         }
 
     var diagnosticAutotracking: Boolean = TrackerDefaults.diagnosticAutotracking
-        set(autotracking) {
+        set(willTrack) {
             if (!builderFinished) {
-                field = autotracking
+                field = willTrack
             }
         }
     
     var lifecycleAutotracking: Boolean = TrackerDefaults.lifecycleAutotracking
-        set(autotracking) {
+        set(willTrack) {
             if (!builderFinished) {
-                field = autotracking
+                field = willTrack
             }
         }
     
     var installAutotracking: Boolean = TrackerDefaults.installAutotracking
-        set(autotracking) {
+        set(willTrack) {
             if (!builderFinished) {
-                field = autotracking
+                field = willTrack
             }
         }
 
     var screenViewAutotracking: Boolean = TrackerDefaults.screenViewAutotracking
-        set(autotracking) {
+        set(willTrack) {
             if (!builderFinished) {
-                field = autotracking
+                field = willTrack
             }
         }
 
@@ -434,6 +444,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         emitter.shutdown()
     }
     // --- Event Tracking Functions
+    
     /**
      * Handles tracking the different types of events that
      * the Tracker can encounter.
@@ -445,6 +456,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         if (!dataCollection) {
             return null
         }
+        
         event.beginProcessing(this)
         var stateSnapshot: TrackerStateSnapshot
         var trackerEvent: TrackerEvent
@@ -496,7 +508,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun addBasicPropertiesToPayload(payload: Payload, event: TrackerEvent) {
         payload.add(Parameters.EID, event.eventId.toString())
-        payload.add(Parameters.DEVICE_TIMESTAMP, java.lang.Long.toString(event.timestamp))
+        payload.add(Parameters.DEVICE_TIMESTAMP, event.timestamp.toString())
         if (event.trueTimestamp != null) {
             payload.add(Parameters.TRUE_TIMESTAMP, event.trueTimestamp.toString())
         }
@@ -544,15 +556,14 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     ) {
         var url: String? = null
         var referrer: String? = null
-        if (event.schema == DeepLinkReceived.schema && event.payload != null) {
+        if (event.schema == DeepLinkReceived.schema) {
             url = event.payload[DeepLinkReceived.PARAM_URL] as String?
             referrer = event.payload[DeepLinkReceived.PARAM_REFERRER] as String?
         } else if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && contexts != null) {
             for (entity in contexts) {
                 if (entity is DeepLink) {
-                    val deepLink = entity
-                    url = deepLink.url
-                    referrer = deepLink.referrer
+                    url = entity.url
+                    referrer = entity.referrer
                     break
                 }
             }
@@ -611,9 +622,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         if (geoLocationContext) {
             contexts.add(getGeoLocationContext(context))
         }
-        if (gdprContext != null) {
-            contexts.add(gdprContext!!.context)
-        }
+        gdprContext?.let { contexts.add(it.context) }
     }
 
     private fun addGlobalContextsToContexts(
@@ -639,6 +648,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         if (contexts.isEmpty()) {
             return
         }
+        
         val data: MutableList<Map<String?, Any?>> = LinkedList()
         for (context in contexts) {
             if (context != null) {
@@ -653,7 +663,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             Parameters.CONTEXT
         )
     }
+    
     // --- Helpers
+    
     /**
      * Builds and adds a finalized payload of a service event
      * by adding in extra information to the payload:
@@ -708,7 +720,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         // Add this payload to the emitter
         emitter.add(payload)
     }
+    
     // --- Controls
+    
     /**
      * Starts event collection processes
      * again.
@@ -757,7 +771,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
      * Convenience function for starting a new session.
      */
     fun startNewSession() {
-        session!!.startNewSession()
+        session?.startNewSession()
     }
     
     // --- GDPR context
@@ -785,26 +799,10 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     fun disableGdprContext() {
         gdprContext = null
     }
-    
-    // --- Getters
-
-    /**
-     * Internal use only
-     * @return screen state from tracker
-     */
-    fun getScreenState(): ScreenState? {
-        val state = stateManager.trackerState.getState("ScreenContext")
-            ?: // Legacy initialization
-            return ScreenState()
-        
-        return if (state is ScreenState) {
-            state
-        } else null
-    }
 
     // --- Global contexts
+    
     fun setGlobalContextGenerators(globalContexts: Map<String, GlobalContext>) {
-        Objects.requireNonNull(globalContexts)
         synchronized(globalContextGenerators) {
             globalContextGenerators.clear()
             globalContextGenerators.putAll(globalContexts)
@@ -812,8 +810,6 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     }
 
     fun addGlobalContext(generator: GlobalContext, tag: String): Boolean {
-        Objects.requireNonNull(generator)
-        Objects.requireNonNull(tag)
         synchronized(globalContextGenerators) {
             if (globalContextGenerators.containsKey(tag)) {
                 return false
@@ -824,7 +820,6 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     }
 
     fun removeGlobalContext(tag: String): GlobalContext? {
-        Objects.requireNonNull(tag)
         synchronized(globalContextGenerators) { return globalContextGenerators.remove(tag) }
     }
 
