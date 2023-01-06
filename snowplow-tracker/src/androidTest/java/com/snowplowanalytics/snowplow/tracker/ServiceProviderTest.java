@@ -46,10 +46,10 @@ public class ServiceProviderTest {
     public void testUpdatingConfigurationRetainsPausedEmitter() throws InterruptedException {
         NetworkConfiguration networkConfig = new NetworkConfiguration("com.acme", POST);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("appId");
-        trackerConfig.installAutotracking = false;
-        trackerConfig.lifecycleAutotracking = false;
-        trackerConfig.screenViewAutotracking = false;
-        trackerConfig.diagnosticAutotracking = false;
+        trackerConfig.setInstallAutotracking(false);
+        trackerConfig.setLifecycleAutotracking(false);
+        trackerConfig.setScreenViewAutotracking(false);
+        trackerConfig.setDiagnosticAutotracking(false);
         MockNetworkConnection networkConnection = new MockNetworkConnection(POST, 200);
         networkConfig.setNetworkConnection(networkConnection);
         List<Configuration> configurations = new ArrayList<>();

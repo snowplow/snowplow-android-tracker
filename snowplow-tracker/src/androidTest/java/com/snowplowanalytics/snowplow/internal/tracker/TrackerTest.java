@@ -109,23 +109,24 @@ public class TrackerTest {
         Emitter emitter = new Emitter(getContext(), "testUrl", builder);
         Subject subject = new Subject(getContext(), null);
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "myNamespace", "myAppId", getContext())
-            .subject(subject)
-            .platform(DevicePlatform.InternetOfThings)
-            .base64(false)
-            .level(LogLevel.VERBOSE)
-            .threadCount(1)
-            .sessionContext(false)
-            .mobileContext(false)
-            .geoLocationContext(false)
-            .foregroundTimeout(5)
-            .backgroundTimeout(5)
-            .timeUnit(TimeUnit.SECONDS)
-            .applicationCrash(false)
-            .lifecycleEvents(true)
-            .installTracking(installTracking)
-            .applicationContext(true)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSubject(subject);
+            tracker.setPlatform(DevicePlatform.InternetOfThings);
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setThreadCount(1);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setForegroundTimeout(5);
+            tracker.setBackgroundTimeout(5);
+            tracker.setTimeUnit(TimeUnit.SECONDS);
+            tracker.setExceptionAutotracking(false);
+            tracker.setLifecycleAutotracking(true);
+            tracker.setInstallAutotracking(installTracking);
+            tracker.setApplicationContext(true);
+        });
+        tracker = new Tracker(emitter, "myNamespace", "myAppId", getContext(), trackerBuilder);
         return tracker;
     }
 
@@ -147,8 +148,8 @@ public class TrackerTest {
         assertEquals(LogLevel.VERBOSE, tracker.getLogLevel());
         assertEquals(2, tracker.getThreadCount());
         assertFalse(tracker.getExceptionAutotracking());
-        assertTrue(tracker.getLifecycleEvents());
-        assertTrue(tracker.getInstallTracking());
+        assertTrue(tracker.getLifecycleAutotracking());
+        assertTrue(tracker.getInstallAutotracking());
         assertTrue(tracker.getApplicationContext());
     }
 
@@ -223,17 +224,17 @@ public class TrackerTest {
             fail("Exception on Emitter creation");
         }
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(false)
-                .mobileContext(false)
-                .screenContext(false)
-                .geoLocationContext(false)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setScreenContext(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setInstallAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+        });
+        tracker = new Tracker(emitter, namespace, "testTrackWithNoContext", getContext(), trackerBuilder);
 
         EventStore eventStore = emitter.getEventStore();
         if (eventStore != null) {
@@ -289,17 +290,17 @@ public class TrackerTest {
             fail("Exception on Emitter creation");
         }
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "testTrackWithNoContext", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(false)
-                .mobileContext(false)
-                .screenContext(false)
-                .geoLocationContext(false)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setScreenContext(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setInstallAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+        });
+        tracker = new Tracker(emitter, namespace, "testTrackWithNoContext", getContext(), trackerBuilder);
 
         Log.i("testTrackWithNoContext", "Send ScreenView event");
         tracker.track(new ScreenView("name"));
@@ -345,16 +346,17 @@ public class TrackerTest {
         Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
         Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(false)
-                .mobileContext(false)
-                .geoLocationContext(false)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
 
         tracker.pauseEventTracking();
         UUID eventId = tracker.track(new ScreenView("name"));
@@ -380,19 +382,19 @@ public class TrackerTest {
         Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
         Emitter emitter = new Emitter(getContext(), getMockServerURI(mockWebServer), builder);
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(true)
-                .mobileContext(false)
-                .geoLocationContext(false)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-                .foregroundTimeout(5)
-                .backgroundTimeout(5)
-                .timeUnit(TimeUnit.SECONDS)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+            tracker.setForegroundTimeout(5);
+            tracker.setBackgroundTimeout(5);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
 
         assertNotNull(tracker.getSession());
         tracker.resumeSessionChecking();
@@ -410,20 +412,19 @@ public class TrackerTest {
         Consumer<Emitter> builder = (emitter -> emitter.setBufferOption(BufferOption.Single));
         Emitter emitter = new Emitter(getContext(), "fake-uri", builder);
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(false)
-                .mobileContext(false)
-                .geoLocationContext(false)
-                .screenContext(true)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-                .foregroundTimeout(5)
-                .backgroundTimeout(5)
-                .timeUnit(TimeUnit.SECONDS)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(false);
+            tracker.setPlatformContextEnabled(false);
+            tracker.setGeoLocationContext(false);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+            tracker.setForegroundTimeout(5);
+            tracker.setBackgroundTimeout(5);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
 
         ScreenState screenState = tracker.getScreenState();
         assertNotNull(screenState);
@@ -466,13 +467,14 @@ public class TrackerTest {
 
         Emitter emitter = new Emitter(getContext(), "com.acme", null);
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .installTracking(false)
-                .screenviewEvents(false)
-                .applicationCrash(true)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(true);
+            tracker.setScreenViewAutotracking(false);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
 
         assertTrue(tracker.getExceptionAutotracking());
         assertEquals(
@@ -495,13 +497,14 @@ public class TrackerTest {
         );
 
         Emitter emitter = new Emitter(getContext(), "com.acme", null);
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .installTracking(false)
-                .screenviewEvents(false)
-                .applicationCrash(false)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
 
         ExceptionHandler handler1 = new ExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(handler1);
@@ -520,18 +523,17 @@ public class TrackerTest {
         Emitter emitter = new Emitter(getContext(), "fake-uri", builder);
         emitter.pauseEmit();
 
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "ns", "myAppId", getContext())
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .sessionContext(true)
-                .installTracking(false)
-                .applicationCrash(false)
-                .screenviewEvents(false)
-                .foregroundTimeout(5)
-                .backgroundTimeout(5)
-                .backgroundTimeout(5)
-                .timeUnit(TimeUnit.SECONDS)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(true);
+            tracker.setInstallAutotracking(false);
+            tracker.setExceptionAutotracking(false);
+            tracker.setScreenViewAutotracking(false);
+            tracker.setForegroundTimeout(5);
+            tracker.setBackgroundTimeout(5);
+        });
+        tracker = new Tracker(emitter, "ns", "myAppId", getContext(), trackerBuilder);
 
         tracker.track(new Structured("c", "a"));
         String sessionIdStart = tracker.getSession().getState().getSessionId();

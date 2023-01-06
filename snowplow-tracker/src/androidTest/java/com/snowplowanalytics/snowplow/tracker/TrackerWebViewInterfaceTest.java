@@ -51,9 +51,9 @@ public class TrackerWebViewInterfaceTest {
 
         NetworkConfiguration networkConfig = new NetworkConfiguration(networkConnection);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("app1");
-        trackerConfig.sessionContext = false;
-        trackerConfig.platformContext = false;
-        trackerConfig.base64encoding = false;
+        trackerConfig.setSessionContext(false);
+        trackerConfig.setPlatformContext(false);
+        trackerConfig.setBase64encoding(false);
 
         String trackerNamespace = String.valueOf(Math.random());
         Snowplow.removeAllTrackers();

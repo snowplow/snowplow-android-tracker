@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -235,12 +236,13 @@ public class SessionTest {
         cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker");
 
         Emitter emitter = new Emitter(getContext(), "", null);
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker", "app", getContext())
-                .sessionContext(true)
-                .lifecycleEvents(true)
-                .foregroundTimeout(100)
-                .backgroundTimeout(2)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSessionContext(true);
+            tracker.setLifecycleAutotracking(true);
+            tracker.setForegroundTimeout(2);
+            tracker.setBackgroundTimeout(100);
+        });
+        Tracker tracker = new Tracker(emitter, "tracker", "app", getContext(), trackerBuilder);
         Session session = tracker.getSession();
 
         getSessionContext(session, "event_1", timestamp, false);
@@ -271,12 +273,13 @@ public class SessionTest {
         cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker");
 
         Emitter emitter = new Emitter(getContext(), "", null);
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker", "app", getContext())
-                .sessionContext(true)
-                .lifecycleEvents(true)
-                .foregroundTimeout(100)
-                .backgroundTimeout(2)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSessionContext(true);
+            tracker.setLifecycleAutotracking(true);
+            tracker.setForegroundTimeout(100);
+            tracker.setBackgroundTimeout(2);
+        });
+        Tracker tracker = new Tracker(emitter, "tracker", "app", getContext(), trackerBuilder);
         Session session = tracker.getSession();
 
         getSessionContext(session, "event_1", timestamp, false);
@@ -358,16 +361,13 @@ public class SessionTest {
         cleanSharedPreferences(getContext(), TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker2");
 
         Emitter emitter = new Emitter(getContext(), "", null);
-        Tracker tracker1 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker1", "app", getContext())
-                .sessionContext(true)
-                .foregroundTimeout(20)
-                .backgroundTimeout(20)
-        );
-        Tracker tracker2 = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
-                .sessionContext(true)
-                .foregroundTimeout(20)
-                .backgroundTimeout(20)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSessionContext(true);
+            tracker.setForegroundTimeout(20);
+            tracker.setBackgroundTimeout(20);
+        });
+        Tracker tracker1 = new Tracker(emitter, "tracker1", "app", getContext(), trackerBuilder);
+        Tracker tracker2 = new Tracker(emitter, "tracker2", "app", getContext(), trackerBuilder);
         Session session1 = tracker1.getSession();
         Session session2 = tracker2.getSession();
 
@@ -394,11 +394,7 @@ public class SessionTest {
         String id2 = session2.getState().getSessionId();
 
         // Recreate tracker2
-        Tracker tracker2b = new Tracker(new Tracker.TrackerBuilder(emitter, "tracker2", "app", getContext())
-                .sessionContext(true)
-                .foregroundTimeout(20)
-                .backgroundTimeout(20)
-        );
+        Tracker tracker2b = new Tracker(emitter, "tracker2", "app", getContext(), trackerBuilder);
         tracker2b.getSession().getSessionContext("session2b-fake-id3", timestamp, false);
         long initialValue2b = tracker2b.getSession().getSessionIndex();
         String previousId2b = tracker2b.getSession().getState().getPreviousSessionId();

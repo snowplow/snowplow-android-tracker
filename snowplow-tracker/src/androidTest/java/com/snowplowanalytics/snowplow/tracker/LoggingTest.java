@@ -82,11 +82,12 @@ public class LoggingTest {
 
     @Test
     public void VerboseLogsShownWhenVerboseSet() {
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
-                .sessionContext(true)
-                .level(LogLevel.VERBOSE)
-                .loggerDelegate(mockLoggerDelegate)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setLogLevel(LogLevel.VERBOSE);
+            tracker.setSessionContext(true);
+            tracker.setLoggerDelegate(mockLoggerDelegate);
+        });
+        tracker = new Tracker(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext(), trackerBuilder);
 
         assertTrue(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
         assertTrue(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
@@ -110,11 +111,12 @@ public class LoggingTest {
 
     @Test
     public void DebugLogsShownWhenDebugSet() {
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
-                .sessionContext(true)
-                .level(LogLevel.DEBUG)
-                .loggerDelegate(mockLoggerDelegate)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setLogLevel(LogLevel.DEBUG);
+            tracker.setSessionContext(true);
+            tracker.setLoggerDelegate(mockLoggerDelegate);
+        });
+        tracker = new Tracker(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext(), trackerBuilder);
 
         assertTrue(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
         assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));
@@ -138,10 +140,11 @@ public class LoggingTest {
 
     @Test
     public void LoggingOffByDefault() {
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext())
-                .sessionContext(true)
-                .loggerDelegate(mockLoggerDelegate)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSessionContext(true);
+            tracker.setLoggerDelegate(mockLoggerDelegate);
+        });
+        tracker = new Tracker(emitter, "namespace", "myAppId", ApplicationProvider.getApplicationContext(), trackerBuilder);
 
         assertFalse(mockLoggerDelegate.capturedLogs.contains("Session checking has been resumed. (debug)"));
         assertFalse(mockLoggerDelegate.capturedLogs.contains("Tracker created successfully. (verbose)"));

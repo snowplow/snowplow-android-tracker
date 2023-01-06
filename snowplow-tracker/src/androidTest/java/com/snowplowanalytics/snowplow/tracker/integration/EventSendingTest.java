@@ -231,14 +231,15 @@ public class EventSendingTest extends AndroidTestCase {
         Subject subject = new Subject(getContext(), null);
 
         if (tracker != null) tracker.close();
-        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, namespace, "myAppId", getContext())
-                .subject(subject)
-                .base64(false)
-                .level(LogLevel.DEBUG)
-                .sessionContext(true)
-                .mobileContext(true)
-                .geoLocationContext(false)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setSubject(subject);
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.DEBUG);
+            tracker.setSessionContext(true);
+            tracker.setPlatformContextEnabled(true);
+            tracker.setGeoLocationContext(false);
+        });
+        tracker = new Tracker(emitter, namespace, "myAppId", getContext(), trackerBuilder);
         emitter.getEventStore().removeAllEvents();
         return tracker;
     }

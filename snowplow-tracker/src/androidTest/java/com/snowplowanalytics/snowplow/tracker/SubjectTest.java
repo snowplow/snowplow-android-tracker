@@ -23,6 +23,7 @@ import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.core.tracker.Subject;
 import com.snowplowanalytics.core.tracker.Logger;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
+import com.snowplowanalytics.snowplow.util.Size;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -59,14 +60,14 @@ public class SubjectTest {
     @Test
     public void testSetScreenRes() {
         Subject subject = createSubject();
-        subject.setScreenResolution(3000,1000);
+        subject.setScreenResolution(new Size(3000,1000));
         assertEquals("3000x1000", subject.getSubject(false).get("res"));
     }
 
     @Test
     public void testSetViewPort() {
         Subject subject = createSubject();
-        subject.setViewPort(3000,1000);
+        subject.setScreenViewPort(new Size(3000,1000));
         assertEquals("3000x1000", subject.getSubject(false).get("vp"));
     }
 

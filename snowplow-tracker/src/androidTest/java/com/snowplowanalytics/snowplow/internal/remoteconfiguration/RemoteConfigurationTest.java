@@ -76,7 +76,7 @@ public class RemoteConfigurationTest {
         NetworkConfiguration networkConfiguration = configurationBundle.networkConfiguration;
         assertEquals(HttpMethod.GET, networkConfiguration.getMethod());
         TrackerConfiguration trackerConfiguration = configurationBundle.trackerConfiguration;
-        assertFalse(trackerConfiguration.applicationContext);
+        assertFalse(trackerConfiguration.getApplicationContext());
         SessionConfiguration sessionConfiguration = configurationBundle.sessionConfiguration;
         assertEquals(60, sessionConfiguration.getForegroundTimeout().convert(TimeUnit.SECONDS));
 
@@ -86,7 +86,7 @@ public class RemoteConfigurationTest {
         assertNull(configurationBundle.networkConfiguration);
         assertNotNull(configurationBundle.subjectConfiguration);
         SubjectConfiguration subjectConfiguration = configurationBundle.subjectConfiguration;
-        assertEquals("testUserId", subjectConfiguration.userId);
+        assertEquals("testUserId", subjectConfiguration.getUserId());
     }
 
     @Test

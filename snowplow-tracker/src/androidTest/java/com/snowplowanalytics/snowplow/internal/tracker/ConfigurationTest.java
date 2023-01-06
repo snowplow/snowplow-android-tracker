@@ -79,7 +79,7 @@ public class ConfigurationTest {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid");
-        trackerConfiguration.platformContext = true;
+        trackerConfiguration.setPlatformContext(true);
         TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
 
         assertNotNull(tracker);
@@ -92,7 +92,7 @@ public class ConfigurationTest {
 
         assertEquals(networkConfiguration.getEndpoint(), scheme + "://" + host);
         assertEquals(protocol, scheme);
-        assertEquals(trackerConfiguration.appId, tracker.getAppId());
+        assertEquals(trackerConfiguration.getAppId(), tracker.getAppId());
         assertEquals("namespace", tracker.getNamespace());
     }
 
@@ -116,11 +116,11 @@ public class ConfigurationTest {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration("appid");
-        trackerConfiguration.sessionContext = true;
+        trackerConfiguration.setSessionContext(true);
         TrackerController tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNotNull(tracker.getSession());
 
-        trackerConfiguration.sessionContext = false;
+        trackerConfiguration.setSessionContext(false);
         tracker = Snowplow.createTracker(context, "namespace", networkConfiguration, trackerConfiguration);
         assertNull(tracker.getSession());
     }
@@ -444,14 +444,14 @@ public class ConfigurationTest {
 
         NetworkConfiguration networkConfig = new NetworkConfiguration(networkConnection);
         TrackerConfiguration trackerConfig = new TrackerConfiguration("app1");
-        trackerConfig.userAnonymisation = true;
-        trackerConfig.sessionContext = true;
-        trackerConfig.platformContext = true;
-        trackerConfig.base64encoding = false;
+        trackerConfig.setUserAnonymisation(true);
+        trackerConfig.setSessionContext(true);
+        trackerConfig.setPlatformContext(true);
+        trackerConfig.setBase64encoding(false);
 
         Snowplow.removeAllTrackers();
         TrackerController tracker = Snowplow.createTracker(context, String.valueOf(Math.random()), networkConfig, trackerConfig);
-        assertTrue(tracker.isUserAnonymisation());
+        assertTrue(tracker.getUserAnonymisation());
 
         tracker.track(new Structured("category", "action"));
 

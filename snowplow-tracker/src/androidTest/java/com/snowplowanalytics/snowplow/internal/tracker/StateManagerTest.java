@@ -11,6 +11,7 @@ import com.snowplowanalytics.core.tracker.StateManager;
 import com.snowplowanalytics.core.tracker.Tracker;
 import com.snowplowanalytics.core.tracker.TrackerEvent;
 import com.snowplowanalytics.core.tracker.TrackerStateSnapshot;
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.event.Background;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.Event;
@@ -119,11 +120,12 @@ public class StateManagerTest {
         MockEventStore eventStore = new MockEventStore();
         Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
         Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
-                .screenContext(true)
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setScreenContext(true);
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+        });
+        Tracker tracker = new Tracker(emitter, "namespace", "appId", context, trackerBuilder);
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));
@@ -190,11 +192,12 @@ public class StateManagerTest {
         MockEventStore eventStore = new MockEventStore();
         Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
         Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
-                .base64(false)
-                .level(LogLevel.VERBOSE)
-                .lifecycleEvents(true)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setLifecycleAutotracking(true);
+            tracker.setBase64Encoded(false);
+            tracker.setLogLevel(LogLevel.VERBOSE);
+        });
+        Tracker tracker = new Tracker(emitter, "namespace", "appId", context, trackerBuilder);
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));
@@ -259,10 +262,11 @@ public class StateManagerTest {
         MockEventStore eventStore = new MockEventStore();
         Consumer<Emitter> builder = (emitter -> emitter.setEventStore(eventStore));
         Emitter emitter = new Emitter(context, "http://snowplow-fake-url.com", builder);
-        Tracker tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "namespace", "appId", context)
-                .base64(false)
-                .deepLinkContext(true)
-        );
+        Consumer<Tracker> trackerBuilder = (tracker -> {
+            tracker.setDeepLinkContext(true);
+            tracker.setBase64Encoded(false);
+        });
+        Tracker tracker = new Tracker(emitter, "namespace", "appId", context, trackerBuilder);
 
         // Send events
         tracker.track(new Timing("category", "variable", 123));
