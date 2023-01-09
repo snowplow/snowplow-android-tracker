@@ -13,9 +13,11 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.net.Uri;
 import androidx.annotation.NonNull;
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.emitter.Emitter;
 import com.snowplowanalytics.snowplow.network.NetworkConnection;
@@ -45,7 +47,14 @@ import static com.snowplowanalytics.snowplow.network.HttpMethod.POST;
 import static com.snowplowanalytics.snowplow.network.Protocol.HTTP;
 import static com.snowplowanalytics.snowplow.network.Protocol.HTTPS;
 
-public class EmitterTest extends AndroidTestCase {
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class EmitterTest {
 
     // Builder Tests
 

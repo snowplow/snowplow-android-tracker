@@ -13,23 +13,26 @@
 
 package com.snowplowanalytics.snowplow.tracker.noise;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import com.snowplowanalytics.core.emitter.Executor;
 import com.snowplowanalytics.core.constants.Parameters;
 import com.snowplowanalytics.core.constants.TrackerConstants;
+import com.snowplowanalytics.core.emitter.Executor;
+import com.snowplowanalytics.core.session.FileStore;
+import com.snowplowanalytics.core.tracker.Logger;
+import com.snowplowanalytics.core.utils.Util;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.Protocol;
-import com.snowplowanalytics.core.session.FileStore;
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
-import com.snowplowanalytics.core.tracker.Logger;
-import com.snowplowanalytics.core.utils.Util;
+
+import org.junit.runner.RunWith;
 
 import java.lang.reflect.Constructor;
 
-public class NoiseTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class NoiseTest {
 
     public void testEnum() {
         NoiseTest.superficialEnumCodeCoverage(BufferOption.class);

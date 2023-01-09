@@ -13,14 +13,15 @@
 
 package com.snowplowanalytics.snowplow.tracker.integration;
 
+import static androidx.test.InstrumentationRegistry.getContext;
 import static org.junit.Assert.assertNotEquals;
 
 import android.annotation.SuppressLint;
-import android.test.AndroidTestCase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.tracker.BuildConfig;
@@ -45,8 +46,6 @@ import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -54,6 +53,13 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -65,13 +71,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class EventSendingTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class EventSendingTest {
 
     private static Tracker tracker;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         try {
             if (tracker == null) return;
             Emitter emitter = tracker.getEmitter();

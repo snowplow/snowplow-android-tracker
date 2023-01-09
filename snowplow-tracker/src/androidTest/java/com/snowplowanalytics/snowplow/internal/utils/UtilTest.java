@@ -1,8 +1,15 @@
 package com.snowplowanalytics.snowplow.internal.utils;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.utils.Util;
+
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class UtilTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class UtilTest {
 
     public void testGetTimestamp() {
         assertEquals(13, Util.getTimestamp().length());

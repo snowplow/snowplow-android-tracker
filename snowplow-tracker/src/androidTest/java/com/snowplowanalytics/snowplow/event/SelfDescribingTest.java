@@ -13,11 +13,14 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
-public class SelfDescribingTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class SelfDescribingTest {
 
     public void testSetSessionTrueTimestamp() {
         SelfDescribing e = new SelfDescribing(new SelfDescribingJson("schema"));

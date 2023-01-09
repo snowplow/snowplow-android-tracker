@@ -13,13 +13,19 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.snowplowanalytics.core.constants.Parameters;
 
 import java.util.Map;
 
-public class EcommerceItemTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class EcommerceItemTest {
 
     public void testExpectedForm() {
         EcommerceTransactionItem ecommerceTransactionItem = new EcommerceTransactionItem("some sku", 123.456, 1)

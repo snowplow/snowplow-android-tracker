@@ -13,13 +13,20 @@
 
 package com.snowplowanalytics.snowplow.event;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.constants.Parameters;
 
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 
-public class TimingTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class TimingTest {
 
     public void testExpectedForm() {
         Timing timing = new Timing("some category", "some var", 123456789)

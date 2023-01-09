@@ -13,10 +13,13 @@
 
 package com.snowplowanalytics.snowplow.internal.emitter.storage;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.test.AndroidTestCase;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,15 +33,23 @@ import com.snowplowanalytics.snowplow.payload.Payload;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
-public class EventStoreTest extends AndroidTestCase {
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class EventStoreTest {
 
     static int QUERY_LIMIT = 150;
 
     private static List<SQLiteEventStore> openedEventStores = new ArrayList<>();
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         for (SQLiteEventStore eventStore : openedEventStores) {
             eventStore.close();
         }

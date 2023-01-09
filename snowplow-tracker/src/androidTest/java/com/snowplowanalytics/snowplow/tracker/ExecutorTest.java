@@ -1,18 +1,23 @@
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.test.AndroidTestCase;
+import static org.junit.Assert.assertTrue;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.emitter.Executor;
+
+import org.junit.Before;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ExecutorTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class ExecutorTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         ExecutorService es = Executor.shutdown();
         if (es != null) {
             es.awaitTermination(60, TimeUnit.SECONDS);

@@ -13,15 +13,19 @@
 
 package com.snowplowanalytics.snowplow.tracker.emitter;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.emitter.TLSArguments;
 import com.snowplowanalytics.core.emitter.TLSVersion;
 
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.EnumSet;
 
-public class TLSArgumentsTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class TLSArgumentsTest {
     public void testEnumStringConversion() {
         EnumSet<TLSVersion> versions = EnumSet.of(TLSVersion.TLSv1_2, TLSVersion.TLSv1_1);
         TLSArguments arguments = new TLSArguments(versions);

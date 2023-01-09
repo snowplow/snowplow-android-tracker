@@ -13,16 +13,25 @@
 
 package com.snowplowanalytics.snowplow.internal.utils;
 
-import android.test.AndroidTestCase;
+import static androidx.test.InstrumentationRegistry.getContext;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.snowplowanalytics.core.session.FileStore;
 import com.snowplowanalytics.core.tracker.Logger;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
 
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileStoreTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class FileStoreTest {
 
     private String fileName = "test";
 

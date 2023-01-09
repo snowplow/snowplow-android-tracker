@@ -13,9 +13,14 @@
 
 package com.snowplowanalytics.snowplow.tracker;
 
-import android.test.AndroidTestCase;
+import static org.junit.Assert.assertEquals;
 
-public class DevicePlatformTest extends AndroidTestCase {
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.runner.RunWith;
+
+@RunWith(AndroidJUnit4.class)
+public class DevicePlatformTest {
 
     public void testPlatforms() {
         assertEquals("web", DevicePlatform.Web.getValue());
