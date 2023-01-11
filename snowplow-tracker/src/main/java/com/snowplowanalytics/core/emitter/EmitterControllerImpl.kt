@@ -62,10 +62,10 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.customRetryForStatusCodes
         set(customRetryForStatusCodes) { emitter.customRetryForStatusCodes = customRetryForStatusCodes }
 
-    override var isServerAnonymisation: Boolean
+    override var serverAnonymisation: Boolean
         get() = emitter.serverAnonymisation
         set(serverAnonymisation) {
-            dirtyConfig.isServerAnonymisation = serverAnonymisation
+            dirtyConfig.serverAnonymisation = serverAnonymisation
             dirtyConfig.serverAnonymisationUpdated = true
             emitter.serverAnonymisation = serverAnonymisation
         }

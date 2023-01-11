@@ -434,7 +434,7 @@ public class ConfigurationTest {
         emitterConfig.serverAnonymisation(true);
 
         TrackerController tracker = Snowplow.createTracker(context, String.valueOf(Math.random()), networkConfig, emitterConfig);
-        assertTrue(tracker.getEmitter().isServerAnonymisation());
+        assertTrue(tracker.getEmitter().getServerAnonymisation());
     }
 
     @Test

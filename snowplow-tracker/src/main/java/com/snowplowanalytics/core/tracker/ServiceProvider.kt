@@ -253,8 +253,8 @@ class ServiceProvider(
     }
 
     private fun makeEmitter(): Emitter {
-        val networkConfig: NetworkConfigurationInterface = networkConfigurationUpdate
-        val emitterConfig: EmitterConfigurationInterface = emitterConfigurationUpdate
+        val networkConfig = networkConfigurationUpdate
+        val emitterConfig = emitterConfigurationUpdate
         val endpoint = networkConfig.endpoint ?: ""
         
         val builder = { emitter: Emitter ->
@@ -273,11 +273,11 @@ class ServiceProvider(
             emitter.threadPoolSize = emitterConfig.threadPoolSize
             emitter.requestCallback = emitterConfig.requestCallback
             emitter.customRetryForStatusCodes = emitterConfig.customRetryForStatusCodes
-            emitter.serverAnonymisation = emitterConfig.isServerAnonymisation
+            emitter.serverAnonymisation = emitterConfig.serverAnonymisation
         }
         
         val emitter = Emitter(context, endpoint, builder)
-        if (emitterConfigurationUpdate.isPaused) {
+        if (emitterConfig.isPaused) {
             emitter.pauseEmit()
         }
         return emitter
@@ -293,7 +293,7 @@ class ServiceProvider(
         val builder = { tracker: Tracker ->
             tracker.subject = subject
             tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
-            tracker.base64Encoded = trackerConfig.base64encoding
+            tracker.base64Encoded = trackerConfigurationUpdate.base64encoding()
             tracker.platform = trackerConfig.devicePlatform
             tracker.logLevel = trackerConfig.logLevel
             tracker.loggerDelegate = trackerConfig.loggerDelegate
@@ -305,7 +305,7 @@ class ServiceProvider(
             tracker.screenContext = trackerConfig.screenContext
             tracker.screenViewAutotracking = trackerConfig.screenViewAutotracking
             tracker.lifecycleAutotracking = trackerConfig.lifecycleAutotracking
-            tracker.installAutotracking = trackerConfig.installAutotracking
+            tracker.installAutotracking = trackerConfigurationUpdate.installAutotracking()
             tracker.exceptionAutotracking = trackerConfig.exceptionAutotracking
             tracker.diagnosticAutotracking = trackerConfig.diagnosticAutotracking
             tracker.userAnonymisation = trackerConfig.userAnonymisation
