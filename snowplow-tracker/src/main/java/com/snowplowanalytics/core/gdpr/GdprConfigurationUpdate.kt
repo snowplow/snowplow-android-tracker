@@ -12,22 +12,17 @@ class GdprConfigurationUpdate : GdprConfiguration(
     var sourceConfig: GdprConfiguration? = null
     var gdpr: Gdpr? = null
     var isEnabled = false
-
-    // gdpr flag
     var gdprUpdated = false
-    fun basisForProcessing(): Basis {
-        return if (sourceConfig == null || gdprUpdated) super.basisForProcessing else sourceConfig!!.basisForProcessing
-    }
 
-    fun documentId(): String {
-        return if (sourceConfig == null || gdprUpdated) super.documentId!! else sourceConfig!!.documentId!!
-    }
-
-    fun documentVersion(): String {
-        return if (sourceConfig == null || gdprUpdated) super.documentVersion!! else sourceConfig!!.documentVersion!!
-    }
-
-    fun documentDescription(): String {
-        return if (sourceConfig == null || gdprUpdated) super.documentDescription!! else sourceConfig!!.documentDescription!!
-    }
+    override val basisForProcessing: Basis
+        get() = if (sourceConfig == null || gdprUpdated) super.basisForProcessing else sourceConfig!!.basisForProcessing
+    
+    override val documentId: String?
+        get() = if (sourceConfig == null || gdprUpdated) super.documentId else sourceConfig!!.documentId
+    
+    override val documentVersion: String?
+        get() = if (sourceConfig == null || gdprUpdated) super.documentVersion else sourceConfig!!.documentVersion
+    
+    override val documentDescription: String?
+        get() = if (sourceConfig == null || gdprUpdated) super.documentDescription else sourceConfig!!.documentDescription
 }

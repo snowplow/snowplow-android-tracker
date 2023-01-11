@@ -286,14 +286,14 @@ class ServiceProvider(
     private fun makeTracker(): Tracker {
         val emitter = orMakeEmitter()
         val subject = orMakeSubject()
-        val trackerConfig: TrackerConfigurationInterface = trackerConfigurationUpdate
-        val sessionConfig: SessionConfigurationInterface = sessionConfigurationUpdate
+        val trackerConfig = trackerConfigurationUpdate
+        val sessionConfig = sessionConfigurationUpdate
         val gdprConfig = gdprConfigurationUpdate
 
         val builder = { tracker: Tracker ->
             tracker.subject = subject
             tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
-            tracker.base64Encoded = trackerConfigurationUpdate.base64encoding()
+            tracker.base64Encoded = trackerConfigurationUpdate.base64encoding
             tracker.platform = trackerConfig.devicePlatform
             tracker.logLevel = trackerConfig.logLevel
             tracker.loggerDelegate = trackerConfig.loggerDelegate
@@ -305,7 +305,7 @@ class ServiceProvider(
             tracker.screenContext = trackerConfig.screenContext
             tracker.screenViewAutotracking = trackerConfig.screenViewAutotracking
             tracker.lifecycleAutotracking = trackerConfig.lifecycleAutotracking
-            tracker.installAutotracking = trackerConfigurationUpdate.installAutotracking()
+            tracker.installAutotracking = trackerConfigurationUpdate.installAutotracking
             tracker.exceptionAutotracking = trackerConfig.exceptionAutotracking
             tracker.diagnosticAutotracking = trackerConfig.diagnosticAutotracking
             tracker.userAnonymisation = trackerConfig.userAnonymisation
@@ -333,7 +333,7 @@ class ServiceProvider(
         }
         val session = tracker.session
         if (session != null) {
-            val onSessionUpdate = sessionConfigurationUpdate.onSessionUpdate()
+            val onSessionUpdate = sessionConfig.onSessionUpdate()
             if (onSessionUpdate != null) {
                 session.onSessionUpdate = onSessionUpdate
             }
