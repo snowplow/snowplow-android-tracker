@@ -37,7 +37,7 @@ interface EventStore {
      * @param ids the events' identifiers in the store.
      * @return a boolean of success to remove.
      */
-    fun removeEvents(ids: List<Long?>): Boolean
+    fun removeEvents(ids: List<Long>): Boolean
 
     /**
      * Empties the store of all the events.

@@ -127,7 +127,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         return retval == 1
     }
 
-    override fun removeEvents(ids: List<Long?>): Boolean {
+    override fun removeEvents(ids: List<Long>): Boolean {
         if (ids.isEmpty()) {
             return false
         }
