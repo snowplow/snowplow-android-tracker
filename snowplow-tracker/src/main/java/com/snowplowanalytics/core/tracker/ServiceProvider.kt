@@ -312,10 +312,10 @@ class ServiceProvider(
             tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
 
             gdprConfig.sourceConfig?.let { tracker.gdprContext = Gdpr(
-                gdprConfig.basisForProcessing(),
-                gdprConfig.documentId(),
-                gdprConfig.documentVersion(),
-                gdprConfig.documentDescription()) }
+                gdprConfig.basisForProcessing,
+                gdprConfig.documentId,
+                gdprConfig.documentVersion,
+                gdprConfig.documentDescription) }
 
             tracker.backgroundTimeout = sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS)
             tracker.foregroundTimeout = sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS)
@@ -333,7 +333,7 @@ class ServiceProvider(
         }
         val session = tracker.session
         if (session != null) {
-            val onSessionUpdate = sessionConfig.onSessionUpdate()
+            val onSessionUpdate = sessionConfig.onSessionUpdate
             if (onSessionUpdate != null) {
                 session.onSessionUpdate = onSessionUpdate
             }
