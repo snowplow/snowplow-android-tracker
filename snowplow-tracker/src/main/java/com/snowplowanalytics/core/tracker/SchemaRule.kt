@@ -25,8 +25,8 @@ class SchemaRule private constructor(val rule: String, private val ruleParts: Li
             return false
         }
         // Check vendor part
-        val ruleVendor = ruleParts[0].split("\\.").toTypedArray()
-        val uriVendor = uriParts[0].split("\\.").toTypedArray()
+        val ruleVendor = ruleParts[0].split(".").toTypedArray()
+        val uriVendor = uriParts[0].split(".").toTypedArray()
         if (uriVendor.size != ruleVendor.size) {
             return false
         }
@@ -101,7 +101,7 @@ class SchemaRule private constructor(val rule: String, private val ruleParts: Li
         private fun validateVendor(vendor: String): Boolean {
             // the components array will be generated like this from vendor:
             // "com.acme.marketing" => ["com", "acme", "marketing"]
-            val components = vendor.split("\\.").toTypedArray()
+            val components = vendor.split(".").toTypedArray()
             // check that vendor doesn't begin or end with period
             // e.g. ".snowplowanalytics.snowplow." => ["", "snowplowanalytics", "snowplow", ""]
             if (components.size > 1 && (components[0].isEmpty() || components[components.size - 1].isEmpty())) {
