@@ -45,7 +45,7 @@ class TrackerPayload : Payload {
         map[key] = value
     }
 
-    override fun addMap(map: Map<String, Any>?) {
+    override fun addMap(map: Map<String, Any?>?) {
         Logger.v(TAG, "Adding new map: %s", map)
         if (map != null) {
             for ((key, value) in map) {

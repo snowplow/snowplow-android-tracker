@@ -21,7 +21,7 @@ import org.json.JSONObject
  * both the Schema and Data.
  */
 open class SelfDescribingJson {
-    private val payload = HashMap<String?, Any?>()
+    private val payload = HashMap<String, Any?>()
     
     /**
      * Builds a SelfDescribingJson object
@@ -118,7 +118,7 @@ open class SelfDescribingJson {
         return this
     }
 
-    val map: Map<String?, Any?>
+    val map: Map<String, Any?>
         get() = payload
 
     override fun toString(): String {

@@ -42,7 +42,7 @@ interface Payload {
      *
      * @param map Mappings to be stored in this map
      */
-    fun addMap(map: Map<String, Any>?)
+    fun addMap(map: Map<String, Any?>?)
 
     /**
      * Add a map to the Payload with a key dependent on the base 64 encoding option you choose using the
