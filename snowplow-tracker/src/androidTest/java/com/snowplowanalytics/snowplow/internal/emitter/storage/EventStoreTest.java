@@ -34,6 +34,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.payload.TrackerPayload;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -57,6 +58,7 @@ public class EventStoreTest {
         EventStoreHelper.removeUnsentEventsExceptForNamespaces(getContext(), new ArrayList<>());
     }
 
+    @Test
     public void testAddEventOnEmptyStore() throws InterruptedException {
         SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         openedEventStores.add(eventStore);
@@ -71,6 +73,7 @@ public class EventStoreTest {
         assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size());
     }
 
+    @Test
     public void testAddEventOnNotEmptyStore() throws InterruptedException {
         SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         openedEventStores.add(eventStore);
@@ -97,6 +100,7 @@ public class EventStoreTest {
         assertEquals(2, eventStore.getEmittableEvents(QUERY_LIMIT).size());
     }
 
+    @Test
     public void testRemoveEventsOnNotEmptyStore() throws InterruptedException {
         SQLiteEventStore eventStore = new SQLiteEventStore(getContext(), "namespace");
         openedEventStores.add(eventStore);
@@ -124,6 +128,7 @@ public class EventStoreTest {
 
     // Tests with database already open
 
+    @Test
     public void testGetNonExistentEvent() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -135,6 +140,7 @@ public class EventStoreTest {
         assertNull(event);
     }
 
+    @Test
     public void testInsertPayload() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -150,6 +156,7 @@ public class EventStoreTest {
         eventStore.insertEvent(getEvent());
     }
 
+    @Test
     public void testRemoveAllEvents() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -165,6 +172,7 @@ public class EventStoreTest {
         assertEquals(0, eventStore.getSize());
     }
 
+    @Test
     public void testRemoveIndividualEvent() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -182,6 +190,7 @@ public class EventStoreTest {
         assertFalse(res);
     }
 
+    @Test
     public void testRemoveRangeOfEvents() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -210,6 +219,7 @@ public class EventStoreTest {
         assertEquals(false, res);
     }
 
+    @Test
     public void testCloseDatabase() throws InterruptedException {
         SQLiteEventStore eventStore = getEventStore();
 
@@ -218,6 +228,7 @@ public class EventStoreTest {
         assertFalse(eventStore.isDatabaseOpen());
     }
 
+    @Test
     public void testUpgrade() {
         EventStoreHelper helper = EventStoreHelper.getInstance(getContext(), "namespace");
         SQLiteDatabase database = helper.getWritableDatabase();
@@ -225,6 +236,7 @@ public class EventStoreTest {
         helper.close();
     }
 
+    @Test
     public void testEventStoreCreateDatabase() throws InterruptedException {
         Context context = getContext();
         SQLiteEventStore eventStore = new SQLiteEventStore(context, "namespace");
@@ -236,6 +248,7 @@ public class EventStoreTest {
         assertTrue(databaseList.contains("snowplowEvents-namespace.sqlite-shm"));
     }
 
+    @Test
     public void testEventStoreRemoveDatabases() throws InterruptedException {
         Context context = getContext();
         SQLiteEventStore eventStore1 = new SQLiteEventStore(context, "namespace1");
@@ -259,6 +272,7 @@ public class EventStoreTest {
         assertFalse(databaseList.contains("snowplowEvents-namespace3.sqlite-shm"));
     }
 
+    @Test
     public void testEventStoreInvalidNamespaceConversion() throws InterruptedException {
         Context context = getContext();
         SQLiteEventStore eventStore = new SQLiteEventStore(context, "namespace*.^?1ò2@");
@@ -268,6 +282,7 @@ public class EventStoreTest {
         assertTrue(databaseList.contains("snowplowEvents-namespace-1-2-.sqlite"));
     }
 
+    @Test
     public void testMigrationFromLegacyToNamespacedEventStore() throws InterruptedException {
         Context context = getContext();
 
@@ -307,6 +322,7 @@ public class EventStoreTest {
         assertTrue(databaseList.contains("snowplowEvents-namespace.sqlite-shm"));
     }
 
+    @Test
     public void testMultipleAccessToSameSQLiteFile() throws InterruptedException {
         Context context = getContext();
         SQLiteEventStore eventStore1 = new SQLiteEventStore(context, "namespace");
