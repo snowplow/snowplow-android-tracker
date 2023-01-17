@@ -54,6 +54,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -113,6 +114,7 @@ public class EventSendingTest {
 
     // Tests
 
+    @Test
     public void testSendGet() throws Exception {
         MockWebServer mockServer = getMockServer(14);
         Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.GET);
@@ -132,9 +134,10 @@ public class EventSendingTest {
         killMockServer(mockServer);
     }
 
+    @Test
     public void testSendPost() throws Exception {
         MockWebServer mockServer = getMockServer(14);
-        Tracker tracker = getTracker("myNamespace", getMockServerURI(mockServer), HttpMethod.POST);
+        Tracker tracker = getTracker("myNamespacePost", getMockServerURI(mockServer), HttpMethod.POST);
 
         trackStructuredEvent(tracker);
         trackUnstructuredEvent(tracker);
@@ -151,6 +154,7 @@ public class EventSendingTest {
         killMockServer(mockServer);
     }
 
+    @Test
     public void testSessionContext() throws Exception {
         MockWebServer mockServer = getMockServer(14);
         Tracker tracker = getTracker("namespaceSessionTest", getMockServerURI(mockServer), HttpMethod.POST);
