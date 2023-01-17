@@ -28,10 +28,10 @@ class MockEventStore : EventStore {
         }
     }
 
-    override fun removeEvents(ids: List<Long>): Boolean {
+    override fun removeEvents(ids: MutableList<Long?>): Boolean {
         var result = true
         for (id in ids) {
-            val removed = removeEvent(id)
+            val removed = removeEvent(id!!)
             result = result && removed
         }
         return result

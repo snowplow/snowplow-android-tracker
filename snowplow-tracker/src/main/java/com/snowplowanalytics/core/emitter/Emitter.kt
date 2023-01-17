@@ -13,8 +13,6 @@
 package com.snowplowanalytics.core.emitter
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
@@ -86,7 +84,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
      */
     var eventStore: EventStore? = null
         set(eventStore) {
-            if (!builderFinished) {
+            if (field == null) {
                 field = eventStore
             }
         }
@@ -221,7 +219,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         set(namespace) {
             field = namespace
             if (eventStore == null) {
-                eventStore = namespace?.let { SQLiteEventStore(context, it) }
+                eventStore = field?.let { SQLiteEventStore(context, it) }
             }
         }
 

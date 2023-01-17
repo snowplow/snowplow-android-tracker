@@ -350,6 +350,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         builder?.accept(this)
         
         emitter.flush()
+        
+        // Setting the emitter namespace has a side-effect of creating a SQLiteEventStore
+        // unless an EventStore was already provided through EmitterConfiguration
         emitter.namespace = namespace
         
         if (trackerVersionSuffix != null) {
@@ -649,7 +652,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             return
         }
         
-        val data: MutableList<Map<String?, Any?>> = LinkedList()
+        val data: MutableList<Map<String, Any?>> = LinkedList()
         for (context in contexts) {
             if (context != null) {
                 data.add(context.map)
