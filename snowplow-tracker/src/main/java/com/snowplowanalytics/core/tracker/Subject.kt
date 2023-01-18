@@ -25,7 +25,7 @@ import java.util.*
  * event sent from the Snowplow Tracker.
  */
 class Subject(context: Context, config: SubjectConfigurationInterface?) {
-    private val standardPairs = HashMap<String, String>()
+    private val standardPairs = HashMap<String, String?>()
     
     var userId: String? = null
         /**
@@ -33,10 +33,6 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
          * @param userId a user id string
          */
         set(userId) {
-            if (userId == null) {
-                return
-            }
-
             field = userId
             standardPairs[Parameters.UID] = userId
         }
@@ -246,9 +242,9 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
      * @param userAnonymisation Whether to anonymize user identifiers
      * @return the standard subject pairs
      */
-    fun getSubject(userAnonymisation: Boolean): Map<String, String> {
+    fun getSubject(userAnonymisation: Boolean): Map<String, String?> {
         if (userAnonymisation) {
-            val pairsCopy: MutableMap<String, String> = HashMap(standardPairs)
+            val pairsCopy: MutableMap<String, String?> = HashMap(standardPairs)
             pairsCopy.remove(Parameters.UID)
             pairsCopy.remove(Parameters.DOMAIN_UID)
             pairsCopy.remove(Parameters.NETWORK_UID)

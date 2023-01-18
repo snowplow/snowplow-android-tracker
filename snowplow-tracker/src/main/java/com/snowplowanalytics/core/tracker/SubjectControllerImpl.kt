@@ -14,7 +14,7 @@ class SubjectControllerImpl  // Constructors
         set(userId) {
             dirtyConfig.userId = userId
             dirtyConfig.userIdUpdated = true
-            subject.userId = (userId!!)
+            subject.userId = userId
         }
     
     override var networkUserId: String?
@@ -22,7 +22,7 @@ class SubjectControllerImpl  // Constructors
         set(networkUserId) {
             dirtyConfig.networkUserId = networkUserId
             dirtyConfig.networkUserIdUpdated = true
-            subject.networkUserId = (networkUserId!!)
+            subject.networkUserId = networkUserId
         }
     
     override var domainUserId: String?
@@ -30,7 +30,7 @@ class SubjectControllerImpl  // Constructors
         set(domainUserId) {
             dirtyConfig.domainUserId = domainUserId
             dirtyConfig.domainUserIdUpdated = true
-            subject.domainUserId = (domainUserId!!)
+            subject.domainUserId = domainUserId
         }
     
     override var useragent: String?
@@ -38,7 +38,7 @@ class SubjectControllerImpl  // Constructors
         set(useragent) {
             dirtyConfig.useragent = useragent
             dirtyConfig.useragentUpdated = true
-            subject.useragent = (useragent!!)
+            subject.useragent = useragent
         }
     
     override var ipAddress: String?
@@ -46,7 +46,7 @@ class SubjectControllerImpl  // Constructors
         set(ipAddress) {
             dirtyConfig.ipAddress = ipAddress
             dirtyConfig.ipAddressUpdated = true
-            subject.ipAddress = (ipAddress!!)
+            subject.ipAddress = ipAddress
         }
     
     override var timezone: String?
@@ -54,7 +54,7 @@ class SubjectControllerImpl  // Constructors
         set(timezone) {
             dirtyConfig.timezone = timezone
             dirtyConfig.timezoneUpdated = true
-            subject.timezone = (timezone!!)
+            subject.timezone = timezone
         }
     
     override var language: String?
@@ -62,7 +62,7 @@ class SubjectControllerImpl  // Constructors
         set(language) {
             dirtyConfig.language = language
             dirtyConfig.languageUpdated = true
-            subject.language = (language!!)
+            subject.language = language
         }
     
     override var screenResolution: Size?
@@ -70,7 +70,7 @@ class SubjectControllerImpl  // Constructors
         set(screenResolution) {
             dirtyConfig.screenResolution = screenResolution
             dirtyConfig.screenResolutionUpdated = true
-            subject.screenResolution = (Size(screenResolution!!.width, screenResolution.height))
+            subject.screenResolution = screenResolution
         }
     
     override var screenViewPort: Size?
@@ -78,7 +78,7 @@ class SubjectControllerImpl  // Constructors
         set(screenViewPort) {
             dirtyConfig.screenViewPort = screenViewPort
             dirtyConfig.screenViewPortUpdated = true
-            subject.screenViewPort = (Size(screenViewPort!!.width, screenViewPort.height))
+            subject.screenViewPort = screenViewPort
         }
     
     override var colorDepth: Int?
@@ -86,7 +86,7 @@ class SubjectControllerImpl  // Constructors
         set(colorDepth) {
             dirtyConfig.colorDepth = colorDepth
             dirtyConfig.colorDepthUpdated = true
-            subject.colorDepth = (colorDepth!!)
+            subject.colorDepth = colorDepth
         }
 
     // Private methods
