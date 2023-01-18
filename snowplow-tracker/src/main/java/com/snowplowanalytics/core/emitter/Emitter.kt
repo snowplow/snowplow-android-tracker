@@ -83,6 +83,8 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
      * The emitter event store object
      */
     var eventStore: EventStore? = null
+        // if not set during Emitter initialisation (via builder),
+        // this is set as part of Tracker initialisation, as a side-effect of setting namespace
         set(eventStore) {
             if (field == null) {
                 field = eventStore
@@ -482,7 +484,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
             if (res.isSuccessful) {
                 removableEvents.addAll(res.eventIds)
                 successCount += res.eventIds.size
-            } else if (customRetryForStatusCodes?.let { res.shouldRetry(it) } == true) {
+            } else if (res.shouldRetry(customRetryForStatusCodes)) {
                 failedWillRetryCount += res.eventIds.size
                 Logger.e(TAG, "Request sending failed but we will retry later.")
             } else {
