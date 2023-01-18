@@ -426,7 +426,7 @@ public class EmitterTest {
 
         Thread.sleep(1000);
 
-        networkConnection.statusCode = 403;
+        networkConnection.setStatusCode(403);
 
         emitter.add(generatePayloads(1).get(0));
 
