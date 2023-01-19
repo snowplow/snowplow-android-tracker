@@ -44,7 +44,7 @@ open class TrackerConfiguration(
     /**
      * @see .devicePlatform
      */
-    override var devicePlatform: DevicePlatform = DevicePlatform.Mobile
+    override var devicePlatform: DevicePlatform = TrackerDefaults.devicePlatform
 
     /**
      * @see .base64encoding

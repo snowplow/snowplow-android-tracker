@@ -24,16 +24,16 @@ object TrackerDefaults {
     var backgroundTimeout: Long = 1800 // 30 minutes
     var threadCount = 10
     var timeUnit = TimeUnit.SECONDS
-    var sessionContext = false
+    var sessionContext = true
     var geoLocationContext = false
-    var platformContext = false
+    var platformContext = true
     var deepLinkContext = true
-    var screenContext = false
-    var applicationContext = false
+    var screenContext = true
+    var applicationContext = true
     var exceptionAutotracking = true
     var diagnosticAutotracking = false
     var lifecycleAutotracking = false
-    var screenViewAutotracking = false
-    var installAutotracking = false
+    var screenViewAutotracking = true
+    var installAutotracking = true
     var userAnonymisation = false
 }
