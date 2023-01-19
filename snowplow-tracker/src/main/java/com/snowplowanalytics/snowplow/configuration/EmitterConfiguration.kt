@@ -1,6 +1,7 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.emitter.EmitterConfigurationInterface
+import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
@@ -11,7 +12,7 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
  * to emit to the collector.     
  * 
  * Default values:
- * bufferOption = BufferOption.Single;
+ * bufferOption = BufferOption.DefaultGroup;
  * emitRange = 150;
  * threadPoolSize = 15;
  * byteLimitGet = 40000;
@@ -22,27 +23,27 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     /**
      * @see .bufferOption
      */
-    override var bufferOption: BufferOption = BufferOption.Single
+    override var bufferOption: BufferOption = EmitterDefaults.bufferOption
 
     /**
      * @see .emitRange
      */
-    override var emitRange: Int = 150
+    override var emitRange: Int = EmitterDefaults.emitRange
 
     /**
      * @see .threadPoolSize
      */
-    override var threadPoolSize: Int = 15
+    override var threadPoolSize: Int = EmitterDefaults.threadPoolSize
 
     /**
      * @see .byteLimitGet
      */
-    override var byteLimitGet: Long = 40000
+    override var byteLimitGet: Long = EmitterDefaults.byteLimitGet
 
     /**
      * @see .byteLimitPost
      */
-    override var byteLimitPost: Long = 40000
+    override var byteLimitPost: Long = EmitterDefaults.byteLimitPost
 
     /**
      * @see .requestCallback
@@ -62,7 +63,7 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     /**
      * @see .serverAnonymisation
      */
-    override var serverAnonymisation: Boolean = false
+    override var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
     
         
     // Builders

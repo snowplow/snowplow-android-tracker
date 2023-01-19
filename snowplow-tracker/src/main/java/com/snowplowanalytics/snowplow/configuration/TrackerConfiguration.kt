@@ -2,6 +2,7 @@ package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
+import com.snowplowanalytics.snowplow.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
@@ -48,12 +49,12 @@ open class TrackerConfiguration(
     /**
      * @see .base64encoding
      */
-    override var base64encoding: Boolean = true
+    override var base64encoding: Boolean = TrackerDefaults.base64Encoded
 
     /**
      * @see .logLevel
      */
-    override var logLevel: LogLevel = LogLevel.OFF
+    override var logLevel: LogLevel = TrackerDefaults.logLevel
 
     /**
      * @see .loggerDelegate
@@ -63,62 +64,62 @@ open class TrackerConfiguration(
     /**
      * @see .sessionContext
      */
-    override var sessionContext: Boolean = true
+    override var sessionContext: Boolean = TrackerDefaults.sessionContext
 
     /**
      * @see .applicationContext
      */
-    override var applicationContext: Boolean = true
+    override var applicationContext: Boolean = TrackerDefaults.applicationContext
 
     /**
      * @see .platformContext
      */
-    override var platformContext: Boolean = true
+    override var platformContext: Boolean = TrackerDefaults.platformContext
 
     /**
      * @see .geoLocationContext
      */
-    override var geoLocationContext: Boolean = false
+    override var geoLocationContext: Boolean = TrackerDefaults.geoLocationContext
 
     /**
      * @see .deepLinkContext
      */
-    override var deepLinkContext: Boolean = true
+    override var deepLinkContext: Boolean = TrackerDefaults.deepLinkContext
 
     /**
      * @see .screenContext
      */
-    override var screenContext: Boolean = true
+    override var screenContext: Boolean = TrackerDefaults.screenContext
 
     /**
      * @see .screenViewAutotracking
      */
-    override var screenViewAutotracking: Boolean = true
+    override var screenViewAutotracking: Boolean = TrackerDefaults.screenViewAutotracking
 
     /**
      * @see .lifecycleAutotracking
      */
-    override var lifecycleAutotracking: Boolean = false
+    override var lifecycleAutotracking: Boolean = TrackerDefaults.lifecycleAutotracking
 
     /**
      * @see .installAutotracking
      */
-    override var installAutotracking: Boolean = true
+    override var installAutotracking: Boolean = TrackerDefaults.installAutotracking
 
     /**
      * @see .exceptionAutotracking
      */
-    override var exceptionAutotracking: Boolean = true
+    override var exceptionAutotracking: Boolean = TrackerDefaults.exceptionAutotracking
 
     /**
      * @see .diagnosticAutotracking
      */
-    override var diagnosticAutotracking: Boolean = false
+    override var diagnosticAutotracking: Boolean = TrackerDefaults.diagnosticAutotracking
 
     /**
      * @see .userAnonymisation
      */
-    override var userAnonymisation: Boolean = false
+    override var userAnonymisation: Boolean = TrackerDefaults.userAnonymisation
 
     /**
      * @see .trackerVersionSuffix

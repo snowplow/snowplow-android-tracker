@@ -10,9 +10,9 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.core.emitter
+package com.snowplowanalytics.snowplow.emitter
 
-import com.snowplowanalytics.snowplow.emitter.BufferOption
+import com.snowplowanalytics.core.emitter.TLSVersion
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.Protocol
 
@@ -24,13 +24,14 @@ object EmitterDefaults {
     var bufferOption = BufferOption.DefaultGroup
     var requestSecurity = Protocol.HTTP
     var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
+    var emitRange: Int = 150
     var emitterTick = 5
     var sendLimit = 250
     var emptyLimit = 5
     var byteLimitGet: Long = 40000
     var byteLimitPost: Long = 40000
     var emitTimeout = 5
-    var threadPoolSize = 2
+    var threadPoolSize = 15
     var serverAnonymisation = false
     var timeUnit = TimeUnit.SECONDS
 }
