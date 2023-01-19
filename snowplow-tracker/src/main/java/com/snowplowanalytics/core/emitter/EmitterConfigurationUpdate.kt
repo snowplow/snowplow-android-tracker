@@ -8,13 +8,13 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
 class EmitterConfigurationUpdate : EmitterConfiguration() {
     var sourceConfig: EmitterConfiguration? = null
     var isPaused = false
-    var bufferOptionUpdated = false
-    var emitRangeUpdated = false
-    var threadPoolSizeUpdated = false
-    var byteLimitGetUpdated = false
-    var byteLimitPostUpdated = false
-    var customRetryForStatusCodesUpdated = false
-    var serverAnonymisationUpdated = false
+    private var bufferOptionUpdated = false
+    private var emitRangeUpdated = false
+    private var threadPoolSizeUpdated = false
+    private var byteLimitGetUpdated = false
+    private var byteLimitPostUpdated = false
+    private var customRetryForStatusCodesUpdated = false
+    private var serverAnonymisationUpdated = false
 
     override var eventStore: EventStore?
         get() = if (sourceConfig == null) null else sourceConfig!!.eventStore

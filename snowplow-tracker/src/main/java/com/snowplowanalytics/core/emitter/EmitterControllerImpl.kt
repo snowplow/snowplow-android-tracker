@@ -23,7 +23,6 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.bufferOption
         set(bufferOption) {
             dirtyConfig.bufferOption = bufferOption
-            dirtyConfig.bufferOptionUpdated = true
             emitter.bufferOption = bufferOption
         }
 
@@ -31,7 +30,6 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.sendLimit
         set(emitRange) {
             dirtyConfig.emitRange = emitRange
-            dirtyConfig.emitRangeUpdated = true
             emitter.sendLimit = emitRange
         }
 
@@ -42,7 +40,6 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.byteLimitGet
         set(byteLimitGet) {
             dirtyConfig.byteLimitGet = byteLimitGet
-            dirtyConfig.byteLimitGetUpdated = true
             emitter.byteLimitGet = byteLimitGet
         }
     
@@ -50,7 +47,6 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.byteLimitPost
         set(byteLimitPost) {
             dirtyConfig.byteLimitPost = byteLimitPost
-            dirtyConfig.byteLimitPostUpdated = true
             emitter.byteLimitPost = byteLimitPost
         }
 
@@ -66,7 +62,6 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.serverAnonymisation
         set(serverAnonymisation) {
             dirtyConfig.serverAnonymisation = serverAnonymisation
-            dirtyConfig.serverAnonymisationUpdated = true
             emitter.serverAnonymisation = serverAnonymisation
         }
 

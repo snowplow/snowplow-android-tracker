@@ -13,7 +13,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.userId
         set(userId) {
             dirtyConfig.userId = userId
-            dirtyConfig.userIdUpdated = true
             subject.userId = userId
         }
     
@@ -21,7 +20,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.networkUserId
         set(networkUserId) {
             dirtyConfig.networkUserId = networkUserId
-            dirtyConfig.networkUserIdUpdated = true
             subject.networkUserId = networkUserId
         }
     
@@ -29,7 +27,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.domainUserId
         set(domainUserId) {
             dirtyConfig.domainUserId = domainUserId
-            dirtyConfig.domainUserIdUpdated = true
             subject.domainUserId = domainUserId
         }
     
@@ -37,7 +34,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.useragent
         set(useragent) {
             dirtyConfig.useragent = useragent
-            dirtyConfig.useragentUpdated = true
             subject.useragent = useragent
         }
     
@@ -45,7 +41,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.ipAddress
         set(ipAddress) {
             dirtyConfig.ipAddress = ipAddress
-            dirtyConfig.ipAddressUpdated = true
             subject.ipAddress = ipAddress
         }
     
@@ -53,7 +48,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.timezone
         set(timezone) {
             dirtyConfig.timezone = timezone
-            dirtyConfig.timezoneUpdated = true
             subject.timezone = timezone
         }
     
@@ -61,7 +55,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.language
         set(language) {
             dirtyConfig.language = language
-            dirtyConfig.languageUpdated = true
             subject.language = language
         }
     
@@ -69,7 +62,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.screenResolution
         set(screenResolution) {
             dirtyConfig.screenResolution = screenResolution
-            dirtyConfig.screenResolutionUpdated = true
             subject.screenResolution = screenResolution
         }
     
@@ -77,7 +69,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.screenViewPort
         set(screenViewPort) {
             dirtyConfig.screenViewPort = screenViewPort
-            dirtyConfig.screenViewPortUpdated = true
             subject.screenViewPort = screenViewPort
         }
     
@@ -85,7 +76,6 @@ class SubjectControllerImpl  // Constructors
         get() = subject.colorDepth
         set(colorDepth) {
             dirtyConfig.colorDepth = colorDepth
-            dirtyConfig.colorDepthUpdated = true
             subject.colorDepth = colorDepth
         }
 

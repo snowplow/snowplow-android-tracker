@@ -10,9 +10,14 @@ class GdprConfigurationUpdate : GdprConfiguration(
     null) {
     @JvmField
     var sourceConfig: GdprConfiguration? = null
-    var gdpr: Gdpr? = null
     var isEnabled = false
-    var gdprUpdated = false
+    private var gdprUpdated = false
+    
+    var gdpr: Gdpr? = null
+        set(value) {
+            field = value
+            gdprUpdated = true
+        }
 
     override val basisForProcessing: Basis
         get() = if (sourceConfig == null || gdprUpdated) super.basisForProcessing else sourceConfig!!.basisForProcessing

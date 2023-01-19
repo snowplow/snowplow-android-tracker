@@ -5,16 +5,16 @@ import com.snowplowanalytics.snowplow.util.Size
 
 class SubjectConfigurationUpdate : SubjectConfiguration() {
     var sourceConfig: SubjectConfiguration? = null
-    var userIdUpdated = false
-    var networkUserIdUpdated = false
-    var domainUserIdUpdated = false
-    var useragentUpdated = false
-    var ipAddressUpdated = false
-    var timezoneUpdated = false
-    var languageUpdated = false
-    var screenResolutionUpdated = false
-    var screenViewPortUpdated = false
-    var colorDepthUpdated = false
+    private var userIdUpdated = false
+    private var networkUserIdUpdated = false
+    private var domainUserIdUpdated = false
+    private var useragentUpdated = false
+    private var ipAddressUpdated = false
+    private var timezoneUpdated = false
+    private var languageUpdated = false
+    private var screenResolutionUpdated = false
+    private var screenViewPortUpdated = false
+    private var colorDepthUpdated = false
 
     override var userId: String?
         get() = if (sourceConfig == null || userIdUpdated) super.userId else sourceConfig!!.userId

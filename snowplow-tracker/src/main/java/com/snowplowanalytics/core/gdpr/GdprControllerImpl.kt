@@ -38,7 +38,6 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
         )
         gdpr = tracker.gdprContext
         dirtyConfig.gdpr = gdpr
-        dirtyConfig.gdprUpdated = true
     }
 
     override val isEnabled: Boolean

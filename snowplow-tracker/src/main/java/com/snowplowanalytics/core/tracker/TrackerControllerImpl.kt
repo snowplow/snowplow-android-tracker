@@ -61,7 +61,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.appId
         set(appId) {
             dirtyConfig.appId = appId
-            dirtyConfig.appIdUpdated = true
             tracker.appId = appId
         }
     
@@ -69,7 +68,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.platform
         set(devicePlatform) {
             dirtyConfig.devicePlatform = devicePlatform
-            dirtyConfig.devicePlatformUpdated = true
             tracker.platform = devicePlatform
         }
     
@@ -77,7 +75,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.base64Encoded
         set(base64encoding) {
             dirtyConfig.base64encoding = base64encoding
-            dirtyConfig.base64encodingUpdated = true
             tracker.base64Encoded = base64encoding
         }
     
@@ -85,7 +82,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.logLevel
         set(logLevel) {
             dirtyConfig.logLevel = logLevel
-            dirtyConfig.logLevelUpdated = true
             tracker.logLevel = logLevel
         }
     
@@ -93,7 +89,6 @@ class TrackerControllerImpl  // Constructors
         get() = Logger.getDelegate()
         set(loggerDelegate) {
             dirtyConfig.loggerDelegate = loggerDelegate
-            dirtyConfig.loggerDelegateUpdated = true
             Logger.setDelegate(loggerDelegate)
         }
     
@@ -101,7 +96,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.applicationContext
         set(applicationContext) {
             dirtyConfig.applicationContext = applicationContext
-            dirtyConfig.applicationContextUpdated = true
             tracker.applicationContext = applicationContext
         }
     
@@ -109,7 +103,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.platformContextEnabled
         set(platformContext) {
             dirtyConfig.platformContext = platformContext
-            dirtyConfig.platformContextUpdated = true
             tracker.platformContextEnabled = platformContext
         }
     
@@ -117,7 +110,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.geoLocationContext
         set(geoLocationContext) {
             dirtyConfig.geoLocationContext = geoLocationContext
-            dirtyConfig.geoLocationContextUpdated = true
             tracker.geoLocationContext = geoLocationContext
         }
     
@@ -125,7 +117,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.sessionContext
         set(sessionContext) {
             dirtyConfig.sessionContext = sessionContext
-            dirtyConfig.sessionContextUpdated = true
             tracker.sessionContext = sessionContext
         }
     
@@ -133,7 +124,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.deepLinkContext
         set(deepLinkContext) {
             dirtyConfig.deepLinkContext = deepLinkContext
-            dirtyConfig.deepLinkContextUpdated = true
             tracker.deepLinkContext = deepLinkContext
         }
     
@@ -141,7 +131,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.screenContext
         set(screenContext) {
             dirtyConfig.screenContext = screenContext
-            dirtyConfig.screenContextUpdated = true
             tracker.screenContext = screenContext
         }
     
@@ -149,7 +138,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.screenViewAutotracking
         set(screenViewAutotracking) {
             dirtyConfig.screenViewAutotracking = screenViewAutotracking
-            dirtyConfig.screenViewAutotrackingUpdated = true
             tracker.screenViewAutotracking = screenViewAutotracking
         }
     
@@ -157,7 +145,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.lifecycleAutotracking
         set(lifecycleAutotracking) {
             dirtyConfig.lifecycleAutotracking = lifecycleAutotracking
-            dirtyConfig.lifecycleAutotrackingUpdated = true
             tracker.lifecycleAutotracking = lifecycleAutotracking
         }
     
@@ -165,7 +152,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.installAutotracking
         set(installAutotracking) {
             dirtyConfig.installAutotracking = installAutotracking
-            dirtyConfig.installAutotrackingUpdated = true
             tracker.installAutotracking = installAutotracking
         }
     
@@ -173,7 +159,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.exceptionAutotracking
         set(exceptionAutotracking) {
             dirtyConfig.exceptionAutotracking = exceptionAutotracking
-            dirtyConfig.exceptionAutotrackingUpdated = true
             tracker.exceptionAutotracking = exceptionAutotracking
         }
     
@@ -181,7 +166,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.diagnosticAutotracking
         set(diagnosticAutotracking) {
             dirtyConfig.diagnosticAutotracking = diagnosticAutotracking
-            dirtyConfig.diagnosticAutotrackingUpdated = true
             tracker.diagnosticAutotracking = diagnosticAutotracking
         }
     
@@ -189,7 +173,6 @@ class TrackerControllerImpl  // Constructors
         get() = tracker.userAnonymisation
         set(userAnonymisation) {
             dirtyConfig.userAnonymisation = userAnonymisation
-            dirtyConfig.userAnonymisationUpdated = true
             tracker.userAnonymisation = userAnonymisation
         }
 

@@ -13,8 +13,8 @@ class SessionConfigurationUpdate @JvmOverloads constructor(
     
     var sourceConfig: SessionConfiguration? = null
     var isPaused = false
-    var foregroundTimeoutUpdated = false
-    var backgroundTimeoutUpdated = false
+    private var foregroundTimeoutUpdated = false
+    private var backgroundTimeoutUpdated = false
 
     override var foregroundTimeout: TimeMeasure
         get() = if (sourceConfig == null || foregroundTimeoutUpdated) super.foregroundTimeout else sourceConfig!!.foregroundTimeout

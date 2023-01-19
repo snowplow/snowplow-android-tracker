@@ -114,7 +114,6 @@ class SessionControllerImpl  // Constructors
                 return
             }
             dirtyConfig.foregroundTimeout = foregroundTimeout
-            dirtyConfig.foregroundTimeoutUpdated = true
             session.foregroundTimeout = foregroundTimeout.convert(TimeUnit.MILLISECONDS)
         }
     
@@ -134,7 +133,6 @@ class SessionControllerImpl  // Constructors
                 return
             }
             dirtyConfig.backgroundTimeout = backgroundTimeout
-            dirtyConfig.backgroundTimeoutUpdated = true
             session.backgroundTimeout =
                 backgroundTimeout.convert(TimeUnit.MILLISECONDS)
         }
