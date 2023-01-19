@@ -99,24 +99,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         
         val oldPolicy = StrictMode.allowThreadDiskReads()
         try {
-            var sessionInfo = getSessionMapFromLegacyTrackerV3(context, sessionVarsName)
-            if (sessionInfo == null) {
-                sessionInfo = getSessionMapFromLegacyTrackerV2(context, sessionVarsName)
-                if (sessionInfo == null) {
-                    try {
-                        sessionInfo = getSessionMapFromLegacyTrackerV1(context)
-                    } catch (e: Exception) {
-                        Logger.track(
-                            TAG,
-                            String.format(
-                                "Exception occurred retrieving session info from file: %s",
-                                e
-                            ),
-                            e
-                        )
-                    }
-                }
-            }
+            val sessionInfo = getSessionMap(context, sessionVarsName)
             if (sessionInfo == null) {
                 Logger.track(TAG, "No previous session info available")
             } else {
@@ -269,69 +252,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         isSessionCheckerEnabled = !isSuspended
     }
 
-    /**
-     * Gets the session information from a file.
-     *
-     * @return a map or null.
-     */
-    private fun getSessionMapFromLegacyTrackerV1(context: Context): MutableMap<String?, Any?> {
-        val sessionMap = FileStore.getMapFromFile(
-            TrackerConstants.SNOWPLOW_SESSION_VARS,
-            context
-        )
-        sessionMap!![Parameters.SESSION_FIRST_ID] = ""
-        sessionMap[Parameters.SESSION_PREVIOUS_ID] = null
-        sessionMap[Parameters.SESSION_STORAGE] = "LOCAL_STORAGE"
-        return sessionMap
-    }
-
-    private fun getSessionMapFromLegacyTrackerV2(
-        context: Context,
-        sessionVarsName: String
-    ): Map<String?, Any?>? {
-        val oldPolicy = StrictMode.allowThreadDiskReads()
-        return try {
-            var sharedPreferences =
-                context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE)
-            if (!sharedPreferences.contains(Parameters.SESSION_ID)) {
-                sharedPreferences = context.getSharedPreferences(
-                    TrackerConstants.SNOWPLOW_SESSION_VARS,
-                    Context.MODE_PRIVATE
-                )
-                if (!sharedPreferences.contains(Parameters.SESSION_ID)) {
-                    return null
-                }
-            }
-            // Create map used as initial session state
-            val sessionMap: MutableMap<String?, Any?> =
-                HashMap()
-            val sessionId = sharedPreferences.getString(
-                Parameters.SESSION_ID,
-                null
-            )
-                ?: return null
-            sessionMap[Parameters.SESSION_ID] = sessionId
-            val userId = sharedPreferences.getString(
-                Parameters.SESSION_USER_ID,
-                null
-            )
-                ?: return null
-            sessionMap[Parameters.SESSION_USER_ID] = userId
-            val sessionIndex = sharedPreferences.getInt(
-                Parameters.SESSION_INDEX,
-                0
-            )
-            sessionMap[Parameters.SESSION_INDEX] = sessionIndex
-            sessionMap[Parameters.SESSION_FIRST_ID] = ""
-            sessionMap[Parameters.SESSION_PREVIOUS_ID] = null
-            sessionMap[Parameters.SESSION_STORAGE] = "LOCAL_STORAGE"
-            sessionMap
-        } finally {
-            StrictMode.setThreadPolicy(oldPolicy)
-        }
-    }
-
-    private fun getSessionMapFromLegacyTrackerV3(
+    private fun getSessionMap(
         context: Context,
         sessionVarsName: String
     ): Map<String?, Any?>? {

@@ -8,34 +8,39 @@ import org.json.JSONObject
 class FetchedConfigurationBundle : Configuration {
     var schema: String
     var configurationVersion: Int
-    var configurationBundle: MutableList<ConfigurationBundle>
+    var configurationBundle: List<ConfigurationBundle>
 
     constructor(schema: String) {
         this.schema = schema
         configurationVersion = -1
-        configurationBundle = ArrayList()
+        configurationBundle = listOf()
     }
 
     // JSON formatter
     constructor(context: Context, jsonObject: JSONObject) {
         schema = jsonObject.getString("\$schema")
         configurationVersion = jsonObject.getInt("configurationVersion")
-        configurationBundle = ArrayList()
+        val tempBundle = ArrayList<ConfigurationBundle>()
+        
         val array = jsonObject.getJSONArray("configurationBundle")
         for (i in 0 until array.length()) {
             val bundleJson = array.getJSONObject(i)
             val bundle = ConfigurationBundle(context, bundleJson)
-            configurationBundle.add(bundle)
+            tempBundle.add(bundle)
         }
+        configurationBundle = tempBundle.toList()
     }
 
     // Copyable
     override fun copy(): Configuration {
         val copy = FetchedConfigurationBundle(schema)
         copy.configurationVersion = configurationVersion
+        
+        val tempBundle = ArrayList<ConfigurationBundle>()
         for (bundle in configurationBundle) {
-            copy.configurationBundle.add(bundle.copy() as ConfigurationBundle)
+            tempBundle.add(bundle.copy() as ConfigurationBundle)
         }
+        copy.configurationBundle = tempBundle.toList()
         return copy
     }
 }

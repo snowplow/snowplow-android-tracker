@@ -14,7 +14,7 @@ import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
  */
 class ConfigurationProvider @JvmOverloads constructor(
     private val remoteConfiguration: RemoteConfiguration,
-    defaultBundles: MutableList<ConfigurationBundle>? = null
+    defaultBundles: List<ConfigurationBundle>? = null
 ) {
     private val cache: ConfigurationCache = ConfigurationCache(remoteConfiguration)
     private var fetcher: ConfigurationFetcher? = null
