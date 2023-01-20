@@ -452,7 +452,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
             isRunning.compareAndSet(true, false)
             return
         }
-        if (eventStore!!.size <= 0) {
+        if (eventStore!!.size() <= 0) {
             if (emptyCount >= emptyLimit) {
                 Logger.d(TAG, "Emitter loop stopping: empty limit reached.")
                 isRunning.compareAndSet(true, false)
@@ -540,7 +540,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         httpMethod: HttpMethod
     ): List<Request> {
         val requests: MutableList<Request> = ArrayList()
-        val sendingTime = Util.timestamp
+        val sendingTime = Util.timestamp()
         
         if (httpMethod === HttpMethod.GET) {
             for (event in events) {

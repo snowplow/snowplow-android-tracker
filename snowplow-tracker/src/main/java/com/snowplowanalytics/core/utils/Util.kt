@@ -40,8 +40,9 @@ object Util {
      * @return the system time as a string
      */
     @JvmStatic
-    val timestamp: String
-        get() = System.currentTimeMillis().toString()
+    fun timestamp(): String {
+        return System.currentTimeMillis().toString()
+    }
 
     @JvmStatic
     fun getDateTimeFromTimestamp(timestamp: Long): String {
@@ -68,8 +69,9 @@ object Util {
      * @return a UUID string
      */
     @JvmStatic
-    val uUIDString: String
-        get() = UUID.randomUUID().toString()
+    fun uUIDString(): String {
+        return UUID.randomUUID().toString()
+    }
 
     /**
      * Count the number of bytes a string will occupy when UTF-8 encoded

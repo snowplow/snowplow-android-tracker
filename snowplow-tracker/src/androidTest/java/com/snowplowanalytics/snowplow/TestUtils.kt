@@ -11,8 +11,8 @@ object TestUtils {
         val sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS + "_" + namespaceId
         val sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString(Parameters.SESSION_USER_ID, uUIDString)
-        editor.putString(Parameters.SESSION_ID, uUIDString)
+        editor.putString(Parameters.SESSION_USER_ID, uUIDString())
+        editor.putString(Parameters.SESSION_ID, uUIDString())
         editor.putInt(Parameters.SESSION_INDEX, 0)
         editor.commit()
     }

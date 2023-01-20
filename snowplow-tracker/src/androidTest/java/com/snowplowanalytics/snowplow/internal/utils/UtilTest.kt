@@ -20,7 +20,7 @@ import java.util.*
 class UtilTest {
     @Test
     fun testGetTimestamp() {
-        Assert.assertEquals(13, timestamp.length.toLong())
+        Assert.assertEquals(13, timestamp().length.toLong())
     }
 
     @Test
@@ -49,7 +49,7 @@ class UtilTest {
 
     @Test
     fun testGetEventId() {
-        val eid = uUIDString
+        val eid = uUIDString()
         Assert.assertNotNull(eid)
         Assert.assertTrue(eid.matches(Regex("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")))
     }

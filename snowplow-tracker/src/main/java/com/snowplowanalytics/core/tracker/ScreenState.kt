@@ -25,7 +25,7 @@ class ScreenState : State {
     private var activityTag: String? = null
 
     init {
-        id = uUIDString
+        id = uUIDString()
         name = "Unknown"
     }
 
@@ -38,7 +38,7 @@ class ScreenState : State {
         if (id != null) {
             this.id = id
         } else {
-            this.id = uUIDString
+            this.id = uUIDString()
         }
     }
 

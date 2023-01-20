@@ -64,7 +64,7 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
         require(name.isNotEmpty()) { "Name cannot be empty" }
 
         this.name = name
-        id = screenId?.toString() ?: Util.uUIDString
+        id = screenId?.toString() ?: Util.uUIDString()
     }
     
     // Builder methods
