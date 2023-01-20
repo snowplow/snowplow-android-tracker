@@ -44,8 +44,9 @@ class MockEventStore : EventStore {
         return true
     }
 
-    override val size: Long
-        get() = db.size.toLong()
+    override fun size(): Long {
+        return db.size.toLong()
+    }
 
     override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
         synchronized(this) {

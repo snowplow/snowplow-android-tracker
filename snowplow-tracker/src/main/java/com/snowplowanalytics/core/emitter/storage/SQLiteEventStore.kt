@@ -198,13 +198,14 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
     }
 
     // Getters
-    override val size: Long
-        get() = if (isDatabaseOpen) {
+    override fun size(): Long {
+        return if (isDatabaseOpen) {
             insertWaitingEventsIfReady()
             DatabaseUtils.queryNumEntries(database, EventStoreHelper.TABLE_EVENTS)
         } else {
             payloadWaitingList.size.toLong()
         }
+    }
 
     override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
         if (!isDatabaseOpen) {

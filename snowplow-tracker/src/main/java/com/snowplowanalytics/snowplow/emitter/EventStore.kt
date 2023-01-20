@@ -49,7 +49,7 @@ interface EventStore {
      * Returns amount of events currently in the store.
      * @return the count of events in the store.
      */
-    val size: Long
+    fun size(): Long
 
     /**
      * Returns a list of EmittableEvent objects which
