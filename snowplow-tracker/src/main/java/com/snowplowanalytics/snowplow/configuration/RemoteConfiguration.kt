@@ -11,13 +11,11 @@ class RemoteConfiguration(endpoint: String, method: HttpMethod) : Configuration 
     /**
      * URL of the remote configuration.
      */
-    @JvmField
     val endpoint: String
 
     /**
      * The method used to send the requests (GET or POST).
      */
-    @JvmField
     val method: HttpMethod
 
     /**

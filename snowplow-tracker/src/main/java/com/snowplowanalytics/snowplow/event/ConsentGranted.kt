@@ -27,27 +27,21 @@ class ConsentGranted(expiry: String, documentId: String, documentVersion: String
     AbstractSelfDescribing() {
     
     /** Expiration of the consent.  */
-    @JvmField
     val expiry: String
 
     /** Identifier of the first document.  */
-    @JvmField
     val documentId: String
 
     /** Version of the first document.  */
-    @JvmField
     val documentVersion: String
 
     /** Name of the first document.  */
-    @JvmField
     var documentName: String? = null
 
     /** Description of the first document.  */
-    @JvmField
     var documentDescription: String? = null
 
     /** Other attached documents.  */
-    @JvmField
     val consentDocuments: MutableList<ConsentDocument> = LinkedList()
 
     /**

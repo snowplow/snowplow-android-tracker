@@ -11,7 +11,6 @@ import kotlin.Int
 class MockNetworkConnection(override var httpMethod: HttpMethod, var statusCode: Int) :
     NetworkConnection {
     private val previousRequests: MutableList<List<Request>> = ArrayList()
-    @JvmField
     val previousResults: MutableList<List<RequestResult>> = ArrayList()
     fun sendingCount(): Int {
         return previousResults.size

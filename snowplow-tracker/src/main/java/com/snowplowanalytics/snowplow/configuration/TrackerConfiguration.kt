@@ -338,7 +338,6 @@ open class TrackerConfiguration(
     }
 
     companion object {
-        @JvmField
         val TAG = TrackerConfiguration::class.java.simpleName
     }
 }

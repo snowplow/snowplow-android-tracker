@@ -28,47 +28,36 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
     AbstractSelfDescribing() {
     
     /** Name of the screen.  */
-    @JvmField
     val name: String
 
     /** Identifier of the screen.  */
-    @JvmField
     val id: String
 
     /** Type of screen.  */
-    @JvmField
     var type: String? = null
 
     /** Name of the previous screen.  */
-    @JvmField
     var previousName: String? = null
 
     /** Identifier of the previous screen.  */
-    @JvmField
     var previousId: String? = null
 
     /** Type of the previous screen.  */
-    @JvmField
     var previousType: String? = null
 
     /** Type of transition between previous and current screen.  */
-    @JvmField
     var transitionType: String? = null
 
     /** Name of the Fragment subclass.  */
-    @JvmField
     var fragmentClassName: String? = null
 
     /** Tag of the Fragment subclass.  */
-    @JvmField
     var fragmentTag: String? = null
 
     /** Name of the Activity subclass.  */
-    @JvmField
     var activityClassName: String? = null
 
     /** Tag of the Activity subclass.  */
-    @JvmField
     var activityTag: String? = null
     
     init {

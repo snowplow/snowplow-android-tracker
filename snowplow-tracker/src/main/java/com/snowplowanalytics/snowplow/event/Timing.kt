@@ -17,13 +17,9 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 
 /** A timing event.  */
 class Timing(category: String, variable: String, timing: Int) : AbstractSelfDescribing() {
-    @JvmField
     val category: String
-    @JvmField
     val variable: String
-    @JvmField
     val timing: Int
-    @JvmField
     var label: String? = null
 
     init {
@@ -55,6 +51,7 @@ class Timing(category: String, variable: String, timing: Int) : AbstractSelfDesc
             }
             return payload
         }
+    
     override val schema: String
         get() = TrackerConstants.SCHEMA_USER_TIMINGS
 }

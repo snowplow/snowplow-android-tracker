@@ -9,9 +9,7 @@ import java.util.ArrayList
 import java.util.HashMap
 
 class MockEventStore : EventStore {
-    @JvmField
     var db = HashMap<Long, Payload?>()
-    @JvmField
     var lastInsertedRow: Long = -1
     override fun add(payload: Payload) {
         synchronized(this) {

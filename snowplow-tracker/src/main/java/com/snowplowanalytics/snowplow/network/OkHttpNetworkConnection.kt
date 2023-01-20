@@ -39,6 +39,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
     private val serverAnonymisation: Boolean
     private var client: OkHttpClient? = null
     private val uriBuilder: Uri.Builder
+    override val uri: Uri
+        get() = uriBuilder.clearQuery().build()
     
     /**
      * Builder for the OkHttpNetworkConnection.
@@ -192,9 +194,6 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
             builder.client
         }
     }
-
-    override val uri: Uri
-        get() = uriBuilder.clearQuery().build()
 
     override fun sendRequests(requests: List<Request>): List<RequestResult> {
         val futures: MutableList<Future<*>> = ArrayList()

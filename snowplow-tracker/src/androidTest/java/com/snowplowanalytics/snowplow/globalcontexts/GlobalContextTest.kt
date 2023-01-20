@@ -23,7 +23,7 @@ internal class GlobalContextGenerator : ContextGenerator {
         return "StringToMatch" == event.payload[Parameters.SE_CATEGORY]
     }
 
-    override fun generateContexts(event: InspectableEvent): List<SelfDescribingJson?> {
+    override fun generateContexts(event: InspectableEvent): List<SelfDescribingJson> {
         return listOf(SelfDescribingJson("schema", object : HashMap<String?, String?>() {
             init {
                 put("key", "value")
@@ -44,7 +44,7 @@ class GlobalContextTest {
         val staticGC = GlobalContext(listOf(sdj))
         val generatorGC = GlobalContext(GlobalContextGenerator())
         val blockGC = GlobalContext(object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return listOf(
                     SelfDescribingJson("schemaBlock", object : HashMap<String?, String?>() {
                         init {
@@ -135,7 +135,7 @@ class GlobalContextTest {
         val trackerEvent = TrackerEvent(event)
         val contexts = staticGC.generateContexts(trackerEvent)
         Assert.assertEquals(1, contexts.size.toLong())
-        Assert.assertEquals("schema", contexts[0]!!.map["schema"])
+        Assert.assertEquals("schema", contexts[0].map["schema"])
     }
 
     @Test
@@ -155,7 +155,7 @@ class GlobalContextTest {
         val trackerEvent = TrackerEvent(event)
         var contexts = filterMatchingGC.generateContexts(trackerEvent)
         Assert.assertEquals(1, contexts.size.toLong())
-        Assert.assertEquals("schema", contexts[0]!!.map["schema"])
+        Assert.assertEquals("schema", contexts[0].map["schema"])
 
         // Not Matching
         val filterNotMatchingGC = GlobalContext(listOf(sdj), object : FunctionalFilter() {
@@ -198,13 +198,13 @@ class GlobalContextTest {
         trackerEvent = TrackerEvent(selfDescribingEvent)
         contexts = rulesetGC.generateContexts(trackerEvent)
         Assert.assertEquals(1, contexts.size.toLong())
-        Assert.assertEquals("schema", contexts[0]!!.map["schema"])
+        Assert.assertEquals("schema", contexts[0].map["schema"])
     }
 
     @Test
     fun testBlockGenerator() {
         val blockGC = GlobalContext(object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return listOf(
                     SelfDescribingJson("schemaBlock", object : HashMap<String?, String?>() {
                         init {
@@ -218,7 +218,7 @@ class GlobalContextTest {
         val trackerEvent = TrackerEvent(event)
         val contexts = blockGC.generateContexts(trackerEvent)
         Assert.assertEquals(1, contexts.size.toLong())
-        Assert.assertEquals("schemaBlock", contexts[0]!!.map["schema"])
+        Assert.assertEquals("schemaBlock", contexts[0].map["schema"])
     }
 
     @Test
@@ -228,7 +228,7 @@ class GlobalContextTest {
         val trackerEvent = TrackerEvent(event)
         val contexts = contextGeneratorGC.generateContexts(trackerEvent)
         Assert.assertEquals(1, contexts.size.toLong())
-        Assert.assertEquals("schema", contexts[0]!!.map["schema"])
+        Assert.assertEquals("schema", contexts[0].map["schema"])
     }
 
     // Service methods

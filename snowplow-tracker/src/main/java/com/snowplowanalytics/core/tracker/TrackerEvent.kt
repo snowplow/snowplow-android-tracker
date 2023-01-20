@@ -28,22 +28,11 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
     override lateinit var payload: MutableMap<String, Any>
     override lateinit var state: TrackerStateSnapshot
     
-    @JvmField
     var eventId: UUID = UUID.randomUUID()
-
-    @JvmField
     var timestamp: Long = System.currentTimeMillis()
-
-    @JvmField
     var trueTimestamp: Long?
-    
-    @JvmField
     var contexts: MutableList<SelfDescribingJson>
-    
-    @JvmField
     var isPrimitive = false
-    
-    @JvmField
     var isService: Boolean
 
     init {

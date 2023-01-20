@@ -16,7 +16,6 @@ package com.snowplowanalytics.snowplow.event
 class Background : AbstractSelfDescribing() {
     
     /** Index indicating the current transition.  */
-    @JvmField
     var backgroundIndex: Int? = null
     
     override val schema: String

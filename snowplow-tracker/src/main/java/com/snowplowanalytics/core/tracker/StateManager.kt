@@ -15,7 +15,6 @@ class StateManager {
         HashMap<String?, MutableList<StateMachineInterface>>()
     private val eventSchemaToPayloadUpdater = HashMap<String?, MutableList<StateMachineInterface>>()
     
-    @JvmField
     val trackerState = TrackerState()
     
     @Synchronized

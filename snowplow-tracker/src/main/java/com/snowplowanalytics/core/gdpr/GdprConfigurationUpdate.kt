@@ -8,7 +8,6 @@ class GdprConfigurationUpdate : GdprConfiguration(
     null, 
     null, 
     null) {
-    @JvmField
     var sourceConfig: GdprConfiguration? = null
     var isEnabled = false
     private var gdprUpdated = false

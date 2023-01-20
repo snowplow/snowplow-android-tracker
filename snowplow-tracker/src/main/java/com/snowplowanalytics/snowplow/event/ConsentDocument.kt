@@ -21,19 +21,15 @@ import com.snowplowanalytics.core.constants.TrackerConstants
  * */
 class ConsentDocument(documentId: String, documentVersion: String) : AbstractSelfDescribing() {
     /** Identifier of the document.  */
-    @JvmField
     val documentId: String
 
     /** Version of the document.  */
-    @JvmField
     val documentVersion: String
 
     /** Name of the document.  */
-    @JvmField
     var documentName: String? = null
 
     /** Description of the document.  */
-    @JvmField
     var documentDescription: String? = null
 
     /**

@@ -28,43 +28,33 @@ class EcommerceTransaction(
 ) : AbstractPrimitive() {
     
     /** Identifier of the order.  */
-    @JvmField
     val orderId: String
 
     /** Total amount of the order.  */
-    @JvmField
     val totalValue: Double
     
     /** The list of Transaction Items passed with the event.  */
-    @JvmField
     val items: List<EcommerceTransactionItem>
 
     /** Identifies an affiliation.  */
-    @JvmField
     var affiliation: String? = null
 
     /** Taxes applied to the purchase.  */
-    @JvmField
     var taxValue: Double? = null
 
     /** Total amount for shipping.  */
-    @JvmField
     var shipping: Double? = null
 
     /** City for shipping.  */
-    @JvmField
     var city: String? = null
 
     /** State for shipping.  */
-    @JvmField
     var state: String? = null
 
     /** Country for shipping.  */
-    @JvmField
     var country: String? = null
 
     /** Currency used for totalValue and taxValue.  */
-    @JvmField
     var currency: String? = null
 
     /**

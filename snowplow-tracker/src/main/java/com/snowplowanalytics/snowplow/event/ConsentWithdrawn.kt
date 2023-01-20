@@ -27,28 +27,43 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
     AbstractSelfDescribing() {
     
     /** Whether to withdraw consent for all consent documents.  */
-    @JvmField
     val all: Boolean
 
     /** Identifier of the first document.  */
-    @JvmField
     val documentId: String
 
     /** Version of the first document.  */
-    @JvmField
     val documentVersion: String
 
     /** Name of the first document.  */
-    @JvmField
     var documentName: String? = null
 
     /** Description of the first document.  */
-    @JvmField
     var documentDescription: String? = null
 
     /** Other attached documents.  */
-    @JvmField
     val consentDocuments: MutableList<ConsentDocument> = LinkedList()
+
+    val documents: List<ConsentDocument>
+        get() {
+            val docs: MutableList<ConsentDocument> = ArrayList()
+            val doc = ConsentDocument(documentId, documentVersion)
+                .documentDescription(documentDescription)
+                .documentName(documentName)
+            docs.add(doc)
+            docs.addAll(consentDocuments)
+            return docs
+        }
+
+    override val dataPayload: Map<String, Any?>
+        get() {
+            val payload = HashMap<String, Any?>()
+            payload[Parameters.CW_ALL] = all
+            return payload
+        }
+
+    override val schema: String
+        get() = TrackerConstants.SCHEMA_CONSENT_WITHDRAWN
 
     /**
      * Creates a consent withdrawn event.
@@ -84,24 +99,6 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
     }
 
     // Public methods
-    val documents: List<ConsentDocument>
-        get() {
-            val docs: MutableList<ConsentDocument> = ArrayList()
-            val doc = ConsentDocument(documentId, documentVersion)
-                .documentDescription(documentDescription)
-                .documentName(documentName)
-            docs.add(doc)
-            docs.addAll(consentDocuments)
-            return docs
-        }
-    override val dataPayload: Map<String, Any?>
-        get() {
-            val payload = HashMap<String, Any?>()
-            payload[Parameters.CW_ALL] = all
-            return payload
-        }
-    override val schema: String
-        get() = TrackerConstants.SCHEMA_CONSENT_WITHDRAWN
 
     override fun beginProcessing(tracker: Tracker) {
         for (document in documents) {

@@ -19,25 +19,14 @@ import com.android.installreferrer.api.ReferrerDetails
 /** A deep-link received in the app.  
  * @param url URL in the received deep-link.
  */
-class DeepLinkReceived(@JvmField val url: String) : AbstractSelfDescribing() {
+class DeepLinkReceived(val url: String) : AbstractSelfDescribing() {
     
     /** Referrer URL, source of this deep-link.  */
-    @JvmField
     var referrer: String? = null
 
     override val schema: String
         get() = Companion.schema
-    
-    // Builder methods
-    
-    /** Referrer URL, source of this deep-link.  */
-    fun referrer(referrer: String?): DeepLinkReceived {
-        this.referrer = referrer
-        return this
-    }
 
-    // Tracker methods
-    
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
@@ -46,7 +35,15 @@ class DeepLinkReceived(@JvmField val url: String) : AbstractSelfDescribing() {
 
             return payload
         }
-
+    
+    // Builder methods
+    
+    /** Referrer URL, source of this deep-link.  */
+    fun referrer(referrer: String?): DeepLinkReceived {
+        this.referrer = referrer
+        return this
+    }
+    
     companion object {
         const val schema = "iglu:com.snowplowanalytics.mobile/deep_link_received/jsonschema/1-0-0"
         const val PARAM_REFERRER = "referrer"

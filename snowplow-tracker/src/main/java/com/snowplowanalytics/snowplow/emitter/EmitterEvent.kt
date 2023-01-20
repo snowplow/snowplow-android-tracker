@@ -14,4 +14,4 @@ package com.snowplowanalytics.snowplow.emitter
 
 import com.snowplowanalytics.snowplow.payload.Payload
 
-class EmitterEvent(@JvmField val payload: Payload, @JvmField val eventId: Long)
+class EmitterEvent(val payload: Payload, val eventId: Long)

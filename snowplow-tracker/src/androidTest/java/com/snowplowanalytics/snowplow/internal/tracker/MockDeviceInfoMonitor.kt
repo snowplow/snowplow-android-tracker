@@ -19,7 +19,6 @@ import com.snowplowanalytics.core.utils.DeviceInfoMonitor
 
 class MockDeviceInfoMonitor : DeviceInfoMonitor() {
     private val methodAccessCounts: MutableMap<String, Int> = HashMap()
-    @JvmField
     var customIdfa: String? = "XJKLJSALFKJ"
     override val osType: String
         get() {

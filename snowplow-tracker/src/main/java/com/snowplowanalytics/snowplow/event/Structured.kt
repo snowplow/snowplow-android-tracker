@@ -17,15 +17,10 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 
 /** A Structured event.  */
 class Structured(category: String, action: String) : AbstractPrimitive() {
-    @JvmField
     val category: String
-    @JvmField
     val action: String
-    @JvmField
     var label: String? = null
-    @JvmField
     var property: String? = null
-    @JvmField
     var value: Double? = null
 
     init {

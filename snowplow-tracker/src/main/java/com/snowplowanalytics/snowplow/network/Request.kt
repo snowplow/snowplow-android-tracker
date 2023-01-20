@@ -23,13 +23,9 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload
  * to the collector.
  */
 class Request {
-    @JvmField
     val payload: Payload
-    @JvmField
     val emitterEventIds: List<Long>
-    @JvmField
     val oversize: Boolean
-    @JvmField
     val customUserAgent: String?
     
     /**
