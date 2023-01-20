@@ -353,7 +353,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
      */
     fun add(payload: Payload) {
         Executor.execute(TAG) {
-            eventStore!!.add(payload)
+            eventStore?.add(payload)
             if (isRunning.compareAndSet(false, true)) {
                 try {
                     attemptEmit(networkConnection)
@@ -447,12 +447,27 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
             isRunning.compareAndSet(true, false)
             return
         }
+        
         if (!Util.isOnline(context)) {
             Logger.d(TAG, "Emitter loop stopping: emitter offline.")
             isRunning.compareAndSet(true, false)
             return
         }
-        if (eventStore!!.size() <= 0) {
+        
+        if (eventStore == null) {
+            Logger.d(TAG, "No EventStore set.")
+            isRunning.compareAndSet(true, false)
+            return
+        }
+        val eventStore = eventStore ?: return
+
+        if (networkConnection == null) {
+            Logger.d(TAG, "No networkConnection set.")
+            isRunning.compareAndSet(true, false)
+            return
+        }
+        
+        if (eventStore.size() <= 0) {
             if (emptyCount >= emptyLimit) {
                 Logger.d(TAG, "Emitter loop stopping: empty limit reached.")
                 isRunning.compareAndSet(true, false)
@@ -470,8 +485,8 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         }
         
         emptyCount = 0
-        val events = eventStore!!.getEmittableEvents(sendLimit)
-        val requests = buildRequests(events, networkConnection!!.httpMethod)
+        val events = eventStore.getEmittableEvents(sendLimit)
+        val requests = buildRequests(events, networkConnection.httpMethod)
         val results = networkConnection.sendRequests(requests)
         
         Logger.v(TAG, "Processing emitter results.")
@@ -480,7 +495,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         var failedWillRetryCount = 0
         var failedWontRetryCount = 0
         val removableEvents: MutableList<Long?> = ArrayList()
-        
+
         for (res in results) {
             if (res.isSuccessful) {
                 removableEvents.addAll(res.eventIds)
@@ -500,7 +515,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
                 )
             }
         }
-        eventStore!!.removeEvents(removableEvents)
+        eventStore.removeEvents(removableEvents)
         
         val allFailureCount = failedWillRetryCount + failedWontRetryCount
         Logger.d(TAG, "Success Count: %s", successCount)
@@ -508,9 +523,9 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         
         if (requestCallback != null) {
             if (allFailureCount != 0) {
-                requestCallback!!.onFailure(successCount, allFailureCount)
+                requestCallback?.onFailure(successCount, allFailureCount)
             } else {
-                requestCallback!!.onSuccess(successCount)
+                requestCallback?.onSuccess(successCount)
             }
         }
         if (failedWillRetryCount > 0 && successCount == 0) {
@@ -544,11 +559,13 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
         
         if (httpMethod === HttpMethod.GET) {
             for (event in events) {
-                val payload = event!!.payload
-                addSendingTimeToPayload(payload, sendingTime)
-                val isOversize = isOversize(payload, httpMethod)
-                val request = Request(payload, event.eventId, isOversize)
-                requests.add(request)
+                val payload = event?.payload
+                if (payload != null) {
+                    addSendingTimeToPayload(payload, sendingTime)
+                    val isOversize = isOversize(payload, httpMethod)
+                    val request = Request(payload, event.eventId, isOversize)
+                    requests.add(request)
+                }
             }
         } else {
             var i = 0
@@ -559,29 +576,31 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
                 var j = i
                 while (j < i + bufferOption.code && j < events.size) {
                     val event = events[j]
-                    val payload = event!!.payload
-                    val eventId = event.eventId
-                    addSendingTimeToPayload(payload, sendingTime)
-                    
-                    if (isOversize(payload, httpMethod)) {
-                        val request = Request(payload, eventId, true)
-                        requests.add(request)
-                    } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
-                        val request = Request(postPayloadMaps, reqEventIds)
-                        requests.add(request)
+                    val payload = event?.payload
+                    val eventId = event?.eventId
+                    if (payload != null && eventId != null) {
+                        addSendingTimeToPayload(payload, sendingTime)
+                        if (isOversize(payload, httpMethod)) {
+                            val request = Request(payload, eventId, true)
+                            requests.add(request)
+                        } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
+                            val request = Request(postPayloadMaps, reqEventIds)
+                            requests.add(request)
 
-                        // Clear collections and build a new POST
-                        postPayloadMaps = ArrayList()
-                        reqEventIds = ArrayList()
+                            // Clear collections and build a new POST
+                            postPayloadMaps = ArrayList()
+                            reqEventIds = ArrayList()
 
-                        // Build and store the request
-                        postPayloadMaps.add(payload)
-                        reqEventIds.add(eventId)
-                    } else {
-                        postPayloadMaps.add(payload)
-                        reqEventIds.add(eventId)
+                            // Build and store the request
+                            postPayloadMaps.add(payload)
+                            reqEventIds.add(eventId)
+                        } else {
+                            postPayloadMaps.add(payload)
+                            reqEventIds.add(eventId)
+                        }
+                        j++
                     }
-                    j++
+                    
                 }
 
                 // Check if all payloads have been processed

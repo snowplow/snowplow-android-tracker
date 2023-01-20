@@ -54,6 +54,14 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      */
     var lastInsertedRowId: Long = -1
         private set
+    
+    /**
+     * Returns truth on if database is open.
+     *
+     * @return a boolean for database status
+     */
+    val databaseOpen: Boolean
+        get() = database != null && database!!.isOpen
 
     /**
      * Creates a new Event Store
@@ -68,7 +76,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
     }
 
     override fun add(payload: Payload) {
-        if (!isDatabaseOpen) {
+        if (!databaseOpen) {
             synchronized(this) { payloadWaitingList.add(payload) }
         } else {
             insertWaitingEventsIfReady()
@@ -81,7 +89,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      * is currently closed.
      */
     fun open() {
-        if (!isDatabaseOpen) {
+        if (!databaseOpen) {
             database = dbHelper.writableDatabase
             database?.enableWriteAheadLogging()
         }
@@ -104,7 +112,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      * was a success or not
      */
     fun insertEvent(payload: Payload): Long {
-        if (isDatabaseOpen) {
+        if (databaseOpen) {
             val bytes = Util.serialize(Util.objectMapToString(payload.map))
             val values = ContentValues(2)
             values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes)
@@ -117,7 +125,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
 
     override fun removeEvent(id: Long): Boolean {
         var retval = -1
-        if (isDatabaseOpen) {
+        if (databaseOpen) {
             retval = database!!.delete(
                 EventStoreHelper.TABLE_EVENTS,
                 EventStoreHelper.COLUMN_ID + "=" + id, null
@@ -132,7 +140,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
             return false
         }
         var retval = -1
-        if (isDatabaseOpen) {
+        if (databaseOpen) {
             retval = database!!.delete(
                 EventStoreHelper.TABLE_EVENTS,
                 EventStoreHelper.COLUMN_ID + " in (" + Util.joinLongList(ids) + ")", null
@@ -145,7 +153,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
     override fun removeAllEvents(): Boolean {
         var retval = 0
         Logger.d(TAG, "Removing all events from database.")
-        if (isDatabaseOpen) {
+        if (databaseOpen) {
             retval = database!!.delete(EventStoreHelper.TABLE_EVENTS, null, null)
         } else {
             Logger.e(TAG, "Database is not open.")
@@ -167,7 +175,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      */
     private fun queryDatabase(query: String?, orderBy: String?): List<Map<String, Any?>> {
         val res: MutableList<Map<String, Any?>> = ArrayList()
-        if (isDatabaseOpen) {
+        if (databaseOpen) {
             var cursor: Cursor? = null
             try {
                 cursor = database!!.query(
@@ -199,7 +207,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
 
     // Getters
     override fun size(): Long {
-        return if (isDatabaseOpen) {
+        return if (databaseOpen) {
             insertWaitingEventsIfReady()
             DatabaseUtils.queryNumEntries(database, EventStoreHelper.TABLE_EVENTS)
         } else {
@@ -208,7 +216,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
     }
 
     override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
-        if (!isDatabaseOpen) {
+        if (!databaseOpen) {
             return emptyList<EmitterEvent>()
         }
         insertWaitingEventsIfReady()
@@ -220,11 +228,11 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
             // Create a TrackerPayload for each event
             val payload = TrackerPayload()
             val eventData =
-                eventMetadata[EventStoreHelper.METADATA_EVENT_DATA] as Map<String, Any>?
+                eventMetadata[EventStoreHelper.METADATA_EVENT_DATA] as? Map<String, Any>?
             payload.addMap(eventData)
 
             // Create EmitterEvent
-            val eventId = eventMetadata[EventStoreHelper.METADATA_ID] as Long?
+            val eventId = eventMetadata[EventStoreHelper.METADATA_ID] as? Long?
             if (eventId == null) {
                 Logger.e(TAG, "Unable to get ID of an event extracted from the database.")
                 continue
@@ -272,16 +280,8 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         return queryDatabase(null, "id DESC LIMIT $range")
     }
 
-    /**
-     * Returns truth on if database is open.
-     *
-     * @return a boolean for database status
-     */
-    val isDatabaseOpen: Boolean
-        get() = database != null && database!!.isOpen
-
     private fun insertWaitingEventsIfReady() {
-        if (isDatabaseOpen && payloadWaitingList.size > 0) {
+        if (databaseOpen && payloadWaitingList.size > 0) {
             synchronized(this) {
                 for (p in payloadWaitingList) {
                     insertEvent(p)

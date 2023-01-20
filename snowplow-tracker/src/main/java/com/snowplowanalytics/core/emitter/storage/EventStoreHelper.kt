@@ -120,7 +120,7 @@ private constructor(context: Context, databaseName: String) :
             }
             // Create new database name
             val sqliteSuffix = namespace.replace("[^a-zA-Z0-9_]+".toRegex(), "-")
-            val dbName = DATABASE_NAME + "-" + sqliteSuffix + ".sqlite"
+            val dbName = "$DATABASE_NAME-$sqliteSuffix.sqlite"
 
             // Migrate old database if it exists
             renameLegacyDatabase(context, dbName)

@@ -46,10 +46,10 @@ class EventStoreTest {
         val eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
-        Assert.assertFalse(eventStore.isDatabaseOpen)
+        Assert.assertFalse(eventStore.databaseOpen)
         Assert.assertEquals(0, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
         waitUntilDatabaseOpen(eventStore)
-        Assert.assertTrue(eventStore.isDatabaseOpen)
+        Assert.assertTrue(eventStore.databaseOpen)
         Assert.assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
     }
 
@@ -72,10 +72,10 @@ class EventStoreTest {
         eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
-        Assert.assertFalse(eventStore.isDatabaseOpen)
+        Assert.assertFalse(eventStore.databaseOpen)
         Assert.assertEquals(0, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
         waitUntilDatabaseOpen(eventStore)
-        Assert.assertTrue(eventStore.isDatabaseOpen)
+        Assert.assertTrue(eventStore.databaseOpen)
         Assert.assertEquals(2, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
     }
 
@@ -98,9 +98,9 @@ class EventStoreTest {
         Assert.assertEquals(1, eventStore.size())
         eventStore.removeAllEvents()
         Assert.assertEquals(0, eventStore.size())
-        Assert.assertFalse(eventStore.isDatabaseOpen)
+        Assert.assertFalse(eventStore.databaseOpen)
         waitUntilDatabaseOpen(eventStore)
-        Assert.assertTrue(eventStore.isDatabaseOpen)
+        Assert.assertTrue(eventStore.databaseOpen)
         Assert.assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
     }
 
@@ -188,9 +188,9 @@ class EventStoreTest {
     @Throws(InterruptedException::class)
     fun testCloseDatabase() {
         val eventStore = eventStore()
-        Assert.assertTrue(eventStore.isDatabaseOpen)
+        Assert.assertTrue(eventStore.databaseOpen)
         eventStore.close()
-        Assert.assertFalse(eventStore.isDatabaseOpen)
+        Assert.assertFalse(eventStore.databaseOpen)
     }
 
     @Test
@@ -337,7 +337,7 @@ class EventStoreTest {
 
     @Throws(InterruptedException::class)
     private fun waitUntilDatabaseOpen(eventStore: SQLiteEventStore) {
-        while (!eventStore.isDatabaseOpen) {
+        while (!eventStore.databaseOpen) {
             Thread.sleep(300)
         }
     }
