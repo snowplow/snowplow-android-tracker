@@ -108,8 +108,8 @@ class StateManager {
     }
 
     @Synchronized
-    fun entitiesForProcessedEvent(event: InspectableEvent): List<SelfDescribingJson?> {
-        val result: MutableList<SelfDescribingJson?> = LinkedList()
+    fun entitiesForProcessedEvent(event: InspectableEvent): List<SelfDescribingJson> {
+        val result: MutableList<SelfDescribingJson> = LinkedList()
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
         val stateMachinesForSchema: List<StateMachineInterface>? =
             eventSchemaToEntitiesGenerator[event.schema]

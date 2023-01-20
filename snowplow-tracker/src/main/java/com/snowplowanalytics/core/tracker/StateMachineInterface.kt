@@ -9,6 +9,6 @@ interface StateMachineInterface {
     fun subscribedEventSchemasForEntitiesGeneration(): List<String?>
     fun subscribedEventSchemasForPayloadUpdating(): List<String?>
     fun transition(event: Event, state: State?): State?
-    fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson?>?
+    fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>?
     fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>?
 }

@@ -39,36 +39,43 @@ class StateManagerTest {
         var trackerState = stateManager.trackerStateForProcessedEvent(eventInc)
         var mockState = trackerState.getState("identifier") as MockState?
         Assert.assertEquals(1, mockState!!.value.toLong())
+        
         var e: InspectableEvent = TrackerEvent(eventInc, trackerState)
         var entities = stateManager.entitiesForProcessedEvent(e)
-        var data = entities[0]!!.map["data"] as Map<String?, Int>?
+        var data = entities[0].map["data"] as Map<String?, Int>?
         Assert.assertEquals(1, data!!["value"]!!.toInt().toLong())
         Assert.assertTrue(stateManager.addPayloadValuesToEvent(e))
         Assert.assertNull(e.payload["newParam"])
+        
         trackerState = stateManager.trackerStateForProcessedEvent(eventInc)
         mockState = trackerState.getState("identifier") as MockState?
         Assert.assertEquals(2, mockState!!.value.toLong())
+        
         e = TrackerEvent(eventInc, trackerState)
         entities = stateManager.entitiesForProcessedEvent(e)
-        data = entities[0]!!.map["data"] as Map<String?, Int>?
+        data = entities[0].map["data"] as Map<String?, Int>?
         Assert.assertEquals(2, data!!["value"]!!.toInt().toLong())
         Assert.assertTrue(stateManager.addPayloadValuesToEvent(e))
         Assert.assertNull(e.payload["newParam"])
+        
         trackerState = stateManager.trackerStateForProcessedEvent(eventDec)
         mockState = trackerState.getState("identifier") as MockState?
         Assert.assertEquals(1, mockState!!.value.toLong())
+        
         e = TrackerEvent(eventDec, trackerState)
         entities = stateManager.entitiesForProcessedEvent(e)
-        data = entities[0]!!.map["data"] as Map<String?, Int>?
+        data = entities[0].map["data"] as Map<String?, Int>?
         Assert.assertEquals(1, data!!["value"]!!.toInt().toLong())
         Assert.assertTrue(stateManager.addPayloadValuesToEvent(e))
         Assert.assertNull(e.payload["newParam"])
+        
         trackerState = stateManager.trackerStateForProcessedEvent(event)
         mockState = trackerState.getState("identifier") as MockState?
         Assert.assertEquals(1, mockState!!.value.toLong())
+        
         e = TrackerEvent(event, trackerState)
         entities = stateManager.entitiesForProcessedEvent(e)
-        data = entities[0]!!.map["data"] as Map<String?, Int>?
+        data = entities[0].map["data"] as Map<String?, Int>?
         Assert.assertEquals(1, data!!["value"]!!.toInt().toLong())
         Assert.assertTrue(stateManager.addPayloadValuesToEvent(e))
         Assert.assertEquals("value", e.payload["newParam"])
@@ -101,6 +108,8 @@ class StateManagerTest {
         val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.screenContext = true
+            tracker.sessionContext = false
+            tracker.platformContextEnabled = false
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
@@ -114,6 +123,7 @@ class StateManagerTest {
         eventStore.removeAllEvents()
         var entities = payload!!.map["co"] as String?
         Assert.assertNull(entities)
+        
         tracker.track(ScreenView("screen1"))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -127,6 +137,7 @@ class StateManagerTest {
             (entities.split("screen1").dropLastWhile { it.isEmpty() }
                 .toTypedArray().size - 1).toLong()
         )
+        
         tracker.track(Timing("category", "variable", 123))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -139,6 +150,7 @@ class StateManagerTest {
             (entities.split("screen1").dropLastWhile { it.isEmpty() }
                 .toTypedArray().size - 1).toLong()
         )
+        
         tracker.track(ScreenView("screen2"))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -151,9 +163,11 @@ class StateManagerTest {
             (entities.split("screen2").dropLastWhile { it.isEmpty() }
                 .toTypedArray().size - 1).toLong()
         )
+        
         val eventPayload = payload.map["ue_pr"] as String?
         Assert.assertTrue(eventPayload!!.contains("screen1"))
         Assert.assertTrue(eventPayload.contains("screen2"))
+        
         tracker.track(Timing("category", "variable", 123))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -166,6 +180,7 @@ class StateManagerTest {
             (entities.split("screen2").dropLastWhile { it.isEmpty() }
                 .toTypedArray().size - 1).toLong()
         )
+        
         tracker.track(Timing("category", "variable", 123))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -419,7 +434,7 @@ internal open class MockStateMachine : StateMachineInterface {
         }
     }
 
-    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson?> {
+    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson> {
         val mockState = state as MockState?
         val sdj = SelfDescribingJson("enitity", object : HashMap<String?, Int?>() {
             init {

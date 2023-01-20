@@ -22,7 +22,7 @@ class GlobalContext {
 
     constructor(contextGenerator: ContextGenerator) {
         generator = object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return contextGenerator.generateContexts(event)
             }
         }
@@ -33,27 +33,27 @@ class GlobalContext {
         }
     }
 
-    constructor(staticContexts: List<SelfDescribingJson?>) {
+    constructor(staticContexts: List<SelfDescribingJson>) {
         generator = object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return staticContexts
             }
         }
         filter = null
     }
 
-    constructor(staticContexts: List<SelfDescribingJson?>, ruleset: SchemaRuleSet?) {
+    constructor(staticContexts: List<SelfDescribingJson>, ruleset: SchemaRuleSet?) {
         generator = object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return staticContexts
             }
         }
         filter = ruleset?.filter
     }
 
-    constructor(staticContexts: List<SelfDescribingJson?>, filter: FunctionalFilter?) {
+    constructor(staticContexts: List<SelfDescribingJson>, filter: FunctionalFilter?) {
         generator = object : FunctionalGenerator() {
-            override fun apply(event: InspectableEvent): List<SelfDescribingJson?> {
+            override fun apply(event: InspectableEvent): List<SelfDescribingJson> {
                 return staticContexts
             }
         }
@@ -74,7 +74,7 @@ class GlobalContext {
         this.filter = filter
     }
 
-    fun generateContexts(event: InspectableEvent): List<SelfDescribingJson?> {
+    fun generateContexts(event: InspectableEvent): List<SelfDescribingJson> {
         return if (filter != null && !filter!!.apply(event)) {
             ArrayList()
         } else generator.apply(event)!!

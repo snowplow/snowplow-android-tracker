@@ -30,9 +30,6 @@ class RequestResult(
      */
     val isSuccessful: Boolean
         get() = statusCode in 200..299
-
-    val isOversize: Boolean
-        get() = oversize
     
     fun shouldRetry(customRetryForStatusCodes: Map<Int, Boolean>?): Boolean {
         // don't retry if successful

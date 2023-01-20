@@ -38,6 +38,7 @@ import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import com.snowplowanalytics.snowplow.tracker.*
+import com.snowplowanalytics.snowplow.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.util.Basis
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -497,7 +498,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         } else {
             addSelfDescribingPropertiesToPayload(payload, event)
         }
-        val contexts = event.contexts as MutableList<SelfDescribingJson?>
+        val contexts = event.contexts
         addBasicContextsToContexts(contexts, event)
         addGlobalContextsToContexts(contexts, event)
         addStateMachineEntitiesToContexts(contexts, event)
@@ -610,26 +611,26 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     }
 
     private fun addBasicContextsToContexts(
-        contexts: MutableList<SelfDescribingJson?>,
+        contexts: MutableList<SelfDescribingJson>,
         event: TrackerEvent
     ) {
         if (applicationContext) {
-            contexts.add(getApplicationContext(context))
+            getApplicationContext(context)?.let { contexts.add(it) }
         }
         if (platformContextEnabled) {
-            contexts.add(platformContextManager.getMobileContext(userAnonymisation))
+            platformContextManager.getMobileContext(userAnonymisation)?.let { contexts.add(it) }
         }
         if (event.isService) {
             return
         }
         if (geoLocationContext) {
-            contexts.add(getGeoLocationContext(context))
+            getGeoLocationContext(context)?.let { contexts.add(it) }
         }
         gdprContext?.let { contexts.add(it.context) }
     }
 
     private fun addGlobalContextsToContexts(
-        contexts: MutableList<SelfDescribingJson?>,
+        contexts: MutableList<SelfDescribingJson>,
         event: InspectableEvent
     ) {
         synchronized(globalContextGenerators) {
@@ -640,23 +641,21 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     }
 
     private fun addStateMachineEntitiesToContexts(
-        contexts: MutableList<SelfDescribingJson?>,
+        contexts: MutableList<SelfDescribingJson>,
         event: InspectableEvent
     ) {
         val stateManagerEntities = stateManager.entitiesForProcessedEvent(event)
         contexts.addAll(stateManagerEntities)
     }
 
-    private fun wrapContextsToPayload(payload: Payload, contexts: List<SelfDescribingJson?>) {
+    private fun wrapContextsToPayload(payload: Payload, contexts: List<SelfDescribingJson>) {
         if (contexts.isEmpty()) {
             return
         }
         
         val data: MutableList<Map<String, Any?>> = LinkedList()
         for (context in contexts) {
-            if (context != null) {
-                data.add(context.map)
-            }
+            data.add(context.map)
         }
         val finalContext = SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data)
         payload.addMap(

@@ -16,6 +16,6 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
 interface ContextGenerator {
-    fun generateContexts(event: InspectableEvent): List<SelfDescribingJson?>
+    fun generateContexts(event: InspectableEvent): List<SelfDescribingJson>
     fun filterEvent(event: InspectableEvent): Boolean
 }

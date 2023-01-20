@@ -13,7 +13,7 @@ class RequestResultTest {
     fun testSuccessfulRequest() {
         val result = RequestResult(200, false, listOf(100L))
         Assert.assertTrue(result.isSuccessful)
-        Assert.assertFalse(result.isOversize)
+        Assert.assertFalse(result.oversize)
         Assert.assertFalse(result.shouldRetry(HashMap()))
         Assert.assertEquals(result.eventIds, listOf(100L))
     }

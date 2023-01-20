@@ -307,7 +307,8 @@ object Snowplow {
     }
 
     // Private methods
-    
+
+    @JvmStatic
     @Synchronized
     private fun createTracker(context: Context, bundles: List<ConfigurationBundle>): List<String> {
         val namespaces: MutableList<String> = ArrayList()
@@ -326,6 +327,7 @@ object Snowplow {
         return namespaces
     }
 
+    @JvmStatic
     @Synchronized
     private fun registerInstance(serviceProvider: ServiceProvider): Boolean {
         val namespace = serviceProvider.namespace
