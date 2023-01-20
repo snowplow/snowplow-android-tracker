@@ -72,7 +72,7 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
                 Logger.e(TAG, "EventStore not available in the Emitter.")
                 return -1
             }
-            return eventStore.size
+            return eventStore.size()
         }
     
     override val isSending: Boolean

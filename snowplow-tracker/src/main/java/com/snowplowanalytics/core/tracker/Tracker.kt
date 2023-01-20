@@ -22,7 +22,6 @@ import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
 import com.snowplowanalytics.core.session.Session.Companion.getInstance
 import com.snowplowanalytics.core.tracker.Logger.d
-import com.snowplowanalytics.core.tracker.Logger.setDelegate
 import com.snowplowanalytics.core.tracker.Logger.track
 import com.snowplowanalytics.core.tracker.Logger.updateLogLevel
 import com.snowplowanalytics.core.tracker.Logger.v
@@ -57,9 +56,9 @@ import kotlin.math.max
  */
 class Tracker(emitter: Emitter, val namespace: String, var appId: String, context: Context, builder: Consumer<Tracker>? = null) {
     private var builderFinished = false
-
     private val context: Context
     private val stateManager = StateManager()
+    
     fun getScreenState(): ScreenState? {
         val state = stateManager.trackerState.getState("ScreenContext")
             ?: // Legacy initialization
@@ -71,9 +70,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     }
     
     private var trackerVersion = BuildConfig.TRACKER_LABEL
-        set(base64) {
+        set(version) {
             if (!builderFinished) {
-                field = base64
+                field = version
             }
         }
     
@@ -282,7 +281,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     var loggerDelegate: LoggerDelegate? = null
         set(delegate) {
             if (!builderFinished) {
-                setDelegate(delegate)
+                field = delegate
             }
         }
     

@@ -14,7 +14,7 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), NetworkController {
     
     // Getters and Setters
-    val isCustomNetworkConnection: Boolean
+    val customNetworkConnection: Boolean
         get() {
             val networkConnection = emitter.networkConnection
             return networkConnection != null && networkConnection !is OkHttpNetworkConnection

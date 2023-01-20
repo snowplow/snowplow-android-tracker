@@ -27,8 +27,19 @@ import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object Logger {
     private val TAG = Logger::class.java.simpleName
-    private var delegate: LoggerDelegate = DefaultLoggerDelegate()
     private var level = 0
+    
+    private var _delegate: LoggerDelegate = DefaultLoggerDelegate()
+    var delegate: LoggerDelegate?
+        get() = _delegate
+        /**
+         * Set the logger delegate that receive logs from the tracker.
+         *
+         * @param delegate The app logger delegate.
+         */
+        set(delegate) {
+            _delegate = delegate ?: DefaultLoggerDelegate()
+        }
 
     /**
      * Updates the logging level.
@@ -38,24 +49,6 @@ object Logger {
     @JvmStatic
     fun updateLogLevel(newLevel: LogLevel) {
         level = newLevel.level
-    }
-
-    /**
-     * Set the logger delegate that receive logs from the tracker.
-     *
-     * @param delegate The app logger delegate.
-     */
-    @JvmStatic
-    fun setDelegate(delegate: LoggerDelegate?) {
-        if (delegate != null) {
-            Logger.delegate = delegate
-        } else {
-            Logger.delegate = DefaultLoggerDelegate()
-        }
-    }
-
-    fun getDelegate(): LoggerDelegate? {
-        return delegate
     }
     
     // -- Log methods
@@ -99,7 +92,7 @@ object Logger {
         if (level >= 1) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            delegate.error(source, message)
+            _delegate.error(source, message)
         }
     }
 
@@ -115,7 +108,7 @@ object Logger {
         if (level >= 2) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            delegate.debug(source, message)
+            _delegate.debug(source, message)
         }
     }
 
@@ -131,7 +124,7 @@ object Logger {
         if (level >= 3) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            delegate.verbose(source, message)
+            _delegate.verbose(source, message)
         }
     }
 
@@ -143,7 +136,7 @@ object Logger {
      * @return the formatted message
      */
     private fun getMessage(msg: String, vararg args: Any?): String {
-        return thread + "|" + String.format(msg, *args)
+        return thread() + "|" + String.format(msg, *args)
     }
 
     /**
@@ -162,8 +155,9 @@ object Logger {
      *
      * @return the thread's name
      */
-    private val thread: String
-        get() = Thread.currentThread().name
+    private fun thread(): String {
+        return Thread.currentThread().name
+    }
 }
 
 /**

@@ -73,6 +73,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
 
     @Volatile
     private var isSessionCheckerEnabled: Boolean
+    
     var foregroundTimeout: Long
     var backgroundTimeout: Long
 

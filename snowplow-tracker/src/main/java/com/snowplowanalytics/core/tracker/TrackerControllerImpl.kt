@@ -86,10 +86,10 @@ class TrackerControllerImpl  // Constructors
         }
     
     override var loggerDelegate: LoggerDelegate?
-        get() = Logger.getDelegate()
+        get() = Logger.delegate
         set(loggerDelegate) {
             dirtyConfig.loggerDelegate = loggerDelegate
-            Logger.setDelegate(loggerDelegate)
+            Logger.delegate = loggerDelegate
         }
     
     override var applicationContext: Boolean

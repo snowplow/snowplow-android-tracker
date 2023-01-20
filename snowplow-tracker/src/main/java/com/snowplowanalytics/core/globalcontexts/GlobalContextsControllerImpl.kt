@@ -10,6 +10,8 @@ import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class GlobalContextsControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), GlobalContextsController {
+    private val tracker: Tracker
+        get() = serviceProvider.orMakeTracker()
 
     override val tags: Set<String?>
         get() = tracker.globalContextTags
@@ -21,8 +23,4 @@ class GlobalContextsControllerImpl(serviceProvider: ServiceProviderInterface) :
     override fun remove(tag: String): GlobalContext? {
         return tracker.removeGlobalContext(tag)
     }
-
-    // Private methods
-    private val tracker: Tracker
-        get() = serviceProvider.orMakeTracker()
 }
