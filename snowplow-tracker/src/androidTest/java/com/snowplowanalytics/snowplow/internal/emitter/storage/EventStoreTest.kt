@@ -95,9 +95,9 @@ class EventStoreTest {
         eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
-        Assert.assertEquals(1, eventStore.size)
+        Assert.assertEquals(1, eventStore.size())
         eventStore.removeAllEvents()
-        Assert.assertEquals(0, eventStore.size)
+        Assert.assertEquals(0, eventStore.size())
         Assert.assertFalse(eventStore.isDatabaseOpen)
         waitUntilDatabaseOpen(eventStore)
         Assert.assertTrue(eventStore.isDatabaseOpen)
@@ -124,7 +124,7 @@ class EventStoreTest {
         val lastRowId = eventStore.lastInsertedRowId
         val event = eventStore.getEvent(id)
         Assert.assertEquals(id, lastRowId)
-        Assert.assertEquals(1, eventStore.size)
+        Assert.assertEquals(1, eventStore.size())
         Assert.assertNotNull(event)
         
         eventStore.close()
@@ -142,9 +142,9 @@ class EventStoreTest {
         eventStore.add(payload())
         eventStore.add(payload())
         
-        Assert.assertEquals(6, eventStore.size)
+        Assert.assertEquals(6, eventStore.size())
         eventStore.removeAllEvents()
-        Assert.assertEquals(0, eventStore.size)
+        Assert.assertEquals(0, eventStore.size())
     }
 
     @Test
@@ -153,7 +153,7 @@ class EventStoreTest {
         val eventStore = eventStore()
         val id = eventStore.insertEvent(payload())
         var res = eventStore.removeEvent(id)
-        Assert.assertEquals(0, eventStore.size)
+        Assert.assertEquals(0, eventStore.size())
         Assert.assertTrue(res)
         res = eventStore.removeEvent(id)
         Assert.assertFalse(res)
@@ -171,9 +171,9 @@ class EventStoreTest {
         idList.add(eventStore.insertEvent(payload()))
         idList.add(eventStore.insertEvent(payload()))
         Assert.assertEquals(3, idList.size.toLong())
-        Assert.assertEquals(3, eventStore.size)
+        Assert.assertEquals(3, eventStore.size())
         var res = eventStore.removeEvents(idList)
-        Assert.assertEquals(0, eventStore.size)
+        Assert.assertEquals(0, eventStore.size())
         Assert.assertEquals(true, res)
         res = eventStore.removeEvents(idList)
         Assert.assertEquals(false, res)
@@ -226,7 +226,7 @@ class EventStoreTest {
         waitUntilDatabaseOpen(eventStore2)
         waitUntilDatabaseOpen(eventStore3)
         // Remove database
-        removeUnsentEventsExceptForNamespaces(context, Arrays.asList("namespace2"))
+        removeUnsentEventsExceptForNamespaces(context, listOf("namespace2"))
         val databaseList = Arrays.asList(*context.databaseList())
         Assert.assertFalse(databaseList.contains("snowplowEvents-namespace1.sqlite"))
         Assert.assertFalse(databaseList.contains("snowplowEvents-namespace1.sqlite-wal"))
@@ -301,14 +301,14 @@ class EventStoreTest {
         var trackerPayload = TrackerPayload()
         trackerPayload.add("key1", "value1")
         eventStore1.insertEvent(trackerPayload)
-        Assert.assertEquals(1, eventStore1.size)
+        Assert.assertEquals(1, eventStore1.size())
         val eventStore2 = SQLiteEventStore(context, "namespace")
         openedEventStores.add(eventStore2)
         waitUntilDatabaseOpen(eventStore2)
         trackerPayload = TrackerPayload()
         trackerPayload.add("key2", "value2")
         eventStore2.insertEvent(trackerPayload)
-        Assert.assertEquals(2, eventStore2.size)
+        Assert.assertEquals(2, eventStore2.size())
     }
 
     // Helper Methods

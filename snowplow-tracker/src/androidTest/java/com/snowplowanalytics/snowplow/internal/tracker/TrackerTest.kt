@@ -59,7 +59,7 @@ class TrackerTest {
             if (eventStore != null) {
                 val isClean = eventStore.removeAllEvents()
                 Log.i("TrackerTest", "EventStore cleaned: $isClean")
-                Log.i("TrackerTest", "Events in the store: " + eventStore.size)
+                Log.i("TrackerTest", "Events in the store: " + eventStore.size())
             } else {
                 Log.i("TrackerTest", "EventStore null")
             }
@@ -317,7 +317,7 @@ class TrackerTest {
         val eventId = Companion.tracker!!.track(ScreenView("name"))
         Assert.assertNull(eventId)
         val req = mockWebServer.takeRequest(2, TimeUnit.SECONDS)
-        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore!!.size)
+        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore!!.size())
         Assert.assertNull(req)
         mockWebServer.shutdown()
     }

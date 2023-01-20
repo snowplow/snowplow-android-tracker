@@ -239,7 +239,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         emitter.flush()
     }
 
@@ -257,7 +257,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertFalse(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(1, emitter.eventStore!!.size)
+        Assert.assertEquals(1, emitter.eventStore!!.size())
         emitter.flush()
     }
 
@@ -274,7 +274,7 @@ class EmitterTest {
             Thread.sleep(600)
             i++
         }
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         var totEvents = 0
         for (results in networkConnection.previousResults) {
             for (result in results) {
@@ -299,7 +299,7 @@ class EmitterTest {
             Thread.sleep(600)
             i++
         }
-        Assert.assertEquals(2, emitter.eventStore!!.size)
+        Assert.assertEquals(2, emitter.eventStore!!.size())
         for (results in networkConnection.previousResults) {
             for (result in results) {
                 Assert.assertFalse(result.isSuccessful)
@@ -323,7 +323,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         emitter.flush()
     }
 
@@ -339,7 +339,7 @@ class EmitterTest {
         Assert.assertEquals(false, emitter.emitterStatus)
         Assert.assertEquals(0, networkConnection.sendingCount().toLong())
         Assert.assertEquals(0, networkConnection.previousResults.size.toLong())
-        Assert.assertEquals(1, emitter.eventStore!!.size)
+        Assert.assertEquals(1, emitter.eventStore!!.size())
         
         emitter.resumeEmit()
         var i = 0
@@ -350,7 +350,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         emitter.flush()
     }
 
@@ -380,7 +380,7 @@ class EmitterTest {
         }
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertFalse(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         emitter.flush()
     }
 
@@ -397,14 +397,14 @@ class EmitterTest {
         // no events in queue since they were dropped because retrying is disabled for 500
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
-        Assert.assertEquals(0, emitter.eventStore!!.size)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
         
         networkConnection.statusCode = 403
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
 
         // event still in queue because retrying is enabled for 403
-        Assert.assertEquals(1, emitter.eventStore!!.size)
+        Assert.assertEquals(1, emitter.eventStore!!.size())
         Assert.assertEquals(2, networkConnection.previousResults.size.toLong())
         emitter.flush()
     }

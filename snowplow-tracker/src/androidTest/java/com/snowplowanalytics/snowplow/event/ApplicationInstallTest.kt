@@ -58,7 +58,7 @@ class ApplicationInstallTest {
         // Track event
         trackerController.track(event)
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }

@@ -244,7 +244,7 @@ class ConfigurationTest {
         // Track fake event
         trackerController.track(Structured("category", "action"))
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }
@@ -295,7 +295,7 @@ class ConfigurationTest {
         trackerController.track(Structured("category", "action"))
         run {
             var i = 0
-            while (eventStore.size < 1 && i < 10) {
+            while (eventStore.size() < 1 && i < 10) {
                 Thread.sleep(1000)
                 i++
             }
@@ -317,7 +317,7 @@ class ConfigurationTest {
         // Check gdpr context not added
         trackerController.track(Structured("category", "action"))
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }
@@ -361,7 +361,7 @@ class ConfigurationTest {
         trackerController.track(Structured("category", "action"))
         run {
             var i = 0
-            while (eventStore.size < 1 && i < 10) {
+            while (eventStore.size() < 1 && i < 10) {
                 Thread.sleep(1000)
                 i++
             }
@@ -383,7 +383,7 @@ class ConfigurationTest {
         // Check gdpr context added
         trackerController.track(Structured("category", "action"))
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }
@@ -442,7 +442,7 @@ class ConfigurationTest {
         // Check global context added to event
         trackerController.track(Structured("category", "action"))
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }

@@ -65,7 +65,7 @@ class DeepLinkReceivedTest {
         // Track event
         trackerController.track(event)
         var i = 0
-        while (eventStore.size < 1 && i < 10) {
+        while (eventStore.size() < 1 && i < 10) {
             Thread.sleep(1000)
             i++
         }
@@ -114,7 +114,7 @@ class DeepLinkReceivedTest {
         trackerController.track(event)
         val screenViewEventId = trackerController.track(screenView)
         var i = 0
-        while (eventStore.size < 2 && i < 10) {
+        while (eventStore.size() < 2 && i < 10) {
             Thread.sleep(1000)
             i++
         }

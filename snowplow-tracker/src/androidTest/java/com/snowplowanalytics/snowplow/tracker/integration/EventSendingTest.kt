@@ -56,7 +56,7 @@ class EventSendingTest {
             tracker!!.close()
             val isClean = emitter.eventStore!!.removeAllEvents()
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: $isClean")
-            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore!!.size)
+            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore!!.size())
         } catch (e: IllegalStateException) {
             Log.i("TrackerTest", "Tracker already closed.")
         }

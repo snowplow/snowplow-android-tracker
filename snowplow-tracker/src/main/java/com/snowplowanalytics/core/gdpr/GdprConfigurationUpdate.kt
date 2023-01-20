@@ -8,6 +8,7 @@ class GdprConfigurationUpdate : GdprConfiguration(
     null, 
     null, 
     null) {
+    
     var sourceConfig: GdprConfiguration? = null
     var isEnabled = false
     private var gdprUpdated = false

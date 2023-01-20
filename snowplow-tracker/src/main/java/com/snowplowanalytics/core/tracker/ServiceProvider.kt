@@ -321,6 +321,7 @@ class ServiceProvider(
         }
         
         val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
+        
         if (globalContextsConfiguration != null) {
             tracker.setGlobalContextGenerators(globalContextsConfiguration!!.contextGenerators)
         }
