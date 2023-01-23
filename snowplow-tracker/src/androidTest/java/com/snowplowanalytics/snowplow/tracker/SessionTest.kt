@@ -55,13 +55,15 @@ class SessionTest {
         Assert.assertNotNull(session.userId)
         val sdj = session.getSessionContext("first-id-1", timestamp, false)
         sessionState = session.state
+
+        Assert.assertNotNull(sdj)
         Assert.assertNotNull(sessionState)
         Assert.assertEquals("first-id-1", sessionState!!.firstEventId)
         Assert.assertEquals(timestampDateTime, sessionState.firstEventTimestamp)
         session.getSessionContext("second-id-2", timestamp + 10000, false)
         Assert.assertEquals("first-id-1", sessionState.firstEventId)
         Assert.assertEquals(timestampDateTime, sessionState.firstEventTimestamp)
-        Assert.assertEquals(TrackerConstants.SESSION_SCHEMA, sdj.map["schema"])
+        Assert.assertEquals(TrackerConstants.SESSION_SCHEMA, sdj!!.map["schema"])
     }
 
     @Test
@@ -70,7 +72,7 @@ class SessionTest {
         val sessionContext = getSessionContext(session, "event_1", timestamp, false)
         Assert.assertNotNull(sessionContext!![Parameters.SESSION_USER_ID])
         Assert.assertNotNull(sessionContext[Parameters.SESSION_ID])
-        Assert.assertEquals(1, session.sessionIndex.toLong())
+        Assert.assertEquals(1, session.sessionIndex?.toLong())
         Assert.assertNotNull(sessionContext[Parameters.SESSION_INDEX])
         Assert.assertEquals(1, sessionContext[Parameters.SESSION_INDEX])
         Assert.assertEquals("event_1", sessionContext[Parameters.SESSION_FIRST_ID])
@@ -343,9 +345,9 @@ class SessionTest {
         val session2 = tracker2.session
         session1!!.getSessionContext("session1-fake-id1", timestamp, false)
         session2!!.getSessionContext("session2-fake-id1", timestamp, false)
-        val initialValue1 = session1.sessionIndex.toLong()
+        val initialValue1 = session1.sessionIndex?.toLong()
         val id1 = session1.state!!.sessionId
-        val initialValue2 = session2.sessionIndex.toLong()
+        val initialValue2 = session2.sessionIndex?.toLong()
 
         // Retrigger session in tracker1
         // The timeout is 20s, this sleep is only 2s - it's still the same session
@@ -358,14 +360,14 @@ class SessionTest {
         session2.getSessionContext("session2-fake-id2", timestamp, false)
 
         // Check sessions have the correct state
-        Assert.assertEquals(0, session1.sessionIndex - initialValue1)
-        Assert.assertEquals(1, session2.sessionIndex - initialValue2)
+        Assert.assertEquals(0, session1.sessionIndex!! - initialValue1!!)
+        Assert.assertEquals(1, session2.sessionIndex!! - initialValue2!!)
         val id2 = session2.state!!.sessionId
 
         // Recreate tracker2
         val tracker2b = Tracker(emitter, "tracker2", "app", context, trackerBuilder)
         tracker2b.session!!.getSessionContext("session2b-fake-id3", timestamp, false)
-        val initialValue2b = tracker2b.session!!.sessionIndex.toLong()
+        val initialValue2b = tracker2b.session!!.sessionIndex?.toLong()
         val previousId2b = tracker2b.session!!.state!!.previousSessionId
 
         // Check the new tracker session gets the data from the old tracker2 session
@@ -406,7 +408,7 @@ class SessionTest {
             eventId,
             eventTimestamp,
             userAnonymisation
-        ).map[Parameters.DATA] as Map<String, Any>?
+        )?.map?.get(Parameters.DATA) as Map<String, Any>?
     }
 
     private fun cleanSharedPreferences(context: Context, sharedPreferencesName: String) {

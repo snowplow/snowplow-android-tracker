@@ -56,13 +56,13 @@ class DeepLinkStateMachine : StateMachineInterface {
                 return null
             }
             // - ReadyForOutput (SV) Init
-            val dlState = state as DeepLinkState
-            if (dlState.readyForOutput) {
+            val dlState = state as? DeepLinkState
+            if (dlState?.readyForOutput == true) {
                 return null
             }
             // - DeepLinkReceived (SV) ReadyForOutput
-            val currentState = DeepLinkState(dlState.url, dlState.referrer)
-            currentState.readyForOutput = true
+            val currentState = dlState?.let { DeepLinkState(it.url, it.referrer) }
+            currentState?.readyForOutput = true
             currentState
         }
     }
@@ -70,13 +70,12 @@ class DeepLinkStateMachine : StateMachineInterface {
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) { return null }
 
-        val deepLinkState = state as DeepLinkState
-        if (!deepLinkState.readyForOutput) {
+        val deepLinkState = state as? DeepLinkState
+        if (deepLinkState?.readyForOutput == false) {
             return null
         }
-        val entity = DeepLink(deepLinkState.url)
-            .referrer(deepLinkState.referrer)
-        return listOf<SelfDescribingJson>(entity)
+        val entity = deepLinkState?.let { DeepLink(it.url).referrer(it.referrer) }
+        return entity?.let { listOf<SelfDescribingJson>(entity) }
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {

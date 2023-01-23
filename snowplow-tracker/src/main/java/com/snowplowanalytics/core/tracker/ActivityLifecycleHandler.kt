@@ -26,8 +26,8 @@ class ActivityLifecycleHandler private constructor(context: Context) :
     Application.ActivityLifecycleCallbacks {
 
     init {
-        val application = context.applicationContext as Application
-        application.registerActivityLifecycleCallbacks(this)
+        val application = context.applicationContext as? Application
+        application?.registerActivityLifecycleCallbacks(this)
     }
 
     override fun onActivityResumed(activity: Activity) {

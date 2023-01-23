@@ -277,6 +277,8 @@ class StateManagerTest {
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.deepLinkContext = true
             tracker.base64Encoded = false
+            tracker.sessionContext = false
+            tracker.platformContextEnabled = false
         }
         val tracker = Tracker(emitter, "namespace", "appId", context, trackerBuilder)
 
