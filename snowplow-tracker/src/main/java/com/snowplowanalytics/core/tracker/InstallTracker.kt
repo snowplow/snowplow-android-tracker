@@ -46,17 +46,19 @@ class InstallTracker private constructor(context: Context) {
         }
 
         override fun onPostExecute(isNewInstall: Boolean) {
-            val installTimestamp = sharedPreferences!!.getLong(TrackerConstants.INSTALL_TIMESTAMP, 0)
+            val installTimestamp = sharedPreferences?.getLong(TrackerConstants.INSTALL_TIMESTAMP, 0)
             // We send the installEvent if it's a new installed app but in case the tracker hasn't been able
             // to send the event before we can retry checking if INSTALL_TIMESTAMP was already removed.
-            if (!isNewInstall && installTimestamp <= 0) {
-                return
+            installTimestamp?.let {
+                if (!isNewInstall && installTimestamp <= 0) {
+                    return
+                }
+                sendInstallEvent(it) 
             }
-            sendInstallEvent(installTimestamp)
             // clear install timestamp
-            val editor = sharedPreferences!!.edit()
-            editor.remove(TrackerConstants.INSTALL_TIMESTAMP)
-            editor.commit()
+            val editor = sharedPreferences?.edit()
+            editor?.remove(TrackerConstants.INSTALL_TIMESTAMP)
+            editor?.commit()
         }
     }
 

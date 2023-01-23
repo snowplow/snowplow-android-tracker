@@ -67,7 +67,7 @@ object Logger {
             var throwable: Throwable? = null
             for (arg in args) {
                 if (Throwable::class.java.isInstance(arg)) {
-                    throwable = arg as Throwable?
+                    throwable = arg as? Throwable?
                     break
                 }
             }

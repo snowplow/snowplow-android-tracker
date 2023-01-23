@@ -40,11 +40,11 @@ class LifecycleStateMachine : StateMachineInterface {
         return null
     }
 
-    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson> {
+    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) return listOf<SelfDescribingJson>(LifecycleEntity(true))
         
-        val s = state as LifecycleState
-        return listOf<SelfDescribingJson>(LifecycleEntity(s.isForeground).index(s.index))
+        val s = state as? LifecycleState
+        return s?.let { listOf<SelfDescribingJson>(LifecycleEntity(it.isForeground).index(it.index)) }
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
