@@ -605,7 +605,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             }
             val sessionContextJson =
                 sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation)
-            event.contexts.add(sessionContextJson)
+            sessionContextJson?.let { event.contexts.add(it) }
         }
     }
 

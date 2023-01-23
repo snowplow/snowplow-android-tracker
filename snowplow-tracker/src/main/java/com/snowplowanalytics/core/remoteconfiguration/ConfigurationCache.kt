@@ -31,9 +31,8 @@ class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
 
     // Private methods
     private fun getCachePath(context: Context): String {
-        if (cacheFilePath != null) {
-            return cacheFilePath as String
-        }
+        cacheFilePath?.let { return it }
+        
         val cacheDirPath = context.cacheDir.absolutePath + File.separator + "snowplow-cache"
         val cacheDir = File(cacheDirPath)
         if (!cacheDir.exists()) {
@@ -50,7 +49,7 @@ class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
         try {
             val fileIn = FileInputStream(path)
             objectIn = ObjectInputStream(fileIn)
-            configuration = objectIn.readObject() as FetchedConfigurationBundle
+            configuration = objectIn.readObject() as? FetchedConfigurationBundle
         } catch (e: FileNotFoundException) {
             // TODO log exception
         } catch (e: IOException) {

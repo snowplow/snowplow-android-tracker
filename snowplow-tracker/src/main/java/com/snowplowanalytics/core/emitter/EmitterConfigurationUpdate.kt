@@ -70,48 +70,10 @@ class EmitterConfigurationUpdate : EmitterConfiguration() {
             serverAnonymisationUpdated = true
         }
 
-//    fun requestCallback(): RequestCallback? {
-//        return if (sourceConfig == null) null else sourceConfig!!.requestCallback
-//    }
-//    
-//    fun bufferOption(): BufferOption {
-//        return if (sourceConfig == null || bufferOptionUpdated) super.bufferOption else sourceConfig!!.bufferOption
-//    }
-
     override var emitRange: Int
         get() = if (sourceConfig == null || emitRangeUpdated) super.emitRange else sourceConfig!!.emitRange
         set(value) {
             super.emitRange = value
             emitRangeUpdated = true
         }
-
-
-//    fun emitRange(): Int {
-//        return if (sourceConfig == null || emitRangeUpdated) super.emitRange else sourceConfig!!.emitRange
-//    }
-
-//    fun threadPoolSize(): Int {
-//        return if (sourceConfig == null || threadPoolSizeUpdated) super.threadPoolSize else sourceConfig!!.threadPoolSize
-//    }
-//
-//    fun byteLimitGet(): Long {
-//        return if (sourceConfig == null || byteLimitGetUpdated) super.byteLimitGet else sourceConfig!!.byteLimitGet
-//    }
-//
-//
-//    fun byteLimitPost(): Long {
-//        return if (sourceConfig == null || byteLimitPostUpdated) super.byteLimitPost else sourceConfig!!.byteLimitPost
-//    }
-
-//
-//    fun customRetryForStatusCodes(): Map<Int, Boolean>? {
-//        return if (sourceConfig == null || customRetryForStatusCodesUpdated) super.customRetryForStatusCodes else sourceConfig!!.customRetryForStatusCodes
-//    }
-//
-//
-//    fun serverAnonymisation(): Boolean {
-//        return if (sourceConfig == null || serverAnonymisationUpdated) super.serverAnonymisation else sourceConfig!!.serverAnonymisation
-//    }
-
-
 }

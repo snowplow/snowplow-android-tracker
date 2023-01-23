@@ -74,7 +74,7 @@ object FileStore {
             Logger.d(TAG, "Attempting to retrieve map from: %s", filename)
             val fis = FileInputStream(file)
             val ois = ObjectInputStream(fis)
-            val varsMap: MutableMap<String?, Any?> = ois.readObject() as HashMap<String?, Any?>
+            val varsMap: MutableMap<String?, Any?>? = ois.readObject() as? HashMap<String?, Any?>
             ois.close()
             Logger.d(TAG, " + Retrieved map from file: %s", varsMap)
             return varsMap

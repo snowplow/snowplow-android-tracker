@@ -75,7 +75,7 @@ class ConfigurationFetcher(
     }
 
     private fun exceptionHandler(t: Throwable?) {
-        var message = t!!.message
+        var message = t?.message
         if (message == null) {
             message = "no message provided"
         }

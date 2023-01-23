@@ -38,7 +38,7 @@ class FetchedConfigurationBundle : Configuration {
         
         val tempBundle = ArrayList<ConfigurationBundle>()
         for (bundle in configurationBundle) {
-            tempBundle.add(bundle.copy() as ConfigurationBundle)
+            (bundle.copy() as? ConfigurationBundle)?.let { tempBundle.add(it) }
         }
         copy.configurationBundle = tempBundle.toList()
         return copy

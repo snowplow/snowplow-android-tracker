@@ -50,7 +50,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     context: Context
 ) {
     // Session Variables
-    var userId: String? = null
+    var userId: String
         private set
     private var eventIndex = 0
 
@@ -85,7 +85,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     var onSessionUpdate: Consumer<SessionState>? = null
 
     // Session values persistence
-    private var sharedPreferences: SharedPreferences? = null
+    private var sharedPreferences: SharedPreferences
 
     init {
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout)
@@ -125,8 +125,15 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         eventId: String,
         eventTimestamp: Long,
         userAnonymisation: Boolean
-    ): SelfDescribingJson {
+    ): SelfDescribingJson? {
         Logger.v(TAG, "Getting session context...")
+
+        if (state == null) {
+            Logger.v(TAG, "Session state not present")
+            return null
+        }
+        val state = state ?: return null
+        
         if (isSessionCheckerEnabled) {
             if (shouldUpdateSession()) {
                 Logger.d(TAG, "Update session information.")
@@ -140,7 +147,8 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             lastSessionCheck = System.currentTimeMillis()
         }
         eventIndex += 1
-        val sessionValues = state!!.sessionValues
+        
+        val sessionValues = state.sessionValues
         val sessionCopy: MutableMap<String, Any?> = HashMap(sessionValues)
         sessionCopy[Parameters.SESSION_EVENT_INDEX] = eventIndex
         if (userAnonymisation) {
@@ -170,10 +178,10 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         eventIndex = 0
         var previousSessionId: String? = null
         var storage = "LOCAL_STORAGE"
-        if (state != null) {
-            sessionIndex = state!!.sessionIndex + 1
-            previousSessionId = state!!.sessionId
-            storage = state!!.storage
+        state?.let {
+            sessionIndex = it.sessionIndex + 1
+            previousSessionId = it.sessionId
+            storage = it.storage
         }
         state = SessionState(
             eventId,
@@ -181,27 +189,29 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             currentSessionId,
             previousSessionId,
             sessionIndex,
-            userId!!,
+            userId,
             storage
         )
-        storeSessionState(state!!)
-        callOnSessionUpdateCallback(state!!)
+        state?.let {
+            storeSessionState(it)
+            callOnSessionUpdateCallback(it)
+        }
     }
 
     private fun storeSessionState(state: SessionState) {
         val jsonObject = JSONObject(state.sessionValues)
         val jsonString = jsonObject.toString()
-        val editor = sharedPreferences!!.edit()
+        val editor = sharedPreferences.edit()
         editor.putString(TrackerConstants.SESSION_STATE, jsonString)
         editor.apply()
     }
 
     private fun callOnSessionUpdateCallback(state: SessionState) {
-        if (onSessionUpdate != null) {
-            val thread = Thread { onSessionUpdate!!.accept(state) }
-            thread.isDaemon = true
-            thread.start()
-        }
+        val onSessionUpdate = onSessionUpdate ?: return
+        
+        val thread = Thread { onSessionUpdate.accept(state) }
+        thread.isDaemon = true
+        thread.start()
     }
 
     private fun executeEventCallback(callback: Runnable?) {
@@ -266,9 +276,9 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             }
             val sessionMap: MutableMap<String?, Any?> = HashMap()
             val jsonString = sharedPreferences.getString(TrackerConstants.SESSION_STATE, null)
-            val jsonObject = JSONObject(jsonString!!)
-            val iterator = jsonObject.keys()
-            while (iterator.hasNext()) {
+            val jsonObject = jsonString?.let { JSONObject(it) }
+            val iterator = jsonObject?.keys()
+            while (iterator?.hasNext() == true) {
                 val key = iterator.next()
                 val value = jsonObject[key]
                 sessionMap[key] = value
@@ -285,8 +295,8 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     /**
      * @return the session index
      */
-    val sessionIndex: Int
-        get() = state!!.sessionIndex //$ to remove
+    val sessionIndex: Int?
+        get() = state?.sessionIndex //$ to remove
 
     companion object {
         private val TAG = Session::class.java.simpleName
@@ -319,13 +329,13 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             val session =
                 Session(foregroundTimeout, backgroundTimeout, timeUnit, namespace, context)
             var callbacks: Array<Runnable?>? = arrayOf(null, null, null, null)
-            if (sessionCallbacks!!.size == 4) {
+            if (sessionCallbacks != null && sessionCallbacks.size == 4) {
                 callbacks = sessionCallbacks
             }
-            session.foregroundTransitionCallback = callbacks!![0]
-            session.backgroundTransitionCallback = callbacks[1]
-            session.foregroundTimeoutCallback = callbacks[2]
-            session.backgroundTimeoutCallback = callbacks[3]
+            session.foregroundTransitionCallback = callbacks?.get(0)
+            session.backgroundTransitionCallback = callbacks?.get(1)
+            session.foregroundTimeoutCallback = callbacks?.get(2)
+            session.backgroundTimeoutCallback = callbacks?.get(3)
             return session
         }
 

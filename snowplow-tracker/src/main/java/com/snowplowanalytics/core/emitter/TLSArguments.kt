@@ -45,7 +45,7 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
             val trustManagerFactory = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm()
             )
-            trustManagerFactory.init(null as KeyStore?)
+            trustManagerFactory.init(null as? KeyStore?)
             val trustManagers = trustManagerFactory.trustManagers
             
             check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
@@ -53,7 +53,7 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
                         + Arrays.toString(trustManagers))
             }
             
-            trustManager = trustManagers[0] as X509TrustManager
+            trustManager = trustManagers[0] as? X509TrustManager
             sslSocketFactory = TLSSocketFactory(versions)
         } catch (e: KeyStoreException) {
             e.printStackTrace()

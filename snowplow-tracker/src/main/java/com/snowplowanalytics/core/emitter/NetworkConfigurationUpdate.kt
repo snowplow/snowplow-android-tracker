@@ -9,9 +9,8 @@ import okhttp3.OkHttpClient
 
 class NetworkConfigurationUpdate : NetworkConfigurationInterface {
     var sourceConfig: NetworkConfiguration? = null
-
-    // customPostPath flag
     var customPostPathUpdated = false
+    
     override var customPostPath: String? = null
         get() = if (sourceConfig == null || customPostPathUpdated) field else sourceConfig!!.customPostPath
     
