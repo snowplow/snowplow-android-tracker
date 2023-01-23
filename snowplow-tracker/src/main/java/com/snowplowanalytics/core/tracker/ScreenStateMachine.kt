@@ -31,32 +31,34 @@ class ScreenStateMachine : StateMachineInterface {
     }
 
     override fun transition(event: Event, state: State?): State? {
-        val screenView = event as ScreenView
-        val screenState: ScreenState = if (state != null) {
+        val screenView = event as? ScreenView
+        val screenState: ScreenState? = if (state != null) {
             // - Screen (SV) Screen
-            state as ScreenState
+            state as? ScreenState
         } else {
             // - Init (SV) Screen
             ScreenState()
         }
-        screenState.updateScreenState(
-            screenView.id,
-            screenView.name,
-            screenView.type,
-            screenView.transitionType,
-            screenView.fragmentClassName,
-            screenView.fragmentTag,
-            screenView.activityClassName,
-            screenView.activityTag
-        )
+        screenView?.let {
+            screenState?.updateScreenState(
+                it.id,
+                it.name,
+                it.type,
+                it.transitionType,
+                it.fragmentClassName,
+                it.fragmentTag,
+                it.activityClassName,
+                it.activityTag
+            )
+        }
         return screenState
     }
 
-    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson> {
+    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) return ArrayList()
-        val screenState = state as ScreenState
-        val entity = screenState.getCurrentScreen(true)
-        return listOf(entity)
+        val screenState = state as? ScreenState
+        val entity = screenState?.getCurrentScreen(true)
+        return entity?.let { listOf(it) }
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {

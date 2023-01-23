@@ -51,8 +51,8 @@ class SchemaRule private constructor(val rule: String, private val ruleParts: Li
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
-        val that = other as SchemaRule
-        return rule == that.rule
+        val that = other as? SchemaRule
+        return rule == that?.rule
     }
 
     override fun hashCode(): Int {
