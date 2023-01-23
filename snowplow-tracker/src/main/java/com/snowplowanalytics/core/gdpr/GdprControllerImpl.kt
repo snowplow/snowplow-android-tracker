@@ -44,14 +44,13 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
         get() = tracker.gdprContext != null
 
     override fun enable(): Boolean {
-        if (gdpr == null) {
-            return false
-        }
+        val gdpr = gdpr ?: return false
+        
         tracker.enableGdprContext(
-            gdpr!!.basisForProcessing,
-            gdpr!!.documentId,
-            gdpr!!.documentVersion,
-            gdpr!!.documentDescription
+            gdpr.basisForProcessing,
+            gdpr.documentId,
+            gdpr.documentVersion,
+            gdpr.documentDescription
         )
         dirtyConfig.isEnabled = true
         return true

@@ -85,9 +85,9 @@ class StateManager {
             }
             for (stateMachine in stateMachines) {
                 val stateIdentifier = stateMachineToIdentifier[stateMachine]
-                val previousStateFuture = trackerState.getStateFuture(stateIdentifier!!)
+                val previousStateFuture = stateIdentifier?.let { trackerState.getStateFuture(it) }
                 val currentStateFuture = StateFuture(event, previousStateFuture, stateMachine)
-                trackerState.put(stateIdentifier, currentStateFuture)
+                stateIdentifier?.let { trackerState.put(it, currentStateFuture) }
                 
                 // TODO: Remove early state computation.
                 /*
@@ -121,10 +121,12 @@ class StateManager {
         }
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
-            val state = event.state.getState(stateIdentifier!!)
-            val entities = stateMachine.entities(event, state)
-            if (entities != null) {
-                result.addAll(entities)
+            if (stateIdentifier != null) {
+                val state = event.state.getState(stateIdentifier)
+                val entities = stateMachine.entities(event, state)
+                if (entities != null) {
+                    result.addAll(entities)
+                }
             }
         }
         return result
@@ -145,10 +147,12 @@ class StateManager {
         }
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
-            val state = event.state.getState(stateIdentifier!!)
-            val payloadValues = stateMachine.payloadValues(event, state)
-            if (payloadValues != null && !event.addPayloadValues(payloadValues)) {
-                failures++
+            if (stateIdentifier != null) {
+                val state = event.state.getState(stateIdentifier)
+                val payloadValues = stateMachine.payloadValues(event, state)
+                if (payloadValues != null && !event.addPayloadValues(payloadValues)) {
+                    failures++
+                }
             }
         }
         return failures == 0
