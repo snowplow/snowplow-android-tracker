@@ -38,7 +38,7 @@ class SessionControllerImpl  // Constructors
 
     
     // Getters and Setters
-    override val sessionIndex: Int
+    override val sessionIndex: Int?
         get() {
             val session = session
             if (session == null) {
@@ -48,14 +48,14 @@ class SessionControllerImpl  // Constructors
             return session.sessionIndex
         }
     
-    override val sessionId: String
+    override val sessionId: String?
         get() {
             val session = session
             if (session == null) {
                 Logger.track(TAG, "Attempt to access SessionController fields when disabled")
                 return ""
             }
-            return session.state!!.sessionId
+            return session.state?.sessionId
         }
     
     override val userId: String
@@ -65,7 +65,7 @@ class SessionControllerImpl  // Constructors
                 Logger.track(TAG, "Attempt to access SessionController fields when disabled")
                 return ""
             }
-            return session.userId!!
+            return session.userId
         }
     
     override val isInBackground: Boolean

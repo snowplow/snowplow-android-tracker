@@ -7,13 +7,13 @@ interface SessionController : SessionConfigurationInterface {
      * The session index.
      * A increasing number which helps to order the sequence of sessions.
      */
-    val sessionIndex: Int
+    val sessionIndex: Int?
 
     /**
      * The session identifier.
      * A unique identifier which is used to identify the session.
      */
-    val sessionId: String
+    val sessionId: String?
 
     /**
      * The session user identifier.
