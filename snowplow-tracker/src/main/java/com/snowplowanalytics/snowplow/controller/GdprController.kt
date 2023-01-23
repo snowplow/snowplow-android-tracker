@@ -13,9 +13,9 @@ interface GdprController : GdprConfigurationInterface {
      */
     fun reset(
         basisForProcessing: Basis,
-        documentId: String,
-        documentVersion: String,
-        documentDescription: String
+        documentId: String?,
+        documentVersion: String?,
+        documentDescription: String?
     )
 
     /**

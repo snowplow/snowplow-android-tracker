@@ -26,9 +26,9 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
     
     override fun reset(
         basisForProcessing: Basis,
-        documentId: String,
-        documentVersion: String,
-        documentDescription: String
+        documentId: String?,
+        documentVersion: String?,
+        documentDescription: String?
     ) {
         tracker.enableGdprContext(
             basisForProcessing,

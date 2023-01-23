@@ -87,9 +87,7 @@ class ServiceProvider(
     }
 
     fun shutdown() {
-        if (tracker != null) {
-            tracker!!.pauseEventTracking()
-        }
+        tracker?.pauseEventTracking()
         stopServices()
         resetServices()
         resetControllers()
@@ -131,12 +129,8 @@ class ServiceProvider(
     }
 
     private fun stopServices() {
-        if (tracker != null) {
-            tracker!!.close()
-        }
-        if (emitter != null) {
-            emitter!!.shutdown()
-        }
+        tracker?.close()
+        emitter?.shutdown()
     }
 
     private fun resetServices() {
@@ -322,9 +316,7 @@ class ServiceProvider(
         
         val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
         
-        if (globalContextsConfiguration != null) {
-            tracker.setGlobalContextGenerators(globalContextsConfiguration!!.contextGenerators)
-        }
+        globalContextsConfiguration?.let { tracker.setGlobalContextGenerators(it.contextGenerators) }
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking()
         }
@@ -356,12 +348,12 @@ class ServiceProvider(
     private fun makeGdprController(): GdprControllerImpl {
         val controller = GdprControllerImpl(this)
         val gdpr = orMakeTracker().gdprContext
-        if (gdpr != null) {
+        gdpr?.let {
             controller.reset(
-                gdpr.basisForProcessing,
-                gdpr.documentId!!,
-                gdpr.documentVersion!!,
-                gdpr.documentDescription!!
+                it.basisForProcessing,
+                it.documentId,
+                it.documentVersion,
+                it.documentDescription
             )
         }
         return controller
