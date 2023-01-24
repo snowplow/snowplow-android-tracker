@@ -59,7 +59,7 @@ class ServiceProvider(
         this.context = context
         appId = context.packageName
         
-        // Reset configurationUpdates
+        // Reset configurationUpdates 
         trackerConfigurationUpdate = TrackerConfigurationUpdate(appId)
         networkConfigurationUpdate = NetworkConfigurationUpdate()
         subjectConfigurationUpdate = SubjectConfigurationUpdate()
@@ -170,74 +170,43 @@ class ServiceProvider(
 
     // Getters
     override fun orMakeSubject(): Subject {
-        if (subject == null) {
-            subject = makeSubject()
-        }
-        return subject!!
+        return subject ?: makeSubject().also { subject = it }
     }
 
     override fun orMakeEmitter(): Emitter {
-        if (emitter == null) {
-            emitter = makeEmitter()
-        }
-        return emitter!!
+        return emitter ?: makeEmitter().also { emitter = it }
     }
     
-
     override fun orMakeTracker(): Tracker {
-        if (tracker == null) {
-            tracker = makeTracker()
-        }
-        return tracker!!
+        return tracker ?: makeTracker().also { tracker = it }
     }
 
     override fun orMakeTrackerController(): TrackerControllerImpl {
-        if (trackerController == null) {
-            trackerController = makeTrackerController()
-        }
-        return trackerController!!
+        return trackerController ?: makeTrackerController().also { trackerController = it }
     }
 
     override fun orMakeSessionController(): SessionControllerImpl {
-        if (sessionController == null) {
-            sessionController = makeSessionController()
-        }
-        return sessionController!!
+        return sessionController ?: makeSessionController().also { sessionController = it }
     }
 
     override fun orMakeEmitterController(): EmitterControllerImpl {
-        if (emitterController == null) {
-            emitterController = makeEmitterController()
-        }
-        return emitterController!!
+        return emitterController ?: makeEmitterController().also { emitterController = it }
     }
 
     override fun orMakeGdprController(): GdprControllerImpl {
-        if (gdprController == null) {
-            gdprController = makeGdprController()
-        }
-        return gdprController!!
+        return gdprController ?: makeGdprController().also { gdprController = it }
     }
 
     override fun orMakeGlobalContextsController(): GlobalContextsControllerImpl {
-        if (globalContextsController == null) {
-            globalContextsController = makeGlobalContextsController()
-        }
-        return globalContextsController!!
+        return globalContextsController ?: makeGlobalContextsController().also { globalContextsController = it }
     }
 
     override fun orMakeSubjectController(): SubjectControllerImpl {
-        if (subjectController == null) {
-            subjectController = makeSubjectController()
-        }
-        return subjectController!!
+        return subjectController ?: makeSubjectController().also { subjectController = it }
     }
 
     override fun orMakeNetworkController(): NetworkControllerImpl {
-        if (networkController == null) {
-            networkController = makeNetworkController()
-        }
-        return networkController!!
+        return networkController ?: makeNetworkController().also { networkController = it }
     }
 
     // Factories
