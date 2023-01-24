@@ -462,11 +462,10 @@ class TrackerTest {
 
     @Test
     fun testStartsNewSessionWhenChangingAnonymousTracking() {
-        val builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        val emitter = Emitter(
-            context, "fake-uri", builder
-        )
+        val emitterBuilder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val emitter = Emitter(context, "fake-uri", emitterBuilder)
         emitter.pauseEmit()
+        
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
@@ -474,16 +473,19 @@ class TrackerTest {
             tracker.installAutotracking = false
             tracker.exceptionAutotracking = false
             tracker.screenViewAutotracking = false
+            tracker.platformContextEnabled = false
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
         Companion.tracker = Tracker(emitter, "ns", "myAppId", context, trackerBuilder)
+        
         Companion.tracker!!.track(Structured("c", "a"))
         val sessionIdStart = Companion.tracker!!.session!!.state!!.sessionId
         Companion.tracker!!.userAnonymisation = true
         Companion.tracker!!.track(Structured("c", "a"))
         val sessionIdAnonymous = Companion.tracker!!.session!!.state!!.sessionId
         Assert.assertNotEquals(sessionIdStart, sessionIdAnonymous)
+        
         Companion.tracker!!.userAnonymisation = false
         Companion.tracker!!.track(Structured("c", "a"))
         val sessionIdNotAnonymous = Companion.tracker!!.session!!.state!!.sessionId

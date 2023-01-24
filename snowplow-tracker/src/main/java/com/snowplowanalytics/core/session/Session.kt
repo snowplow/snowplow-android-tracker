@@ -127,13 +127,6 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         userAnonymisation: Boolean
     ): SelfDescribingJson? {
         Logger.v(TAG, "Getting session context...")
-
-        if (state == null) {
-            Logger.v(TAG, "Session state not present")
-            return null
-        }
-        val state = state ?: return null
-        
         if (isSessionCheckerEnabled) {
             if (shouldUpdateSession()) {
                 Logger.d(TAG, "Update session information.")
@@ -147,6 +140,11 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             lastSessionCheck = System.currentTimeMillis()
         }
         eventIndex += 1
+        
+        val state = state ?: run {
+            Logger.v(TAG, "Session state not present")
+            return null 
+        }
         
         val sessionValues = state.sessionValues
         val sessionCopy: MutableMap<String, Any?> = HashMap(sessionValues)

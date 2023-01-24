@@ -212,6 +212,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     var sessionContext: Boolean = TrackerDefaults.sessionContext
         @Synchronized
         set(sessionContext) {
+            println("❌ setting sessionContext in Tracker")
             field = sessionContext
             
             if (session != null && !sessionContext) {
@@ -294,7 +295,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             if (session == null || !lifecycleAutotracking) {
                 return
             }
-            val isForeground = data["isForeground"] as Boolean? ?: return
+            val isForeground = data["isForeground"] as? Boolean? ?: return
             if (session.isBackground == !isForeground) {
                 // if the new lifecycle state confirms the session state, there isn't any lifecycle transition
                 return
@@ -310,7 +311,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private val receiveScreenViewNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
             if (screenViewAutotracking) {
-                val event = data["event"] as Event?
+                val event = data["event"] as? Event?
                 event?.let { track(it) }
             }
         }
@@ -318,7 +319,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private val receiveInstallNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
             if (installAutotracking) {
-                val event = data["event"] as Event?
+                val event = data["event"] as? Event?
                 event?.let { track(it) }
             }
         }
@@ -326,7 +327,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private val receiveDiagnosticNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
             if (diagnosticAutotracking) {
-                val event = data["event"] as Event?
+                val event = data["event"] as? Event?
                 event?.let { track(it) }
             }
         }
@@ -335,7 +336,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         object : FunctionalObserver() {
             override fun apply(data: Map<String, Any>) {
                 if (exceptionAutotracking) {
-                    val event = data["event"] as Event?
+                    val event = data["event"] as? Event?
                     event?.let { track(it) }
                 }
             }
@@ -351,12 +352,12 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         
         emitter.flush()
         
-        // Setting the emitter namespace has a side-effect of creating a SQLiteEventStore
+        // Setting the emitter namespace has a side-effect of creating a SQLiteEventStore,
         // unless an EventStore was already provided through EmitterConfiguration
         emitter.namespace = namespace
         
-        if (trackerVersionSuffix != null) {
-            val suffix = trackerVersionSuffix!!.replace("[^A-Za-z0-9.-]".toRegex(), "")
+        trackerVersionSuffix?.let {
+            val suffix = it.replace("[^A-Za-z0-9.-]".toRegex(), "")
             if (suffix.isNotEmpty()) {
                 trackerVersion = "$trackerVersion $suffix"
             }
@@ -369,6 +370,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
         // When session context is enabled
         if (sessionContext) {
+            println("❌ tracker init if sessionContext")
             var callbacks = arrayOf<Runnable?>(null, null, null, null)
             if (sessionCallbacks.size == 4) {
                 callbacks = sessionCallbacks
@@ -481,8 +483,8 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun transformEvent(event: TrackerEvent) {
         // Application_install event needs the timestamp to the real installation event.
-        if (event.schema != null && event.schema == TrackerConstants.SCHEMA_APPLICATION_INSTALL && event.trueTimestamp != null) {
-            event.timestamp = event.trueTimestamp!!
+        if (event.schema != null && event.schema == TrackerConstants.SCHEMA_APPLICATION_INSTALL) {
+            event.trueTimestamp?.let { event.timestamp = it }
             event.trueTimestamp = null
         }
         // Payload can be optionally updated with values based on internal state
@@ -512,15 +514,11 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private fun addBasicPropertiesToPayload(payload: Payload, event: TrackerEvent) {
         payload.add(Parameters.EID, event.eventId.toString())
         payload.add(Parameters.DEVICE_TIMESTAMP, event.timestamp.toString())
-        if (event.trueTimestamp != null) {
-            payload.add(Parameters.TRUE_TIMESTAMP, event.trueTimestamp.toString())
-        }
+        event.trueTimestamp?.let { payload.add(Parameters.TRUE_TIMESTAMP, it.toString()) }
         payload.add(Parameters.APPID, appId)
         payload.add(Parameters.NAMESPACE, namespace)
         payload.add(Parameters.TRACKER_VERSION, trackerVersion)
-        if (subject != null) {
-            payload.addMap(HashMap(subject!!.getSubject(userAnonymisation)))
-        }
+        subject?.let { payload.addMap(HashMap(it.getSubject(userAnonymisation))) }
         payload.add(Parameters.PLATFORM, platform.value)
     }
 
@@ -531,16 +529,18 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun addSelfDescribingPropertiesToPayload(payload: Payload, event: TrackerEvent) {
         payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED)
-        val data = SelfDescribingJson(event.schema!!, event.payload)
-        val unstructuredEventPayload = HashMap<String?, Any?>()
-        unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
-        unstructuredEventPayload[Parameters.DATA] = data.map
-        payload.addMap(
-            unstructuredEventPayload,
-            base64Encoded,
-            Parameters.UNSTRUCTURED_ENCODED,
-            Parameters.UNSTRUCTURED
-        )
+        event.schema?.let {
+            val data = SelfDescribingJson(it, event.payload)
+            val unstructuredEventPayload = HashMap<String?, Any?>()
+            unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
+            unstructuredEventPayload[Parameters.DATA] = data.map
+            payload.addMap(
+                unstructuredEventPayload,
+                base64Encoded,
+                Parameters.UNSTRUCTURED_ENCODED,
+                Parameters.UNSTRUCTURED
+            )
+        }
     }
 
     /*
@@ -560,8 +560,8 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         var url: String? = null
         var referrer: String? = null
         if (event.schema == DeepLinkReceived.schema) {
-            url = event.payload[DeepLinkReceived.PARAM_URL] as String?
-            referrer = event.payload[DeepLinkReceived.PARAM_REFERRER] as String?
+            url = event.payload[DeepLinkReceived.PARAM_URL] as? String?
+            referrer = event.payload[DeepLinkReceived.PARAM_REFERRER] as? String?
         } else if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && contexts != null) {
             for (entity in contexts) {
                 if (entity is DeepLink) {
@@ -689,9 +689,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         payload.add(Parameters.TRACKER_VERSION, trackerVersion)
 
         // If there is a subject present for the Tracker add it
-        if (subject != null) {
-            payload.addMap(HashMap(subject!!.getSubject(userAnonymisation)))
-        }
+        subject?.let { payload.addMap(HashMap(it.getSubject(userAnonymisation))) }
 
         // Add Mobile Context
         if (platformContextEnabled) {
