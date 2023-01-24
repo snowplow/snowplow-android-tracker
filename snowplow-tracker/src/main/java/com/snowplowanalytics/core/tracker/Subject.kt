@@ -185,22 +185,15 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
         setDefaultScreenResolution(context)
         
         if (config != null) {
-            if (config.userId != null) userId = (config.userId!!)
-            if (config.networkUserId != null) networkUserId = (config.networkUserId!!)
-            if (config.domainUserId != null) domainUserId = (config.domainUserId!!)
-            if (config.useragent != null) useragent = (config.useragent!!)
-            if (config.ipAddress != null) ipAddress = (config.ipAddress!!)
-            if (config.timezone != null) timezone = config.timezone!!
-            if (config.language != null) language = (config.language!!)
-            if (config.screenResolution != null) {
-                val size = config.screenResolution
-                screenResolution = (Size(size!!.width, size.height))
-            }
-            if (config.screenViewPort != null) {
-                val size = config.screenViewPort
-                screenViewPort = (Size(size!!.width, size.height))
-            }
-            if (config.colorDepth != null) colorDepth = (config.colorDepth!!)
+            config.networkUserId?.let { networkUserId = it }
+            config.domainUserId?.let { domainUserId = it }
+            config.useragent?.let { useragent = it }
+            config.ipAddress?.let { ipAddress = it }
+            config.timezone?.let { timezone = it }
+            config.language?.let { language = it }
+            config.screenResolution?.let { screenResolution = it }
+            config.screenViewPort?.let { screenViewPort = it }
+            config.colorDepth?.let { colorDepth = it }
         }
         v(TAG, "Subject created successfully.")
     }
@@ -231,10 +224,10 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
      * @param context the android context
      */
     private fun setDefaultScreenResolution(context: Context) {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        val display = windowManager?.defaultDisplay
         val size = Point()
-        display.getSize(size)
+        display?.getSize(size)
         screenResolution = (Size(size.x, size.y))
     }
 
