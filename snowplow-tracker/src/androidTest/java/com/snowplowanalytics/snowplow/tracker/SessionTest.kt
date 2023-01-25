@@ -72,7 +72,7 @@ class SessionTest {
         val sessionContext = getSessionContext(session, "event_1", timestamp, false)
         Assert.assertNotNull(sessionContext!![Parameters.SESSION_USER_ID])
         Assert.assertNotNull(sessionContext[Parameters.SESSION_ID])
-        Assert.assertEquals(1, session.sessionIndex?.toLong())
+        Assert.assertEquals(1, session.sessionIndex)
         Assert.assertNotNull(sessionContext[Parameters.SESSION_INDEX])
         Assert.assertEquals(1, sessionContext[Parameters.SESSION_INDEX])
         Assert.assertEquals("event_1", sessionContext[Parameters.SESSION_FIRST_ID])
