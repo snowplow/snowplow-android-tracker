@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.globalcontexts
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GlobalContext {
     private var generator: FunctionalGenerator
@@ -75,8 +76,8 @@ class GlobalContext {
     }
 
     fun generateContexts(event: InspectableEvent): List<SelfDescribingJson> {
-        return if (filter != null && !filter!!.apply(event)) {
-            ArrayList()
-        } else generator.apply(event)!!
+        filter?.let { if (!it.apply(event)) return ArrayList() }
+        
+        return generator.apply(event)
     }
 }
