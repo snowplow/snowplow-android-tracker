@@ -3,6 +3,7 @@ package com.snowplowanalytics.snowplow.configuration
 import android.net.Uri
 import com.snowplowanalytics.core.emitter.NetworkConfigurationInterface
 import com.snowplowanalytics.core.tracker.Logger
+import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.NetworkConnection
 import com.snowplowanalytics.snowplow.network.Protocol
@@ -14,6 +15,11 @@ import java.util.*
 /**
  * Represents the network communication configuration
  * allowing the tracker to be able to send events to the Snowplow collector.
+ * 
+ * Default values:
+ * method = HttpMethod.POST;
+ * protocol = Protocol.HTTP;
+ * timeout = 5;
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
@@ -24,12 +30,12 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
      * @return Method used to send events to the collector.
      */
-    override var method: HttpMethod? = null
+    override var method: HttpMethod = EmitterDefaults.httpMethod
 
     /**
      * @return Protocol used to send events to the collector.
      */
-    override var protocol: Protocol? = null
+    override var protocol: Protocol? = EmitterDefaults.requestSecurity
 
     /**
      * @see .NetworkConfiguration
@@ -44,7 +50,7 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
      * @see .timeout
      */
-    override var timeout: Int? = null
+    override var timeout: Int? = EmitterDefaults.emitTimeout
 
     /**
      * @see .okHttpClient
@@ -144,9 +150,8 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
         val copy: NetworkConfiguration = if (networkConnection != null) {
             NetworkConfiguration(networkConnection!!)
         } else {
-            val scheme =
-                if (protocol == Protocol.HTTPS) "https://" else "http://"
-            NetworkConfiguration(scheme + endpoint, method!!)
+            val scheme = if (protocol == Protocol.HTTPS) "https://" else "http://"
+            NetworkConfiguration(scheme + endpoint, method)
         }
         copy.customPostPath = customPostPath
         copy.timeout = timeout
