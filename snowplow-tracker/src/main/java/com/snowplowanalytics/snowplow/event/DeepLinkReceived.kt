@@ -65,7 +65,7 @@ class DeepLinkReceived(val url: String) : AbstractSelfDescribing() {
             val extras = intent.extras
             
             if (extras != null) {
-                val referrerUri = extras[Intent.EXTRA_REFERRER] as Uri?
+                val referrerUri = extras[Intent.EXTRA_REFERRER] as? Uri?
                 referrerUri?.let { referrer = it.toString() }
             }
             return DeepLinkReceived(deepLinkUrl).referrer(referrer)

@@ -181,8 +181,8 @@ class MessageNotification(
             payload[PARAM_BODY] = body
             payload[PARAM_TRIGGER] = trigger.name
             action?.let { payload[PARAM_ACTION] = it }
-            if (attachments != null && attachments!!.isNotEmpty()) {
-                payload[PARAM_MESSAGENOTIFICATIONATTACHMENTS] = attachments
+            attachments?.let { 
+                if (it.isNotEmpty()) payload[PARAM_MESSAGENOTIFICATIONATTACHMENTS] = it
             }
             bodyLocArgs?.let { payload[PARAM_BODYLOCARGS] = it }
             bodyLocKey?.let { payload[PARAM_BODYLOCKEY] = it }

@@ -46,9 +46,7 @@ class Timing(category: String, variable: String, timing: Int) : AbstractSelfDesc
             payload[Parameters.UT_CATEGORY] = this.category
             payload[Parameters.UT_VARIABLE] = variable
             payload[Parameters.UT_TIMING] = timing
-            if (label != null && label!!.isNotEmpty()) {
-                payload[Parameters.UT_LABEL] = label
-            }
+            label?.let { if (it.isNotEmpty()) payload[Parameters.UT_LABEL] = it }
             return payload
         }
     
