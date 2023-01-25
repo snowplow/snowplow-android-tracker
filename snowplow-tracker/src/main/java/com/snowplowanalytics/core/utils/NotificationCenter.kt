@@ -54,7 +54,7 @@ object NotificationCenter {
                 continue
             }
             val dataCopy: Map<String, Any> = HashMap(data)
-            weakObserver.get()!!.apply(dataCopy)
+            weakObserver.get()?.apply(dataCopy)
         }
         return observers.isNotEmpty()
     }

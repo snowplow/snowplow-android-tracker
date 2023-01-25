@@ -115,9 +115,9 @@ object Util {
     @JvmStatic
     fun isOnline(context: Context): Boolean {
         Logger.v(TAG, "Checking tracker internet connectivity.")
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         return try {
-            val ni = cm.activeNetworkInfo
+            val ni = cm?.activeNetworkInfo
             val connected = ni != null && ni.isConnected
             Logger.d(TAG, "Tracker connection online: %s", connected)
             connected
@@ -191,23 +191,25 @@ object Util {
      */
     @SuppressLint("MissingPermission") // Suppressed as it's caught by SecurityException catch block.
     fun getLastKnownLocation(context: Context): Location? {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
         var location: Location? = null
         
         try {
             var locationProvider: String? = null
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) == true) {
                 locationProvider = LocationManager.GPS_PROVIDER
-            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            } else if (locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true) {
                 locationProvider = LocationManager.NETWORK_PROVIDER
             } else {
-                val locationProviders = locationManager.getProviders(true)
-                if (locationProviders.size > 0) {
-                    locationProvider = locationProviders[0]
+                val locationProviders = locationManager?.getProviders(true)
+                locationProviders?.let {
+                    if (it.size > 0) { locationProvider = it[0] }
                 }
             }
-            if (locationProvider != null && locationProvider != "") {
-                location = locationManager.getLastKnownLocation(locationProvider)
+            locationProvider?.let { 
+                if (it.isNotEmpty()) {
+                    location = locationManager?.getLastKnownLocation(it)
+                }
             }
         } catch (ex: SecurityException) {
             Logger.e(TAG, "Exception occurred when retrieving location: %s", ex.toString())
@@ -319,7 +321,7 @@ object Util {
         try {
             val memIn = ByteArrayInputStream(bytes)
             val `in` = ObjectInputStream(memIn)
-            val map: Map<String, String> = `in`.readObject() as HashMap<String, String>
+            val map: Map<String, String>? = `in`.readObject() as? HashMap<String, String>
             `in`.close()
             memIn.close()
             newMap = map
