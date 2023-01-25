@@ -407,15 +407,15 @@ class StateManagerTest {
 
 internal class MockState(var value: Int) : State
 internal open class MockStateMachine : StateMachineInterface {
-    override fun subscribedEventSchemasForTransitions(): List<String?> {
+    override fun subscribedEventSchemasForTransitions(): List<String> {
         return LinkedList(listOf("inc", "dec"))
     }
 
-    override fun subscribedEventSchemasForEntitiesGeneration(): List<String?> {
+    override fun subscribedEventSchemasForEntitiesGeneration(): List<String> {
         return LinkedList(listOf("*"))
     }
 
-    override fun subscribedEventSchemasForPayloadUpdating(): List<String?> {
+    override fun subscribedEventSchemasForPayloadUpdating(): List<String> {
         return LinkedList(listOf("event"))
     }
 

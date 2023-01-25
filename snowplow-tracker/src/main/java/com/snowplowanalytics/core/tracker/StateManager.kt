@@ -10,10 +10,10 @@ class StateManager {
     
     private val identifierToStateMachine = HashMap<String, StateMachineInterface>()
     private val stateMachineToIdentifier = HashMap<StateMachineInterface, String>()
-    private val eventSchemaToStateMachine = HashMap<String?, MutableList<StateMachineInterface>>()
+    private val eventSchemaToStateMachine = HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToEntitiesGenerator =
-        HashMap<String?, MutableList<StateMachineInterface>>()
-    private val eventSchemaToPayloadUpdater = HashMap<String?, MutableList<StateMachineInterface>>()
+        HashMap<String, MutableList<StateMachineInterface>>()
+    private val eventSchemaToPayloadUpdater = HashMap<String, MutableList<StateMachineInterface>>()
     
     val trackerState = TrackerState()
     
@@ -160,8 +160,8 @@ class StateManager {
 
     // Private methods
     private fun addToSchemaRegistry(
-        schemaRegistry: MutableMap<String?, MutableList<StateMachineInterface>>,
-        schemas: List<String?>,
+        schemaRegistry: MutableMap<String, MutableList<StateMachineInterface>>,
+        schemas: List<String>,
         stateMachine: StateMachineInterface
     ) {
         for (eventSchema in schemas) {
@@ -175,8 +175,8 @@ class StateManager {
     }
 
     private fun removeFromSchemaRegistry(
-        schemaRegistry: Map<String?, MutableList<StateMachineInterface>>,
-        schemas: List<String?>,
+        schemaRegistry: Map<String, MutableList<StateMachineInterface>>,
+        schemas: List<String>,
         stateMachine: StateMachineInterface
     ) {
         for (eventSchema in schemas) {
