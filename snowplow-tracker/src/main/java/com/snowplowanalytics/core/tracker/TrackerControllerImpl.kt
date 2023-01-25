@@ -187,7 +187,7 @@ class TrackerControllerImpl  // Constructors
     private val tracker: Tracker
         get() {
             if (!serviceProvider.isTrackerInitialized) {
-                loggerDelegate!!.error(
+                loggerDelegate?.error(
                     TAG,
                     "Recreating tracker instance after it was removed. This will not be supported in future versions."
                 )

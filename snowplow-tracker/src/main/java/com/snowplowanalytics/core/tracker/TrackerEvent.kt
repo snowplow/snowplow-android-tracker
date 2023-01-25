@@ -51,7 +51,7 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
             name = event.name
             isPrimitive = true
         } else {
-            schema = (event as AbstractSelfDescribing).schema
+            schema = (event as? AbstractSelfDescribing)?.schema
             isPrimitive = false
         }
     }

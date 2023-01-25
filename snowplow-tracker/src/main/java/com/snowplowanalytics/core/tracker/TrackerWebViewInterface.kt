@@ -172,7 +172,7 @@ class TrackerWebViewInterface {
         for (i in 0 until contextJson.length()) {
             val itemJson = contextJson.getJSONObject(i)
             val item = jsonToMap(itemJson)
-            val schema = item["schema"] as String?
+            val schema = item["schema"] as? String?
             val data = item["data"]
             if (schema != null && data != null) {
                 entities.add(SelfDescribingJson(schema, data))
