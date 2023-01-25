@@ -40,8 +40,8 @@ open class DeviceInfoMonitor {
 
     open fun getCarrier(context: Context): String? {
         val telephonyManager =
-            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val carrierName = telephonyManager.networkOperatorName
+            context.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+        val carrierName = telephonyManager?.networkOperatorName
         if (carrierName != "") {
             return carrierName
         }
@@ -66,10 +66,10 @@ open class DeviceInfoMonitor {
                     it,
                     "isLimitAdTrackingEnabled", null
                 )
-            } as Boolean
-            if (limitedTracking) {
+            } as? Boolean
+            if (limitedTracking == true) {
                 ""
-            } else invokeInstanceMethod(advertisingInfoObject, "getId", null) as String
+            } else advertisingInfoObject?.let { invokeInstanceMethod(it, "getId", null) } as? String
         } catch (e: Exception) {
             Logger.e(
                 TrackerConfiguration.TAG,
@@ -104,10 +104,10 @@ open class DeviceInfoMonitor {
     }
 
     fun getNetworkInfo(context: Context): NetworkInfo? {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         var ni: NetworkInfo? = null
         try {
-            val maybeNi = cm.activeNetworkInfo
+            val maybeNi = cm?.activeNetworkInfo
             if (maybeNi != null && maybeNi.isConnected) {
                 ni = maybeNi
             }
@@ -185,9 +185,9 @@ open class DeviceInfoMonitor {
 
     // --- PRIVATE
     private fun getMemoryInfo(context: Context): ActivityManager.MemoryInfo {
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
         val mi = ActivityManager.MemoryInfo()
-        activityManager.getMemoryInfo(mi)
+        activityManager?.getMemoryInfo(mi)
         return mi
     }
 
