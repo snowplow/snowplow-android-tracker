@@ -255,7 +255,7 @@ class ServiceProvider(
         val builder = { tracker: Tracker ->
             tracker.subject = subject
             tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
-            tracker.base64Encoded = trackerConfigurationUpdate.base64encoding
+            tracker.base64Encoded = trackerConfig.base64encoding
             tracker.platform = trackerConfig.devicePlatform
             tracker.logLevel = trackerConfig.logLevel
             tracker.loggerDelegate = trackerConfig.loggerDelegate

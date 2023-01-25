@@ -48,6 +48,7 @@ class LoggingTest {
     var emitter: Emitter? = null
     var tracker: Tracker? = null
     var networkConfig: NetworkConfiguration? = null
+    
     @Before
     @Throws(Exception::class)
     fun setUp() {

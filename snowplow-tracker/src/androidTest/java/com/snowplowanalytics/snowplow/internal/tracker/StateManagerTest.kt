@@ -220,6 +220,7 @@ class StateManagerTest {
         Assert.assertTrue(entities!!.contains("\"isVisible\":true"))
         Assert.assertEquals(1, (entities.split("isVisible").dropLastWhile { it.isEmpty() }
             .toTypedArray().size - 1).toLong())
+        
         tracker.track(Background())
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -230,6 +231,7 @@ class StateManagerTest {
         Assert.assertTrue(entities!!.contains("\"isVisible\":false"))
         Assert.assertEquals(1, (entities.split("isVisible").dropLastWhile { it.isEmpty() }
             .toTypedArray().size - 1).toLong())
+        
         tracker.track(ScreenView("screen1"))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -237,10 +239,10 @@ class StateManagerTest {
         eventStore.removeAllEvents()
         entities = payload!!.map["co"] as String?
         Assert.assertNotNull(entities)
-        println(entities)
         Assert.assertTrue(entities!!.contains("\"isVisible\":false"))
         Assert.assertEquals(1, (entities.split("isVisible").dropLastWhile { it.isEmpty() }
             .toTypedArray().size - 1).toLong())
+        
         tracker.track(Foreground().foregroundIndex(9))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -253,6 +255,7 @@ class StateManagerTest {
         Assert.assertTrue(entities.contains("\"index\":9"))
         Assert.assertEquals(1, (entities.split("isVisible").dropLastWhile { it.isEmpty() }
             .toTypedArray().size - 1).toLong())
+        
         tracker.track(ScreenView("screen1"))
         Thread.sleep(1000)
         if (eventStore.lastInsertedRow == -1L) Assert.fail()
@@ -260,7 +263,6 @@ class StateManagerTest {
         eventStore.removeAllEvents()
         entities = payload!!.map["co"] as String?
         Assert.assertNotNull(entities)
-        println(entities)
         Assert.assertTrue(entities!!.contains("\"isVisible\":true"))
         Assert.assertTrue(entities.contains("\"index\":9"))
         Assert.assertEquals(1, (entities.split("isVisible").dropLastWhile { it.isEmpty() }

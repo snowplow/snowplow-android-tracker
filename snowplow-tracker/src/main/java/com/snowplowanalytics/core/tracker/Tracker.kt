@@ -212,7 +212,6 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     var sessionContext: Boolean = TrackerDefaults.sessionContext
         @Synchronized
         set(sessionContext) {
-            println("❌ setting sessionContext in Tracker")
             field = sessionContext
             
             if (session != null && !sessionContext) {
@@ -283,6 +282,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         set(delegate) {
             if (!builderFinished) {
                 field = delegate
+                Logger.delegate = delegate
             }
         }
     
@@ -370,7 +370,6 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
         // When session context is enabled
         if (sessionContext) {
-            println("❌ tracker init if sessionContext")
             var callbacks = arrayOf<Runnable?>(null, null, null, null)
             if (sessionCallbacks.size == 4) {
                 callbacks = sessionCallbacks

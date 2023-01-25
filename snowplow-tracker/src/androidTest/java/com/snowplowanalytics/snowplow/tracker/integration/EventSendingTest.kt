@@ -431,9 +431,7 @@ class EventSendingTest {
 
     @Throws(Exception::class)
     fun checkUnstructuredEvent(json: JSONObject) {
-        println(json)
         val unstructEvent = JSONObject(json.getString("ue_pr"))
-        println(unstructEvent)
         Assert.assertEquals(
             "iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0",
             unstructEvent.getString("schema")

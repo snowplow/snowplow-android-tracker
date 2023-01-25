@@ -29,16 +29,14 @@ object Logger {
     private val TAG = Logger::class.java.simpleName
     private var level = 0
     
-    private var _delegate: LoggerDelegate = DefaultLoggerDelegate()
-    var delegate: LoggerDelegate?
-        get() = _delegate
+    var delegate: LoggerDelegate? = DefaultLoggerDelegate()
         /**
          * Set the logger delegate that receive logs from the tracker.
          *
          * @param delegate The app logger delegate.
          */
         set(delegate) {
-            _delegate = delegate ?: DefaultLoggerDelegate()
+            field = delegate ?: DefaultLoggerDelegate()
         }
 
     /**
@@ -92,7 +90,7 @@ object Logger {
         if (level >= 1) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            _delegate.error(source, message)
+            delegate?.error(source, message)
         }
     }
 
@@ -108,7 +106,7 @@ object Logger {
         if (level >= 2) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            _delegate.debug(source, message)
+            delegate?.debug(source, message)
         }
     }
 
@@ -124,7 +122,7 @@ object Logger {
         if (level >= 3) {
             val source = getTag(tag)
             val message = getMessage(msg, *args)
-            _delegate.verbose(source, message)
+            delegate?.verbose(source, message)
         }
     }
 
