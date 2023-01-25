@@ -12,31 +12,33 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import com.snowplowanalytics.core.statemachine.StateMachineEvent
+import com.snowplowanalytics.core.statemachine.TrackerState
+import com.snowplowanalytics.core.statemachine.TrackerStateSnapshot
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.event.TrackerError
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
 
 class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSnapshot? = null) :
-    InspectableEvent {
+    StateMachineEvent {
     
     override var schema: String? = null
     override var name: String? = null
     override lateinit var payload: MutableMap<String, Any>
     override lateinit var state: TrackerStateSnapshot
-    
+    override lateinit var entities: MutableList<SelfDescribingJson>
+
     var eventId: UUID = UUID.randomUUID()
     var timestamp: Long = System.currentTimeMillis()
     var trueTimestamp: Long?
-    var contexts: MutableList<SelfDescribingJson>
     var isPrimitive = false
     var isService: Boolean
 
     init {
-        contexts = event.contexts.toMutableList()
+        entities = event.entities.toMutableList()
         trueTimestamp = event.trueTimestamp
         payload = HashMap(event.dataPayload)
         

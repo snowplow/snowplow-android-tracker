@@ -20,8 +20,14 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  */
 interface Event {
     /**
-     * @return the event custom contexts
+     * @return the event custom context entities
      */
+    val entities: List<SelfDescribingJson>
+
+    /**
+     * @return the event custom context entities
+     */
+    @Deprecated("Please use `entities`")
     val contexts: List<SelfDescribingJson>
 
     /**

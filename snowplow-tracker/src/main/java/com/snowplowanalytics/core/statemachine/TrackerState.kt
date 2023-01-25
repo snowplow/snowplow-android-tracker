@@ -1,4 +1,4 @@
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 class TrackerState : TrackerStateSnapshot {
     private var trackerState = HashMap<String, StateFuture>()

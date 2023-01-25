@@ -3,6 +3,9 @@ package com.snowplowanalytics.snowplow.internal.tracker
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.emitter.Emitter
+import com.snowplowanalytics.core.statemachine.State
+import com.snowplowanalytics.core.statemachine.StateMachineInterface
+import com.snowplowanalytics.core.statemachine.StateManager
 import com.snowplowanalytics.core.tracker.*
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -39,7 +42,7 @@ class StateManagerTest {
         var mockState = trackerState.getState("identifier") as MockState?
         Assert.assertEquals(1, mockState!!.value.toLong())
         
-        var e: InspectableEvent = TrackerEvent(eventInc, trackerState)
+        var e = TrackerEvent(eventInc, trackerState)
         var entities = stateManager.entitiesForProcessedEvent(e)
         var data = entities[0].map["data"] as Map<String?, Int>?
         Assert.assertEquals(1, data!!["value"]!!.toInt().toLong())
@@ -93,7 +96,7 @@ class StateManagerTest {
         val trackerState = stateManager.trackerStateForProcessedEvent(eventInc)
         val state = trackerState.getState("identifier")
         Assert.assertNull(state)
-        val e: InspectableEvent = TrackerEvent(eventInc, trackerState)
+        val e = TrackerEvent(eventInc, trackerState)
         val entities = stateManager.entitiesForProcessedEvent(e)
         Assert.assertEquals(0, entities.size.toLong())
     }
@@ -338,7 +341,7 @@ class StateManagerTest {
             }
         })
         val trackerState = stateManager.trackerStateForProcessedEvent(eventInc)
-        val e: InspectableEvent = TrackerEvent(eventInc, trackerState)
+        val e = TrackerEvent(eventInc, trackerState)
         val entities = stateManager.entitiesForProcessedEvent(e)
         Assert.assertEquals(2, entities.size.toLong())
     }
@@ -355,7 +358,7 @@ class StateManagerTest {
             }
         })
         val trackerState = stateManager.trackerStateForProcessedEvent(eventInc)
-        val e: InspectableEvent = TrackerEvent(eventInc, trackerState)
+        val e = TrackerEvent(eventInc, trackerState)
         val entities = stateManager.entitiesForProcessedEvent(e)
         Assert.assertEquals(1, entities.size.toLong())
     }

@@ -1,4 +1,4 @@
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson

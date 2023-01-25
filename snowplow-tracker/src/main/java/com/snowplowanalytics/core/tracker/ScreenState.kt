@@ -3,6 +3,7 @@ package com.snowplowanalytics.core.tracker
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.utils.Util.uUIDString
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload

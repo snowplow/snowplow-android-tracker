@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.tracker
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.core.tracker.State
+import com.snowplowanalytics.core.statemachine.State
 
 class SessionState(
     val firstEventId: String,

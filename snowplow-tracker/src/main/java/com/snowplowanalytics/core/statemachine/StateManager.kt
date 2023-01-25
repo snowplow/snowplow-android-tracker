@@ -1,9 +1,8 @@
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
 
 class StateManager {
@@ -107,7 +106,7 @@ class StateManager {
     }
 
     @Synchronized
-    fun entitiesForProcessedEvent(event: InspectableEvent): List<SelfDescribingJson> {
+    fun entitiesForProcessedEvent(event: StateMachineEvent): List<SelfDescribingJson> {
         val result: MutableList<SelfDescribingJson> = LinkedList()
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
         val stateMachinesForSchema: List<StateMachineInterface>? =
@@ -133,7 +132,7 @@ class StateManager {
     }
 
     @Synchronized
-    fun addPayloadValuesToEvent(event: InspectableEvent): Boolean {
+    fun addPayloadValuesToEvent(event: StateMachineEvent): Boolean {
         var failures = 0
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
         val stateMachinesForSchema: List<StateMachineInterface>? =
