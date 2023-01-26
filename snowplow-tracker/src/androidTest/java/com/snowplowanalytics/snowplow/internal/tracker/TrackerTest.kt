@@ -19,6 +19,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.emitter.Emitter
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.emitter.Executor.shutdown
 import com.snowplowanalytics.core.emitter.Executor.threadCount
 import com.snowplowanalytics.core.tracker.ExceptionHandler
@@ -31,6 +32,7 @@ import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.event.SelfDescribing
 import com.snowplowanalytics.snowplow.event.Structured
 import com.snowplowanalytics.snowplow.event.Timing
+import com.snowplowanalytics.snowplow.network.Protocol
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
@@ -180,14 +182,17 @@ class TrackerTest {
     @Test
     @Throws(JSONException::class, IOException::class, InterruptedException::class)
     fun testTrackSelfDescribingEvent() {
-//        Executor.setThreadCount(30);
-//        Executor.shutdown();
+        shutdown()
+        
         val namespace = "myNamespace"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
         var emitter: Emitter? = null
         val builder =
-            Consumer { emitterArg: Emitter -> emitterArg.bufferOption = BufferOption.Single }
+            Consumer { emitterArg: Emitter -> 
+                emitterArg.bufferOption = BufferOption.Single
+                emitterArg.requestSecurity = Protocol.HTTP
+            }
         try {
             emitter = Emitter(context, getMockServerURI(mockWebServer)!!, builder)
         } catch (e: Exception) {
@@ -237,24 +242,31 @@ class TrackerTest {
     @Test
     @Throws(Exception::class)
     fun testTrackWithNoContext() {
-        threadCount = 30
         shutdown()
-        val namespace = "myNamespace"
+        
+        val namespace = "myNamespaceNoContext"
         TestUtils.createSessionSharedPreferences(context, namespace)
+        
         val mockWebServer = getMockServer(1)
+        
         var emitter: Emitter? = null
-        val builder =
-            Consumer { emitterArg: Emitter -> emitterArg.bufferOption = BufferOption.Single }
+        val emitterBuilder =
+            Consumer { emitterArg: Emitter -> 
+                emitterArg.bufferOption = BufferOption.Single
+                emitterArg.requestSecurity = Protocol.HTTP
+            }
         try {
-            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, builder)
+            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, emitterBuilder)
         } catch (e: Exception) {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
         }
+        
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = false
+            tracker.applicationContext = false
             tracker.platformContextEnabled = false
             tracker.screenContext = false
             tracker.geoLocationContext = false
@@ -263,10 +275,12 @@ class TrackerTest {
         }
         Companion.tracker =
             Tracker(emitter!!, namespace, "testTrackWithNoContext", context, trackerBuilder)
+        
         Log.i("testTrackWithNoContext", "Send ScreenView event")
         Companion.tracker!!.track(ScreenView("name"))
         val req = mockWebServer.takeRequest(60, TimeUnit.SECONDS)
         Assert.assertNotNull(req)
+        
         val reqCount = mockWebServer.requestCount
         Assert.assertEquals(1, reqCount.toLong())
         val payload = JSONObject(req!!.body.readUtf8())
