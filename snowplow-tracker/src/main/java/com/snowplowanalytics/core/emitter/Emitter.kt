@@ -19,7 +19,6 @@ import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.utils.Util
 import com.snowplowanalytics.snowplow.emitter.BufferOption
-import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.emitter.EmitterEvent
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.*

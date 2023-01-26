@@ -37,7 +37,6 @@ import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import com.snowplowanalytics.snowplow.tracker.*
-import com.snowplowanalytics.snowplow.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.util.Basis
 import java.util.*
 import java.util.concurrent.TimeUnit

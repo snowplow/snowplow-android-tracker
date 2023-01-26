@@ -10,28 +10,28 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker
+package com.snowplowanalytics.core.emitter
 
+import com.snowplowanalytics.snowplow.emitter.BufferOption
+import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.network.Protocol
+
+import java.util.*
 import java.util.concurrent.TimeUnit
 
-object TrackerDefaults {
-    var base64Encoded = true
-    var devicePlatform = DevicePlatform.Mobile
-    var logLevel = LogLevel.OFF
-    var foregroundTimeout: Long = 1800 // 30 minutes
-    var backgroundTimeout: Long = 1800 // 30 minutes
-    var threadCount = 10
+object EmitterDefaults {
+    var httpMethod = HttpMethod.POST
+    var bufferOption = BufferOption.DefaultGroup
+    var requestSecurity = Protocol.HTTPS
+    var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
+    var emitRange: Int = 150
+    var emitterTick = 5
+    var sendLimit = 250
+    var emptyLimit = 5
+    var byteLimitGet: Long = 40000
+    var byteLimitPost: Long = 40000
+    var emitTimeout = 5
+    var threadPoolSize = 15
+    var serverAnonymisation = false
     var timeUnit = TimeUnit.SECONDS
-    var sessionContext = true
-    var geoLocationContext = false
-    var platformContext = true
-    var deepLinkContext = true
-    var screenContext = true
-    var applicationContext = true
-    var exceptionAutotracking = true
-    var diagnosticAutotracking = false
-    var lifecycleAutotracking = false
-    var screenViewAutotracking = true
-    var installAutotracking = true
-    var userAnonymisation = false
 }

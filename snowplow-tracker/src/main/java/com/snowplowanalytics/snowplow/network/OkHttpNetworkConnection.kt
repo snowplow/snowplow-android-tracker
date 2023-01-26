@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Build
 
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
+import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.emitter.TLSArguments
 import com.snowplowanalytics.core.emitter.TLSVersion

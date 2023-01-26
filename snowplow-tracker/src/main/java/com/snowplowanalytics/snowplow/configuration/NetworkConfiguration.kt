@@ -3,7 +3,7 @@ package com.snowplowanalytics.snowplow.configuration
 import android.net.Uri
 import com.snowplowanalytics.core.emitter.NetworkConfigurationInterface
 import com.snowplowanalytics.core.tracker.Logger
-import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
+import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.NetworkConnection
 import com.snowplowanalytics.snowplow.network.Protocol

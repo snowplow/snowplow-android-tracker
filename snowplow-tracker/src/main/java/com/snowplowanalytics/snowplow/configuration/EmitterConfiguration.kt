@@ -1,7 +1,7 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.emitter.EmitterConfigurationInterface
-import com.snowplowanalytics.snowplow.emitter.EmitterDefaults
+import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback

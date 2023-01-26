@@ -2,7 +2,7 @@ package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
-import com.snowplowanalytics.snowplow.tracker.TrackerDefaults
+import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
