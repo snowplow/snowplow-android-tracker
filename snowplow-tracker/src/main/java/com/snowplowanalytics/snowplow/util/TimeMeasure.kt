@@ -22,9 +22,9 @@ class TimeMeasure(val value: Long, val unit: TimeUnit) : java.io.Serializable {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         
-        val that = other as TimeMeasure
+        val that = other as? TimeMeasure
         val ms1 = convert(TimeUnit.MILLISECONDS)
-        val ms2 = that.convert(TimeUnit.MILLISECONDS)
+        val ms2 = that?.convert(TimeUnit.MILLISECONDS)
         
         return ms1 == ms2
     }

@@ -12,8 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.tracker
 
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform
-import com.snowplowanalytics.snowplow.tracker.LogLevel
 import java.util.concurrent.TimeUnit
 
 object TrackerDefaults {

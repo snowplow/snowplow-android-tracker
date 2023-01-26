@@ -67,7 +67,7 @@ object Snowplow {
         onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
     ) {
         configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles)
-        configurationProvider!!.retrieveConfiguration(
+        configurationProvider?.retrieveConfiguration(
             context,
             false
         ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
@@ -75,7 +75,7 @@ object Snowplow {
             val configurationState = fetchedConfigurationPair.second
             val bundles = fetchedConfigurationBundle.configurationBundle
             val namespaces = createTracker(context, bundles)
-            onSuccess?.accept(Pair(namespaces, configurationState))
+            onSuccess.accept(Pair(namespaces, configurationState))
         }
     }
 
@@ -103,9 +103,7 @@ object Snowplow {
      */
     @JvmStatic
     fun refresh(context: Context, onSuccess: Consumer<Pair<List<String>, ConfigurationState>?>?) {
-        if (configurationProvider == null) return
-        
-        configurationProvider!!.retrieveConfiguration(
+        configurationProvider?.let { it.retrieveConfiguration(
             context,
             true
         ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
@@ -114,7 +112,7 @@ object Snowplow {
             val bundles = fetchedConfigurationBundle.configurationBundle
             val namespaces = createTracker(context, bundles)
             onSuccess?.accept(Pair(namespaces, configurationState))
-        }
+        } }
     }
     
     // Standard configuration
@@ -320,7 +318,7 @@ object Snowplow {
             } else {
                 val list = bundle.configurations
                 val array = list.toTypedArray()
-                createTracker(context, bundle.namespace, bundle.networkConfiguration!!, *array)
+                bundle.networkConfiguration?.let { createTracker(context, bundle.namespace, it, *array) }
                 namespaces.add(bundle.namespace)
             }
         }
