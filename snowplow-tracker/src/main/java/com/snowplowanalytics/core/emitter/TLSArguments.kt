@@ -32,12 +32,12 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
     /**
      * @return the trust manager argument
      */
-    var trustManager: X509TrustManager? = null
+    lateinit var trustManager: X509TrustManager
 
     /**
      * @return the ssl socket factory argument
      */
-    var sslSocketFactory: SSLSocketFactory? = null
+    lateinit var sslSocketFactory: SSLSocketFactory
 
     
     init {
@@ -53,7 +53,7 @@ class TLSArguments(private val tlsVersions: EnumSet<TLSVersion>) {
                         + Arrays.toString(trustManagers))
             }
             
-            trustManager = trustManagers[0] as? X509TrustManager
+            trustManager = trustManagers[0] as X509TrustManager
             sslSocketFactory = TLSSocketFactory(versions)
         } catch (e: KeyStoreException) {
             e.printStackTrace()

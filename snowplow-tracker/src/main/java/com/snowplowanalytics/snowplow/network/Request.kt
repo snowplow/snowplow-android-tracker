@@ -58,7 +58,7 @@ class Request {
         }
         payload = TrackerPayload()
         val payloadBundle = SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData)
-        payload.addMap(payloadBundle.map as Map<String, Any>)
+        payload.addMap(payloadBundle.map as? Map<String, Any>)
         this.emitterEventIds = emitterEventIds
         customUserAgent = tempUserAgent
         oversize = false
@@ -71,7 +71,7 @@ class Request {
      * @return User-Agent string from subject settings or the default one.
      */
     private fun getUserAgent(payload: Payload): String? {
-        val hashMap = payload.map as HashMap<*, *>
-        return hashMap[Parameters.USERAGENT] as String?
+        val hashMap = payload.map as? HashMap<*, *>
+        return hashMap?.let { it[Parameters.USERAGENT] as? String? }
     }
 }

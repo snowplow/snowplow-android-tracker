@@ -185,7 +185,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         // Configure with external OkHttpClient
         client = if (builder.client == null) {
             OkHttpClient.Builder()
-                .sslSocketFactory(tlsArguments.sslSocketFactory!!, tlsArguments.trustManager!!)
+                .sslSocketFactory(tlsArguments.sslSocketFactory, tlsArguments.trustManager)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
                 .cookieJar(builder.cookieJar ?: CollectorCookieJar(builder.context))
@@ -213,10 +213,11 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         // Get results of futures
         // - Wait up to emitTimeout seconds for the request
         for (i in futures.indices) {
-            var code = -1
+            var code: Int = -1
             
             try {
-                code = futures[i][emitTimeout.toLong(), TimeUnit.SECONDS] as Int
+                val tempCode = futures[i][emitTimeout.toLong(), TimeUnit.SECONDS] as? Int
+                tempCode?.let { code = it }
             } catch (ie: InterruptedException) {
                 Logger.e(TAG, "Request Future was interrupted: %s", ie.message)
             } catch (ee: ExecutionException) {
@@ -251,9 +252,9 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         uriBuilder.clearQuery()
 
         // Build the request query
-        val hashMap = request.payload.map as HashMap<*, *>
-        for (key in hashMap.keys as Iterable<String>) {
-            val value = hashMap[key] as String?
+        val hashMap = request.payload.map
+        for (key in hashMap.keys) {
+            val value = hashMap[key] as? String?
             uriBuilder.appendQueryParameter(key, value)
         }
 
@@ -311,10 +312,12 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         return try {
             Logger.v(TAG, "Sending request: %s", request)
             TrafficStats.setThreadStatsTag(TRAFFIC_STATS_TAG)
-            val resp = client!!.newCall(request).execute()
-            val code = resp.code
-            resp.body!!.close()
-            code
+            val resp = client?.newCall(request)?.execute()
+            resp?.let {
+                resp.body?.close()
+                return resp.code
+            }
+            -1
         } catch (e: IOException) {
             Logger.e(TAG, "Request sending failed: %s", e.toString())
             -1
