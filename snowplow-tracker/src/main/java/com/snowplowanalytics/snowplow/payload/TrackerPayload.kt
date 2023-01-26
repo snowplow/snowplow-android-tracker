@@ -65,9 +65,9 @@ class TrackerPayload : Payload {
             Logger.v(TAG, "Adding new map: %s", map)
 
             if (base64_encoded) { // base64 encoded data
-                add(type_encoded!!, Util.base64Encode(mapString))
+                type_encoded?.let { add(it, Util.base64Encode(mapString)) }
             } else { // add it as a child node
-                add(type_no_encoded!!, mapString)
+                type_no_encoded?.let { add(it, mapString) }
             }
         }
     }
