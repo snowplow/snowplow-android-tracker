@@ -18,7 +18,7 @@ import java.util.*
  * 
  * Default values:
  * method = HttpMethod.POST;
- * protocol = Protocol.HTTP;
+ * protocol = Protocol.HTTPS;
  * timeout = 5;
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
