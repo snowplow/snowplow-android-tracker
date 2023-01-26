@@ -190,5 +190,5 @@ class PlatformContextTest {
 
     // --- PRIVATE
     private val context: Context
-        private get() = InstrumentationRegistry.getInstrumentation().targetContext
+        get() = InstrumentationRegistry.getInstrumentation().targetContext
 }

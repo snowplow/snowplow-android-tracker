@@ -14,7 +14,7 @@ package com.snowplowanalytics.snowplow.internal.emitter.storage
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.emitter.storage.EventStoreHelper.Companion.getInstance
 import com.snowplowanalytics.core.emitter.storage.EventStoreHelper.Companion.removeUnsentEventsExceptForNamespaces
@@ -37,13 +37,13 @@ class EventStoreTest {
             eventStore.close()
         }
         openedEventStores.clear()
-        removeUnsentEventsExceptForNamespaces(InstrumentationRegistry.getContext(), ArrayList())
+        removeUnsentEventsExceptForNamespaces(InstrumentationRegistry.getInstrumentation().targetContext, ArrayList())
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun testAddEventOnEmptyStore() {
-        val eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        val eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
         Assert.assertFalse(eventStore.databaseOpen)
@@ -56,7 +56,7 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testAddEventOnNotEmptyStore() {
-        var eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        var eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
 
         // fill eventStore with 1 event
@@ -64,12 +64,12 @@ class EventStoreTest {
         trackerPayload.add("k", "v")
         eventStore.add(trackerPayload)
         waitUntilDatabaseOpen(eventStore)
-        val list = eventStore.getEmittableEvents(QUERY_LIMIT)
+        eventStore.getEmittableEvents(QUERY_LIMIT)
         Assert.assertEquals(1, eventStore.getEmittableEvents(QUERY_LIMIT).size.toLong())
         eventStore.close()
 
         // add new event
-        eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
         Assert.assertFalse(eventStore.databaseOpen)
@@ -82,7 +82,7 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testRemoveEventsOnNotEmptyStore() {
-        var eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        var eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
 
         // fill eventStore with 1 event
@@ -92,7 +92,7 @@ class EventStoreTest {
         eventStore.close()
 
         // add new event and remove when database closed
-        eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
         eventStore.add(payload())
         Assert.assertEquals(1, eventStore.size())
@@ -195,7 +195,7 @@ class EventStoreTest {
 
     @Test
     fun testUpgrade() {
-        val helper = getInstance(InstrumentationRegistry.getContext(), "namespace")
+        val helper = getInstance(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         val database = helper.writableDatabase
         helper.onUpgrade(database, 1, 2)
         helper.close()
@@ -204,11 +204,11 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testEventStoreCreateDatabase() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = SQLiteEventStore(context, "namespace")
         openedEventStores.add(eventStore)
         waitUntilDatabaseOpen(eventStore)
-        val databaseList = Arrays.asList(*context.databaseList())
+        val databaseList = listOf(*context.databaseList())
         Assert.assertTrue(databaseList.contains("snowplowEvents-namespace.sqlite"))
         Assert.assertTrue(databaseList.contains("snowplowEvents-namespace.sqlite-wal"))
         Assert.assertTrue(databaseList.contains("snowplowEvents-namespace.sqlite-shm"))
@@ -217,17 +217,17 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testEventStoreRemoveDatabases() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore1 = SQLiteEventStore(context, "namespace1")
         val eventStore2 = SQLiteEventStore(context, "namespace2")
         val eventStore3 = SQLiteEventStore(context, "namespace3")
-        openedEventStores.addAll(Arrays.asList(eventStore1, eventStore2, eventStore3))
+        openedEventStores.addAll(listOf(eventStore1, eventStore2, eventStore3))
         waitUntilDatabaseOpen(eventStore1)
         waitUntilDatabaseOpen(eventStore2)
         waitUntilDatabaseOpen(eventStore3)
         // Remove database
         removeUnsentEventsExceptForNamespaces(context, listOf("namespace2"))
-        val databaseList = Arrays.asList(*context.databaseList())
+        val databaseList = listOf(*context.databaseList())
         Assert.assertFalse(databaseList.contains("snowplowEvents-namespace1.sqlite"))
         Assert.assertFalse(databaseList.contains("snowplowEvents-namespace1.sqlite-wal"))
         Assert.assertFalse(databaseList.contains("snowplowEvents-namespace1.sqlite-shm"))
@@ -242,18 +242,18 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testEventStoreInvalidNamespaceConversion() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = SQLiteEventStore(context, "namespace*.^?1ò2@")
         openedEventStores.add(eventStore)
         waitUntilDatabaseOpen(eventStore)
-        val databaseList = Arrays.asList(*context.databaseList())
+        val databaseList = listOf(*context.databaseList())
         Assert.assertTrue(databaseList.contains("snowplowEvents-namespace-1-2-.sqlite"))
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun testMigrationFromLegacyToNamespacedEventStore() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         // Create fake legacy database
         val legacyDB: SQLiteOpenHelper =
@@ -267,7 +267,7 @@ class EventStoreTest {
         val db = legacyDB.writableDatabase
         db.enableWriteAheadLogging()
         legacyDB.close()
-        var databaseList = Arrays.asList(*context.databaseList())
+        var databaseList = listOf(*context.databaseList())
         // old DB
         Assert.assertTrue(databaseList.contains("snowplowEvents.sqlite"))
         // old DB is closed so these should be false
@@ -282,7 +282,7 @@ class EventStoreTest {
         val eventStore = SQLiteEventStore(context, "namespace")
         openedEventStores.add(eventStore)
         waitUntilDatabaseOpen(eventStore)
-        databaseList = Arrays.asList(*context.databaseList())
+        databaseList = listOf(*context.databaseList())
         Assert.assertFalse(databaseList.contains("snowplowEvents.sqlite"))
         Assert.assertFalse(databaseList.contains("snowplowEvents.sqlite-wal"))
         Assert.assertFalse(databaseList.contains("snowplowEvents.sqlite-shm"))
@@ -294,7 +294,7 @@ class EventStoreTest {
     @Test
     @Throws(InterruptedException::class)
     fun testMultipleAccessToSameSQLiteFile() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore1 = SQLiteEventStore(context, "namespace")
         openedEventStores.add(eventStore1)
         waitUntilDatabaseOpen(eventStore1)
@@ -315,7 +315,7 @@ class EventStoreTest {
 
     @Throws(InterruptedException::class)
     private fun eventStore(): SQLiteEventStore {
-        val eventStore = SQLiteEventStore(InstrumentationRegistry.getContext(), "namespace")
+        val eventStore = SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
         openedEventStores.add(eventStore)
         waitUntilDatabaseOpen(eventStore)
         eventStore.removeAllEvents()

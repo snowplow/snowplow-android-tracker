@@ -12,7 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.internal.utils
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.tracker.Logger.updateLogLevel
 import com.snowplowanalytics.core.session.FileStore.deleteFile
@@ -36,7 +36,7 @@ class FileStoreTest {
 
     @After
     fun cleanup() {
-        deleteFile(fileName, InstrumentationRegistry.getContext())
+        deleteFile(fileName, InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     @Test
@@ -44,7 +44,7 @@ class FileStoreTest {
         setup()
         val map: MutableMap<String?, String?> = HashMap()
         map["hello"] = "world"
-        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getContext())
+        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getInstrumentation().targetContext)
         Assert.assertTrue(result)
         cleanup()
     }
@@ -54,9 +54,9 @@ class FileStoreTest {
         setup()
         val map: MutableMap<String?, String?> = HashMap()
         map["hello"] = "world"
-        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getContext())
+        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getInstrumentation().targetContext)
         Assert.assertTrue(result)
-        val mapRes: Map<*, *>? = getMapFromFile(fileName, InstrumentationRegistry.getContext())
+        val mapRes: Map<*, *>? = getMapFromFile(fileName, InstrumentationRegistry.getInstrumentation().targetContext)
         Assert.assertNotNull(mapRes)
         Assert.assertTrue(mapRes!!.containsKey("hello"))
         Assert.assertEquals("world", mapRes["hello"])
@@ -68,9 +68,9 @@ class FileStoreTest {
         setup()
         val map: MutableMap<String?, String?> = HashMap()
         map["hello"] = "world"
-        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getContext())
+        val result = saveMapToFile(fileName, map, InstrumentationRegistry.getInstrumentation().targetContext)
         Assert.assertTrue(result)
-        val delRes = deleteFile(fileName, InstrumentationRegistry.getContext())
+        val delRes = deleteFile(fileName, InstrumentationRegistry.getInstrumentation().targetContext)
         Assert.assertTrue(delRes)
     }
 }

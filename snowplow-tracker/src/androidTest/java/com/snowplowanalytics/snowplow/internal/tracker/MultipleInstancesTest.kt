@@ -114,8 +114,8 @@ class MultipleInstancesTest {
     @Test
     fun testRemoveAllTrackers() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val t1 = createTracker(context, "t1", NetworkConfiguration("snowplowanalytics.fake"))
-        val t2 = createTracker(context, "t2", NetworkConfiguration("snowplowanalytics.fake2"))
+        createTracker(context, "t1", NetworkConfiguration("snowplowanalytics.fake"))
+        createTracker(context, "t2", NetworkConfiguration("snowplowanalytics.fake2"))
         removeAllTrackers()
         Assert.assertEquals(mutableSetOf<Any>(), instancedTrackerNamespaces)
     }

@@ -19,7 +19,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.emitter.Emitter
-import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.emitter.Executor.shutdown
 import com.snowplowanalytics.core.emitter.Executor.threadCount
 import com.snowplowanalytics.core.tracker.ExceptionHandler
@@ -407,7 +406,6 @@ class TrackerTest {
 
         // Send another screenView
         screenView = ScreenView("screen2")
-        val screenId1 = screenView.dataPayload["id"] as String?
         val eventId2 = Companion.tracker!!.track(screenView)
         Assert.assertNotEquals(eventId1.toString(), eventId2.toString())
     }

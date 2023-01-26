@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class MessageNotificationTest {
@@ -14,7 +13,7 @@ class MessageNotificationTest {
             .notificationTimestamp("2020-12-31T15:59:60-08:00")
             .action("action")
             .bodyLocKey("loc key")
-            .bodyLocArgs(Arrays.asList("loc arg1", "loc arg2"))
+            .bodyLocArgs(listOf("loc arg1", "loc arg2"))
             .sound("chime.mp3")
             .notificationCount(9)
             .category("category1")

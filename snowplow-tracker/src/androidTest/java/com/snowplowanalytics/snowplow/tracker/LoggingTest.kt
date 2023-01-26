@@ -44,10 +44,10 @@ class LoggingTest {
         }
     }
 
-    var mockLoggerDelegate: MockLoggerDelegate? = null
+    private var mockLoggerDelegate: MockLoggerDelegate? = null
     var emitter: Emitter? = null
     var tracker: Tracker? = null
-    var networkConfig: NetworkConfiguration? = null
+    private var networkConfig: NetworkConfiguration? = null
     
     @Before
     @Throws(Exception::class)
@@ -62,7 +62,7 @@ class LoggingTest {
     // The Emitter logs at error level during failed attempts to send, but it's difficult to delay JUnit long enough to reach that point
     // Therefore these tests look at verbose and debug logging only
     @Test
-    fun VerboseLogsShownWhenVerboseSet() {
+    fun verboseLogsShownWhenVerboseSet() {
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = true
@@ -80,7 +80,7 @@ class LoggingTest {
     }
 
     @Test
-    fun VerboseLogsWithTrackerConfig() {
+    fun verboseLogsWithTrackerConfig() {
         val trackerConfig = TrackerConfiguration("appId")
             .logLevel(LogLevel.VERBOSE)
             .loggerDelegate(mockLoggerDelegate)
@@ -96,7 +96,7 @@ class LoggingTest {
     }
 
     @Test
-    fun DebugLogsShownWhenDebugSet() {
+    fun debugLogsShownWhenDebugSet() {
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.logLevel = LogLevel.DEBUG
             tracker.sessionContext = true
@@ -114,7 +114,7 @@ class LoggingTest {
     }
 
     @Test
-    fun DebugLogsWithTrackerConfig() {
+    fun debugLogsWithTrackerConfig() {
         val trackerConfig = TrackerConfiguration("appId")
             .logLevel(LogLevel.DEBUG)
             .loggerDelegate(mockLoggerDelegate)
@@ -130,7 +130,7 @@ class LoggingTest {
     }
 
     @Test
-    fun LoggingOffByDefault() {
+    fun loggingOffByDefault() {
         val trackerBuilder = Consumer { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.loggerDelegate = mockLoggerDelegate
@@ -147,7 +147,7 @@ class LoggingTest {
     }
 
     @Test
-    fun LoggingOffByDefaultWithConfig() {
+    fun loggingOffByDefaultWithConfig() {
         val trackerConfig = TrackerConfiguration("appId")
             .loggerDelegate(mockLoggerDelegate)
             .sessionContext(true)
