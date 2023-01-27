@@ -22,7 +22,6 @@ android {
     useLibrary 'android.test.base'
 
     defaultConfig {
-        // With API 24: Remove `androidx.appcompat:appcompat` as it's needed for Consumer<T>.
         minSdkVersion 24
         targetSdkVersion 32
         versionCode 1
