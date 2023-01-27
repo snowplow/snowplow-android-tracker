@@ -119,6 +119,10 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             }
         }
 
+    /**
+     * This configuration option is not published in the TrackerConfiguration class.
+     * Create a Tracker directly, not via the Snowplow interface, to configure threadCount.
+     */
     var threadCount: Int = TrackerDefaults.threadCount
         set(threadCount) {
             if (!builderFinished) {
@@ -126,6 +130,10 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             }
         }
 
+    /**
+    * This configuration option is not published in the TrackerConfiguration class.
+    * Create a Tracker directly, not via the Snowplow interface, to configure timeUnit.
+    */
     var timeUnit: TimeUnit = TrackerDefaults.timeUnit
         set(timeunit) {
             if (!builderFinished) {
@@ -191,6 +199,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         }
 
     /**
+     * This configuration option is not published in the TrackerConfiguration class.
+     * Create a Tracker directly, not via the Snowplow interface, to configure sessionCallbacks.
+     * 
      * A set of callbacks. Four callbacks must be provided, in this order, even if some are null: 
      * * foregroundTransitionCallback. Called when session transitions to foreground
      * * backgroundTransitionCallback. Called when session transitions to background
