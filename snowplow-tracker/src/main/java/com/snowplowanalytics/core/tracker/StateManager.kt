@@ -31,17 +31,17 @@ class StateManager {
         stateMachineToIdentifier[stateMachine] = identifier
         addToSchemaRegistry(
             eventSchemaToStateMachine,
-            stateMachine.subscribedEventSchemasForTransitions(),
+            stateMachine.subscribedEventSchemasForTransitions,
             stateMachine
         )
         addToSchemaRegistry(
             eventSchemaToEntitiesGenerator,
-            stateMachine.subscribedEventSchemasForEntitiesGeneration(),
+            stateMachine.subscribedEventSchemasForEntitiesGeneration,
             stateMachine
         )
         addToSchemaRegistry(
             eventSchemaToPayloadUpdater,
-            stateMachine.subscribedEventSchemasForPayloadUpdating(),
+            stateMachine.subscribedEventSchemasForPayloadUpdating,
             stateMachine
         )
     }
@@ -54,17 +54,17 @@ class StateManager {
         trackerState.removeState(identifier)
         removeFromSchemaRegistry(
             eventSchemaToStateMachine,
-            stateMachine.subscribedEventSchemasForTransitions(),
+            stateMachine.subscribedEventSchemasForTransitions,
             stateMachine
         )
         removeFromSchemaRegistry(
             eventSchemaToEntitiesGenerator,
-            stateMachine.subscribedEventSchemasForEntitiesGeneration(),
+            stateMachine.subscribedEventSchemasForEntitiesGeneration,
             stateMachine
         )
         removeFromSchemaRegistry(
             eventSchemaToPayloadUpdater,
-            stateMachine.subscribedEventSchemasForPayloadUpdating(),
+            stateMachine.subscribedEventSchemasForPayloadUpdating,
             stateMachine
         )
         return true

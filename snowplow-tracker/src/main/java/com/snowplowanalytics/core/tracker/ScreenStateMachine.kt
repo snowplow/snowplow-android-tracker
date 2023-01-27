@@ -18,17 +18,14 @@ class ScreenStateMachine : StateMachineInterface {
       - Screen
      */
     
-    override fun subscribedEventSchemasForTransitions(): List<String> {
-        return listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
-    }
+    override val subscribedEventSchemasForTransitions: List<String>
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
 
-    override fun subscribedEventSchemasForEntitiesGeneration(): List<String> {
-        return listOf("*")
-    }
+    override val subscribedEventSchemasForEntitiesGeneration: List<String>
+        get() = listOf("*")
 
-    override fun subscribedEventSchemasForPayloadUpdating(): List<String> {
-        return listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
-    }
+    override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
 
     override fun transition(event: Event, state: State?): State? {
         val screenView = event as? ScreenView

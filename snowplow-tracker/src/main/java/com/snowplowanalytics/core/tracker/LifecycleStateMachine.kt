@@ -18,17 +18,14 @@ class LifecycleStateMachine : StateMachineInterface {
       - Visible, NotVisible
      */
     
-    override fun subscribedEventSchemasForTransitions(): List<String> {
-        return listOf(Background.schema, Foreground.schema)
-    }
+    override val subscribedEventSchemasForTransitions: List<String>
+        get() = listOf(Background.schema, Foreground.schema)
 
-    override fun subscribedEventSchemasForEntitiesGeneration(): List<String> {
-        return listOf("*")
-    }
+    override val subscribedEventSchemasForEntitiesGeneration: List<String>
+        get() = listOf("*")
 
-    override fun subscribedEventSchemasForPayloadUpdating(): List<String> {
-        return emptyList()
-    }
+    override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = emptyList()
 
     override fun transition(event: Event, currentState: State?): State? {
         if (event is Foreground) {

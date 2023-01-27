@@ -33,17 +33,14 @@ class DeepLinkStateMachine : StateMachineInterface {
       - ReadyForOutput
       */
 
-    override fun subscribedEventSchemasForTransitions(): List<String> {
-        return listOf(DeepLinkReceived.schema, TrackerConstants.SCHEMA_SCREEN_VIEW)
-    }
+    override val subscribedEventSchemasForTransitions: List<String>
+        get() = listOf(DeepLinkReceived.schema, TrackerConstants.SCHEMA_SCREEN_VIEW)
 
-    override fun subscribedEventSchemasForEntitiesGeneration(): List<String> {
-        return listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
-    }
+    override val subscribedEventSchemasForEntitiesGeneration: List<String> 
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
 
-    override fun subscribedEventSchemasForPayloadUpdating(): List<String> {
-        return ArrayList()
-    }
+    override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = ArrayList()
 
     override fun transition(event: Event, state: State?): State? {
         // - Init (DL) DeepLinkReceived
