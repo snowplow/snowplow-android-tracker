@@ -406,17 +406,14 @@ class StateManagerTest {
 
 internal class MockState(var value: Int) : State
 internal open class MockStateMachine : StateMachineInterface {
-    override fun subscribedEventSchemasForTransitions(): List<String> {
-        return LinkedList(listOf("inc", "dec"))
-    }
+    override val subscribedEventSchemasForTransitions: List<String>
+        get() = LinkedList(listOf("inc", "dec"))
 
-    override fun subscribedEventSchemasForEntitiesGeneration(): List<String> {
-        return LinkedList(listOf("*"))
-    }
+    override val subscribedEventSchemasForEntitiesGeneration: List<String>
+        get() = LinkedList(listOf("*"))
 
-    override fun subscribedEventSchemasForPayloadUpdating(): List<String> {
-        return LinkedList(listOf("event"))
-    }
+    override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = LinkedList(listOf("event"))
 
     override fun transition(event: Event, state: State?): State? {
         val e = event as SelfDescribing
