@@ -14,7 +14,7 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), EmitterController {
     
     private val emitter: Emitter
-        get() = serviceProvider.orMakeTracker().emitter
+        get() = serviceProvider.getOrMakeTracker().emitter
     
     override val eventStore: EventStore?
         get() = emitter.eventStore

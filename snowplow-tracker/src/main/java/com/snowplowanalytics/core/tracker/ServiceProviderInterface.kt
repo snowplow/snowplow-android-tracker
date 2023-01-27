@@ -12,18 +12,18 @@ interface ServiceProviderInterface {
 
     // Internal services
     val isTrackerInitialized: Boolean
-    fun orMakeTracker(): Tracker
-    fun orMakeEmitter(): Emitter
-    fun orMakeSubject(): Subject
+    fun getOrMakeTracker(): Tracker
+    fun getOrMakeEmitter(): Emitter
+    fun getOrMakeSubject(): Subject
 
     // Controllers
-    fun orMakeTrackerController(): TrackerControllerImpl
-    fun orMakeEmitterController(): EmitterControllerImpl
-    fun orMakeNetworkController(): NetworkControllerImpl
-    fun orMakeGdprController(): GdprControllerImpl
-    fun orMakeGlobalContextsController(): GlobalContextsControllerImpl
-    fun orMakeSubjectController(): SubjectControllerImpl
-    fun orMakeSessionController(): SessionControllerImpl
+    fun getOrMakeTrackerController(): TrackerControllerImpl
+    fun getOrMakeEmitterController(): EmitterControllerImpl
+    fun getOrMakeNetworkController(): NetworkControllerImpl
+    fun getOrMakeGdprController(): GdprControllerImpl
+    fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl
+    fun getOrMakeSubjectController(): SubjectControllerImpl
+    fun getOrMakeSessionController(): SessionControllerImpl
 
     // Configuration Updates
     val trackerConfigurationUpdate: TrackerConfigurationUpdate

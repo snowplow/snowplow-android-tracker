@@ -16,17 +16,17 @@ class TrackerControllerImpl  // Constructors
     (serviceProvider: ServiceProvider) : Controller(serviceProvider), TrackerController {
     // Sub-controllers
     override val network: NetworkController
-        get() = serviceProvider.orMakeNetworkController()
+        get() = serviceProvider.getOrMakeNetworkController()
     override val emitter: EmitterController
-        get() = serviceProvider.orMakeEmitterController()
+        get() = serviceProvider.getOrMakeEmitterController()
     override val subject: SubjectController
-        get() = serviceProvider.orMakeSubjectController()
+        get() = serviceProvider.getOrMakeSubjectController()
     override val gdpr: GdprController
-        get() = serviceProvider.orMakeGdprController()
+        get() = serviceProvider.getOrMakeGdprController()
     override val globalContexts: GlobalContextsController
-        get() = serviceProvider.orMakeGlobalContextsController()
+        get() = serviceProvider.getOrMakeGlobalContextsController()
     val sessionController: SessionControllerImpl
-        get() = serviceProvider.orMakeSessionController()
+        get() = serviceProvider.getOrMakeSessionController()
     override val session: SessionController?
         get() {
             val sessionController = sessionController
@@ -192,7 +192,7 @@ class TrackerControllerImpl  // Constructors
                     "Recreating tracker instance after it was removed. This will not be supported in future versions."
                 )
             }
-            return serviceProvider.orMakeTracker()
+            return serviceProvider.getOrMakeTracker()
         }
     private val dirtyConfig: TrackerConfigurationUpdate
         get() = serviceProvider.trackerConfigurationUpdate

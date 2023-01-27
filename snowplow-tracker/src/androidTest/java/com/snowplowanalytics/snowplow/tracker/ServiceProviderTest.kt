@@ -47,7 +47,7 @@ class ServiceProviderTest {
         )
 
         // pause emitter
-        provider.orMakeEmitterController().pause()
+        provider.getOrMakeEmitterController().pause()
 
         // refresh configuration
         val configurationUpdates: MutableList<Configuration> = ArrayList()
@@ -55,20 +55,20 @@ class ServiceProviderTest {
         provider.reset(configurationUpdates)
 
         // track event and check that emitter is paused
-        provider.orMakeTrackerController().track(Structured("cat", "act"))
+        provider.getOrMakeTrackerController().track(Structured("cat", "act"))
         Thread.sleep(1000)
-        Assert.assertFalse(provider.orMakeEmitter().emitterStatus)
+        Assert.assertFalse(provider.getOrMakeEmitter().emitterStatus)
         Assert.assertEquals(0, networkConnection.sendingCount().toLong())
 
         // resume emitting
-        provider.orMakeEmitterController().resume()
+        provider.getOrMakeEmitterController().resume()
         var i = 0
         while (i < 10 && networkConnection.sendingCount() < 1) {
             Thread.sleep(600)
             i++
         }
         Assert.assertEquals(1, networkConnection.sendingCount().toLong())
-        provider.orMakeEmitter().flush()
+        provider.getOrMakeEmitter().flush()
     }
 
     @Test
@@ -81,7 +81,7 @@ class ServiceProviderTest {
         )
 
         // listen for the error log
-        val tracker: TrackerController = provider.orMakeTrackerController()
+        val tracker: TrackerController = provider.getOrMakeTrackerController()
         val loggedError = booleanArrayOf(false)
         tracker.loggerDelegate = object : LoggerDelegate {
             override fun error(tag: String, msg: String) {

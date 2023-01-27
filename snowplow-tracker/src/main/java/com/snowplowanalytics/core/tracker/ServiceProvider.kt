@@ -75,7 +75,7 @@ class ServiceProvider(
         if (trackerConfigurationUpdate.sourceConfig == null) {
             trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
         }
-        orMakeTracker() // Build tracker to initialize NotificationCenter receivers
+        getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
     }
 
     fun reset(configurations: List<Configuration>) {
@@ -83,7 +83,7 @@ class ServiceProvider(
         resetConfigurationUpdates()
         processConfigurations(configurations)
         resetServices()
-        orMakeTracker()
+        getOrMakeTracker()
     }
 
     fun shutdown() {
@@ -169,43 +169,43 @@ class ServiceProvider(
     }
 
     // Getters
-    override fun orMakeSubject(): Subject {
+    override fun getOrMakeSubject(): Subject {
         return subject ?: makeSubject().also { subject = it }
     }
 
-    override fun orMakeEmitter(): Emitter {
+    override fun getOrMakeEmitter(): Emitter {
         return emitter ?: makeEmitter().also { emitter = it }
     }
     
-    override fun orMakeTracker(): Tracker {
+    override fun getOrMakeTracker(): Tracker {
         return tracker ?: makeTracker().also { tracker = it }
     }
 
-    override fun orMakeTrackerController(): TrackerControllerImpl {
+    override fun getOrMakeTrackerController(): TrackerControllerImpl {
         return trackerController ?: makeTrackerController().also { trackerController = it }
     }
 
-    override fun orMakeSessionController(): SessionControllerImpl {
+    override fun getOrMakeSessionController(): SessionControllerImpl {
         return sessionController ?: makeSessionController().also { sessionController = it }
     }
 
-    override fun orMakeEmitterController(): EmitterControllerImpl {
+    override fun getOrMakeEmitterController(): EmitterControllerImpl {
         return emitterController ?: makeEmitterController().also { emitterController = it }
     }
 
-    override fun orMakeGdprController(): GdprControllerImpl {
+    override fun getOrMakeGdprController(): GdprControllerImpl {
         return gdprController ?: makeGdprController().also { gdprController = it }
     }
 
-    override fun orMakeGlobalContextsController(): GlobalContextsControllerImpl {
+    override fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl {
         return globalContextsController ?: makeGlobalContextsController().also { globalContextsController = it }
     }
 
-    override fun orMakeSubjectController(): SubjectControllerImpl {
+    override fun getOrMakeSubjectController(): SubjectControllerImpl {
         return subjectController ?: makeSubjectController().also { subjectController = it }
     }
 
-    override fun orMakeNetworkController(): NetworkControllerImpl {
+    override fun getOrMakeNetworkController(): NetworkControllerImpl {
         return networkController ?: makeNetworkController().also { networkController = it }
     }
 
@@ -247,8 +247,8 @@ class ServiceProvider(
     }
 
     private fun makeTracker(): Tracker {
-        val emitter = orMakeEmitter()
-        val subject = orMakeSubject()
+        val emitter = getOrMakeEmitter()
+        val subject = getOrMakeSubject()
         val trackerConfig = trackerConfigurationUpdate
         val sessionConfig = sessionConfigurationUpdate
         val gdprConfig = gdprConfigurationUpdate
@@ -317,7 +317,7 @@ class ServiceProvider(
 
     private fun makeGdprController(): GdprControllerImpl {
         val controller = GdprControllerImpl(this)
-        val gdpr = orMakeTracker().gdprContext
+        val gdpr = getOrMakeTracker().gdprContext
         gdpr?.let {
             controller.reset(
                 it.basisForProcessing,

@@ -5,9 +5,7 @@ import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.controller.NetworkController
 import com.snowplowanalytics.snowplow.network.HttpMethod
-import com.snowplowanalytics.snowplow.network.NetworkConnection
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection
-import java.util.concurrent.atomic.AtomicReference
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) : 
@@ -48,7 +46,7 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
 
     // Private methods
     private val emitter: Emitter
-        get() = serviceProvider.orMakeEmitter()
+        get() = serviceProvider.getOrMakeEmitter()
     
     private val dirtyConfig: NetworkConfigurationUpdate
         get() = serviceProvider.networkConfigurationUpdate

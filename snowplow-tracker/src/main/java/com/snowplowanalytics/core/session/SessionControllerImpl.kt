@@ -161,9 +161,9 @@ class SessionControllerImpl  // Constructors
 
     // Private methods
     private val tracker: Tracker
-        get() = serviceProvider.orMakeTracker()
+        get() = serviceProvider.getOrMakeTracker()
     private val session: Session?
-        get() = serviceProvider.orMakeTracker().session
+        get() = serviceProvider.getOrMakeTracker().session
     private val dirtyConfig: SessionConfigurationUpdate
         get() = serviceProvider.sessionConfigurationUpdate
 }

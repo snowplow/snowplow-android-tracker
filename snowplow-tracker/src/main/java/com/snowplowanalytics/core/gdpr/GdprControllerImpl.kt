@@ -63,7 +63,7 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
 
     // Private methods
     private val tracker: Tracker
-        get() = serviceProvider.orMakeTracker()
+        get() = serviceProvider.getOrMakeTracker()
     private val dirtyConfig: GdprConfigurationUpdate
         get() = serviceProvider.gdprConfigurationUpdate
 }

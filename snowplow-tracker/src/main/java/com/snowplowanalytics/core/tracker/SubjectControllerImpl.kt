@@ -81,7 +81,7 @@ class SubjectControllerImpl  // Constructors
 
     // Private methods
     private val subject: Subject
-        get() = serviceProvider.orMakeSubject()
+        get() = serviceProvider.getOrMakeSubject()
     private val dirtyConfig: SubjectConfigurationUpdate
         get() = serviceProvider.subjectConfigurationUpdate
 }

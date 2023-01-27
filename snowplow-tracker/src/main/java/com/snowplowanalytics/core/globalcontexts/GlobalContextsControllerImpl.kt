@@ -11,7 +11,7 @@ import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 class GlobalContextsControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), GlobalContextsController {
     private val tracker: Tracker
-        get() = serviceProvider.orMakeTracker()
+        get() = serviceProvider.getOrMakeTracker()
 
     override val tags: Set<String?>
         get() = tracker.globalContextTags
