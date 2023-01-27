@@ -16,7 +16,7 @@ project.ext {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     buildToolsVersion "30.0.2"
 
     useLibrary 'android.test.base'
@@ -24,7 +24,7 @@ android {
     defaultConfig {
         // With API 24: Remove `androidx.appcompat:appcompat` as it's needed for Consumer<T>.
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 1
         versionName "$project.version"
 
