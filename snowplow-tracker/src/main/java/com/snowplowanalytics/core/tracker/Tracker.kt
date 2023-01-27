@@ -563,14 +563,14 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private fun workaroundForCampaignAttributionEnrichment(
         payload: Payload,
         event: TrackerEvent,
-        contexts: List<SelfDescribingJson?>?
+        contexts: List<SelfDescribingJson>
     ) {
         var url: String? = null
         var referrer: String? = null
         if (event.schema == DeepLinkReceived.schema) {
             url = event.payload[DeepLinkReceived.PARAM_URL] as? String?
             referrer = event.payload[DeepLinkReceived.PARAM_REFERRER] as? String?
-        } else if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && contexts != null) {
+        } else if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW) {
             for (entity in contexts) {
                 if (entity is DeepLink) {
                     url = entity.url
@@ -672,62 +672,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             Parameters.CONTEXT
         )
     }
-    
-    // --- Helpers
-    
-    /**
-     * Builds and adds a finalized payload of a service event
-     * by adding in extra information to the payload:
-     * - The event contexts (limited to identify the device and app)
-     * - The Tracker Subject
-     * - The Tracker parameters
-     *
-     * @param payload Payload the raw event payload to be
-     * decorated.
-     * @param contexts The raw context list
-     */
-    private fun addServiceEventPayload(
-        payload: Payload,
-        contexts: MutableList<SelfDescribingJson?>
-    ) {
-        // Add default parameters to the payload
-        payload.add(Parameters.PLATFORM, platform.value)
-        payload.add(Parameters.APPID, appId)
-        payload.add(Parameters.NAMESPACE, namespace)
-        payload.add(Parameters.TRACKER_VERSION, trackerVersion)
 
-        // If there is a subject present for the Tracker add it
-        subject?.let { payload.addMap(HashMap(it.getSubject(userAnonymisation))) }
-
-        // Add Mobile Context
-        if (platformContextEnabled) {
-            contexts.add(platformContextManager.getMobileContext(userAnonymisation))
-        }
-
-        // Add application context
-        if (applicationContext) {
-            contexts.add(getApplicationContext(context))
-        }
-
-        // If there are contexts to nest
-        if (contexts.size > 0) {
-            val contextMaps: MutableList<Map<*, *>> = LinkedList()
-            for (selfDescribingJson in contexts) {
-                if (selfDescribingJson != null) {
-                    contextMaps.add(selfDescribingJson.map)
-                }
-            }
-            val envelope = SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, contextMaps)
-            payload.addMap(
-                envelope.map, base64Encoded, Parameters.CONTEXT_ENCODED,
-                Parameters.CONTEXT
-            )
-        }
-
-        // Add this payload to the emitter
-        emitter.add(payload)
-    }
-    
     // --- Controls
     
     /**
