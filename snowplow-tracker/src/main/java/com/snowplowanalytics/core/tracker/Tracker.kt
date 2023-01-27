@@ -41,7 +41,6 @@ import com.snowplowanalytics.snowplow.util.Basis
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.function.Consumer
 import kotlin.math.max
 
 /**
@@ -53,7 +52,7 @@ import kotlin.math.max
  * @param context The Android application context
  * @param builder A closure to set Tracker configuration
  */
-class Tracker(emitter: Emitter, val namespace: String, var appId: String, context: Context, builder: Consumer<Tracker>? = null) {
+class Tracker(emitter: Emitter, val namespace: String, var appId: String, context: Context, builder: ((Tracker) -> Unit)? = null) {
     private var builderFinished = false
     private val context: Context
     private val stateManager = StateManager()
@@ -347,7 +346,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
      */
     init {
         this.context = context
-        builder?.accept(this)
+        builder?.let { it(this) }
         
         emitter.flush()
         

@@ -13,7 +13,6 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class StateManagerTest {
@@ -104,9 +103,9 @@ class StateManagerTest {
     fun testScreenStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = Consumer { emitter: Emitter -> emitter.eventStore = eventStore }
+        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
         val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.screenContext = true
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
@@ -200,9 +199,9 @@ class StateManagerTest {
     fun testLifecycleStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = Consumer { emitter: Emitter -> emitter.eventStore = eventStore }
+        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
         val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.lifecycleAutotracking = true
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
@@ -274,9 +273,9 @@ class StateManagerTest {
     fun testDeepLinkStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = Consumer { emitter: Emitter -> emitter.eventStore = eventStore }
+        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
         val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.deepLinkContext = true
             tracker.base64Encoded = false
             tracker.sessionContext = false

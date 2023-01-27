@@ -25,7 +25,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class LoggingTest {
@@ -53,7 +52,7 @@ class LoggingTest {
     @Throws(Exception::class)
     fun setUp() {
         mockLoggerDelegate = MockLoggerDelegate()
-        val builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         emitter = Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", builder)
         networkConfig = NetworkConfiguration("http://localhost", HttpMethod.POST)
     }
@@ -63,7 +62,7 @@ class LoggingTest {
     // Therefore these tests look at verbose and debug logging only
     @Test
     fun verboseLogsShownWhenVerboseSet() {
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = true
             tracker.loggerDelegate = mockLoggerDelegate
@@ -97,7 +96,7 @@ class LoggingTest {
 
     @Test
     fun debugLogsShownWhenDebugSet() {
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.logLevel = LogLevel.DEBUG
             tracker.sessionContext = true
             tracker.loggerDelegate = mockLoggerDelegate
@@ -131,7 +130,7 @@ class LoggingTest {
 
     @Test
     fun loggingOffByDefault() {
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.loggerDelegate = mockLoggerDelegate
         }

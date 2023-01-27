@@ -33,13 +33,12 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import java.util.function.Consumer
 
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
  */
-class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>? = null) {
+class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Unit)? = null) {
     private val TAG = Emitter::class.java.simpleName
 
     private var builderFinished = false
@@ -309,7 +308,7 @@ class Emitter(context: Context, collectorUri: String, builder: Consumer<Emitter>
      */
     init {
         this.context = context
-        builder?.accept(this)
+        builder?.let { it(this) }
 
         if (networkConnection == null) {
             isCustomNetworkConnection = false

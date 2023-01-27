@@ -29,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class SessionTest {
@@ -213,7 +212,7 @@ class SessionTest {
         val emitter = Emitter(
             context, "", null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.lifecycleAutotracking = true
             tracker.foregroundTimeout = 100
@@ -252,7 +251,7 @@ class SessionTest {
         val emitter = Emitter(
             context, "", null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.lifecycleAutotracking = true
             tracker.foregroundTimeout = 100
@@ -334,7 +333,7 @@ class SessionTest {
         val emitter = Emitter(
             context, "", null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.foregroundTimeout = 20
             tracker.backgroundTimeout = 20

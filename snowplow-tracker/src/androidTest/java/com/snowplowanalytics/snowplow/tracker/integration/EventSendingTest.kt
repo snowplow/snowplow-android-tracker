@@ -43,7 +43,6 @@ import java.io.IOException
 import java.net.URLDecoder
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class EventSendingTest {
@@ -196,7 +195,7 @@ class EventSendingTest {
     // Helpers
     private fun getTracker(namespace: String?, uri: String?, method: HttpMethod?): Tracker {
         createSessionSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, namespace!!)
-        val builder = Consumer { emitter: Emitter ->
+        val builder = { emitter: Emitter ->
             emitter.bufferOption = BufferOption.Single
             emitter.httpMethod = method!!
             emitter.requestSecurity = Protocol.HTTP
@@ -208,7 +207,7 @@ class EventSendingTest {
         
         if (tracker != null) tracker!!.close()
         
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.subject = subject
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.DEBUG

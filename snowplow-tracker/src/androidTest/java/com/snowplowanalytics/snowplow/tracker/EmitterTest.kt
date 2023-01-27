@@ -26,38 +26,36 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class EmitterTest {
     // Builder Tests
     @Test
     fun testHttpMethodSet() {
-        var builder = Consumer { emitter: Emitter -> emitter.httpMethod = HttpMethod.GET }
+        var builder = { emitter: Emitter -> emitter.httpMethod = HttpMethod.GET }
         var emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(HttpMethod.GET, emitter.httpMethod)
-        builder = Consumer { emitter1: Emitter -> emitter1.httpMethod = HttpMethod.POST }
+        builder = { emitter1: Emitter -> emitter1.httpMethod = HttpMethod.POST }
         emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(HttpMethod.POST, emitter.httpMethod)
     }
 
     @Test
     fun testBufferOptionSet() {
-        var builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        var builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         var emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(BufferOption.Single, emitter.bufferOption)
-        builder =
-            Consumer { emitter1: Emitter -> emitter1.bufferOption = BufferOption.DefaultGroup }
+        builder = { emitter1: Emitter -> emitter1.bufferOption = BufferOption.DefaultGroup }
         emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(BufferOption.DefaultGroup, emitter.bufferOption)
-        builder = Consumer { emitter2: Emitter -> emitter2.bufferOption = BufferOption.HeavyGroup }
+        builder = { emitter2: Emitter -> emitter2.bufferOption = BufferOption.HeavyGroup }
         emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
     }
 
     @Test
     fun testCallbackSet() {
-        val builder = Consumer { emitter: Emitter ->
+        val builder = { emitter: Emitter ->
             emitter.requestCallback = object : RequestCallback {
                 override fun onSuccess(successCount: Int) {}
                 override fun onFailure(successCount: Int, failureCount: Int) {}
@@ -70,14 +68,14 @@ class EmitterTest {
     @Test
     fun testUriSet() {
         val uri = "com.acme"
-        var builder = Consumer { emitter: Emitter ->
+        var builder = { emitter: Emitter ->
             emitter.bufferOption = BufferOption.Single
             emitter.httpMethod = HttpMethod.GET
             emitter.requestSecurity = Protocol.HTTP
         }
         var emitter = Emitter(context, uri, builder)
         Assert.assertEquals("http://$uri/i", emitter.emitterUri)
-        builder = Consumer { emitter1: Emitter ->
+        builder = { emitter1: Emitter ->
             emitter1.bufferOption = BufferOption.DefaultGroup
             emitter1.httpMethod = HttpMethod.POST
             emitter1.requestSecurity = Protocol.HTTP
@@ -87,14 +85,14 @@ class EmitterTest {
             "http://$uri/com.snowplowanalytics.snowplow/tp2",
             emitter.emitterUri
         )
-        builder = Consumer { emitter2: Emitter ->
+        builder = { emitter2: Emitter ->
             emitter2.bufferOption = BufferOption.DefaultGroup
             emitter2.httpMethod = HttpMethod.GET
             emitter2.requestSecurity = Protocol.HTTPS
         }
         emitter = Emitter(context, uri, builder)
         Assert.assertEquals("https://$uri/i", emitter.emitterUri)
-        builder = Consumer { emitter3: Emitter ->
+        builder = { emitter3: Emitter ->
             emitter3.bufferOption = BufferOption.DefaultGroup
             emitter3.httpMethod = HttpMethod.POST
             emitter3.requestSecurity = Protocol.HTTPS
@@ -105,45 +103,45 @@ class EmitterTest {
 
     @Test
     fun testSecuritySet() {
-        var builder = Consumer { emitter: Emitter -> emitter.requestSecurity = Protocol.HTTP }
+        var builder = { emitter: Emitter -> emitter.requestSecurity = Protocol.HTTP }
         var emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(Protocol.HTTP, emitter.requestSecurity)
-        builder = Consumer { emitter1: Emitter -> emitter1.requestSecurity = Protocol.HTTPS }
+        builder = { emitter1: Emitter -> emitter1.requestSecurity = Protocol.HTTPS }
         emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(Protocol.HTTPS, emitter.requestSecurity)
     }
 
     @Test
     fun testTickSet() {
-        val builder = Consumer { emitter: Emitter -> emitter.emitterTick = 0 }
+        val builder = { emitter: Emitter -> emitter.emitterTick = 0 }
         val emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(0, emitter.emitterTick.toLong())
     }
 
     @Test
     fun testEmptyLimitSet() {
-        val builder = Consumer { emitter: Emitter -> emitter.emptyLimit = 0 }
+        val builder = { emitter: Emitter -> emitter.emptyLimit = 0 }
         val emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(0, emitter.emptyLimit.toLong())
     }
 
     @Test
     fun testSendLimitSet() {
-        val builder = Consumer { emitter: Emitter -> emitter.sendLimit = 200 }
+        val builder = { emitter: Emitter -> emitter.sendLimit = 200 }
         val emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(200, emitter.sendLimit.toLong())
     }
 
     @Test
     fun testByteLimitGetSet() {
-        val builder = Consumer { emitter: Emitter -> emitter.byteLimitGet = 20000 }
+        val builder = { emitter: Emitter -> emitter.byteLimitGet = 20000 }
         val emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(20000, emitter.byteLimitGet)
     }
 
     @Test
     fun testByteLimitPostSet() {
-        val builder = Consumer { emitter: Emitter -> emitter.byteLimitPost = 25000 }
+        val builder = { emitter: Emitter -> emitter.byteLimitPost = 25000 }
         val emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(25000, emitter.byteLimitPost)
     }
@@ -152,7 +150,7 @@ class EmitterTest {
     @Throws(InterruptedException::class)
     fun testUpdatingEmitterSettings() {
         val uri = "snowplow.io"
-        var builder = Consumer { emitter: Emitter ->
+        var builder = { emitter: Emitter ->
             emitter.bufferOption = BufferOption.Single
             emitter.httpMethod = HttpMethod.POST
             emitter.requestSecurity = Protocol.HTTP
@@ -194,7 +192,7 @@ class EmitterTest {
         emitter.bufferOption = BufferOption.DefaultGroup
         Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
         emitter.shutdown()
-        builder = Consumer { emitter1: Emitter ->
+        builder = { emitter1: Emitter ->
             emitter1.bufferOption = BufferOption.Single
             emitter1.httpMethod = HttpMethod.POST
             emitter1.requestSecurity = Protocol.HTTP
@@ -357,7 +355,7 @@ class EmitterTest {
     @Test
     @Throws(InterruptedException::class)
     fun testUpdatesNetworkConnectionWhileRunning() {
-        val builder = Consumer { emitter: Emitter -> emitter.eventStore = MockEventStore() }
+        val builder = { emitter: Emitter -> emitter.eventStore = MockEventStore() }
         val emitter = Emitter(context, "com.acme", builder)
         emitter.flush()
         Thread.sleep(100)
@@ -411,7 +409,7 @@ class EmitterTest {
 
     // Emitter Builder
     private fun getEmitter(networkConnection: NetworkConnection?, option: BufferOption?): Emitter {
-        val builder = Consumer { emitter: Emitter ->
+        val builder = { emitter: Emitter ->
             emitter.networkConnection = networkConnection
             emitter.bufferOption = option!!
             emitter.emitterTick = 0

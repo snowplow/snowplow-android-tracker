@@ -45,7 +45,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @RunWith(AndroidJUnit4::class)
 class TrackerTest {
@@ -80,7 +79,7 @@ class TrackerTest {
     private fun getTracker(installTracking: Boolean): Tracker? {
         val namespace = "myNamespace"
         TestUtils.createSessionSharedPreferences(context, namespace)
-        val builder = Consumer { emitter: Emitter ->
+        val builder = { emitter: Emitter ->
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
         }
@@ -90,7 +89,7 @@ class TrackerTest {
         val subject = Subject(
             context, null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.subject = subject
             tracker.platform = DevicePlatform.InternetOfThings
             tracker.base64Encoded = false
@@ -188,7 +187,7 @@ class TrackerTest {
         val mockWebServer = getMockServer(1)
         var emitter: Emitter? = null
         val builder =
-            Consumer { emitterArg: Emitter -> 
+            { emitterArg: Emitter -> 
                 emitterArg.bufferOption = BufferOption.Single
                 emitterArg.requestSecurity = Protocol.HTTP
             }
@@ -198,7 +197,7 @@ class TrackerTest {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
         }
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = false
@@ -250,7 +249,7 @@ class TrackerTest {
         
         var emitter: Emitter? = null
         val emitterBuilder =
-            Consumer { emitterArg: Emitter -> 
+            { emitterArg: Emitter -> 
                 emitterArg.bufferOption = BufferOption.Single
                 emitterArg.requestSecurity = Protocol.HTTP
             }
@@ -261,7 +260,7 @@ class TrackerTest {
             Assert.fail("Exception on Emitter creation")
         }
         
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = false
@@ -311,11 +310,11 @@ class TrackerTest {
         val namespace = "myNamespace"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
-        val builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
             context, getMockServerURI(mockWebServer)!!, builder
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = false
@@ -343,11 +342,11 @@ class TrackerTest {
         val namespace = "myNamespace"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
-        val builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
             context, getMockServerURI(mockWebServer)!!, builder
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = true
@@ -371,11 +370,11 @@ class TrackerTest {
     fun testTrackScreenView() {
         val namespace = "myNamespace"
         TestUtils.createSessionSharedPreferences(context, namespace)
-        val builder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
             context, "fake-uri", builder
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.screenContext = true
@@ -424,7 +423,7 @@ class TrackerTest {
         val emitter = Emitter(
             context, "com.acme", null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.installAutotracking = false
@@ -452,7 +451,7 @@ class TrackerTest {
         val emitter = Emitter(
             context, "com.acme", null
         )
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.installAutotracking = false
@@ -474,11 +473,11 @@ class TrackerTest {
 
     @Test
     fun testStartsNewSessionWhenChangingAnonymousTracking() {
-        val emitterBuilder = Consumer { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
+        val emitterBuilder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(context, "fake-uri", emitterBuilder)
         emitter.pauseEmit()
         
-        val trackerBuilder = Consumer { tracker: Tracker ->
+        val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
             tracker.sessionContext = true
