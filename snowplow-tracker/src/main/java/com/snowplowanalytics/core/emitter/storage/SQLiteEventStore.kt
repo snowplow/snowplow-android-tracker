@@ -228,8 +228,10 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
             // Create a TrackerPayload for each event
             val payload = TrackerPayload()
             val eventData =
-                eventMetadata[EventStoreHelper.METADATA_EVENT_DATA] as? Map<String, Any>?
-            payload.addMap(eventData)
+                eventMetadata[EventStoreHelper.METADATA_EVENT_DATA] as? Map<String, Any>
+            if (eventData != null) {
+                payload.addMap(eventData)
+            }
 
             // Create EmitterEvent
             val eventId = eventMetadata[EventStoreHelper.METADATA_ID] as? Long?

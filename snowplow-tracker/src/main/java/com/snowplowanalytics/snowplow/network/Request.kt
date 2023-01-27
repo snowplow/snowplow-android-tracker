@@ -58,7 +58,7 @@ class Request {
         }
         payload = TrackerPayload()
         val payloadBundle = SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData)
-        payload.addMap(payloadBundle.map as? Map<String, Any>)
+        (payloadBundle.map as? Map<String, Any>)?.let { payload.addMap(it) }
         this.emitterEventIds = emitterEventIds
         customUserAgent = tempUserAgent
         oversize = false

@@ -75,14 +75,6 @@ class TrackerPayloadTest {
     }
 
     @Test
-    fun testDontCrashWhenAddNullMap() {
-        payload!!.addMap(null)
-        Assert.assertTrue(payload!!.map.isEmpty())
-        payload!!.addMap(null, true, "a", "b")
-        Assert.assertTrue(payload!!.map.isEmpty())
-    }
-
-    @Test
     @Throws(JSONException::class)
     fun testAddSimpleMapBase64NoEncode() {
         payload!!.addMap(createTestMap(), false, "enc", "no_enc")

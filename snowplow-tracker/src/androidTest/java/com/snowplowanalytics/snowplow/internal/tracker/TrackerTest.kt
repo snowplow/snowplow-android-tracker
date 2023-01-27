@@ -54,6 +54,7 @@ class TrackerTest {
     fun setUp() {
         try {
             if (Companion.tracker == null) return
+            
             val emitter = Companion.tracker!!.emitter
             val eventStore = emitter.eventStore
             if (eventStore != null) {

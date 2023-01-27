@@ -208,7 +208,7 @@ class SelfDescribingJsonTest {
     fun testCreateWithTrackerPayload() {
         val payload = TrackerPayload()
         testMap!!["a"] = "b"
-        payload.addMap(testMap)
+        payload.addMap(testMap!!)
         val json = SelfDescribingJson(testSchema, payload)
 
         // {"schema":"org.test.scheme","data":{"a":"b"}}
@@ -224,7 +224,7 @@ class SelfDescribingJsonTest {
     fun testCreateThenSetTrackerPayload() {
         val payload = TrackerPayload()
         testMap!!["a"] = "b"
-        payload.addMap(testMap)
+        payload.addMap(testMap!!)
         val json = SelfDescribingJson(testSchema)
         json.setData(payload)
 
@@ -252,7 +252,7 @@ class SelfDescribingJsonTest {
     fun testGetByteSize() {
         val payload = TrackerPayload()
         testMap!!["a"] = "b"
-        payload.addMap(testMap)
+        payload.addMap(testMap!!)
         val json = SelfDescribingJson(testSchema)
         json.setData(payload)
         Assert.assertEquals(45, json.byteSize)
