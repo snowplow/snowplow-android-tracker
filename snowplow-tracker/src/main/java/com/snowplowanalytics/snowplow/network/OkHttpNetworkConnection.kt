@@ -68,6 +68,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
          * @param version the TLS version allowed for requests
          * @return itself
          */
@@ -77,6 +79,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
@@ -127,6 +131,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Instead, configure it via EmitterConfiguration.
          * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
          * @return itself
          */

@@ -227,6 +227,7 @@ class ServiceProvider(
             emitter.customPostPath = networkConfig.customPostPath
             emitter.client = networkConfig.okHttpClient
             emitter.cookieJar = networkConfig.okHttpCookieJar
+            emitter.emitTimeout = networkConfig.timeout
             emitter.sendLimit = emitterConfig.emitRange
             emitter.bufferOption = emitterConfig.bufferOption
             emitter.eventStore = emitterConfig.eventStore

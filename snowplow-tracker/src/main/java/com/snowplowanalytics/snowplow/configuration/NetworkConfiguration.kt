@@ -19,7 +19,7 @@ import java.util.*
  * Default values:
  * method = HttpMethod.POST;
  * protocol = Protocol.HTTPS;
- * timeout = 5;
+ * timeout = 5 seconds;
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
@@ -120,6 +120,8 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
 
     /**
      * The timeout set for the requests to the collector.
+     * The maximum timeout for emitting events. If emit time exceeds this value
+     * TimeOutException will be thrown.
      */
     fun timeout(timeout: Int): NetworkConfiguration {
         this.timeout = timeout

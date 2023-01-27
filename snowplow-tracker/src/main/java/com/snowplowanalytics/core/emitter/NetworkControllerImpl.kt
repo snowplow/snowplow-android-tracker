@@ -40,7 +40,7 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
             emitter.customPostPath = customPostPath
         }
     
-    override var timeout: Int
+    override var timeout: Int?
         get() = emitter.emitTimeout
         set(timeout) {
             emitter.emitTimeout = timeout

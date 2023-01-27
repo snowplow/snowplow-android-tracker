@@ -49,7 +49,11 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     private val context: Context
     private lateinit var uri: String
     private var emptyCount = 0
-    
+
+    /**
+     * This configuration option is not published in the EmitterConfiguration class.
+     * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure timeUnit.
+     */
     var timeUnit: TimeUnit = EmitterDefaults.timeUnit
         set(unit) {
             if (!builderFinished) {
@@ -91,17 +95,22 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
     
     /**
+     * This configuration option is not published in the EmitterConfiguration class.
+     * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
      * @return the TLS versions accepted for the emitter
      */
     var tlsVersions: EnumSet<TLSVersion> = EmitterDefaults.tlsVersions
 
     /**
-     * The emitter tick
+     * The emitter tick. This configuration option is not published in the EmitterConfiguration class.
+     * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure emitterTick.
      */
     var emitterTick: Int = EmitterDefaults.emitterTick
 
     /**
      * The amount of times the event store can be empty before it is shut down.
+     * This configuration option is not published in the EmitterConfiguration class.
+     * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure emptyLimit.
      */
     var emptyLimit: Int = EmitterDefaults.emptyLimit
 
@@ -140,15 +149,17 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
             this.uri = uri
             if (!isCustomNetworkConnection && builderFinished) {
                 networkConnection =
-                    OkHttpNetworkConnectionBuilder(uri, context)
-                        .method(httpMethod)
-                        .tls(tlsVersions)
-                        .emitTimeout(emitTimeout)
-                        .customPostPath(customPostPath)
-                        .client(client)
-                        .cookieJar(cookieJar)
-                        .serverAnonymisation(serverAnonymisation)
-                        .build()
+                    emitTimeout?.let {
+                        OkHttpNetworkConnectionBuilder(uri, context)
+                            .method(httpMethod)
+                            .tls(tlsVersions)
+                            .emitTimeout(it)
+                            .customPostPath(customPostPath)
+                            .client(client)
+                            .cookieJar(cookieJar)
+                            .serverAnonymisation(serverAnonymisation)
+                            .build()
+                    }
             }
         }
 
@@ -163,15 +174,17 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         set(method) {
             field = method
             if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                networkConnection = emitTimeout?.let {
+                    OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
-                        .emitTimeout(emitTimeout)
+                        .emitTimeout(it)
                         .customPostPath(customPostPath)
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
                         .build()
+                }
                 
             }
         }
@@ -203,19 +216,24 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         set(security) {
             field = security
             if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                networkConnection = emitTimeout?.let {
+                    OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
-                        .emitTimeout(emitTimeout)
+                        .emitTimeout(it)
                         .customPostPath(customPostPath)
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
                         .build()
+                }
                 
             }
         }
 
+    /**
+     * Emitter namespace. NB: setting the namespace has a side-effect of creating the SQLiteEventStore
+     */
     var namespace: String? = null
         set(namespace) {
             field = namespace
@@ -225,13 +243,19 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
 
     /**
-     * The timeout for the Emitter
+     * The maximum timeout for emitting events. If emit time exceeds this value 
+     * TimeOutException will be thrown.
+     * 
+     * This configuration option, used to create an OkHttpNetworkConnection, is not published 
+     * in the EmitterConfiguration class. However, it is published in the NetworkConfiguration class.
+     * Configure emitTimeout by providing it via networkConfiguration to Snowplow.createTracker().
      */
-    var emitTimeout: Int = EmitterDefaults.emitTimeout
+    var emitTimeout: Int? = EmitterDefaults.emitTimeout
         set(emitTimeout) {
-            field = emitTimeout
-            if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+            emitTimeout?.let { 
+                field = emitTimeout
+                if (!isCustomNetworkConnection && builderFinished) {
+                    networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
                         .emitTimeout(emitTimeout)
@@ -240,7 +264,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
                         .build()
-                
+                }
             }
         }
     
@@ -251,15 +275,17 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         set(customPostPath) {
             field = customPostPath
             if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
+                networkConnection = emitTimeout?.let {
+                    OkHttpNetworkConnectionBuilder(uri, context)
                         .method(httpMethod)
                         .tls(tlsVersions)
-                        .emitTimeout(emitTimeout)
+                        .emitTimeout(it)
                         .customPostPath(customPostPath)
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
                         .build()
+                }
                 
             }
         }
@@ -284,15 +310,17 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         set(serverAnonymisation) {
             field = serverAnonymisation
             if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = OkHttpNetworkConnectionBuilder(uri, context)
-                    .method(httpMethod)
-                    .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
-                    .customPostPath(customPostPath)
-                    .client(client)
-                    .cookieJar(cookieJar)
-                    .serverAnonymisation(serverAnonymisation)
-                    .build()
+                networkConnection = emitTimeout?.let {
+                    OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(it)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .build()
+                }
             }
         }
 
@@ -319,15 +347,17 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                 endpoint = protocol + endpoint
             }
             uri = endpoint
-            networkConnection = OkHttpNetworkConnectionBuilder(endpoint, context)
+            networkConnection = emitTimeout?.let {
+                OkHttpNetworkConnectionBuilder(endpoint, context)
                     .method(httpMethod)
                     .tls(tlsVersions)
-                    .emitTimeout(emitTimeout)
+                    .emitTimeout(it)
                     .customPostPath(customPostPath)
                     .client(client)
                     .cookieJar(cookieJar)
                     .serverAnonymisation(serverAnonymisation)
                     .build()
+            }
         } else {
             isCustomNetworkConnection = true
         }
