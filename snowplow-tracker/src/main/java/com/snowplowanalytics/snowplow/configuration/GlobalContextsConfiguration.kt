@@ -1,5 +1,6 @@
 package com.snowplowanalytics.snowplow.configuration
 
+import com.snowplowanalytics.core.globalcontexts.GlobalContextPluginConfiguration
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsConfigurationInterface
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 
@@ -56,5 +57,14 @@ class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalCo
     // Copyable
     override fun copy(): GlobalContextsConfiguration {
         return GlobalContextsConfiguration(contextGenerators)
+    }
+
+    internal fun toPluginConfigurations(): List<GlobalContextPluginConfiguration> {
+        return contextGenerators.map {
+            GlobalContextPluginConfiguration(
+                identifier = it.key,
+                globalContext = it.value
+            )
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.snowplowanalytics.core.emitter.Emitter
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.statemachine.StateMachineInterface
 import com.snowplowanalytics.core.statemachine.StateManager
+import com.snowplowanalytics.core.statemachine.TrackerState
 import com.snowplowanalytics.core.tracker.*
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -16,13 +17,14 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import kotlin.collections.ArrayList
 
 @RunWith(AndroidJUnit4::class)
 class StateManagerTest {
     @Test
     fun testStateManager() {
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
         val eventInc = SelfDescribing("inc", object : HashMap<String, Any?>() {
             init {
                 put("value", 1)
@@ -86,7 +88,7 @@ class StateManagerTest {
     @Test
     fun testAddRemoveStateMachine() {
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
         stateManager.removeStateMachine("identifier")
         val eventInc = SelfDescribing("inc", object : HashMap<String, Any?>() {
             init {
@@ -333,8 +335,8 @@ class StateManagerTest {
     @Throws(InterruptedException::class)
     fun testAllowsMultipleStateMachines() {
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier1")
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier2")
+        stateManager.addOrReplaceStateMachine(MockStateMachine("identifier1"))
+        stateManager.addOrReplaceStateMachine(MockStateMachine("identifier2"))
         val eventInc = SelfDescribing("inc", object : HashMap<String, Any?>() {
             init {
                 put("value", 1)
@@ -350,8 +352,8 @@ class StateManagerTest {
     @Throws(InterruptedException::class)
     fun testDoesntDuplicateStateFromStateMachinesWithSameId() {
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
         val eventInc = SelfDescribing("inc", object : HashMap<String, Any?>() {
             init {
                 put("value", 1)
@@ -366,7 +368,7 @@ class StateManagerTest {
     @Test
     fun testReplacingStateMachineDoesntResetTrackerState() {
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
         stateManager.trackerStateForProcessedEvent(
             SelfDescribing(
                 "inc",
@@ -377,7 +379,7 @@ class StateManagerTest {
                 })
         )
         val state1 = stateManager.trackerState.getState("identifier")
-        stateManager.addOrReplaceStateMachine(MockStateMachine(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
         val state2 = stateManager.trackerState.getState("identifier")
         Assert.assertNotNull(state1)
         Assert.assertSame(state1, state2)
@@ -389,7 +391,7 @@ class StateManagerTest {
         class MockStateMachine2 : MockStateMachine()
 
         val stateManager = StateManager()
-        stateManager.addOrReplaceStateMachine(MockStateMachine1(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine1())
         stateManager.trackerStateForProcessedEvent(
             SelfDescribing(
                 "inc",
@@ -400,15 +402,37 @@ class StateManagerTest {
                 })
         )
         val state1 = stateManager.trackerState.getState("identifier")
-        stateManager.addOrReplaceStateMachine(MockStateMachine2(), "identifier")
+        stateManager.addOrReplaceStateMachine(MockStateMachine2())
         val state2 = stateManager.trackerState.getState("identifier")
         Assert.assertNotNull(state1)
         Assert.assertNotSame(state1, state2)
     }
+
+    @Test
+    fun testAfterTrackCallback() {
+        val stateManager = StateManager()
+        val stateMachine = MockStateMachine()
+        stateManager.addOrReplaceStateMachine(stateMachine)
+
+        stateManager.afterTrack(
+            TrackerEvent(
+                Structured("cat", "act"),
+                TrackerState()
+            )
+        )
+
+        Thread.sleep(100)
+        Assert.assertEquals(1, stateMachine.afterTrackEvents.size)
+        Assert.assertEquals("cat", stateMachine.afterTrackEvents.first().payload["se_ca"])
+    }
 } // Mock classes
 
 internal class MockState(var value: Int) : State
-internal open class MockStateMachine : StateMachineInterface {
+internal open class MockStateMachine(
+    override val identifier: String = "identifier"
+) : StateMachineInterface {
+    var afterTrackEvents: MutableList<InspectableEvent> = ArrayList()
+
     override val subscribedEventSchemasForTransitions: List<String>
         get() = LinkedList(listOf("inc", "dec"))
 
@@ -417,6 +441,9 @@ internal open class MockStateMachine : StateMachineInterface {
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
         get() = LinkedList(listOf("event"))
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
+        get() = Collections.singletonList("*")
 
     override fun transition(event: Event, state: State?): State? {
         val e = event as SelfDescribing
@@ -453,5 +480,9 @@ internal open class MockStateMachine : StateMachineInterface {
                 put("newParam", "value")
             }
         }
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+        afterTrackEvents.add(event)
     }
 }

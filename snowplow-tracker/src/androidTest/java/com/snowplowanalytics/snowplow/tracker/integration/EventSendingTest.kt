@@ -193,16 +193,17 @@ class EventSendingTest {
     }
 
     // Helpers
-    private fun getTracker(namespace: String?, uri: String?, method: HttpMethod?): Tracker {
-        createSessionSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, namespace!!)
+    private fun getTracker(namespace: String, uri: String, method: HttpMethod): Tracker {
+        val ns = namespace + Math.random().toString() // add random number to ensure different namespace on each run
+        createSessionSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, ns)
         val builder = { emitter: Emitter ->
             emitter.bufferOption = BufferOption.Single
-            emitter.httpMethod = method!!
+            emitter.httpMethod = method
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
         }
-        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri!!, builder)
+        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
         val subject = Subject(InstrumentationRegistry.getInstrumentation().targetContext, null)
         
         if (tracker != null) tracker!!.close()
@@ -217,7 +218,7 @@ class EventSendingTest {
         }
         tracker = Tracker(
             emitter,
-            namespace,
+            ns,
             "myAppId",
             InstrumentationRegistry.getInstrumentation().targetContext,
             trackerBuilder
@@ -227,10 +228,8 @@ class EventSendingTest {
     }
 
     @SuppressLint("DefaultLocale")
-    fun getMockServerURI(mockServer: MockWebServer?): String? {
-        return if (mockServer != null) {
-            String.format("%s:%d", mockServer.hostName, mockServer.port)
-        } else null
+    fun getMockServerURI(mockServer: MockWebServer): String {
+        return String.format("%s:%d", mockServer.hostName, mockServer.port)
     }
 
     @Throws(Exception::class)
@@ -304,7 +303,7 @@ class EventSendingTest {
             val query = JSONObject(getQueryMap(request.path!!.substring(3)))
             Assert.assertEquals("mob", query["p"])
             Assert.assertEquals("myAppId", query["aid"])
-            Assert.assertEquals("myNamespace", query["tna"])
+            Assert.assertTrue(query.getString("tna").startsWith("myNamespace"))
             Assert.assertEquals(BuildConfig.TRACKER_LABEL, query["tv"])
             Assert.assertEquals("English", query["lang"])
             Assert.assertTrue(query.has("dtm"))
@@ -339,7 +338,7 @@ class EventSendingTest {
                 val json = data.getJSONObject(i)
                 Assert.assertEquals("mob", json.getString("p"))
                 Assert.assertEquals("myAppId", json.getString("aid"))
-                Assert.assertEquals("myNamespacePost", json.getString("tna"))
+                Assert.assertTrue(json.getString("tna").startsWith("myNamespacePost"))
                 Assert.assertEquals(BuildConfig.TRACKER_LABEL, json.getString("tv"))
                 Assert.assertEquals("English", json.getString("lang"))
                 Assert.assertTrue(json.has("dtm"))

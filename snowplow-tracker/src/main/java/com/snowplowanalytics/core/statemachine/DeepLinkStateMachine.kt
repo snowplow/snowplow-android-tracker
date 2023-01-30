@@ -18,7 +18,7 @@ import com.snowplowanalytics.snowplow.event.DeepLinkReceived
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
-import java.util.*
+import kotlin.collections.ArrayList
 
 class DeepLinkStateMachine : StateMachineInterface {
     /*
@@ -33,6 +33,9 @@ class DeepLinkStateMachine : StateMachineInterface {
       - ReadyForOutput
       */
 
+    override val identifier: String
+        get() = ID
+
     override val subscribedEventSchemasForTransitions: List<String>
         get() = listOf(DeepLinkReceived.schema, TrackerConstants.SCHEMA_SCREEN_VIEW)
 
@@ -41,6 +44,9 @@ class DeepLinkStateMachine : StateMachineInterface {
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
         get() = ArrayList()
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
+        get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
         // - Init (DL) DeepLinkReceived
@@ -77,5 +83,13 @@ class DeepLinkStateMachine : StateMachineInterface {
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
         return null
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+    }
+
+    companion object {
+        val ID: String
+            get() = "DeepLinkContext"
     }
 }

@@ -12,6 +12,8 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.statemachine.StateMachineEvent
 import com.snowplowanalytics.core.statemachine.TrackerState
 import com.snowplowanalytics.core.statemachine.TrackerStateSnapshot
@@ -19,6 +21,7 @@ import com.snowplowanalytics.snowplow.event.AbstractPrimitive
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.event.TrackerError
+import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
 
@@ -68,5 +71,49 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
             }
         }
         return result
+    }
+
+    fun addContextEntity(entity: SelfDescribingJson) {
+        entities.add(entity)
+    }
+
+    fun wrapContextsToPayload(payload: Payload, base64Encoded: Boolean) {
+        if (entities.isEmpty()) {
+            return
+        }
+
+        val data: MutableList<Map<String, Any?>> = LinkedList()
+        for (entity in entities) {
+            data.add(entity.map)
+        }
+        val finalContext = SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data)
+        payload.addMap(
+            finalContext.map,
+            base64Encoded,
+            Parameters.CONTEXT_ENCODED,
+            Parameters.CONTEXT
+        )
+    }
+
+    fun wrapPropertiesToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        if (isPrimitive) {
+            toPayload.addMap(payload)
+        } else {
+            wrapSelfDescribingToPayload(toPayload, base64Encoded)
+        }
+    }
+
+    private fun wrapSelfDescribingToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        val schema = schema ?: return
+        val data = SelfDescribingJson(schema, payload)
+        val unstructuredEventPayload = HashMap<String?, Any?>()
+        unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
+        unstructuredEventPayload[Parameters.DATA] = data.map
+        toPayload.addMap(
+            unstructuredEventPayload,
+            base64Encoded,
+            Parameters.UNSTRUCTURED_ENCODED,
+            Parameters.UNSTRUCTURED
+        )
     }
 }

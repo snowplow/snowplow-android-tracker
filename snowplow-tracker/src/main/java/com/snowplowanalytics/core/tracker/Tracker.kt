@@ -33,9 +33,7 @@ import com.snowplowanalytics.core.utils.Util.getApplicationContext
 import com.snowplowanalytics.core.utils.Util.getGeoLocationContext
 import com.snowplowanalytics.snowplow.entity.DeepLink
 import com.snowplowanalytics.snowplow.event.*
-import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 import com.snowplowanalytics.snowplow.payload.Payload
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import com.snowplowanalytics.snowplow.tracker.*
 import com.snowplowanalytics.snowplow.util.Basis
@@ -269,9 +267,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         set(deepLinkContext) {
             field = deepLinkContext
             if (deepLinkContext) {
-                stateManager.addOrReplaceStateMachine(DeepLinkStateMachine(), "DeepLinkContext")
+                addOrReplaceStateMachine(DeepLinkStateMachine())
             } else {
-                stateManager.removeStateMachine("DeepLinkContext")
+                removeStateMachine(DeepLinkStateMachine.ID)
             }
         }
 
@@ -280,9 +278,9 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         set(screenContext) {
             field = screenContext
             if (screenContext) {
-                stateManager.addOrReplaceStateMachine(ScreenStateMachine(), "ScreenContext")
+                addOrReplaceStateMachine(ScreenStateMachine())
             } else {
-                stateManager.removeStateMachine("ScreenContext")
+                removeStateMachine(ScreenStateMachine.ID)
             }
         }
     
@@ -295,9 +293,6 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
                 Logger.delegate = delegate
             }
         }
-    
-    private val globalContextGenerators =
-        Collections.synchronizedMap(HashMap<String, GlobalContext>())
     
     private val receiveLifecycleNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
@@ -442,7 +437,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         if (lifecycleAutotracking) {
             initialize(context)
             // Initialize LifecycleStateMachine for lifecycle entities
-            stateManager.addOrReplaceStateMachine(LifecycleStateMachine(), "Lifecycle")
+            addOrReplaceStateMachine(LifecycleStateMachine())
         }
     }
 
@@ -481,74 +476,69 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         }
         val reportsOnDiagnostic = event !is TrackerError
         execute(reportsOnDiagnostic, TAG) {
-            transformEvent(trackerEvent)
             val payload = payloadWithEvent(trackerEvent)
             v(TAG, "Adding new payload to event storage: %s", payload)
             emitter.add(payload)
             event.endProcessing(this)
+            stateManager.afterTrack(trackerEvent)
         }
         return trackerEvent.eventId
     }
 
-    private fun transformEvent(event: TrackerEvent) {
+    private fun payloadWithEvent(event: TrackerEvent): Payload {
+        val payload = TrackerPayload()
+
+        // Payload properties
+        setApplicationInstallEventTimestamp(event)
+        addBasicPropertiesToPayload(payload, event)
+        addStateMachinePayloadValues(event)
+        event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
+
+        // Context entities
+        addBasicContexts(event)
+        addStateMachineEntities(event)
+        event.wrapContextsToPayload(payload, base64Encoded=base64Encoded)
+
+        // Workaround for campaign attribution
+        if (!event.isPrimitive) {
+            // TODO: To remove when Atomic table refactoring is finished
+            workaroundForCampaignAttributionEnrichment(payload, event)
+        }
+        return payload
+    }
+
+    private fun setApplicationInstallEventTimestamp(event: TrackerEvent) {
         // Application_install event needs the timestamp to the real installation event.
         if (event.schema != null && event.schema == TrackerConstants.SCHEMA_APPLICATION_INSTALL) {
             event.trueTimestamp?.let { event.timestamp = it }
             event.trueTimestamp = null
         }
+    }
+
+    private fun addStateMachinePayloadValues(event: TrackerEvent) {
         // Payload can be optionally updated with values based on internal state
         stateManager.addPayloadValuesToEvent(event)
     }
 
-    private fun payloadWithEvent(event: TrackerEvent): Payload {
-        val payload = TrackerPayload()
-        addBasicPropertiesToPayload(payload, event)
-        if (event.isPrimitive) {
-            addPrimitivePropertiesToPayload(payload, event)
-        } else {
-            addSelfDescribingPropertiesToPayload(payload, event)
-        }
-        val entities = event.entities
-        addBasicContextsToContexts(entities, event)
-        addGlobalContextsToContexts(entities, event)
-        addStateMachineEntitiesToContexts(entities, event)
-        wrapContextsToPayload(payload, entities)
-        if (!event.isPrimitive) {
-            // TODO: To remove when Atomic table refactoring is finished
-            workaroundForCampaignAttributionEnrichment(payload, event, entities)
-        }
-        return payload
-    }
-
     private fun addBasicPropertiesToPayload(payload: Payload, event: TrackerEvent) {
+        // Event ID
         payload.add(Parameters.EID, event.eventId.toString())
+        // Timestamps
         payload.add(Parameters.DEVICE_TIMESTAMP, event.timestamp.toString())
         event.trueTimestamp?.let { payload.add(Parameters.TRUE_TIMESTAMP, it.toString()) }
+        // Tracker info (version, namespace, app ID)
         payload.add(Parameters.APPID, appId)
         payload.add(Parameters.NAMESPACE, namespace)
         payload.add(Parameters.TRACKER_VERSION, trackerVersion)
+        // Subject
         subject?.let { payload.addMap(HashMap(it.getSubject(userAnonymisation))) }
+        // Platform
         payload.add(Parameters.PLATFORM, platform.value)
-    }
-
-    private fun addPrimitivePropertiesToPayload(payload: Payload, event: TrackerEvent) {
-        payload.add(Parameters.EVENT, event.name)
-        payload.addMap(event.payload)
-    }
-
-    private fun addSelfDescribingPropertiesToPayload(payload: Payload, event: TrackerEvent) {
-        payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED)
-        event.schema?.let {
-            val data = SelfDescribingJson(it, event.payload)
-            val unstructuredEventPayload = HashMap<String?, Any?>()
-            unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
-            unstructuredEventPayload[Parameters.DATA] = data.map
-            payload.addMap(
-                unstructuredEventPayload,
-                base64Encoded,
-                Parameters.UNSTRUCTURED_ENCODED,
-                Parameters.UNSTRUCTURED
-            )
+        // Event name
+        if (event.isPrimitive) {
+            payload.add(Parameters.EVENT, event.name)
+        } else {
+            payload.add(Parameters.EVENT, TrackerConstants.EVENT_UNSTRUCTURED)
         }
     }
 
@@ -561,18 +551,14 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
      This is a hack that should be removed once the atomic event table is dismissed and all the events
      will be SelfDescribing.
     */
-    private fun workaroundForCampaignAttributionEnrichment(
-        payload: Payload,
-        event: TrackerEvent,
-        contexts: List<SelfDescribingJson>
-    ) {
+    private fun workaroundForCampaignAttributionEnrichment(payload: Payload, event: TrackerEvent) {
         var url: String? = null
         var referrer: String? = null
         if (event.schema == DeepLinkReceived.schema) {
             url = event.payload[DeepLinkReceived.PARAM_URL] as? String?
             referrer = event.payload[DeepLinkReceived.PARAM_REFERRER] as? String?
         } else if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW) {
-            for (entity in contexts) {
+            for (entity in event.entities) {
                 if (entity is DeepLink) {
                     url = entity.url
                     referrer = entity.referrer
@@ -618,60 +604,27 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         }
     }
 
-    private fun addBasicContextsToContexts(
-        contexts: MutableList<SelfDescribingJson>,
-        event: TrackerEvent
-    ) {
+    private fun addBasicContexts(event: TrackerEvent) {
         if (applicationContext) {
-            getApplicationContext(context)?.let { contexts.add(it) }
+            getApplicationContext(context)?.let { event.addContextEntity(it) }
         }
         if (platformContextEnabled) {
-            platformContextManager.getMobileContext(userAnonymisation)?.let { contexts.add(it) }
+            platformContextManager.getMobileContext(userAnonymisation)?.let { event.addContextEntity(it) }
         }
         if (event.isService) {
             return
         }
         if (geoLocationContext) {
-            getGeoLocationContext(context)?.let { contexts.add(it) }
+            getGeoLocationContext(context)?.let { event.addContextEntity(it) }
         }
-        gdprContext?.let { contexts.add(it.context) }
+        gdprContext?.let { event.addContextEntity(it.context) }
     }
 
-    private fun addGlobalContextsToContexts(
-        contexts: MutableList<SelfDescribingJson>,
-        event: StateMachineEvent
-    ) {
-        synchronized(globalContextGenerators) {
-            for (generator in globalContextGenerators.values) {
-                contexts.addAll(generator.generateContexts(event))
-            }
-        }
-    }
-
-    private fun addStateMachineEntitiesToContexts(
-        contexts: MutableList<SelfDescribingJson>,
-        event: StateMachineEvent
-    ) {
+    private fun addStateMachineEntities(event: TrackerEvent) {
         val stateManagerEntities = stateManager.entitiesForProcessedEvent(event)
-        contexts.addAll(stateManagerEntities)
-    }
-
-    private fun wrapContextsToPayload(payload: Payload, contexts: List<SelfDescribingJson>) {
-        if (contexts.isEmpty()) {
-            return
+        for (entity in stateManagerEntities) {
+            event.addContextEntity(entity)
         }
-        
-        val data: MutableList<Map<String, Any?>> = LinkedList()
-        for (context in contexts) {
-            data.add(context.map)
-        }
-        val finalContext = SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data)
-        payload.addMap(
-            finalContext.map,
-            base64Encoded,
-            Parameters.CONTEXT_ENCODED,
-            Parameters.CONTEXT
-        )
     }
 
     // --- Controls
@@ -753,31 +706,15 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         gdprContext = null
     }
 
-    // --- Global contexts
-    
-    fun setGlobalContextGenerators(globalContexts: Map<String, GlobalContext>) {
-        synchronized(globalContextGenerators) {
-            globalContextGenerators.clear()
-            globalContextGenerators.putAll(globalContexts)
-        }
+    // --- State machines
+
+    fun addOrReplaceStateMachine(stateMachine: StateMachineInterface) {
+        stateManager.addOrReplaceStateMachine(stateMachine)
     }
 
-    fun addGlobalContext(generator: GlobalContext, tag: String): Boolean {
-        synchronized(globalContextGenerators) {
-            if (globalContextGenerators.containsKey(tag)) {
-                return false
-            }
-            globalContextGenerators[tag] = generator
-            return true
-        }
+    fun removeStateMachine(identifier: String) {
+        stateManager.removeStateMachine(identifier)
     }
-
-    fun removeGlobalContext(tag: String): GlobalContext? {
-        synchronized(globalContextGenerators) { return globalContextGenerators.remove(tag) }
-    }
-
-    val globalContextTags: Set<String>
-        get() = globalContextGenerators.keys
 
     companion object {
         private val TAG = Tracker::class.java.simpleName

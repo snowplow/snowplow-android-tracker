@@ -56,6 +56,12 @@ interface TrackerController : TrackerConfigurationInterface {
      * @apiNote Don't retain the reference. It may change on tracker reconfiguration.
      */
     val globalContexts: GlobalContextsController
+
+    /**
+     * Controller for managing tracker plugins
+     * @apiNote Don't retain the reference. It may change on tracker reconfiguration.
+     */
+    val plugins: PluginsController
     
     // Methods
     /**

@@ -32,6 +32,8 @@ class TrackerControllerImpl  // Constructors
             val sessionController = sessionController
             return if (sessionController.isEnabled) sessionController else null
         }
+    override val plugins: PluginsController
+        get() = serviceProvider.pluginsController
 
     // Control methods
     override fun pause() {
