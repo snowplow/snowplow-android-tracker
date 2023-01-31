@@ -16,14 +16,14 @@ project.ext {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 31
     buildToolsVersion "30.0.2"
 
     useLibrary 'android.test.base'
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 32
+        targetSdkVersion 31
         versionCode 1
         versionName "$project.version"
 
