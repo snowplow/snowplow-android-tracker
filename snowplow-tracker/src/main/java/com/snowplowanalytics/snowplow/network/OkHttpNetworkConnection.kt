@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.emitter.TLSArguments
 import com.snowplowanalytics.core.emitter.TLSVersion
@@ -38,6 +39,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
     private val serverAnonymisation: Boolean
     private var client: OkHttpClient? = null
     private val uriBuilder: Uri.Builder
+    override val uri: Uri
+        get() = uriBuilder.clearQuery().build()
     
     /**
      * Builder for the OkHttpNetworkConnection.
@@ -47,13 +50,13 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         val uri: String,
         val context: Context
     ) {
-        var httpMethod = HttpMethod.POST // Optional
-        var tlsVersions = EnumSet.of(TLSVersion.TLSv1_2) // Optional
-        var emitTimeout = 5 // Optional
+        var httpMethod = EmitterDefaults.httpMethod // Optional
+        var tlsVersions: EnumSet<TLSVersion> = EmitterDefaults.tlsVersions // Optional
+        var emitTimeout = EmitterDefaults.emitTimeout // Optional
         var client: OkHttpClient? = null // Optional
         var cookieJar: CookieJar? = null // Optional
         var customPostPath: String? = null //Optional
-        var serverAnonymisation = false // Optional
+        var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
 
         /**
          * @param httpMethod The method by which requests are emitted
@@ -65,6 +68,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
          * @param version the TLS version allowed for requests
          * @return itself
          */
@@ -74,6 +79,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
@@ -124,6 +131,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * This configuration option is not published in the NetworkConfiguration class.
+         * Instead, configure it via EmitterConfiguration.
          * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
          * @return itself
          */
@@ -192,9 +201,6 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
     }
 
-    override val uri: Uri
-        get() = uriBuilder.clearQuery().build()
-
     override fun sendRequests(requests: List<Request>): List<RequestResult> {
         val futures: MutableList<Future<*>> = ArrayList()
         val results: MutableList<RequestResult> = ArrayList()
@@ -213,10 +219,11 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         // Get results of futures
         // - Wait up to emitTimeout seconds for the request
         for (i in futures.indices) {
-            var code = -1
+            var code: Int = -1
             
             try {
-                code = futures[i][emitTimeout.toLong(), TimeUnit.SECONDS] as Int
+                val tempCode = futures[i][emitTimeout.toLong(), TimeUnit.SECONDS] as? Int
+                tempCode?.let { code = it }
             } catch (ie: InterruptedException) {
                 Logger.e(TAG, "Request Future was interrupted: %s", ie.message)
             } catch (ee: ExecutionException) {
@@ -251,9 +258,9 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         uriBuilder.clearQuery()
 
         // Build the request query
-        val hashMap = request.payload.map as HashMap<*, *>
-        for (key in hashMap.keys as Iterable<String>) {
-            val value = hashMap[key] as String?
+        val hashMap = request.payload.map
+        for (key in hashMap.keys) {
+            val value = hashMap[key] as? String?
             uriBuilder.appendQueryParameter(key, value)
         }
 
@@ -311,10 +318,12 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         return try {
             Logger.v(TAG, "Sending request: %s", request)
             TrafficStats.setThreadStatsTag(TRAFFIC_STATS_TAG)
-            val resp = client!!.newCall(request).execute()
-            val code = resp.code
-            resp.body!!.close()
-            code
+            val resp = client?.newCall(request)?.execute()
+            resp?.let {
+                resp.body?.close()
+                return resp.code
+            }
+            -1
         } catch (e: IOException) {
             Logger.e(TAG, "Request sending failed: %s", e.toString())
             -1

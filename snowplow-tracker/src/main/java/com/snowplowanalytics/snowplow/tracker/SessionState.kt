@@ -44,9 +44,9 @@ class SessionState(
     companion object {
         @JvmStatic
         fun build(storedState: Map<String?, Any?>): SessionState? {
-            var value: Any? = storedState[Parameters.SESSION_FIRST_ID] as? String
-                ?: return null
-            val firstEventId = value as String
+            var value: Any? = storedState[Parameters.SESSION_FIRST_ID]
+            if (value !is String) return null
+            val firstEventId = value
             
             value = storedState[Parameters.SESSION_FIRST_TIMESTAMP]
             if (value !is String) return null
@@ -60,7 +60,7 @@ class SessionState(
             if (value !is String) {
                 value = null
             }
-            val previousSessionId = value as String?
+            val previousSessionId = value as? String?
             
             value = storedState[Parameters.SESSION_INDEX]
             if (value !is Int) return null

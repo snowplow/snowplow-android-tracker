@@ -45,30 +45,26 @@ class TrackerPayload : Payload {
         map[key] = value
     }
 
-    override fun addMap(map: Map<String, Any>?) {
+    override fun addMap(map: Map<String, Any?>) {
         Logger.v(TAG, "Adding new map: %s", map)
-        if (map != null) {
-            for ((key, value) in map) {
-                add(key, value)
-            }
+        for ((key, value) in map) {
+            add(key, value)
         }
     }
 
     override fun addMap(
-        map: Map<*, *>?,
+        map: Map<*, *>,
         base64_encoded: Boolean,
-        type_encoded: String?,
-        type_no_encoded: String?
+        type_encoded: String,
+        type_no_encoded: String
     ) {
-        if (map != null) {
-            val mapString = JSONObject(map).toString()
-            Logger.v(TAG, "Adding new map: %s", map)
+        val mapString = JSONObject(map).toString()
+        Logger.v(TAG, "Adding new map: %s", map)
 
-            if (base64_encoded) { // base64 encoded data
-                add(type_encoded!!, Util.base64Encode(mapString))
-            } else { // add it as a child node
-                add(type_no_encoded!!, mapString)
-            }
+        if (base64_encoded) { // base64 encoded data
+            add(type_encoded, Util.base64Encode(mapString))
+        } else { // add it as a child node
+            add(type_no_encoded, mapString)
         }
     }
 

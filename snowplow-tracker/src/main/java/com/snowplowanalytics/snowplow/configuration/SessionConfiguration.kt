@@ -30,67 +30,23 @@ open class SessionConfiguration
      * session id is updated while the app is in the
      * foreground.
      */
-    @JvmField
-    var foregroundTimeout: TimeMeasure,
+    override var foregroundTimeout: TimeMeasure,
     
     /**
      * The amount of time that can elapse before the
      * session id is updated while the app is in the
      * background.
      */
-    @JvmField
-    var backgroundTimeout: TimeMeasure
+    override var backgroundTimeout: TimeMeasure
 ) : SessionConfigurationInterface, Configuration {
     
     /**
      * The callback called everytime the session is updated.
      */
-    @JvmField
-    var onSessionUpdate: Consumer<SessionState>? = null
+    override var onSessionUpdate: Consumer<SessionState>? = null
     
-    // Getters and Setters
-    /**
-     * @see .foregroundTimeout
-     */
-    override fun getForegroundTimeout(): TimeMeasure {
-        return foregroundTimeout
-    }
-
-    /**
-     * @see .foregroundTimeout
-     */
-    override fun setForegroundTimeout(foregroundTimeout: TimeMeasure) {
-        this.foregroundTimeout = foregroundTimeout
-    }
-
-    /**
-     * @see .backgroundTimeout
-     */
-    override fun getBackgroundTimeout(): TimeMeasure {
-        return backgroundTimeout
-    }
-
-    /**
-     * @see .backgroundTimeout
-     */
-    override fun setBackgroundTimeout(backgroundTimeout: TimeMeasure) {
-        this.backgroundTimeout = backgroundTimeout
-    }
-
-    /**
-     * @see .onSessionUpdate
-     */
-    override fun getOnSessionUpdate(): Consumer<SessionState>? {
-        return onSessionUpdate
-    }
-
-    /**
-     * @see .onSessionUpdate
-     */
-    override fun setOnSessionUpdate(onSessionUpdate: Consumer<SessionState>?) {
-        this.onSessionUpdate = onSessionUpdate
-    }
     // Builders
+    
     /**
      * @see .onSessionUpdate
      */

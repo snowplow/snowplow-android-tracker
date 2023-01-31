@@ -25,67 +25,51 @@ class MessageNotification(
 ) : AbstractSelfDescribing() {
     
     /** The action associated with the notification.  */
-    @JvmField
     var action: String? = null
 
     /** Attachments added to the notification (they can be part of the data object).  */
-    @JvmField
     var attachments: List<MessageNotificationAttachment>? = null
 
     /** Variable string values to be used in place of the format specifiers in bodyLocArgs to use to localize the body text to the user's current localization.  */
-    @JvmField
     var bodyLocArgs: List<String>? = null
 
     /** The key to the body string in the app's string resources to use to localize the body text to the user's current localization.  */
-    @JvmField
     var bodyLocKey: String? = null
 
     /** The category associated to the notification.  */
-    @JvmField
     var category: String? = null
 
     /** The application is notified of the delivery of the notification if it's in the foreground or background, the app will be woken up (iOS only).  */
-    @JvmField
     var contentAvailable: Boolean? = null
 
     /** The group which this notification is part of.  */
-    @JvmField
     var group: String? = null
 
     /** The icon associated to the notification (Android only).  */
-    @JvmField
     var icon: String? = null
 
     /** The number of items this notification represents.  */
-    @JvmField
     var notificationCount: Int? = null
 
     /** The time when the event of the notification occurred.  */
-    @JvmField
     var notificationTimestamp: String? = null
 
     /** The sound played when the device receives the notification.  */
-    @JvmField
     var sound: String? = null
 
     /** The notification's subtitle. (iOS only)  */
-    @JvmField
     var subtitle: String? = null
 
     /** An identifier similar to 'group' but usable for different purposes (Android only).  */
-    @JvmField
     var tag: String? = null
 
     /** An identifier similar to 'group' but usable for different purposes (iOS only).  */
-    @JvmField
     var threadIdentifier: String? = null
 
     /** Variable string values to be used in place of the format specifiers in titleLocArgs to use to localize the title text to the user's current localization.  */
-    @JvmField
     var titleLocArgs: List<String>? = null
 
     /** The key to the title string in the app's string resources to use to localize the title text to the user's current localization.  */
-    @JvmField
     var titleLocKey: String? = null
 
     override val schema: String
@@ -197,8 +181,8 @@ class MessageNotification(
             payload[PARAM_BODY] = body
             payload[PARAM_TRIGGER] = trigger.name
             action?.let { payload[PARAM_ACTION] = it }
-            if (attachments != null && attachments!!.isNotEmpty()) {
-                payload[PARAM_MESSAGENOTIFICATIONATTACHMENTS] = attachments
+            attachments?.let { 
+                if (it.isNotEmpty()) payload[PARAM_MESSAGENOTIFICATIONATTACHMENTS] = it
             }
             bodyLocArgs?.let { payload[PARAM_BODYLOCARGS] = it }
             bodyLocKey?.let { payload[PARAM_BODYLOCKEY] = it }

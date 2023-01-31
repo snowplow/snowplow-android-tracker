@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 /** A foreground transition event.  */
 class Foreground : AbstractSelfDescribing() {
     /** Index indicating the current transition.  */
-    @JvmField
     var foregroundIndex: Int? = null
 
     override val schema: String

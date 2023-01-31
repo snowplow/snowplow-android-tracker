@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
@@ -21,11 +20,10 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  */
 class SelfDescribing : AbstractSelfDescribing {
     /**
-     * The properties of the event. Has two field:
+     * The properties of the event. Has two fields:
      * * a "data" field containing the event properties,
      * * a "schema" field identifying the schema against which the data is validated.
      */
-    @JvmField
     val eventData: SelfDescribingJson
     
     // Tracker methods

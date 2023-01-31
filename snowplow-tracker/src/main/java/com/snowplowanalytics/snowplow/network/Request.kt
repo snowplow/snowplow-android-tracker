@@ -23,13 +23,9 @@ import com.snowplowanalytics.snowplow.payload.TrackerPayload
  * to the collector.
  */
 class Request {
-    @JvmField
     val payload: Payload
-    @JvmField
     val emitterEventIds: List<Long>
-    @JvmField
     val oversize: Boolean
-    @JvmField
     val customUserAgent: String?
     
     /**
@@ -62,7 +58,7 @@ class Request {
         }
         payload = TrackerPayload()
         val payloadBundle = SelfDescribingJson(TrackerConstants.SCHEMA_PAYLOAD_DATA, payloadData)
-        payload.addMap(payloadBundle.map as Map<String, Any>)
+        (payloadBundle.map as? Map<String, Any>)?.let { payload.addMap(it) }
         this.emitterEventIds = emitterEventIds
         customUserAgent = tempUserAgent
         oversize = false
@@ -75,7 +71,7 @@ class Request {
      * @return User-Agent string from subject settings or the default one.
      */
     private fun getUserAgent(payload: Payload): String? {
-        val hashMap = payload.map as HashMap<*, *>
-        return hashMap[Parameters.USERAGENT] as String?
+        val hashMap = payload.map as? HashMap<*, *>
+        return hashMap?.let { it[Parameters.USERAGENT] as? String? }
     }
 }

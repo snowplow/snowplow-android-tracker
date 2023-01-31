@@ -63,11 +63,11 @@ object Snowplow {
     fun setup(
         context: Context,
         remoteConfiguration: RemoteConfiguration,
-        defaultBundles: List<ConfigurationBundle?>?,
+        defaultBundles: List<ConfigurationBundle>?,
         onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
     ) {
         configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles)
-        configurationProvider!!.retrieveConfiguration(
+        configurationProvider?.retrieveConfiguration(
             context,
             false
         ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
@@ -75,7 +75,7 @@ object Snowplow {
             val configurationState = fetchedConfigurationPair.second
             val bundles = fetchedConfigurationBundle.configurationBundle
             val namespaces = createTracker(context, bundles)
-            onSuccess?.accept(Pair(namespaces, configurationState))
+            onSuccess.accept(Pair(namespaces, configurationState))
         }
     }
 
@@ -103,9 +103,7 @@ object Snowplow {
      */
     @JvmStatic
     fun refresh(context: Context, onSuccess: Consumer<Pair<List<String>, ConfigurationState>?>?) {
-        if (configurationProvider == null) return
-        
-        configurationProvider!!.retrieveConfiguration(
+        configurationProvider?.let { it.retrieveConfiguration(
             context,
             true
         ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
@@ -114,7 +112,7 @@ object Snowplow {
             val bundles = fetchedConfigurationBundle.configurationBundle
             val namespaces = createTracker(context, bundles)
             onSuccess?.accept(Pair(namespaces, configurationState))
-        }
+        } }
     }
     
     // Standard configuration
@@ -200,7 +198,7 @@ object Snowplow {
                 ServiceProvider(context, namespace, network, listOf(*configurations))
             registerInstance(serviceProvider)
         }
-        return serviceProvider.orMakeTrackerController
+        return serviceProvider.getOrMakeTrackerController()
     }
 
     /**
@@ -212,7 +210,7 @@ object Snowplow {
     @JvmStatic
     val defaultTracker: TrackerController?
         get() {
-            return defaultServiceProvider?.orMakeTrackerController
+            return defaultServiceProvider?.getOrMakeTrackerController()
         }
 
     /**
@@ -225,7 +223,7 @@ object Snowplow {
     @Synchronized
     fun getTracker(namespace: String): TrackerController? {
         val serviceProvider = serviceProviderInstances[namespace] ?: return null
-        return serviceProvider.orMakeTrackerController
+        return serviceProvider.getOrMakeTrackerController()
     }
 
     /**
@@ -307,7 +305,8 @@ object Snowplow {
     }
 
     // Private methods
-    
+
+    @JvmStatic
     @Synchronized
     private fun createTracker(context: Context, bundles: List<ConfigurationBundle>): List<String> {
         val namespaces: MutableList<String> = ArrayList()
@@ -319,13 +318,14 @@ object Snowplow {
             } else {
                 val list = bundle.configurations
                 val array = list.toTypedArray()
-                createTracker(context, bundle.namespace, bundle.networkConfiguration!!, *array)
+                bundle.networkConfiguration?.let { createTracker(context, bundle.namespace, it, *array) }
                 namespaces.add(bundle.namespace)
             }
         }
         return namespaces
     }
 
+    @JvmStatic
     @Synchronized
     private fun registerInstance(serviceProvider: ServiceProvider): Boolean {
         val namespace = serviceProvider.namespace

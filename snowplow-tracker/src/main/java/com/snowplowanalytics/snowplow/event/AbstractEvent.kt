@@ -25,7 +25,6 @@ import java.util.*
  */
 abstract class AbstractEvent : Event {
     /** List of custom contexts associated with the event.  */
-    @JvmField
     val customContexts: MutableList<SelfDescribingJson> = LinkedList()
     
     /**

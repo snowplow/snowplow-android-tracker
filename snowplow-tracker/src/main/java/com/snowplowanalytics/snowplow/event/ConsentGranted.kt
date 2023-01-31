@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Tracker
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
 
@@ -28,36 +27,31 @@ class ConsentGranted(expiry: String, documentId: String, documentVersion: String
     AbstractSelfDescribing() {
     
     /** Expiration of the consent.  */
-    @JvmField
     val expiry: String
 
     /** Identifier of the first document.  */
-    @JvmField
     val documentId: String
 
     /** Version of the first document.  */
-    @JvmField
     val documentVersion: String
 
     /** Name of the first document.  */
-    @JvmField
     var documentName: String? = null
 
     /** Description of the first document.  */
-    @JvmField
     var documentDescription: String? = null
 
     /** Other attached documents.  */
-    @JvmField
     val consentDocuments: MutableList<ConsentDocument> = LinkedList()
 
     /**
      * Creates a consent granted event with a first document.
      */
     init {
-        Preconditions.checkArgument(expiry.isNotEmpty(), "Expiry cannot be empty")
-        Preconditions.checkArgument(documentId.isNotEmpty(), "Document ID cannot be empty")
-        Preconditions.checkArgument(documentVersion.isNotEmpty(), "Document version cannot be empty")
+        require(expiry.isNotEmpty()) { "Expiry cannot be empty" }
+        require(documentId.isNotEmpty()) { "Document ID cannot be empty" }
+        require(documentVersion.isNotEmpty()) { "Document version cannot be empty" }
+        
         this.expiry = expiry
         this.documentId = documentId
         this.documentVersion = documentVersion

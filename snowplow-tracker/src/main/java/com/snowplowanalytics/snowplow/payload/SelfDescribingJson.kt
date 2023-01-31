@@ -13,7 +13,6 @@
 package com.snowplowanalytics.snowplow.payload
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.core.utils.Preconditions
 import com.snowplowanalytics.core.utils.Util
 import org.json.JSONObject
 
@@ -22,7 +21,7 @@ import org.json.JSONObject
  * both the Schema and Data.
  */
 open class SelfDescribingJson {
-    private val payload = HashMap<String?, Any?>()
+    private val payload = HashMap<String, Any?>()
     
     /**
      * Builds a SelfDescribingJson object
@@ -77,7 +76,7 @@ open class SelfDescribingJson {
      * @return itself if it passes precondition checks
      */
     fun setSchema(schema: String): SelfDescribingJson {
-        Preconditions.checkArgument(schema.isNotEmpty(), "schema cannot be empty.")
+        require(schema.isNotEmpty()) { "schema cannot be empty" }
         
         payload[Parameters.SCHEMA] = schema
         return this
@@ -119,7 +118,7 @@ open class SelfDescribingJson {
         return this
     }
 
-    val map: Map<String?, Any?>
+    val map: Map<String, Any?>
         get() = payload
 
     override fun toString(): String {

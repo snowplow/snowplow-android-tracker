@@ -18,53 +18,23 @@ open class GdprConfiguration
     /**
      * Basis for processing.
      */
-    @JvmField
-    val basisForProcessing: Basis,
+    override val basisForProcessing: Basis,
+    
     /**
      * ID of a GDPR basis document.
      */
-    @JvmField
-    val documentId: String?,
+    override val documentId: String?,
+    
     /**
      * Version of the document.
      */
-    @JvmField
-    val documentVersion: String?,
+    override val documentVersion: String?,
+    
     /**
      * Description of the document.
      */
-    @JvmField
-    val documentDescription: String?
+    override val documentDescription: String?
 ) : Configuration, GdprConfigurationInterface {
-
-    // Getters
-    /**
-     * Basis for processing.
-     */
-    override fun getBasisForProcessing(): Basis {
-        return basisForProcessing
-    }
-
-    /**
-     * ID of a GDPR basis document.
-     */
-    override fun getDocumentId(): String? {
-        return documentId
-    }
-
-    /**
-     * Version of the document.
-     */
-    override fun getDocumentVersion(): String? {
-        return documentVersion
-    }
-
-    /**
-     * Description of the document.
-     */
-    override fun getDocumentDescription(): String? {
-        return documentDescription
-    }
 
     // Copyable
     override fun copy(): GdprConfiguration {

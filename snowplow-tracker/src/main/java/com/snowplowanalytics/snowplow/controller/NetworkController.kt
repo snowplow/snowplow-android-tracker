@@ -22,5 +22,5 @@ interface NetworkController {
     /**
      * The timeout set for the requests to the collector.
      */
-    var timeout: Int
+    var timeout: Int?
 }

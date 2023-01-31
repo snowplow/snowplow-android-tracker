@@ -49,7 +49,7 @@ class CollectorCookieJar(context: Context) : CookieJar {
     private fun loadFromSharedPreferences() {
         val cookiesToRemove: MutableList<String> = ArrayList()
         for ((key, value) in sharedPreferences.all) {
-            val serializedCookie = value as String? ?: continue
+            val serializedCookie = value as? String? ?: continue
             try {
                 val cookie = CollectorCookie(serializedCookie)
                 cookies.add(cookie)

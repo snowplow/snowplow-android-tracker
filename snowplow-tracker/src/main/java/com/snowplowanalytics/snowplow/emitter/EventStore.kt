@@ -37,7 +37,7 @@ interface EventStore {
      * @param ids the events' identifiers in the store.
      * @return a boolean of success to remove.
      */
-    fun removeEvents(ids: List<Long?>): Boolean
+    fun removeEvents(ids: MutableList<Long?>): Boolean
 
     /**
      * Empties the store of all the events.
@@ -49,7 +49,7 @@ interface EventStore {
      * Returns amount of events currently in the store.
      * @return the count of events in the store.
      */
-    val size: Long
+    fun size(): Long
 
     /**
      * Returns a list of EmittableEvent objects which

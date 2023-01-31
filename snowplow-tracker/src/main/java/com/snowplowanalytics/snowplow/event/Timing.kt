@@ -14,22 +14,18 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /** A timing event.  */
 class Timing(category: String, variable: String, timing: Int) : AbstractSelfDescribing() {
-    @JvmField
     val category: String
-    @JvmField
     val variable: String
-    @JvmField
     val timing: Int
-    @JvmField
     var label: String? = null
 
     init {
-        Preconditions.checkArgument(category.isNotEmpty(), "category cannot be empty")
-        Preconditions.checkArgument(variable.isNotEmpty(), "variable cannot be empty")
+        require(category.isNotEmpty()) { "category cannot be empty" }
+        require(variable.isNotEmpty()) { "variable cannot be empty" }
+        
         this.category = category
         this.variable = variable
         this.timing = timing
@@ -50,11 +46,10 @@ class Timing(category: String, variable: String, timing: Int) : AbstractSelfDesc
             payload[Parameters.UT_CATEGORY] = this.category
             payload[Parameters.UT_VARIABLE] = variable
             payload[Parameters.UT_TIMING] = timing
-            if (label != null && label!!.isNotEmpty()) {
-                payload[Parameters.UT_LABEL] = label
-            }
+            label?.let { if (it.isNotEmpty()) payload[Parameters.UT_LABEL] = it }
             return payload
         }
+    
     override val schema: String
         get() = TrackerConstants.SCHEMA_USER_TIMINGS
 }

@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.Preconditions
 
 /**
  * A pageview event.
@@ -32,7 +31,8 @@ class PageView(pageUrl: String) : AbstractPrimitive() {
     private var referrer: String? = null
     
     init {
-        Preconditions.checkArgument(pageUrl.isNotEmpty(), "pageUrl cannot be empty")
+        require(pageUrl.isNotEmpty()) { "pageUrl cannot be empty" }
+        
         this.pageUrl = pageUrl
     }
     

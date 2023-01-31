@@ -4,16 +4,12 @@ import android.content.Context
 import org.json.JSONObject
 
 class ConfigurationBundle @JvmOverloads constructor(
-    @JvmField val namespace: String,
+    val namespace: String,
     networkConfiguration: NetworkConfiguration? = null
 ) : Configuration {
-    @JvmField
     var networkConfiguration: NetworkConfiguration? = null
-    @JvmField
     var trackerConfiguration: TrackerConfiguration? = null
-    @JvmField
     var subjectConfiguration: SubjectConfiguration? = null
-    @JvmField
     var sessionConfiguration: SessionConfiguration? = null
 
     init {
