@@ -20,9 +20,9 @@ class PluginsControllerImpl
     (serviceProvider: ServiceProvider) : Controller(serviceProvider), PluginsController {
 
     override val identifiers: List<String>
-    get() {
-        return serviceProvider.pluginConfigurations.map { it.identifier }
-    }
+        get() {
+            return serviceProvider.pluginConfigurations.map { it.identifier }
+        }
 
     override fun addPlugin(plugin: PluginConfigurationInterface) {
         serviceProvider.addPlugin(plugin)

@@ -47,7 +47,7 @@ class PluginStateMachine(
         return null
     }
 
-    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
+    override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson> {
         return entitiesConfiguration?.closure?.apply(event) ?: emptyList()
     }
 

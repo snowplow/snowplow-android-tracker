@@ -77,7 +77,7 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
         entities.add(entity)
     }
 
-    fun wrapContextsToPayload(payload: Payload, base64Encoded: Boolean) {
+    fun wrapEntitiesToPayload(payload: Payload, base64Encoded: Boolean) {
         if (entities.isEmpty()) {
             return
         }

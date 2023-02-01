@@ -497,7 +497,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         // Context entities
         addBasicContexts(event)
         addStateMachineEntities(event)
-        event.wrapContextsToPayload(payload, base64Encoded=base64Encoded)
+        event.wrapEntitiesToPayload(payload, base64Encoded=base64Encoded)
 
         // Workaround for campaign attribution
         if (!event.isPrimitive) {
