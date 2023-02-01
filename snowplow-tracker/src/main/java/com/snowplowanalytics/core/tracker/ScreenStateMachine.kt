@@ -2,6 +2,8 @@ package com.snowplowanalytics.core.tracker
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.statemachine.State
+import com.snowplowanalytics.core.statemachine.StateMachineInterface
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson

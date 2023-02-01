@@ -1,4 +1,4 @@
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 interface TrackerStateSnapshot {
     fun getState(stateIdentifier: String): State?

@@ -143,7 +143,7 @@ class TrackerWebViewInterface {
         if (context != null) {
             val contextEntities = parseContext(context)
             if (contextEntities.isNotEmpty()) {
-                event.contexts(contextEntities)
+                event.entities(contextEntities)
             }
         }
         if (trackers == null || trackers.isEmpty()) {

@@ -281,14 +281,14 @@ class EventSendingTest {
     }
 
     @Throws(JSONException::class)
-    fun getSessionData(contexts: JSONArray): JSONObject? {
-        for (i in 0 until contexts.length()) {
+    fun getSessionData(entities: JSONArray): JSONObject? {
+        for (i in 0 until entities.length()) {
             val sessionSchema =
                 "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2"
-            val context = contexts[i] as JSONObject
-            val schema = context["schema"] as String
+            val entity = entities[i] as JSONObject
+            val schema = entity["schema"] as String
             if (schema == sessionSchema) {
-                return context["data"] as JSONObject
+                return entity["data"] as JSONObject
             }
         }
         return null
@@ -460,7 +460,7 @@ class EventSendingTest {
     fun trackPageView(tracker: Tracker) {
         tracker.track(PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"))
         tracker.track(
-            PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(
+            PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").entities(
                 customContext
             )
         )
@@ -472,7 +472,7 @@ class EventSendingTest {
         )
         tracker.track(
             Structured("category", "action").label("label").property("property").value(0.00)
-                .contexts(
+                .entities(
                     customContext
                 )
         )
@@ -480,13 +480,13 @@ class EventSendingTest {
 
     private fun trackScreenView(tracker: Tracker) {
         tracker.track(ScreenView("screenName"))
-        tracker.track(ScreenView("screenName").contexts(customContext))
+        tracker.track(ScreenView("screenName").entities(customContext))
     }
 
     private fun trackTimings(tracker: Tracker) {
         tracker.track(Timing("category", "variable", 1).label("label"))
         tracker.track(
-            Timing("category", "variable", 1).label("label").contexts(
+            Timing("category", "variable", 1).label("label").entities(
                 customContext
             )
         )
@@ -501,7 +501,7 @@ class EventSendingTest {
         )
         tracker.track(SelfDescribing(test))
         tracker.track(
-            SelfDescribing(test).contexts(
+            SelfDescribing(test).entities(
                 customContext
             )
         )
@@ -519,7 +519,7 @@ class EventSendingTest {
         tracker.track(
             EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50)
                 .shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD")
-                .contexts(
+                .entities(
                     customContext
                 )
         )
@@ -543,7 +543,7 @@ class EventSendingTest {
         )
         tracker.track(
             ConsentGranted("gexpiry", "gid", "dversion").documentDescription("gdesc")
-                .documentName("dname").documents(documents).contexts(
+                .documentName("dname").documents(documents).entities(
                 customContext
             )
         )
@@ -567,7 +567,7 @@ class EventSendingTest {
         )
         tracker.track(
             ConsentWithdrawn(false, "gid", "dversion").documentDescription("gdesc")
-                .documentName("dname").documents(documents).contexts(
+                .documentName("dname").documents(documents).entities(
                 customContext
             )
         )

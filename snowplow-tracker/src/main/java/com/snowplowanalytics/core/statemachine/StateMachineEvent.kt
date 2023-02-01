@@ -10,28 +10,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker
+package com.snowplowanalytics.core.statemachine
 
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
 /**
  * The inspectable properties of the event used to generate context entities.
  */
-interface InspectableEvent {
+interface StateMachineEvent : InspectableEvent {
     /**
-     * The schema of the event
+     * The tracker state at the time the event was sent.
      */
-    val schema: String?
+    val state: TrackerStateSnapshot
+
     /**
-     * The name of the event
+     * Add payload values to the event.
+     * @param payload Map of values to add to the event payload
+     * @return Whether or not the values have been successfully added to the event payload
      */
-    val name: String?
-    /**
-     * The payload of the event
-     */
-    val payload: Map<String, Any>
-    /**
-     * The list of context entities
-     */
-    val entities: MutableList<SelfDescribingJson>
+    fun addPayloadValues(payload: Map<String, Any>): Boolean
 }

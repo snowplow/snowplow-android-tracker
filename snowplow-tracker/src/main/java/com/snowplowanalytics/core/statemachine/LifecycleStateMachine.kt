@@ -1,4 +1,4 @@
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.entity.LifecycleEntity
 import com.snowplowanalytics.snowplow.event.Background

@@ -21,6 +21,7 @@ import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
 import com.snowplowanalytics.core.session.Session.Companion.getInstance
+import com.snowplowanalytics.core.statemachine.*
 import com.snowplowanalytics.core.tracker.Logger.d
 import com.snowplowanalytics.core.tracker.Logger.track
 import com.snowplowanalytics.core.tracker.Logger.updateLogLevel
@@ -507,14 +508,14 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         } else {
             addSelfDescribingPropertiesToPayload(payload, event)
         }
-        val contexts = event.contexts
-        addBasicContextsToContexts(contexts, event)
-        addGlobalContextsToContexts(contexts, event)
-        addStateMachineEntitiesToContexts(contexts, event)
-        wrapContextsToPayload(payload, contexts)
+        val entities = event.entities
+        addBasicContextsToContexts(entities, event)
+        addGlobalContextsToContexts(entities, event)
+        addStateMachineEntitiesToContexts(entities, event)
+        wrapContextsToPayload(payload, entities)
         if (!event.isPrimitive) {
             // TODO: To remove when Atomic table refactoring is finished
-            workaroundForCampaignAttributionEnrichment(payload, event, contexts)
+            workaroundForCampaignAttributionEnrichment(payload, event, entities)
         }
         return payload
     }
@@ -613,7 +614,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             }
             val sessionContextJson =
                 sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation)
-            sessionContextJson?.let { event.contexts.add(it) }
+            sessionContextJson?.let { event.entities.add(it) }
         }
     }
 
@@ -638,7 +639,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun addGlobalContextsToContexts(
         contexts: MutableList<SelfDescribingJson>,
-        event: InspectableEvent
+        event: StateMachineEvent
     ) {
         synchronized(globalContextGenerators) {
             for (generator in globalContextGenerators.values) {
@@ -649,7 +650,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun addStateMachineEntitiesToContexts(
         contexts: MutableList<SelfDescribingJson>,
-        event: InspectableEvent
+        event: StateMachineEvent
     ) {
         val stateManagerEntities = stateManager.entitiesForProcessedEvent(event)
         contexts.addAll(stateManagerEntities)
