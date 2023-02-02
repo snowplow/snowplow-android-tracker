@@ -19,6 +19,9 @@ class ScreenStateMachine : StateMachineInterface {
      Entity Generation:
       - Screen
      */
+
+    override val identifier: String
+        get() = ID
     
     override val subscribedEventSchemasForTransitions: List<String>
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
@@ -28,6 +31,9 @@ class ScreenStateMachine : StateMachineInterface {
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
+        get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
         val screenView = event as? ScreenView
@@ -78,5 +84,13 @@ class ScreenStateMachine : StateMachineInterface {
             return addedValues
         }
         return null
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+    }
+
+    companion object {
+        val ID: String
+            get() = "ScreenContext"
     }
 }

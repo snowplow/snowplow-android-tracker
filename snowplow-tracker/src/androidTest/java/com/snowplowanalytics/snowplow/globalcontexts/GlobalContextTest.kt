@@ -241,6 +241,12 @@ class GlobalContextTest {
             .base64encoding(false)
             .sessionContext(true)
         val gcConfig = GlobalContextsConfiguration(generators)
-        return createTracker(context, "aNamespace", networkConfig, trackerConfig, gcConfig)
+        return createTracker(
+            context,
+            "aNamespace" + Math.random().toString(),
+            networkConfig,
+            trackerConfig,
+            gcConfig
+        )
     }
 }

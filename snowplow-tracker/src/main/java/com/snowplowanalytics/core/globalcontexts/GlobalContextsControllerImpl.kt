@@ -10,17 +10,33 @@ import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class GlobalContextsControllerImpl(serviceProvider: ServiceProviderInterface) :
     Controller(serviceProvider), GlobalContextsController {
-    private val tracker: Tracker
-        get() = serviceProvider.getOrMakeTracker()
 
     override val tags: Set<String?>
-        get() = tracker.globalContextTags
+        get() {
+            return serviceProvider.pluginConfigurations.filter {
+                it is GlobalContextPluginConfiguration
+            }
+                .map { it.identifier }
+                .toSet()
+        }
 
     override fun add(tag: String, contextGenerator: GlobalContext): Boolean {
-        return tracker.addGlobalContext(contextGenerator, tag)
+        if (tags.contains(tag)) {
+            return false
+        }
+        val plugin = GlobalContextPluginConfiguration(
+            identifier = tag,
+            globalContext = contextGenerator
+        )
+        serviceProvider.pluginsController.addPlugin(plugin)
+        return true
     }
 
     override fun remove(tag: String): GlobalContext? {
-        return tracker.removeGlobalContext(tag)
+        val configuration = serviceProvider.pluginConfigurations.firstOrNull {
+            it.identifier == tag && it is GlobalContextPluginConfiguration
+        } as GlobalContextPluginConfiguration?
+        serviceProvider.pluginsController.removePlugin(tag)
+        return configuration?.globalContext
     }
 }

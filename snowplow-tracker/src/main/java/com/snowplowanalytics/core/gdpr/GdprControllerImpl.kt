@@ -13,7 +13,7 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
     private var gdpr: Gdpr? = null
     
     override val basisForProcessing: Basis?
-        get() = if (gdpr == null) { null } else gdpr!!.basisForProcessing
+        get() = gdpr?.basisForProcessing
             
     override val documentId: String?
         get() = if (gdpr == null) { null } else gdpr!!.documentId

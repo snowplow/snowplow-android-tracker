@@ -1,5 +1,7 @@
 package com.snowplowanalytics.core.statemachine
 
+import com.snowplowanalytics.core.emitter.Executor.execute
+import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -13,21 +15,22 @@ class StateManager {
     private val eventSchemaToEntitiesGenerator =
         HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToPayloadUpdater = HashMap<String, MutableList<StateMachineInterface>>()
-    
+    private val eventSchemaToAfterTrackCallback = HashMap<String, MutableList<StateMachineInterface>>()
+
     val trackerState = TrackerState()
     
     @Synchronized
-    fun addOrReplaceStateMachine(stateMachine: StateMachineInterface, identifier: String) {
-        val previousStateMachine = identifierToStateMachine[identifier]
+    fun addOrReplaceStateMachine(stateMachine: StateMachineInterface) {
+        val previousStateMachine = identifierToStateMachine[stateMachine.identifier]
         if (previousStateMachine != null) {
             if (stateMachine.javaClass == previousStateMachine.javaClass) {
                 return
             }
-            removeStateMachine(identifier)
+            removeStateMachine(stateMachine.identifier)
         }
         
-        identifierToStateMachine[identifier] = stateMachine
-        stateMachineToIdentifier[stateMachine] = identifier
+        identifierToStateMachine[stateMachine.identifier] = stateMachine
+        stateMachineToIdentifier[stateMachine] = stateMachine.identifier
         addToSchemaRegistry(
             eventSchemaToStateMachine,
             stateMachine.subscribedEventSchemasForTransitions,
@@ -41,6 +44,11 @@ class StateManager {
         addToSchemaRegistry(
             eventSchemaToPayloadUpdater,
             stateMachine.subscribedEventSchemasForPayloadUpdating,
+            stateMachine
+        )
+        addToSchemaRegistry(
+            eventSchemaToAfterTrackCallback,
+            stateMachine.subscribedEventSchemasForAfterTrackCallback,
             stateMachine
         )
     }
@@ -66,6 +74,11 @@ class StateManager {
             stateMachine.subscribedEventSchemasForPayloadUpdating,
             stateMachine
         )
+        removeFromSchemaRegistry(
+            eventSchemaToAfterTrackCallback,
+            stateMachine.subscribedEventSchemasForAfterTrackCallback,
+            stateMachine
+        )
         return true
     }
 
@@ -73,15 +86,9 @@ class StateManager {
     fun trackerStateForProcessedEvent(event: Event): TrackerStateSnapshot {
         if (event is AbstractSelfDescribing) {
             val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-            val stateMachinesForSchema: List<StateMachineInterface>? =
-                eventSchemaToStateMachine[event.schema]
-            if (stateMachinesForSchema != null) {
-                stateMachines.addAll(stateMachinesForSchema)
-            }
-            val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToStateMachine["*"]
-            if (stateMachinesGeneral != null) {
-                stateMachines.addAll(stateMachinesGeneral)
-            }
+            eventSchemaToStateMachine[event.schema]?.let { stateMachines.addAll(it) }
+            eventSchemaToStateMachine["*"]?.let { stateMachines.addAll(it) }
+
             for (stateMachine in stateMachines) {
                 val stateIdentifier = stateMachineToIdentifier[stateMachine]
                 val previousStateFuture = stateIdentifier?.let { trackerState.getStateFuture(it) }
@@ -107,17 +114,13 @@ class StateManager {
 
     @Synchronized
     fun entitiesForProcessedEvent(event: StateMachineEvent): List<SelfDescribingJson> {
+        val schema = event.schema ?: event.name
+
         val result: MutableList<SelfDescribingJson> = LinkedList()
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-        val stateMachinesForSchema: List<StateMachineInterface>? =
-            eventSchemaToEntitiesGenerator[event.schema]
-        if (stateMachinesForSchema != null) {
-            stateMachines.addAll(stateMachinesForSchema)
-        }
-        val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToEntitiesGenerator["*"]
-        if (stateMachinesGeneral != null) {
-            stateMachines.addAll(stateMachinesGeneral)
-        }
+        eventSchemaToEntitiesGenerator[schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToEntitiesGenerator["*"]?.let { stateMachines.addAll(it) }
+
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
             if (stateIdentifier != null) {
@@ -135,15 +138,9 @@ class StateManager {
     fun addPayloadValuesToEvent(event: StateMachineEvent): Boolean {
         var failures = 0
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-        val stateMachinesForSchema: List<StateMachineInterface>? =
-            eventSchemaToPayloadUpdater[event.schema]
-        if (stateMachinesForSchema != null) {
-            stateMachines.addAll(stateMachinesForSchema)
-        }
-        val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToPayloadUpdater["*"]
-        if (stateMachinesGeneral != null) {
-            stateMachines.addAll(stateMachinesGeneral)
-        }
+        eventSchemaToPayloadUpdater[event.schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToPayloadUpdater["*"]?.let { stateMachines.addAll(it) }
+
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
             if (stateIdentifier != null) {
@@ -155,6 +152,23 @@ class StateManager {
             }
         }
         return failures == 0
+    }
+
+    @Synchronized
+    fun afterTrack(event: StateMachineEvent) {
+        val schema = event.schema ?: event.name
+
+        val stateMachines: MutableList<StateMachineInterface> = LinkedList()
+        eventSchemaToAfterTrackCallback[schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToAfterTrackCallback["*"]?.let { stateMachines.addAll(it) }
+
+        if (stateMachines.isNotEmpty()) {
+            execute(TAG) {
+                for (stateMachine in stateMachines) {
+                    stateMachine.afterTrack(event)
+                }
+            }
+        }
     }
 
     // Private methods
@@ -182,5 +196,10 @@ class StateManager {
             val list = schemaRegistry[eventSchema]
             list?.remove(stateMachine)
         }
+    }
+
+
+    companion object {
+        private val TAG = StateManager::class.java.simpleName
     }
 }

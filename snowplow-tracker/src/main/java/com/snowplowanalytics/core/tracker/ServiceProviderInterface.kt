@@ -6,6 +6,7 @@ import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
+import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
 
 interface ServiceProviderInterface {
     val namespace: String
@@ -24,6 +25,7 @@ interface ServiceProviderInterface {
     fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl
     fun getOrMakeSubjectController(): SubjectControllerImpl
     fun getOrMakeSessionController(): SessionControllerImpl
+    val pluginsController: PluginsControllerImpl
 
     // Configuration Updates
     val trackerConfigurationUpdate: TrackerConfigurationUpdate
@@ -32,4 +34,9 @@ interface ServiceProviderInterface {
     val emitterConfigurationUpdate: EmitterConfigurationUpdate
     val sessionConfigurationUpdate: SessionConfigurationUpdate
     val gdprConfigurationUpdate: GdprConfigurationUpdate
+
+    // Plugins
+    val pluginConfigurations: List<PluginConfigurationInterface>
+    fun addPlugin(plugin: PluginConfigurationInterface)
+    fun removePlugin(identifier: String)
 }

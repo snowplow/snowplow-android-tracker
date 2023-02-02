@@ -17,6 +17,9 @@ class LifecycleStateMachine : StateMachineInterface {
      Entity Generation:
       - Visible, NotVisible
      */
+
+    override val identifier: String
+        get() = ID
     
     override val subscribedEventSchemasForTransitions: List<String>
         get() = listOf(Background.schema, Foreground.schema)
@@ -25,6 +28,9 @@ class LifecycleStateMachine : StateMachineInterface {
         get() = listOf("*")
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = emptyList()
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = emptyList()
 
     override fun transition(event: Event, currentState: State?): State? {
@@ -46,5 +52,13 @@ class LifecycleStateMachine : StateMachineInterface {
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
         return null
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+    }
+
+    companion object {
+        val ID: String
+            get() = "Lifecycle"
     }
 }
