@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
@@ -36,15 +48,13 @@ class ServiceProvider(
     private var subjectController: SubjectControllerImpl? = null
     private var sessionController: SessionControllerImpl? = null
     private var gdprController: GdprControllerImpl? = null
-    private var globalContextsController: GlobalContextsControllerImpl? = null
+    override val pluginsController: PluginsControllerImpl by lazy {
+        PluginsControllerImpl(this)
+    }
 
     // Original configurations
-    private val trackerConfiguration: TrackerConfiguration
-    private val emitterConfiguration: EmitterConfiguration? = null
-    private val subjectConfiguration: SubjectConfiguration? = null
-    private val sessionConfiguration: SessionConfiguration? = null
-    private val gdprConfiguration: GdprConfiguration? = null
-    private var globalContextsConfiguration: GlobalContextsConfiguration? = null
+    override var pluginConfigurations: MutableList<PluginConfigurationInterface> = ArrayList()
+        private set
 
     // Configuration updates
     override lateinit var trackerConfigurationUpdate: TrackerConfigurationUpdate
@@ -69,7 +79,6 @@ class ServiceProvider(
         
         // Process configurations
         networkConfigurationUpdate.sourceConfig = networkConfiguration
-        trackerConfiguration = TrackerConfiguration(appId)
         processConfigurations(configurations)
         
         if (trackerConfigurationUpdate.sourceConfig == null) {
@@ -99,31 +108,29 @@ class ServiceProvider(
         for (configuration in configurations) {
             if (configuration is NetworkConfiguration) {
                 networkConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is TrackerConfiguration) {
+            else if (configuration is TrackerConfiguration) {
                 trackerConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is SubjectConfiguration) {
+            else if (configuration is SubjectConfiguration) {
                 subjectConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is SessionConfiguration) {
+            else if (configuration is SessionConfiguration) {
                 sessionConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is EmitterConfiguration) {
+            else if (configuration is EmitterConfiguration) {
                 emitterConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is GdprConfiguration) {
+            else if (configuration is GdprConfiguration) {
                 gdprConfigurationUpdate.sourceConfig = configuration
-                continue
             }
-            if (configuration is GlobalContextsConfiguration) {
-                globalContextsConfiguration = configuration
-                continue
+            else if (configuration is GlobalContextsConfiguration) {
+                for (plugin in configuration.toPluginConfigurations()) {
+                    pluginConfigurations.add(plugin)
+                }
+            }
+            else if (configuration is PluginConfigurationInterface) {
+                pluginConfigurations.add(configuration)
             }
         }
     }
@@ -144,7 +151,6 @@ class ServiceProvider(
         sessionController = null
         emitterController = null
         gdprController = null
-        globalContextsController = null
         subjectController = null
         networkController = null
     }
@@ -198,7 +204,7 @@ class ServiceProvider(
     }
 
     override fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl {
-        return globalContextsController ?: makeGlobalContextsController().also { globalContextsController = it }
+        return GlobalContextsControllerImpl(this)
     }
 
     override fun getOrMakeSubjectController(): SubjectControllerImpl {
@@ -282,11 +288,14 @@ class ServiceProvider(
 
             tracker.backgroundTimeout = sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS)
             tracker.foregroundTimeout = sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS)
+
+            for (plugin in pluginConfigurations) {
+                tracker.addOrReplaceStateMachine(plugin.toStateMachine())
+            }
         }
         
         val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
         
-        globalContextsConfiguration?.let { tracker.setGlobalContextGenerators(it.contextGenerators) }
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking()
         }
@@ -329,15 +338,26 @@ class ServiceProvider(
         return controller
     }
 
-    private fun makeGlobalContextsController(): GlobalContextsControllerImpl {
-        return GlobalContextsControllerImpl(this)
-    }
-
     private fun makeSubjectController(): SubjectControllerImpl {
         return SubjectControllerImpl(this)
     }
 
     private fun makeNetworkController(): NetworkControllerImpl {
         return NetworkControllerImpl(this)
+    }
+
+    // Plugins
+
+    override fun addPlugin(plugin: PluginConfigurationInterface) {
+        removePlugin(plugin.identifier)
+        pluginConfigurations.add(plugin)
+        tracker?.addOrReplaceStateMachine(plugin.toStateMachine())
+    }
+
+    override fun removePlugin(identifier: String) {
+        pluginConfigurations.removeAll {
+            it.identifier == identifier
+        }
+        tracker?.removeStateMachine(identifier)
     }
 }

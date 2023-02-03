@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.entity.DeepLink
@@ -18,7 +18,7 @@ import com.snowplowanalytics.snowplow.event.DeepLinkReceived
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
-import java.util.*
+import kotlin.collections.ArrayList
 
 class DeepLinkStateMachine : StateMachineInterface {
     /*
@@ -33,6 +33,9 @@ class DeepLinkStateMachine : StateMachineInterface {
       - ReadyForOutput
       */
 
+    override val identifier: String
+        get() = ID
+
     override val subscribedEventSchemasForTransitions: List<String>
         get() = listOf(DeepLinkReceived.schema, TrackerConstants.SCHEMA_SCREEN_VIEW)
 
@@ -41,6 +44,9 @@ class DeepLinkStateMachine : StateMachineInterface {
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
         get() = ArrayList()
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
+        get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
         // - Init (DL) DeepLinkReceived
@@ -77,5 +83,13 @@ class DeepLinkStateMachine : StateMachineInterface {
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
         return null
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+    }
+
+    companion object {
+        val ID: String
+            get() = "DeepLinkContext"
     }
 }

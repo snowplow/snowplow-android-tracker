@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -35,9 +35,15 @@ abstract class AbstractEvent : Event {
     // Builder methods
     
     /** Adds a list of contexts.  */
-    fun contexts(contexts: List<SelfDescribingJson>?): AbstractEvent {
-        contexts?.let { customContexts.addAll(contexts) }
+    fun entities(entities: List<SelfDescribingJson>?): AbstractEvent {
+        entities?.let { customContexts.addAll(entities) }
         return this
+    }
+
+    /** Adds a list of contexts.  */
+    @Deprecated("Please use `entities()`")
+    fun contexts(contexts: List<SelfDescribingJson>?): AbstractEvent {
+        return entities(contexts)
     }
 
     /** Set the custom timestamp of the event.  */
@@ -51,8 +57,11 @@ abstract class AbstractEvent : Event {
     /**
      * @return the event custom context
      */
-    override val contexts: List<SelfDescribingJson>
+    override val entities: List<SelfDescribingJson>
         get() = ArrayList(customContexts)
+
+    override val contexts: List<SelfDescribingJson>
+        get() = entities
 
     override fun beginProcessing(tracker: Tracker) {}
     override fun endProcessing(tracker: Tracker) {}

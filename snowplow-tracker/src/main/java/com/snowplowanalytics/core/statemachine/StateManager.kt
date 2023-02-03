@@ -1,9 +1,22 @@
-package com.snowplowanalytics.core.tracker
+/*
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+package com.snowplowanalytics.core.statemachine
 
+import com.snowplowanalytics.core.emitter.Executor.execute
+import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
 
 class StateManager {
@@ -14,21 +27,22 @@ class StateManager {
     private val eventSchemaToEntitiesGenerator =
         HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToPayloadUpdater = HashMap<String, MutableList<StateMachineInterface>>()
-    
+    private val eventSchemaToAfterTrackCallback = HashMap<String, MutableList<StateMachineInterface>>()
+
     val trackerState = TrackerState()
     
     @Synchronized
-    fun addOrReplaceStateMachine(stateMachine: StateMachineInterface, identifier: String) {
-        val previousStateMachine = identifierToStateMachine[identifier]
+    fun addOrReplaceStateMachine(stateMachine: StateMachineInterface) {
+        val previousStateMachine = identifierToStateMachine[stateMachine.identifier]
         if (previousStateMachine != null) {
             if (stateMachine.javaClass == previousStateMachine.javaClass) {
                 return
             }
-            removeStateMachine(identifier)
+            removeStateMachine(stateMachine.identifier)
         }
         
-        identifierToStateMachine[identifier] = stateMachine
-        stateMachineToIdentifier[stateMachine] = identifier
+        identifierToStateMachine[stateMachine.identifier] = stateMachine
+        stateMachineToIdentifier[stateMachine] = stateMachine.identifier
         addToSchemaRegistry(
             eventSchemaToStateMachine,
             stateMachine.subscribedEventSchemasForTransitions,
@@ -42,6 +56,11 @@ class StateManager {
         addToSchemaRegistry(
             eventSchemaToPayloadUpdater,
             stateMachine.subscribedEventSchemasForPayloadUpdating,
+            stateMachine
+        )
+        addToSchemaRegistry(
+            eventSchemaToAfterTrackCallback,
+            stateMachine.subscribedEventSchemasForAfterTrackCallback,
             stateMachine
         )
     }
@@ -67,6 +86,11 @@ class StateManager {
             stateMachine.subscribedEventSchemasForPayloadUpdating,
             stateMachine
         )
+        removeFromSchemaRegistry(
+            eventSchemaToAfterTrackCallback,
+            stateMachine.subscribedEventSchemasForAfterTrackCallback,
+            stateMachine
+        )
         return true
     }
 
@@ -74,15 +98,9 @@ class StateManager {
     fun trackerStateForProcessedEvent(event: Event): TrackerStateSnapshot {
         if (event is AbstractSelfDescribing) {
             val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-            val stateMachinesForSchema: List<StateMachineInterface>? =
-                eventSchemaToStateMachine[event.schema]
-            if (stateMachinesForSchema != null) {
-                stateMachines.addAll(stateMachinesForSchema)
-            }
-            val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToStateMachine["*"]
-            if (stateMachinesGeneral != null) {
-                stateMachines.addAll(stateMachinesGeneral)
-            }
+            eventSchemaToStateMachine[event.schema]?.let { stateMachines.addAll(it) }
+            eventSchemaToStateMachine["*"]?.let { stateMachines.addAll(it) }
+
             for (stateMachine in stateMachines) {
                 val stateIdentifier = stateMachineToIdentifier[stateMachine]
                 val previousStateFuture = stateIdentifier?.let { trackerState.getStateFuture(it) }
@@ -107,18 +125,14 @@ class StateManager {
     }
 
     @Synchronized
-    fun entitiesForProcessedEvent(event: InspectableEvent): List<SelfDescribingJson> {
+    fun entitiesForProcessedEvent(event: StateMachineEvent): List<SelfDescribingJson> {
+        val schema = event.schema ?: event.name
+
         val result: MutableList<SelfDescribingJson> = LinkedList()
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-        val stateMachinesForSchema: List<StateMachineInterface>? =
-            eventSchemaToEntitiesGenerator[event.schema]
-        if (stateMachinesForSchema != null) {
-            stateMachines.addAll(stateMachinesForSchema)
-        }
-        val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToEntitiesGenerator["*"]
-        if (stateMachinesGeneral != null) {
-            stateMachines.addAll(stateMachinesGeneral)
-        }
+        eventSchemaToEntitiesGenerator[schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToEntitiesGenerator["*"]?.let { stateMachines.addAll(it) }
+
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
             if (stateIdentifier != null) {
@@ -133,18 +147,12 @@ class StateManager {
     }
 
     @Synchronized
-    fun addPayloadValuesToEvent(event: InspectableEvent): Boolean {
+    fun addPayloadValuesToEvent(event: StateMachineEvent): Boolean {
         var failures = 0
         val stateMachines: MutableList<StateMachineInterface> = LinkedList()
-        val stateMachinesForSchema: List<StateMachineInterface>? =
-            eventSchemaToPayloadUpdater[event.schema]
-        if (stateMachinesForSchema != null) {
-            stateMachines.addAll(stateMachinesForSchema)
-        }
-        val stateMachinesGeneral: List<StateMachineInterface>? = eventSchemaToPayloadUpdater["*"]
-        if (stateMachinesGeneral != null) {
-            stateMachines.addAll(stateMachinesGeneral)
-        }
+        eventSchemaToPayloadUpdater[event.schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToPayloadUpdater["*"]?.let { stateMachines.addAll(it) }
+
         for (stateMachine in stateMachines) {
             val stateIdentifier = stateMachineToIdentifier[stateMachine]
             if (stateIdentifier != null) {
@@ -156,6 +164,23 @@ class StateManager {
             }
         }
         return failures == 0
+    }
+
+    @Synchronized
+    fun afterTrack(event: StateMachineEvent) {
+        val schema = event.schema ?: event.name
+
+        val stateMachines: MutableList<StateMachineInterface> = LinkedList()
+        eventSchemaToAfterTrackCallback[schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToAfterTrackCallback["*"]?.let { stateMachines.addAll(it) }
+
+        if (stateMachines.isNotEmpty()) {
+            execute(TAG) {
+                for (stateMachine in stateMachines) {
+                    stateMachine.afterTrack(event)
+                }
+            }
+        }
     }
 
     // Private methods
@@ -183,5 +208,10 @@ class StateManager {
             val list = schemaRegistry[eventSchema]
             list?.remove(stateMachine)
         }
+    }
+
+
+    companion object {
+        private val TAG = StateManager::class.java.simpleName
     }
 }

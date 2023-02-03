@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -12,31 +12,36 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.statemachine.StateMachineEvent
+import com.snowplowanalytics.core.statemachine.TrackerState
+import com.snowplowanalytics.core.statemachine.TrackerStateSnapshot
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.event.TrackerError
+import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
 
 class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSnapshot? = null) :
-    InspectableEvent {
+    StateMachineEvent {
     
     override var schema: String? = null
     override var name: String? = null
     override lateinit var payload: MutableMap<String, Any>
     override lateinit var state: TrackerStateSnapshot
-    
+    override lateinit var entities: MutableList<SelfDescribingJson>
+
     var eventId: UUID = UUID.randomUUID()
     var timestamp: Long = System.currentTimeMillis()
     var trueTimestamp: Long?
-    var contexts: MutableList<SelfDescribingJson>
     var isPrimitive = false
     var isService: Boolean
 
     init {
-        contexts = event.contexts.toMutableList()
+        entities = event.entities.toMutableList()
         trueTimestamp = event.trueTimestamp
         payload = HashMap(event.dataPayload)
         
@@ -66,5 +71,49 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
             }
         }
         return result
+    }
+
+    fun addContextEntity(entity: SelfDescribingJson) {
+        entities.add(entity)
+    }
+
+    fun wrapEntitiesToPayload(payload: Payload, base64Encoded: Boolean) {
+        if (entities.isEmpty()) {
+            return
+        }
+
+        val data: MutableList<Map<String, Any?>> = LinkedList()
+        for (entity in entities) {
+            data.add(entity.map)
+        }
+        val finalContext = SelfDescribingJson(TrackerConstants.SCHEMA_CONTEXTS, data)
+        payload.addMap(
+            finalContext.map,
+            base64Encoded,
+            Parameters.CONTEXT_ENCODED,
+            Parameters.CONTEXT
+        )
+    }
+
+    fun wrapPropertiesToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        if (isPrimitive) {
+            toPayload.addMap(payload)
+        } else {
+            wrapSelfDescribingToPayload(toPayload, base64Encoded)
+        }
+    }
+
+    private fun wrapSelfDescribingToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        val schema = schema ?: return
+        val data = SelfDescribingJson(schema, payload)
+        val unstructuredEventPayload = HashMap<String?, Any?>()
+        unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
+        unstructuredEventPayload[Parameters.DATA] = data.map
+        toPayload.addMap(
+            unstructuredEventPayload,
+            base64Encoded,
+            Parameters.UNSTRUCTURED_ENCODED,
+            Parameters.UNSTRUCTURED
+        )
     }
 }

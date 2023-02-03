@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -20,8 +20,14 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  */
 interface Event {
     /**
-     * @return the event custom contexts
+     * @return the event custom context entities
      */
+    val entities: List<SelfDescribingJson>
+
+    /**
+     * @return the event custom context entities
+     */
+    @Deprecated("Please use `entities`")
     val contexts: List<SelfDescribingJson>
 
     /**

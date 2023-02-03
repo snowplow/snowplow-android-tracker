@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -183,7 +183,7 @@ class TrackerTest {
     fun testTrackSelfDescribingEvent() {
         shutdown()
         
-        val namespace = "myNamespace"
+        val namespace = "trackSelfDescribingEvent"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
         var emitter: Emitter? = null
@@ -243,7 +243,7 @@ class TrackerTest {
     fun testTrackWithNoContext() {
         shutdown()
         
-        val namespace = "myNamespaceNoContext"
+        val namespace = "trackWithNoContext"
         TestUtils.createSessionSharedPreferences(context, namespace)
         
         val mockWebServer = getMockServer(1)
@@ -308,7 +308,7 @@ class TrackerTest {
     fun testTrackWithoutDataCollection() {
         threadCount = 30
         shutdown()
-        val namespace = "myNamespace"
+        val namespace = "trackWithoutDataCollection"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
@@ -340,7 +340,7 @@ class TrackerTest {
     fun testTrackWithSession() {
         threadCount = 30
         shutdown()
-        val namespace = "myNamespace"
+        val namespace = "trackWithSession"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
@@ -369,7 +369,7 @@ class TrackerTest {
 
     @Test
     fun testTrackScreenView() {
-        val namespace = "myNamespace"
+        val namespace = "trackScreenView"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
@@ -412,7 +412,7 @@ class TrackerTest {
 
     @Test
     fun testTrackUncaughtException() {
-        val namespace = "myNamespace"
+        val namespace = "trackUncaughtException"
         TestUtils.createSessionSharedPreferences(context, namespace)
         Thread.setDefaultUncaughtExceptionHandler(
             TestExceptionHandler("Illegal State Exception has been thrown!")
@@ -441,7 +441,7 @@ class TrackerTest {
 
     @Test
     fun testExceptionHandler() {
-        val namespace = "myNamespace"
+        val namespace = "exceptionHandler"
         TestUtils.createSessionSharedPreferences(context, namespace)
         val handler = TestExceptionHandler("Illegal State Exception has been thrown!")
         Thread.setDefaultUncaughtExceptionHandler(handler)

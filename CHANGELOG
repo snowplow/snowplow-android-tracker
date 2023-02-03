@@ -1,6 +1,9 @@
-Version 5.0.0-alpha.1 (2022-11-30)
+Version 5.0.0-beta.1 (2022-02-02)
 --------------------------
-Migrate published API to Kotlin (#561)
+Update copyrights to 2023 (#579)
+Add ability to provide custom tracker plugins to inspect and enrich tracked events (#574)
+Refactor event interface and rename contexts to entities (#573)
+Migrate internal classes to Kotlin (#564)
 
 Version 4.1.1 (2022-12-02)
 --------------------------

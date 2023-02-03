@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -193,16 +193,17 @@ class EventSendingTest {
     }
 
     // Helpers
-    private fun getTracker(namespace: String?, uri: String?, method: HttpMethod?): Tracker {
-        createSessionSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, namespace!!)
+    private fun getTracker(namespace: String, uri: String, method: HttpMethod): Tracker {
+        val ns = namespace + Math.random().toString() // add random number to ensure different namespace on each run
+        createSessionSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, ns)
         val builder = { emitter: Emitter ->
             emitter.bufferOption = BufferOption.Single
-            emitter.httpMethod = method!!
+            emitter.httpMethod = method
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
         }
-        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri!!, builder)
+        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
         val subject = Subject(InstrumentationRegistry.getInstrumentation().targetContext, null)
         
         if (tracker != null) tracker!!.close()
@@ -217,7 +218,7 @@ class EventSendingTest {
         }
         tracker = Tracker(
             emitter,
-            namespace,
+            ns,
             "myAppId",
             InstrumentationRegistry.getInstrumentation().targetContext,
             trackerBuilder
@@ -227,10 +228,8 @@ class EventSendingTest {
     }
 
     @SuppressLint("DefaultLocale")
-    fun getMockServerURI(mockServer: MockWebServer?): String? {
-        return if (mockServer != null) {
-            String.format("%s:%d", mockServer.hostName, mockServer.port)
-        } else null
+    fun getMockServerURI(mockServer: MockWebServer): String {
+        return String.format("%s:%d", mockServer.hostName, mockServer.port)
     }
 
     @Throws(Exception::class)
@@ -281,14 +280,14 @@ class EventSendingTest {
     }
 
     @Throws(JSONException::class)
-    fun getSessionData(contexts: JSONArray): JSONObject? {
-        for (i in 0 until contexts.length()) {
+    fun getSessionData(entities: JSONArray): JSONObject? {
+        for (i in 0 until entities.length()) {
             val sessionSchema =
                 "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2"
-            val context = contexts[i] as JSONObject
-            val schema = context["schema"] as String
+            val entity = entities[i] as JSONObject
+            val schema = entity["schema"] as String
             if (schema == sessionSchema) {
-                return context["data"] as JSONObject
+                return entity["data"] as JSONObject
             }
         }
         return null
@@ -304,7 +303,7 @@ class EventSendingTest {
             val query = JSONObject(getQueryMap(request.path!!.substring(3)))
             Assert.assertEquals("mob", query["p"])
             Assert.assertEquals("myAppId", query["aid"])
-            Assert.assertEquals("myNamespace", query["tna"])
+            Assert.assertTrue(query.getString("tna").startsWith("myNamespace"))
             Assert.assertEquals(BuildConfig.TRACKER_LABEL, query["tv"])
             Assert.assertEquals("English", query["lang"])
             Assert.assertTrue(query.has("dtm"))
@@ -339,7 +338,7 @@ class EventSendingTest {
                 val json = data.getJSONObject(i)
                 Assert.assertEquals("mob", json.getString("p"))
                 Assert.assertEquals("myAppId", json.getString("aid"))
-                Assert.assertEquals("myNamespacePost", json.getString("tna"))
+                Assert.assertTrue(json.getString("tna").startsWith("myNamespacePost"))
                 Assert.assertEquals(BuildConfig.TRACKER_LABEL, json.getString("tv"))
                 Assert.assertEquals("English", json.getString("lang"))
                 Assert.assertTrue(json.has("dtm"))
@@ -460,7 +459,7 @@ class EventSendingTest {
     fun trackPageView(tracker: Tracker) {
         tracker.track(PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"))
         tracker.track(
-            PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").contexts(
+            PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer").entities(
                 customContext
             )
         )
@@ -472,7 +471,7 @@ class EventSendingTest {
         )
         tracker.track(
             Structured("category", "action").label("label").property("property").value(0.00)
-                .contexts(
+                .entities(
                     customContext
                 )
         )
@@ -480,13 +479,13 @@ class EventSendingTest {
 
     private fun trackScreenView(tracker: Tracker) {
         tracker.track(ScreenView("screenName"))
-        tracker.track(ScreenView("screenName").contexts(customContext))
+        tracker.track(ScreenView("screenName").entities(customContext))
     }
 
     private fun trackTimings(tracker: Tracker) {
         tracker.track(Timing("category", "variable", 1).label("label"))
         tracker.track(
-            Timing("category", "variable", 1).label("label").contexts(
+            Timing("category", "variable", 1).label("label").entities(
                 customContext
             )
         )
@@ -501,7 +500,7 @@ class EventSendingTest {
         )
         tracker.track(SelfDescribing(test))
         tracker.track(
-            SelfDescribing(test).contexts(
+            SelfDescribing(test).entities(
                 customContext
             )
         )
@@ -519,7 +518,7 @@ class EventSendingTest {
         tracker.track(
             EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50)
                 .shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD")
-                .contexts(
+                .entities(
                     customContext
                 )
         )
@@ -543,7 +542,7 @@ class EventSendingTest {
         )
         tracker.track(
             ConsentGranted("gexpiry", "gid", "dversion").documentDescription("gdesc")
-                .documentName("dname").documents(documents).contexts(
+                .documentName("dname").documents(documents).entities(
                 customContext
             )
         )
@@ -567,7 +566,7 @@ class EventSendingTest {
         )
         tracker.track(
             ConsentWithdrawn(false, "gid", "dversion").documentDescription("gdesc")
-                .documentName("dname").documents(documents).contexts(
+                .documentName("dname").documents(documents).entities(
                 customContext
             )
         )

@@ -1,4 +1,16 @@
-package com.snowplowanalytics.core.tracker
+/*
+ * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
+package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.entity.LifecycleEntity
 import com.snowplowanalytics.snowplow.event.Background
@@ -17,6 +29,9 @@ class LifecycleStateMachine : StateMachineInterface {
      Entity Generation:
       - Visible, NotVisible
      */
+
+    override val identifier: String
+        get() = ID
     
     override val subscribedEventSchemasForTransitions: List<String>
         get() = listOf(Background.schema, Foreground.schema)
@@ -25,6 +40,9 @@ class LifecycleStateMachine : StateMachineInterface {
         get() = listOf("*")
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
+        get() = emptyList()
+
+    override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = emptyList()
 
     override fun transition(event: Event, currentState: State?): State? {
@@ -46,5 +64,13 @@ class LifecycleStateMachine : StateMachineInterface {
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
         return null
+    }
+
+    override fun afterTrack(event: InspectableEvent) {
+    }
+
+    companion object {
+        val ID: String
+            get() = "Lifecycle"
     }
 }
