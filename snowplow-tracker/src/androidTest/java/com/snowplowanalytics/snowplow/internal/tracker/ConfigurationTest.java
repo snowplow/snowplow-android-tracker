@@ -113,6 +113,15 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void sessionIdEmptyBeforeSessionInitialized() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        NetworkConfiguration networkConfig = new NetworkConfiguration("fake-url", HttpMethod.POST);
+        TrackerController tracker = Snowplow.createTracker(context, "emptySessionIdTest", networkConfig);
+        String sessionId = tracker.getSession().getSessionId();
+        assertEquals("", sessionId);
+    }
+
+    @Test
     public void sessionControllerUnavailableWhenContextTurnedOff() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         NetworkConfiguration networkConfiguration = new NetworkConfiguration("fake-url", HttpMethod.POST);

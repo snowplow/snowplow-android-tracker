@@ -15,6 +15,7 @@ public interface SessionController extends SessionConfigurationInterface {
     /**
      * The session identifier.
      * A unique identifier which is used to identify the session.
+     * Returns an empty string if accessed before the session is initialized.
      */
     @NonNull
     String getSessionId();
