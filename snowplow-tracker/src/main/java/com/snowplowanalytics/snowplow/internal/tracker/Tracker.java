@@ -755,7 +755,9 @@ public class Tracker {
                 return;
             }
             SelfDescribingJson sessionContextJson = sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation);
-            event.contexts.add(sessionContextJson);
+            if (sessionContextJson != null) {
+                event.contexts.add(sessionContextJson);
+            }
         }
     }
 

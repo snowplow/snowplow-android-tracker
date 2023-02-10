@@ -181,7 +181,7 @@ public class Session {
      *
      * @return a SelfDescribingJson containing the session context
      */
-    @NonNull
+    @Nullable
     public synchronized SelfDescribingJson getSessionContext(@NonNull String eventId, long eventTimestamp, boolean userAnonymisation) {
         Logger.v(TAG, "Getting session context...");
         if (isSessionCheckerEnabled) {
@@ -197,6 +197,10 @@ public class Session {
             }
             lastSessionCheck = System.currentTimeMillis();
         }
+
+        SessionState state = getState();
+        if (state == null) { return null; }
+
         eventIndex += 1;
 
         Map<String, Object> sessionValues = state.getSessionValues();

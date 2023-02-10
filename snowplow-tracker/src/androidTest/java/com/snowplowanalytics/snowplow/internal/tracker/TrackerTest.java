@@ -26,6 +26,7 @@ import com.snowplowanalytics.snowplow.TestUtils;
 import com.snowplowanalytics.snowplow.emitter.EventStore;
 import com.snowplowanalytics.snowplow.event.SelfDescribing;
 import com.snowplowanalytics.snowplow.event.Structured;
+import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import com.snowplowanalytics.snowplow.internal.emitter.Emitter;
@@ -35,6 +36,7 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.event.ScreenView;
 import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.tracker.LogLevel;
+import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -397,6 +399,26 @@ public class TrackerTest {
         tracker.pauseSessionChecking();
 
         mockWebServer.shutdown();
+    }
+
+    // This test was used to replicate issue #581 and fix it
+    @Test
+    public void testTrackWithPausedSessionDoesntThrowException() {
+        Emitter emitter = new Emitter(
+                getContext(),
+                "",
+                new Emitter.EmitterBuilder()
+                        .networkConnection(new MockNetworkConnection(HttpMethod.POST, 200)));
+
+        tracker = new Tracker(new Tracker.TrackerBuilder(emitter, "pausedSession", "myAppId", getContext())
+                .sessionContext(true)
+        );
+
+        // Pause session tracking
+        tracker.pauseSessionChecking();
+
+        // Track an event to make sure it does not throw an exception
+        tracker.track(new ScreenView("screen1"));
     }
 
     @Test
