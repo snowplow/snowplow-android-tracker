@@ -1,3 +1,7 @@
+Version 4.1.2 (2022-02-15)
+--------------------------
+Fix crash with null pointer when accessing session (#581)
+
 Version 4.1.1 (2022-12-02)
 --------------------------
 Hardcode the anonymised session user ID (#567)  
