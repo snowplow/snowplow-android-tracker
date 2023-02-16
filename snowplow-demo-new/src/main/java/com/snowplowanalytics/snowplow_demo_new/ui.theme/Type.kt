@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_compose.ui.theme
+package com.snowplowanalytics.snowplow_demo_new.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
