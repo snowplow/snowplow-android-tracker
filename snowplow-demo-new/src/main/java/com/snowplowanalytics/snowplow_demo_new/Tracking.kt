@@ -14,7 +14,7 @@ object Tracking {
     fun setup() : TrackerController {
         println("❗️ tracker setup")
         
-        val trackerConfig = TrackerConfiguration("appID").logLevel(LogLevel.VERBOSE)
+        val trackerConfig = TrackerConfiguration("appID").logLevel(LogLevel.DEBUG)
         val networkConfig = NetworkConfiguration("https://984a-82-26-43-253.ngrok.io", HttpMethod.POST)
         
         return Snowplow.createTracker(
