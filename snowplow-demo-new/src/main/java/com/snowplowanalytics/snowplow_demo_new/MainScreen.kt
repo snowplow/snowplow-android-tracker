@@ -20,10 +20,10 @@ fun MainScreen(
     onTrackButtonClicked: () -> Unit = {},
     onSchemaClicked: (String) -> Unit = {}
 ) {
-    var selectedSchema by remember { mutableStateOf("") }
+//    var selectedSchema by remember { mutableStateOf("") }
     
 //    Tracking.tracker()?.track(ScreenView("main", UUID.randomUUID()))
-    IgluCentralAPI.schemas()
+//    IgluCentralAPI.schemas()
     
     Column(modifier = Modifier.padding(all = 8.dp)) {
         Button(onClick = onNextButtonClicked) {
@@ -35,13 +35,16 @@ fun MainScreen(
         Button(onClick = onTrackButtonClicked) {
             Text("Track an event")
         }
-    }
+        
+        Spacer(modifier = Modifier.width(20.dp))
 
-    LazyColumn {
-        items(schemasTemp()) {
-                schema -> SchemaTitleCard(schema = schema, onClick = onSchemaClicked)
+        LazyColumn {
+            items(schemasTemp()) {
+                    schema -> SchemaTitleCard(schema = schema, onClick = onSchemaClicked)
+            }
         }
     }
+
 
     
 }
