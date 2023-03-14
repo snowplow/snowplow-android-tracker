@@ -13,16 +13,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SchemaDetail(schema: String) {
-    val composableScope = rememberCoroutineScope()
-    composableScope.launch { IgluCentralAPI.singleSchemaBody(schema) }
+//    val composableScope = rememberCoroutineScope()
+//    composableScope.launch { IgluAPIService.singleSchemaBody(schema) }
 
     Column(modifier = Modifier.padding(all = 8.dp)) {
         Text("This is the second screen.")
         Text("Schema is: $schema")
-        val testString = IgluCentralAPI.schema(schema)
+//        val testString = IgluAPIService.schema(schema)
 
         Spacer(modifier = Modifier.width(20.dp))
         
-        Text(testString)
+//        Text(testString)
     }
 }

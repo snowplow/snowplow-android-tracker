@@ -20,7 +20,6 @@ fun MainScreen(
     onTrackButtonClicked: () -> Unit = {},
     onSchemaClicked: (String) -> Unit = {}
 ) {
-//    var selectedSchema by remember { mutableStateOf("") }
     
 //    Tracking.tracker()?.track(ScreenView("main", UUID.randomUUID()))
 //    IgluCentralAPI.schemas()
