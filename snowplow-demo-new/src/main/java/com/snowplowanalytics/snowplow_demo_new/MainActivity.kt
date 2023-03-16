@@ -18,11 +18,17 @@ import androidx.compose.ui.unit.dp
 import com.snowplowanalytics.snowplow_demo_new.ui.theme.ComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
+    val listvm = SchemaListViewModel()
+    val detailvm = SchemaDetailViewModel()
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeDemoTheme {
-                ComposeDemoApp()
+                ComposeDemoApp(
+                    listViewModel = listvm, 
+                    detailViewModel = detailvm
+                )
             }
         }
     }

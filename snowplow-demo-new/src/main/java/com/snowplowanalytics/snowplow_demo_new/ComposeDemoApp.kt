@@ -3,6 +3,9 @@ package com.snowplowanalytics.snowplow_demo_new
 
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
@@ -15,7 +18,10 @@ object Destinations {
 }
 
 @Composable
-fun ComposeDemoApp() {
+fun ComposeDemoApp(
+    listViewModel: SchemaListViewModel,
+    detailViewModel: SchemaDetailViewModel
+) {
     val navController = rememberNavController()
 //    val tracker = Tracking.setup()
     
@@ -36,7 +42,7 @@ fun ComposeDemoApp() {
         
         composable(Destinations.SCHEMA_LIST_ROUTE) {
             SchemaListScreen(
-                vm = SchemaListViewModel(), 
+                vm = listViewModel, 
                 onSchemaClicked = {
                     val encoded = Base64.getEncoder().encodeToString(it.toByteArray())
                     navController.navigate("detail/$encoded")
@@ -47,8 +53,9 @@ fun ComposeDemoApp() {
 
         composable(Destinations.SCHEMA_DETAIL_ROUTE) { 
             val schemaUrl = it.arguments?.getString("schema")
+
             SchemaDetailScreen(
-                vm = SchemaDetailViewModel(),
+                vm = detailViewModel,
                 schemaUrl = String(Base64.getDecoder().decode(schemaUrl)).drop(5))
         }
     }

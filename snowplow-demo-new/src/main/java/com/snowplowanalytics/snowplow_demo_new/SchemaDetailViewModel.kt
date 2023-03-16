@@ -24,7 +24,7 @@ class SchemaDetailViewModel : ViewModel() {
                 println("❗ " + description.value)
 
             } catch (e: Exception) {
-                println("❗❌ " + e.message.toString())
+                println("❌ " + e.message.toString())
             }
         }
 
