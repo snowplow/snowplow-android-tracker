@@ -7,38 +7,30 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snowplowanalytics.snowplow_demo_new.data.Schema
+import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
 import kotlinx.coroutines.launch
 
 class SchemaListViewModel : ViewModel() {
     var errorMessage: String by mutableStateOf("")
-    
-    private val _schemasList = mutableStateListOf<String>()
-    val schemaList: List<String>
-        get() = _schemasList
 
-    private val _schemasPartsList = mutableStateListOf<HashMap<String, String>>()
-    val schemaPartsList: List<HashMap<String, String>>
+    private val _schemasPartsList = mutableStateListOf<SchemaUrlParts>()
+    val schemaPartsList: List<SchemaUrlParts>
         get() = _schemasPartsList
-    
 
     fun getSchemaList() {
         viewModelScope.launch {
             val apiService = IgluAPIService.getInstance()
             try {
                 val schemas = apiService.getSchemas()
-                _schemasList.clear()
-                _schemasList.addAll(schemas)
-                
                 for (schema in schemas) {
                     val schemaParts = schema.drop(5).split("/")
-                    val schemaHash = HashMap<String, String>()
-                    schemaHash["url"] = schema
-                    schemaHash["name"] = schemaParts[1]
-                    schemaHash["vendor"] = schemaParts[0]
-                    schemaHash["version"] = schemaParts[3]
-                    _schemasPartsList.add(schemaHash)
+                    _schemasPartsList.add(SchemaUrlParts(
+                        url = schema,
+                        name = schemaParts[1],
+                        vendor = schemaParts[0],
+                        version = schemaParts[3]
+                    ))
                 }
-                
             } catch (e: Exception) {
                 errorMessage = e.message.toString()
             }

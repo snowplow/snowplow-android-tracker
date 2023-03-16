@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
 
 @Composable
 fun SchemaListScreen(
@@ -46,12 +47,12 @@ fun SchemaListScreen(
 }
 
 @Composable
-fun SchemaCard(schema: HashMap<String,String>, onClick: (String) -> Unit) {
+fun SchemaCard(schema: SchemaUrlParts, onClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { schema["url"]?.let { onClick.invoke(it) } },
+            .clickable { schema.url.let { onClick.invoke(it) } },
         horizontalArrangement = Arrangement.SpaceBetween
     
     ) {
@@ -64,18 +65,18 @@ fun SchemaCard(schema: HashMap<String,String>, onClick: (String) -> Unit) {
 
                 Text("Name")
                 Text(
-                    schema.getOrElse("name") { "schema name" },
+                    schema.name,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text("Vendor")
                 Text(
-                    schema.getOrElse("vendor") { "vendor" },
+                    schema.vendor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text("Version")
                 Text(
-                    schema.getOrElse("version") { "version" },
+                    schema.version,
                 )
             }
         }

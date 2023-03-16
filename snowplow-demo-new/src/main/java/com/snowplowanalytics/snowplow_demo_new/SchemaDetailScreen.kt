@@ -1,10 +1,11 @@
 package com.snowplowanalytics.snowplow_demo_new
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -16,7 +17,8 @@ fun SchemaDetailScreen(
 ) {
     
     LaunchedEffect(Unit, block = {
-        vm.getSchemaDetails(schemaUrl)
+        vm.getSchemaDescription(schemaUrl)
+        vm.getSchemaJson(schemaUrl)
     })
     
     val schemaParts = vm.processSchemaUrl(schemaUrl)
@@ -24,7 +26,7 @@ fun SchemaDetailScreen(
     Column(modifier = Modifier.padding(all = 8.dp)) {
         Spacer(modifier = Modifier.width(40.dp))
         
-        Column {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text("URL")
             Text(schemaUrl)
             Spacer(modifier = Modifier.width(20.dp))
@@ -43,6 +45,10 @@ fun SchemaDetailScreen(
             
             Text("Description")
             Text(vm.description.value ?: "No description found.")
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Text("JSON Schema")
+            Text(vm.json.value.toString(4).replace("\\", ""))
             Spacer(modifier = Modifier.width(20.dp))
         }
     }
