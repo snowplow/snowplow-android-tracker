@@ -8,16 +8,16 @@ import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListViewModel
 import com.snowplowanalytics.snowplow_demo_new.ui.theme.ComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
-    private val listvm = SchemaListViewModel()
-    private val detailvm = SchemaDetailViewModel()
+    private val listVm = SchemaListViewModel()
+    private val detailVm = SchemaDetailViewModel()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeDemoTheme {
                 ComposeDemoApp(
-                    listViewModel = listvm, 
-                    detailViewModel = detailvm
+                    listViewModel = listVm, 
+                    detailViewModel = detailVm
                 )
             }
         }

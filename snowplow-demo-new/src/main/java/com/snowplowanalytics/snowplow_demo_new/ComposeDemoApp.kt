@@ -5,7 +5,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.snowplowanalytics.snowplow_demo_new.data.Tracking
+import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailScreen
 import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailViewModel
+import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListScreen
 import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListViewModel
 import java.util.*
 
@@ -20,6 +22,8 @@ fun ComposeDemoApp(
     detailViewModel: SchemaDetailViewModel
 ) {
     val navController = rememberNavController()
+    
+    // Initialises the Snowplow tracker
     Tracking.setup()
     
     NavHost(
@@ -34,12 +38,10 @@ fun ComposeDemoApp(
                     navController.navigate("detail/$encoded")
                 }
             )
-            
         }
 
         composable(Destinations.SCHEMA_DETAIL_ROUTE) { 
             val schemaUrl = it.arguments?.getString("schema")
-
             SchemaDetailScreen(
                 vm = detailViewModel,
                 schemaUrl = String(Base64.getDecoder().decode(schemaUrl)).drop(5),
