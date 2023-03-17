@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new
+package com.snowplowanalytics.snowplow_demo_new.data
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext

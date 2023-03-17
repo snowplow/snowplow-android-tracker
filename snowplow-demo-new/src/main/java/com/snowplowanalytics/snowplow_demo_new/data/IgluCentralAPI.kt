@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new
+package com.snowplowanalytics.snowplow_demo_new.data
 
 import com.snowplowanalytics.snowplow_demo_new.data.Schema
 import okhttp3.ResponseBody
@@ -8,7 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
-
 
 const val IGLU_BASE_URL = "http://iglucentral.com/"
 

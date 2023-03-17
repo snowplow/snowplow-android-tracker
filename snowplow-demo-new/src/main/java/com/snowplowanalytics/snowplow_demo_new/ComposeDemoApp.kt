@@ -1,14 +1,12 @@
 package com.snowplowanalytics.snowplow_demo_new
 
-
-
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import com.snowplowanalytics.snowplow_demo_new.data.Tracking
+import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailViewModel
+import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListViewModel
 import java.util.*
 
 object Destinations {
@@ -22,7 +20,7 @@ fun ComposeDemoApp(
     detailViewModel: SchemaDetailViewModel
 ) {
     val navController = rememberNavController()
-//    val tracker = Tracking.setup()
+    Tracking.setup()
     
     NavHost(
         navController = navController, 
@@ -44,7 +42,9 @@ fun ComposeDemoApp(
 
             SchemaDetailScreen(
                 vm = detailViewModel,
-                schemaUrl = String(Base64.getDecoder().decode(schemaUrl)).drop(5))
+                schemaUrl = String(Base64.getDecoder().decode(schemaUrl)).drop(5),
+                onBackButtonClicked = { navController.navigate(Destinations.SCHEMA_LIST_ROUTE) }
+            )
         }
     }
 }

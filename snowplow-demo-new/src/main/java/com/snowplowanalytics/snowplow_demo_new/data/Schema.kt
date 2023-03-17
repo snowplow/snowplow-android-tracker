@@ -1,7 +1,5 @@
 package com.snowplowanalytics.snowplow_demo_new.data
 
-import org.json.JSONObject
-
 data class Schema(
     val description: String?,
 )

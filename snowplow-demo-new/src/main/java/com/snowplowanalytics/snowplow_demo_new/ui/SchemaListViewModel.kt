@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new
+package com.snowplowanalytics.snowplow_demo_new.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.snowplowanalytics.snowplow_demo_new.data.Schema
+import com.snowplowanalytics.snowplow_demo_new.IgluAPIService
 import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
 import kotlinx.coroutines.launch
 
