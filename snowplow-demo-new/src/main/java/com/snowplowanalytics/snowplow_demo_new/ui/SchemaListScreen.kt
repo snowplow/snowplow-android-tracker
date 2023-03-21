@@ -34,7 +34,7 @@ fun SchemaListScreen(
     })
 
     // Tracks a ScreenView event
-    Tracking.tracker()?.track(ScreenView("list", UUID.randomUUID()))
+    Tracking.TrackScreenView("list")
 
     Scaffold(topBar = {
         TopAppBar (
@@ -103,17 +103,4 @@ fun ListSchemaProperty(title: String, data: String) {
         overflow = TextOverflow.Ellipsis,
     )
     Spacer(modifier = Modifier.height(6.dp))
-}
-
-@Preview
-@Composable
-fun PreviewCard() {
-    SchemaCard(
-        schema = SchemaUrlParts(
-            "url",
-            "namenamename",
-            "vendorvendorvendor.vendorvendorvendor.vendor.vendorvendorvendor",
-            "1.0.0"
-        ), onClick = {}
-    )
 }

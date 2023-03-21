@@ -32,16 +32,14 @@ fun SchemaDetailScreen(
         vm.getSchemaJson(schemaUrl)
     })
     val schemaParts = vm.processSchemaUrl(schemaUrl)
-    
+
+    // Tracks a ScreenView with attached context entity.
+    // This entity records information about the specific schema being viewed
     val entity = SelfDescribingJson(
         "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0", 
         hashMapOf("name" to schemaParts.name, "vendor" to schemaParts.vendor)
     )
-    val event = ScreenView("detail", UUID.randomUUID()).entities(listOf(entity))
-
-    // Tracks a ScreenView with attached context entity.
-    // This entity records information about the specific schema being viewed
-    Tracking.tracker()?.track(event)
+    Tracking.TrackScreenView("detail", entities = listOf(entity))
     
     Scaffold(
         topBar = {

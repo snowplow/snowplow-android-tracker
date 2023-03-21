@@ -24,7 +24,7 @@ fun ComposeDemoApp(
     val navController = rememberNavController()
     
     // Initialises the Snowplow tracker
-    Tracking.setup()
+    Tracking.setup("compose_demo")
     
     NavHost(
         navController = navController, 
