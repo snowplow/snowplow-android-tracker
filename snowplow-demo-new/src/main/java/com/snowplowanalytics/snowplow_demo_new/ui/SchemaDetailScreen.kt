@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow_demo_new.R
+import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
 import com.snowplowanalytics.snowplow_demo_new.data.Tracking
 import java.util.*
 
@@ -54,93 +54,41 @@ fun SchemaDetailScreen(
                             contentDescription = stringResource(R.string.back_button)
                         )
                     }
-
                 }
             )
         }
     ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
-            Column(modifier = Modifier.padding(all = 8.dp)) {
-                Spacer(modifier = Modifier.width(40.dp))
-
+            Column(modifier = Modifier.padding(all = 12.dp)) {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text(
-                        text = "URL",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
+                    DetailsSchemaProperty(title = "URL", data = schemaUrl)
+                    DetailsSchemaProperty(title = "Name", data = schemaParts.name)
+                    DetailsSchemaProperty(title = "Vendor", data = schemaParts.vendor)
+                    DetailsSchemaProperty(title = "Version", data = schemaParts.version)
+                    DetailsSchemaProperty(
+                        title = "Description", 
+                        data = vm.description.value ?: "null"
                     )
-                    Text(
-                        schemaUrl,
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
+                    DetailsSchemaProperty(
+                        title = "JSON Schema", 
+                        data = vm.json.value.toString(4).replace("\\", "")
                     )
-                    Spacer(modifier = Modifier.width(30.dp))
-
-                    Text(
-                        text = "Name",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Text(
-                        schemaParts.name,
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-                    )
-                    Spacer(modifier = Modifier.width(30.dp))
-
-                    Text(
-                        text = "Vendor",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Text(
-                        schemaParts.vendor,
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-                    )
-                    Spacer(modifier = Modifier.width(30.dp))
-
-                    Text(
-                        text = "Version",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Text(
-                        schemaParts.version,
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    Text(
-                        text = "Description",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Text(
-                        vm.description.value ?: "No description found.",
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    Text(
-                        text = "JSON Schema",
-                        modifier = Modifier.padding(4.dp),
-                        style = TextStyle(fontSize = 12.sp)
-                    )
-                    Text(
-                        vm.json.value.toString(4).replace("\\", ""),
-                        style = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
                 }
             }
         }
-    } 
+    }
+}
 
-    
-
-    
+@Composable
+fun DetailsSchemaProperty(title: String, data: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.subtitle1
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        data,
+        style = MaterialTheme.typography.body1,
+    )
+    Spacer(modifier = Modifier.height(16.dp))
 }

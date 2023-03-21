@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -11,13 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow_demo_new.R
 import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
@@ -43,7 +43,6 @@ fun SchemaListScreen(
                     Text("Schemas")
                 }
             })
-
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (vm.errorMessage.isEmpty()) {
@@ -58,7 +57,6 @@ fun SchemaListScreen(
                 Text(vm.errorMessage)
             }
         }
-
     }
 }
 
@@ -71,57 +69,40 @@ fun SchemaCard(schema: SchemaUrlParts, onClick: (String) -> Unit) {
             .clickable { onClick.invoke(schema.url) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-
-
         ) {
-        
         Column(modifier = Modifier.fillMaxWidth(0.9F)) {
-            Text(
-                text = "Name", 
-                modifier = Modifier.padding(4.dp), 
-                style = TextStyle(fontSize = 12.sp)
-            )
-            Text(
-                schema.name,
-                style = TextStyle(fontSize = 14.sp),
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-            )
-            Text(
-                text = "Vendor",
-                modifier = Modifier.padding(4.dp),
-                style = TextStyle(fontSize = 12.sp)
-            )
-            Text(
-                schema.vendor,
-                maxLines = 1,
-                style = TextStyle(fontSize = 14.sp),
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-            )
-            Text(
-                text = "Version",
-                modifier = Modifier.padding(4.dp),
-                style = TextStyle(fontSize = 12.sp)
-            )
-            Text(
-                schema.version,
-                style = TextStyle(fontSize = 14.sp),
-                modifier = Modifier.paddingFromBaseline(bottom = 4.dp),
-            )
+            ListSchemaProperty(title = "Name", data = schema.name)
+            ListSchemaProperty(title = "Vendor", data = schema.vendor)
+            ListSchemaProperty(title = "Version", data = schema.version)
         }
         Column {
             Icon(
                 imageVector = Icons.Filled.ArrowForward,
-                contentDescription = stringResource(R.string.detail_button)
+                contentDescription = stringResource(R.string.detail_button),
+                tint = MaterialTheme.colors.primary
             )
         }
-        
-        
-        
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
     }
-    Divider()
+    Divider(
+        color = MaterialTheme.colors.primary
+    )
+}
+
+@Composable
+fun ListSchemaProperty(title: String, data: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.subtitle1
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        data,
+        style = MaterialTheme.typography.body1,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+    Spacer(modifier = Modifier.height(6.dp))
 }
 
 @Preview

@@ -13,7 +13,7 @@ interface IgluAPIService {
     suspend fun getSchemas(): List<String>
 
     @GET("schemas/{schemaUrl}")
-    suspend fun getSchemaDescription(@Path("schemaUrl") schemaUrl: String): Schema
+    suspend fun getSchemaDescription(@Path("schemaUrl") schemaUrl: String): SchemaDescription
 
     @GET("schemas/{schemaUrl}")
     suspend fun getSchemaJson(@Path("schemaUrl") schemaUrl: String): ResponseBody

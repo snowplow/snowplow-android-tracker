@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow_demo_new.data
 
-data class Schema(
+data class SchemaDescription(
     val description: String?,
 )
 

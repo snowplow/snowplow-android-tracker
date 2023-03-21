@@ -11,8 +11,7 @@ import org.json.JSONObject
 
 class SchemaDetailViewModel : ViewModel() {
     
-    var description: MutableState<String?> = mutableStateOf("initial value description")
-
+    var description: MutableState<String?> = mutableStateOf("")
     var json: MutableState<JSONObject> = mutableStateOf(JSONObject())
     
     fun getSchemaDescription(schemaUrl: String) {
