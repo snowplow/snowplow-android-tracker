@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new.data
+package com.snowplowanalytics.snowplowdemocompose.data
 
 data class SchemaDescription(
     val description: String?,

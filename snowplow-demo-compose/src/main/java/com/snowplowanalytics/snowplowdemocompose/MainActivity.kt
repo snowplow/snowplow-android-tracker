@@ -1,11 +1,11 @@
-package com.snowplowanalytics.snowplow_demo_new
+package com.snowplowanalytics.snowplowdemocompose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailViewModel
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListViewModel
-import com.snowplowanalytics.snowplow_demo_new.ui.theme.ComposeDemoTheme
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaDetailViewModel
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaListViewModel
+import com.snowplowanalytics.snowplowdemocompose.ui.theme.ComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
     private val listVm = SchemaListViewModel()

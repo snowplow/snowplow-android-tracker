@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new.data
+package com.snowplowanalytics.snowplowdemocompose.data
 
 import okhttp3.ResponseBody
 import retrofit2.Retrofit

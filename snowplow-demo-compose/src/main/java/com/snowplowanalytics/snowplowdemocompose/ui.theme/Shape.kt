@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new.ui.theme
+package com.snowplowanalytics.snowplowdemocompose.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

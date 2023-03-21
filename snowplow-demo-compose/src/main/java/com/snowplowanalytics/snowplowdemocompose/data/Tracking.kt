@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new.data
+package com.snowplowanalytics.snowplowdemocompose.data
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,7 +13,7 @@ import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.LogLevel
-import java.util.*
+import java.util.UUID
 
 object Tracking {
     @Composable

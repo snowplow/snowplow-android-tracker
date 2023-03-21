@@ -1,14 +1,14 @@
-package com.snowplowanalytics.snowplow_demo_new
+package com.snowplowanalytics.snowplowdemocompose
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
-import com.snowplowanalytics.snowplow_demo_new.data.Tracking
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailScreen
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaDetailViewModel
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListScreen
-import com.snowplowanalytics.snowplow_demo_new.ui.SchemaListViewModel
+import com.snowplowanalytics.snowplowdemocompose.data.Tracking
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaDetailScreen
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaDetailViewModel
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaListScreen
+import com.snowplowanalytics.snowplowdemocompose.ui.SchemaListViewModel
 import java.util.*
 
 object Destinations {

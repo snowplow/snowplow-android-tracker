@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow_demo_new.ui
+package com.snowplowanalytics.snowplowdemocompose.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,15 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow_demo_new.R
-import com.snowplowanalytics.snowplow_demo_new.data.SchemaUrlParts
-import com.snowplowanalytics.snowplow_demo_new.data.Tracking
-import java.util.*
+import com.snowplowanalytics.snowplowdemocompose.R
+import com.snowplowanalytics.snowplowdemocompose.data.Tracking
 
 
 @Composable
