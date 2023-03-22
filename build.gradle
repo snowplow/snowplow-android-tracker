@@ -16,10 +16,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "io.github.gradle-nexus.publish-plugin" version "1.2.0"
-}
-
 subprojects {
     group = 'com.snowplowanalytics'
     version = '5.0.0-beta.1'
@@ -30,16 +26,5 @@ subprojects {
             allowInsecureProtocol = true
         }
         mavenCentral()
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = System.getenv('SONA_USER')
-            password = System.getenv('SONA_PASS')
-            stagingProfileId = SONATYPE_STAGING_PROFILE
-//            nexusUrl.set(uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/"))
-        }
     }
 }

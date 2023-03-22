@@ -44,4 +44,5 @@ jobs:
       
       - name: Publish
         run: |
-          ./gradlew publishToSonatype
+          ./gradlew -PisRelease=true publishReleasePublicationToMavenLocal
+          ./gradlew -PisRelease=true publishReleasePublicationToMavenRepository --stacktrace
