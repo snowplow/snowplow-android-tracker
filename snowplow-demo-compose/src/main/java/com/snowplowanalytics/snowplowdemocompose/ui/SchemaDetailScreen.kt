@@ -28,13 +28,15 @@ fun SchemaDetailScreen(
     })
     val schemaParts = vm.processSchemaUrl(schemaUrl)
 
-    // Tracks a ScreenView with attached context entity.
-    // This entity records information about the specific schema being viewed
+    // ScreenViews, like all event types, can be tracked manually.
+    // This code tracks a ScreenView with attached context entity.
+    // The entity records information about the specific schema being viewed.
+    // To attach entities to ScreenViews tracked automatically via Navigation, use the Global Contexts API.
     val entity = SelfDescribingJson(
         "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0", 
         hashMapOf("name" to schemaParts.name, "vendor" to schemaParts.vendor)
     )
-    Tracking.TrackScreenView("detail", entities = listOf(entity))
+    Tracking.ManuallyTrackScreenView("schema_detail", entities = listOf(entity))
     
     Scaffold(
         topBar = {

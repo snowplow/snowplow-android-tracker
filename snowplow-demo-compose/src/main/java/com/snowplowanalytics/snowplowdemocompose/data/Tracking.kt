@@ -1,8 +1,10 @@
 package com.snowplowanalytics.snowplowdemocompose.data
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
@@ -19,7 +21,7 @@ object Tracking {
     @Composable
     fun setup(namespace: String) : TrackerController {
         // Replace this collector endpoint with your own
-        val networkConfig = NetworkConfiguration("https://cb8c-18-194-133-57.ngrok.io", HttpMethod.POST)
+        val networkConfig = NetworkConfiguration("https://23a6-82-26-43-253.ngrok.io", HttpMethod.POST)
         val trackerConfig = TrackerConfiguration("appID").logLevel(LogLevel.DEBUG)
         val emitterConfig = EmitterConfiguration().bufferOption(BufferOption.Single)
 
@@ -33,9 +35,16 @@ object Tracking {
     }
 
     @Composable
-    fun TrackScreenView(screenName: String, 
-                        screenId: UUID? = UUID.randomUUID(), 
-                        entities: List<SelfDescribingJson>? = null,
+    fun AutoTrackScreenView(navController: NavController) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            Snowplow.defaultTracker?.track(ScreenView(destination.route ?: "null", UUID.randomUUID()))
+        }
+    }
+    
+    @Composable
+    fun ManuallyTrackScreenView(screenName: String,
+                                screenId: UUID? = UUID.randomUUID(),
+                                entities: List<SelfDescribingJson>? = null,
     ) {
         LaunchedEffect(Unit, block = {
             val event = ScreenView(screenName, screenId).entities(entities)

@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.snowplowanalytics.snowplowdemocompose.R
 import com.snowplowanalytics.snowplowdemocompose.data.SchemaUrlParts
-import com.snowplowanalytics.snowplowdemocompose.data.Tracking
 
 @Composable
 fun SchemaListScreen(
@@ -26,9 +25,6 @@ fun SchemaListScreen(
     LaunchedEffect(Unit, block = {
         vm.getSchemaList()
     })
-
-    // Tracks a ScreenView event
-    Tracking.TrackScreenView("list")
 
     Scaffold(topBar = {
         TopAppBar (

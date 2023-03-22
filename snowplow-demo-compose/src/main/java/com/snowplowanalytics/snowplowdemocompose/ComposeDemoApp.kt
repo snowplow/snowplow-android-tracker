@@ -23,8 +23,10 @@ fun ComposeDemoApp(
 ) {
     val navController = rememberNavController()
     
-    // Initialises the Snowplow tracker
+    // Initialises the Snowplow tracker and sets up screen view autotracking
+    // A ScreenView event will be generated every time the navigation destination changes
     Tracking.setup("compose_demo")
+    Tracking.AutoTrackScreenView(navController = navController)
     
     NavHost(
         navController = navController, 
