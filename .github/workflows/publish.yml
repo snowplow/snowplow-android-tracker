@@ -1,0 +1,26 @@
+name: Test publish
+on:
+  workflow_dispatch: {}
+jobs:
+  publish:
+    runs-on: macos-latest
+
+    env: 
+      SONA_USER: ${{ secrets.SONA_USER }}
+      SONA_PASS: ${{ secrets.SONA_PASS }}
+      SONA_PGP_PASSPHRASE: ${{ secrets.SONA_PGP_PASSPHRASE }}
+      SONA_PGP_SECRET: ${{ secrets.SONA_PGP_SECRET }}
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build
+        run: ./gradlew assembleRelease
+
+      - name: Publish
+        run: |
+          ./gradlew publishToSonatype

@@ -13,9 +13,11 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.7.20"
         classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1"
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.13.0'
     }
+}
+
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
 subprojects {
@@ -28,5 +30,15 @@ subprojects {
             allowInsecureProtocol = true
         }
         mavenCentral()
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv('SONA_USER')
+            password = System.getenv('SONA_PASS')
+            nexusUrl.set(uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/"))
+        }
     }
 }

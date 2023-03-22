@@ -2,10 +2,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: 'signing'
 
 jacoco {
     toolVersion = "0.8.5"
@@ -18,6 +17,7 @@ project.ext {
 android {
     compileSdkVersion 33
     buildToolsVersion "30.0.3"
+    namespace "com.snowplowanalytics.snowplow.tracker"
 
     useLibrary 'android.test.base'
 
@@ -104,6 +104,25 @@ dependencies {
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
 }
 
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    configurations.implementation.setCanBeResolved(true)
+
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.implementation
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
 android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         title = "Documentation for snowplow-android-core $version API"
@@ -120,25 +139,68 @@ coveralls {
     jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
 }
 
-signing {
-    useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
-}
-
-// Deprecated: to fix as explained in https://github.com/vanniktech/gradle-maven-publish-plugin/issues/137
-mavenPublish {
-    targets {
-        uploadArchives {
-            releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            repositoryUsername = System.getenv('SONA_USER')
-            repositoryPassword = System.getenv('SONA_PASS')
-        }
-    }
-    nexus {
-        repositoryUsername = System.getenv('SONA_USER') // defaults to the mavenCentralRepositoryUsername Gradle Property
-        repositoryPassword = System.getenv('SONA_PASS') // defaults to the mavenCentralRepositoryPassword Gradle Property
-    }
-}
-
 repositories {
     mavenCentral()
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId GROUP
+                artifactId POM_ARTIFACT_ID
+                version VERSION_NAME
+
+                // artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+                from components.release
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+
+                    licenses {
+                        license {
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                            distribution = POM_LICENCE_DIST
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
+                        }
+                    }
+
+                    scm {
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                    }
+
+                    // A slight fix so that the generated POM will include any transitive dependencies
+                    // that the library builds upon
+                    withXml {
+                        def dependenciesNode = asNode().appendNode('dependencies')
+
+                        project.configurations.implementation.allDependencies.each {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
+    sign publishing.publications
 }
