@@ -8,16 +8,16 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.7.20"
-        classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.8.10"
+        classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.12.2"
     }
 }
 
 plugins {
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.2.0"
 }
 
 subprojects {
@@ -39,7 +39,7 @@ nexusPublishing {
             username = System.getenv('SONA_USER')
             password = System.getenv('SONA_PASS')
             stagingProfileId = SONATYPE_STAGING_PROFILE
-            nexusUrl.set(uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/"))
+//            nexusUrl.set(uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/"))
         }
     }
 }
