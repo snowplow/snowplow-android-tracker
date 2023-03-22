@@ -121,7 +121,7 @@ class RemoteConfigurationTest {
         val expected =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         expected.configurationVersion = 12
-        expected.configurationBundle = Lists.newArrayList(bundle)
+        expected.configurationBundle = listOf(bundle)
         val remoteConfiguration = RemoteConfiguration("http://example.com", HttpMethod.GET)
         var cache = ConfigurationCache(remoteConfiguration)
         cache.clearCache(context)
@@ -238,7 +238,7 @@ class RemoteConfigurationTest {
         val cached =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 1
-        cached.configurationBundle = Lists.newArrayList(bundle)
+        cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
 
         // test
@@ -281,7 +281,7 @@ class RemoteConfigurationTest {
         val cached =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 1
-        cached.configurationBundle = Lists.newArrayList(bundle)
+        cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
 
         // test
@@ -324,7 +324,7 @@ class RemoteConfigurationTest {
         val cached =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 1
-        cached.configurationBundle = Lists.newArrayList(bundle)
+        cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
         val expectation = Any() as Object
         val provider = ConfigurationProvider(remoteConfig)
@@ -368,7 +368,7 @@ class RemoteConfigurationTest {
         val cached =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 1
-        cached.configurationBundle = Lists.newArrayList(bundle)
+        cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
         val expectation = Any() as Object
         val provider = ConfigurationProvider(remoteConfig)
@@ -420,7 +420,7 @@ class RemoteConfigurationTest {
         val cached =
             FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 2
-        cached.configurationBundle = Lists.newArrayList(bundle)
+        cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
 
         // stub request for configuration (return version 1)
