@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId 'com.snowplowanalytics.snowplowdemokotlin'
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 32
         versionCode 1
         versionName '1.0'
