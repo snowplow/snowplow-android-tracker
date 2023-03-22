@@ -10,6 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level:
+          - 21
           - 24
           - 30
 
