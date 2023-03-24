@@ -1,6 +1,5 @@
 package com.snowplowanalytics.snowplowdemocompose.data
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +14,6 @@ import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.LogLevel
-import java.util.UUID
 
 object Tracking {
     @Composable
@@ -37,17 +35,16 @@ object Tracking {
     @Composable
     fun AutoTrackScreenView(navController: NavController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            Snowplow.defaultTracker?.track(ScreenView(destination.route ?: "null", UUID.randomUUID()))
+            Snowplow.defaultTracker?.track(ScreenView(destination.route ?: "null"))
         }
     }
     
     @Composable
     fun ManuallyTrackScreenView(screenName: String,
-                                screenId: UUID? = UUID.randomUUID(),
                                 entities: List<SelfDescribingJson>? = null,
     ) {
         LaunchedEffect(Unit, block = {
-            val event = ScreenView(screenName, screenId).entities(entities)
+            val event = ScreenView(screenName).entities(entities)
             Snowplow.defaultTracker?.track(event)
         })
     }

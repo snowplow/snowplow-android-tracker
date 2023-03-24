@@ -16,6 +16,8 @@ object Destinations {
     const val SCHEMA_DETAIL_ROUTE = "detail/{schema}"
 }
 
+// This demo app displays the publicly available schemas from Iglu Central
+// http://iglucentral.com/
 @Composable
 fun ComposeDemoApp(
     listViewModel: SchemaListViewModel,
