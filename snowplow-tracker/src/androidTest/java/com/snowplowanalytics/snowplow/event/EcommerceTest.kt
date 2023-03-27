@@ -38,7 +38,7 @@ class EcommerceTest {
         Assert.assertFalse(data.containsKey(Parameters.TR_COUNTRY))
         Assert.assertFalse(data.containsKey(Parameters.TR_CURRENCY))
         val ecommerceTransactionItem = EcommerceTransactionItem("some sku", 123.456, 1)
-        val items: List<EcommerceTransactionItem> = Lists.newArrayList(ecommerceTransactionItem)
+        val items = listOf(ecommerceTransactionItem)
         ecommerceTransaction = EcommerceTransaction("some order id", 123.456, items)
             .affiliation("some affiliate")
             .taxValue(50.6)

@@ -2,10 +2,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: 'signing'
 
 jacoco {
     toolVersion = "0.8.5"
@@ -16,13 +15,14 @@ project.ext {
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 33
+    buildToolsVersion "30.0.3"
+    namespace "com.snowplowanalytics.snowplow.tracker"
 
     useLibrary 'android.test.base'
 
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
         versionName "$project.version"
@@ -65,8 +65,14 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     // This enables long timeouts required on slow environments
@@ -77,22 +83,44 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.4.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.annotation:annotation:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.preference:preference:1.2.0'
     compileOnly "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     compileOnly "com.android.installreferrer:installreferrer:2.2"
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     // test
     testImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     testImplementation "com.android.installreferrer:installreferrer:2.2"
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation 'com.google.android.gms:play-services-analytics:18.0.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'com.google.android.gms:play-services-analytics:18.0.2'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    configurations.implementation.setCanBeResolved(true)
+
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.implementation
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
 }
 
 android.libraryVariants.all { variant ->
@@ -111,25 +139,66 @@ coveralls {
     jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
 }
 
-signing {
-    useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
-}
-
-// Deprecated: to fix as explained in https://github.com/vanniktech/gradle-maven-publish-plugin/issues/137
-mavenPublish {
-    targets {
-        uploadArchives {
-            releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            repositoryUsername = System.getenv('SONA_USER')
-            repositoryPassword = System.getenv('SONA_PASS')
-        }
-    }
-    nexus {
-        repositoryUsername = System.getenv('SONA_USER') // defaults to the mavenCentralRepositoryUsername Gradle Property
-        repositoryPassword = System.getenv('SONA_PASS') // defaults to the mavenCentralRepositoryPassword Gradle Property
-    }
-}
-
 repositories {
     mavenCentral()
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId GROUP
+                artifactId POM_ARTIFACT_ID
+                version VERSION_NAME
+
+                from components.release
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+
+                    licenses {
+                        license {
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                            distribution = POM_LICENCE_DIST
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
+                        }
+                    }
+
+                    scm {
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                    credentials {
+                        username System.getenv('SONA_USER')
+                        password System.getenv('SONA_PASS')
+                    }
+                    url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            }
+        }
+    }
+
+    signing {
+        useInMemoryPgpKeys(System.getenv('SONA_PGP_SECRET'), System.getenv('SONA_PGP_PASSPHRASE'))
+        sign publishing.publications
+    }
+}
+
+task publishReleaseLocal { dependsOn "publishReleasePublicationToMavenLocal" }

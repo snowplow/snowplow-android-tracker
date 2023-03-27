@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplowtrackerdemo;
+package com.snowplowanalytics.snowplowtrackerdemojava;
 
 import android.Manifest;
 import android.app.Activity;
@@ -46,6 +46,7 @@ import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GdprConfiguration;
 import com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration;
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration;
+import com.snowplowanalytics.snowplow.configuration.PluginConfiguration;
 import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration;
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration;
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
@@ -55,6 +56,7 @@ import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
@@ -63,14 +65,16 @@ import com.snowplowanalytics.snowplow.tracker.LogLevel;
 import com.snowplowanalytics.core.utils.Util;
 import com.snowplowanalytics.snowplow.util.Basis;
 import com.snowplowanalytics.snowplow.util.TimeMeasure;
-import com.snowplowanalytics.snowplowtrackerdemo.utils.DemoUtils;
-import com.snowplowanalytics.snowplowtrackerdemo.utils.TrackerEvents;
+import com.snowplowanalytics.snowplowtrackerdemojava.utils.DemoUtils;
+import com.snowplowanalytics.snowplowtrackerdemojava.utils.TrackerEvents;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.snowplowanalytics.core.utils.Util.addToMap;
 
@@ -320,6 +324,9 @@ public class Demo extends Activity implements LoggerDelegate {
         addToMap("email", "info@snowplow.io", pairs);
         gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs))));
 
+        PluginConfiguration plugin = new PluginConfiguration("myPlugin");
+        plugin.afterTrack(null, event -> System.out.printf("Tracked event with %d entities%n", event.getEntities().size()));
+
         Snowplow.createTracker(getApplicationContext(),
                 namespace,
                 networkConfiguration,
@@ -327,7 +334,8 @@ public class Demo extends Activity implements LoggerDelegate {
                 emitterConfiguration,
                 sessionConfiguration,
                 gdprConfiguration,
-                gcConfiguration
+                gcConfiguration,
+                plugin
         );
         Snowplow.subscribeToWebViewEvents(_webView);
         return true;
