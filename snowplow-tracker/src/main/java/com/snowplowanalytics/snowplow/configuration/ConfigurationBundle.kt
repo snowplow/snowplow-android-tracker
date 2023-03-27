@@ -15,6 +15,9 @@ package com.snowplowanalytics.snowplow.configuration
 import android.content.Context
 import org.json.JSONObject
 
+/**
+ * For remote configuration. Bundles [Configuration] objects to apply to a tracker.
+ */
 class ConfigurationBundle @JvmOverloads constructor(
     val namespace: String,
     networkConfiguration: NetworkConfiguration? = null
@@ -23,6 +26,16 @@ class ConfigurationBundle @JvmOverloads constructor(
     var trackerConfiguration: TrackerConfiguration? = null
     var subjectConfiguration: SubjectConfiguration? = null
     var sessionConfiguration: SessionConfiguration? = null
+    
+    val configurations: List<Configuration>
+        get() {
+            val array: MutableList<Configuration> = ArrayList()
+            networkConfiguration?.let { array.add(it) }
+            trackerConfiguration?.let { array.add(it) }
+            subjectConfiguration?.let { array.add(it) }
+            sessionConfiguration?.let { array.add(it) }
+            return array
+        }
 
     init {
         this.networkConfiguration = networkConfiguration
@@ -44,16 +57,6 @@ class ConfigurationBundle @JvmOverloads constructor(
         json = jsonObject.optJSONObject("sessionConfiguration")
         json?.let { sessionConfiguration = SessionConfiguration(it) }
     }
-
-    val configurations: List<Configuration>
-        get() {
-            val array: MutableList<Configuration> = ArrayList()
-            networkConfiguration?.let { array.add(it) }
-            trackerConfiguration?.let { array.add(it) }
-            subjectConfiguration?.let { array.add(it) }
-            sessionConfiguration?.let { array.add(it) }
-            return array
-        }
 
     // Copyable
     override fun copy(): Configuration {

@@ -16,6 +16,9 @@ import okhttp3.Cookie
 import okhttp3.Cookie.Builder
 import org.json.JSONObject
 
+/**
+ * An implementation of `OkHttp.Cookie`, for use with the [CollectorCookieJar].
+ */
 class CollectorCookie {
     val cookie: Cookie
 

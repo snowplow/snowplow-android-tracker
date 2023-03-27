@@ -16,39 +16,47 @@ import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * The event interface
+ * The Event interface
  */
 interface Event {
     /**
+     * The list of entities associated with an event.
      * @return the event custom context entities
      */
     val entities: MutableList<SelfDescribingJson>
 
     /**
+     * @Deprecated 
      * @return the event custom context entities
      */
     @Deprecated("Please use `entities`")
     val contexts: List<SelfDescribingJson>
 
     /**
+     * Set a custom timestamp.
      * @return the optional true events timestamp
      */
     val trueTimestamp: Long?
 
     /**
+     * The payload for the event.
      * @return the event data payload
      */
     val dataPayload: Map<String, Any?>
 
     /**
+     * Internal use only - Don't use in production, it can change without notice.
+     * 
      * Hook method called just before the event processing in order to execute special operations.
-     * @apiNote Internal use only - Don't use in production, it can change without notice.
+     * @suppress
      */
     fun beginProcessing(tracker: Tracker)
 
     /**
+     * Internal use only - Don't use in production, it can change without notice.
+     * 
      * Hook method called just after the event processing in order to execute special operations.
-     * @apiNote Internal use only - Don't use in production, it can change without notice.
+     * @suppress
      */
     fun endProcessing(tracker: Tracker)
 }

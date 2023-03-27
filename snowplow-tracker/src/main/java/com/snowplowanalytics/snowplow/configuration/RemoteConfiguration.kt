@@ -17,11 +17,13 @@ import com.snowplowanalytics.snowplow.network.HttpMethod
 import java.util.*
 
 /**
- * Represents the configuration for fetching configurations from a remote source.
+ * Provide a [RemoteConfiguration] instance when creating a tracker for remote configuration using 
+ * [Snowplow.setup](com.snowplowanalytics.snowplow.Snowplow.setup). 
  */
 class RemoteConfiguration(endpoint: String, method: HttpMethod) : Configuration {
     /**
-     * URL of the remote configuration.
+     * URL for the remote configuration. The URL can include the schema/protocol (e.g. `http://remote-config-url.xyz`).
+     * If it doesn't include the protocol, the HTTPS protocol is automatically selected.
      */
     val endpoint: String
 
@@ -32,9 +34,8 @@ class RemoteConfiguration(endpoint: String, method: HttpMethod) : Configuration 
 
     /**
      * @param endpoint URL of the remote configuration.
-     * The URL can include the schema/protocol (e.g.: `http://remote-config-url.xyz`).
-     * In case the URL doesn't include the schema/protocol, the HTTPS protocol is
-     * automatically selected.
+     * The URL can include the schema/protocol (e.g. `http://remote-config-url.xyz`).
+     * If it doesn't include the protocol, the HTTPS protocol is automatically selected.
      * @param method   The method used to send the requests (GET or POST).
      */
     init {

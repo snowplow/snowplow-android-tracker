@@ -14,6 +14,11 @@ package com.snowplowanalytics.snowplow.entity
 
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
+/**
+ * Used in Lifecycle autotracking. A LifecycleEntity can be automatically added to all events.
+ * 
+ * @see com.snowplowanalytics.snowplow.configuration.TrackerConfiguration.lifecycleAutotracking
+ */
 class LifecycleEntity(isVisible: Boolean) : SelfDescribingJson(SCHEMA_LIFECYCLEENTITY) {
     private val parameters = HashMap<String, Any>()
 

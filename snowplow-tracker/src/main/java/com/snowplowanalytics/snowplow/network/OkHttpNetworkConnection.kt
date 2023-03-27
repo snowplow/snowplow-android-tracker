@@ -71,6 +71,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
 
         /**
+         * GET or POST.
          * @param httpMethod The method by which requests are emitted
          * @return itself
          */
@@ -80,8 +81,10 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * This configuration option is not published in the NetworkConfiguration class.
-         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
+         * This configuration option is not published in the 
+         * [NetworkConfiguration](com.snowplowanalytics.snowplow.configuration.NetworkConfiguration) class.
+         * Create an Emitter and Tracker directly, not via the 
+         * [Snowplow](com.snowplowanalytics.snowplow.Snowplow) interface, to configure tlsVersions.
          * @param version the TLS version allowed for requests
          * @return itself
          */
@@ -91,8 +94,10 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * This configuration option is not published in the NetworkConfiguration class.
-         * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
+         * This configuration option is not published in the
+         * [NetworkConfiguration](com.snowplowanalytics.snowplow.configuration.NetworkConfiguration) class.
+         * Create an Emitter and Tracker directly, not via the
+         * [Snowplow](com.snowplowanalytics.snowplow.Snowplow) interface, to configure tlsVersions.
          * @param versions the TLS versions allowed for requests
          * @return itself
          */
@@ -102,8 +107,9 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * @param emitTimeout The maximum timeout for emitting events. If emit time exceeds this value
-         * TimeOutException will be thrown
+         * Maximum time allowed for a request. If emit time exceeds this value a
+         * TimeOutException will be thrown, which is caught and logged.
+         * @param emitTimeout The maximum timeout for emitting events. 
          * @return itself
          */
         fun emitTimeout(emitTimeout: Int): OkHttpNetworkConnectionBuilder {
@@ -112,9 +118,10 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * @param client An OkHttp client that will be used in the emitter, you can provide your
-         *      own if you want to share your Singleton client's interceptors, connection pool etc.,
-         *      otherwise a new one is created.
+         * A custom OkHttp client that will be used in the emitter. Provide your
+         * own if you want to share your Singleton client's interceptors, connection pool etc.,
+         * otherwise a new one is created. as part of the OkHttpNetworkConnection instantiation.
+         * @param client An OkHttp client
          * @return itself
          */
         fun client(client: OkHttpClient?): OkHttpNetworkConnectionBuilder {
@@ -123,9 +130,9 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * @param cookieJar An OkHttp cookie jar to override the default cookie jar that stores
-         * cookies in SharedPreferences. The cookie jar will be ignored in case
-         * custom `client` is configured.
+         * An OkHttp cookie jar to override the default [CollectorCookieJar](com.snowplowanalytics.snowplow.network.CollectorCookieJar) that stores
+         * cookies in SharedPreferences. The cookie jar will be ignored when custom [client] is configured.
+         * @param cookieJar OkHttp CookieJar
          * @return itself
          */
         fun cookieJar(cookieJar: CookieJar?): OkHttpNetworkConnectionBuilder {
@@ -134,6 +141,10 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * A custom path which will be added to the endpoint URL to specify the
+         * complete URL of the event collector when paired with the POST method. The default path is
+         * "com.snowplowanalytics/snowplow/tp2".
+         * The collector must be configured to accept the custom path.
          * @param customPostPath A custom path that is used on the endpoint to send requests.
          * @return itself
          */
@@ -143,9 +154,11 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
-         * This configuration option is not published in the NetworkConfiguration class.
-         * Instead, configure it via EmitterConfiguration.
-         * @param serverAnonymisation whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
+         * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`.
+         * This configuration option is not published in the
+         * [NetworkConfiguration](com.snowplowanalytics.snowplow.configuration.NetworkConfiguration) class.
+         * Instead, configure it via [EmitterConfiguration](com.snowplowanalytics.snowplow.configuration.EmitterConfiguration).
+         * @param serverAnonymisation whether to anonymise
          * @return itself
          */
         fun serverAnonymisation(serverAnonymisation: Boolean): OkHttpNetworkConnectionBuilder {

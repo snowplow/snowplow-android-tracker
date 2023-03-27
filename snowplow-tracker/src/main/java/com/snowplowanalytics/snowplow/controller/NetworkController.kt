@@ -14,6 +14,9 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.snowplow.network.HttpMethod
 
+/**
+ * Controller for managing the network connection to the event collector.
+ */
 interface NetworkController {
     /**
      * URL used to send events to the collector.

@@ -20,20 +20,21 @@ import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 /**
- * This class represents the configuration of the applications session.
- * The SessionConfiguration can be used to setup the behaviour of sessions.
+ * The [SessionConfiguration] is used to configure session behaviour. 
+ * Session data is stored as [SessionState], and is appended to every event as an entity (`client_session`), by default. 
+ * 
+ * Session data is maintained for the life of the application being installed on a device.
+ * A new session will be created if the session information is not accessed within a configurable timeout.
  *
- * A session is a context which is appended to each event sent.
- * The values it brings can change based on:
+ * A new session will be created based on:
  * - the timeout set for the inactivity of app when in foreground;
  * - the timeout set for the inactivity of app when in background.
  *
- * Session data is maintained for the life of the application being installed on a device.
- * A new session will be created if the session information is not accessed within a configurable timeout.
+ * @see [TrackerConfiguration.sessionContext]
  */
 open class SessionConfiguration
 /**
- * This will setup the session behaviour of the tracker.
+ * This will set up the session behaviour of the tracker.
  * @param foregroundTimeout The timeout set for the inactivity of app when in foreground.
  * @param backgroundTimeout The timeout set for the inactivity of app when in background.
  */(
@@ -53,15 +54,12 @@ open class SessionConfiguration
 ) : SessionConfigurationInterface, Configuration {
     
     /**
-     * The callback called everytime the session is updated.
+     * The callback called every time the session is updated.
      */
     override var onSessionUpdate: Consumer<SessionState>? = null
     
     // Builders
     
-    /**
-     * @see .onSessionUpdate
-     */
     fun onSessionUpdate(onSessionUpdate: Consumer<SessionState>?): SessionConfiguration {
         this.onSessionUpdate = onSessionUpdate
         return this
@@ -74,6 +72,9 @@ open class SessionConfiguration
     }
 
     // JSON Formatter
+    /**
+     * This constructor is used in remote configuration.
+     */
     constructor(jsonObject: JSONObject) : this(
         TimeMeasure(30, TimeUnit.MINUTES),
         TimeMeasure(30, TimeUnit.MINUTES)

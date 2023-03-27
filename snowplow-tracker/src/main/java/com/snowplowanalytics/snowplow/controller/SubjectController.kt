@@ -14,4 +14,8 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.tracker.SubjectConfigurationInterface
 
+/**
+ * Controller for managing Subject.
+ * @see com.snowplowanalytics.core.tracker.Subject
+ */
 interface SubjectController : SubjectConfigurationInterface

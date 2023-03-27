@@ -15,6 +15,10 @@ package com.snowplowanalytics.snowplow.globalcontexts
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
+/**
+ * Pass a FunctionalGenerator when creating [GlobalContext] to add a context entity to every event, 
+ * where the entity can contain properties from the event. 
+ */
 abstract class FunctionalGenerator {
     abstract fun apply(event: InspectableEvent): List<SelfDescribingJson>
 }

@@ -15,6 +15,10 @@ package com.snowplowanalytics.snowplow.globalcontexts
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
+/**
+ * Pass a ContextGenerator when initialising a [GlobalContext] to set specific rules on which 
+ * entities should be added to which events.
+ */
 interface ContextGenerator {
     fun generateContexts(event: InspectableEvent): List<SelfDescribingJson>
     fun filterEvent(event: InspectableEvent): Boolean

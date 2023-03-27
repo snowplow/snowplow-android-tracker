@@ -14,6 +14,10 @@ package com.snowplowanalytics.snowplow.globalcontexts
 
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
+/**
+ * Abstract base class that allows the selective addition of an entity to only a subset of events, 
+ * using [GlobalContext].
+ */
 abstract class FunctionalFilter {
     abstract fun apply(event: InspectableEvent): Boolean
 }

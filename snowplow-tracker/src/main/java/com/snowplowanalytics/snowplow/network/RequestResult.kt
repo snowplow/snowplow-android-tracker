@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.network
 import java.util.*
 
 /**
- * Stores the result of a Request Attempt
+ * Stores the result of a Request attempt.
  * @param statusCode HTTP status code from Collector response
  * @param oversize was the request oversize
  * @param eventIds a list of event ids involved in the sending
@@ -30,7 +30,17 @@ class RequestResult(
      */
     val isSuccessful: Boolean
         get() = statusCode in 200..299
-    
+
+    /**
+     * Checks if the request should be retried.
+     * Requests will not be retried if:
+     * - the request was successful (status code 2xx)
+     * - the request is larger than the configured maximum byte size
+     * - the status code is in the list of configured no-retry codes
+     * - the status code is in the list of default no-retry codes - 400, 401, 403, 410, or 422 
+     * 
+     * @see com.snowplowanalytics.snowplow.configuration.EmitterConfiguration.customRetryForStatusCodes
+     */
     fun shouldRetry(customRetryForStatusCodes: Map<Int, Boolean>?): Boolean {
         // don't retry if successful
         if (isSuccessful) {

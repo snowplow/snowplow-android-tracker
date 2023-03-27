@@ -12,4 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.util
 
+/**
+ * Used internally for screen resolution and screen viewport size measurements.
+ */
 data class Size(val width: Int, val height: Int)

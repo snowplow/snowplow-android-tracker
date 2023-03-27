@@ -17,20 +17,20 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
 
 /**
- * Base AbstractEvent class which contains common
- * elements to all events:
+ * Base AbstractEvent class which contains common elements to all events:
  * - Custom Context: list of custom contexts or null
  * - Timestamp: user defined event timestamp or 0
  * - AbstractEvent Id: a unique id for the event
  */
 abstract class AbstractEvent : Event {
+    /** List of custom entities associated with the event.  */
     /** List of custom contexts associated with the event.  */
     @Deprecated("Please use `entities`")
     @JvmField
     val customContexts: MutableList<SelfDescribingJson> = LinkedList()
     
     /**
-     * @return the optional true (custom) event timestamp
+     * @return the optional "true" (custom) event timestamp
      */
     override var trueTimestamp: Long? = null
     
@@ -62,6 +62,7 @@ abstract class AbstractEvent : Event {
     override val entities: MutableList<SelfDescribingJson>
         get() = customContexts
 
+    @Deprecated("Please use `entities`")
     override val contexts: List<SelfDescribingJson>
         get() = entities
 

@@ -18,6 +18,7 @@ class Background : AbstractSelfDescribing() {
     /** Index indicating the current transition.  */
     var backgroundIndex: Int? = null
     
+    /** The event schema */
     override val schema: String
         get() = Companion.schema
 

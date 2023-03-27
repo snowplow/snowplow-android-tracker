@@ -28,6 +28,9 @@ enum class DevicePlatform(val value: String) {
     InternetOfThings("iot");
 
     companion object {
+        /**
+         * Used in remote configuration.
+         */
         @JvmStatic
         fun getByValue(value: String): DevicePlatform {
             for (element in EnumSet.allOf(DevicePlatform::class.java)) {

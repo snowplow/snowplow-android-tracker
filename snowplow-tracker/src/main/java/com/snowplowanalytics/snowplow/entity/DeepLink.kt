@@ -14,13 +14,25 @@ package com.snowplowanalytics.snowplow.entity
 
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
+/**
+ * Used for the [DeepLink] entity that can be automatically added to the first 
+ * [ScreenView](com.snowplowanalytics.snowplow.event.ScreenView) event tracked 
+ * following a deep link.  
+ * 
+ * @see com.snowplowanalytics.snowplow.configuration.TrackerConfiguration.deepLinkContext
+ */
 class DeepLink(url: String) : SelfDescribingJson(SCHEMA_DEEPLINK) {
     private val parameters = HashMap<String, Any>()
+
+    val url: String?
+        get() = parameters[PARAM_DEEPLINK_URL] as? String?
+    val referrer: String?
+        get() = parameters[PARAM_DEEPLINK_REFERRER] as? String?
 
     init {
         parameters[PARAM_DEEPLINK_URL] = url
         setData(parameters)
-        // Set here further checks about the arguments.
+        // TODO Set here further checks about the arguments.
     }
 
     // Builder methods
@@ -29,12 +41,7 @@ class DeepLink(url: String) : SelfDescribingJson(SCHEMA_DEEPLINK) {
         setData(parameters)
         return this
     }
-
-    val url: String?
-        get() = parameters[PARAM_DEEPLINK_URL] as? String?
-    val referrer: String?
-        get() = parameters[PARAM_DEEPLINK_REFERRER] as? String?
-
+    
     companion object {
         const val SCHEMA_DEEPLINK = "iglu:com.snowplowanalytics.mobile/deep_link/jsonschema/1-0-0"
         const val PARAM_DEEPLINK_REFERRER = "referrer"

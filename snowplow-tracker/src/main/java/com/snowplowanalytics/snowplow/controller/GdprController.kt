@@ -15,9 +15,12 @@ package com.snowplowanalytics.snowplow.controller
 import com.snowplowanalytics.core.gdpr.GdprConfigurationInterface
 import com.snowplowanalytics.snowplow.util.Basis
 
+/**
+ * Controller for managing the GDPR context entity.
+ */
 interface GdprController : GdprConfigurationInterface {
     /**
-     * Reset GDPR context to be sent with each event.
+     * Reset GDPR entity to be sent with each event.
      * @param basisForProcessing GDPR Basis for processing.
      * @param documentId ID of a GDPR basis document.
      * @param documentVersion Version of the document.
@@ -31,17 +34,17 @@ interface GdprController : GdprConfigurationInterface {
     )
 
     /**
-     * Whether the recorded GDPR context is enabled and will be attached as context.
+     * Whether the specified GDPR data will be attached as entity to all events.
      */
     val isEnabled: Boolean
 
     /**
-     * Enable the GDPR context recorded.
+     * Enable the GDPR entity.
      */
     fun enable(): Boolean
 
     /**
-     * Disable the GDPR context recorded.
+     * Disable the GDPR entity.
      */
     fun disable()
 }

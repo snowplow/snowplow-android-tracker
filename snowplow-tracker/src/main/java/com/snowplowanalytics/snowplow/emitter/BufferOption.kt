@@ -13,24 +13,24 @@
 package com.snowplowanalytics.snowplow.emitter
 
 /**
- * BufferOption is used to set the buffer size of your Emitter.
+ * BufferOption is used to set how many events will be in one request to the collector.
  */
 enum class BufferOption(val code: Int) {
     /**
-     * Sends both GET and POST requests with only a single event.  Can cause a spike in
+     * Sends both GET and POST requests with only a single event. Can cause a spike in
      * network traffic if used in correlation with a large amount of events.
      */
     Single(1),
 
     /**
-     * Sends POST requests in groups of 10 events.  This is the default amount of events too
-     * package into a POST.  All GET requests will still emit one at a time.
+     * Sends POST requests in groups of 10 events. This is the default amount of events to
+     * package into a POST. All GET requests will still emit one at a time.
      */
     DefaultGroup(10),
 
     /**
-     * Sends POST requests in groups of 25 events.  Useful for situations where many events
-     * need to be sent.  All GET requests will still emit one at a time.
+     * Sends POST requests in groups of 25 events. Useful for situations where many events
+     * need to be sent. All GET requests will still emit one at a time.
      */
     HeavyGroup(25);
 }

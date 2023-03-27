@@ -14,6 +14,9 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.emitter.EmitterConfigurationInterface
 
+/**
+ * Controller for managing how events are sent.
+ */
 interface EmitterController : EmitterConfigurationInterface {
     /**
      * Number of events recorded in the EventStore.
@@ -31,7 +34,7 @@ interface EmitterController : EmitterConfigurationInterface {
      * Suitable for low bandwidth situations.
      */
     fun pause()
-
+    
     /**
      * Resume emitting events if previously paused.
      * The emitter will resume emitting events again.

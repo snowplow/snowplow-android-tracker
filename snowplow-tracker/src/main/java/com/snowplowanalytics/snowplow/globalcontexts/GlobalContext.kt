@@ -17,6 +17,19 @@ import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * This class allows the attachment of context entities to all events, or all events of a chosen type. 
+ * 
+ * Multiple GlobalContext rules can be provided on tracker creation, using the 
+ * [GlobalContextsConfiguration](com.snowplowanalytics.snowplow.configuration.GlobalContextsConfiguration) class.
+ * Alternatively, GlobalContexts can be added and removed at runtime, using 
+ * [GlobalContextsController.add](com.snowplowanalytics.snowplow.controller.GlobalContextsController.add)
+ * and [GlobalContextsController.remove](com.snowplowanalytics.snowplow.controller.GlobalContextsController.remove) methods.
+ * 
+ * These methods can be accessed directly from the tracker like this: `tracker.globalContexts.add("rule_name", GlobalContext)`
+ * 
+ * @see com.snowplowanalytics.snowplow.controller.TrackerController.globalContexts
+ */
 class GlobalContext {
     private var generator: FunctionalGenerator
     private var filter: FunctionalFilter?

@@ -100,7 +100,8 @@ class ConsentGranted(expiry: String, documentId: String, documentVersion: String
             payload[Parameters.CG_EXPIRY] = expiry
             return payload
         }
-    
+
+    /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_CONSENT_GRANTED
 
