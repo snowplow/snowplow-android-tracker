@@ -39,9 +39,7 @@ class InstallTracker private constructor(context: Context) {
     private inner class SharedPreferencesTask : AsyncTask<Context?, Void?, Boolean>() {
         
         override fun doInBackground(vararg params: Context?): Boolean? {
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-                params[0]
-            )
+            sharedPreferences = params[0]?.let { PreferenceManager.getDefaultSharedPreferences(it) }
             isNewInstall = if (sharedPreferences?.getString(TrackerConstants.INSTALLED_BEFORE, null) == null) {
                 // mark the install if there's no value
                 val editor = sharedPreferences?.edit()
