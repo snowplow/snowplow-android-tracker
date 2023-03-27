@@ -1,3 +1,7 @@
+Version 5.0.0-beta.2 (2022-03-28)
+--------------------------
+Upgrade Gradle to 7.6 and lower minSdkVersion requirement to 21 (#587 and #585)
+
 Version 5.0.0-beta.1 (2022-02-02)
 --------------------------
 Update copyrights to 2023 (#579)
