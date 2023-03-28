@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">snowplow-demo-compose</string>
+    <string name="back_button">Back</string>
+    <string name="detail_button">Details</string>
+</resources>
