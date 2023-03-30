@@ -1,3 +1,4 @@
+import org.jetbrains.dokka.gradle.DokkaTask
 
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
@@ -202,6 +203,14 @@ afterEvaluate {
             println 'Used useInMemoryPgpKeys()'
         } else {
             println 'Signing credentials not found, skipping.'
+        }
+    }
+}
+
+tasks.withType(DokkaTask.class) {
+    dokkaSourceSets {
+        configureEach {
+            includes.from(project.files(), "Module.md")
         }
     }
 }

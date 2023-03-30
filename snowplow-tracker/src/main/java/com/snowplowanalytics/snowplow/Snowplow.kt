@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.network.HttpMethod
 import java.util.*
 
 /**
- * Entry point to instance a new Snowplow tracker.
+ * Instance a new Snowplow tracker for local or remote configuration, and manage multiple trackers.
  */
 object Snowplow {
     // Private properties
