@@ -38,6 +38,14 @@ object TrackerEvents {
     private fun trackDeepLink(tracker: TrackerController) {
         val event = DeepLinkReceived("http://snowplow.io/path?param=value&param2=value2")
             .referrer("http://snowplow.io/path?param=value&param2=value2")
+
+        // add a context entity
+        val entity = SelfDescribingJson(
+            "iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1",
+            mapOf("targetUrl" to "http://a-target-url.com")
+        )
+        event.entities.add(entity)
+
         tracker.track(event)
     }
 

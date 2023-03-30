@@ -22,7 +22,7 @@ interface Event {
     /**
      * @return the event custom context entities
      */
-    val entities: List<SelfDescribingJson>
+    val entities: MutableList<SelfDescribingJson>
 
     /**
      * @return the event custom context entities

@@ -60,6 +60,13 @@ public class TrackerEvents {
     private static void trackDeepLink(TrackerController tracker) {
         DeepLinkReceived event = new DeepLinkReceived("http://snowplow.io/path?param=value&param2=value2")
                 .referrer("http://snowplow.io/path?param=value&param2=value2");
+
+        // add a context entity
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("targetUrl", "http://a-target-url.com");
+        SelfDescribingJson entity = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
+        event.getEntities().add(entity);
+
         tracker.track(event);
     }
 

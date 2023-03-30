@@ -25,6 +25,8 @@ import java.util.*
  */
 abstract class AbstractEvent : Event {
     /** List of custom contexts associated with the event.  */
+    @Deprecated("Please use `entities`")
+    @JvmField
     val customContexts: MutableList<SelfDescribingJson> = LinkedList()
     
     /**
@@ -33,14 +35,14 @@ abstract class AbstractEvent : Event {
     override var trueTimestamp: Long? = null
     
     // Builder methods
-    
-    /** Adds a list of contexts.  */
+
+    /** Adds a list of context entities to the existing ones. */
     fun entities(entities: List<SelfDescribingJson>?): AbstractEvent {
         entities?.let { customContexts.addAll(entities) }
         return this
     }
 
-    /** Adds a list of contexts.  */
+    /** Adds a list of context entities to the existing ones. */
     @Deprecated("Please use `entities()`")
     fun contexts(contexts: List<SelfDescribingJson>?): AbstractEvent {
         return entities(contexts)
@@ -55,10 +57,10 @@ abstract class AbstractEvent : Event {
     // Public methods
     
     /**
-     * @return the event custom context
+     * @return the event custom context entities
      */
-    override val entities: List<SelfDescribingJson>
-        get() = ArrayList(customContexts)
+    override val entities: MutableList<SelfDescribingJson>
+        get() = customContexts
 
     override val contexts: List<SelfDescribingJson>
         get() = entities
