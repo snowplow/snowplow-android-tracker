@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SessionConfigurationUpdate</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>snowplow-android-tracker</span>
+            </a>
+    </div>
+    <div>
+5.0.0-beta.2    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="snowplow-android-tracker::com.snowplowanalytics.core.session/SessionConfigurationUpdate///PointingToDeclaration//918778150">
+  <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.core.session</a><span class="delimiter">/</span><span class="current">SessionConfigurationUpdate</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Session</span><wbr></wbr><span>Configuration</span><wbr></wbr><span><span>Update</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SessionConfigurationUpdate</a> <span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html"><span class="token annotation builtin">JvmOverloads</span></a> </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">foregroundTimeout<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a><span class="token operator"> = </span>TimeMeasure(30, TimeUnit.MINUTES)<span class="token punctuation">, </span></span><span class="parameter ">backgroundTimeout<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a><span class="token operator"> = </span>TimeMeasure(30, TimeUnit.MINUTES)</span></span><span class="token punctuation">)</span> : <a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/index.html">SessionConfiguration</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-331792309%2FConstructors%2F918778150" anchor-label="SessionConfigurationUpdate" id="-331792309%2FConstructors%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-session-configuration-update.html"><span>Session</span><wbr></wbr><span>Configuration</span><wbr></wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-331792309%2FConstructors%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html"><span class="token annotation builtin">JvmOverloads</span></a></div></div><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">foregroundTimeout<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a><span class="token operator"> = </span>TimeMeasure(30, TimeUnit.MINUTES)<span class="token punctuation">, </span></span><span class="parameter ">backgroundTimeout<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a><span class="token operator"> = </span>TimeMeasure(30, TimeUnit.MINUTES)</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="128996477%2FFunctions%2F918778150" anchor-label="copy" id="128996477%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/copy.html"><span><span>copy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="128996477%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/copy.html"><span class="token function">copy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.configuration/-configuration/index.html">Configuration</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-909556577%2FFunctions%2F918778150" anchor-label="onSessionUpdate" id="-909556577%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/on-session-update.html"><span>on</span><wbr></wbr><span>Session</span><wbr></wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-909556577%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/on-session-update.html"><span class="token function">onSessionUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onSessionUpdate<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/core/util/Consumer.html">Consumer</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.tracker/-session-state/index.html">SessionState</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/index.html">SessionConfiguration</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1876659428%2FProperties%2F918778150" anchor-label="backgroundTimeout" id="1876659428%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="background-timeout.html"><span>background</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1876659428%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="background-timeout.html">backgroundTimeout</a><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a></div><div class="brief "><p class="paragraph">The amount of time that can elapse before the session id is updated while the app is in the background.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1561457415%2FProperties%2F918778150" anchor-label="foregroundTimeout" id="-1561457415%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="foreground-timeout.html"><span>foreground</span><wbr></wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1561457415%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="foreground-timeout.html">foregroundTimeout</a><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.util/-time-measure/index.html">TimeMeasure</a></div><div class="brief "><p class="paragraph">The amount of time that can elapse before the session id is updated while the app is in the foreground.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-675560341%2FProperties%2F918778150" anchor-label="isPaused" id="-675560341%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-paused.html"><span>is</span><wbr></wbr><span><span>Paused</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-675560341%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="is-paused.html">isPaused</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-535093001%2FProperties%2F918778150" anchor-label="onSessionUpdate" id="-535093001%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-session-update.html"><span>on</span><wbr></wbr><span>Session</span><wbr></wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-535093001%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="on-session-update.html">onSessionUpdate</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/core/util/Consumer.html">Consumer</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.tracker/-session-state/index.html">SessionState</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The callback called every time the session is updated.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-616538938%2FProperties%2F918778150" anchor-label="sourceConfig" id="-616538938%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="source-config.html"><span>source</span><wbr></wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-616538938%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="source-config.html">sourceConfig</a><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.configuration/-session-configuration/index.html">SessionConfiguration</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
