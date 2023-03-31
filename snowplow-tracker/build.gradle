@@ -211,6 +211,11 @@ tasks.withType(DokkaTask.class) {
     dokkaSourceSets {
         configureEach {
             includes.from(project.files(), "Module.md")
+
+            perPackageOption {
+                matchingRegex.set("com.snowplowanalytics.core.*") // exclude core packages from API docs
+                suppress.set(true)
+            }
         }
     }
 }
