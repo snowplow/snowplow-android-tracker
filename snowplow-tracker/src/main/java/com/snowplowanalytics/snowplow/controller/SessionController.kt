@@ -14,6 +14,9 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.session.SessionConfigurationInterface
 
+/**
+ * Controller for managing Sessions.
+ */
 interface SessionController : SessionConfigurationInterface {
     /**
      * The session index.
@@ -29,7 +32,7 @@ interface SessionController : SessionConfigurationInterface {
 
     /**
      * The session user identifier.
-     * It identifies this app installation and it doesn't change for the life of the app.
+     * It identifies this app installation and doesn't change for the life of the app.
      * It will change only when the app is uninstalled and installed again.
      * An app update doesn't change the value.
      */
@@ -52,7 +55,7 @@ interface SessionController : SessionConfigurationInterface {
 
     /**
      * Pause the session tracking.
-     * Meanwhile the session is paused it can't expire and can't be updated.
+     * While the session is paused it can't expire or be updated.
      */
     fun pause()
 
@@ -62,7 +65,7 @@ interface SessionController : SessionConfigurationInterface {
     fun resume()
 
     /**
-     * Expire the current session also if the timeout is not triggered.
+     * Expire the current session even if the timeout is not triggered.
      */
     fun startNewSession()
 }

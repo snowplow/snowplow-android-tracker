@@ -15,6 +15,11 @@ package com.snowplowanalytics.snowplow.globalcontexts
 import com.snowplowanalytics.core.tracker.SchemaRule
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
+/**
+ * Use this class to add a [GlobalContext] to specific events only, based on the event schema.
+ * New SchemaRuleSets are created using the companion object `build` methods.
+ * 
+ */
 class SchemaRuleSet private constructor(allowed: List<String?>, denied: List<String?>) {
     private val rulesAllowed: MutableList<SchemaRule> = ArrayList()
     private val rulesDenied: MutableList<SchemaRule> = ArrayList()
@@ -70,6 +75,21 @@ class SchemaRuleSet private constructor(allowed: List<String?>, denied: List<Str
         return false
     }
 
+    /**
+     * Build a [SchemaRuleSet]. Provide schema strings for events that entities will either be attached to
+     * (`allowed` schemas) or not (`denied` schemas).
+     * Schema strings can contain wildcards, e.g. 
+     * `iglu:com.acme.marketing / * / jsonschema / *-*-*` (without spaces).
+     * 
+     * They follow the same five-part format as an Iglu URI `iglu:vendor/event_name/format/version`,
+     * with the exception that a wildcard can be used to refer to all cases.
+     * 
+     * The parts of a rule are wildcarded with certain guidelines:
+     * - asterisks cannot be used for the protocol (i.e. schemas always start with `iglu:`)
+     * - version matching must be specified like so: `––`, where any part of the versioning can be defined, e.g. `1-–`, 
+     * but only sequential parts can be wildcarded, e.g. `1--1` is invalid but `1-1–*` is valid
+     * - vendors cannot be defined with non-wildcarded parts between wildcarded parts: `com.acme.*.marketing.*` is invalid, while `com.acme.*.*` is valid
+     */
     companion object {
         @JvmStatic
         fun buildRuleSet(allowed: List<String>, denied: List<String>): SchemaRuleSet {

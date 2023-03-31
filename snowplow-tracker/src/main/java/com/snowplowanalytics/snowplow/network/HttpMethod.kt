@@ -22,7 +22,7 @@ enum class HttpMethod {
     GET,
 
     /**
-     * Events can be grouped together in a SchemaPayload and sent in one request if desired.
+     * Events can be grouped together and sent in one request if desired.
      */
     POST
 }

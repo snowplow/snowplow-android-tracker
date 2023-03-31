@@ -16,8 +16,9 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 
 /**
- * A pageview event.
+ * A pageView event.
  * @param pageUrl The page URL.
+ * @Deprecated This event has been designed for web trackers, and is not suitable for mobile apps.
  */
 @Deprecated("This event has been designed for web trackers, not suitable for mobile apps. Use `DeepLinkReceived` event to track deep-link received in the app.")
 class PageView(pageUrl: String) : AbstractPrimitive() {

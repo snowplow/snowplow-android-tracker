@@ -143,7 +143,10 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
     companion object {
         private val TAG = ScreenView::class.java.simpleName
 
-        /** Creates a ScreenView event using the data of an Activity class.  */
+        /** 
+         * Creates a ScreenView event using the data of an Activity class. 
+         * Used in Activity lifecycle management. 
+         */
         @JvmStatic
         fun buildWithActivity(activity: Activity): ScreenView {
             val activityClassName = activity.localClassName
@@ -174,6 +177,9 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
         }
 
         // Private methods
+        /**
+         * @suppress
+         */
         private fun getSnowplowScreenId(activity: Activity): String? {
             val activityClass: Class<out Activity> = activity.javaClass
             try {
@@ -205,6 +211,9 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
             return null
         }
 
+        /**
+         * @suppress
+         */
         private fun getValidName(s1: String?, s2: String?): String {
             if (s1 != null && s1.isNotEmpty()) return s1
             return if (s2 != null && s2.isNotEmpty()) {

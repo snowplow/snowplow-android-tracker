@@ -17,8 +17,8 @@ import com.snowplowanalytics.core.utils.Util
 import org.json.JSONObject
 
 /**
- * Returns a standard Tracker Payload consisting of
- * many key - pair values.
+ * Stores many key - pair values. 
+ * This class is used by the tracker to add various fields and entities to tracked events.
  */
 class TrackerPayload : Payload {
     private val TAG = TrackerPayload::class.java.simpleName

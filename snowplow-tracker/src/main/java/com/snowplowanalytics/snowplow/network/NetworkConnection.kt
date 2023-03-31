@@ -15,8 +15,7 @@ package com.snowplowanalytics.snowplow.network
 import android.net.Uri
 
 /**
- * Interface for the component that
- * sends events to the collector.
+ * Interface for the component that sends events to the collector.
  */
 interface NetworkConnection {
     /**
@@ -27,11 +26,13 @@ interface NetworkConnection {
     fun sendRequests(requests: List<Request>): List<RequestResult>
 
     /**
-     * @return http method used to send requests to the collector.
+     * GET or POST used to send requests to the collector.
+     * @return http method used
      */
     val httpMethod: HttpMethod
 
     /**
+     * Event collector URI.
      * @return URI of the collector.
      */
     val uri: Uri

@@ -14,4 +14,7 @@ package com.snowplowanalytics.snowplow.emitter
 
 import com.snowplowanalytics.snowplow.payload.Payload
 
+/**
+ * A wrapper for event data while it is being processed for sending.
+ */
 class EmitterEvent(val payload: Payload, val eventId: Long)

@@ -68,7 +68,8 @@ class ConsentDocument(documentId: String, documentVersion: String) : AbstractSel
             payload[Parameters.CD_VERSION] = documentVersion
             return payload
         }
-    
+
+    /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_CONSENT_DOCUMENT
 }

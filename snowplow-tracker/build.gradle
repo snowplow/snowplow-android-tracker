@@ -1,10 +1,12 @@
+import org.jetbrains.dokka.gradle.DokkaTask
 
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'signing'
+apply plugin: 'org.jetbrains.dokka'
 
 jacoco {
     toolVersion = "0.8.5"
@@ -201,6 +203,19 @@ afterEvaluate {
             println 'Used useInMemoryPgpKeys()'
         } else {
             println 'Signing credentials not found, skipping.'
+        }
+    }
+}
+
+tasks.withType(DokkaTask.class) {
+    dokkaSourceSets {
+        configureEach {
+            includes.from(project.files(), "Module.md")
+
+            perPackageOption {
+                matchingRegex.set("com.snowplowanalytics.core.*") // exclude core packages from API docs
+                suppress.set(true)
+            }
         }
     }
 }

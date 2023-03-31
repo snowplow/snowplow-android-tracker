@@ -17,11 +17,17 @@ import com.snowplowanalytics.core.globalcontexts.GlobalContextsConfigurationInte
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 
 /**
- * This class allows the setup of Global Contexts which are attached to selected events.
+ * This class allows the setting up of Global Contexts. Global Contexts are entities
+ * which are attached to selected events. Provide a [GlobalContextsConfiguration] when creating a tracker
+ * to use them. [GlobalContext] can also be added and removed at runtime. Multiple [GlobalContext]s 
+ * can be set along with their identifying tags (i.e. name).
  */
 class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalContext>?) :
     Configuration, GlobalContextsConfigurationInterface {
-    
+
+    /**
+     * The component GlobalContexts with their tags.
+     */
     val contextGenerators: MutableMap<String, GlobalContext>
 
     /**
@@ -34,7 +40,7 @@ class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalCo
     
     /**
      * Allows for the creation of a map of tags and associated [GlobalContext] generators.
-     * They are used by the tracker based on the filter settings defined on each [GlobalContext].
+     * They are used by the tracker to add entities based on the filter settings defined on each [GlobalContext].
      * @param contextGenerators Map of Global Contexts generators.
      */
     init {
@@ -45,7 +51,7 @@ class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalCo
     
 
     /**
-     * Add a GlobalContext generator to the configuration of the tracker.
+     * Add a GlobalContext generator to the tracker at runtime.
      * @param tag The label identifying the generator in the tracker.
      * @param contextGenerator The GlobalContext generator.
      * @return Whether the adding operation has succeeded.
@@ -58,9 +64,9 @@ class GlobalContextsConfiguration(contextGenerators: MutableMap<String, GlobalCo
     }
 
     /**
-     * Remove a GlobalContext generator from the configuration of the tracker.
+     * Remove a GlobalContext generator from the tracker at runtime.
      * @param tag The label identifying the generator in the tracker.
-     * @return Whether the removing operation has succeded.
+     * @return Whether the removing operation has succeeded.
      */
     override fun remove(tag: String): GlobalContext? {
         return contextGenerators.remove(tag)

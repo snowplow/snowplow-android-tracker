@@ -16,11 +16,12 @@ import com.snowplowanalytics.core.gdpr.GdprConfigurationInterface
 import com.snowplowanalytics.snowplow.util.Basis
 
 /**
- * This class allows the GDPR configuration of the tracker.
+ * Allows the GDPR configuration of the tracker. Provide a [GdprConfiguration] when creating a tracker 
+ * to attach a GDPR entity to every event.
  */
 open class GdprConfiguration
 /**
- * Enables GDPR context to be sent with each event.
+ * Enables GDPR entity to be sent with each event.
  *
  * @param basisForProcessing  GDPR Basis for processing.
  * @param documentId          ID of a GDPR basis document.

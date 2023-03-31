@@ -67,6 +67,8 @@ internal fun PluginConfigurationInterface.toStateMachine(): PluginStateMachine {
 /**
  * Configuration for a custom tracker plugin.
  * Enables you to add closures to be called when and after events are tracked in the tracker.
+ * 
+ * @property identifier Unique identifier of the plugin within the tracker.
  */
 class PluginConfiguration(
     override val identifier: String

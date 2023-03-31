@@ -17,6 +17,7 @@ class Foreground : AbstractSelfDescribing() {
     /** Index indicating the current transition.  */
     var foregroundIndex: Int? = null
 
+    /** The event schema */
     override val schema: String
         get() = Companion.schema
     

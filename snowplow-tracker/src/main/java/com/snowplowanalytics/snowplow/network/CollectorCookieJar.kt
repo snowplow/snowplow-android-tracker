@@ -22,6 +22,12 @@ import org.json.JSONException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * This class is the default cookie jar in [OkHttpNetworkConnection], the default class for 
+ * controlling network connections between the tracker and the event collector. 
+ * It allows the response cookie (assigned to `network_userid`) to be saved and added to 
+ * subsequent requests.
+ */
 class CollectorCookieJar(context: Context) : CookieJar {
     private val cookies: MutableSet<CollectorCookie> = Collections.newSetFromMap(ConcurrentHashMap())
     private val sharedPreferences: SharedPreferences

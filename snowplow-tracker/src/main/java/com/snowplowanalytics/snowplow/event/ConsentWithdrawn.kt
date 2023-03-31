@@ -62,6 +62,7 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
             return payload
         }
 
+    /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_CONSENT_WITHDRAWN
 

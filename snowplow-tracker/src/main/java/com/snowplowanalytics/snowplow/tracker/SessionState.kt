@@ -15,6 +15,12 @@ package com.snowplowanalytics.snowplow.tracker
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.statemachine.State
 
+/**
+ * Stores the current Session information. Used in creating the client_session entity when
+ * [sessionContext](com.snowplowanalytics.snowplow.configuration.TrackerConfiguration.sessionContext) is configured.
+ * 
+ * @see com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
+ */
 class SessionState(
     val firstEventId: String,
     val firstEventTimestamp: String,

@@ -12,6 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.event
 
+/**
+ * Abstract class which contains common elements to all "primitive" events, i.e. events that are
+ * not based on a schema, such as [Structured] events.
+ */
 abstract class AbstractPrimitive protected constructor() : AbstractEvent() {
     /**
      * @return The name of the event.

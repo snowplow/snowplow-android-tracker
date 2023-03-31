@@ -12,6 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.event
 
+/**
+ * Abstract class which contains common elements to all self-describing events, i.e. events that are
+ * based on a schema. Examples include [SelfDescribing], [ScreenView], and [Foreground] events.
+ */
 abstract class AbstractSelfDescribing protected constructor() : AbstractEvent() {
     /**
      * @return The schema of the event.

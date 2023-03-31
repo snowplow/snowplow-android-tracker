@@ -12,7 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.event
 
-/** Attachment object that identify an attachment in the MessageNotification.  */
+/** Attachment object that identifies an attachment in the MessageNotification.  */
 class MessageNotificationAttachment(identifier: String, type: String, url: String) :
     HashMap<String, Any>() {
     

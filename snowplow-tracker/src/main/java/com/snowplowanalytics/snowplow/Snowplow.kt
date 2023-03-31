@@ -34,21 +34,40 @@ import com.snowplowanalytics.snowplow.network.HttpMethod
 import java.util.*
 
 /**
- * Entry point to instance a new Snowplow tracker.
+ * Instance a new Snowplow tracker for local or remote configuration, and manage multiple trackers.
  */
 object Snowplow {
     // Private properties
     private var defaultServiceProvider: ServiceProvider? = null
     private val serviceProviderInstances: MutableMap<String, ServiceProvider?> = HashMap()
     private var configurationProvider: ConfigurationProvider? = null
+
+    /**
+     * The default tracker instance is the first created in the app, but that can be overridden programmatically
+     * using [Snowplow.setTrackerAsDefault].
+     *
+     * @return The default tracker instance, or `null` when the tracker has been removed or never initialized.
+     */
+    @JvmStatic
+    val defaultTracker: TrackerController?
+        get() {
+            return defaultServiceProvider?.getOrMakeTrackerController()
+        }
+
+    /**
+     * @return Set of namespace of the active trackers in the app.
+     */
+    @JvmStatic
+    val instancedTrackerNamespaces: Set<String>
+        get() = serviceProviderInstances.keys
     
     // Remote configuration
     
     /**
-     * Setup a single or a set of tracker instances which will be used inside the app to track events.
+     * Set up a single or a set of tracker instances which will be used inside the app to track events.
      * The app can run multiple tracker instances which will be identified by string `namespaces`.
-     * The trackers configuration is automatically download from the endpoint indicated in the `RemoteConfiguration`
-     * passed as argument. For more details see `RemoteConfiguration`.
+     * The trackers configuration is automatically downloaded from the endpoint indicated in the [RemoteConfiguration]
+     * passed as argument. For more details see [RemoteConfiguration].
      *
      * The method is asynchronous and you can receive the list of the created trackers in the callbacks once the trackers are created.
      * The callback can be called multiple times in case a cached configuration is ready and later a fetched configuration is available.
@@ -56,16 +75,18 @@ object Snowplow {
      * a new one. The downloaded configuration updates the cached one only if the configuration version is greater than the cached one.
      * Otherwise the cached one is kept and the callback is not called.
      *
-     * IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * IMPORTANT: The [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore) will persist all the events that have been tracked but not yet sent.
      * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
-     * To remove all the zombie events you can an internal method `removeUnsentEventsExceptForNamespaces` on `SPSQLEventStore`
+     * To remove all the zombie events you can use the internal method 
+     * [.removeUnsentEventsExceptForNamespaces](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore.removeUnsentEventsExceptForNamespaces)
+     * in [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore)
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
      * @param remoteConfiguration The remote configuration used to indicate where to download the configuration from.
-     * @param defaultBundles The default configuration passed by default in case there isn't a cached version and it's able to download a new one.
+     * @param defaultBundles The default configuration passed by default in case there isn't a cached version and it's not able to download a new one.
      * @param onSuccess The callback called when a configuration (cached or downloaded) is set.
      * It passes a pair object with the list of the namespaces associated
      * to the created trackers and the state of the configuration – whether it was
@@ -93,18 +114,20 @@ object Snowplow {
 
     /**
      * Reconfigure, create or delete the trackers based on the configuration downloaded remotely.
-     * The trackers configuration is automatically download from the endpoint indicated in the `RemoteConfiguration`
-     * previously used to setup the trackers.
+     * The trackers configuration is automatically downloaded from the endpoint indicated in the [RemoteConfiguration]
+     * previously used to set up the trackers.
      *
      * The method is asynchronous and you can receive the list of the created trackers in the callbacks once the trackers are created.
      * The downloaded configuration updates the cached one only if the configuration version is greater than the cached one.
      * Otherwise the cached one is kept and the callback is not called.
      *
-     * IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * IMPORTANT: The [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore) will persist all the events that have been tracked but not yet sent.
      * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
-     * To remove all the zombie events you can an internal method `removeUnsentEventsExceptForNamespaces` on `SPSQLEventStore`
+     * To remove all the zombie events you can use the internal method
+     * [.removeUnsentEventsExceptForNamespaces](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore.removeUnsentEventsExceptForNamespaces)
+     * in [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore)
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
@@ -132,18 +155,19 @@ object Snowplow {
     /**
      * Create a new tracker instance which will be used inside the app to track events.
      * The app can run multiple tracker instances which will be identified by string `namespaces`.
-     * The tracker will be configured with default setting and only the collector endpoint URL need
+     * The tracker will be configured with default settings and only the collector endpoint URL needs
      * to be passed for the configuration.
      * For the default configuration of the tracker see [TrackerConfiguration]
      *
-     * To configure tracker with more details see [.createTracker]
-     * To use the tracker as singleton see [.getDefaultTracker]
+     * To use the tracker as singleton see [Snowplow.defaultTracker]
      *
-     * @apiNote IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * IMPORTANT: The [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore) will persist all the events that have been tracked but not yet sent.
      * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
-     * To remove all the zombie events you can an internal method [removeUnsentEventsExceptForNamespaces][EventStoreHelper]
+     * To remove all the zombie events you can use the internal method
+     * [.removeUnsentEventsExceptForNamespaces](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore.removeUnsentEventsExceptForNamespaces)
+     * in [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore)
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
@@ -170,18 +194,20 @@ object Snowplow {
      * The app can run multiple tracker instances which will be identified by string `namespaces`.
      * Each tracker can be configured by various configuration objects implementing the
      * [Configuration] interface.
-     * For the default configuration of the tracker see [TrackerConfiguration.TrackerConfiguration]
+     * For the default configuration of the tracker see [TrackerConfiguration]
      *
-     * The configurations are only for the setup of the tracker and *any change to the configuration
-     * object properties will NOT change the tracker setup at runtime*.
+     * The configurations are only for the setting up of the tracker and **any change to the configuration
+     * object properties will NOT change the tracker setup at runtime**.
      *
-     * To use the tracker as singleton see [.getDefaultTracker]
+     * To use the tracker as singleton see [Snowplow.defaultTracker]
      *
-     * @apiNote IMPORTANT: The EventStore will persist all the events that have been tracked but not yet sent.
+     * IMPORTANT: The [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore) will persist all the events that have been tracked but not yet sent.
      * Those events are attached to the namespace.
      * If the tracker is removed or the app relaunched with a different namespace, those events can't
      * be sent to the collector and they remain in a zombie state inside the EventStore.
-     * To remove all the zombie events you can an internal method [removeUnsentEventsExceptForNamespaces][EventStoreHelper.removeUnsentEventsExceptForNamespaces]
+     * To remove all the zombie events you can use the internal method
+     * [.removeUnsentEventsExceptForNamespaces](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore.removeUnsentEventsExceptForNamespaces)
+     * in [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore)
      * which will delete all the EventStores instanced with namespaces not listed in the passed list.
      *
      * @param context The Android app context.
@@ -189,7 +215,7 @@ object Snowplow {
      * multiple tracker instances.
      * @param network The NetworkConfiguration object with settings for the communication with the
      * collector.
-     * @param configurations All the configuration objects with the details about the fine tuning of
+     * @param configurations All the other configuration objects with the details about the fine tuning of
      * the tracker.
      * @return The tracker instance created.
      */
@@ -214,22 +240,10 @@ object Snowplow {
     }
 
     /**
-     * The default tracker instance is the first created in the app, but that can be overridden programmatically
-     * calling [.setTrackerAsDefault].
-     *
-     * @return The default tracker instance or `null` whether the tracker has been removed or never initialized.
-     */
-    @JvmStatic
-    val defaultTracker: TrackerController?
-        get() {
-            return defaultServiceProvider?.getOrMakeTrackerController()
-        }
-
-    /**
-     * Using the namespace identifier is possible to get the trackerController if already instanced.
+     * Using the namespace identifier it is possible to get the tracker if already instanced.
      *
      * @param namespace The namespace that identifies the tracker.
-     * @return The tracker if it exist with that namespace.
+     * @return The tracker if one exists with that namespace.
      */
     @JvmStatic
     @Synchronized
@@ -239,11 +253,10 @@ object Snowplow {
     }
 
     /**
-     * Set the passed tracker as default tracker if it's registered as an active tracker in the app.
-     * If the passed instance is of a tracker which is already removed (see [removeTracker][.removeTracker])
-     * then it can't become the new default tracker and the operation fails.
+     * Set the passed tracker as default. The tracker must be active: one that has been removed 
+     * (see [Snowplow.removeTracker]) cannot become the new default tracker, and the operation fails.
      *
-     * @param trackerController The new default tracker.
+     * @param trackerController The tracker to use as the new default.
      * @return Whether the tracker passed is registered among the active trackers of the app.
      */
     @JvmStatic
@@ -259,13 +272,11 @@ object Snowplow {
 
     /**
      * A tracker can be removed from the active trackers of the app.
-     * Once it has been removed it can't be added again or set as default.
-     * The unique way to resume a removed tracker is creating a new tracker with same namespace and
-     * same configurations.
-     * The removed tracker is always stopped.
+     * The removed tracker is always stopped, and cannot be added again or set as default.
+     * To "resume" a removed tracker, create a new tracker with the same namespace and configuration.
      *
-     * @param trackerController The tracker controller to remove.
-     * @return Whether it has been able to remove it.
+     * @param trackerController The tracker to remove.
+     * @return Whether it was possible to remove it.
      */
     @JvmStatic
     @Synchronized
@@ -284,9 +295,8 @@ object Snowplow {
     }
 
     /**
-     * Remove all the trackers.
-     * The removed tracker is always stopped.
-     * @see .removeTracker
+     * Remove all the trackers. A removed tracker is always stopped.
+     * @see [Snowplow.removeTracker]
      */
     @JvmStatic
     @Synchronized
@@ -300,16 +310,9 @@ object Snowplow {
     }
 
     /**
-     * @return Set of namespace of the active trackers in the app.
-     */
-    @JvmStatic
-    val instancedTrackerNamespaces: Set<String>
-        get() = serviceProviderInstances.keys
-
-    /**
-     * Add a JavaScript interface to the Web view that listens for events tracked using 
-     * the Snowplow library for Web views.
-     * @param webView Web view instance in which to subscribe for events
+     * Add a JavaScript interface to the WebView that listens for events tracked using 
+     * the [Snowplow library for WebViews](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/webview-tracker/).
+     * @param webView WebView instance to subscribe to for events
      */
     @JvmStatic
     fun subscribeToWebViewEvents(webView: WebView) {

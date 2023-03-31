@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.tracker
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * The inspectable properties of the event used to generate context entities.
+ * The inspectable properties of a tracked event, used in the GlobalContexts API to generate context entities.
  */
 interface InspectableEvent {
     /**

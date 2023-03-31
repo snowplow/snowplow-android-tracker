@@ -13,11 +13,8 @@
 package com.snowplowanalytics.snowplow.payload
 
 /**
- * Payload interface
  * The Payload is used to store all the parameters and configurations that are used
- * to send data via the HTTP GET/POST request.
- *
- * @version 0.5.0
+ * to send data via the GET/POST request.
  */
 interface Payload {
     /**

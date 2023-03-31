@@ -228,6 +228,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     /**
      * Updates the session timeout and the indexes.
      * Note: Internal use only.
+     * @suppress
      * @param isBackground whether or not the application moved to background.
      */
     fun setBackground(isBackground: Boolean) {

@@ -12,6 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.util
 
+/**
+ * The possible options for GDPR processing.
+ * @see com.snowplowanalytics.snowplow.configuration.GdprConfiguration
+ */
 enum class Basis {
     CONSENT, CONTRACT, LEGAL_OBLIGATION, VITAL_INTERESTS, PUBLIC_TASK, LEGITIMATE_INTERESTS
 }

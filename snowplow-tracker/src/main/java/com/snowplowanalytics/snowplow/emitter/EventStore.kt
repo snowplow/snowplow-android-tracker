@@ -15,8 +15,7 @@ package com.snowplowanalytics.snowplow.emitter
 import com.snowplowanalytics.snowplow.payload.Payload
 
 /**
- * Interface for the component that
- * persists events before sending.
+ * The component that persists and buffers events before sending.
  */
 interface EventStore {
     /**
@@ -52,10 +51,8 @@ interface EventStore {
     fun size(): Long
 
     /**
-     * Returns a list of EmittableEvent objects which
-     * contains events and related ids.
-     * @return EmittableEvent objects containing
-     * eventIds and event payloads.
+     * Returns a list of [EmitterEvent] objects which contain events and related IDs.
+     * @return EmitterEvent objects containing eventIds and event payloads.
      */
     fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?>
 }

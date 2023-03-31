@@ -19,70 +19,33 @@ import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
 
 /**
- * It allows the tracker configuration from the emission perspective.
- * The EmitterConfiguration can be used to setup details about how the tracker should treat the events
- * to emit to the collector.     
+ * Configure how the tracker should send the events to the collector.     
  * 
  * Default values:
- * bufferOption = BufferOption.DefaultGroup;
- * emitRange = 150;
- * threadPoolSize = 15;
- * byteLimitGet = 40000;
- * byteLimitPost = 40000;
- * serverAnonymisation = false;
+ *   - bufferOption: [BufferOption.DefaultGroup]
+ *   - serverAnonymisation: false
+ *   - emitRange: 150 - maximum number of events to process at a time
+ *   - threadPoolSize: 15
+ *   - byteLimitGet: 40000 bytes
+ *   - byteLimitPost: 40000 bytes
  */
 open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
-    /**
-     * @see .bufferOption
-     */
+
     override var bufferOption: BufferOption = EmitterDefaults.bufferOption
-
-    /**
-     * @see .emitRange
-     */
     override var emitRange: Int = EmitterDefaults.emitRange
-
-    /**
-     * @see .threadPoolSize
-     */
     override var threadPoolSize: Int = EmitterDefaults.threadPoolSize
-
-    /**
-     * @see .byteLimitGet
-     */
     override var byteLimitGet: Long = EmitterDefaults.byteLimitGet
-
-    /**
-     * @see .byteLimitPost
-     */
     override var byteLimitPost: Long = EmitterDefaults.byteLimitPost
-
-    /**
-     * @see .requestCallback
-     */
     override var requestCallback: RequestCallback? = null
-
-    /**
-     * @see .eventStore
-     */
     override var eventStore: EventStore? = null
-
-    /**
-     * @see .customRetryForStatusCodes
-     */
     override var customRetryForStatusCodes: Map<Int, Boolean>? = null
-
-    /**
-     * @see .serverAnonymisation
-     */
     override var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
     
-        
     // Builders
     
     /**
-     * Sets whether the buffer should send events instantly or after the buffer
-     * has reached it's limit. By default, this is set to BufferOption Default.
+     * How many events to send in each request. By default, this is set to [BufferOption.DefaultGroup], 
+     * a maximum of 10 events per request.
      */
     fun bufferOption(bufferOption: BufferOption): EmitterConfiguration {
         this.bufferOption = bufferOption
@@ -90,7 +53,8 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     }
 
     /**
-     * Maximum number of events collected from the EventStore to be sent in a request.
+     * Maximum number of events collected from the EventStore to be processed into requests at one time. 
+     * The number of events per request is set using [EmitterConfiguration.bufferOption].
      */
     fun emitRange(emitRange: Int): EmitterConfiguration {
         this.emitRange = emitRange
@@ -123,7 +87,8 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
 
     /**
      * Custom component with full ownership for persisting events before to be sent to the collector.
-     * If it's not set the tracker will use a SQLite database as default EventStore.
+     * If it's not set the tracker will use a SQLite database as 
+     * [default EventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore).
      */
     fun eventStore(eventStore: EventStore?): EmitterConfiguration {
         this.eventStore = eventStore
@@ -131,7 +96,7 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     }
 
     /**
-     * Callback called for each request performed by the tracker to the collector.
+     * Callback called for each request performed by the tracker to the event collector.
      */
     fun requestCallback(requestCallback: RequestCallback?): EmitterConfiguration {
         this.requestCallback = requestCallback
@@ -139,8 +104,10 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
     }
 
     /**
-     * Custom retry rules for HTTP status codes returned from the Collector.
-     * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false for not retry).
+     * Custom retry rules for HTTP status codes returned from the collector.
+     * The dictionary is a mapping of integers (status codes) to booleans (true for retry and false 
+     * for not retry). By default, events in requests that return codes 400, 401, 403, 410, or 422 are
+     * not retried and are deleted from the EventStore.
      */
     fun customRetryForStatusCodes(customRetryForStatusCodes: Map<Int, Boolean>?): EmitterConfiguration {
         this.customRetryForStatusCodes = customRetryForStatusCodes

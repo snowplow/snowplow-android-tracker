@@ -14,4 +14,7 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsConfigurationInterface
 
+/**
+ * Controller for managing the Global Contexts.
+ */
 interface GlobalContextsController : GlobalContextsConfigurationInterface

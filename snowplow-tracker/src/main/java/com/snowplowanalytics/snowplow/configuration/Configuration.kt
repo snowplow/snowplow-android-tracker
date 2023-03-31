@@ -14,6 +14,9 @@ package com.snowplowanalytics.snowplow.configuration
 
 import java.io.Serializable
 
+/**
+ * Interface for tracker configurations. Provides a common base for all the configuration classes.
+ */
 interface Configuration : Serializable {
     fun copy(): Configuration
 }

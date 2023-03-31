@@ -29,9 +29,12 @@ import java.util.*
  * allowing the tracker to be able to send events to the Snowplow collector.
  * 
  * Default values:
- * method = HttpMethod.POST;
- * protocol = Protocol.HTTPS;
- * timeout = 5 seconds;
+ * 
+ * method: [HttpMethod.POST]
+ * 
+ * protocol: [Protocol.HTTPS]
+ * 
+ * timeout: 5 seconds
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
@@ -40,38 +43,18 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     override var endpoint: String? = null
 
     /**
-     * @return Method used to send events to the collector.
+     * @return Method (GET or POST) used to send events to the collector.
      */
     override var method: HttpMethod = EmitterDefaults.httpMethod
 
     /**
-     * @return Protocol used to send events to the collector.
+     * @return Protocol (HTTP or HTTPS) used to send events to the collector.
      */
     override var protocol: Protocol? = EmitterDefaults.requestSecurity
-
-    /**
-     * @see .NetworkConfiguration
-     */
     override var networkConnection: NetworkConnection? = null
-    
-    /**
-     * @see .customPostPath
-     */
     override var customPostPath: String? = null
-
-    /**
-     * @see .timeout
-     */
     override var timeout: Int? = EmitterDefaults.emitTimeout
-
-    /**
-     * @see .okHttpClient
-     */
     override var okHttpClient: OkHttpClient? = null
-
-    /**
-     * @see .okHttpCookieJar
-     */
     override var okHttpCookieJar: CookieJar? = null
 
     // Constructors
@@ -79,8 +62,7 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     /**
      * @param endpoint URL of the collector that is going to receive the events tracked by the tracker.
      * The URL can include the schema/protocol (e.g.: `http://collector-url.com`).
-     * In case the URL doesn't include the schema/protocol, the HTTPS protocol is
-     * automatically selected.
+     * If the URL doesn't include the protocol, HTTPS is automatically selected.
      * @param method The method used to send the requests (GET or POST).
      */
     @JvmOverloads
@@ -111,7 +93,7 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     }
 
     /**
-     * @param networkConnection The NetworkConnection component which will control the
+     * @param networkConnection A [NetworkConnection] component which will control the
      * communication between the tracker and the collector.
      */
     constructor(networkConnection: NetworkConnection) {
@@ -123,7 +105,9 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     
     /**
      * A custom path which will be added to the endpoint URL to specify the
-     * complete URL of the collector when paired with the POST method.
+     * complete URL of the event collector when paired with the POST method. The default path is 
+     * "com.snowplowanalytics/snowplow/tp2". 
+     * The collector must be configured to accept the custom path.
      */
     fun customPostPath(customPostPath: String): NetworkConfiguration {
         this.customPostPath = customPostPath
@@ -141,9 +125,9 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     }
 
     /**
-     * An OkHttp client that will be used in the emitter, you can provide your
-     * own if you want to share your Singleton client's interceptors, connection pool etc..
-     * Otherwise a new one is created.
+     * An OkHttp client that will be used in the emitter. You can provide your
+     * own if you want to share your Singleton client's interceptors, connection pool etc.
+     * By default a new [OkHttpClient] is created when the tracker is instantiated.
      */
     fun okHttpClient(okHttpClient: OkHttpClient): NetworkConfiguration {
         this.okHttpClient = okHttpClient
@@ -151,8 +135,10 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     }
 
     /**
-     * An OkHttp cookie jar to override the default cookie jar that stores cookies in SharedPreferences.
-     * The cookie jar will be ignored in case custom `okHttpClient` is configured.
+     * An OkHttp cookie jar to override the default 
+     * [CollectorCookieJar](com.snowplowanalytics.snowplow.network.CollectorCookieJar) 
+     * that stores cookies in SharedPreferences.
+     * A cookie jar provided here will be ignored if a custom `okHttpClient` is configured.
      */
     fun okHttpCookieJar(okHttpCookieJar: CookieJar): NetworkConfiguration {
         this.okHttpCookieJar = okHttpCookieJar
@@ -173,6 +159,9 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
     }
 
     // JSON Formatter
+    /**
+     * This constructor is used during remote configuration.
+     */
     constructor(jsonObject: JSONObject) : this("") {
         try {
             endpoint = jsonObject.getString("endpoint")

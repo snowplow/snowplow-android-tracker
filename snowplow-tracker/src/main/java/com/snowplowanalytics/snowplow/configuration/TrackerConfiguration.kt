@@ -22,127 +22,57 @@ import org.json.JSONObject
 import java.util.*
 
 /**
- * This class represents the configuration of the tracker and the core tracker properties.
- * The TrackerConfiguration can be used to setup the tracker behaviour indicating what should be
- * tracked in term of automatic tracking and contexts/entities to track with the events.
+ * The [TrackerConfiguration] can be used to set up the tracker behaviour, including what should be
+ * tracked in term of automatic tracking, and entities to track with the events. 
+ * Tracker logging can also be configured here.
  *
  * Default values:
- * devicePlatform = DevicePlatform.Mobile;
- * base64encoding = true;
- * logLevel = LogLevel.OFF;
- * loggerDelegate = null;
- * sessionContext = true;
- * applicationContext = true;
- * platformContext = true;
- * geoLocationContext = false;
- * screenContext = true;
- * deepLinkContext = true;
- * screenViewAutotracking = true;
- * lifecycleAutotracking = false;
- * installAutotracking = true;
- * exceptionAutotracking = true;
- * diagnosticAutotracking = false;
- * userAnonymisation = false;
+ *  - devicePlatform: [DevicePlatform.Mobile]
+ *  - base64encoding: true
+ *  - logLevel: [LogLevel.OFF]
+ *  - loggerDelegate: null
+ *  - sessionContext: true
+ *  - applicationContext: true
+ *  - platformContext: true
+ *  - geoLocationContext: false
+ *  - screenContext: true
+ *  - deepLinkContext: true
+ *  - screenViewAutotracking: true
+ *  - lifecycleAutotracking: false
+ *  - installAutotracking: true
+ *  - exceptionAutotracking: true
+ *  - diagnosticAutotracking: false
+ *  - userAnonymisation: false
  * 
  * @param appId Identifier of the app.
 */
 open class TrackerConfiguration(
-    /**
-     * @see .appId
-     */
     override var appId: String
 ) : TrackerConfigurationInterface, Configuration {
     
-    /**
-     * @see .devicePlatform
-     */
     override var devicePlatform: DevicePlatform = TrackerDefaults.devicePlatform
-
-    /**
-     * @see .base64encoding
-     */
     override var base64encoding: Boolean = TrackerDefaults.base64Encoded
-
-    /**
-     * @see .logLevel
-     */
     override var logLevel: LogLevel = TrackerDefaults.logLevel
-
-    /**
-     * @see .loggerDelegate
-     */
     override var loggerDelegate: LoggerDelegate? = null
-
-    /**
-     * @see .sessionContext
-     */
     override var sessionContext: Boolean = TrackerDefaults.sessionContext
-
-    /**
-     * @see .applicationContext
-     */
     override var applicationContext: Boolean = TrackerDefaults.applicationContext
-
-    /**
-     * @see .platformContext
-     */
     override var platformContext: Boolean = TrackerDefaults.platformContext
-
-    /**
-     * @see .geoLocationContext
-     */
     override var geoLocationContext: Boolean = TrackerDefaults.geoLocationContext
-
-    /**
-     * @see .deepLinkContext
-     */
     override var deepLinkContext: Boolean = TrackerDefaults.deepLinkContext
-
-    /**
-     * @see .screenContext
-     */
     override var screenContext: Boolean = TrackerDefaults.screenContext
-
-    /**
-     * @see .screenViewAutotracking
-     */
     override var screenViewAutotracking: Boolean = TrackerDefaults.screenViewAutotracking
-
-    /**
-     * @see .lifecycleAutotracking
-     */
     override var lifecycleAutotracking: Boolean = TrackerDefaults.lifecycleAutotracking
-
-    /**
-     * @see .installAutotracking
-     */
     override var installAutotracking: Boolean = TrackerDefaults.installAutotracking
-
-    /**
-     * @see .exceptionAutotracking
-     */
     override var exceptionAutotracking: Boolean = TrackerDefaults.exceptionAutotracking
-
-    /**
-     * @see .diagnosticAutotracking
-     */
     override var diagnosticAutotracking: Boolean = TrackerDefaults.diagnosticAutotracking
-
-    /**
-     * @see .userAnonymisation
-     */
     override var userAnonymisation: Boolean = TrackerDefaults.userAnonymisation
-
-    /**
-     * @see .trackerVersionSuffix
-     */
     override var trackerVersionSuffix: String? = null
     
 
     // Builder methods
     
     /**
-     * Identifer of the app.
+     * Identifier of the app. This will be included in every event.
      */
     fun appId(appId: String): TrackerConfiguration {
         this.appId = appId
@@ -150,7 +80,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * It sets the device platform the tracker is running on.
+     * Specify the device platform the tracker is running on.
      */
     fun devicePlatform(devicePlatform: DevicePlatform): TrackerConfiguration {
         this.devicePlatform = devicePlatform
@@ -174,7 +104,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * It sets the logger delegate that receive logs from the tracker.
+     * It sets the logger delegate that receive logs from the tracker. Default is STDOUT.
      */
     fun loggerDelegate(loggerDelegate: LoggerDelegate?): TrackerConfiguration {
         this.loggerDelegate = loggerDelegate
@@ -182,7 +112,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether application context is sent with all the tracked events.
+     * Whether the application context entity should be sent with all the tracked events.
      */
     fun applicationContext(applicationContext: Boolean): TrackerConfiguration {
         this.applicationContext = applicationContext
@@ -190,7 +120,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether mobile/platform context is sent with all the tracked events.
+     * Whether the mobile/platform context entity should be sent with all the tracked events.
      */
     fun platformContext(platformContext: Boolean): TrackerConfiguration {
         this.platformContext = platformContext
@@ -198,10 +128,10 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether geo-location context is sent with all the tracked events.
-     *
-     * @apiNote Requires Location permissions as per the requirements of the various
-     * Android versions. Otherwise the whole context is skipped.
+     * Whether the geo-location context entity should be sent with all the tracked events. 
+     * The location is based off the last cached location in the device.
+     * Requires Location permissions as per the requirements of the various
+     * Android versions. Otherwise no entity is added at all.
      */
     fun geoLocationContext(geoLocationContext: Boolean): TrackerConfiguration {
         this.geoLocationContext = geoLocationContext
@@ -209,7 +139,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether session context is sent with all the tracked events.
+     * Whether the session context entity should be sent with all the tracked events.
      */
     fun sessionContext(sessionContext: Boolean): TrackerConfiguration {
         this.sessionContext = sessionContext
@@ -217,7 +147,8 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether deepLink context is sent with all the ScreenView events.
+     * Whether the [DeepLink](com.snowplowanalytics.snowplow.entity.DeepLink) context entity 
+     * should be sent with the first ScreenView event following a deep link.
      */
     fun deepLinkContext(deepLinkContext: Boolean): TrackerConfiguration {
         this.deepLinkContext = deepLinkContext
@@ -225,7 +156,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether screen context is sent with all the tracked events.
+     * Whether the screen context entity should be sent with all the tracked events.
      */
     fun screenContext(screenContext: Boolean): TrackerConfiguration {
         this.screenContext = screenContext
@@ -233,7 +164,10 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether enable automatic tracking of ScreenView events.
+     * Whether to enable automatic tracking of ScreenView events. 
+     * Note that this automatic tracking relies on the Android 
+     * `Application.ActivityLifecycleCallbacks` interface, and therefore only works with Activity-based
+     * apps. Composable screens or views in Jetpack Compose apps are not autotracked.
      */
     fun screenViewAutotracking(screenViewAutotracking: Boolean): TrackerConfiguration {
         this.screenViewAutotracking = screenViewAutotracking
@@ -241,8 +175,8 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether enable automatic tracking of background and foreground transitions.
-     * @apiNote It needs the Foreground library installed.
+     * Whether to enable automatic tracking of background and foreground transitions. 
+     * The Foreground library must be installed.
      */
     fun lifecycleAutotracking(lifecycleAutotracking: Boolean): TrackerConfiguration {
         this.lifecycleAutotracking = lifecycleAutotracking
@@ -250,7 +184,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether enable automatic tracking of install event.
+     * Whether to enable automatic tracking of install event.
      */
     fun installAutotracking(installAutotracking: Boolean): TrackerConfiguration {
         this.installAutotracking = installAutotracking
@@ -258,7 +192,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether enable crash reporting.
+     * Whether to enable crash reporting.
      */
     fun exceptionAutotracking(exceptionAutotracking: Boolean): TrackerConfiguration {
         this.exceptionAutotracking = exceptionAutotracking
@@ -266,7 +200,7 @@ open class TrackerConfiguration(
     }
 
     /**
-     * Whether enable diagnostic reporting.
+     * Whether to enable diagnostic reporting.
      */
     fun diagnosticAutotracking(diagnosticAutotracking: Boolean): TrackerConfiguration {
         this.diagnosticAutotracking = diagnosticAutotracking
@@ -283,8 +217,10 @@ open class TrackerConfiguration(
     }
 
     /**
+     * Do not use. Internal use only. 
+     * 
      * Decorate the v_tracker field in the tracker protocol.
-     * @note Do not use. Internal use only.
+     * @suppress
      */
     fun trackerVersionSuffix(trackerVersionSuffix: String?): TrackerConfiguration {
         this.trackerVersionSuffix = trackerVersionSuffix
@@ -314,6 +250,9 @@ open class TrackerConfiguration(
     }
 
     // JSON Formatter
+    /**
+     * This constructor is used in remote configuration.
+     */
     constructor(appId: String, jsonObject: JSONObject) : this(
         jsonObject.optString(
             "appId",

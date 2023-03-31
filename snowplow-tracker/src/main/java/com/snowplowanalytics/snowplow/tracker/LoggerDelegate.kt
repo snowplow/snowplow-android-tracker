@@ -12,6 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.tracker
 
+/**
+ * Provide a LoggerDelegate when configuring a new tracker to log to a custom destination 
+ * (rather than STDOUT).
+ * 
+ * @see com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
+ */
 interface LoggerDelegate {
     /**
      * Error Level Logging

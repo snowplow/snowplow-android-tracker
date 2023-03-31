@@ -15,21 +15,21 @@ package com.snowplowanalytics.snowplow.controller
 import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
 
 /**
- * Controller for managing plugins initialized in the tracker
+ * Controller for managing plugins initialized in the tracker.
  */
 interface PluginsController {
     /**
-     * List of initialized plugin identifiers
+     * List of initialized plugin identifiers.
      */
     val identifiers: List<String>
 
     /**
-     * Add a new plugin
+     * Add a new plugin.
      */
     fun addPlugin(plugin: PluginConfigurationInterface)
 
     /**
-     * Remove plugin with the identifier
+     * Remove plugin with the identifier.
      */
     fun removePlugin(identifier: String)
 }

@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.configuration
 
 /**
- * State of retrieved remote configuration that states where the configuration was retrieved from.
+ * State of retrieved remote configuration, specifying where the configuration was retrieved from.
  */
 enum class ConfigurationState {
     /**
