@@ -157,6 +157,7 @@ object Snowplow {
      * The app can run multiple tracker instances which will be identified by string `namespaces`.
      * The tracker will be configured with default settings and only the collector endpoint URL needs
      * to be passed for the configuration.
+     * By default, the tracker will send events by POST; pass [HttpMethod.GET] here to change that.
      * For the default configuration of the tracker see [TrackerConfiguration]
      *
      * To use the tracker as singleton see [Snowplow.defaultTracker]
@@ -182,7 +183,7 @@ object Snowplow {
         context: Context,
         namespace: String,
         endpoint: String,
-        method: HttpMethod
+        method: HttpMethod = HttpMethod.POST
     ): TrackerController {
         val network = NetworkConfiguration(endpoint, method)
         val tracker = TrackerConfiguration(context.packageName)

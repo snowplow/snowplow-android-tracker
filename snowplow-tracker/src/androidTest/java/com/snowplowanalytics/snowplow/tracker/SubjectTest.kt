@@ -109,7 +109,7 @@ class SubjectTest {
 
     @Test
     fun testSubjectUserIdCanBeUpdated() {
-        val tracker = createTracker(context, "default", "https://fake-url", HttpMethod.POST)
+        val tracker = createTracker(context, "default", "https://fake-url")
         Assert.assertNotNull(tracker.subject)
         Assert.assertNull(tracker.subject.userId)
         tracker.subject.userId = "fakeUserId"
