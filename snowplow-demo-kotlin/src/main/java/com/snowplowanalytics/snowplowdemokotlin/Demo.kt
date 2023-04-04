@@ -18,7 +18,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
@@ -29,8 +28,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
-
-import com.snowplowanalytics.snowplow.configuration.ConfigurationState
+import androidx.preference.PreferenceManager
 import com.snowplowanalytics.core.utils.Util
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.defaultTracker
@@ -42,15 +40,11 @@ import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.RequestCallback
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.DevicePlatform
-import com.snowplowanalytics.snowplow.tracker.LogLevel
-import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
-import com.snowplowanalytics.snowplow.tracker.SessionState
+import com.snowplowanalytics.snowplow.tracker.*
 import com.snowplowanalytics.snowplow.util.Basis
 import com.snowplowanalytics.snowplow.util.TimeMeasure
 import com.snowplowanalytics.snowplowdemokotlin.utils.DemoUtils
 import com.snowplowanalytics.snowplowdemokotlin.utils.TrackerEvents
-
 import java.util.concurrent.TimeUnit
 
 /**
@@ -293,6 +287,12 @@ class Demo : Activity(), LoggerDelegate {
             "ruleSetExampleTag",
             GlobalContext(listOf(SelfDescribingJson(SCHEMA_IDENTIFY, pairs)))
         )
+
+        val plugin = PluginConfiguration("myPlugin")
+        plugin.afterTrack(null) { event: InspectableEvent -> 
+            println("Tracked event with ${event.entities.size} entities")
+        }
+        
         createTracker(
             applicationContext,
             namespace,
@@ -301,7 +301,8 @@ class Demo : Activity(), LoggerDelegate {
             emitterConfiguration,
             sessionConfiguration,
             gdprConfiguration,
-            gcConfiguration
+            gcConfiguration,
+            plugin
         )
         subscribeToWebViewEvents(_webView!!)
         return true
