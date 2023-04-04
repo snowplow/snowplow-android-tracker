@@ -289,7 +289,7 @@ class Demo : Activity(), LoggerDelegate {
         )
 
         val plugin = PluginConfiguration("myPlugin")
-        plugin.afterTrack(null) { event: InspectableEvent -> 
+        plugin.afterTrack { event: InspectableEvent -> 
             println("Tracked event with ${event.entities.size} entities")
         }
         
