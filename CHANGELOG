@@ -1,8 +1,20 @@
-Version 5.0.0-beta.2 (2022-03-28)
+Version 5.0.0 (2023-04-04)
+--------------------------
+Add plugin example to Kotlin demo (#593)
+Add default POST argument to basic createTracker method (#592)
+Use Dokka for API docs (#591)
+Reintroduce customContexts as a Java field and return a mutable list from entities in events (#590)
+Add Jetpack Compose demo app (#586)
+
+Version 5.0.0-beta.2 (2023-03-28)
 --------------------------
 Upgrade Gradle to 7.6 and lower minSdkVersion requirement to 21 (#587 and #585)
 
-Version 5.0.0-beta.1 (2022-02-02)
+Version 4.1.2 (2023-02-15)
+--------------------------
+Fix crash with null pointer when accessing session (#581)
+
+Version 5.0.0-beta.1 (2023-02-02)
 --------------------------
 Update copyrights to 2023 (#579)
 Add ability to provide custom tracker plugins to inspect and enrich tracked events (#574)
