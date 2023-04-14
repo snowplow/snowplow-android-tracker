@@ -45,7 +45,11 @@ object TrackerConstants {
     const val SCHEMA_GDPR = "iglu:com.snowplowanalytics.snowplow/gdpr/jsonschema/1-0-0"
     const val SCHEMA_DIAGNOSTIC_ERROR =
         "iglu:com.snowplowanalytics.snowplow/diagnostic_error/jsonschema/1-0-0"
-    const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
+    const val SCHEMA_ECOMMERCE_ACTION = 
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/snowplow_ecommerce_action/jsonschema/1-0-1"
+    const val SCHEMA_ECOMMERCE_PRODUCT =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/product/jsonschema/1-0-0"
+        const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
     const val EVENT_PAGE_VIEW = "pv"
     const val EVENT_STRUCTURED = "se"
     const val EVENT_UNSTRUCTURED = "ue"

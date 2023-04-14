@@ -16,20 +16,18 @@ import android.content.Context
 import android.webkit.WebView
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
+import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.ecommerce.EcommercePluginManager
 
-import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
 import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider
-import com.snowplowanalytics.snowplow.configuration.ConfigurationState
 import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterface
+import com.snowplowanalytics.snowplow.configuration.*
 
-import com.snowplowanalytics.snowplow.configuration.Configuration
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
-import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 import java.util.*
 
@@ -229,12 +227,12 @@ object Snowplow {
     ): TrackerController {
         var serviceProvider = serviceProviderInstances[namespace]
         if (serviceProvider != null) {
-            val configList: MutableList<Configuration> = ArrayList(listOf(*configurations))
+            val configList: MutableList<Configuration> = ArrayList(listOf(*configurations, EcommercePluginManager.ecommPlugin()))
             configList.add(network)
             serviceProvider.reset(configList)
         } else {
             serviceProvider =
-                ServiceProvider(context, namespace, network, listOf(*configurations))
+                ServiceProvider(context, namespace, network, listOf(*configurations, EcommercePluginManager.ecommPlugin()))
             registerInstance(serviceProvider)
         }
         return serviceProvider.getOrMakeTrackerController()

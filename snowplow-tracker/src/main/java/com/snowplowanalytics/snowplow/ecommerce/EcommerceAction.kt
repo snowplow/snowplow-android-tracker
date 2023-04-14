@@ -10,28 +10,17 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker
+package com.snowplowanalytics.snowplow.ecommerce
 
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-
-/**
- * The inspectable properties of a tracked event, used in the GlobalContexts API to generate context entities.
- */
-interface InspectableEvent {
-    /**
-     * The schema of the event
-     */
-    val schema: String?
-    /**
-     * The name of the event
-     */
-    val name: String?
-    /**
-     * The payload of the event
-     */
-    val payload: MutableMap<String, Any>
-    /**
-     * The list of context entities
-     */
-    val entities: MutableList<SelfDescribingJson>
+enum class EcommerceAction {
+    add_to_cart,
+    remove_from_cart,
+    product_view,
+    list_click,
+    list_view,
+    promo_click,
+    promo_view,
+    checkout_step,
+    transaction,
+    refund
 }

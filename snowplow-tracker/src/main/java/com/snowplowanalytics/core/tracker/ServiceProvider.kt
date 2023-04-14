@@ -85,6 +85,7 @@ class ServiceProvider(
             trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
         }
         getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
+        
     }
 
     fun reset(configurations: List<Configuration>) {
