@@ -77,6 +77,21 @@ object Parameters {
     const val TI_ITEM_PRICE = "ti_pr"
     const val TI_ITEM_QUANTITY = "ti_qu"
     const val TI_ITEM_CURRENCY = "ti_cu"
+    
+    // Snowplow Ecommerce Product
+    const val ECOMM_PRODUCT_ID = "id"
+    const val ECOMM_PRODUCT_NAME = "name"
+    const val ECOMM_PRODUCT_CATEGORY = "category"
+    const val ECOMM_PRODUCT_PRICE = "price"
+    const val ECOMM_PRODUCT_LIST_PRICE = "list_price"
+    const val ECOMM_PRODUCT_QUANTITY = "quantity"
+    const val ECOMM_PRODUCT_SIZE = "size"
+    const val ECOMM_PRODUCT_VARIANT = "variant"
+    const val ECOMM_PRODUCT_BRAND = "brand"
+    const val ECOMM_PRODUCT_INVENTORY_STATUS = "inventory_status"
+    const val ECOMM_PRODUCT_POSITION = "position"
+    const val ECOMM_PRODUCT_CURRENCY = "currency"
+    const val ECOMM_PRODUCT_CREATIVE_ID = "creative_id"
 
     // Screen View
     const val SV_ID = "id"

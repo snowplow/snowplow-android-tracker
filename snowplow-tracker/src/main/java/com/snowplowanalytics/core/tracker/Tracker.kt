@@ -477,8 +477,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         val reportsOnDiagnostic = event !is TrackerError
         execute(reportsOnDiagnostic, TAG) {
             val payload = payloadWithEvent(trackerEvent)
-            v(TAG, "Adding new payload to event storage: %s", payload)
-            emitter.add(payload)
+            v(TAG, "Adding new payload to event storage: %s", payload)emitter.add(payload)
             event.endProcessing(this)
             stateManager.afterTrack(trackerEvent)
         }

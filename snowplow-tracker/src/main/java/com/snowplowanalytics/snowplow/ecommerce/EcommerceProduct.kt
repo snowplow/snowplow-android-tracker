@@ -5,65 +5,65 @@ data class EcommerceProduct(
      * The SKU or product ID
      */
     val id: String,
-    
+
     /**
      * The name or title of the product
      */
-    val name: String?,
-    
+    val name: String? = null,
+
     /**
      * The category the product belongs to.
      * Use a consistent separator to express multiple levels. E.g. Woman/Shoes/Sneakers
      */
-    val category: String?,
-    
+    val category: String? = null,
+
     /**
      * The price of the product at the current time.
      */
     val price: Number,
-    
+
     /**
      * The recommended or list price of a product
      */
-    val list_price: Number?,
-    
+    val listPrice: Number? = null,
+
     /**
      * The quantity of the product taking part in the action. Used for Cart events.
      */
-    val quantity: Number?,
-    
+    val quantity: Number? = null,
+
     /**
      * The size of the product
      */
-    val size: String?,
-    
+    val size: String? = null,
+
     /**
      * The variant of the product
      */
-    val variant: String?,
-    
+    val variant: String? = null,
+
     /**
      * The brand of the product
      */
-    val brand: String?,
-    
+    val brand: String? = null,
+
     /**
      * The inventory status of the product (e.g. in stock, out of stock, preorder, backorder, etc)
      */
-    val inventory_status: String?,
-    
+    val inventoryStatus: String? = null,
+
     /**
      * The position the product was presented in a list of products (search results, product list page, etc)
      */
-    val position: Number?,
-    
+    val position: Number? = null,
+
     /**
      * The currency in which the product is being priced (ISO 4217)
      */
     val currency: String,
-    
+
     /**
      * Identifier/Name/Url for the creative presented on a list or product view.
      */
-    val creative_id: String?
+    val creativeId: String? = null
 )

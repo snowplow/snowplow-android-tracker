@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
@@ -90,9 +91,13 @@ class EcommerceTest {
         val mockServer = getMockServer(14)
         val tracker = getTracker("myNamespace", getMockServerURI(mockServer))
         
-        val productView = ProductView("product ID 123", "product name")
+        val product = EcommerceProduct("id", price = 12.34, currency = "GBP", name = "lovely product")
+        
+        val productView = ProductView(product)
+        val productListClick = ProductListClick(product)
         
         tracker.track(productView)
+        tracker.track(productListClick)
         tracker.track(ScreenView("screenview"))
         
         waitForTracker(tracker)
@@ -137,28 +142,7 @@ class EcommerceTest {
         )
         val networkConfig = NetworkConfiguration(uri)
         val trackerConfig = TrackerConfiguration("appId").base64encoding(false)
-        val ecommPlugin = PluginConfiguration("myPlugin")
 
-//        ecommPlugin.entities(
-//            listOf(TrackerConstants.SCHEMA_ECOMMERCE_ACTION)
-//        ) {
-//            println("💥 in closure")
-//            val payload = it.payload
-//            println("❗️ ${payload["ecomm_id"]}, ${payload["ecomm_name"]}")
-//            val product = SelfDescribingJson(
-//                TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT, 
-//                hashMapOf(
-//                    "id" to payload["ecomm_id"], 
-//                    "name" to payload["ecomm_name"]
-//                )
-//            )
-//
-//            payload.remove("ecomm_id")
-//            payload.remove("ecomm_name")
-//            
-//            listOf(product)
-//        }
-        
         return Snowplow.createTracker(
             InstrumentationRegistry.getInstrumentation().targetContext,
             ns,

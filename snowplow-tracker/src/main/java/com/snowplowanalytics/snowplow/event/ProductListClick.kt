@@ -18,7 +18,7 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
 
 
-class ProductView(val product: EcommerceProduct) : AbstractSelfDescribing() {
+class ProductListClick(val product: EcommerceProduct) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -27,7 +27,7 @@ class ProductView(val product: EcommerceProduct) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.product_view
+            payload["type"] = EcommerceAction.list_click
             
             product.id.let { payload[Parameters.ECOMM_PRODUCT_ID] = it }
             product.name?.let { payload[Parameters.ECOMM_PRODUCT_NAME] = it }
