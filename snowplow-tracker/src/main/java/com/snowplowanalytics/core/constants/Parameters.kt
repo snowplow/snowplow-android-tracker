@@ -92,6 +92,23 @@ object Parameters {
     const val ECOMM_PRODUCT_POSITION = "position"
     const val ECOMM_PRODUCT_CURRENCY = "currency"
     const val ECOMM_PRODUCT_CREATIVE_ID = "creative_id"
+    
+    // Snowplow Ecommerce Cart
+    const val ECOMM_CART_ID = "cart_id"
+    const val ECOMM_CART_VALUE = "total_value"
+    const val ECOMM_CART_CURRENCY = "currency"
+    
+    // Snowplow Ecommerce Transaction
+    const val ECOMM_TRANSACTION_ID = "transaction_id"
+    const val ECOMM_TRANSACTION_REVENUE = "revenue"
+    const val ECOMM_TRANSACTION_CURRENCY = "currency"
+    const val ECOMM_TRANSACTION_PAYMENT_METHOD = "payment_method"
+    const val ECOMM_TRANSACTION_QUANTITY = "total_quantity"
+    const val ECOMM_TRANSACTION_TAX = "tax"
+    const val ECOMM_TRANSACTION_SHIPPING = "shipping"
+    const val ECOMM_TRANSACTION_DISCOUNT_CODE = "discount_code"
+    const val ECOMM_TRANSACTION_DISCOUNT_AMOUNT = "discount_amount"
+    const val ECOMM_TRANSACTION_CREDIT_ORDER = "credit_order"
 
     // Screen View
     const val SV_ID = "id"

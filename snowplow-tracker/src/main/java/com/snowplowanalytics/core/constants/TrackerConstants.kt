@@ -49,7 +49,11 @@ object TrackerConstants {
         "iglu:com.snowplowanalytics.snowplow.ecommerce/snowplow_ecommerce_action/jsonschema/1-0-1"
     const val SCHEMA_ECOMMERCE_PRODUCT =
         "iglu:com.snowplowanalytics.snowplow.ecommerce/product/jsonschema/1-0-0"
-        const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
+    const val SCHEMA_ECOMMERCE_CART =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/cart/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_TRANSACTION =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/transaction/jsonschema/1-0-0"
+    const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
     const val EVENT_PAGE_VIEW = "pv"
     const val EVENT_STRUCTURED = "se"
     const val EVENT_UNSTRUCTURED = "ue"

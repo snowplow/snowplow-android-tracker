@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.EcommerceCart
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.event.*
@@ -91,13 +92,19 @@ class EcommerceTest {
         val mockServer = getMockServer(14)
         val tracker = getTracker("myNamespace", getMockServerURI(mockServer))
         
-        val product = EcommerceProduct("id", price = 12.34, currency = "GBP", name = "lovely product")
+        val product = EcommerceProduct("id", price = 12.34, currency = "GBP", name = "lovely product", position = 1)
+        val product2 = EcommerceProduct("id2", price = 34.99, currency = "USD", name = "product 2", position = 2)
+        val cart = EcommerceCart("cart id", 33.33, "GBP")
         
         val productView = ProductView(product)
         val productListClick = ProductListClick(product)
+        val productListView = ProductListView(listOf(product, product2))
+        val addToCart = AddToCart(cart, listOf(product, product2))
         
         tracker.track(productView)
         tracker.track(productListClick)
+        tracker.track(productListView)
+        tracker.track(addToCart)
         tracker.track(ScreenView("screenview"))
         
         waitForTracker(tracker)

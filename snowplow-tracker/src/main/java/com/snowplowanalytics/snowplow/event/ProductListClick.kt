@@ -12,7 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.event
 
-import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
@@ -28,20 +27,7 @@ class ProductListClick(val product: EcommerceProduct) : AbstractSelfDescribing()
         get() {
             val payload = HashMap<String, Any?>()
             payload["type"] = EcommerceAction.list_click
-            
-            product.id.let { payload[Parameters.ECOMM_PRODUCT_ID] = it }
-            product.name?.let { payload[Parameters.ECOMM_PRODUCT_NAME] = it }
-            product.category?.let { payload[Parameters.ECOMM_PRODUCT_CATEGORY] = it }
-            product.price.let { payload[Parameters.ECOMM_PRODUCT_PRICE] = it }
-            product.listPrice?.let { payload[Parameters.ECOMM_PRODUCT_LIST_PRICE] = it }
-            product.quantity?.let { payload[Parameters.ECOMM_PRODUCT_QUANTITY] = it }
-            product.size?.let { payload[Parameters.ECOMM_PRODUCT_SIZE] = it }
-            product.variant?.let { payload[Parameters.ECOMM_PRODUCT_VARIANT] = it }
-            product.brand?.let { payload[Parameters.ECOMM_PRODUCT_BRAND] = it }
-            product.inventoryStatus?.let { payload[Parameters.ECOMM_PRODUCT_INVENTORY_STATUS] = it }
-            product.position?.let { payload[Parameters.ECOMM_PRODUCT_POSITION] = it }
-            product.currency.let { payload[Parameters.ECOMM_PRODUCT_CURRENCY] = it }
-            product.creativeId?.let { payload[Parameters.ECOMM_PRODUCT_CREATIVE_ID] = it }
+            payload["product"] = product
             return payload
         }
     
