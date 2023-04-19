@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow.ecommerce
 
-data class EcommerceProduct(
+data class Product(
     /**
      * The SKU or product ID
      */

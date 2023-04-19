@@ -14,10 +14,10 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
+import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
-class ProductListClick(val product: EcommerceProduct) : AbstractSelfDescribing() {
+class ProductListClick(val product: Product) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

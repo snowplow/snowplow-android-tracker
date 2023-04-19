@@ -13,37 +13,29 @@
 package com.snowplowanalytics.snowplow.tracker.integration
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
 import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.TestUtils.createSessionSharedPreferences
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceCart
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
+import com.snowplowanalytics.snowplow.ecommerce.Cart
+import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.Transaction
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.event.*
-import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import com.snowplowanalytics.snowplow.tracker.BuildConfig
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import java.net.URLDecoder
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -92,19 +84,22 @@ class EcommerceTest {
         val mockServer = getMockServer(14)
         val tracker = getTracker("myNamespace", getMockServerURI(mockServer))
         
-        val product = EcommerceProduct("id", price = 12.34, currency = "GBP", name = "lovely product", position = 1)
-        val product2 = EcommerceProduct("id2", price = 34.99, currency = "USD", name = "product 2", position = 2)
-        val cart = EcommerceCart("cart id", 33.33, "GBP")
+        val product = Product("id", price = 12.34, currency = "GBP", name = "lovely product", position = 1)
+        val product2 = Product("id2", price = 34.99, currency = "USD", name = "product 2", position = 2)
+        val cart = Cart("cart id", 33.33, "GBP")
+        val transaction = Transaction("id", 123, "EUR", "method")
         
         val productView = ProductView(product)
         val productListClick = ProductListClick(product)
         val productListView = ProductListView(listOf(product, product2))
         val addToCart = AddToCart(cart, listOf(product, product2))
+        val transactionEvent = TransactionEvent(transaction, listOf(product))
         
         tracker.track(productView)
         tracker.track(productListClick)
         tracker.track(productListView)
         tracker.track(addToCart)
+        tracker.track(transactionEvent)
         tracker.track(ScreenView("screenview"))
         
         waitForTracker(tracker)

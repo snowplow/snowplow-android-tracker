@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow.ecommerce
 
-data class EcommerceCart(
+data class Cart(
     /**
      * The unique ID representing this cart
      */

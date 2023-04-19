@@ -15,9 +15,10 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.Transaction
 
 
-class ProductListView(val products: List<Product>, val name: String? = null) : AbstractSelfDescribing() {
+class TransactionEvent(val transaction: Transaction, val products: List<Product>) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -26,8 +27,8 @@ class ProductListView(val products: List<Product>, val name: String? = null) : A
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.list_view
-            payload["name"] = name
+            payload["type"] = EcommerceAction.transaction
+            payload["transaction"] = transaction
             payload["products"] = products
             return payload
         }

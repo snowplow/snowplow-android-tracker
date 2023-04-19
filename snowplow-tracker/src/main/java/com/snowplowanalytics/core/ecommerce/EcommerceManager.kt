@@ -15,9 +15,9 @@ package com.snowplowanalytics.core.ecommerce
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceCart
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
-import com.snowplowanalytics.snowplow.event.EcommerceTransaction
+import com.snowplowanalytics.snowplow.ecommerce.Cart
+import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.Transaction
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 object EcommerceManager {
@@ -27,15 +27,12 @@ object EcommerceManager {
         ecommercePlugin.entities(
             listOf(TrackerConstants.SCHEMA_ECOMMERCE_ACTION)
         ) {
-            println("💥 in closure")
             val payload = it.payload
             val toAttach: MutableList<SelfDescribingJson> = ArrayList()
-            
-            println("❗️ ${payload["type"]}")
-            
+
             when (payload["type"]) {
                 EcommerceAction.product_view, EcommerceAction.list_click -> {
-                    val product = payload["product"] as EcommerceProduct
+                    val product = payload["product"] as Product
                     toAttach.add(productToSdj(product))
                     payload.remove("product")
                 }
@@ -43,7 +40,7 @@ object EcommerceManager {
                 EcommerceAction.list_view -> {
                     val products = payload["products"] as List<*>
                     for (product in products) {
-                        toAttach.add(productToSdj(product as EcommerceProduct))
+                        toAttach.add(productToSdj(product as Product))
                     }
                     payload.remove("products")
                 }
@@ -51,46 +48,33 @@ object EcommerceManager {
                 EcommerceAction.add_to_cart, EcommerceAction.remove_from_cart -> {
                     val products = payload["products"] as List<*>
                     for (product in products) {
-                        toAttach.add(productToSdj(product as EcommerceProduct))
+                        toAttach.add(productToSdj(product as Product))
                     }
                     payload.remove("products")
                     
-                    val cart = payload["cart"] as EcommerceCart
-                    toAttach.add(SelfDescribingJson(
-                        TrackerConstants.SCHEMA_ECOMMERCE_CART,
-                        hashMapOf(
-                            Parameters.ECOMM_CART_ID to cart.cartId,
-                            Parameters.ECOMM_CART_VALUE to cart.totalValue,
-                            Parameters.ECOMM_CART_CURRENCY to cart.currency,
-                        ))
-                    )
+                    val cart = payload["cart"] as Cart
+                    toAttach.add(cartToSdj(cart))
                     payload.remove("cart")
                 }
                 
                 EcommerceAction.transaction -> {
                     val products = payload["products"] as List<*>
                     for (product in products) {
-                        toAttach.add(productToSdj(product as EcommerceProduct))
+                        toAttach.add(productToSdj(product as Product))
                     }
                     payload.remove("products")
 
-//                    val transaction = payload["transaction"] as EcommerceTransaction
-//                    toAttach.add(SelfDescribingJson(
-//                        TrackerConstants.SCHEMA_ECOMMERCE_CART,
-//                        hashMapOf(
-//                             Parameters.ECOMM_TRANSACTION_ID to transaction."transaction_id",
-//                             Parameters.ECOMM_TRANSACTION_REVENUE to transaction."revenue",
-//                             Parameters.ECOMM_TRANSACTION_CURRENCY to transaction."currency",
-//                             Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to transaction."payment_method",
-//                             Parameters.ECOMM_TRANSACTION_QUANTITY to transaction."total_quantity",
-//                             Parameters.ECOMM_TRANSACTION_TAX to transaction."tax",
-//                             Parameters.ECOMM_TRANSACTION_SHIPPING to transaction."shipping",
-//                             Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to transaction."discount_code",
-//                             Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to transaction."discount_amount",
-//                             Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to transaction."credit_order"
-//                        ))
-//                    )
-//                    payload.remove("cart")
+                    val transaction = payload["transaction"] as Transaction
+                    toAttach.add(transactionToSdj(transaction))
+                    payload.remove("transaction")
+                }
+                
+                EcommerceAction.checkout_step -> {
+                    
+                }
+                
+                EcommerceAction.promo_view, EcommerceAction.promo_click -> {
+                    
                 }
             }
 
@@ -101,7 +85,7 @@ object EcommerceManager {
         return ecommercePlugin
     }
     
-    private fun productToSdj(product: EcommerceProduct) : SelfDescribingJson {
+    private fun productToSdj(product: Product) : SelfDescribingJson {
         return SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT,
             hashMapOf(
@@ -118,6 +102,35 @@ object EcommerceManager {
                 Parameters.ECOMM_PRODUCT_POSITION to product.position,
                 Parameters.ECOMM_PRODUCT_CURRENCY to product.currency,
                 Parameters.ECOMM_PRODUCT_CREATIVE_ID to product.creativeId
+            )
+        )
+    }
+
+    private fun cartToSdj(cart: Cart) : SelfDescribingJson {
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            hashMapOf(
+                Parameters.ECOMM_CART_ID to cart.cartId,
+                Parameters.ECOMM_CART_VALUE to cart.totalValue,
+                Parameters.ECOMM_CART_CURRENCY to cart.currency,
+            )
+        )
+    }
+
+    private fun transactionToSdj(transaction: Transaction) : SelfDescribingJson {
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            hashMapOf(
+                Parameters.ECOMM_TRANSACTION_ID to transaction.transactionId,
+                Parameters.ECOMM_TRANSACTION_REVENUE to transaction.revenue,
+                Parameters.ECOMM_TRANSACTION_CURRENCY to transaction.currency,
+                Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to transaction.paymentMethod,
+                Parameters.ECOMM_TRANSACTION_QUANTITY to transaction.totalQuantity,
+                Parameters.ECOMM_TRANSACTION_TAX to transaction.tax,
+                Parameters.ECOMM_TRANSACTION_SHIPPING to transaction.shipping,
+                Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to transaction.discountCode,
+                Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to transaction.discountAmount,
+                Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to transaction.creditOrder
             )
         )
     }

@@ -14,11 +14,11 @@ package com.snowplowanalytics.snowplow.event
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceCart
-import com.snowplowanalytics.snowplow.ecommerce.EcommerceProduct
+import com.snowplowanalytics.snowplow.ecommerce.Cart
+import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
-class RemoveFromCart(val cart: EcommerceCart, val products: List<EcommerceProduct>) : AbstractSelfDescribing() {
+class RemoveFromCart(val cart: Cart, val products: List<Product>) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
