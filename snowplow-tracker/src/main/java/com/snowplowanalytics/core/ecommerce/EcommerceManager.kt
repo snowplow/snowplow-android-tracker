@@ -15,9 +15,7 @@ package com.snowplowanalytics.core.ecommerce
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
-import com.snowplowanalytics.snowplow.ecommerce.Cart
-import com.snowplowanalytics.snowplow.ecommerce.Product
-import com.snowplowanalytics.snowplow.ecommerce.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 object EcommerceManager {
@@ -70,11 +68,15 @@ object EcommerceManager {
                 }
                 
                 EcommerceAction.checkout_step -> {
-                    
+                    val checkout = payload["checkout"] as Checkout
+                    toAttach.add(checkoutToSdj(checkout))
+                    payload.remove("checkout")
                 }
                 
                 EcommerceAction.promo_view, EcommerceAction.promo_click -> {
-                    
+                    val promotion = payload["promo"] as Promotion
+                    toAttach.add(promotionToSdj(promotion))
+                    payload.remove("promo")
                 }
             }
 
@@ -119,7 +121,7 @@ object EcommerceManager {
 
     private fun transactionToSdj(transaction: Transaction) : SelfDescribingJson {
         return SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION,
             hashMapOf(
                 Parameters.ECOMM_TRANSACTION_ID to transaction.transactionId,
                 Parameters.ECOMM_TRANSACTION_REVENUE to transaction.revenue,
@@ -131,6 +133,41 @@ object EcommerceManager {
                 Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to transaction.discountCode,
                 Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to transaction.discountAmount,
                 Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to transaction.creditOrder
+            )
+        )
+    }
+
+    private fun checkoutToSdj(checkout: Checkout) : SelfDescribingJson {
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_CHECKOUT_STEP,
+            hashMapOf(
+                Parameters.ECOMM_CHECKOUT_STEP to checkout.step,
+                Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE to checkout.shippingPostcode,
+                Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE to checkout.billingPostcode,
+                Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS to checkout.shippingFullAddress,
+                Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS to checkout.billingFullAddress,
+                Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER to checkout.deliveryProvider,
+                Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD to checkout.deliveryMethod,
+                Parameters.ECOMM_CHECKOUT_COUPON_CODE to checkout.couponCode,
+                Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE to checkout.accountType,
+                Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD to checkout.paymentMethod,
+                Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT to checkout.proofOfPayment,
+                Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN to checkout.marketingOptIn,
+            )
+        )
+    }
+
+    private fun promotionToSdj(promotion: Promotion) : SelfDescribingJson {
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_PROMOTION,
+            hashMapOf(
+                Parameters.ECOMM_PROMO_ID to promotion.id,
+                Parameters.ECOMM_PROMO_NAME to promotion.name,
+                Parameters.ECOMM_PROMO_PRODUCT_IDS to promotion.productIds,
+                Parameters.ECOMM_PROMO_POSITION to promotion.position,
+                Parameters.ECOMM_PROMO_CREATIVE_ID to promotion.creativeId,
+                Parameters.ECOMM_PROMO_TYPE to promotion.type,
+                Parameters.ECOMM_PROMO_SLOT to promotion.slot
             )
         )
     }

@@ -110,6 +110,29 @@ object Parameters {
     const val ECOMM_TRANSACTION_DISCOUNT_AMOUNT = "discount_amount"
     const val ECOMM_TRANSACTION_CREDIT_ORDER = "credit_order"
 
+    // Snowplow Ecommerce Checkout Step
+    const val ECOMM_CHECKOUT_STEP = "step"
+    const val ECOMM_CHECKOUT_SHIPPING_POSTCODE = "shipping_postcode"
+    const val ECOMM_CHECKOUT_BILLING_POSTCODE = "billing_postcode"
+    const val ECOMM_CHECKOUT_SHIPPING_ADDRESS = "shipping_full_address"
+    const val ECOMM_CHECKOUT_BILLING_ADDRESS = "billing_full_address"
+    const val ECOMM_CHECKOUT_DELIVERY_PROVIDER = "delivery_provider"
+    const val ECOMM_CHECKOUT_DELIVERY_METHOD = "delivery_method"
+    const val ECOMM_CHECKOUT_COUPON_CODE = "coupon_code"
+    const val ECOMM_CHECKOUT_ACCOUNT_TYPE = "account_type"
+    const val ECOMM_CHECKOUT_PAYMENT_METHOD = "payment_method"
+    const val ECOMM_CHECKOUT_PROOF_OF_PAYMENT = "proof_of_payment"
+    const val ECOMM_CHECKOUT_MARKETING_OPT_IN = "marketing_opt_in"
+
+    // Snowplow Ecommerce Promo
+    const val ECOMM_PROMO_ID = "id"
+    const val ECOMM_PROMO_NAME = "name"
+    const val ECOMM_PROMO_PRODUCT_IDS = "product_ids"
+    const val ECOMM_PROMO_POSITION = "position"
+    const val ECOMM_PROMO_CREATIVE_ID = "creative_id"
+    const val ECOMM_PROMO_TYPE = "type"
+    const val ECOMM_PROMO_SLOT = "slot"
+
     // Screen View
     const val SV_ID = "id"
     const val SV_NAME = "name"
