@@ -19,7 +19,7 @@ data class Promotion(
     /**
      * The position the promotion was presented in a list of promotions E.g. banner, slider.
      */
-    val position: Number? = null,
+    val position: Int? = null,
     
     /**
      * Identifier/Name/Url for the creative presented on the promotion.

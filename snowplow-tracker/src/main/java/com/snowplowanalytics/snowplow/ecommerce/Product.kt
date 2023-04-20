@@ -30,7 +30,7 @@ data class Product(
     /**
      * The quantity of the product taking part in the action. Used for Cart events.
      */
-    val quantity: Number? = null,
+    val quantity: Int? = null,
 
     /**
      * The size of the product
@@ -55,7 +55,7 @@ data class Product(
     /**
      * The position the product was presented in a list of products (search results, product list page, etc)
      */
-    val position: Number? = null,
+    val position: Int? = null,
 
     /**
      * The currency in which the product is being priced (ISO 4217)

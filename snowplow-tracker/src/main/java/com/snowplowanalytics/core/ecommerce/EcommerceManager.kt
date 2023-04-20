@@ -20,7 +20,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 object EcommerceManager {
     fun plugin() : PluginConfiguration {
-        val ecommercePlugin = PluginConfiguration("ecommercePlugin")
+        val ecommercePlugin = PluginConfiguration("ecommerce_plugin_sp_internal")
         
         ecommercePlugin.entities(
             listOf(TrackerConstants.SCHEMA_ECOMMERCE_ACTION)
@@ -74,7 +74,7 @@ object EcommerceManager {
                 }
                 
                 EcommerceAction.promo_view, EcommerceAction.promo_click -> {
-                    val promotion = payload["promo"] as Promotion
+                    val promotion = payload["promotion"] as Promotion
                     toAttach.add(promotionToSdj(promotion))
                     payload.remove("promo")
                 }

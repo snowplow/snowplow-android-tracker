@@ -5,7 +5,7 @@ data class Cart(
      * The unique ID representing this cart
      */
     val cartId: String? = null,
-            
+
     /**
      * The total value of the cart after this interaction
      */

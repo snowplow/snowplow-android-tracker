@@ -30,7 +30,7 @@ class PromotionView(val promotion: Promotion) : AbstractSelfDescribing() {
         get() {
             val payload = HashMap<String, Any?>()
             payload["type"] = EcommerceAction.promo_view
-            payload["promo"] = promotion
+            payload["promotion"] = promotion
             return payload
         }
     

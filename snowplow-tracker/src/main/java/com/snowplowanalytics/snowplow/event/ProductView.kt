@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.event
 
+import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.Product
@@ -26,8 +27,8 @@ class ProductView(val product: Product) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.product_view
-            payload["product"] = product
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.product_view
+            payload[Parameters.ECOMM_PRODUCT] = product
             return payload
         }
     

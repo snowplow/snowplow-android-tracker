@@ -17,17 +17,23 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
-class ProductListView(val products: List<Product>, val name: String? = null) : AbstractSelfDescribing() {
+class ProductListView(val products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
+
+    // Builder methods
+    fun name(name: String?): ProductListView {
+        this.name = name
+        return this
+    }
     
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
             payload["type"] = EcommerceAction.list_view
-            payload["name"] = name
+            name?.let { payload["name"] = it }
             payload["products"] = products
             return payload
         }

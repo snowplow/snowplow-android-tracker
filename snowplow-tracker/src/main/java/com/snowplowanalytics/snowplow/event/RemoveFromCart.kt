@@ -18,7 +18,7 @@ import com.snowplowanalytics.snowplow.ecommerce.Cart
 import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
-class RemoveFromCart(val cart: Cart, val products: List<Product>) : AbstractSelfDescribing() {
+class RemoveFromCart(val cart: Cart, val products: MutableList<Product>) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

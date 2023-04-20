@@ -24,7 +24,7 @@ data class Transaction(
     /**
      * Total quantity of items in the transaction
      */
-    val totalQuantity: Number? = null,
+    val totalQuantity: Int? = null,
     
     /**
      * Total amount of tax on the transaction
