@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class AddToCartTest {
+class RemoveFromCartTest {
     @Test
     fun testExpectedForm() {
         val product1 = Product(
@@ -46,10 +46,10 @@ class AddToCartTest {
             currency = "GBP"
         )
         
-        var event = AddToCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
+        var event = RemoveFromCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
         var data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.add_to_cart)
+        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.remove_from_cart)
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))
@@ -57,7 +57,7 @@ class AddToCartTest {
         Assert.assertEquals(data[Parameters.ECOMM_CART_VALUE], 123.45)
         Assert.assertEquals(data[Parameters.ECOMM_CART_CURRENCY], "GBP")
 
-        event = AddToCart("id", 0.5, "USD", listOf(product1))
+        event = RemoveFromCart("id", 0.5, "USD", listOf(product1))
         data = event.dataPayload
         Assert.assertEquals(data[Parameters.ECOMM_CART_ID], "id")
     }

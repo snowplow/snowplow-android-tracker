@@ -12,13 +12,29 @@
  */
 package com.snowplowanalytics.snowplow.event
 
+import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.Cart
 import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
-class AddToCart(val cart: Cart, val products: List<Product>) : AbstractSelfDescribing() {
+class AddToCart(
+    /**
+     * The unique ID representing this cart
+     */
+    val cartId: String? = null,
+
+    /**
+     * The total value of the cart after this interaction
+     */
+    val totalValue: Number,
+
+    /**
+     * The currency used for this cart (ISO 4217)
+     */
+    val currency: String,
+    val products: List<Product>
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -27,9 +43,11 @@ class AddToCart(val cart: Cart, val products: List<Product>) : AbstractSelfDescr
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.add_to_cart
-            payload["cart"] = cart
-            payload["products"] = products
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart
+            payload[Parameters.ECOMM_CART_ID] = cartId
+            payload[Parameters.ECOMM_CART_VALUE] = totalValue
+            payload[Parameters.ECOMM_CART_CURRENCY] = currency
+            payload[Parameters.ECOMM_PRODUCTS] = products
             return payload
         }
     

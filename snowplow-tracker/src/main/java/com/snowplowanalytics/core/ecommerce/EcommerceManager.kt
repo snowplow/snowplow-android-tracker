@@ -50,9 +50,14 @@ object EcommerceManager {
                     }
                     payload.remove("products")
                     
-                    val cart = payload["cart"] as Cart
-                    toAttach.add(cartToSdj(cart))
-                    payload.remove("cart")
+                    toAttach.add(cartInfoToSdj(
+                        payload[Parameters.ECOMM_CART_ID] as String?,
+                        payload[Parameters.ECOMM_CART_VALUE] as Number,
+                        payload[Parameters.ECOMM_CART_CURRENCY] as String,
+                    ))
+                    payload.remove(Parameters.ECOMM_CART_ID)
+                    payload.remove(Parameters.ECOMM_CART_VALUE)
+                    payload.remove(Parameters.ECOMM_CART_CURRENCY)
                 }
                 
                 EcommerceAction.transaction -> {
@@ -79,7 +84,7 @@ object EcommerceManager {
                     payload.remove("promo")
                 }
             }
-
+            // TODO remove null properties - does it do it automatically? check SDJ
             payload["type"] = payload["type"].toString()
             return@entities toAttach
             
@@ -108,13 +113,13 @@ object EcommerceManager {
         )
     }
 
-    private fun cartToSdj(cart: Cart) : SelfDescribingJson {
+    private fun cartInfoToSdj(cartId: String?, totalValue: Number, currency: String) : SelfDescribingJson {
         return SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_CART,
             hashMapOf(
-                Parameters.ECOMM_CART_ID to cart.cartId,
-                Parameters.ECOMM_CART_VALUE to cart.totalValue,
-                Parameters.ECOMM_CART_CURRENCY to cart.currency,
+                Parameters.ECOMM_CART_ID to cartId,
+                Parameters.ECOMM_CART_VALUE to totalValue,
+                Parameters.ECOMM_CART_CURRENCY to currency,
             )
         )
     }

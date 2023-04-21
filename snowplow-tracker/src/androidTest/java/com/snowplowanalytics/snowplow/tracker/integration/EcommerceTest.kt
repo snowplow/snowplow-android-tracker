@@ -22,9 +22,6 @@ import com.snowplowanalytics.snowplow.TestUtils.createSessionSharedPreferences
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.ecommerce.Cart
-import com.snowplowanalytics.snowplow.ecommerce.Product
-import com.snowplowanalytics.snowplow.ecommerce.Transaction
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
