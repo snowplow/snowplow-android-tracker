@@ -31,6 +31,7 @@ import com.snowplowanalytics.snowplow.tracker.MockEventStore
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import com.snowplowanalytics.snowplow.tracker.SessionState
 import com.snowplowanalytics.snowplow.util.Basis
+import com.snowplowanalytics.snowplow.util.Size
 import com.snowplowanalytics.snowplow.util.TimeMeasure
 import junit.framework.TestCase
 import org.json.JSONException
@@ -544,5 +545,37 @@ class ConfigurationTest {
         // Check eid field
         val trackedEventId = request.payload.map["eid"] as String?
         Assert.assertEquals(eventId.toString(), trackedEventId)
+    }
+
+    @Test
+    fun subjectConfigurationSetsPropertiesInSubject() {
+        val subjectConfig = SubjectConfiguration()
+        subjectConfig.userId("uid")
+        subjectConfig.networkUserId("nuid")
+        subjectConfig.domainUserId("duid")
+        subjectConfig.useragent("ua")
+        subjectConfig.ipAddress("localhost")
+        subjectConfig.timezone("UTC+1")
+        subjectConfig.language("sk")
+        subjectConfig.screenResolution(Size(width = 1024, height = 768))
+        subjectConfig.screenViewPort(Size(width = 800, height = 600))
+        subjectConfig.colorDepth(16)
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.GET, 200))
+        val tracker = createTracker(context, Math.random().toString(), networkConfig, subjectConfig)
+
+        Assert.assertEquals("uid", tracker.subject.userId)
+        Assert.assertEquals("nuid", tracker.subject.networkUserId)
+        Assert.assertEquals("duid", tracker.subject.domainUserId)
+        Assert.assertEquals("ua", tracker.subject.useragent)
+        Assert.assertEquals("localhost", tracker.subject.ipAddress)
+        Assert.assertEquals("UTC+1", tracker.subject.timezone)
+        Assert.assertEquals("sk", tracker.subject.language)
+        Assert.assertEquals(1024, tracker.subject.screenResolution?.width)
+        Assert.assertEquals(768, tracker.subject.screenResolution?.height)
+        Assert.assertEquals(800, tracker.subject.screenViewPort?.width)
+        Assert.assertEquals(600, tracker.subject.screenViewPort?.height)
+        Assert.assertEquals(16, tracker.subject.colorDepth)
     }
 }
