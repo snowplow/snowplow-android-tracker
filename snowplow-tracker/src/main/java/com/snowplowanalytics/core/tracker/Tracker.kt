@@ -492,11 +492,12 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         setApplicationInstallEventTimestamp(event)
         addBasicPropertiesToPayload(payload, event)
         addStateMachinePayloadValues(event)
-        event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
 
         // Context entities
         addBasicContexts(event)
         addStateMachineEntities(event)
+        
+        event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
         event.wrapEntitiesToPayload(payload, base64Encoded=base64Encoded)
 
         // Workaround for campaign attribution

@@ -10,124 +10,126 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.tracker.integration
+package com.snowplowanalytics.snowplow.internal.tracker
 
 import android.annotation.SuppressLint
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
+import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.TestUtils.createSessionSharedPreferences
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.emitter.EventStore
+import com.snowplowanalytics.snowplow.ecommerce.Product
 import com.snowplowanalytics.snowplow.event.*
+import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
-import okhttp3.mockwebserver.MockResponse
+import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 @RunWith(AndroidJUnit4::class)
 class EcommerceTest {
-//    @Before
-//    @Throws(Exception::class)
-//    fun setUp() {
-//        try {
-//            if (tracker == null) return
-//            val emitter = tracker!!.emitter
-//            tracker!!.close()
-//            val isClean = emitter.eventStore!!.removeAllEvents()
-//            Log.i("TrackerTest", "Tracker closed - EventStore cleaned: $isClean")
-//            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore!!.size())
-//        } catch (e: IllegalStateException) {
-//            Log.i("TrackerTest", "Tracker already closed.")
-//        }
-//    }
-
-    // Test Setup
-    @Throws(IOException::class)
-    private fun getMockServer(count: Int): MockWebServer {
-        val eventStore: EventStore =
-            SQLiteEventStore(InstrumentationRegistry.getInstrumentation().targetContext, "namespace")
-        eventStore.removeAllEvents()
-
-        val mockServer = MockWebServer()
-        mockServer.start()
-        val mockResponse = MockResponse().setResponseCode(200)
-        for (i in 0 until count) {
-            mockServer.enqueue(mockResponse)
-        }
-        return mockServer
-    }
-
-    @Throws(IOException::class)
-    fun killMockServer(mockServer: MockWebServer) {
-        mockServer.shutdown()
-    }
-
-    // Tests
+    
     @Test
     @Throws(Exception::class)
     fun productView() {
-//        val mockServer = getMockServer(14)
-//        val tracker = getTracker("myNamespace", getMockServerURI(mockServer))
-//        
-//        val product = Product("id", price = 12.34, currency = "GBP", name = "lovely product", position = 1)
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        
+        Snowplow.removeAllTrackers()
+        
+        val networkConfig = NetworkConfiguration(networkConnection)
+        val trackerConfig = TrackerConfiguration("appId").base64encoding(false)
+
+        val tracker = Snowplow.createTracker(
+            context,
+            "ns${Math.random()}",
+            networkConfig,
+            trackerConfig
+        )
+        
+        val product = Product(
+            "id", 
+            price = 12.34, 
+            currency = "GBP", 
+            name = "lovely product", 
+            position = 1
+        )
+        tracker.track(ProductView(product))
+        
+        run {
+            var i = 0
+            while (i < 10 && networkConnection.countRequests() == 0) {
+                Thread.sleep(1000)
+                i++
+            }
+        }
+        
+        Assert.assertEquals(1, networkConnection.countRequests())
+        
+        val request = networkConnection.allRequests[0]
+        val event = JSONObject(request.payload.map["ue_pr"] as String)
+            .getJSONObject("data")
+        val entities = JSONObject(request.payload.map["co"] as String)
+            .getJSONArray("data")
+        
+        var productEntity: JSONObject? = null
+        for (i in 0 until entities.length()) {
+            if (entities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT) {
+                productEntity = entities.getJSONObject(i).getJSONObject("data")
+            }
+        }
+        Assert.assertEquals(TrackerConstants.SCHEMA_ECOMMERCE_ACTION, event.getString("schema"))
+        Assert.assertEquals(EcommerceAction.product_view.toString(), event.getJSONObject("data").getString("type"))
+        Assert.assertFalse(event.getJSONObject("data").has(Parameters.ECOMM_NAME))
+        
+        Assert.assertNotNull(productEntity)
+        Assert.assertEquals("id", productEntity!!.get(Parameters.ECOMM_PRODUCT_ID))
+        Assert.assertEquals(12.34, productEntity.get(Parameters.ECOMM_PRODUCT_PRICE))
+        Assert.assertEquals("GBP", productEntity.get(Parameters.ECOMM_PRODUCT_CURRENCY))
+        Assert.assertEquals("lovely product", productEntity.get(Parameters.ECOMM_PRODUCT_NAME))
+        Assert.assertEquals(1, productEntity.get(Parameters.ECOMM_PRODUCT_POSITION))
+        
+        Assert.assertFalse(productEntity.has(Parameters.ECOMM_PRODUCT_LIST_PRICE))
+        Assert.assertFalse(productEntity.has(Parameters.ECOMM_PRODUCT_VARIANT))
+        
+        
+        
+        
+        
+        
+
+        
 //        val product2 = Product("id2", price = 34.99, currency = "USD", name = "product 2", position = 2)
-//        val cart = Cart("cart id", 33.33, "GBP")
 //        val transaction = Transaction("id", 123, "EUR", "method")
+//
 //        
-//        val productView = ProductView(product)
 //        val productListClick = ProductListClick(product)
 //        val productListView = ProductListView(listOf(product, product2))
-//        val addToCart = AddToCart(cart, listOf(product, product2))
 //        val transactionEvent = TransactionEvent(transaction, listOf(product))
-//        
-//        tracker.track(productView)
-//        tracker.track(productListClick)
-//        tracker.track(productListView)
-//        tracker.track(addToCart)
-//        tracker.track(transactionEvent)
+//
+////        tracker.track(productView)
+////        tracker.track(productListClick)
+////        tracker.track(productListView)
+////        tracker.track(transactionEvent)
 //        tracker.track(ScreenView("screenview"))
-//        
+//
 //        waitForTracker(tracker)
-//        
-//        val requests = getRequests(mockServer, 14)
-//        
-//        for (request in requests) {
-//            val body = JSONObject(request!!.body.readUtf8())
-//            val data = body.getJSONArray("data")
-//            
-//            for (i in 0 until data.length()) {
-//                val json = data.getJSONObject(i)
-//
-//
-//                val unstructEvent = JSONObject(json.getString("ue_pr"))
-//                Assert.assertEquals(
-//                    "iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0",
-//                    unstructEvent.getString("schema")
-//                )
-//                val innerSchema = unstructEvent.getJSONObject("data").getString("schema")
-//                val innerData = unstructEvent.getJSONObject("data").getJSONObject("data")
-//                when (innerSchema) {
-//                    "iglu:com.snowplowanalytics.snowplow/screen_view/jsonschema/1-0-0" -> checkScreenView(
-//                        innerData
-//                    )
-//                    else -> {}
-//                }
-//            }
-//        }
-//        
-//        killMockServer(mockServer)
+
+        
     }
     
 
