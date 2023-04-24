@@ -185,6 +185,7 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
         setDefaultScreenResolution(context)
         
         if (config != null) {
+            config.userId?.let { userId = it }
             config.networkUserId?.let { networkUserId = it }
             config.domainUserId?.let { domainUserId = it }
             config.useragent?.let { useragent = it }

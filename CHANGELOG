@@ -1,3 +1,7 @@
+Version 5.0.1 (2023-04-24)
+--------------------------
+Fix adding user ID set in SubjectConfiguration to events (#595)
+
 Version 5.0.0 (2023-04-04)
 --------------------------
 Add plugin example to Kotlin demo (#593)
