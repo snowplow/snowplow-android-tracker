@@ -19,11 +19,9 @@ import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
 class AddToCart(
-    /**
-     * The unique ID representing this cart
-     */
-    val cartId: String? = null,
-
+    
+    val products: List<Product>,
+    
     /**
      * The total value of the cart after this interaction
      */
@@ -33,8 +31,12 @@ class AddToCart(
      * The currency used for this cart (ISO 4217)
      */
     val currency: String,
-    val products: List<Product>
-) : AbstractSelfDescribing() {
+    
+    /**
+     * The unique ID representing this cart
+     */
+    val cartId: String? = null
+    ) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

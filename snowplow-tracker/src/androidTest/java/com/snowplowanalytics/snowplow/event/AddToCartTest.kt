@@ -57,7 +57,7 @@ class AddToCartTest {
         Assert.assertEquals(data[Parameters.ECOMM_CART_VALUE], 123.45)
         Assert.assertEquals(data[Parameters.ECOMM_CART_CURRENCY], "GBP")
 
-        event = AddToCart("id", 0.5, "USD", listOf(product1))
+        event = AddToCart(listOf(product1), 0.5, "USD", "id")
         data = event.dataPayload
         Assert.assertEquals(data[Parameters.ECOMM_CART_ID], "id")
     }

@@ -19,10 +19,7 @@ import com.snowplowanalytics.snowplow.ecommerce.Product
 
 
 class RemoveFromCart(
-    /**
-     * The unique ID representing this cart
-     */
-    val cartId: String? = null,
+    val products: List<Product>,
 
     /**
      * The total value of the cart after this interaction
@@ -33,7 +30,11 @@ class RemoveFromCart(
      * The currency used for this cart (ISO 4217)
      */
     val currency: String,
-    val products: List<Product>
+
+    /**
+     * The unique ID representing this cart
+     */
+    val cartId: String? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */

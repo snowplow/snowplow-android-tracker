@@ -53,7 +53,7 @@ object EcommerceManager {
                     toAttach.add(cartInfoToSdj(
                         payload[Parameters.ECOMM_CART_ID] as String?,
                         payload[Parameters.ECOMM_CART_VALUE] as Number,
-                        payload[Parameters.ECOMM_CART_CURRENCY] as String,
+                        payload[Parameters.ECOMM_CART_CURRENCY] as String
                     ))
                     payload.remove(Parameters.ECOMM_CART_ID)
                     payload.remove(Parameters.ECOMM_CART_VALUE)
