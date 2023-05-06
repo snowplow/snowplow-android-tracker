@@ -294,7 +294,14 @@ class ServiceProvider(
             }
         }
         
-        val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
+        val tracker = Tracker(
+            emitter,
+            namespace,
+            trackerConfig.appId,
+            trackerConfig.platformContextProperties,
+            context,
+            builder
+        )
         
         if (trackerConfigurationUpdate.isPaused) {
             tracker.pauseEventTracking()

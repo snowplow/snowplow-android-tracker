@@ -220,6 +220,7 @@ class EventSendingTest {
             emitter,
             ns,
             "myAppId",
+            null,
             InstrumentationRegistry.getInstrumentation().targetContext,
             trackerBuilder
         )

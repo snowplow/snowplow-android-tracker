@@ -120,6 +120,12 @@ object Parameters {
     const val BATTERY_STATE = "batteryState"
     const val AVAILABLE_STORAGE = "availableStorage"
     const val TOTAL_STORAGE = "totalStorage"
+    const val IS_PORTRAIT = "isPortrait"
+    const val MOBILE_RESOLUTION = "resolution"
+    const val MOBILE_LANGUAGE = "language"
+    const val MOBILE_SCALE = "scale"
+    const val APP_SET_ID = "appSetId"
+    const val APP_SET_ID_SCOPE = "appSetIdScope"
 
     // Geolocation context
     const val LATITUDE = "latitude"
