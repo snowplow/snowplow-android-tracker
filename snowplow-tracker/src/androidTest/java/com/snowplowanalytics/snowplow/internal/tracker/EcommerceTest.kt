@@ -114,7 +114,7 @@ class EcommerceTest {
 
         Assert.assertNotNull(productEntity)
         Assert.assertEquals("id", productEntity!!.get(Parameters.ECOMM_PRODUCT_ID))
-        Assert.assertEquals(5.00, productEntity.get(Parameters.ECOMM_PRODUCT_PRICE))
+        Assert.assertEquals(5, productEntity.get(Parameters.ECOMM_PRODUCT_PRICE))
         Assert.assertEquals("EUR", productEntity.get(Parameters.ECOMM_PRODUCT_CURRENCY))
         Assert.assertFalse(productEntity.has(Parameters.ECOMM_PRODUCT_POSITION))
 
@@ -143,7 +143,7 @@ class EcommerceTest {
             price = 1000,
             currency = "AUD",
             name = "snowplow",
-            category = "plows",
+            category = "ploughs",
             listPrice = 1500.0,
             size = "large",
             variant = "shiny",
@@ -235,6 +235,54 @@ class EcommerceTest {
         Assert.assertEquals(100, cart.get(Parameters.ECOMM_CART_VALUE))
         Assert.assertEquals("GBP", cart.get(Parameters.ECOMM_CART_CURRENCY))
         Assert.assertFalse(cart.has(Parameters.ECOMM_CART_ID))
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun removeFromCart() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val tracker = getTracker(networkConnection)
+
+        val product = Product(
+            "product123",
+            price = 200000,
+            currency = "JPY",
+        )
+
+        tracker.track(RemoveFromCart(listOf(product), 400000, "JPY", "cart567"))
+        waitForEvents(networkConnection, 1)
+
+        Assert.assertEquals(1, networkConnection.countRequests())
+
+        val request = networkConnection.allRequests[0]
+        val event = JSONObject(request.payload.map["ue_pr"] as String)
+            .getJSONObject("data")
+        val entities = JSONObject(request.payload.map["co"] as String)
+            .getJSONArray("data")
+
+        val productEntities = ArrayList<JSONObject>()
+        val cartEntities = ArrayList<JSONObject>()
+        for (i in 0 until entities.length()) {
+            if (entities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT) {
+                productEntities.add(entities.getJSONObject(i).getJSONObject("data"))
+            } else if (entities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_CART) {
+                cartEntities.add(entities.getJSONObject(i).getJSONObject("data"))
+            }
+        }
+
+        Assert.assertEquals(TrackerConstants.SCHEMA_ECOMMERCE_ACTION, event.getString("schema"))
+        Assert.assertEquals(EcommerceAction.remove_from_cart.toString(), event.getJSONObject("data").getString("type"))
+        Assert.assertFalse(event.getJSONObject("data").has(Parameters.ECOMM_NAME))
+
+        Assert.assertEquals(1, productEntities.size)
+        Assert.assertEquals(1, cartEntities.size)
+
+        Assert.assertEquals("product123", productEntities[0].get(Parameters.ECOMM_PRODUCT_ID))
+
+        val cart = cartEntities[0]
+        Assert.assertEquals(400000, cart.get(Parameters.ECOMM_CART_VALUE))
+        Assert.assertEquals("JPY", cart.get(Parameters.ECOMM_CART_CURRENCY))
+        Assert.assertEquals("cart567", cart.get(Parameters.ECOMM_CART_ID))
     }
     
 
