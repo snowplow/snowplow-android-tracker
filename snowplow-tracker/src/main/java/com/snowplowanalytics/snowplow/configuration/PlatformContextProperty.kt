@@ -40,7 +40,7 @@ enum class PlatformContextProperty {
     IS_PORTRAIT,
     /// Screen resolution in pixels. Arrives in the form of WIDTHxHEIGHT (e.g., 1200x900). Doesn't change when device orientation changes
     RESOLUTION,
-    /// Scale factor used to convert logical coordinates to device coordinates of the screen (uses UIScreen.scale on iOS)
+    /// Scale factor used to convert logical coordinates to device coordinates of the screen (uses DisplayMetrics.density on Android)
     SCALE,
     /// System language currently used on the device (ISO 639)
     LANGUAGE,

@@ -194,7 +194,7 @@ open class DeviceInfoMonitor {
         return "${width}x${height}"
     }
 
-    /// Scale factor used to convert logical coordinates to device coordinates of the screen (uses DisplayMetrics.density on Android)
+    /// Scale factor used to convert logical coordinates to device coordinates of the screen (uses DisplayMetrics.density)
     open fun getScale(context: Context): Float? {
         return context.resources.displayMetrics.density
     }
