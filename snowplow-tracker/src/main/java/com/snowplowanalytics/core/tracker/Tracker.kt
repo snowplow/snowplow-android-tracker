@@ -31,6 +31,7 @@ import com.snowplowanalytics.core.utils.NotificationCenter.addObserver
 import com.snowplowanalytics.core.utils.NotificationCenter.removeObserver
 import com.snowplowanalytics.core.utils.Util.getApplicationContext
 import com.snowplowanalytics.core.utils.Util.getGeoLocationContext
+import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import com.snowplowanalytics.snowplow.entity.DeepLink
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.Payload
@@ -51,7 +52,13 @@ import kotlin.math.max
  * @param context The Android application context
  * @param builder A closure to set Tracker configuration
  */
-class Tracker(emitter: Emitter, val namespace: String, var appId: String, context: Context, builder: ((Tracker) -> Unit)? = null) {
+class Tracker(
+    emitter: Emitter,
+    val namespace: String,
+    var appId: String,
+    platformContextProperties: List<PlatformContextProperty>?,
+    context: Context,
+    builder: ((Tracker) -> Unit)? = null) {
     private var builderFinished = false
     private val context: Context
     private val stateManager = StateManager()
@@ -76,8 +83,8 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private val _dataCollection = AtomicBoolean(true)
     val dataCollection: Boolean
         get() = _dataCollection.get()
-    
-    private val platformContextManager = PlatformContext(context)
+
+    private val platformContextManager = PlatformContext(platformContextProperties, context)
 
     var emitter: Emitter = emitter
         set(emitter) {

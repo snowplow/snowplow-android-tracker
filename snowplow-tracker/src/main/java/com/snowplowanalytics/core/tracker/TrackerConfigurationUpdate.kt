@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
@@ -39,6 +40,7 @@ class TrackerConfigurationUpdate : TrackerConfiguration {
     private var diagnosticAutotrackingUpdated = false
     private var userAnonymisationUpdated = false
     private var trackerVersionSuffixUpdated = false
+    private var platformContextPropertiesUpdated = false
 
     constructor(appId: String) : super(appId)
     constructor(appId: String, jsonObject: JSONObject) : super(appId, jsonObject)
@@ -167,5 +169,12 @@ class TrackerConfigurationUpdate : TrackerConfiguration {
         set(value) {
             super.trackerVersionSuffix = value
             trackerVersionSuffixUpdated = true
+        }
+
+    override var platformContextProperties: List<PlatformContextProperty>?
+        get() = if (sourceConfig == null || platformContextPropertiesUpdated) super.platformContextProperties else sourceConfig!!.platformContextProperties
+        set(value) {
+            super.platformContextProperties = value
+            platformContextPropertiesUpdated = true
         }
 }

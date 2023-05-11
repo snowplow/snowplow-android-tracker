@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
+import com.snowplowanalytics.core.tracker.PlatformContext
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
@@ -67,7 +68,13 @@ open class TrackerConfiguration(
     override var diagnosticAutotracking: Boolean = TrackerDefaults.diagnosticAutotracking
     override var userAnonymisation: Boolean = TrackerDefaults.userAnonymisation
     override var trackerVersionSuffix: String? = null
-    
+
+    /**
+     * List of properties of the platform context to track.
+     * If not passed and `platformContext` is enabled, all available properties will be tracked.
+     * The required `osType`, `osVersion`, `deviceManufacturer`, and `deviceModel` properties will be tracked in the entity regardless of this setting.
+     */
+    open var platformContextProperties: List<PlatformContextProperty>? = null
 
     // Builder methods
     
@@ -227,6 +234,16 @@ open class TrackerConfiguration(
         return this
     }
 
+    /**
+     * List of properties of the platform context to track.
+     * If not passed and `platformContext` is enabled, all available properties will be tracked.
+     * The required `osType`, `osVersion`, `deviceManufacturer`, and `deviceModel` properties will be tracked in the entity regardless of this setting.
+     */
+    fun platformContextProperties(platformContextProperties: List<PlatformContextProperty>?): TrackerConfiguration {
+        this.platformContextProperties = platformContextProperties
+        return this
+    }
+
     // Copyable
     override fun copy(): Configuration {
         return TrackerConfiguration(appId)
@@ -247,6 +264,7 @@ open class TrackerConfiguration(
             .diagnosticAutotracking(diagnosticAutotracking)
             .userAnonymisation(userAnonymisation)
             .trackerVersionSuffix(trackerVersionSuffix)
+            .platformContextProperties(platformContextProperties)
     }
 
     // JSON Formatter
