@@ -129,7 +129,7 @@ class StateManagerTest {
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
-        val tracker = Tracker(emitter, "namespace", "appId", context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))
@@ -223,7 +223,7 @@ class StateManagerTest {
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
-        val tracker = Tracker(emitter, "namespace", "appId", context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))
@@ -298,7 +298,7 @@ class StateManagerTest {
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
         }
-        val tracker = Tracker(emitter, "namespace", "appId", context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))

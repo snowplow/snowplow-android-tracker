@@ -34,7 +34,7 @@ object TrackerConstants {
         "iglu:com.snowplowanalytics.snowplow/consent_document/jsonschema/1-0-0"
     const val GEOLOCATION_SCHEMA =
         "iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0"
-    const val MOBILE_SCHEMA = "iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-2"
+    const val MOBILE_SCHEMA = "iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-3"
     const val SESSION_SCHEMA = "iglu:com.snowplowanalytics.snowplow/client_session/jsonschema/1-0-2"
     const val APPLICATION_ERROR_SCHEMA =
         "iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-0"

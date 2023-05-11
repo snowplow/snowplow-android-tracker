@@ -71,6 +71,7 @@ class LoggingTest {
             emitter!!,
             "namespace",
             "myAppId",
+            null,
             ApplicationProvider.getApplicationContext(),
             trackerBuilder
         )
@@ -105,6 +106,7 @@ class LoggingTest {
             emitter!!,
             "namespace",
             "myAppId",
+            null,
             ApplicationProvider.getApplicationContext(),
             trackerBuilder
         )
@@ -138,6 +140,7 @@ class LoggingTest {
             emitter!!,
             "namespace",
             "myAppId",
+            null,
             ApplicationProvider.getApplicationContext(),
             trackerBuilder
         )

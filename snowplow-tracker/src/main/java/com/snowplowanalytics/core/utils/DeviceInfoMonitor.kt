@@ -16,16 +16,15 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.os.BatteryManager
-import android.os.Build
-import android.os.Environment
-import android.os.StatFs
+import android.os.*
 import android.telephony.TelephonyManager
 import android.util.Pair
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
+import java.lang.reflect.InvocationTargetException
 import java.util.*
 
 open class DeviceInfoMonitor {
@@ -183,6 +182,78 @@ open class DeviceInfoMonitor {
             return statFs.totalBytes
         }
 
+    /// Whether the device orientation is portrait (either upright or upside down)
+    open fun getIsPortrait(context: Context): Boolean? {
+        return context.resources.configuration.orientation == ORIENTATION_PORTRAIT
+    }
+
+    /// Resolution in pixels. Arrives in the form of WIDTHxHEIGHT (e.g., 1200x900). Doesn't change when device orientation changes
+    open fun getResolution(context: Context): String? {
+        val width = context.resources.displayMetrics.widthPixels
+        val height = context.resources.displayMetrics.heightPixels
+        return "${width}x${height}"
+    }
+
+    /// Scale factor used to convert logical coordinates to device coordinates of the screen (uses DisplayMetrics.density)
+    open fun getScale(context: Context): Float? {
+        return context.resources.displayMetrics.density
+    }
+
+    /// System language currently used on the device (ISO 639)
+    open val language: String?
+        get() {
+            return Locale.getDefault().isO3Language
+        }
+
+    /// Android vendor ID scoped to the set of apps published under the same Google Play developer account (see https://developer.android.com/training/articles/app-set-id)
+    open fun getAppSetIdAndScope(context: Context): Pair<String, String>? {
+        // needs to be executed on the background thread
+        if (Looper.myLooper() == Looper.getMainLooper()) { return null }
+
+        try {
+            // Using Java reflection because the tracker doesn't import the gms library directly
+            // and can only use the APIs in case the user app imports it.
+
+            // equivalent of: val client = AppSet.getClient()
+            val client = invokeStaticMethod(
+                "com.google.android.gms.appset.AppSet", "getClient",
+                arrayOf(Context::class.java), context
+            ) ?: return null
+
+            // equivalent of: val task = client.getAppSetIdInfo()
+            val task = invokeInstanceMethod(
+                client, "getAppSetIdInfo", null
+            ) ?: return null
+
+            // equivalent of: val appSetInfo = Tasks.await(task)
+            val appSetInfo = invokeStaticMethod(
+                "com.google.android.gms.tasks.Tasks", "await",
+                arrayOf(Class.forName("com.google.android.gms.tasks.Task")), task
+            ) ?: return null
+
+            // equivalent of: val id = appSetInfo.getId()
+            val id = invokeInstanceMethod(appSetInfo, "getId", null) ?: return null
+
+            // equivalent of: val id = appSetInfo.getScope()
+            val scope = invokeInstanceMethod(appSetInfo, "getScope", null) ?: return null
+
+            return Pair(
+                id as String,
+                if (scope as Int == 1) { "app" } else { "developer" }
+            )
+        } catch (e: ClassNotFoundException) {
+            Logger.d(TAG, "AppSetID error: Google Play Services not found")
+        } catch (e: InvocationTargetException) {
+            Logger.d(TAG, "AppSetID error: Google Play Services not available")
+        } catch (e: Exception) {
+            Logger.d(TAG, "AppSetID error: couldn't connect to Google Play Services"
+            )
+        }
+
+        return null
+    }
+
+
     // --- PRIVATE
     private fun getMemoryInfo(context: Context): ActivityManager.MemoryInfo {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
@@ -256,5 +327,7 @@ open class DeviceInfoMonitor {
             }
             return methodObject.invoke(instance, *args)
         }
+
+        private val TAG = DeviceInfoMonitor::class.java.simpleName
     }
 }
