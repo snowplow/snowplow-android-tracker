@@ -264,6 +264,7 @@ open class TrackerConfiguration(
             .diagnosticAutotracking(diagnosticAutotracking)
             .userAnonymisation(userAnonymisation)
             .trackerVersionSuffix(trackerVersionSuffix)
+            .platformContextProperties(platformContextProperties)
     }
 
     // JSON Formatter
