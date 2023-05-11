@@ -1,3 +1,7 @@
+Version 5.1.0 (2023-05-11)
+--------------------------
+Track new properties in platform context version 1-0-3 and make it configurable which properties to track (#598)
+
 Version 5.0.1 (2023-04-24)
 --------------------------
 Fix adding user ID set in SubjectConfiguration to events (#595)
