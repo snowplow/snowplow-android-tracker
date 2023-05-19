@@ -89,6 +89,8 @@ interface TrackerConfigurationInterface {
 
     /**
      * Whether enable automatic tracking of install event.
+     * In case com.android.installreferrer:installreferrer library is present,
+     * an entity with the referrer details will be attached to the install event.
      */
     var installAutotracking: Boolean
 
