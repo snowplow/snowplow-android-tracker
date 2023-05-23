@@ -25,6 +25,8 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Entity tracked along with the `application_install` event to give information about the Play Store referrer.
  * Only tracked in case `com.android.installreferrer` package is added to app dependencies.
+ * 
+ * Schema: iglu:com.android.installreferrer.api/referrer_details/jsonschema/1-0-0
  *
  * @param installReferrer The referrer URL of the installed package
  * @param referrerClickTimestamp The timestamp when referrer click happens

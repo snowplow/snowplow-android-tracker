@@ -22,7 +22,7 @@ import java.util.*
 
 /**
  * An event tracked on the first launch of the app in case install autotracking is enabled.
- * It is accompanied by an install referrer entity if available.
+ * It is accompanied by an install referrer entity (`InstallReferrerDetails`) if available.
  */
 class ApplicationInstallEvent : AbstractSelfDescribing() {
 
