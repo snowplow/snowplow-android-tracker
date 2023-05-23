@@ -21,6 +21,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.utils.Util
+import com.snowplowanalytics.snowplow.entity.ClientSessionEntity
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.SessionState
 import com.snowplowanalytics.snowplow.tracker.SessionState.Companion.build
@@ -154,7 +155,7 @@ class Session @SuppressLint("ApplySharedPref") constructor(
                 "00000000-0000-0000-0000-000000000000"
             sessionCopy[Parameters.SESSION_PREVIOUS_ID] = null
         }
-        return SelfDescribingJson(TrackerConstants.SESSION_SCHEMA, sessionCopy)
+        return ClientSessionEntity(sessionCopy)
     }
 
     private fun shouldUpdateSession(): Boolean {
