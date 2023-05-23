@@ -41,4 +41,5 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.browser:browser:1.5.0'
     implementation 'com.google.android.gms:play-services-appset:16.0.2'
+    implementation "com.android.installreferrer:installreferrer:2.2"
 }

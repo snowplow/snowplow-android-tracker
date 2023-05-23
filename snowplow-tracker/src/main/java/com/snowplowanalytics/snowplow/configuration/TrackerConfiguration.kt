@@ -192,6 +192,8 @@ open class TrackerConfiguration(
 
     /**
      * Whether to enable automatic tracking of install event.
+     * In case com.android.installreferrer:installreferrer library is present,
+     * an entity with the referrer details will be attached to the install event.
      */
     fun installAutotracking(installAutotracking: Boolean): TrackerConfiguration {
         this.installAutotracking = installAutotracking

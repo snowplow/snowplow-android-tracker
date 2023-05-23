@@ -430,7 +430,7 @@ class Tracker(
 
     private fun initializeInstallTracking() {
         if (installAutotracking) {
-            InstallTracker.getInstance(context)
+            ApplicationInstallEvent.trackIfFirstLaunch(context)
         }
     }
 
