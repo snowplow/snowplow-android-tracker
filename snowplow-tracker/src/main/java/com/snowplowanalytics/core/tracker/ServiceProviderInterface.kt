@@ -18,7 +18,7 @@ import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
-import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
+import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
 
 interface ServiceProviderInterface {
     val namespace: String
@@ -48,7 +48,7 @@ interface ServiceProviderInterface {
     val gdprConfigurationUpdate: GdprConfigurationUpdate
 
     // Plugins
-    val pluginConfigurations: List<PluginConfigurationInterface>
-    fun addPlugin(plugin: PluginConfigurationInterface)
+    val pluginConfigurations: List<PluginIdentifiable>
+    fun addPlugin(plugin: PluginIdentifiable)
     fun removePlugin(identifier: String)
 }

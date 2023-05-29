@@ -28,6 +28,7 @@ class StateManager {
         HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToPayloadUpdater = HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToAfterTrackCallback = HashMap<String, MutableList<StateMachineInterface>>()
+    private val eventSchemaToFilter = HashMap<String, MutableList<StateMachineInterface>>()
 
     val trackerState = TrackerState()
     
@@ -63,6 +64,11 @@ class StateManager {
             stateMachine.subscribedEventSchemasForAfterTrackCallback,
             stateMachine
         )
+        addToSchemaRegistry(
+            eventSchemaToFilter,
+            stateMachine.subscribedEventSchemasForFiltering,
+            stateMachine
+        )
     }
 
     @Synchronized
@@ -89,6 +95,11 @@ class StateManager {
         removeFromSchemaRegistry(
             eventSchemaToAfterTrackCallback,
             stateMachine.subscribedEventSchemasForAfterTrackCallback,
+            stateMachine
+        )
+        removeFromSchemaRegistry(
+            eventSchemaToFilter,
+            stateMachine.subscribedEventSchemasForFiltering,
             stateMachine
         )
         return true
@@ -134,11 +145,9 @@ class StateManager {
         eventSchemaToEntitiesGenerator["*"]?.let { stateMachines.addAll(it) }
 
         for (stateMachine in stateMachines) {
-            val stateIdentifier = stateMachineToIdentifier[stateMachine]
-            if (stateIdentifier != null) {
+            stateMachineToIdentifier[stateMachine]?.let { stateIdentifier ->
                 val state = event.state.getState(stateIdentifier)
-                val entities = stateMachine.entities(event, state)
-                if (entities != null) {
+                stateMachine.entities(event, state)?.let { entities ->
                     result.addAll(entities)
                 }
             }
@@ -154,12 +163,12 @@ class StateManager {
         eventSchemaToPayloadUpdater["*"]?.let { stateMachines.addAll(it) }
 
         for (stateMachine in stateMachines) {
-            val stateIdentifier = stateMachineToIdentifier[stateMachine]
-            if (stateIdentifier != null) {
+            stateMachineToIdentifier[stateMachine]?.let { stateIdentifier ->
                 val state = event.state.getState(stateIdentifier)
-                val payloadValues = stateMachine.payloadValues(event, state)
-                if (payloadValues != null && !event.addPayloadValues(payloadValues)) {
-                    failures++
+                stateMachine.payloadValues(event, state)?.let { payloadValues ->
+                    if (!event.addPayloadValues(payloadValues)) {
+                        failures++
+                    }
                 }
             }
         }
@@ -181,6 +190,25 @@ class StateManager {
                 }
             }
         }
+    }
+
+    @Synchronized
+    fun filter(event: StateMachineEvent): Boolean {
+        val schema = event.schema ?: event.name
+
+        val stateMachines: MutableList<StateMachineInterface> = LinkedList()
+        eventSchemaToFilter[schema]?.let { stateMachines.addAll(it) }
+        eventSchemaToFilter["*"]?.let { stateMachines.addAll(it) }
+
+        for (stateMachine in stateMachines) {
+            stateMachineToIdentifier[stateMachine]?.let { stateIdentifier ->
+                val state = event.state.getState(stateIdentifier)
+                if (stateMachine.filter(event, state) == false) {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     // Private methods

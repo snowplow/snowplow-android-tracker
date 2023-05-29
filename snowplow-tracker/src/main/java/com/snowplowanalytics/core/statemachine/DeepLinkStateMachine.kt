@@ -48,6 +48,9 @@ class DeepLinkStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForFiltering: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, state: State?): State? {
         // - Init (DL) DeepLinkReceived
         // - ReadyForOutput (DL) DeepLinkReceived
@@ -86,6 +89,10 @@ class DeepLinkStateMachine : StateMachineInterface {
     }
 
     override fun afterTrack(event: InspectableEvent) {
+    }
+
+    override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
     }
 
     companion object {

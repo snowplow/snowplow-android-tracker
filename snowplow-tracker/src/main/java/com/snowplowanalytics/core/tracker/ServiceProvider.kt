@@ -53,7 +53,7 @@ class ServiceProvider(
     }
 
     // Original configurations
-    override var pluginConfigurations: MutableList<PluginConfigurationInterface> = ArrayList()
+    override var pluginConfigurations: MutableList<PluginIdentifiable> = ArrayList()
         private set
 
     // Configuration updates
@@ -129,7 +129,7 @@ class ServiceProvider(
                     pluginConfigurations.add(plugin)
                 }
             }
-            else if (configuration is PluginConfigurationInterface) {
+            else if (configuration is PluginIdentifiable) {
                 pluginConfigurations.add(configuration)
             }
         }
@@ -355,7 +355,7 @@ class ServiceProvider(
 
     // Plugins
 
-    override fun addPlugin(plugin: PluginConfigurationInterface) {
+    override fun addPlugin(plugin: PluginIdentifiable) {
         removePlugin(plugin.identifier)
         pluginConfigurations.add(plugin)
         tracker?.addOrReplaceStateMachine(plugin.toStateMachine())

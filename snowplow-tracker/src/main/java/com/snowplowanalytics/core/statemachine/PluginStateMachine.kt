@@ -14,6 +14,7 @@ package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.configuration.PluginAfterTrackConfiguration
 import com.snowplowanalytics.snowplow.configuration.PluginEntitiesConfiguration
+import com.snowplowanalytics.snowplow.configuration.PluginFilterConfiguration
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
@@ -22,7 +23,8 @@ import java.util.*
 class PluginStateMachine(
     override val identifier: String,
     val entitiesConfiguration: PluginEntitiesConfiguration?,
-    val afterTrackConfiguration: PluginAfterTrackConfiguration?
+    val afterTrackConfiguration: PluginAfterTrackConfiguration?,
+    val filterConfiguration: PluginFilterConfiguration?
 ) : StateMachineInterface {
 
     override val subscribedEventSchemasForTransitions: List<String>
@@ -43,6 +45,12 @@ class PluginStateMachine(
             return config.schemas ?: Collections.singletonList("*")
         }
 
+    override val subscribedEventSchemasForFiltering: List<String>
+        get() {
+            val config = filterConfiguration ?: return emptyList()
+            return config.schemas ?: Collections.singletonList("*")
+        }
+
     override fun transition(event: Event, state: State?): State? {
         return null
     }
@@ -57,5 +65,9 @@ class PluginStateMachine(
 
     override fun afterTrack(event: InspectableEvent) {
         afterTrackConfiguration?.closure?.accept(event)
+    }
+
+    override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return filterConfiguration?.closure?.apply(event)
     }
 }

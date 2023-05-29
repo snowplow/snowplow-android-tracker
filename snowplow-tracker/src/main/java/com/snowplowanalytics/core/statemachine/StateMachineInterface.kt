@@ -22,8 +22,11 @@ interface StateMachineInterface {
     val subscribedEventSchemasForEntitiesGeneration: List<String>
     val subscribedEventSchemasForPayloadUpdating: List<String>
     val subscribedEventSchemasForAfterTrackCallback: List<String>
+    val subscribedEventSchemasForFiltering: List<String>
+
     fun transition(event: Event, state: State?): State?
     fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>?
     fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>?
     fun afterTrack(event: InspectableEvent)
+    fun filter(event: InspectableEvent, state: State?): Boolean?
 }

@@ -189,6 +189,28 @@ class PluginsTest {
         Assert.assertFalse(pluginCalled)
     }
 
+    @Test
+    fun filtersEvents() {
+        val filterPlugin = PluginConfiguration("filter")
+            .filter(listOf("s1")) { false }
+
+        var afterTrackCalled = false
+        val afterTrackPlugin = PluginConfiguration("afterTrack")
+            .afterTrack { afterTrackCalled = true }
+
+        val tracker = createTracker(listOf(filterPlugin, afterTrackPlugin))
+
+        tracker.track(SelfDescribing("s1", emptyMap()))
+        Thread.sleep(100)
+
+        Assert.assertFalse(afterTrackCalled)
+
+        tracker.track(SelfDescribing("s2", emptyMap()))
+        Thread.sleep(100)
+
+        Assert.assertTrue(afterTrackCalled)
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

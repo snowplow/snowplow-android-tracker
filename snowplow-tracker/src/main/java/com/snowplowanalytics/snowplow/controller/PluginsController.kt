@@ -12,7 +12,7 @@
  */
 package com.snowplowanalytics.snowplow.controller
 
-import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
+import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
 
 /**
  * Controller for managing plugins initialized in the tracker.
@@ -26,7 +26,7 @@ interface PluginsController {
     /**
      * Add a new plugin.
      */
-    fun addPlugin(plugin: PluginConfigurationInterface)
+    fun addPlugin(plugin: PluginIdentifiable)
 
     /**
      * Remove plugin with the identifier.

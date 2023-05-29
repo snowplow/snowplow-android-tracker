@@ -13,7 +13,7 @@
 package com.snowplowanalytics.core.tracker
 
 import com.snowplowanalytics.core.Controller
-import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
+import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
 import com.snowplowanalytics.snowplow.controller.PluginsController
 
 class PluginsControllerImpl
@@ -24,7 +24,7 @@ class PluginsControllerImpl
             return serviceProvider.pluginConfigurations.map { it.identifier }
         }
 
-    override fun addPlugin(plugin: PluginConfigurationInterface) {
+    override fun addPlugin(plugin: PluginIdentifiable) {
         serviceProvider.addPlugin(plugin)
     }
 
