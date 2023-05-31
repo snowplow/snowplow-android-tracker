@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
+import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
 import com.snowplowanalytics.snowplow.event.Event
 import java.util.*
 
@@ -78,6 +79,12 @@ interface TrackerController : TrackerConfigurationInterface {
      * Note: don't retain the reference. It may change on tracker reconfiguration.
      */
     val plugins: PluginsController
+
+    /**
+     * Controller for ecommerce
+     * Note: don't retain the reference. It may change on tracker reconfiguration.
+     */
+    val ecommerce: EcommerceController
     
     // Methods
     

@@ -14,6 +14,7 @@ package com.snowplowanalytics.core.tracker
 
 import android.content.Context
 import androidx.annotation.RestrictTo
+import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.emitter.*
 import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
@@ -48,6 +49,7 @@ class ServiceProvider(
     private var subjectController: SubjectControllerImpl? = null
     private var sessionController: SessionControllerImpl? = null
     private var gdprController: GdprControllerImpl? = null
+    private var ecommerceController: EcommerceControllerImpl? = null
     override val pluginsController: PluginsControllerImpl by lazy {
         PluginsControllerImpl(this)
     }
@@ -216,6 +218,10 @@ class ServiceProvider(
         return networkController ?: makeNetworkController().also { networkController = it }
     }
 
+    override fun getOrMakeEcommerceController(): EcommerceControllerImpl {
+        return ecommerceController ?: makeEcommerceController().also { ecommerceController = it }
+    }
+
     // Factories
     private fun makeSubject(): Subject {
         return Subject(context, subjectConfigurationUpdate)
@@ -345,6 +351,10 @@ class ServiceProvider(
 
     private fun makeNetworkController(): NetworkControllerImpl {
         return NetworkControllerImpl(this)
+    }
+
+    private fun makeEcommerceController(): EcommerceControllerImpl {
+        return EcommerceControllerImpl(this)
     }
 
     // Plugins

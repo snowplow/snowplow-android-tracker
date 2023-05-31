@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
 import androidx.preference.PreferenceManager
+import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.utils.Util
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.defaultTracker
@@ -293,7 +294,7 @@ class Demo : Activity(), LoggerDelegate {
             println("Tracked event with ${event.entities.size} entities")
         }
         
-        createTracker(
+        val tracker = createTracker(
             applicationContext,
             namespace,
             networkConfiguration,
@@ -305,6 +306,7 @@ class Demo : Activity(), LoggerDelegate {
             plugin
         )
         subscribeToWebViewEvents(_webView!!)
+        tracker.ecommerce.setPageType("homepage", null, null)
         return true
     }
 
