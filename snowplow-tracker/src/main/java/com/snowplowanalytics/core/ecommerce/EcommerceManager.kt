@@ -18,7 +18,7 @@ import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 object EcommerceManager {
@@ -70,7 +70,7 @@ object EcommerceManager {
                     }
                     payload.remove("products")
 
-                    val transaction = payload["transaction"] as Transaction
+                    val transaction = payload["transaction"] as TransactionDetails
                     toAttach.add(transactionToSdj(transaction))
                     payload.remove("transaction")
                 }
@@ -131,7 +131,7 @@ object EcommerceManager {
         )
     }
 
-    private fun transactionToSdj(transaction: Transaction) : SelfDescribingJson {
+    private fun transactionToSdj(transaction: TransactionDetails) : SelfDescribingJson {
         val map = hashMapOf(
             Parameters.ECOMM_TRANSACTION_ID to transaction.transactionId,
             Parameters.ECOMM_TRANSACTION_REVENUE to transaction.revenue,

@@ -1,6 +1,6 @@
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
-data class Transaction(
+data class TransactionDetails(
     /**
      * The ID of the transaction
      */

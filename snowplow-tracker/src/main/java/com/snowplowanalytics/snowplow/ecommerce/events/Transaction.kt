@@ -15,11 +15,11 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 
-class TransactionEvent(val transaction: Transaction, val products: List<Product>) : AbstractSelfDescribing() {
+class Transaction(val transaction: TransactionDetails, val products: List<Product>) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

@@ -25,7 +25,6 @@ import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
 import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.Transaction
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
@@ -33,7 +32,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionView
 import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart
-import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
@@ -348,7 +347,12 @@ class EcommerceTest {
         val product1 = Product("id1", currency = "CHF", price = 10.99)
         val product2 = Product("id2", currency = "CHF", price = 4)
 
-        tracker.track(TransactionEvent(transaction, listOf(product1, product2)))
+        tracker.track(
+            com.snowplowanalytics.snowplow.ecommerce.events.Transaction(
+                transaction,
+                listOf(product1, product2)
+            )
+        )
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
