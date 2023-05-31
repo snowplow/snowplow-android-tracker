@@ -10,17 +10,15 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.event
+package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.Checkout
-import com.snowplowanalytics.snowplow.ecommerce.Product
-import com.snowplowanalytics.snowplow.ecommerce.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 
-class PromotionClick(val promotion: Promotion) : AbstractSelfDescribing() {
+class CheckoutStep(val checkout: Checkout) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -29,8 +27,8 @@ class PromotionClick(val promotion: Promotion) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.promo_click
-            payload["promotion"] = promotion
+            payload["type"] = EcommerceAction.checkout_step
+            payload["checkout"] = checkout
             return payload
         }
     

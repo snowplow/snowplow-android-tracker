@@ -10,31 +10,47 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.event
+package com.snowplowanalytics.snowplow.ecommerce.events
 
+import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 
-class ProductListClick(val product: Product, var name: String? = null) : AbstractSelfDescribing() {
+class AddToCart(
+
+    val products: List<Product>,
+
+    /**
+     * The total value of the cart after this interaction
+     */
+    val totalValue: Number,
+
+    /**
+     * The currency used for this cart (ISO 4217)
+     */
+    val currency: String,
+
+    /**
+     * The unique ID representing this cart
+     */
+    val cartId: String? = null
+    ) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
-
-    // Builder methods
-    fun name(name: String?): ProductListClick {
-        this.name = name
-        return this
-    }
     
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.list_click
-            name?.let { payload["name"] = it }
-            payload["product"] = product
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart
+            payload[Parameters.ECOMM_CART_ID] = cartId
+            payload[Parameters.ECOMM_CART_VALUE] = totalValue
+            payload[Parameters.ECOMM_CART_CURRENCY] = currency
+            payload[Parameters.ECOMM_PRODUCTS] = products
             return payload
         }
     

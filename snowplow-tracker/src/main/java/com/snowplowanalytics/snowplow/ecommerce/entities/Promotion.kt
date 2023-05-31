@@ -1,4 +1,4 @@
-package com.snowplowanalytics.snowplow.ecommerce
+package com.snowplowanalytics.snowplow.ecommerce.entities
 
 data class Promotion(
     /**

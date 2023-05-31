@@ -10,25 +10,32 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.event
+package com.snowplowanalytics.snowplow.ecommerce.events
 
-import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 
-class ProductView(val product: Product) : AbstractSelfDescribing() {
+class ProductListClick(val product: Product, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
+
+    // Builder methods
+    fun name(name: String?): ProductListClick {
+        this.name = name
+        return this
+    }
     
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.product_view
-            payload[Parameters.ECOMM_PRODUCT] = product
+            payload["type"] = EcommerceAction.list_click
+            name?.let { payload["name"] = it }
+            payload["product"] = product
             return payload
         }
     

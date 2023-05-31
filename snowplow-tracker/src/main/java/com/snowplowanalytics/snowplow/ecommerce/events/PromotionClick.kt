@@ -10,33 +10,15 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.event
+package com.snowplowanalytics.snowplow.ecommerce.events
 
-import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 
-class AddToCart(
-    
-    val products: List<Product>,
-    
-    /**
-     * The total value of the cart after this interaction
-     */
-    val totalValue: Number,
-
-    /**
-     * The currency used for this cart (ISO 4217)
-     */
-    val currency: String,
-    
-    /**
-     * The unique ID representing this cart
-     */
-    val cartId: String? = null
-    ) : AbstractSelfDescribing() {
+class PromotionClick(val promotion: Promotion) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -45,11 +27,8 @@ class AddToCart(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart
-            payload[Parameters.ECOMM_CART_ID] = cartId
-            payload[Parameters.ECOMM_CART_VALUE] = totalValue
-            payload[Parameters.ECOMM_CART_CURRENCY] = currency
-            payload[Parameters.ECOMM_PRODUCTS] = products
+            payload["type"] = EcommerceAction.promo_click
+            payload["promotion"] = promotion
             return payload
         }
     

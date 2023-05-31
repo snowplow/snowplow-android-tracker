@@ -15,7 +15,10 @@ package com.snowplowanalytics.core.ecommerce
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
-import com.snowplowanalytics.snowplow.ecommerce.*
+import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
+import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.ecommerce.entities.Transaction
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 object EcommerceManager {
