@@ -1,3 +1,9 @@
+Version 5.2.0 (2023-06-02)
+--------------------------
+Track install referrer details entity along with the application install event if available (#249)
+Add a filter API to plugins to decide whether to track an event or not (#608)
+Add version to default remote configuration and don't update unless remote configuration is newer (#603)
+
 Version 5.1.0 (2023-05-11)
 --------------------------
 Track new properties in platform context version 1-0-3 and make it configurable which properties to track (#598)

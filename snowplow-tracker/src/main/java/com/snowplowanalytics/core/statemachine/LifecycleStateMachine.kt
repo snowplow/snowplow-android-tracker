@@ -45,6 +45,9 @@ class LifecycleStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForFiltering: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, currentState: State?): State? {
         if (event is Foreground) {
             return LifecycleState(true, event.foregroundIndex)
@@ -67,6 +70,10 @@ class LifecycleStateMachine : StateMachineInterface {
     }
 
     override fun afterTrack(event: InspectableEvent) {
+    }
+
+    override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
     }
 
     companion object {
