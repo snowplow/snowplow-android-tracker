@@ -92,7 +92,7 @@ class RemoteConfigurationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val body =
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        withMockServer(200, body) { mockWebServer, endpoint ->
+        withMockServer(200, body) { _, endpoint ->
 
             val expectation = Any() as Object
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
@@ -152,7 +152,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/2-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
 
             // test
             val expectation = Any() as Object
@@ -175,7 +175,7 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_notDownloading_fails() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        withMockServer(500, "{}") { mockWebServer, endpoint ->
+        withMockServer(500, "{}") { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             val cache = ConfigurationCache(remoteConfig)
             cache.clearCache(context)
@@ -195,7 +195,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             val cache = ConfigurationCache(remoteConfig)
             cache.clearCache(context)
@@ -215,7 +215,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             val cache = ConfigurationCache(remoteConfig)
             cache.clearCache(context)
@@ -256,7 +256,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             val cache = ConfigurationCache(remoteConfig)
             cache.clearCache(context)
@@ -310,7 +310,6 @@ class RemoteConfigurationTest {
             cache.writeCache(context, cached)
             val expectation = Any() as Object
             val provider = ConfigurationProvider(remoteConfig)
-            val i = intArrayOf(0) // Needed to make it accessible inside the closure.
             provider.retrieveConfiguration(
                 context,
                 false
@@ -403,7 +402,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
@@ -438,7 +437,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
@@ -473,7 +472,7 @@ class RemoteConfigurationTest {
         withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}"
-        ) { mockWebServer, endpoint ->
+        ) { _, endpoint ->
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
