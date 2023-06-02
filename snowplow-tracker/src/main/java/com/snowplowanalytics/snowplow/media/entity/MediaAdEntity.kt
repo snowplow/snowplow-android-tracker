@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.media.entity
 
+import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+
 /**
  * Properties for the ad context entity attached to media events during ad playback.
  * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/ad/jsonschema/1-0-0`
@@ -24,7 +27,7 @@ package com.snowplowanalytics.snowplow.media.entity
  * @param duration Length of the video ad in seconds
  * @param skippable Indicating whether skip controls are made available to the end user
  */
-data class MediaAd(
+data class MediaAdEntity(
     var name: String? = null,
     var adId: String,
     var creativeId: String? = null,
@@ -33,4 +36,27 @@ data class MediaAd(
     var skippable: Boolean? = null,
 ) {
     constructor(adId: String) : this(name = null, adId = adId)
+
+    internal val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
+            MediaSchemata.adSchema,
+            mapOf(
+                "adId" to adId,
+                "name" to name,
+                "creativeId" to creativeId,
+                "podPosition" to podPosition,
+                "duration" to duration,
+                "skippable" to skippable,
+            )
+                .filterValues { it != null }
+        )
+
+    internal fun update(fromAd: MediaAdEntity) {
+        adId = fromAd.adId
+        fromAd.name?.let { name = it }
+        fromAd.creativeId?.let { creativeId = it }
+        fromAd.podPosition?.let { podPosition = it }
+        fromAd.duration?.let { duration = it }
+        fromAd.skippable?.let { skippable = it }
+    }
 }

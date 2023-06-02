@@ -14,19 +14,33 @@
 package com.snowplowanalytics.snowplow.media.event
 
 import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.core.media.event.MediaPlayerUpdatingEvent
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event sent when the playback rate has changed.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param previousRate Playback rate before the change (1 is normal). If not set, the previous rate is taken from the last setting in media player.
+ * @param newRate Playback rate after the change (1 is normal).
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaPlaybackRateChangeEvent(
+    var previousRate: Double? = null,
+    var newRate: Double
+) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("playback_rate_change")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
+            "previousRate" to previousRate,
+            "newRate" to newRate
         ).filterValues { it != null }
+
+    override fun update(player: MediaPlayerEntity) {
+        if (previousRate == null) {
+            player.playbackRate?.let { previousRate = it }
+        }
+        player.playbackRate = newRate
+    }
 }

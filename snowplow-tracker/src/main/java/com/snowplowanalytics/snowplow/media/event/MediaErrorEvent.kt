@@ -17,16 +17,24 @@ import com.snowplowanalytics.core.media.MediaSchemata
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event tracked when the resource could not be loaded due to an error.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param errorCode Error-identifying code for the playback issue. E.g. E522.
+ * @param errorName Name for the type of error that occurred in the playback. E.g. forbidden.
+ * @param errorDescription Longer description for the error that occurred in the playback.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaErrorEvent(
+    var errorCode: String? = null,
+    var errorName: String? = null,
+    var errorDescription: String? = null
+) : AbstractSelfDescribing() {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("error")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
+            "errorCode" to errorCode,
+            "errorName" to errorName,
+            "errorDescription" to errorDescription,
         ).filterValues { it != null }
 }

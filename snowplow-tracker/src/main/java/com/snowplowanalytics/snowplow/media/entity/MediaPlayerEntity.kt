@@ -13,6 +13,9 @@
 
 package com.snowplowanalytics.snowplow.media.entity
 
+import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+
 /**
  * Properties for the media player context entity attached to media events.
  * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/player/jsonschema/1-0-0`
@@ -33,7 +36,7 @@ package com.snowplowanalytics.snowplow.media.entity
  * @param quality Quality level of the playback (e.g., 1080p, 720p)
  * @param volume Volume percent (0 is muted, 100 is max)
  */
-data class MediaPlayer(
+data class MediaPlayerEntity(
     var currentTime: Double? = null,
     var duration: Double? = null,
     var ended: Boolean? = null,
@@ -57,4 +60,44 @@ data class MediaPlayer(
                 return ((currentTime ?: 0.0) / duration * 100).toInt()
             }
         }
+
+    internal val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
+            MediaSchemata.playerSchema,
+            mapOf(
+                "currentTime" to (currentTime ?: 0.0),
+                "duration" to duration,
+                "ended" to (ended ?: false),
+                "fullscreen" to fullscreen,
+                "livestream" to livestream,
+                "label" to label,
+                "loop" to loop,
+                "mediaType" to mediaType?.toString(),
+                "muted" to muted,
+                "paused" to (paused ?: true),
+                "pictureInPicture" to pictureInPicture,
+                "playerType" to playerType,
+                "playbackRate" to playbackRate,
+                "quality" to quality,
+                "volume" to volume
+            ).filter { it.value != null }
+        )
+
+    internal fun update(player: MediaPlayerEntity) {
+        player.currentTime?.let { currentTime = it }
+        player.duration?.let { duration = it }
+        player.ended?.let { ended = it }
+        player.fullscreen?.let { fullscreen = it }
+        player.livestream?.let { livestream = it }
+        player.label?.let { label = it }
+        player.loop?.let { loop = it }
+        player.mediaType?.let { mediaType = it }
+        player.muted?.let { muted = it }
+        player.paused?.let { paused = it }
+        player.pictureInPicture?.let { pictureInPicture = it }
+        player.playerType?.let { playerType = it }
+        player.playbackRate?.let { playbackRate = it }
+        player.quality?.let { quality = it }
+        player.volume?.let { volume = it }
+    }
 }

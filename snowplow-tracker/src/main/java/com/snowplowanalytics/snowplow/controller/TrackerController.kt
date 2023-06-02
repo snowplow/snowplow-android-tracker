@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.controller
 
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.snowplow.event.Event
+import com.snowplowanalytics.snowplow.media.controller.MediaController
 import java.util.*
 
 /**
@@ -78,6 +79,11 @@ interface TrackerController : TrackerConfigurationInterface {
      * Note: don't retain the reference. It may change on tracker reconfiguration.
      */
     val plugins: PluginsController
+
+    /**
+     * Media controller for managing media tracking instances and tracking media events.
+     */
+    val media: MediaController
     
     // Methods
     

@@ -14,19 +14,27 @@
 package com.snowplowanalytics.snowplow.media.event
 
 import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.core.media.event.MediaPlayerUpdatingEvent
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event fired immediately after the browser switches into or out of picture-in-picture mode.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param pictureInPicture Whether the video element is showing picture-in-picture after the change.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaPictureInPictureChangeEvent(
+    var pictureInPicture: Boolean
+) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("picture_in_picture_change")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
-        ).filterValues { it != null }
+            "pictureInPicture" to pictureInPicture
+        )
+
+    override fun update(player: MediaPlayerEntity) {
+        player.pictureInPicture = pictureInPicture
+    }
 }

@@ -17,13 +17,13 @@ import com.snowplowanalytics.core.media.MediaSchemata
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event fired when the user resumed playing the ad creative after it had been stopped or paused.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param percentProgress The percentage of the ad that was played when the user resumed it
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaAdResumeEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("ad_resume")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(

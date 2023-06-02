@@ -14,19 +14,27 @@
 package com.snowplowanalytics.snowplow.media.event
 
 import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.core.media.event.MediaPlayerUpdatingEvent
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event fired immediately after the browser switches into or out of full-screen mode.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param fullscreen Whether the video element is fullscreen after the change.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaFullscreenChangeEvent(
+    var fullscreen: Boolean
+) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("fullscreen_change")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
-        ).filterValues { it != null }
+            "fullscreen" to fullscreen
+        )
+
+    override fun update(player: MediaPlayerEntity) {
+        player.fullscreen = fullscreen
+    }
 }

@@ -13,14 +13,39 @@
 
 package com.snowplowanalytics.snowplow.media.controller
 
+import com.snowplowanalytics.snowplow.media.configuration.MediaTrackingConfiguration
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
+
 /**
  * Controller for managing media tracking instances and tracking media events.
  */
 interface MediaController {
     /**
      * Starts media tracking for a single media content tracked in a media player.
+     *
      * @param id Unique identifier for the media tracking instance. The same ID will be used for media player session if enabled.
+     * @param player Properties for the media player context entity attached to media events.
      */
-    fun startMediaTracking(id: String): MediaTracking
+    fun startMediaTracking(id: String, player: MediaPlayerEntity? = null): MediaTracking
 
+    /**
+     * Starts media tracking for a single media content tracked in a media player.
+     *
+     * @param configuration Configuration for the media tracking instance.
+     */
+    fun startMediaTracking(configuration: MediaTrackingConfiguration): MediaTracking
+
+    /**
+     * Returns a media tracking instance for the given ID.
+     *
+     * @param id Unique identifier for the media tracking instance.
+     */
+    fun getMediaTracking(id: String): MediaTracking?
+
+    /**
+     * Ends autotracked events and cleans the media tracking instance.
+     *
+     * @param id Unique identifier for the media tracking instance.
+     */
+    fun endMediaTracking(id: String)
 }

@@ -17,16 +17,14 @@ import com.snowplowanalytics.core.media.MediaSchemata
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
- * Media player event fired when the user clicked on the ad
- *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * Media player event fired when a midpoint of ad is reached after continuous ad playback at normal speed.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaAdMidpointEvent : AbstractSelfDescribing() {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("ad_quartile")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
-        ).filterValues { it != null }
+            "percentProgress" to 50,
+        )
 }

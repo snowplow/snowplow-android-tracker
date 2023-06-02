@@ -14,19 +14,21 @@
 package com.snowplowanalytics.snowplow.media.event
 
 import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.core.media.event.MediaPlayerUpdatingEvent
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
 /**
- * Media player event fired when the user clicked on the ad
- *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * Media player event sent when the player changes state to playing from previously being paused.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaPlayEvent : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("play")
 
     override val dataPayload: Map<String, Any?>
-        get() = mapOf(
-            "percentProgress" to percentProgress
-        ).filterValues { it != null }
+        get() = emptyMap()
+
+    override fun update(player: MediaPlayerEntity) {
+        player.paused = false
+    }
 }

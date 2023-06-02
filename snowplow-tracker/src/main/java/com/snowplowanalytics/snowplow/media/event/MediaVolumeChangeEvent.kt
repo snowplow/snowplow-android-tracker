@@ -14,19 +14,33 @@
 package com.snowplowanalytics.snowplow.media.event
 
 import com.snowplowanalytics.core.media.MediaSchemata
+import com.snowplowanalytics.core.media.event.MediaPlayerUpdatingEvent
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
 /**
- * Media player event fired when the user clicked on the ad
+ * Media player event sent when the volume has changed.
  *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
+ * @param previousVolume Volume percentage before the change. If not set, the previous volume is taken from the last setting in media player.
+ * @param newVolume Volume percentage after the change.
  */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
+class MediaVolumeChangeEvent(
+    var previousVolume: Int? = null,
+    var newVolume: Int,
+) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
+        get() = MediaSchemata.eventSchema("volume_change")
 
     override val dataPayload: Map<String, Any?>
         get() = mapOf(
-            "percentProgress" to percentProgress
+            "previousVolume" to previousVolume,
+            "newVolume" to newVolume,
         ).filterValues { it != null }
+
+    override fun update(player: MediaPlayerEntity) {
+        if (previousVolume == null) {
+            player.volume?.let { previousVolume = it }
+        }
+        player.volume = newVolume
+    }
 }

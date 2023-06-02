@@ -11,22 +11,13 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 
-package com.snowplowanalytics.snowplow.media.event
+package com.snowplowanalytics.core.media.event
 
-import com.snowplowanalytics.core.media.MediaSchemata
-import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 
-/**
- * Media player event fired when the user clicked on the ad
- *
- * @param percentProgress The percentage of the ad that was played when the user clicked on it
- */
-class MediaAdClickEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
-    override val schema: String
-        get() = MediaSchemata.eventSchema("ad_click")
-
-    override val dataPayload: Map<String, Any?>
-        get() = mapOf(
-            "percentProgress" to percentProgress
-        ).filterValues { it != null }
+interface MediaPlayerUpdatingEvent {
+    /**
+     * Updates event properties based on the player entity but also updates the player properties based on the event.
+     */
+    fun update(player: MediaPlayerEntity)
 }

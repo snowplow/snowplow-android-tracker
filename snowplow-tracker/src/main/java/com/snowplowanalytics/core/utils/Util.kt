@@ -46,9 +46,14 @@ object Util {
 
     @JvmStatic
     fun getDateTimeFromTimestamp(timestamp: Long): String {
+        val date = Date(timestamp)
+        return getDateTimeFromDate(date)
+    }
+
+    @JvmStatic
+    fun getDateTimeFromDate(date: Date): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale("en"))
         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-        val date = Date(timestamp)
         return dateFormat.format(date)
     }
 
