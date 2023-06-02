@@ -40,7 +40,7 @@
             </a>
     </div>
     <div>
-5.1.0    </div>
+5.2.0    </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
@@ -58,54 +58,54 @@
   <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.snowplow.configuration</a><span class="delimiter">/</span><span class="current">PluginConfigurationInterface</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Plugin</span><wbr></wbr><span>Configuration</span><wbr></wbr><span><span>Interface</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">PluginConfigurationInterface</a></div><p class="paragraph">Interface for tracker plugin definition. Specifies configurations for the closures called when and after events are tracked.</p><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-plugin-configuration/index.html">PluginConfiguration</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html"><strike>PluginConfigurationInterface</strike></a> : <a href="../-plugin-identifiable/index.html">PluginIdentifiable</a>, <a href="../-plugin-entities-callable/index.html">PluginEntitiesCallable</a>, <a href="../-plugin-after-track-callable/index.html">PluginAfterTrackCallable</a></div><div class="deprecation-content"><h3 class="">Deprecated</h3><p class="paragraph">Use PluginIdentifiable, PluginEntitiesCallable and PluginAfterTrackCallable instead</p></div><p class="paragraph">Interface for tracker plugin definition. Specifies configurations for the closures called when and after events are tracked.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="1060891979%2FProperties%2F918778150" anchor-label="afterTrackConfiguration" id="1060891979%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+        <div class="table"><a data-name="-754217849%2FProperties%2F918778150" anchor-label="afterTrackConfiguration" id="-754217849%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
           <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="after-track-configuration.html"><span>after</span><wbr></wbr><span>Track</span><wbr></wbr><span><span>Configuration</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1060891979%2FProperties%2F918778150"></span>
+                  <div><a href="../-plugin-after-track-callable/after-track-configuration.html"><span>after</span><wbr></wbr><span>Track</span><wbr></wbr><span><span>Configuration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-754217849%2FProperties%2F918778150"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="after-track-configuration.html">afterTrackConfiguration</a><span class="token operator">: </span><a href="../-plugin-after-track-configuration/index.html">PluginAfterTrackConfiguration</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Closure configuration that is called after events are tracked.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-plugin-after-track-callable/after-track-configuration.html">afterTrackConfiguration</a><span class="token operator">: </span><a href="../-plugin-after-track-configuration/index.html">PluginAfterTrackConfiguration</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Closure configuration that is called after events are tracked.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1595943933%2FProperties%2F918778150" anchor-label="entitiesConfiguration" id="1595943933%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+<a data-name="-1319357113%2FProperties%2F918778150" anchor-label="entitiesConfiguration" id="-1319357113%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
           <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="entities-configuration.html"><span>entities</span><wbr></wbr><span><span>Configuration</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1595943933%2FProperties%2F918778150"></span>
+                  <div><a href="../-plugin-entities-callable/entities-configuration.html"><span>entities</span><wbr></wbr><span><span>Configuration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1319357113%2FProperties%2F918778150"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="entities-configuration.html">entitiesConfiguration</a><span class="token operator">: </span><a href="../-plugin-entities-configuration/index.html">PluginEntitiesConfiguration</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Closure configuration that is called when events are tracked to generate context entities to enrich the events.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-plugin-entities-callable/entities-configuration.html">entitiesConfiguration</a><span class="token operator">: </span><a href="../-plugin-entities-configuration/index.html">PluginEntitiesConfiguration</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Closure configuration that is called when events are tracked to generate context entities to enrich the events.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1310595327%2FProperties%2F918778150" anchor-label="identifier" id="1310595327%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+<a data-name="271183282%2FProperties%2F918778150" anchor-label="identifier" id="271183282%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
           <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="identifier.html"><span><span>identifier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1310595327%2FProperties%2F918778150"></span>
+                  <div><a href="../-plugin-identifiable/identifier.html"><span><span>identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="271183282%2FProperties%2F918778150"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="identifier.html">identifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Unique identifier of the plugin within the tracker.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-plugin-identifiable/identifier.html">identifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Unique identifier of the plugin within the tracker.</p></div></div></div>
                 </div>
               </div>
             </div>
