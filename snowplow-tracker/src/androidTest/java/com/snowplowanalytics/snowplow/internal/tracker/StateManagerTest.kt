@@ -437,6 +437,15 @@ class StateManagerTest {
         Assert.assertEquals(1, stateMachine.afterTrackEvents.size)
         Assert.assertEquals("cat", stateMachine.afterTrackEvents.first().payload["se_ca"])
     }
+
+    @Test
+    fun testFilterReturnsSettingOfStateMachine() {
+        val stateManager = StateManager()
+        stateManager.addOrReplaceStateMachine(MockStateMachine())
+
+        Assert.assertFalse(stateManager.filter(TrackerEvent(SelfDescribing("s1", emptyMap()), TrackerState())))
+        Assert.assertTrue(stateManager.filter(TrackerEvent(SelfDescribing("s2", emptyMap()), TrackerState())))
+    }
 } // Mock classes
 
 internal class MockState(var value: Int) : State
@@ -456,6 +465,9 @@ internal open class MockStateMachine(
 
     override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = Collections.singletonList("*")
+
+    override val subscribedEventSchemasForFiltering: List<String>
+        get() = Collections.singletonList("s1")
 
     override fun transition(event: Event, state: State?): State? {
         val e = event as SelfDescribing
@@ -496,5 +508,9 @@ internal open class MockStateMachine(
 
     override fun afterTrack(event: InspectableEvent) {
         afterTrackEvents.add(event)
+    }
+
+    override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return false
     }
 }

@@ -483,16 +483,20 @@ class Tracker(
         }
         val reportsOnDiagnostic = event !is TrackerError
         execute(reportsOnDiagnostic, TAG) {
-            val payload = payloadWithEvent(trackerEvent)
-            v(TAG, "Adding new payload to event storage: %s", payload)
-            emitter.add(payload)
-            event.endProcessing(this)
-            stateManager.afterTrack(trackerEvent)
+            payloadWithEvent(trackerEvent)?.let { payload ->
+                v(TAG, "Adding new payload to event storage: %s", payload)
+                emitter.add(payload)
+                event.endProcessing(this)
+                stateManager.afterTrack(trackerEvent)
+            } ?: run {
+                d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
+                event.endProcessing(this)
+            }
         }
         return trackerEvent.eventId
     }
 
-    private fun payloadWithEvent(event: TrackerEvent): Payload {
+    private fun payloadWithEvent(event: TrackerEvent): Payload? {
         val payload = TrackerPayload()
 
         // Payload properties
@@ -505,6 +509,11 @@ class Tracker(
         addBasicContexts(event)
         addStateMachineEntities(event)
         event.wrapEntitiesToPayload(payload, base64Encoded=base64Encoded)
+
+        // Decide whether to track the event or not
+        if (!stateManager.filter(event)) {
+            return null
+        }
 
         // Workaround for campaign attribution
         if (!event.isPrimitive) {
