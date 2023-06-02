@@ -261,6 +261,8 @@ public class Demo extends Activity implements LoggerDelegate {
                     updateLogger("Configuration retrieved from cache");
                 case FETCHED:
                     updateLogger("Configuration fetched from remote endpoint");
+                case DEFAULT:
+                    updateLogger("Default configuration used");
             }
             Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
             callbackTrackerReady.accept(true);

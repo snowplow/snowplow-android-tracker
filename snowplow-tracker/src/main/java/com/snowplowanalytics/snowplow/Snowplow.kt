@@ -87,6 +87,57 @@ object Snowplow {
      * @param context The Android app context.
      * @param remoteConfiguration The remote configuration used to indicate where to download the configuration from.
      * @param defaultBundles The default configuration passed by default in case there isn't a cached version and it's not able to download a new one.
+     * @param defaultBundleVersion Version of the default configuration that will be used to compare with the fetched remote config to decide whether to replace it.
+     * @param onSuccess The callback called when a configuration (cached or downloaded) is set.
+     * It passes a pair object with the list of the namespaces associated
+     * to the created trackers and the state of the configuration – whether it was
+     * retrieved from cache or fetched over the network.
+     */
+    @JvmStatic
+    fun setup(
+        context: Context,
+        remoteConfiguration: RemoteConfiguration,
+        defaultBundles: List<ConfigurationBundle>?,
+        defaultBundleVersion: Int,
+        onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
+    ) {
+        configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles, defaultBundleVersion)
+        configurationProvider?.retrieveConfiguration(
+            context,
+            false
+        ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            val fetchedConfigurationBundle = fetchedConfigurationPair.first
+            val configurationState = fetchedConfigurationPair.second
+            val bundles = fetchedConfigurationBundle.configurationBundle
+            val namespaces = createTracker(context, bundles)
+            onSuccess.accept(Pair(namespaces, configurationState))
+        }
+    }
+
+    /**
+     * Set up a single or a set of tracker instances which will be used inside the app to track events.
+     * The app can run multiple tracker instances which will be identified by string `namespaces`.
+     * The trackers configuration is automatically downloaded from the endpoint indicated in the [RemoteConfiguration]
+     * passed as argument. For more details see [RemoteConfiguration].
+     *
+     * The method is asynchronous and you can receive the list of the created trackers in the callbacks once the trackers are created.
+     * The callback can be called multiple times in case a cached configuration is ready and later a fetched configuration is available.
+     * You can also pass as argument a default configuration in case there isn't a cached configuration and it's not able to download
+     * a new one. The downloaded configuration updates the cached one only if the configuration version is greater than the cached one.
+     * Otherwise the cached one is kept and the callback is not called.
+     *
+     * IMPORTANT: The [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore) will persist all the events that have been tracked but not yet sent.
+     * Those events are attached to the namespace.
+     * If the tracker is removed or the app relaunched with a different namespace, those events can't
+     * be sent to the collector and they remain in a zombie state inside the EventStore.
+     * To remove all the zombie events you can use the internal method
+     * [.removeUnsentEventsExceptForNamespaces](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore.removeUnsentEventsExceptForNamespaces)
+     * in [SQLiteEventStore](com.snowplowanalytics.core.emitter.storage.SQLiteEventStore)
+     * which will delete all the EventStores instanced with namespaces not listed in the passed list.
+     *
+     * @param context The Android app context.
+     * @param remoteConfiguration The remote configuration used to indicate where to download the configuration from.
+     * @param defaultBundles The default configuration passed by default in case there isn't a cached version and it's not able to download a new one.
      * @param onSuccess The callback called when a configuration (cached or downloaded) is set.
      * It passes a pair object with the list of the namespaces associated
      * to the created trackers and the state of the configuration – whether it was
@@ -99,17 +150,7 @@ object Snowplow {
         defaultBundles: List<ConfigurationBundle>?,
         onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
     ) {
-        configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles)
-        configurationProvider?.retrieveConfiguration(
-            context,
-            false
-        ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            val fetchedConfigurationBundle = fetchedConfigurationPair.first
-            val configurationState = fetchedConfigurationPair.second
-            val bundles = fetchedConfigurationBundle.configurationBundle
-            val namespaces = createTracker(context, bundles)
-            onSuccess.accept(Pair(namespaces, configurationState))
-        }
+        setup(context, remoteConfiguration, defaultBundles, Int.MIN_VALUE, onSuccess)
     }
 
     /**

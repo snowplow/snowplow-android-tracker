@@ -216,6 +216,7 @@ class Demo : Activity(), LoggerDelegate {
                         updateLogger("Configuration fetched from remote endpoint")
                     }
                     ConfigurationState.FETCHED -> updateLogger("Configuration fetched from remote endpoint")
+                    ConfigurationState.DEFAULT -> updateLogger("Default configuration used")
                     else -> updateLogger("Configuration was not found")
                 }
                 defaultTracker!!.emitter.requestCallback = requestCallback

@@ -26,7 +26,8 @@ import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
  */
 class ConfigurationProvider @JvmOverloads constructor(
     private val remoteConfiguration: RemoteConfiguration,
-    defaultBundles: List<ConfigurationBundle>? = null
+    defaultBundles: List<ConfigurationBundle>? = null,
+    defaultBundleVersion: Int = Int.MIN_VALUE
 ) {
     private val cache: ConfigurationCache = ConfigurationCache(remoteConfiguration)
     private var fetcher: ConfigurationFetcher? = null
@@ -36,7 +37,7 @@ class ConfigurationProvider @JvmOverloads constructor(
     init {
         if (defaultBundles != null) {
             val bundle = FetchedConfigurationBundle("1.0")
-            bundle.configurationVersion = Int.MIN_VALUE
+            bundle.configurationVersion = defaultBundleVersion
             bundle.configurationBundle = defaultBundles
             defaultBundle = bundle
         }
@@ -67,17 +68,17 @@ class ConfigurationProvider @JvmOverloads constructor(
                         return
                     }
                     synchronized(this) {
-                        if (cacheBundle != null && cacheBundle!!.configurationVersion >= fetchedConfigurationBundle.configurationVersion) {
-                            return
-                        }
-                        cache.writeCache(context, fetchedConfigurationBundle)
-                        cacheBundle = fetchedConfigurationBundle
-                        onFetchCallback.accept(
-                            Pair(
-                                fetchedConfigurationBundle,
-                                ConfigurationState.FETCHED
+                        val isNewer = (cacheBundle ?: defaultBundle)?.let { it.configurationVersion < fetchedConfigurationBundle.configurationVersion } ?: true
+                        if (isNewer) {
+                            cache.writeCache(context, fetchedConfigurationBundle)
+                            cacheBundle = fetchedConfigurationBundle
+                            onFetchCallback.accept(
+                                Pair(
+                                    fetchedConfigurationBundle,
+                                    ConfigurationState.FETCHED
+                                )
                             )
-                        )
+                        }
                     }
                 }
             })
