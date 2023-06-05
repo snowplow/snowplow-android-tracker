@@ -57,6 +57,8 @@ object TrackerConstants {
         "iglu:com.snowplowanalytics.snowplow.ecommerce/checkout_step/jsonschema/1-0-0"
     const val SCHEMA_ECOMMERCE_PROMOTION =
         "iglu:com.snowplowanalytics.snowplow.ecommerce/promotion/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_REFUND =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/refund/jsonschema/1-0-0"
     const val SCHEMA_ECOMMERCE_USER =
         "iglu:com.snowplowanalytics.snowplow.ecommerce/user/jsonschema/1-0-0"
     const val SCHEMA_ECOMMERCE_PAGE =

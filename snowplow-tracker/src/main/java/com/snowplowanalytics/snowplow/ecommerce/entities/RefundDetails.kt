@@ -12,39 +12,24 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
-data class Promotion(
+data class RefundDetails(
     /**
-     * The ID of the promotion.
+     * The ID of the transaction.
      */
-    val id: String,
+    val transactionId: String,
     
     /**
-     * The name of the promotion.
+     * The currency in which the product is being priced (ISO 4217).
      */
-    val name: String? = null,
+    val currency: String,
     
     /**
-     * List of SKUs or product IDs showcased in the promotion.
+     * The monetary amount refunded.
      */
-    val productIds: List<String>? = null,
+    val refundAmount: Number,
     
     /**
-     * The position the promotion was presented in a list of promotions E.g. banner, slider.
+     * Reason for refunding the whole or part of the transaction.
      */
-    val position: Int? = null,
-    
-    /**
-     * Identifier/Name/Url for the creative presented on the promotion.
-     */
-    val creativeId: String? = null,
-    
-    /**
-     * Type of the promotion delivery mechanism. E.g. popup, banner, intra-content
-     */
-    val type: String? = null,
-    
-    /**
-     * The website slot in which the promotional content was added to.
-     */
-    val slot: String? = null
+    val refundReason: String? = null
 )

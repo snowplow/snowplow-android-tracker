@@ -16,37 +16,39 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
+import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class ProductViewTest {
+class TransactionTest {
     @Test
     fun testExpectedForm() {
-        val product = Product(
+        val txn = TransactionDetails("transactionId", 8999, "EUR", "visa")
+
+        val product1 = Product(
             id = "product ID",
             name = "product name",
             category = "category",
-            price = 100,
-            listPrice = 110,
-            quantity = 2,
-            size = "small",
-            variant = "black/black",
-            brand = "Snowplow",
-            inventoryStatus = "backorder",
-            position = 1,
-            currency = "GBP",
-            creativeId = "ecomm1"
+            currency = "JPY",
+            price = 123456789
         )
-        val event = ProductView(product)
+        val product2 = Product(
+            id = "id",
+            price = 0.99,
+            category = "category2",
+            currency = "GBP"
+        )
+
+        val event = Transaction(txn, listOf(product1, product2))
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.product_view)
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
-        Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)
+        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.transaction)
+        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
+        Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))
     }
 }

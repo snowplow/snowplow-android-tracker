@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
 import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
 import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
@@ -126,6 +127,18 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
                     toAttach.add(promotionToSdj(promotion))
                     payload.remove("promo")
                 }
+
+                EcommerceAction.refund -> {
+                    val products = payload["products"] as List<*>
+                    for (product in products) {
+                        toAttach.add(productToSdj(product as Product))
+                    }
+                    payload.remove("products")
+
+                    val refund = payload["refund"] as RefundDetails
+                    toAttach.add(refundToSdj(refund))
+                    payload.remove("refund")
+                }
             }
             payload["type"] = payload["type"].toString()
             return@entities toAttach
@@ -229,6 +242,21 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
 
         return SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_PROMOTION,
+            map
+        )
+    }
+
+    private fun refundToSdj(refund: RefundDetails) : SelfDescribingJson {
+        val map = hashMapOf(
+            Parameters.ECOMM_REFUND_ID to refund.transactionId,
+            Parameters.ECOMM_REFUND_CURRENCY to refund.currency,
+            Parameters.ECOMM_REFUND_AMOUNT to refund.refundAmount,
+            Parameters.ECOMM_REFUND_REASON to refund.refundReason
+        )
+        map.values.removeAll(sequenceOf(null))
+
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
             map
         )
     }

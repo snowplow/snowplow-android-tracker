@@ -142,6 +142,13 @@ object Parameters {
     const val ECOMM_PROMO_TYPE = "type"
     const val ECOMM_PROMO_SLOT = "slot"
 
+    // Snowplow Ecommerce Refund
+    const val ECOMM_REFUND_ID = "transaction_id"
+    const val ECOMM_REFUND_CURRENCY = "currency"
+    const val ECOMM_REFUND_AMOUNT = "refund_amount"
+    const val ECOMM_REFUND_REASON = "refund_reason"
+
+
     // Screen View
     const val SV_ID = "id"
     const val SV_NAME = "name"

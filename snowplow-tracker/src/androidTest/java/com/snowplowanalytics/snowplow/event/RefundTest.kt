@@ -16,37 +16,35 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
+import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
+import com.snowplowanalytics.snowplow.ecommerce.events.Refund
+import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class ProductViewTest {
+class RefundTest {
     @Test
     fun testExpectedForm() {
-        val product = Product(
+        val refund = RefundDetails("id", "USD", 123.45)
+
+        val product1 = Product(
             id = "product ID",
             name = "product name",
             category = "category",
-            price = 100,
-            listPrice = 110,
-            quantity = 2,
-            size = "small",
-            variant = "black/black",
-            brand = "Snowplow",
-            inventoryStatus = "backorder",
-            position = 1,
-            currency = "GBP",
-            creativeId = "ecomm1"
+            currency = "JPY",
+            price = 123456789
         )
-        val event = ProductView(product)
+
+        val event = Refund(refund, listOf(product1))
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.product_view)
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
-        Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)
+        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.refund)
+        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
+        Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1))
     }
 }

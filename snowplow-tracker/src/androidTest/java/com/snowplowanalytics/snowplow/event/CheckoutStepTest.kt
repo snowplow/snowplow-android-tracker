@@ -15,38 +15,29 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
+import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class ProductViewTest {
+class CheckoutStepTest {
     @Test
     fun testExpectedForm() {
-        val product = Product(
-            id = "product ID",
-            name = "product name",
-            category = "category",
-            price = 100,
-            listPrice = 110,
-            quantity = 2,
-            size = "small",
-            variant = "black/black",
-            brand = "Snowplow",
-            inventoryStatus = "backorder",
-            position = 1,
-            currency = "GBP",
-            creativeId = "ecomm1"
+        val checkout = Checkout(
+            step = 5,
+            deliveryMethod = "stork",
+            marketingOptIn = true
         )
-        val event = ProductView(product)
+            
+        val event = CheckoutStep(checkout)
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.product_view)
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
+        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.checkout_step)
+        Assert.assertTrue(data.containsKey(Parameters.ECOMM_CHECKOUT_STEP))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)
+        Assert.assertEquals(data[Parameters.ECOMM_CHECKOUT_STEP], checkout)
     }
 }
