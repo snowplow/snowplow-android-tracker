@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+/**
+ * Used for the PromotionClick and PromotionView events in Ecommerce.
+ */
 data class Promotion(
     /**
      * The ID of the promotion.

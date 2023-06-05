@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+/**
+ * Used for a checkout_step event in Ecommerce.
+ */
 data class Checkout(
     /* Checkout step index */
     val step: Number,

@@ -17,7 +17,12 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
+/**
+ * Track a product list view.
+ *
+ * @param products - List of products viewed by the visitor.
+ * @param name - The list name.
+ */
 class ProductListView(val products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */

@@ -17,7 +17,11 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
+/**
+ * Track a promotion view.
+ *
+ * @param promotion - The promotion viewed by the visitor.
+ */
 class PromotionView(val promotion: Promotion) : AbstractSelfDescribing() {
 
     /** The event schema */

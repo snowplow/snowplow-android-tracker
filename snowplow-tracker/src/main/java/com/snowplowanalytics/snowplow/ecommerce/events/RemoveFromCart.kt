@@ -18,7 +18,14 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
+/**
+ * Track a product or products being removed from cart.
+ *
+ * @param products - List of product(s) that were removed from the cart.
+ * @param totalValue - Total value of the cart after the product(s) were removed.
+ * @param currency - Currency used for the cart.
+ * @param cartId - Cart identifier.
+ */
 class RemoveFromCart(
     val products: List<Product>,
 

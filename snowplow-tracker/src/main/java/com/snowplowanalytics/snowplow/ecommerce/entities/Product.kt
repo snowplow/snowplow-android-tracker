@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+/**
+ * Used for Ecommerce events.
+ */
 data class Product(
     /**
      * The SKU or product ID

@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.core.ecommerce
 
+/**
+ * Available types of ecommerce action. Each one is a different event type.
+ */
 enum class EcommerceAction {
     // lowercase to match the schema
     add_to_cart,

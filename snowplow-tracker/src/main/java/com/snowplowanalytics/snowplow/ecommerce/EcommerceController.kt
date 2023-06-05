@@ -13,7 +13,7 @@
 package com.snowplowanalytics.snowplow.ecommerce
 
 /**
- * Controller for managing how events are sent.
+ * Controller for managing Ecommerce entities.
  */
 interface EcommerceController {
     fun setPageType(type: String, language: String? = null, locale: String? = null)

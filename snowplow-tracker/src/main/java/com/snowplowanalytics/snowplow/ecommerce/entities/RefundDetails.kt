@@ -12,9 +12,12 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+/**
+ * Used for a Refund event in Ecommerce.
+ */
 data class RefundDetails(
     /**
-     * The ID of the transaction.
+     * The ID of the relevant transaction.
      */
     val transactionId: String,
     

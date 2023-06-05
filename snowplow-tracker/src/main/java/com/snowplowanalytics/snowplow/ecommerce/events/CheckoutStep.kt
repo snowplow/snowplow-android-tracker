@@ -17,7 +17,11 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
+/**
+ * Track a checkout step.
+ *
+ * @param checkout - Attributes for the current checkout step.
+ */
 class CheckoutStep(val checkout: Checkout) : AbstractSelfDescribing() {
 
     /** The event schema */

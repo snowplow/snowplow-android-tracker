@@ -18,8 +18,13 @@ import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
-class Transaction(val transaction: TransactionDetails, val products: List<Product>) : AbstractSelfDescribing() {
+/**
+ * Track a transaction event.
+ *
+ * @param transaction - The transaction information
+ * @param products - The products included in the transaction.
+ */
+class Transaction(val transaction: TransactionDetails, val products: List<Product>? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

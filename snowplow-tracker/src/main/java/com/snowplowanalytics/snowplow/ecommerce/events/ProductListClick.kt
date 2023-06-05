@@ -17,7 +17,12 @@ import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-
+/**
+ * Track a product list click event.
+ *
+ * @param product - Information about the product that was clicked.
+ * @param name - The list name.
+ */
 class ProductListClick(val product: Product, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */

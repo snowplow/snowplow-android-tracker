@@ -12,6 +12,9 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+/**
+ * Used for a Transaction event in Ecommerce.
+ */
 data class TransactionDetails(
     /**
      * The ID of the transaction

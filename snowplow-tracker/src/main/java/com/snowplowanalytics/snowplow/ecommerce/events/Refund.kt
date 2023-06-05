@@ -18,7 +18,15 @@ import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
-class Refund(val refund: RefundDetails, val products: List<Product>) : AbstractSelfDescribing() {
+/**
+ * Track a refund event. Use the same transaction ID as for the original Transaction event.
+ * Provide a list of products to specify certain products to be refunded, otherwise the whole transaction 
+ * will be marked as refunded.
+ *
+ * @param refund - The transaction information
+ * @param products - The products to be refunded.
+ */
+class Refund(val refund: RefundDetails, val products: List<Product>? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
