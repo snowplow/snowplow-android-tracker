@@ -20,7 +20,9 @@ import com.snowplowanalytics.core.tracker.Tracker
  * @param orderId Identifier of the order.
  * @param totalValue Total amount of the order.
  * @param items Items purchased.
+ * @Deprecated Use the ecommerce package instead
  */
+@Deprecated("Use the ecommerce package instead")
 class EcommerceTransaction(
     orderId: String,
     totalValue: Double,
