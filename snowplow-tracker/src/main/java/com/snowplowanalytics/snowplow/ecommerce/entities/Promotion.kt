@@ -29,7 +29,7 @@ data class Promotion(
     val productIds: List<String>? = null,
     
     /**
-     * The position the promotion was presented in a list of promotions E.g. banner, slider.
+     * The position the promotion was presented in a list of promotions such as a banner or slider, e.g. 2.
      */
     val position: Int? = null,
     
