@@ -12,11 +12,20 @@
  */
 package com.snowplowanalytics.snowplow.event
 
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.snowplow.Snowplow
+import com.snowplowanalytics.snowplow.configuration.Configuration
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
+import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
+import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
+import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,4 +58,39 @@ class ProductViewTest {
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)
     }
+
+    @Test
+    fun testEventDetailsConvertedIntoEntity() {
+        // plugin to check if event was tracked
+        var eventTracked = false
+        
+        val plugin = PluginConfiguration("testPlugin")
+        plugin.afterTrack { 
+            eventTracked = true
+            println("🔴 " + it.entities)
+        }
+        
+        val tracker = createTracker(listOf(plugin))
+        val event = ProductView(Product("id", price = 123, currency = "GBP", category = "cat"))
+        tracker.track(event)
+        
+        Thread.sleep(500)
+
+        // check if event was tracked
+        Assert.assertTrue(eventTracked)
+
+    }
+
+    private fun createTracker(configurations: List<Configuration>): TrackerController {
+        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
+        return Snowplow.createTracker(
+            context = context,
+            namespace = "ns" + Math.random().toString(),
+            network = networkConfig,
+            configurations = configurations.toTypedArray()
+        )
+    }
+
+    private val context: Context
+        get() = InstrumentationRegistry.getInstrumentation().targetContext
 }

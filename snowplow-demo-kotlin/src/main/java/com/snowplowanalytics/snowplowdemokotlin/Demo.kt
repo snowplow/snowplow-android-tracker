@@ -306,7 +306,7 @@ class Demo : Activity(), LoggerDelegate {
             plugin
         )
         subscribeToWebViewEvents(_webView!!)
-        tracker.ecommerce.setPageType("homepage", null, null)
+        tracker.ecommerce.setEcommerceUser("ecomm_user_id")
         return true
     }
 

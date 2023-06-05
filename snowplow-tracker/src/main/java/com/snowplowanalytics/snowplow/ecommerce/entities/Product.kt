@@ -15,7 +15,7 @@ data class Product(
      * The category the product belongs to.
      * Use a consistent separator to express multiple levels. E.g. Woman/Shoes/Sneakers
      */
-    val category: String? = null,
+    val category: String,
 
     /**
      * The price of the product at the current time.

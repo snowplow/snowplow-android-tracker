@@ -13,6 +13,7 @@
 package com.snowplowanalytics.core.ecommerce
 
 enum class EcommerceAction {
+    // lowercase to match the schema
     add_to_cart,
     remove_from_cart,
     product_view,

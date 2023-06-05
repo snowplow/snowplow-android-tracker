@@ -43,6 +43,7 @@ class RemoveFromCartTest {
         )
         val product2 = Product(
             id = "ID2",
+            category = "category2",
             price = 0.99,
             currency = "GBP"
         )

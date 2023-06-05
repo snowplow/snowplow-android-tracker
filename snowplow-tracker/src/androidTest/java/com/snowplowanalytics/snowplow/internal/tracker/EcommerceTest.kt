@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
 import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
@@ -35,6 +36,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart
 import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.network.Request
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import org.json.JSONObject
 import org.junit.Assert
@@ -57,7 +59,8 @@ class EcommerceTest {
             price = 12.34, 
             currency = "GBP", 
             name = "lovely product", 
-            position = 1
+            position = 1,
+            category = "accessories"
         )
         tracker.track(ProductView(product))
         waitForEvents(networkConnection, 1)
@@ -65,6 +68,7 @@ class EcommerceTest {
         Assert.assertEquals(1, networkConnection.countRequests())
         
         val request = networkConnection.allRequests[0]
+        println(request.payload)
         val event = JSONObject(request.payload.map["ue_pr"] as String)
             .getJSONObject("data")
         val entities = JSONObject(request.payload.map["co"] as String)
@@ -101,6 +105,7 @@ class EcommerceTest {
             "id",
             price = 5.00,
             currency = "EUR",
+            category = "misc"
         )
         tracker.track(ProductListClick(product))
         waitForEvents(networkConnection, 1)
@@ -148,6 +153,7 @@ class EcommerceTest {
             "id",
             price = 0.99,
             currency = "CAD",
+            category = "motors"
         )
         val product2 = Product(
             "id2",
@@ -209,6 +215,7 @@ class EcommerceTest {
         val product1 = Product(
             "id1",
             price = 0.99,
+            category = "flour",
             currency = "USD",
         )
 
@@ -258,6 +265,7 @@ class EcommerceTest {
             "product123",
             price = 200000,
             currency = "JPY",
+            category = "kitchen"
         )
 
         tracker.track(RemoveFromCart(listOf(product), 400000, "JPY", "cart567"))
@@ -337,18 +345,18 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val transaction = Transaction(
+        val transaction = TransactionDetails(
             transactionId = "id123",
             revenue = 5,
             currency = "CHF",
             paymentMethod = "credit_card"
         )
 
-        val product1 = Product("id1", currency = "CHF", price = 10.99)
-        val product2 = Product("id2", currency = "CHF", price = 4)
+        val product1 = Product("id1", currency = "CHF", price = 10.99, category = "climbing")
+        val product2 = Product("id2", currency = "CHF", price = 4, category = "boxing")
 
         tracker.track(
-            com.snowplowanalytics.snowplow.ecommerce.events.Transaction(
+            Transaction(
                 transaction,
                 listOf(product1, product2)
             )
@@ -444,6 +452,7 @@ class EcommerceTest {
         Assert.assertEquals(1, networkConnection.countRequests())
 
         val request = networkConnection.allRequests[0]
+        println(request.payload)
         val event = JSONObject(request.payload.map["ue_pr"] as String)
             .getJSONObject("data")
         val entities = JSONObject(request.payload.map["co"] as String)
@@ -462,6 +471,92 @@ class EcommerceTest {
         Assert.assertEquals(1, promoEntities.size)
 
         Assert.assertEquals("promo1", promoEntities[0].get(Parameters.ECOMM_PROMO_ID))
+    }
+    
+    @Test
+    fun addsPageEntity() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val tracker = getTracker(networkConnection)
+        
+        tracker.ecommerce.setPageType(type = "listing", language = "DE", locale = "DE")
+        
+        tracker.track(ScreenView("screen"))
+        waitForEvents(networkConnection, 1)
+        
+        var request = networkConnection.allRequests[0]
+        var pageEntities = getPageEntity(request)
+
+        Assert.assertEquals(1, pageEntities.size)
+        Assert.assertEquals("DE", pageEntities[0].get("language"))
+        Assert.assertEquals("listing", pageEntities[0].get("type"))
+        Assert.assertEquals("DE", pageEntities[0].get("locale"))
+
+
+        // replacing earlier Page
+        tracker.ecommerce.setPageType(type = "home_screen", language = "EN-GB")
+
+        tracker.track(Structured("category", "action"))
+        waitForEvents(networkConnection, 2)
+
+        request = networkConnection.allRequests[1]
+        pageEntities = getPageEntity(request)
+        
+        Assert.assertEquals(1, pageEntities.size)
+        Assert.assertEquals("EN-GB", pageEntities[0].get("language"))
+        Assert.assertEquals("home_screen", pageEntities[0].get("type"))
+        Assert.assertFalse(pageEntities[0].has("locale"))
+        
+        // removing Page
+        tracker.ecommerce.removePageType()
+        tracker.track(ScreenView("productA"))
+        waitForEvents(networkConnection, 3)
+
+        request = networkConnection.allRequests[2]
+        pageEntities = getPageEntity(request)
+
+        Assert.assertEquals(0, pageEntities.size)
+    }
+
+    @Test
+    fun addsUserEntity() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val tracker = getTracker(networkConnection)
+
+        tracker.ecommerce.setEcommerceUser("user_id")
+
+        tracker.track(ScreenView("screen"))
+        waitForEvents(networkConnection, 1)
+
+        var request = networkConnection.allRequests[0]
+        var userEntities = getUserEntity(request)
+
+        Assert.assertEquals(1, userEntities.size)
+        Assert.assertEquals("user_id", userEntities[0].get("id"))
+        Assert.assertFalse(userEntities[0].has("is_guest"))
+
+        // replacing earlier User
+        tracker.ecommerce.setEcommerceUser("a_new_user", false, "email@email.com")
+
+        tracker.track(Structured("category", "action"))
+        waitForEvents(networkConnection, 2)
+
+        request = networkConnection.allRequests[1]
+        userEntities = getUserEntity(request)
+
+        Assert.assertEquals(1, userEntities.size)
+        Assert.assertEquals("a_new_user", userEntities[0].get("id"))
+        Assert.assertEquals(false, userEntities[0].get("is_guest"))
+        Assert.assertEquals("email@email.com", userEntities[0].get("email"))
+
+        // removing User
+        tracker.ecommerce.removeEcommerceUser()
+        tracker.track(ScreenView("productA"))
+        waitForEvents(networkConnection, 3)
+
+        request = networkConnection.allRequests[2]
+        userEntities = getUserEntity(request)
+
+        Assert.assertEquals(0, userEntities.size)
     }
     
 
@@ -488,5 +583,31 @@ class EcommerceTest {
             Thread.sleep(1000)
             i++
         }
+    }
+    
+    private fun getPageEntity(request: Request) : ArrayList<JSONObject> {
+        val pageEntities = ArrayList<JSONObject>()
+        val entities = JSONObject(request.payload.map["co"] as String)
+            .getJSONArray("data")
+
+        for (i in 0 until entities.length()) {
+            if (entities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_PAGE) {
+                pageEntities.add(entities.getJSONObject(i).getJSONObject("data"))
+            }
+        }
+        return pageEntities
+    }
+
+    private fun getUserEntity(request: Request) : ArrayList<JSONObject> {
+        val userEntities = ArrayList<JSONObject>()
+        val entities = JSONObject(request.payload.map["co"] as String)
+            .getJSONArray("data")
+
+        for (i in 0 until entities.length()) {
+            if (entities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_USER) {
+                userEntities.add(entities.getJSONObject(i).getJSONObject("data"))
+            }
+        }
+        return userEntities
     }
 }

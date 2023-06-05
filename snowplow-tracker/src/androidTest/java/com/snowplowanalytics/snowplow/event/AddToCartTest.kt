@@ -44,7 +44,8 @@ class AddToCartTest {
         val product2 = Product(
             id = "ID2",
             price = 0.99,
-            currency = "GBP"
+            currency = "GBP",
+            category = "category"
         )
         
         var event = AddToCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))

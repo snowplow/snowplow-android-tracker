@@ -44,6 +44,7 @@ class ProductListViewTest {
         val product2 = Product(
             id = "ID2",
             price = 0.99,
+            category = "category2",
             currency = "GBP"
         )
         

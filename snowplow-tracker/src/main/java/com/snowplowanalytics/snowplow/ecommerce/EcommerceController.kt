@@ -16,7 +16,11 @@ package com.snowplowanalytics.snowplow.ecommerce
  * Controller for managing how events are sent.
  */
 interface EcommerceController {
-    fun setPageType(type: String, language: String?, locale: String?)
+    fun setPageType(type: String, language: String? = null, locale: String? = null)
     
-    fun setEcommerceUser(id: String, is_guest: Boolean?, email: String?)
+    fun setEcommerceUser(id: String, is_guest: Boolean? = null, email: String? = null)
+    
+    fun removePageType()
+    
+    fun removeEcommerceUser()
 }

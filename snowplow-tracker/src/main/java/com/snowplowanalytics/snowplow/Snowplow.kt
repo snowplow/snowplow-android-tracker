@@ -16,7 +16,6 @@ import android.content.Context
 import android.webkit.WebView
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
-import com.snowplowanalytics.core.ecommerce.EcommerceManager
 
 import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider
 import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle
@@ -225,12 +224,12 @@ object Snowplow {
     ): TrackerController {
         var serviceProvider = serviceProviderInstances[namespace]
         if (serviceProvider != null) {
-            val configList: MutableList<Configuration> = ArrayList(listOf(*configurations, EcommerceManager.plugin()))
+            val configList: MutableList<Configuration> = ArrayList(listOf(*configurations))
             configList.add(network)
             serviceProvider.reset(configList)
         } else {
             serviceProvider =
-                ServiceProvider(context, namespace, network, listOf(*configurations, EcommerceManager.plugin()))
+                ServiceProvider(context, namespace, network, listOf(*configurations))
             registerInstance(serviceProvider)
         }
         return serviceProvider.getOrMakeTrackerController()
