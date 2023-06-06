@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplowdemokotlin
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -29,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
 import androidx.preference.PreferenceManager
+import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.utils.Util
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.defaultTracker
@@ -56,6 +58,7 @@ class Demo : Activity(), LoggerDelegate {
     private var _startButton: Button? = null
     private var _tabButton: Button? = null
     private var _loadWebViewButton: Button? = null
+    private var _videoBtn: Button? = null
     private var _uriField: EditText? = null
     private var _webViewUriField: EditText? = null
     private var _type: RadioGroup? = null
@@ -97,6 +100,13 @@ class Demo : Activity(), LoggerDelegate {
         _webViewUriField = findViewById<View>(R.id.web_view_uri_field) as EditText
         _webView = findViewById<View>(R.id.web_view) as WebView
         _loadWebViewButton = findViewById<View>(R.id.btn_load_webview) as Button
+        _videoBtn = findViewById<View>(R.id.btn_lite_video) as Button
+        _videoBtn?.setOnClickListener {
+            Logger.updateLogLevel(LogLevel.VERBOSE)
+            val intent = Intent(this@Demo, MediaActivity::class.java)
+            startActivity(intent)
+        }
+
 
         _logOutput?.movementMethod = ScrollingMovementMethod()
         _logOutput?.text = ""
