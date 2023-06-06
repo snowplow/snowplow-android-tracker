@@ -12,19 +12,83 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.events
 
+import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
  * Track a transaction event.
  *
- * @param transaction - The transaction information
- * @param products - The products included in the transaction.
+ * @param transactionId The ID of the transaction.
+ * @param revenue The total value of the transaction.
+ * @param currency The currency used for the transaction.
+ * @param paymentMethod The payment method used for the transaction.
+ * @param totalQuantity Total quantity of items in the transaction.
+ * @param tax Total amount of tax on the transaction.
+ * @param shipping Total cost of shipping on the transaction.
+ * @param discountCode Discount code used.
+ * @param discountAmount Discount amount taken off.
+ * @param creditOrder Whether the transaction is a credit order or not.
+ * @param products The products included in the transaction.
  */
-class Transaction(val transaction: TransactionDetails, val products: List<Product>? = null) : AbstractSelfDescribing() {
+class Transaction(
+    /**
+    * The ID of the transaction
+    */
+    val transactionId: String,
+    
+    /**
+    * The total value of the transaction
+    */
+    val revenue: Number,
+    
+    /**
+    * The currency used for the transaction
+    */
+    val currency: String,
+    
+    /**
+    * The payment method used for the transaction
+    */
+    val paymentMethod: String,
+    
+    /**
+    * Total quantity of items in the transaction
+    */
+    val totalQuantity: Int? = null,
+    
+    /**
+    * Total amount of tax on the transaction
+    */
+    val tax: Number? = null,
+    
+    /**
+    * Total cost of shipping on the transaction
+    */
+    val shipping: Number? = null,
+    
+    /**
+    * Discount code used
+    */
+    val discountCode: String? = null,
+    
+    /**
+    * Discount amount taken off
+    */
+    val discountAmount: Number? = null,
+    
+    /**
+    * Whether the transaction is a credit order or not
+    */
+    val creditOrder: Boolean? = null,
+    
+    /**
+    * Products in the transaction.
+    */
+    val products: List<Product>? = null
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -34,8 +98,17 @@ class Transaction(val transaction: TransactionDetails, val products: List<Produc
         get() {
             val payload = HashMap<String, Any?>()
             payload["type"] = EcommerceAction.transaction
-            payload["transaction"] = transaction
             payload["products"] = products
+            payload[Parameters.ECOMM_TRANSACTION_ID] = transactionId
+            payload[Parameters.ECOMM_TRANSACTION_REVENUE] = revenue
+            payload[Parameters.ECOMM_TRANSACTION_CURRENCY] = currency
+            payload[Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD] = paymentMethod
+            payload[Parameters.ECOMM_TRANSACTION_QUANTITY] = totalQuantity
+            payload[Parameters.ECOMM_TRANSACTION_TAX] = tax
+            payload[Parameters.ECOMM_TRANSACTION_SHIPPING] = shipping
+            payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE] = discountCode
+            payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT] = discountAmount
+            payload[Parameters.ECOMM_TRANSACTION_CREDIT_ORDER] = creditOrder
             return payload
         }
     

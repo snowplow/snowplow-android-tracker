@@ -20,7 +20,6 @@ import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -109,9 +108,28 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
                     }
                     payload.remove("products")
 
-                    val transaction = payload["transaction"] as TransactionDetails
-                    toAttach.add(transactionToSdj(transaction))
-                    payload.remove("transaction")
+                    toAttach.add(transactionInfoToSdj(
+                        payload[Parameters.ECOMM_TRANSACTION_ID] as String,
+                        payload[Parameters.ECOMM_TRANSACTION_REVENUE] as Number,
+                        payload[Parameters.ECOMM_TRANSACTION_CURRENCY] as String,
+                        payload[Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD] as String,
+                        payload[Parameters.ECOMM_TRANSACTION_QUANTITY] as Int?,
+                        payload[Parameters.ECOMM_TRANSACTION_TAX] as Number?,
+                        payload[Parameters.ECOMM_TRANSACTION_SHIPPING] as Number?,
+                        payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE] as String?,
+                        payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT] as Number?,
+                        payload[Parameters.ECOMM_TRANSACTION_CREDIT_ORDER] as Boolean?
+                    ))
+                    payload.remove(Parameters.ECOMM_TRANSACTION_ID)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_REVENUE)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_CURRENCY)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_QUANTITY)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_TAX)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_SHIPPING)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT)
+                    payload.remove(Parameters.ECOMM_TRANSACTION_CREDIT_ORDER)
                 }
 
                 EcommerceAction.checkout_step -> {
@@ -231,18 +249,29 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
         )
     }
 
-    private fun transactionToSdj(transaction: TransactionDetails) : SelfDescribingJson {
+    private fun transactionInfoToSdj(
+        transactionId: String,
+        revenue: Number,
+        currency: String,
+        paymentMethod: String,
+        totalQuantity: Int?,
+        tax: Number?,
+        shipping: Number?,
+        discountCode: String?,
+        discountAmount: Number?,
+        creditOrder: Boolean?
+    ) : SelfDescribingJson {
         val map = hashMapOf(
-            Parameters.ECOMM_TRANSACTION_ID to transaction.transactionId,
-            Parameters.ECOMM_TRANSACTION_REVENUE to transaction.revenue,
-            Parameters.ECOMM_TRANSACTION_CURRENCY to transaction.currency,
-            Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to transaction.paymentMethod,
-            Parameters.ECOMM_TRANSACTION_QUANTITY to transaction.totalQuantity,
-            Parameters.ECOMM_TRANSACTION_TAX to transaction.tax,
-            Parameters.ECOMM_TRANSACTION_SHIPPING to transaction.shipping,
-            Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to transaction.discountCode,
-            Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to transaction.discountAmount,
-            Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to transaction.creditOrder
+            Parameters.ECOMM_TRANSACTION_ID to transactionId,
+            Parameters.ECOMM_TRANSACTION_REVENUE to revenue,
+            Parameters.ECOMM_TRANSACTION_CURRENCY to currency,
+            Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to paymentMethod,
+            Parameters.ECOMM_TRANSACTION_QUANTITY to totalQuantity,
+            Parameters.ECOMM_TRANSACTION_TAX to tax,
+            Parameters.ECOMM_TRANSACTION_SHIPPING to shipping,
+            Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to discountCode,
+            Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to discountAmount,
+            Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to creditOrder
         )
         map.values.removeAll(sequenceOf(null))
 

@@ -16,8 +16,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
 import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import org.junit.Assert
 import org.junit.Test
@@ -28,8 +26,6 @@ import java.util.*
 class TransactionTest {
     @Test
     fun testExpectedForm() {
-        val txn = TransactionDetails("transactionId", 8999, "EUR", "visa")
-
         val product1 = Product(
             id = "product ID",
             name = "product name",
@@ -44,11 +40,20 @@ class TransactionTest {
             currency = "GBP"
         )
 
-        val event = Transaction(txn, listOf(product1, product2))
+        val event = Transaction("transactionId",
+            8999, 
+            "EUR", 
+            "visa", 
+            products = listOf(product1, product2)
+        )
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.transaction)
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))
+        Assert.assertEquals(listOf(product1, product2), data[Parameters.ECOMM_PRODUCTS])
+        Assert.assertEquals("transactionId", data[Parameters.ECOMM_TRANSACTION_ID])
+        Assert.assertEquals(8999, data[Parameters.ECOMM_TRANSACTION_REVENUE])
+        Assert.assertEquals("visa", data[Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD])
+        Assert.assertEquals("EUR", data[Parameters.ECOMM_TRANSACTION_CURRENCY])
     }
 }

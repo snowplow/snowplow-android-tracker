@@ -24,7 +24,6 @@ import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
@@ -37,7 +36,6 @@ import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.Request
-import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import org.json.JSONObject
 import org.junit.Assert
@@ -287,20 +285,16 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val transaction = TransactionDetails(
-            transactionId = "id123",
-            revenue = 5,
-            currency = "CHF",
-            paymentMethod = "credit_card"
-        )
-
         val product1 = Product("id1", currency = "CHF", price = 10.99, category = "climbing")
         val product2 = Product("id2", currency = "CHF", price = 4, category = "boxing")
 
         tracker.track(
             Transaction(
-                transaction,
-                listOf(product1, product2)
+                transactionId = "id123",
+                revenue = 5,
+                currency = "CHF",
+                paymentMethod = "credit_card",
+                products = listOf(product1, product2)
             )
         )
         waitForEvents(networkConnection, 1)
