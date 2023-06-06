@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import org.junit.Assert
 import org.junit.Test
@@ -26,18 +25,17 @@ import java.util.*
 class CheckoutStepTest {
     @Test
     fun testExpectedForm() {
-        val checkout = Checkout(
-            step = 5,
+        val event = CheckoutStep(step = 5,
             deliveryMethod = "stork",
-            marketingOptIn = true
-        )
-            
-        val event = CheckoutStep(checkout)
+            marketingOptIn = true)
         val data: Map<String, Any?> = event.dataPayload
+        
         Assert.assertNotNull(data)
         Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.checkout_step)
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_CHECKOUT_STEP))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_CHECKOUT_STEP], checkout)
+        Assert.assertEquals(5, data[Parameters.ECOMM_CHECKOUT_STEP])
+        Assert.assertEquals("stork", data[Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD])
+        Assert.assertEquals(true, data[Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN])
     }
 }

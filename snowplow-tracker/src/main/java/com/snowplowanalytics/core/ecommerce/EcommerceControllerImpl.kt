@@ -18,7 +18,6 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
-import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
@@ -117,9 +116,32 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
                 }
 
                 EcommerceAction.checkout_step -> {
-                    val checkout = payload["checkout"] as Checkout
-                    toAttach.add(checkoutToSdj(checkout))
-                    payload.remove("checkout")
+                    toAttach.add(checkoutInfoToSdj(
+                        payload[Parameters.ECOMM_CHECKOUT_STEP] as Number,
+                        payload[Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_COUPON_CODE] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT] as String?,
+                        payload[Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN] as Boolean?
+                    ))
+                    payload.remove(Parameters.ECOMM_CHECKOUT_STEP)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_COUPON_CODE)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT)
+                    payload.remove(Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN)
                 }
 
                 EcommerceAction.promo_view, EcommerceAction.promo_click -> {
@@ -205,20 +227,33 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
         )
     }
 
-    private fun checkoutToSdj(checkout: Checkout) : SelfDescribingJson {
+    private fun checkoutInfoToSdj(
+        step: Number,
+        shippingPostcode: String?,
+        billingPostcode: String?,
+        shippingFullAddress: String?,
+        billingFullAddress: String?,
+        deliveryProvider: String?,
+        deliveryMethod: String?,
+        couponCode: String?,
+        accountType: String?,
+        paymentMethod: String?,
+        proofOfPayment: String?,
+        marketingOptIn: Boolean?
+    ) : SelfDescribingJson {
         val map = hashMapOf(
-            Parameters.ECOMM_CHECKOUT_STEP to checkout.step,
-            Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE to checkout.shippingPostcode,
-            Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE to checkout.billingPostcode,
-            Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS to checkout.shippingFullAddress,
-            Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS to checkout.billingFullAddress,
-            Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER to checkout.deliveryProvider,
-            Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD to checkout.deliveryMethod,
-            Parameters.ECOMM_CHECKOUT_COUPON_CODE to checkout.couponCode,
-            Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE to checkout.accountType,
-            Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD to checkout.paymentMethod,
-            Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT to checkout.proofOfPayment,
-            Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN to checkout.marketingOptIn,
+            Parameters.ECOMM_CHECKOUT_STEP to step,
+            Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE to shippingPostcode,
+            Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE to billingPostcode,
+            Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS to shippingFullAddress,
+            Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS to billingFullAddress,
+            Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER to deliveryProvider,
+            Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD to deliveryMethod,
+            Parameters.ECOMM_CHECKOUT_COUPON_CODE to couponCode,
+            Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE to accountType,
+            Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD to paymentMethod,
+            Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT to proofOfPayment,
+            Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN to marketingOptIn,
         )
         map.values.removeAll(sequenceOf(null))
 

@@ -22,7 +22,6 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
-import com.snowplowanalytics.snowplow.ecommerce.entities.Checkout
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
@@ -263,9 +262,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val checkout = Checkout(1)
-
-        tracker.track(CheckoutStep(checkout))
+        tracker.track(CheckoutStep(step = 1, couponCode = "WELCOME2023"))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -281,6 +278,7 @@ class EcommerceTest {
         Assert.assertEquals(1, checkoutEntities.size)
 
         Assert.assertEquals(1, checkoutEntities[0].get(Parameters.ECOMM_CHECKOUT_STEP))
+        Assert.assertEquals("WELCOME2023", checkoutEntities[0].get(Parameters.ECOMM_CHECKOUT_COUPON_CODE))
     }
 
     @Test
