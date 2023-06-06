@@ -28,6 +28,9 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  */
 class AddToCart(
 
+    /**
+     * List of product(s) that were added to the cart.
+     */
     val products: List<Product>,
 
     /**

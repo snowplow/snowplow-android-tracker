@@ -34,40 +34,40 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param marketingOptIn If opted in to marketing campaigns to the email address. * 
  */
 class CheckoutStep(
-    /* Checkout step index */
+    /** Checkout step index */
     val step: Number,
     
-    /* Shipping address postcode */
+    /** Shipping address postcode */
     val shippingPostcode: String? = null,
     
-    /* Billing address postcode */
+    /** Billing address postcode */
     val billingPostcode: String? = null,
     
-    /* Full shipping address */
+    /** Full shipping address */
     val shippingFullAddress: String? = null,
     
-    /* Full billing address */
+    /** Full billing address */
     val billingFullAddress: String? = null,
     
-    /* Can be used to discern delivery providers DHL, PostNL etc. */
+    /** Can be used to discern delivery providers DHL, PostNL etc. */
     val deliveryProvider: String? = null,
     
-    /* E.g. store pickup, standard delivery, express delivery, international */
+    /** E.g. store pickup, standard delivery, express delivery, international */
     val deliveryMethod: String? = null,
     
-    /* Coupon applied at checkout */
+    /** Coupon applied at checkout */
     val couponCode: String? = null,
     
-    /* Type of account used on checkout, e.g. existing user, guest */
+    /** Type of account used on checkout, e.g. existing user, guest */
     val accountType: String? = null,
     
-    /* Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc. */
+    /** Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc. */
     val paymentMethod: String? = null,
     
-    /* E.g. invoice or receipt */
+    /** E.g. invoice or receipt */
     val proofOfPayment: String? = null,
     
-    /* If opted in to marketing campaigns to the email address */
+    /** If opted in to marketing campaigns to the email address */
     val marketingOptIn: Boolean? = null
 ) : AbstractSelfDescribing() {
 

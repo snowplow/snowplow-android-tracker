@@ -20,7 +20,6 @@ import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
 import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
@@ -157,9 +156,16 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
                     }
                     payload.remove("products")
 
-                    val refund = payload["refund"] as RefundDetails
-                    toAttach.add(refundToSdj(refund))
-                    payload.remove("refund")
+                    toAttach.add(refundInfoToSdj(
+                        payload[Parameters.ECOMM_REFUND_ID] as String,
+                        payload[Parameters.ECOMM_REFUND_CURRENCY] as String,
+                        payload[Parameters.ECOMM_REFUND_AMOUNT] as Number,
+                        payload[Parameters.ECOMM_REFUND_REASON] as String?
+                    ))
+                    payload.remove(Parameters.ECOMM_REFUND_ID)
+                    payload.remove(Parameters.ECOMM_REFUND_CURRENCY)
+                    payload.remove(Parameters.ECOMM_REFUND_AMOUNT)
+                    payload.remove(Parameters.ECOMM_REFUND_REASON)
                 }
             }
             payload["type"] = payload["type"].toString()
@@ -202,6 +208,25 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
 
         return SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            map
+        )
+    }
+
+    private fun refundInfoToSdj(transactionId: String, 
+                                currency: String, 
+                                refundAmount: Number, 
+                                refundReason: String?
+                                ) : SelfDescribingJson {
+        val map = hashMapOf(
+            Parameters.ECOMM_REFUND_ID to transactionId,
+            Parameters.ECOMM_REFUND_CURRENCY to currency,
+            Parameters.ECOMM_REFUND_AMOUNT to refundAmount,
+            Parameters.ECOMM_REFUND_REASON to refundReason
+        )
+        map.values.removeAll(sequenceOf(null))
+
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
             map
         )
     }
@@ -280,19 +305,5 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
             map
         )
     }
-
-    private fun refundToSdj(refund: RefundDetails) : SelfDescribingJson {
-        val map = hashMapOf(
-            Parameters.ECOMM_REFUND_ID to refund.transactionId,
-            Parameters.ECOMM_REFUND_CURRENCY to refund.currency,
-            Parameters.ECOMM_REFUND_AMOUNT to refund.refundAmount,
-            Parameters.ECOMM_REFUND_REASON to refund.refundReason
-        )
-        map.values.removeAll(sequenceOf(null))
-
-        return SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
-            map
-        )
-    }
+    
 }

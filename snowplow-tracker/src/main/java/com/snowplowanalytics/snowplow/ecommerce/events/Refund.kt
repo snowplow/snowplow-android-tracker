@@ -12,10 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.events
 
+import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
@@ -23,10 +23,28 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * Provide a list of products to specify certain products to be refunded, otherwise the whole transaction 
  * will be marked as refunded.
  *
- * @param refund - The transaction information
- * @param products - The products to be refunded.
+ * @param transactionId The ID of the relevant transaction.
+ * @param currency The currency in which the product(s) are being priced (ISO 4217).
+ * @param refundAmount The monetary amount refunded.
+ * @param refundReason Reason for refunding the whole or part of the transaction.
+ * @param products The products to be refunded.
  */
-class Refund(val refund: RefundDetails, val products: List<Product>? = null) : AbstractSelfDescribing() {
+class Refund(
+    /** The ID of the relevant transaction. */
+    val transactionId: String,
+    
+    /** The currency in which the product is being priced (ISO 4217). */
+    val currency: String,
+    
+    /** The monetary amount refunded. */
+    val refundAmount: Number,
+    
+    /** Reason for refunding the whole or part of the transaction. */
+    val refundReason: String? = null, 
+    
+    /** The products to be refunded. */
+    val products: List<Product>? = null
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -36,8 +54,11 @@ class Refund(val refund: RefundDetails, val products: List<Product>? = null) : A
         get() {
             val payload = HashMap<String, Any?>()
             payload["type"] = EcommerceAction.refund
-            payload["refund"] = refund
             payload["products"] = products
+            payload[Parameters.ECOMM_REFUND_ID] = transactionId
+            payload[Parameters.ECOMM_REFUND_CURRENCY] = currency
+            payload[Parameters.ECOMM_REFUND_AMOUNT] = refundAmount
+            payload[Parameters.ECOMM_REFUND_REASON] = refundReason
             return payload
         }
     

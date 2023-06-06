@@ -24,7 +24,6 @@ import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.entities.RefundDetails
 import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionDetails
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
@@ -38,6 +37,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.Request
+import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import org.json.JSONObject
 import org.junit.Assert
@@ -391,23 +391,20 @@ class EcommerceTest {
     fun refund() {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
-
-        val refund = RefundDetails(
-            "refund_123",
-            "GBP",
-            1.00
-        )
         
         val product1 = Product("productId", category = "roses", price = 24.99, currency = "CAD")
         val product2 = Product("id2", category = "gloves", price = 3.56, currency = "CAD")
-
-        tracker.track(Refund(refund, listOf(product1, product2)))
+        
+        tracker.track(Refund("refund_123",
+            "GBP",
+            1.00,
+            products = listOf(product1, product2))
+        )
         waitForEvents(networkConnection, 1)
-
+        
         Assert.assertEquals(1, networkConnection.countRequests())
 
         val request = networkConnection.allRequests[0]
-        println(request.payload)
         val event = getEvent(request)
         val productEntities = getProductEntities(request)
         val refundEntities = getRefundEntities(request)
