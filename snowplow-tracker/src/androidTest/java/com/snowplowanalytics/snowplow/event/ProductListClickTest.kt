@@ -45,7 +45,7 @@ class ProductListClickTest {
         var productListClick = ProductListClick(product)
         var data: Map<String, Any?> = productListClick.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.list_click)
+        Assert.assertEquals(EcommerceAction.list_click.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)

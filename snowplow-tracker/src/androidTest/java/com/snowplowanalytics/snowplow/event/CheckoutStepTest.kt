@@ -31,7 +31,7 @@ class CheckoutStepTest {
         val data: Map<String, Any?> = event.dataPayload
         
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.checkout_step)
+        Assert.assertEquals(EcommerceAction.checkout_step.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_CHECKOUT_STEP))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(5, data[Parameters.ECOMM_CHECKOUT_STEP])

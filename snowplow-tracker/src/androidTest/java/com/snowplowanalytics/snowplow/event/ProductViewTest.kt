@@ -44,7 +44,7 @@ class ProductViewTest {
         val event = ProductView(product)
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.product_view)
+        Assert.assertEquals(EcommerceAction.product_view.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)

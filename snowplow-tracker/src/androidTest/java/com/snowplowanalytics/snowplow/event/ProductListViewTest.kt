@@ -51,7 +51,7 @@ class ProductListViewTest {
         var event = ProductListView(listOf(product1, product2))
         var data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.list_view)
+        Assert.assertEquals(EcommerceAction.list_view.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))

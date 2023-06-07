@@ -34,10 +34,10 @@ class RefundTest {
             price = 123456789
         )
 
-        val event = Refund("id", "USD", 123.45, products = listOf(product1))
+        val event = Refund("id", currency = "USD", refundAmount = 123.45, products = listOf(product1))
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.refund)
+        Assert.assertEquals(EcommerceAction.refund.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertEquals(listOf(product1), data[Parameters.ECOMM_PRODUCTS])
         Assert.assertEquals("id", data[Parameters.ECOMM_REFUND_ID])

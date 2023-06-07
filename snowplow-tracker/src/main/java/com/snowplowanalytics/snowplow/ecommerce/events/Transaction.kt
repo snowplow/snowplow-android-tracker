@@ -59,7 +59,7 @@ class Transaction(
     /**
     * Total quantity of items in the transaction
     */
-    var totalQuantity: Int? = null,
+    var totalQuantity: Int,
     
     /**
     * Total amount of tax on the transaction

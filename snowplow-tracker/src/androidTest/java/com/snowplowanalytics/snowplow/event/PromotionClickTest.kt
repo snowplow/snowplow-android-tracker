@@ -38,7 +38,7 @@ class PromotionClickTest {
         val event = PromotionClick(promotion)
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.promo_click)
+        Assert.assertEquals(EcommerceAction.promo_click.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PROMOTION))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PROMOTION], promotion)

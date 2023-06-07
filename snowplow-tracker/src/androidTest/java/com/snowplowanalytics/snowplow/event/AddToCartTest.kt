@@ -51,7 +51,7 @@ class AddToCartTest {
         var event = AddToCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
         var data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.add_to_cart)
+        Assert.assertEquals(EcommerceAction.add_to_cart.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))

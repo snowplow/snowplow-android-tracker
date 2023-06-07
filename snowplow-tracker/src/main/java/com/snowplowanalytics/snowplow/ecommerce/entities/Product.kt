@@ -22,15 +22,15 @@ data class Product(
     var id: String,
 
     /**
-     * The name or title of the product
-     */
-    var name: String? = null,
-
-    /**
      * The category the product belongs to.
      * Use a consistent separator to express multiple levels. E.g. Woman/Shoes/Sneakers
      */
     var category: String,
+
+    /**
+     * The currency in which the product is being priced (ISO 4217)
+     */
+    var currency: String,
 
     /**
      * The price of the product at the current time.
@@ -41,6 +41,11 @@ data class Product(
      * The recommended or list price of a product
      */
     var listPrice: Number? = null,
+
+    /**
+     * The name or title of the product
+     */
+    var name: String? = null,
 
     /**
      * The quantity of the product taking part in the action. Used for Cart events.
@@ -71,11 +76,6 @@ data class Product(
      * The position the product was presented in a list of products (search results, product list page, etc)
      */
     var position: Int? = null,
-
-    /**
-     * The currency in which the product is being priced (ISO 4217)
-     */
-    var currency: String,
 
     /*r
      * Identifier/Name/Url for the creative presented on a list or product view.

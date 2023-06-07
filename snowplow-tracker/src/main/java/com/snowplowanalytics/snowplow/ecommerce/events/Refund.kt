@@ -35,11 +35,11 @@ class Refund(
     /** The ID of the relevant transaction. */
     var transactionId: String,
     
-    /** The currency in which the product is being priced (ISO 4217). */
-    var currency: String,
-    
     /** The monetary amount refunded. */
     var refundAmount: Number,
+
+    /** The currency in which the product is being priced (ISO 4217). */
+    var currency: String,
     
     /** Reason for refunding the whole or part of the transaction. */
     var refundReason: String? = null, 

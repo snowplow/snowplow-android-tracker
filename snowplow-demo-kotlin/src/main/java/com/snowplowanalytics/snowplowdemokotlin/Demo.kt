@@ -29,8 +29,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.core.util.Pair
 import androidx.preference.PreferenceManager
-import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.utils.Util
+import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.defaultTracker
 import com.snowplowanalytics.snowplow.Snowplow.setup
@@ -222,6 +222,7 @@ class Demo : Activity(), LoggerDelegate {
                 defaultTracker!!.emitter.requestCallback = requestCallback
                 callbackTrackerReady.accept(true)
             })
+        defaultTracker?.ecommerce?.setPageType("demo_app_screen")
         return true
     }
 
@@ -317,7 +318,7 @@ class Demo : Activity(), LoggerDelegate {
             return
         }
         TrackerEvents.trackAll(tracker)
-        eventsCreated += 11
+        eventsCreated += 21
         val made = "Made: $eventsCreated"
         runOnUiThread { _eventsCreated!!.text = made }
     }

@@ -43,12 +43,13 @@ class TransactionTest {
         val event = Transaction("transactionId",
             8999, 
             "EUR", 
-            "visa", 
+            "visa",
+            2000,
             products = listOf(product1, product2)
         )
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(data[Parameters.ECOMM_TYPE], EcommerceAction.transaction)
+        Assert.assertEquals(EcommerceAction.transaction.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertEquals(listOf(product1, product2), data[Parameters.ECOMM_PRODUCTS])
         Assert.assertEquals("transactionId", data[Parameters.ECOMM_TRANSACTION_ID])

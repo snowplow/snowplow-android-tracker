@@ -294,6 +294,7 @@ class EcommerceTest {
                 revenue = 5,
                 currency = "CHF",
                 paymentMethod = "credit_card",
+                totalQuantity = 2,
                 products = listOf(product1, product2)
             )
         )
@@ -390,8 +391,8 @@ class EcommerceTest {
         val product2 = Product("id2", category = "gloves", price = 3.56, currency = "CAD")
         
         tracker.track(Refund("refund_123",
-            "GBP",
-            1.00,
+            currency = "GBP",
+            refundAmount = 1.00,
             products = listOf(product1, product2))
         )
         waitForEvents(networkConnection, 1)
