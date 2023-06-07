@@ -37,57 +37,57 @@ class Transaction(
     /**
     * The ID of the transaction
     */
-    val transactionId: String,
+    var transactionId: String,
     
     /**
     * The total value of the transaction
     */
-    val revenue: Number,
+    var revenue: Number,
     
     /**
     * The currency used for the transaction
     */
-    val currency: String,
+    var currency: String,
     
     /**
     * The payment method used for the transaction
     */
-    val paymentMethod: String,
+    var paymentMethod: String,
     
     /**
     * Total quantity of items in the transaction
     */
-    val totalQuantity: Int? = null,
+    var totalQuantity: Int? = null,
     
     /**
     * Total amount of tax on the transaction
     */
-    val tax: Number? = null,
+    var tax: Number? = null,
     
     /**
     * Total cost of shipping on the transaction
     */
-    val shipping: Number? = null,
+    var shipping: Number? = null,
     
     /**
     * Discount code used
     */
-    val discountCode: String? = null,
+    var discountCode: String? = null,
     
     /**
     * Discount amount taken off
     */
-    val discountAmount: Number? = null,
+    var discountAmount: Number? = null,
     
     /**
     * Whether the transaction is a credit order or not
     */
-    val creditOrder: Boolean? = null,
+    var creditOrder: Boolean? = null,
     
     /**
     * Products in the transaction.
     */
-    val products: List<Product>? = null
+    var products: List<Product>? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */

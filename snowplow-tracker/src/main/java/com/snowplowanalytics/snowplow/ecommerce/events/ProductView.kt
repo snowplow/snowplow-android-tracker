@@ -23,7 +23,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  *
  * @param product - The product that was viewed in a product detail page.
  */
-class ProductView(val product: Product) : AbstractSelfDescribing() {
+class ProductView(var product: Product) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

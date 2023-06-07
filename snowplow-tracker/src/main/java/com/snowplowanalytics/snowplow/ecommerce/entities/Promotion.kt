@@ -13,41 +13,41 @@
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
 /**
- * Used for the PromotionClick and PromotionView events in Ecommerce.
+ * Used for the PromotionClick and PromotionView events in Ecommercer
  */
 data class Promotion(
     /**
      * The ID of the promotion.
      */
-    val id: String,
+    var id: String,
     
     /**
      * The name of the promotion.
      */
-    val name: String? = null,
+    var name: String? = null,
     
     /**
      * List of SKUs or product IDs showcased in the promotion.
      */
-    val productIds: List<String>? = null,
+    var productIds: List<String>? = null,
     
     /**
      * The position the promotion was presented in a list of promotions such as a banner or slider, e.g. 2.
      */
-    val position: Int? = null,
+    var position: Int? = null,
     
     /**
      * Identifier/Name/Url for the creative presented on the promotion.
      */
-    val creativeId: String? = null,
+    var creativeId: String? = null,
     
     /**
      * Type of the promotion delivery mechanism. E.g. popup, banner, intra-content
      */
-    val type: String? = null,
+    var type: String? = null,
     
     /**
      * The website slot in which the promotional content was added to.
      */
-    val slot: String? = null
+    var slot: String? = null
 )

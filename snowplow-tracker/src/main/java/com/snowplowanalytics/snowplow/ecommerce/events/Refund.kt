@@ -31,19 +31,19 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  */
 class Refund(
     /** The ID of the relevant transaction. */
-    val transactionId: String,
+    var transactionId: String,
     
     /** The currency in which the product is being priced (ISO 4217). */
-    val currency: String,
+    var currency: String,
     
     /** The monetary amount refunded. */
-    val refundAmount: Number,
+    var refundAmount: Number,
     
     /** Reason for refunding the whole or part of the transaction. */
-    val refundReason: String? = null, 
+    var refundReason: String? = null, 
     
     /** The products to be refunded. */
-    val products: List<Product>? = null
+    var products: List<Product>? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */

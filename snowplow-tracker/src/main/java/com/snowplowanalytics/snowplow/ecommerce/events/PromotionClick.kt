@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  *
  * @param promotion - The promotion selected by the visitor.
  */
-class PromotionClick(val promotion: Promotion) : AbstractSelfDescribing() {
+class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

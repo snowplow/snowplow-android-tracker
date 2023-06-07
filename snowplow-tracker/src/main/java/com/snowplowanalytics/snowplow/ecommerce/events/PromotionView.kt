@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  *
  * @param promotion - The promotion viewed by the visitor.
  */
-class PromotionView(val promotion: Promotion) : AbstractSelfDescribing() {
+class PromotionView(var promotion: Promotion) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String

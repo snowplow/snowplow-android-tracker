@@ -23,17 +23,11 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param product - Information about the product that was clicked.
  * @param name - The list name.
  */
-class ProductListClick(val product: Product, var name: String? = null) : AbstractSelfDescribing() {
+class ProductListClick(var product: Product, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
-
-    // Builder methods
-    fun name(name: String?): ProductListClick {
-        this.name = name
-        return this
-    }
     
     override val dataPayload: Map<String, Any?>
         get() {

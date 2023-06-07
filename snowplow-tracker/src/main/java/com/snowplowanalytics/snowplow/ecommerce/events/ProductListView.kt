@@ -23,18 +23,12 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param products - List of products viewed by the visitor.
  * @param name - The list name.
  */
-class ProductListView(val products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
+class ProductListView(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
 
-    // Builder methods
-    fun name(name: String?): ProductListView {
-        this.name = name
-        return this
-    }
-    
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()

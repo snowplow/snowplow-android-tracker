@@ -27,22 +27,22 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param cartId - Cart identifier.
  */
 class RemoveFromCart(
-    val products: List<Product>,
+    var products: List<Product>,
 
     /**
      * The total value of the cart after this interaction
      */
-    val totalValue: Number,
+    var totalValue: Number,
 
     /**
      * The currency used for this cart (ISO 4217)
      */
-    val currency: String,
+    var currency: String,
 
     /**
      * The unique ID representing this cart
      */
-    val cartId: String? = null
+    var cartId: String? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */

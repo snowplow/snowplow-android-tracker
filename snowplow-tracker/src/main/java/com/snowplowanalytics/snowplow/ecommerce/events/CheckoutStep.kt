@@ -35,40 +35,40 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  */
 class CheckoutStep(
     /** Checkout step index */
-    val step: Number,
+    var step: Number,
     
     /** Shipping address postcode */
-    val shippingPostcode: String? = null,
+    var shippingPostcode: String? = null,
     
     /** Billing address postcode */
-    val billingPostcode: String? = null,
+    var billingPostcode: String? = null,
     
     /** Full shipping address */
-    val shippingFullAddress: String? = null,
+    var shippingFullAddress: String? = null,
     
     /** Full billing address */
-    val billingFullAddress: String? = null,
+    var billingFullAddress: String? = null,
     
     /** Can be used to discern delivery providers DHL, PostNL etc. */
-    val deliveryProvider: String? = null,
+    var deliveryProvider: String? = null,
     
     /** E.g. store pickup, standard delivery, express delivery, international */
-    val deliveryMethod: String? = null,
+    var deliveryMethod: String? = null,
     
     /** Coupon applied at checkout */
-    val couponCode: String? = null,
+    var couponCode: String? = null,
     
     /** Type of account used on checkout, e.g. existing user, guest */
-    val accountType: String? = null,
+    var accountType: String? = null,
     
     /** Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc. */
-    val paymentMethod: String? = null,
+    var paymentMethod: String? = null,
     
     /** E.g. invoice or receipt */
-    val proofOfPayment: String? = null,
+    var proofOfPayment: String? = null,
     
     /** If opted in to marketing campaigns to the email address */
-    val marketingOptIn: Boolean? = null
+    var marketingOptIn: Boolean? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */
