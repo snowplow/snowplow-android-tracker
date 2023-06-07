@@ -25,23 +25,16 @@ import java.util.*
  */
 object TrackerEvents {
     fun trackAll(tracker: TrackerController) {
-//        trackDeepLink(tracker)
-//        trackPageView(tracker)
-//        trackStructuredEvent(tracker)
+        trackDeepLink(tracker)
+        trackPageView(tracker)
+        trackStructuredEvent(tracker)
         trackScreenView(tracker)
-//        trackTimings(tracker)
-//        trackUnstructuredEvent(tracker)
-//        trackEcommerceEvent(tracker)
-//        trackConsentGranted(tracker)
-//        trackConsentWithdrawn(tracker)
-//        trackMessageNotification(tracker)
-        
-        tracker.track(ProductView(
-            Product("product123", 
-            price = 666, 
-            currency = "USD",
-            category = "homewares"
-        )))
+        trackTimings(tracker)
+        trackUnstructuredEvent(tracker)
+        trackEcommerceEvent(tracker)
+        trackConsentGranted(tracker)
+        trackConsentWithdrawn(tracker)
+        trackMessageNotification(tracker)
     }
 
     private fun trackDeepLink(tracker: TrackerController) {

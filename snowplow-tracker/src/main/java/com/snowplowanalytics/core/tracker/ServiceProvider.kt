@@ -89,7 +89,6 @@ class ServiceProvider(
             trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
         }
         getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
-        ecommerceController.registerEntities()
     }
 
     fun reset(configurations: List<Configuration>) {

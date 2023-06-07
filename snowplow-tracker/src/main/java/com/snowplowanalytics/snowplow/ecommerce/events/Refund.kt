@@ -15,8 +15,10 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a refund event. Use the same transaction ID as for the original Transaction event.
@@ -44,7 +46,7 @@ class Refund(
     
     /** The products to be refunded. */
     var products: List<Product>? = null
-) : AbstractSelfDescribing() {
+) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -53,13 +55,38 @@ class Refund(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.refund
-            payload["products"] = products
-            payload[Parameters.ECOMM_REFUND_ID] = transactionId
-            payload[Parameters.ECOMM_REFUND_CURRENCY] = currency
-            payload[Parameters.ECOMM_REFUND_AMOUNT] = refundAmount
-            payload[Parameters.ECOMM_REFUND_REASON] = refundReason
+            payload["type"] = EcommerceAction.refund.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() {
+            val entities = mutableListOf<SelfDescribingJson>()
+            products?.let {
+                for (product in it) {
+                    entities.add(productToSdj(product))
+                }
+            }
+            entities.add(refundToSdj(transactionId, currency, refundAmount, refundReason))
+            return entities
+        }
+
+    private fun refundToSdj(transactionId: String,
+                                currency: String,
+                                refundAmount: Number,
+                                refundReason: String?
+    ) : SelfDescribingJson {
+        val map = hashMapOf(
+            Parameters.ECOMM_REFUND_ID to transactionId,
+            Parameters.ECOMM_REFUND_CURRENCY to currency,
+            Parameters.ECOMM_REFUND_AMOUNT to refundAmount,
+            Parameters.ECOMM_REFUND_REASON to refundReason
+        )
+        map.values.removeAll(sequenceOf(null))
+
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
+            map
+        )
+    }
 }

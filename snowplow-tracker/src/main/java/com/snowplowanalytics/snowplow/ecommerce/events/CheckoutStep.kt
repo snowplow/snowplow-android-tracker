@@ -16,6 +16,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a checkout step.
@@ -78,20 +79,33 @@ class CheckoutStep(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.checkout_step
-            payload[Parameters.ECOMM_CHECKOUT_STEP] = step
-            payload[Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE] = shippingPostcode
-            payload[Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE] = billingPostcode
-            payload[Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS] = shippingFullAddress
-            payload[Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS] = billingFullAddress
-            payload[Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER] = deliveryProvider
-            payload[Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD] = deliveryMethod
-            payload[Parameters.ECOMM_CHECKOUT_COUPON_CODE] = couponCode
-            payload[Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE] = accountType
-            payload[Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD] = paymentMethod
-            payload[Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT] = proofOfPayment
-            payload[Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN] = marketingOptIn
+            payload["type"] = EcommerceAction.checkout_step.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() = listOf(checkoutToSdj())
+
+    private fun checkoutToSdj() : SelfDescribingJson {
+        val map = hashMapOf(
+            Parameters.ECOMM_CHECKOUT_STEP to step,
+            Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE to shippingPostcode,
+            Parameters.ECOMM_CHECKOUT_BILLING_POSTCODE to billingPostcode,
+            Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS to shippingFullAddress,
+            Parameters.ECOMM_CHECKOUT_BILLING_ADDRESS to billingFullAddress,
+            Parameters.ECOMM_CHECKOUT_DELIVERY_PROVIDER to deliveryProvider,
+            Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD to deliveryMethod,
+            Parameters.ECOMM_CHECKOUT_COUPON_CODE to couponCode,
+            Parameters.ECOMM_CHECKOUT_ACCOUNT_TYPE to accountType,
+            Parameters.ECOMM_CHECKOUT_PAYMENT_METHOD to paymentMethod,
+            Parameters.ECOMM_CHECKOUT_PROOF_OF_PAYMENT to proofOfPayment,
+            Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN to marketingOptIn,
+        )
+        map.values.removeAll(sequenceOf(null))
+
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_CHECKOUT_STEP,
+            map
+        )
+    }
 }

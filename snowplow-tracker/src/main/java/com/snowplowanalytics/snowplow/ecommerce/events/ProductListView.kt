@@ -14,8 +14,10 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a product list view.
@@ -23,7 +25,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param products - List of products viewed by the visitor.
  * @param name - The list name.
  */
-class ProductListView(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
+class ProductListView(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -32,10 +34,17 @@ class ProductListView(var products: List<Product>, var name: String? = null) : A
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.list_view
+            payload["type"] = EcommerceAction.list_view.toString()
             name?.let { payload["name"] = it }
-            payload["products"] = products
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() {
+            val entities = mutableListOf<SelfDescribingJson>()
+            for (product in products) {
+                entities.add(productToSdj(product))
+            }
+            return entities
+        }
 }

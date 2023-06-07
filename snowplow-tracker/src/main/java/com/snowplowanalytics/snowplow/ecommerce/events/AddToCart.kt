@@ -15,8 +15,10 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a product or products being added to cart.
@@ -34,20 +36,20 @@ class AddToCart(
     var products: List<Product>,
 
     /**
-     * The total value of the cart after this interaction
+     * The total value of the cart after this interaction.
      */
     var totalValue: Number,
 
     /**
-     * The currency used for this cart (ISO 4217)
+     * The currency used for this cart (ISO 4217).
      */
     var currency: String,
 
     /**
-     * The unique ID representing this cart
+     * The unique ID representing this cart.
      */
     var cartId: String? = null
-    ) : AbstractSelfDescribing() {
+    ) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -56,12 +58,17 @@ class AddToCart(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart
-            payload[Parameters.ECOMM_CART_ID] = cartId
-            payload[Parameters.ECOMM_CART_VALUE] = totalValue
-            payload[Parameters.ECOMM_CART_CURRENCY] = currency
-            payload[Parameters.ECOMM_PRODUCTS] = products
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() {
+            val entities = mutableListOf<SelfDescribingJson>()
+            for (product in products) {
+                entities.add(productToSdj(product))
+            }
+            entities.add(cartToSdj(cartId, totalValue, currency))
+            return entities
+        }
 }

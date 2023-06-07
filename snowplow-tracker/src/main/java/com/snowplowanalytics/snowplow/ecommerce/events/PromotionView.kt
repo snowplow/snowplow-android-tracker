@@ -14,15 +14,17 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a promotion view.
  *
  * @param promotion - The promotion viewed by the visitor.
  */
-class PromotionView(var promotion: Promotion) : AbstractSelfDescribing() {
+class PromotionView(var promotion: Promotion) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -31,9 +33,10 @@ class PromotionView(var promotion: Promotion) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.promo_view
-            payload["promotion"] = promotion
+            payload["type"] = EcommerceAction.promo_view.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() = listOf(promotionToSdj(promotion))
 }

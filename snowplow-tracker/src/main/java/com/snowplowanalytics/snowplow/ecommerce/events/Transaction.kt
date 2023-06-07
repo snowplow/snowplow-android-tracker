@@ -15,8 +15,10 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a transaction event.
@@ -88,7 +90,7 @@ class Transaction(
     * Products in the transaction.
     */
     var products: List<Product>? = null
-) : AbstractSelfDescribing() {
+) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -97,19 +99,40 @@ class Transaction(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.transaction
-            payload["products"] = products
-            payload[Parameters.ECOMM_TRANSACTION_ID] = transactionId
-            payload[Parameters.ECOMM_TRANSACTION_REVENUE] = revenue
-            payload[Parameters.ECOMM_TRANSACTION_CURRENCY] = currency
-            payload[Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD] = paymentMethod
-            payload[Parameters.ECOMM_TRANSACTION_QUANTITY] = totalQuantity
-            payload[Parameters.ECOMM_TRANSACTION_TAX] = tax
-            payload[Parameters.ECOMM_TRANSACTION_SHIPPING] = shipping
-            payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE] = discountCode
-            payload[Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT] = discountAmount
-            payload[Parameters.ECOMM_TRANSACTION_CREDIT_ORDER] = creditOrder
+            payload["type"] = EcommerceAction.transaction.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() {
+            val entities = mutableListOf<SelfDescribingJson>()
+            products?.let { 
+                for (product in it) {
+                    entities.add(productToSdj(product))
+                }
+            }
+            entities.add(transactionInfoToSdj())
+            return entities
+        }
+
+    private fun transactionInfoToSdj() : SelfDescribingJson {
+        val map = hashMapOf(
+            Parameters.ECOMM_TRANSACTION_ID to transactionId,
+            Parameters.ECOMM_TRANSACTION_REVENUE to revenue,
+            Parameters.ECOMM_TRANSACTION_CURRENCY to currency,
+            Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to paymentMethod,
+            Parameters.ECOMM_TRANSACTION_QUANTITY to totalQuantity,
+            Parameters.ECOMM_TRANSACTION_TAX to tax,
+            Parameters.ECOMM_TRANSACTION_SHIPPING to shipping,
+            Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to discountCode,
+            Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to discountAmount,
+            Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to creditOrder
+        )
+        map.values.removeAll(sequenceOf(null))
+
+        return SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION,
+            map
+        )
+    }
 }

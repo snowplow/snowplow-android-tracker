@@ -15,15 +15,17 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a product view/detail.
  *
  * @param product - The product that was viewed in a product detail page.
  */
-class ProductView(var product: Product) : AbstractSelfDescribing() {
+class ProductView(var product: Product) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String
@@ -32,9 +34,10 @@ class ProductView(var product: Product) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.product_view
-            payload[Parameters.ECOMM_PRODUCT] = product
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.product_view.toString()
             return payload
         }
-    
+
+    override val entitiesForProcessing: List<SelfDescribingJson>?
+        get() = listOf(productToSdj(product))
 }
