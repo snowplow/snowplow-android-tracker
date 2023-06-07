@@ -42,7 +42,7 @@ class TrackerControllerImpl  // Constructors
         get() = serviceProvider.getOrMakeSessionController()
     
     override val ecommerce: EcommerceControllerImpl
-        get() = serviceProvider.getOrMakeEcommerceController()
+        get() = serviceProvider.ecommerceController
     override val session: SessionController?
         get() {
             val sessionController = sessionController

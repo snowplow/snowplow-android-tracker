@@ -49,7 +49,9 @@ class ServiceProvider(
     private var subjectController: SubjectControllerImpl? = null
     private var sessionController: SessionControllerImpl? = null
     private var gdprController: GdprControllerImpl? = null
-    private var ecommerceController: EcommerceControllerImpl? = null
+    override val ecommerceController: EcommerceControllerImpl by lazy {
+        EcommerceControllerImpl(this)
+    }
     override val pluginsController: PluginsControllerImpl by lazy {
         PluginsControllerImpl(this)
     }
@@ -87,7 +89,7 @@ class ServiceProvider(
             trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
         }
         getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
-        getOrMakeEcommerceController().registerEntities()
+        ecommerceController.registerEntities()
     }
 
     fun reset(configurations: List<Configuration>) {
@@ -216,10 +218,6 @@ class ServiceProvider(
 
     override fun getOrMakeNetworkController(): NetworkControllerImpl {
         return networkController ?: makeNetworkController().also { networkController = it }
-    }
-
-    override fun getOrMakeEcommerceController(): EcommerceControllerImpl {
-        return ecommerceController ?: makeEcommerceController().also { ecommerceController = it }
     }
 
     // Factories
@@ -351,10 +349,6 @@ class ServiceProvider(
 
     private fun makeNetworkController(): NetworkControllerImpl {
         return NetworkControllerImpl(this)
-    }
-
-    private fun makeEcommerceController(): EcommerceControllerImpl {
-        return EcommerceControllerImpl(this)
     }
 
     // Plugins

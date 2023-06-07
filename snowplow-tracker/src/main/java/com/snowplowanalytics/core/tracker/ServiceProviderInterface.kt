@@ -38,8 +38,8 @@ interface ServiceProviderInterface {
     fun getOrMakeGlobalContextsController(): GlobalContextsControllerImpl
     fun getOrMakeSubjectController(): SubjectControllerImpl
     fun getOrMakeSessionController(): SessionControllerImpl
-    fun getOrMakeEcommerceController(): EcommerceControllerImpl
     val pluginsController: PluginsControllerImpl
+    val ecommerceController: EcommerceControllerImpl
 
     // Configuration Updates
     val trackerConfigurationUpdate: TrackerConfigurationUpdate
