@@ -116,7 +116,7 @@ class MediaEventAndEntitySerializationTest {
         val entity = session.entity(stats)
         assertEquals(mediaSchema("session"), entity.map["schema"] as? String)
         val data = entity.map["data"] as? Map<*, *>
-        assertEquals("xxx", data?.get("id"))
+        assertEquals("xxx", data?.get("mediaSessionId"))
         assertEquals(getDateTimeFromDate(date), data?.get("startedAt"))
         assertEquals(13, data?.get("pingInterval"))
         assertEquals(10.0, data?.get("timePlayed"))
