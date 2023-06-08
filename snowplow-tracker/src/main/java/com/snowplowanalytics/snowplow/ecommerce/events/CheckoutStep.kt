@@ -36,7 +36,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  */
 class CheckoutStep @JvmOverloads constructor(
     /** Checkout step index */
-    var step: Number,
+    var step: Int,
     
     /** Shipping address postcode */
     var shippingPostcode: String? = null,
