@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick
@@ -36,11 +37,28 @@ class PromotionClickTest {
             "top_slot"
         )
         val event = PromotionClick(promotion)
+
+        val map = hashMapOf<String, Any>(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_PROMOTION,
+            "data" to hashMapOf(
+                Parameters.ECOMM_PROMO_ID to "promo_id",
+                Parameters.ECOMM_PROMO_NAME to "name",
+                Parameters.ECOMM_PROMO_PRODUCT_IDS to listOf("abc", "def", "xyz"),
+                Parameters.ECOMM_PROMO_POSITION to 4,
+                Parameters.ECOMM_PROMO_CREATIVE_ID to "creative",
+                Parameters.ECOMM_PROMO_TYPE to "banner",
+                Parameters.ECOMM_PROMO_SLOT to "top_slot"
+            )
+        )
+        
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.promo_click.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PROMOTION))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PROMOTION], promotion)
+
+        val entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(1, entities!!.size)
+        Assert.assertEquals(map, entities[0].map)
     }
 }

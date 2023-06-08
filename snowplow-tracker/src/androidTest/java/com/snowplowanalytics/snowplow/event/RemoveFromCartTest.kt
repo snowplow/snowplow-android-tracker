@@ -48,19 +48,16 @@ class RemoveFromCartTest {
             currency = "GBP"
         )
         
-        var event = RemoveFromCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
-        var data: Map<String, Any?> = event.dataPayload
+        val event = RemoveFromCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
+        val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.remove_from_cart.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))
-        Assert.assertNull(data[Parameters.ECOMM_CART_ID])
-        Assert.assertEquals(data[Parameters.ECOMM_CART_VALUE], 123.45)
-        Assert.assertEquals(data[Parameters.ECOMM_CART_CURRENCY], "GBP")
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_CART_CURRENCY))
 
-        event = RemoveFromCart(listOf(product1), 0.5, "USD", "id")
-        data = event.dataPayload
-        Assert.assertEquals(data[Parameters.ECOMM_CART_ID], "id")
+        val entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(3, entities!!.size)
     }
 }

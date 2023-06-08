@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
@@ -42,11 +43,35 @@ class ProductViewTest {
             creativeId = "ecomm1"
         )
         val event = ProductView(product)
+
+        val map = hashMapOf<String, Any>(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT,
+            "data" to hashMapOf<String, Any>(
+                Parameters.ECOMM_PRODUCT_ID to "product ID",
+                Parameters.ECOMM_PRODUCT_NAME to "product name",
+                Parameters.ECOMM_PRODUCT_CATEGORY to "category",
+                Parameters.ECOMM_PRODUCT_PRICE to 100,
+                Parameters.ECOMM_PRODUCT_LIST_PRICE to 110,
+                Parameters.ECOMM_PRODUCT_QUANTITY to 2,
+                Parameters.ECOMM_PRODUCT_SIZE to "small",
+                Parameters.ECOMM_PRODUCT_VARIANT to "black/black",
+                Parameters.ECOMM_PRODUCT_BRAND to "Snowplow",
+                Parameters.ECOMM_PRODUCT_INVENTORY_STATUS to "backorder",
+                Parameters.ECOMM_PRODUCT_POSITION to 1,
+                Parameters.ECOMM_PRODUCT_CURRENCY to "GBP",
+                Parameters.ECOMM_PRODUCT_CREATIVE_ID to "ecomm1"
+            )
+        )
+        
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.product_view.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCT))
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_PRODUCT_ID))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCT], product)
+
+        val entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(1, entities!!.size)
+        Assert.assertEquals(map, entities[0].map)
     }
 }

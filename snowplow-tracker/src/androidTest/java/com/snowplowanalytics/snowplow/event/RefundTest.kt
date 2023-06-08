@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.ecommerce.events.Refund
@@ -35,13 +36,23 @@ class RefundTest {
         )
 
         val event = Refund("id", currency = "USD", refundAmount = 123.45, products = listOf(product1))
+
+        val map = hashMapOf<String, Any>(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
+            "data" to hashMapOf(
+                Parameters.ECOMM_REFUND_ID to "id",
+                Parameters.ECOMM_REFUND_CURRENCY to "USD",
+                Parameters.ECOMM_REFUND_AMOUNT to 123.45,
+            )
+        )
+        
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.refund.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
-        Assert.assertEquals(listOf(product1), data[Parameters.ECOMM_PRODUCTS])
-        Assert.assertEquals("id", data[Parameters.ECOMM_REFUND_ID])
-        Assert.assertEquals("USD", data[Parameters.ECOMM_REFUND_CURRENCY])
-        Assert.assertEquals(123.45, data[Parameters.ECOMM_REFUND_AMOUNT])
+
+        val entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(2, entities!!.size)
+        Assert.assertEquals(map, entities[1].map)
     }
 }

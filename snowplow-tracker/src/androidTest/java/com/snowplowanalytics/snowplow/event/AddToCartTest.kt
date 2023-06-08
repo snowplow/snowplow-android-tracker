@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
@@ -49,18 +50,36 @@ class AddToCartTest {
         )
         
         var event = AddToCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
-        var data: Map<String, Any?> = event.dataPayload
+        var cartMap = hashMapOf<String, Any>(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            "data" to hashMapOf<String, Any>(
+                Parameters.ECOMM_CART_VALUE to 123.45,
+                Parameters.ECOMM_CART_CURRENCY to "GBP"
+            )
+        )
+        
+        val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.add_to_cart.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_PRODUCTS))
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(data[Parameters.ECOMM_PRODUCTS], listOf(product1, product2))
-        Assert.assertNull(data[Parameters.ECOMM_CART_ID])
-        Assert.assertEquals(data[Parameters.ECOMM_CART_VALUE], 123.45)
-        Assert.assertEquals(data[Parameters.ECOMM_CART_CURRENCY], "GBP")
-
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_CART_ID))
+        
+        var entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(3, entities!!.size)
+        Assert.assertEquals(cartMap, entities[2].map)
+        
         event = AddToCart(listOf(product1), 0.5, "USD", "id")
-        data = event.dataPayload
-        Assert.assertEquals(data[Parameters.ECOMM_CART_ID], "id")
+        cartMap = hashMapOf(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            "data" to hashMapOf<String, Any>(
+                Parameters.ECOMM_CART_VALUE to 0.5,
+                Parameters.ECOMM_CART_CURRENCY to "USD",
+                Parameters.ECOMM_CART_ID to "id",
+            ))
+        
+        entities = event.entitiesForProcessing
+        Assert.assertEquals(cartMap, entities!![1].map)
     }
 }

@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.event
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
 import org.junit.Assert
@@ -26,16 +27,32 @@ class CheckoutStepTest {
     @Test
     fun testExpectedForm() {
         val event = CheckoutStep(step = 5,
+            "postcode",
+            shippingFullAddress = "full address",
             deliveryMethod = "stork",
-            marketingOptIn = true)
+            marketingOptIn = true
+        )
+        val map = hashMapOf<String, Any>(
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CHECKOUT_STEP,
+            "data" to hashMapOf<String, Any>(
+                Parameters.ECOMM_CHECKOUT_STEP to 5,
+                Parameters.ECOMM_CHECKOUT_SHIPPING_POSTCODE to "postcode",
+                Parameters.ECOMM_CHECKOUT_SHIPPING_ADDRESS to "full address",
+                Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD to "stork",
+                Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN to true,
+            )
+        )
+        
         val data: Map<String, Any?> = event.dataPayload
         
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.checkout_step.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertTrue(data.containsKey(Parameters.ECOMM_CHECKOUT_STEP))
+        Assert.assertFalse(data.containsKey(Parameters.ECOMM_CHECKOUT_STEP))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
-        Assert.assertEquals(5, data[Parameters.ECOMM_CHECKOUT_STEP])
-        Assert.assertEquals("stork", data[Parameters.ECOMM_CHECKOUT_DELIVERY_METHOD])
-        Assert.assertEquals(true, data[Parameters.ECOMM_CHECKOUT_MARKETING_OPT_IN])
+
+        val entities = event.entitiesForProcessing
+        Assert.assertNotNull(entities)
+        Assert.assertEquals(1, entities!!.size)
+        Assert.assertEquals(map, entities[0].map)
     }
 }
