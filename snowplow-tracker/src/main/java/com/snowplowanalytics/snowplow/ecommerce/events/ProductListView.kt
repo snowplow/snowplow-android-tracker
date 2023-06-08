@@ -25,7 +25,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param products - List of products viewed by the visitor.
  * @param name - The list name.
  */
-class ProductListView(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
+class ProductListView @JvmOverloads constructor(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String

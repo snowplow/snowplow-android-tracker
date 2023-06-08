@@ -28,7 +28,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param currency - Currency used for the cart.
  * @param cartId - Cart identifier.
  */
-class AddToCart(
+class AddToCart @JvmOverloads constructor(
 
     /**
      * List of product(s) that were added to the cart.

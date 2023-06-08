@@ -25,7 +25,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param product - Information about the product that was clicked.
  * @param name - The list name.
  */
-class ProductListClick(var product: Product, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
+class ProductListClick @JvmOverloads constructor(var product: Product, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
 
     /** The event schema */
     override val schema: String

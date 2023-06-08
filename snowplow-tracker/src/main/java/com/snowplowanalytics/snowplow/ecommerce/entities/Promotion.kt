@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.ecommerce.entities
 /**
  * Used for the PromotionClick and PromotionView events in Ecommercer
  */
-data class Promotion(
+data class Promotion @JvmOverloads constructor(
     /**
      * The ID of the promotion.
      */

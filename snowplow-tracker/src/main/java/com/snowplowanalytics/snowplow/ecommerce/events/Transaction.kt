@@ -35,7 +35,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param creditOrder Whether the transaction is a credit order or not.
  * @param products The products included in the transaction.
  */
-class Transaction(
+class Transaction @JvmOverloads constructor(
     /**
     * The ID of the transaction
     */

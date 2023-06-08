@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param proofOfPayment E.g. invoice or receipt
  * @param marketingOptIn If opted in to marketing campaigns to the email address. * 
  */
-class CheckoutStep(
+class CheckoutStep @JvmOverloads constructor(
     /** Checkout step index */
     var step: Number,
     

@@ -31,7 +31,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param refundReason Reason for refunding the whole or part of the transaction.
  * @param products The products to be refunded.
  */
-class Refund(
+class Refund @JvmOverloads constructor(
     /** The ID of the relevant transaction. */
     var transactionId: String,
     

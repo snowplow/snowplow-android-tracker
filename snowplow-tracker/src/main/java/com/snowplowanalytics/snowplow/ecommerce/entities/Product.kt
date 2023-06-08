@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.ecommerce.entities
 /**
  * Used for Ecommerce events.
  */
-data class Product(
+data class Product @JvmOverloads constructor(
     /**
      * The SKU or product ID
      */
