@@ -200,8 +200,9 @@ class TestMediaController {
         Thread.sleep(100)
 
         assertEquals(2, trackedEvents.size)
-        assertEquals(0.5, firstEvent.payload.get("previousRate"))
-        assertEquals(1.5, firstEvent.payload.get("newRate"))
+        val rateEvent = trackedEvents.find { it.schema == eventSchema("playback_rate_change") }
+        assertEquals(0.5, rateEvent?.payload?.get("previousRate"))
+        assertEquals(1.5, rateEvent?.payload?.get("newRate"))
         assertEquals(1.5, firstPlayer?.get("playbackRate"))
         assertEquals(1.5, secondPlayer?.get("playbackRate"))
     }
@@ -219,8 +220,9 @@ class TestMediaController {
         Thread.sleep(100)
 
         assertEquals(2, trackedEvents.size)
-        assertEquals(80, firstEvent.payload.get("previousVolume"))
-        assertEquals(90, firstEvent.payload.get("newVolume"))
+        val volumeEvent = trackedEvents.find { it.schema == eventSchema("volume_change") }
+        assertEquals(80, volumeEvent?.payload?.get("previousVolume"))
+        assertEquals(90, volumeEvent?.payload?.get("newVolume"))
         assertEquals(90, firstPlayer?.get("volume"))
         assertEquals(90, secondPlayer?.get("volume"))
     }
@@ -299,10 +301,14 @@ class TestMediaController {
 
         Thread.sleep(100)
 
-        assertEquals(15, firstEvent.payload.get("percentProgress"))
-        assertEquals(30, trackedEvents.get(1).payload.get("percentProgress"))
-        assertEquals(40, trackedEvents.get(2).payload.get("percentProgress"))
-        assertEquals(50, trackedEvents.get(3).payload.get("percentProgress"))
+        val adClickEvent = trackedEvents.find { it.schema == eventSchema("ad_click") }
+        assertEquals(15, adClickEvent?.payload?.get("percentProgress"))
+        val adSkipEvent = trackedEvents.find { it.schema == eventSchema("ad_skip") }
+        assertEquals(30, adSkipEvent?.payload?.get("percentProgress"))
+        val adResumeEvent = trackedEvents.find { it.schema == eventSchema("ad_resume") }
+        assertEquals(40, adResumeEvent?.payload?.get("percentProgress"))
+        val adPauseEvent = trackedEvents.find { it.schema == eventSchema("ad_pause") }
+        assertEquals(50, adPauseEvent?.payload?.get("percentProgress"))
     }
 
     @Test
@@ -395,7 +401,8 @@ class TestMediaController {
 
         Thread.sleep(100)
 
-        val lastSession = trackedEvents.last().entities.find { it.map.get("schema") == sessionSchema }?.map?.get("data") as? Map<*, *>
+        val endEvent = trackedEvents.find { it.schema == eventSchema("end") }
+        val lastSession = endEvent?.entities?.find { it.map.get("schema") == sessionSchema }?.map?.get("data") as? Map<*, *>
         assertNotNull(lastSession)
         assertEquals(10.0, lastSession?.get("timePlayed"))
         assertEquals(11.0, lastSession?.get("contentWatched"))
