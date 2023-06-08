@@ -56,7 +56,6 @@ import com.snowplowanalytics.snowplow.controller.TrackerController;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import com.snowplowanalytics.snowplow.tracker.InspectableEvent;
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate;
 import com.snowplowanalytics.snowplow.network.HttpMethod;
 import com.snowplowanalytics.snowplow.network.RequestCallback;
@@ -68,13 +67,12 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import com.snowplowanalytics.snowplowtrackerdemojava.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemojava.utils.TrackerEvents;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static com.snowplowanalytics.core.utils.Util.addToMap;
 
@@ -265,6 +263,11 @@ public class Demo extends Activity implements LoggerDelegate {
             Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
             callbackTrackerReady.accept(true);
         });
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setScreenType(
+                "demo_app_screen",
+                null,
+                "England/London"
+        );
         return true;
     }
 
@@ -338,6 +341,7 @@ public class Demo extends Activity implements LoggerDelegate {
                 plugin
         );
         Snowplow.subscribeToWebViewEvents(_webView);
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceUser("ecomm_user_id", null, null);
         return true;
     }
 

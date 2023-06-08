@@ -24,7 +24,8 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : EcommerceController {
-    override fun setPageType(type: String, language: String?, locale: String?) {
+
+    override fun setScreenType(type: String, language: String?, locale: String?) {
         val plugin = PluginConfiguration("ecommercePageTypePluginInternal")
         plugin.entities  {
             val map = mutableMapOf<String, Any>()
@@ -50,7 +51,7 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
         serviceProvider.addPlugin(plugin)
     }
 
-    override fun removePageType() {
+    override fun removeScreenType() {
         serviceProvider.removePlugin("ecommercePageTypePluginInternal")
     }
 

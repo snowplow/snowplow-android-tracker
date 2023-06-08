@@ -16,11 +16,11 @@ package com.snowplowanalytics.snowplow.ecommerce
  * Controller for managing Ecommerce entities.
  */
 interface EcommerceController {
-    fun setPageType(type: String, language: String? = null, locale: String? = null)
+    fun setScreenType(type: String, language: String? = null, locale: String? = null)
     
     fun setEcommerceUser(id: String, is_guest: Boolean? = null, email: String? = null)
     
-    fun removePageType()
+    fun removeScreenType()
     
     fun removeEcommerceUser()
 }
