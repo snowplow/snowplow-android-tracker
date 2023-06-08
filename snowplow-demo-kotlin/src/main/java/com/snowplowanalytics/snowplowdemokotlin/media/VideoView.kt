@@ -17,7 +17,7 @@ import android.content.Context
 import android.util.AttributeSet
 
 class VideoView : android.widget.VideoView {
-    private var _player: VideoPlayer? = null
+    private var viewController: VideoViewController? = null
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -27,23 +27,23 @@ class VideoView : android.widget.VideoView {
         defStyle
     )
 
-    fun setVideoPlayer(player: VideoPlayer?) {
-        _player = player
+    fun setVideoPlayer(player: VideoViewController?) {
+        viewController = player
     }
 
     override fun start() {
         super.start()
-        _player?.resumePlayback()
+        viewController?.onPlay()
     }
 
     override fun pause() {
         super.pause()
-        _player?.pausePlayback()
+        viewController?.onPause()
     }
 
     override fun seekTo(msec: Int) {
         super.seekTo(msec)
-        _player?.seekStart()
+        viewController?.onSeekStart()
     }
 }
 

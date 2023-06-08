@@ -34,7 +34,7 @@ class MediaSessionEntity(
                 "startedAt" to getDateTimeFromDate(startedAt),
                 "pingInterval" to pingInterval,
                 "timePlayed" to roundDuration(stats.timePlayed),
-                "timePlayed" to roundDuration(stats.timePlayed),
+                "timePaused" to roundDuration(stats.timePaused),
                 "timePlayedMuted" to roundDuration(stats.timePlayedMuted),
                 "timeSpentAds" to roundDuration(stats.timeSpentAds),
                 "timeBuffering" to roundDuration(stats.timeBuffering),
@@ -42,7 +42,7 @@ class MediaSessionEntity(
                 "adBreaks" to if (stats.adBreaks > 0) { stats.adBreaks } else { null },
                 "adsSkipped" to if (stats.adsSkipped > 0) { stats.adsSkipped } else { null },
                 "adsClicked" to if (stats.adsClicked > 0) { stats.adsClicked } else { null },
-                "avgPlaybackRate" to roundStat(stats.avgPlaybackRate),
+                "avgPlaybackRate" to if (stats.avgPlaybackRate != 1.0) { roundStat(stats.avgPlaybackRate) } else { null },
                 "contentWatched" to roundDuration(stats.contentWatched),
             ).filterValues { it != null }
         )

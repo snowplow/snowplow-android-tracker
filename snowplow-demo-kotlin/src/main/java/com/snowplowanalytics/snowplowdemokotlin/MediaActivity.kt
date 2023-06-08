@@ -16,24 +16,22 @@ package com.snowplowanalytics.snowplowdemokotlin
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
-import com.snowplowanalytics.snowplowdemokotlin.media.VideoPlayer
+import com.snowplowanalytics.snowplowdemokotlin.media.VideoViewController
 
 class MediaActivity : Activity() {
-    private var player: VideoPlayer? = null
+    private var videoViewController: VideoViewController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
-        player = VideoPlayer(this)
-
         val uri = Uri.parse("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
-        player?.loadContent(uri)
+        videoViewController = VideoViewController(activity = this, uri = uri)
     }
 
     override fun onDestroy() {
-        player?.destroy()
-        player = null
+        videoViewController?.destroy()
+        videoViewController = null
         super.onDestroy()
     }
 }
