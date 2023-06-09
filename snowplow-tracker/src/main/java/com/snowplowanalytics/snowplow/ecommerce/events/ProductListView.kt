@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -25,7 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param products - List of products viewed by the visitor.
  * @param name - The list name.
  */
-class ProductListView @JvmOverloads constructor(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
+class ProductListView @JvmOverloads constructor(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -43,7 +42,7 @@ class ProductListView @JvmOverloads constructor(var products: List<Product>, var
         get() {
             val entities = mutableListOf<SelfDescribingJson>()
             for (product in products) {
-                entities.add(productToSdj(product))
+                entities.add(product.entity)
             }
             return entities
         }

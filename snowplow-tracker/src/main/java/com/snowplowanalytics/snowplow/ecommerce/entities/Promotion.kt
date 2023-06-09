@@ -12,6 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+
 /**
  * Used for the PromotionClick and PromotionView events in Ecommercer
  */
@@ -47,7 +51,21 @@ data class Promotion @JvmOverloads constructor(
     var type: String? = null,
     
     /**
-     * The website slot in which the promotional content was added to.
+     * The UI slot in which the promotional content was added to.
      */
     var slot: String? = null
-)
+) {
+    internal val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_PROMOTION,
+            mapOf(
+                Parameters.ECOMM_PROMO_ID to id,
+                Parameters.ECOMM_PROMO_NAME to name,
+                Parameters.ECOMM_PROMO_PRODUCT_IDS to productIds,
+                Parameters.ECOMM_PROMO_POSITION to position,
+                Parameters.ECOMM_PROMO_CREATIVE_ID to creativeId,
+                Parameters.ECOMM_PROMO_TYPE to type,
+                Parameters.ECOMM_PROMO_SLOT to slot
+            ).filter { it.value != null }
+        )
+}

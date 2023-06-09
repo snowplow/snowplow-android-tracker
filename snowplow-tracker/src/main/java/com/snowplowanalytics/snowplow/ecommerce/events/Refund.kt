@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -46,7 +45,7 @@ class Refund @JvmOverloads constructor(
     
     /** The products to be refunded. */
     var products: List<Product>? = null
-) : AbstractSelfDescribing(), EcommerceEvent {
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -64,29 +63,21 @@ class Refund @JvmOverloads constructor(
             val entities = mutableListOf<SelfDescribingJson>()
             products?.let {
                 for (product in it) {
-                    entities.add(productToSdj(product))
+                    entities.add(product.entity)
                 }
             }
-            entities.add(refundToSdj(transactionId, currency, refundAmount, refundReason))
+            entities.add(entity)
             return entities
         }
 
-    private fun refundToSdj(transactionId: String,
-                                currency: String,
-                                refundAmount: Number,
-                                refundReason: String?
-    ) : SelfDescribingJson {
-        val map = hashMapOf(
-            Parameters.ECOMM_REFUND_ID to transactionId,
-            Parameters.ECOMM_REFUND_CURRENCY to currency,
-            Parameters.ECOMM_REFUND_AMOUNT to refundAmount,
-            Parameters.ECOMM_REFUND_REASON to refundReason
-        )
-        map.values.removeAll(sequenceOf(null))
-
-        return SelfDescribingJson(
+    private val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
-            map
+            mapOf<String, Any?>(
+                Parameters.ECOMM_REFUND_ID to transactionId,
+                Parameters.ECOMM_REFUND_CURRENCY to currency,
+                Parameters.ECOMM_REFUND_AMOUNT to refundAmount,
+                Parameters.ECOMM_REFUND_REASON to refundReason
+            ).filter { it.value != null }
         )
-    }
 }

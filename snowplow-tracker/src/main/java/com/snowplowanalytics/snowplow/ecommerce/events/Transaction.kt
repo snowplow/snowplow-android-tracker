@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -90,7 +89,7 @@ class Transaction @JvmOverloads constructor(
     * Products in the transaction.
     */
     var products: List<Product>? = null
-) : AbstractSelfDescribing(), EcommerceEvent {
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -108,31 +107,27 @@ class Transaction @JvmOverloads constructor(
             val entities = mutableListOf<SelfDescribingJson>()
             products?.let { 
                 for (product in it) {
-                    entities.add(productToSdj(product))
+                    entities.add(product.entity)
                 }
             }
-            entities.add(transactionInfoToSdj())
+            entities.add(entity)
             return entities
         }
 
-    private fun transactionInfoToSdj() : SelfDescribingJson {
-        val map = hashMapOf(
-            Parameters.ECOMM_TRANSACTION_ID to transactionId,
-            Parameters.ECOMM_TRANSACTION_REVENUE to revenue,
-            Parameters.ECOMM_TRANSACTION_CURRENCY to currency,
-            Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to paymentMethod,
-            Parameters.ECOMM_TRANSACTION_QUANTITY to totalQuantity,
-            Parameters.ECOMM_TRANSACTION_TAX to tax,
-            Parameters.ECOMM_TRANSACTION_SHIPPING to shipping,
-            Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to discountCode,
-            Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to discountAmount,
-            Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to creditOrder
-        )
-        map.values.removeAll(sequenceOf(null))
-
-        return SelfDescribingJson(
+    private val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
             TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION,
-            map
+            mapOf<String, Any?>(
+                Parameters.ECOMM_TRANSACTION_ID to transactionId,
+                Parameters.ECOMM_TRANSACTION_REVENUE to revenue,
+                Parameters.ECOMM_TRANSACTION_CURRENCY to currency,
+                Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to paymentMethod,
+                Parameters.ECOMM_TRANSACTION_QUANTITY to totalQuantity,
+                Parameters.ECOMM_TRANSACTION_TAX to tax,
+                Parameters.ECOMM_TRANSACTION_SHIPPING to shipping,
+                Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to discountCode,
+                Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to discountAmount,
+                Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to creditOrder
+            ).filter { it.value != null }
         )
-    }
 }

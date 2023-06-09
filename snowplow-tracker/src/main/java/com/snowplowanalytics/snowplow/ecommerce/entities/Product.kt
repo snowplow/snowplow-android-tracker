@@ -12,6 +12,10 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.entities
 
+import com.snowplowanalytics.core.constants.Parameters
+import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+
 /**
  * Used for Ecommerce events.
  */
@@ -81,4 +85,24 @@ data class Product @JvmOverloads constructor(
      * Identifier/Name/Url for the creative presented on a list or product view.
      */
     var creativeId: String? = null
-)
+) {
+    internal val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_PRODUCT,
+            mapOf<String, Any?>(
+                Parameters.ECOMM_PRODUCT_ID to id,
+                Parameters.ECOMM_PRODUCT_NAME to name,
+                Parameters.ECOMM_PRODUCT_CATEGORY to category,
+                Parameters.ECOMM_PRODUCT_PRICE to price,
+                Parameters.ECOMM_PRODUCT_LIST_PRICE to listPrice,
+                Parameters.ECOMM_PRODUCT_QUANTITY to quantity,
+                Parameters.ECOMM_PRODUCT_SIZE to size,
+                Parameters.ECOMM_PRODUCT_VARIANT to variant,
+                Parameters.ECOMM_PRODUCT_BRAND to brand,
+                Parameters.ECOMM_PRODUCT_INVENTORY_STATUS to inventoryStatus,
+                Parameters.ECOMM_PRODUCT_POSITION to position,
+                Parameters.ECOMM_PRODUCT_CURRENCY to currency,
+                Parameters.ECOMM_PRODUCT_CREATIVE_ID to creativeId
+            ).filter { it.value != null }
+        )
+}

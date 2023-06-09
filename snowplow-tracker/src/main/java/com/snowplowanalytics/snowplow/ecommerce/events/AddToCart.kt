@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -49,7 +48,7 @@ class AddToCart @JvmOverloads constructor(
      * The unique ID representing this cart.
      */
     var cartId: String? = null
-    ) : AbstractSelfDescribing(), EcommerceEvent {
+    ) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -66,9 +65,19 @@ class AddToCart @JvmOverloads constructor(
         get() {
             val entities = mutableListOf<SelfDescribingJson>()
             for (product in products) {
-                entities.add(productToSdj(product))
+                entities.add(product.entity)
             }
-            entities.add(cartToSdj(cartId, totalValue, currency))
+            entities.add(entity)
             return entities
         }
+
+    private val entity: SelfDescribingJson
+        get() = SelfDescribingJson(
+            TrackerConstants.SCHEMA_ECOMMERCE_CART,
+            mapOf<String, Any?>(
+                Parameters.ECOMM_CART_ID to cartId,
+                Parameters.ECOMM_CART_VALUE to totalValue,
+                Parameters.ECOMM_CART_CURRENCY to currency,
+            ).filter { it.value != null }
+        )
 }

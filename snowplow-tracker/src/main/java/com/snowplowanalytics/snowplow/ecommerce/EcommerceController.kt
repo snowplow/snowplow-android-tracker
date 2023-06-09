@@ -16,11 +16,24 @@ package com.snowplowanalytics.snowplow.ecommerce
  * Controller for managing Ecommerce entities.
  */
 interface EcommerceController {
+
+    /**
+     * Add an ecommerce Screen/Page entity to all subsequent events.
+     */
     fun setScreenType(type: String, language: String? = null, locale: String? = null)
-    
+
+    /**
+     * Add an ecommerce User entity to all subsequent events.
+     */
     fun setEcommerceUser(id: String, is_guest: Boolean? = null, email: String? = null)
-    
+
+    /**
+     * Stop adding a Screen/Page entity to events.
+     */
     fun removeScreenType()
-    
+
+    /**
+     * Stop adding a User entity to events.
+     */
     fun removeEcommerceUser()
 }

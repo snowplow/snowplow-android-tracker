@@ -15,7 +15,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -25,7 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  *
  * @param product - The product that was viewed in a product detail page.
  */
-class ProductView(var product: Product) : AbstractSelfDescribing(), EcommerceEvent {
+class ProductView(var product: Product) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -39,5 +38,5 @@ class ProductView(var product: Product) : AbstractSelfDescribing(), EcommerceEve
         }
 
     override val entitiesForProcessing: List<SelfDescribingJson>?
-        get() = listOf(productToSdj(product))
+        get() = listOf(product.entity)
 }

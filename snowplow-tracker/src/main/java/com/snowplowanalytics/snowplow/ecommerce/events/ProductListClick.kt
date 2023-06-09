@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Product
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -25,7 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param product - Information about the product that was clicked.
  * @param name - The list name.
  */
-class ProductListClick @JvmOverloads constructor(var product: Product, var name: String? = null) : AbstractSelfDescribing(), EcommerceEvent {
+class ProductListClick @JvmOverloads constructor(var product: Product, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -40,5 +39,5 @@ class ProductListClick @JvmOverloads constructor(var product: Product, var name:
         }
 
     override val entitiesForProcessing: List<SelfDescribingJson>?
-        get() = listOf(productToSdj(product))
+        get() = listOf(product.entity)
 }

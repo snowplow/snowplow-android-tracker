@@ -14,7 +14,6 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.core.ecommerce.EcommerceEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -24,7 +23,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  *
  * @param promotion - The promotion selected by the visitor.
  */
-class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing(), EcommerceEvent {
+class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -38,5 +37,5 @@ class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing(), Ecomm
         }
 
     override val entitiesForProcessing: List<SelfDescribingJson>?
-        get() = listOf(promotionToSdj(promotion))
+        get() = listOf(promotion.entity)
 }
