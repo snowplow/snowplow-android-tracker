@@ -263,7 +263,7 @@ public class Demo extends Activity implements LoggerDelegate {
             Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
             callbackTrackerReady.accept(true);
         });
-        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setPageType(
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
                 "demo_app_screen",
                 null,
                 "England/London"

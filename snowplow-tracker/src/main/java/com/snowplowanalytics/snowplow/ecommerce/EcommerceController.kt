@@ -20,7 +20,7 @@ interface EcommerceController {
     /**
      * Add an ecommerce Screen/Page entity to all subsequent events.
      */
-    fun setPageType(type: String, language: String? = null, locale: String? = null)
+    fun setEcommerceScreen(type: String, language: String? = null, locale: String? = null)
 
     /**
      * Add an ecommerce User entity to all subsequent events.
@@ -30,7 +30,7 @@ interface EcommerceController {
     /**
      * Stop adding a Screen/Page entity to events.
      */
-    fun removePageType()
+    fun removeEcommerceScreen()
 
     /**
      * Stop adding a User entity to events.
