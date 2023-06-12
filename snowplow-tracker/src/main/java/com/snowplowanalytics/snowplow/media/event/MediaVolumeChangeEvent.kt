@@ -21,12 +21,12 @@ import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 /**
  * Media player event sent when the volume has changed.
  *
- * @param previousVolume Volume percentage before the change. If not set, the previous volume is taken from the last setting in media player.
  * @param newVolume Volume percentage after the change.
+ * @param previousVolume Volume percentage before the change. If not set, the previous volume is taken from the last setting in media player.
  */
-class MediaVolumeChangeEvent(
-    var previousVolume: Int? = null,
+class MediaVolumeChangeEvent @JvmOverloads constructor (
     var newVolume: Int,
+    var previousVolume: Int? = null,
 ) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
         get() = MediaSchemata.eventSchema("volume_change")

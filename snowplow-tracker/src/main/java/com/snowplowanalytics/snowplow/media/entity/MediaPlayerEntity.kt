@@ -36,7 +36,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param quality Quality level of the playback (e.g., 1080p, 720p)
  * @param volume Volume percent (0 is muted, 100 is max)
  */
-data class MediaPlayerEntity(
+data class MediaPlayerEntity @JvmOverloads constructor(
     var currentTime: Double? = null,
     var duration: Double? = null,
     var ended: Boolean? = null,

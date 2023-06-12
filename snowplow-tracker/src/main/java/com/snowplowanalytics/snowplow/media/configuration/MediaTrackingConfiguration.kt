@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
  * @param entities Additional context entities to attach to media events.
  * @param captureEvents List of event types to allow tracking. If not specified (`null`), all tracked events will be allowed and tracked. Otherwise, tracked event types not present in the list will be discarded.
  */
-data class MediaTrackingConfiguration(
+data class MediaTrackingConfiguration @JvmOverloads constructor(
     val id: String,
     var player: MediaPlayerEntity? = null,
     var pings: Boolean = true,

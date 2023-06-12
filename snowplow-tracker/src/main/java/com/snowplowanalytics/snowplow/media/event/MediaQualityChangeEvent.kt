@@ -21,15 +21,15 @@ import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 /**
  * Media player event tracked when the video playback quality changes.
  *
- * @param previousQuality Quality level before the change (e.g., 1080p). If not set, the previous quality is taken from the last setting in media player.
  * @param newQuality Quality level after the change (e.g., 1080p).
+ * @param previousQuality Quality level before the change (e.g., 1080p). If not set, the previous quality is taken from the last setting in media player.
  * @param bitrate The current bitrate in bits per second.
  * @param framesPerSecond The current number of frames per second.
  * @param automatic Whether the change was automatic or triggered by the user.
  */
-class MediaQualityChangeEvent(
-    var previousQuality: String? = null,
+class MediaQualityChangeEvent @JvmOverloads constructor (
     var newQuality: String? = null,
+    var previousQuality: String? = null,
     var bitrate: Int? = null,
     var framesPerSecond: Int? = null,
     var automatic: Boolean? = null

@@ -23,7 +23,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
  * @param errorName Name for the type of error that occurred in the playback. E.g. forbidden.
  * @param errorDescription Longer description for the error that occurred in the playback.
  */
-class MediaErrorEvent(
+class MediaErrorEvent @JvmOverloads constructor(
     var errorCode: String? = null,
     var errorName: String? = null,
     var errorDescription: String? = null

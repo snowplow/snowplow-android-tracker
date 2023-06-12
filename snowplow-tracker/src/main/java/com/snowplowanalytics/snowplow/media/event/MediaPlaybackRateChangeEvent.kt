@@ -21,12 +21,12 @@ import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 /**
  * Media player event sent when the playback rate has changed.
  *
- * @param previousRate Playback rate before the change (1 is normal). If not set, the previous rate is taken from the last setting in media player.
  * @param newRate Playback rate after the change (1 is normal).
+ * @param previousRate Playback rate before the change (1 is normal). If not set, the previous rate is taken from the last setting in media player.
  */
-class MediaPlaybackRateChangeEvent(
-    var previousRate: Double? = null,
-    var newRate: Double
+class MediaPlaybackRateChangeEvent @JvmOverloads constructor (
+    var newRate: Double,
+    var previousRate: Double? = null
 ) : AbstractSelfDescribing(), MediaPlayerUpdatingEvent {
     override val schema: String
         get() = MediaSchemata.eventSchema("playback_rate_change")
