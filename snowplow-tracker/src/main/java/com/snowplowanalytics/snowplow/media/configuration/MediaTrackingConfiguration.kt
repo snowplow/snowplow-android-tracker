@@ -42,5 +42,8 @@ data class MediaTrackingConfiguration(
     var entities: List<SelfDescribingJson>? = null,
     var captureEvents: List<KClass<*>>? = null,
     ) {
-    constructor(id: String, player: MediaPlayerEntity? = null) : this(id, player, true, null, null, true, null, null, null)
+    fun setCaptureEvents(captureEvents: List<Class<*>>?): MediaTrackingConfiguration {
+        this.captureEvents = captureEvents?.map { it.kotlin }
+        return this
+    }
 }
