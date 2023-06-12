@@ -303,7 +303,7 @@ class Demo : Activity(), LoggerDelegate {
         plugin.afterTrack { event: InspectableEvent -> 
             println("Tracked event with ${event.entities.size} entities")
         }
-        
+
         createTracker(
             applicationContext,
             namespace,

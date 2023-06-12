@@ -35,8 +35,6 @@ data class MediaAdEntity @JvmOverloads constructor(
     var duration: Double? = null,
     var skippable: Boolean? = null,
 ) {
-    constructor(adId: String) : this(name = null, adId = adId)
-
     internal val entity: SelfDescribingJson
         get() = SelfDescribingJson(
             MediaSchemata.adSchema,
