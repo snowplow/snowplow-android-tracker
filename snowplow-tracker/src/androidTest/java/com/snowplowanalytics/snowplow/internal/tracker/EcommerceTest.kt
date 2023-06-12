@@ -421,7 +421,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
         
-        tracker.ecommerce.setScreenType(type = "listing", language = "DE", locale = "DE")
+        tracker.ecommerce.setPageType(type = "listing", language = "DE", locale = "DE")
         
         tracker.track(ScreenView("screen"))
         waitForEvents(networkConnection, 1)
@@ -436,7 +436,7 @@ class EcommerceTest {
 
 
         // replacing earlier Page
-        tracker.ecommerce.setScreenType(type = "home_screen", language = "EN-GB")
+        tracker.ecommerce.setPageType(type = "home_screen", language = "EN-GB")
 
         tracker.track(Structured("category", "action"))
         waitForEvents(networkConnection, 2)
@@ -450,7 +450,7 @@ class EcommerceTest {
         Assert.assertFalse(pageEntities[0].has("locale"))
         
         // removing Page
-        tracker.ecommerce.removeScreenType()
+        tracker.ecommerce.removePageType()
         tracker.track(ScreenView("productA"))
         waitForEvents(networkConnection, 3)
 

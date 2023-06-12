@@ -221,7 +221,7 @@ class Demo : Activity(), LoggerDelegate {
                 defaultTracker!!.emitter.requestCallback = requestCallback
                 callbackTrackerReady.accept(true)
             })
-        defaultTracker?.ecommerce?.setScreenType("demo_app_screen", locale = "England/London")
+        defaultTracker?.ecommerce?.setPageType("demo_app_screen", locale = "England/London")
         return true
     }
 
