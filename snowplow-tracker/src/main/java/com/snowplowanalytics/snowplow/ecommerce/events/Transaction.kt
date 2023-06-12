@@ -24,64 +24,64 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  *
  * @param transactionId The ID of the transaction.
  * @param revenue The total value of the transaction.
- * @param currency The currency used for the transaction.
- * @param paymentMethod The payment method used for the transaction.
+ * @param currency The currency used (ISO 4217).
+ * @param paymentMethod The payment method used.
  * @param totalQuantity Total quantity of items in the transaction.
  * @param tax Total amount of tax on the transaction.
  * @param shipping Total cost of shipping on the transaction.
  * @param discountCode Discount code used.
  * @param discountAmount Discount amount taken off.
- * @param creditOrder Whether the transaction is a credit order or not.
- * @param products The products included in the transaction.
+ * @param creditOrder Whether it is a credit order or not.
+ * @param products The product(s) included in the transaction.
  */
 class Transaction @JvmOverloads constructor(
     /**
-    * The ID of the transaction
+    * The ID of the transaction.
     */
     var transactionId: String,
     
     /**
-    * The total value of the transaction
+    * The total value of the transaction.
     */
     var revenue: Number,
     
     /**
-    * The currency used for the transaction
+    * The currency used for the transaction (ISO 4217).
     */
     var currency: String,
     
     /**
-    * The payment method used for the transaction
+    * The payment method used for the transaction.
     */
     var paymentMethod: String,
     
     /**
-    * Total quantity of items in the transaction
+    * Total quantity of items in the transaction.
     */
     var totalQuantity: Int,
     
     /**
-    * Total amount of tax on the transaction
+    * Total amount of tax on the transaction.
     */
     var tax: Number? = null,
     
     /**
-    * Total cost of shipping on the transaction
+    * Total cost of shipping on the transaction.
     */
     var shipping: Number? = null,
     
     /**
-    * Discount code used
+    * Discount code used.
     */
     var discountCode: String? = null,
     
     /**
-    * Discount amount taken off
+    * Discount amount taken off.
     */
     var discountAmount: Number? = null,
     
     /**
-    * Whether the transaction is a credit order or not
+    * Whether the transaction is a credit order or not.
     */
     var creditOrder: Boolean? = null,
     

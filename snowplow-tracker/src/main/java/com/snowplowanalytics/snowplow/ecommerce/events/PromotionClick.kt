@@ -19,9 +19,9 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a promotion click.
+ * Track a promotion click or selection.
  *
- * @param promotion - The promotion selected by the visitor.
+ * @param promotion - The promotion selected.
  */
 class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing() {
 

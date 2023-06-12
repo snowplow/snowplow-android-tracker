@@ -24,7 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  *
  * @param products - List of product(s) that were added to the cart.
  * @param totalValue - Total value of the cart after the product(s) were added.
- * @param currency - Currency used for the cart.
+ * @param currency - Currency used for the cart (ISO 4217).
  * @param cartId - Cart identifier.
  */
 class AddToCart @JvmOverloads constructor(
@@ -60,7 +60,7 @@ class AddToCart @JvmOverloads constructor(
             payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart.toString()
             return payload
         }
-
+    
     override val entitiesForProcessing: List<SelfDescribingJson>?
         get() {
             val entities = mutableListOf<SelfDescribingJson>()

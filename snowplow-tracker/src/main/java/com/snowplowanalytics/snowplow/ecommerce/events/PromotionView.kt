@@ -21,11 +21,11 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Track a promotion view.
  *
- * @param promotion - The promotion viewed by the visitor.
+ * @param promotion - The promotion viewed.
  */
 class PromotionView(var promotion: Promotion) : AbstractSelfDescribing() {
 
-    /** The event schema */
+    /** The event schema. */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
     

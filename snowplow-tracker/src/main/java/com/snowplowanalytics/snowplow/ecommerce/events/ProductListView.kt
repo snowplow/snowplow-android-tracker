@@ -21,7 +21,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Track a product list view.
  *
- * @param products - List of products viewed by the visitor.
+ * @param products - List of products viewed.
  * @param name - The list name.
  */
 class ProductListView @JvmOverloads constructor(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {

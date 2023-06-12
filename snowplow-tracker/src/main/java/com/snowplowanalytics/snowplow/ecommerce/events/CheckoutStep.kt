@@ -27,39 +27,39 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param shippingFullAddress Full shipping address.
  * @param billingFullAddress Full billing address.
  * @param deliveryProvider Can be used to discern delivery providers e.g. DHL, PostNL etc.
- * @param deliveryMethod Store pickup, standard delivery, express delivery, international...
+ * @param deliveryMethod Store pickup, standard delivery, express delivery, international, etc.
  * @param couponCode Coupon applied at checkout.
  * @param accountType Type of account used on checkout, e.g. existing user, guest.
  * @param paymentMethod Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc.
- * @param proofOfPayment E.g. invoice or receipt
- * @param marketingOptIn If opted in to marketing campaigns to the email address. * 
+ * @param proofOfPayment E.g. invoice or receipt.
+ * @param marketingOptIn If opted in to marketing campaigns to the email address.
  */
 class CheckoutStep @JvmOverloads constructor(
-    /** Checkout step index */
+    /** Checkout step index. */
     var step: Int,
     
-    /** Shipping address postcode */
+    /** Shipping address postcode. */
     var shippingPostcode: String? = null,
     
-    /** Billing address postcode */
+    /** Billing address postcode. */
     var billingPostcode: String? = null,
     
-    /** Full shipping address */
+    /** Full shipping address. */
     var shippingFullAddress: String? = null,
     
-    /** Full billing address */
+    /** Full billing address. */
     var billingFullAddress: String? = null,
     
     /** Can be used to discern delivery providers DHL, PostNL etc. */
     var deliveryProvider: String? = null,
     
-    /** E.g. store pickup, standard delivery, express delivery, international */
+    /** E.g. store pickup, standard delivery, express delivery, international. */
     var deliveryMethod: String? = null,
     
-    /** Coupon applied at checkout */
+    /** Coupon applied at checkout. */
     var couponCode: String? = null,
     
-    /** Type of account used on checkout, e.g. existing user, guest */
+    /** Type of account used on checkout, e.g. existing user, guest. */
     var accountType: String? = null,
     
     /** Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc. */
@@ -68,7 +68,7 @@ class CheckoutStep @JvmOverloads constructor(
     /** E.g. invoice or receipt */
     var proofOfPayment: String? = null,
     
-    /** If opted in to marketing campaigns to the email address */
+    /** If opted in to marketing campaigns to the email address. */
     var marketingOptIn: Boolean? = null
 ) : AbstractSelfDescribing() {
 

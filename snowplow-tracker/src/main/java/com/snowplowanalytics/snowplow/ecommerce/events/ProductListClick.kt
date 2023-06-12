@@ -19,9 +19,9 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a product list click event.
+ * Track a product list click or selection event.
  *
- * @param product - Information about the product that was clicked.
+ * @param product - Information about the product that was selected.
  * @param name - The list name.
  */
 class ProductListClick @JvmOverloads constructor(var product: Product, var name: String? = null) : AbstractSelfDescribing() {

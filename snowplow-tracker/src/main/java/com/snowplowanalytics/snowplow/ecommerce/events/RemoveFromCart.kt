@@ -24,7 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  *
  * @param products - List of product(s) that were removed from the cart.
  * @param totalValue - Total value of the cart after the product(s) were removed.
- * @param currency - Currency used for the cart.
+ * @param currency - Currency used for the cart (ISO 4217).
  * @param cartId - Cart identifier.
  */
 class RemoveFromCart @JvmOverloads constructor(

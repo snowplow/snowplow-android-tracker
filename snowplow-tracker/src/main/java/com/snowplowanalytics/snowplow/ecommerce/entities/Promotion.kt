@@ -17,7 +17,8 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Used for the PromotionClick and PromotionView events in Ecommercer
+ * Provided to certain Ecommerce events. The Promotion properties will be sent with the event as a
+ * Promotion entity.
  */
 data class Promotion @JvmOverloads constructor(
     /**
@@ -41,12 +42,12 @@ data class Promotion @JvmOverloads constructor(
     var position: Int? = null,
     
     /**
-     * Identifier/Name/Url for the creative presented on the promotion.
+     * Identifier, name, or url for the creative presented on the promotion.
      */
     var creativeId: String? = null,
     
     /**
-     * Type of the promotion delivery mechanism. E.g. popup, banner, intra-content
+     * Type of the promotion delivery mechanism. E.g. popup, banner, intra-content.
      */
     var type: String? = null,
     
