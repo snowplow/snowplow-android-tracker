@@ -20,20 +20,7 @@ import com.snowplowanalytics.snowplow.util.Basis
  * Allows the GDPR configuration of the tracker. Provide a [GdprConfiguration] when creating a tracker 
  * to attach a GDPR entity to every event.
  */
-open class GdprConfiguration
-/**
- * Enables GDPR entity to be sent with each event.
- *
- * @param basisForProcessing  GDPR Basis for processing.
- * @param documentId          ID of a GDPR basis document.
- * @param documentVersion     Version of the document.
- * @param documentDescription Description of the document.
- */(
-    basisForProcessing: Basis? = null,
-    documentId: String? = null,
-    documentVersion: String? = null,
-    documentDescription: String? = null
-) : Configuration, GdprConfigurationInterface {
+open class GdprConfiguration : Configuration, GdprConfigurationInterface {
 
     /**
      * Fallback configuration to read from in case requested values are not present in this configuration.
@@ -50,7 +37,7 @@ open class GdprConfiguration
         get() = _gdpr ?: sourceConfig?.gdpr
         set(value) { _gdpr = value }
 
-    private var _basisForProcessing: Basis? = basisForProcessing
+    private var _basisForProcessing: Basis? = null
     /**
      * Basis for processing.
      */
@@ -58,7 +45,7 @@ open class GdprConfiguration
         get() = _basisForProcessing ?: sourceConfig?.basisForProcessing ?: Basis.CONTRACT
         set(value) { _basisForProcessing = value }
 
-    private var _documentId: String? = documentId
+    private var _documentId: String? = null
     /**
      * ID of a GDPR basis document.
      */
@@ -66,7 +53,7 @@ open class GdprConfiguration
         get() = _documentId ?: sourceConfig?.documentId
         set(value) { _documentId = value }
 
-    private var _documentVersion: String? = documentVersion
+    private var _documentVersion: String? = null
     /**
      * Version of the document.
      */
@@ -74,13 +61,35 @@ open class GdprConfiguration
         get() = _documentVersion ?: sourceConfig?.documentVersion
         set(value) { _documentVersion = value }
 
-    private var _documentDescription: String? = documentDescription
+    private var _documentDescription: String? = null
     /**
      * Description of the document.
      */
     override var documentDescription: String?
         get() = _documentDescription ?: sourceConfig?.documentDescription
         set(value) { _documentDescription = value }
+
+    /**
+     * Enables GDPR entity to be sent with each event.
+     *
+     * @param basisForProcessing  GDPR Basis for processing.
+     * @param documentId          ID of a GDPR basis document.
+     * @param documentVersion     Version of the document.
+     * @param documentDescription Description of the document.
+     */
+    constructor(
+        basisForProcessing: Basis,
+        documentId: String?,
+        documentVersion: String?,
+        documentDescription: String?
+    ) {
+        this._basisForProcessing = basisForProcessing
+        this._documentId = documentId
+        this._documentVersion = documentVersion
+        this._documentDescription = documentDescription
+    }
+
+    internal constructor()
 
     // Copyable
     override fun copy(): GdprConfiguration {
