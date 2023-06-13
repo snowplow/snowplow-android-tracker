@@ -43,6 +43,14 @@ class RemoteConfigurationBundle : Configuration {
         configurationBundle = tempBundle.toList()
     }
 
+    fun updateSourceConfig(sourceRemoteBundle: RemoteConfigurationBundle) {
+        for (bundle in configurationBundle) {
+            sourceRemoteBundle.configurationBundle.find { it.namespace == bundle.namespace }?.let {
+                bundle.updateSourceConfig(it)
+            }
+        }
+    }
+
     // Copyable
     override fun copy(): Configuration {
         val copy = RemoteConfigurationBundle(schema)

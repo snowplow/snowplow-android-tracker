@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 object EmitterDefaults {
     var httpMethod = HttpMethod.POST
     var bufferOption = BufferOption.DefaultGroup
-    var requestSecurity = Protocol.HTTPS
+    var httpProtocol = Protocol.HTTPS
     var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
     var emitRange: Int = 150
     var emitterTick = 5

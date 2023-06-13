@@ -54,6 +54,7 @@ class RemoteConfigurationProvider @JvmOverloads constructor(
                 cacheBundle = cache.readCache(context)
             }
             if (cacheBundle != null) {
+                defaultBundle?.let { cacheBundle?.updateSourceConfig(it) }
                 onFetchCallback.accept(Pair(cacheBundle, ConfigurationState.CACHED))
             } else if (defaultBundle != null) {
                 onFetchCallback.accept(Pair(defaultBundle, ConfigurationState.DEFAULT))
@@ -63,18 +64,19 @@ class RemoteConfigurationProvider @JvmOverloads constructor(
             context,
             remoteConfiguration,
             object : Consumer<RemoteConfigurationBundle> {
-                override fun accept(remoteConfigurationBundle: RemoteConfigurationBundle) {
-                    if (!schemaCompatibility(remoteConfigurationBundle.schema)) {
+                override fun accept(bundle: RemoteConfigurationBundle) {
+                    if (!schemaCompatibility(bundle.schema)) {
                         return
                     }
                     synchronized(this) {
-                        val isNewer = (cacheBundle ?: defaultBundle)?.let { it.configurationVersion < remoteConfigurationBundle.configurationVersion } ?: true
+                        val isNewer = (cacheBundle ?: defaultBundle)?.let { it.configurationVersion < bundle.configurationVersion } ?: true
                         if (isNewer) {
-                            cache.writeCache(context, remoteConfigurationBundle)
-                            cacheBundle = remoteConfigurationBundle
+                            defaultBundle?.let { bundle.updateSourceConfig(it) }
+                            cache.writeCache(context, bundle)
+                            cacheBundle = bundle
                             onFetchCallback.accept(
                                 Pair(
-                                    remoteConfigurationBundle,
+                                    bundle,
                                     ConfigurationState.FETCHED
                                 )
                             )

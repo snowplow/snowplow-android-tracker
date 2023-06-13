@@ -15,9 +15,9 @@ package com.snowplowanalytics.snowplow.tracker
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.snowplowanalytics.core.emitter.EmitterConfigurationUpdate
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.snowplow.configuration.Configuration
+import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
@@ -51,7 +51,7 @@ class ServiceProviderTest {
 
         // refresh configuration
         val configurationUpdates: MutableList<Configuration> = ArrayList()
-        configurationUpdates.add(EmitterConfigurationUpdate())
+        configurationUpdates.add(EmitterConfiguration())
         provider.reset(configurationUpdates)
 
         // track event and check that emitter is paused

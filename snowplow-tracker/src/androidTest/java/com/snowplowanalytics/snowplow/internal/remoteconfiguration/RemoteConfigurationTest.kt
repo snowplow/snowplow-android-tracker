@@ -20,10 +20,7 @@ import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationCache
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationFetcher
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvider
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
-import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
-import com.snowplowanalytics.snowplow.configuration.ConfigurationState
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
+import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -496,6 +493,32 @@ class RemoteConfigurationTest {
             Assert.assertEquals(2, numCallbackCalls)
             Assert.assertEquals(ConfigurationState.FETCHED, lastConfigurationState)
         }
+    }
+
+    @Test
+    fun testKeepsPropertiesOfSourceConfigurationIfNotOverridenInRemote() {
+        val bundle1 = ConfigurationBundle("ns1")
+        bundle1.trackerConfiguration = TrackerConfiguration("app-1")
+        bundle1.subjectConfiguration = SubjectConfiguration()
+            .domainUserId("duid1")
+            .userId("u1")
+
+        val bundle2 = ConfigurationBundle("ns1")
+        bundle2.subjectConfiguration = SubjectConfiguration()
+            .domainUserId("duid2")
+
+        val remoteBundle1 = RemoteConfigurationBundle("")
+        remoteBundle1.configurationBundle = listOf(bundle1)
+
+        val remoteBundle2 = RemoteConfigurationBundle("")
+        remoteBundle2.configurationBundle = listOf(bundle2)
+
+        remoteBundle2.updateSourceConfig(remoteBundle1)
+
+        val finalBundle = remoteBundle2.configurationBundle.first()
+        Assert.assertEquals("app-1", finalBundle.trackerConfiguration?.appId)
+        Assert.assertEquals("u1", finalBundle.subjectConfiguration?.userId)
+        Assert.assertEquals("duid2", finalBundle.subjectConfiguration?.domainUserId)
     }
 
     // Private methods

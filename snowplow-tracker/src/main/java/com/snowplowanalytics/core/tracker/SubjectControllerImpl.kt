@@ -14,6 +14,7 @@ package com.snowplowanalytics.core.tracker
 
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
+import com.snowplowanalytics.snowplow.configuration.SubjectConfiguration
 import com.snowplowanalytics.snowplow.controller.SubjectController
 import com.snowplowanalytics.snowplow.util.Size
 
@@ -94,6 +95,6 @@ class SubjectControllerImpl  // Constructors
     // Private methods
     private val subject: Subject
         get() = serviceProvider.getOrMakeSubject()
-    private val dirtyConfig: SubjectConfigurationUpdate
-        get() = serviceProvider.subjectConfigurationUpdate
+    private val dirtyConfig: SubjectConfiguration
+        get() = serviceProvider.subjectConfiguration
 }

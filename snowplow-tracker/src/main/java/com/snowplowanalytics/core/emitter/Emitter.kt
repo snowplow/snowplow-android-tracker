@@ -208,7 +208,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The request security selected for the emitter
      */
-    var requestSecurity: Protocol = EmitterDefaults.requestSecurity
+    var requestSecurity: Protocol = EmitterDefaults.httpProtocol
         /**
          * Sets the Protocol for the Emitter
          * @param security the Protocol

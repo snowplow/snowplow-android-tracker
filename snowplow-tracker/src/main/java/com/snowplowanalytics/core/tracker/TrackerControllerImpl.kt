@@ -15,6 +15,7 @@ package com.snowplowanalytics.core.tracker
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.session.SessionControllerImpl
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.*
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.media.controller.MediaController
@@ -211,8 +212,8 @@ class TrackerControllerImpl  // Constructors
             }
             return serviceProvider.getOrMakeTracker()
         }
-    private val dirtyConfig: TrackerConfigurationUpdate
-        get() = serviceProvider.trackerConfigurationUpdate
+    private val dirtyConfig: TrackerConfiguration
+        get() = serviceProvider.trackerConfiguration
 
     companion object {
         private val TAG = TrackerControllerImpl::class.java.simpleName

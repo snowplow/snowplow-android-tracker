@@ -15,6 +15,7 @@ package com.snowplowanalytics.core.emitter
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
+import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.controller.NetworkController
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.OkHttpNetworkConnection
@@ -46,7 +47,6 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
         get() = emitter.customPostPath
         set(customPostPath) {
             dirtyConfig.customPostPath = customPostPath
-            dirtyConfig.customPostPathUpdated = true
             emitter.customPostPath = customPostPath
         }
     
@@ -60,6 +60,6 @@ class NetworkControllerImpl(serviceProvider: ServiceProviderInterface) :
     private val emitter: Emitter
         get() = serviceProvider.getOrMakeEmitter()
     
-    private val dirtyConfig: NetworkConfigurationUpdate
-        get() = serviceProvider.networkConfigurationUpdate
+    private val dirtyConfig: NetworkConfiguration
+        get() = serviceProvider.networkConfiguration
 }
