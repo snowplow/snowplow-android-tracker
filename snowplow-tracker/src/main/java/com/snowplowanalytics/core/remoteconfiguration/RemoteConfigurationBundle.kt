@@ -17,7 +17,7 @@ import com.snowplowanalytics.snowplow.configuration.Configuration
 import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
 import org.json.JSONObject
 
-class FetchedConfigurationBundle : Configuration {
+class RemoteConfigurationBundle : Configuration {
     var schema: String
     var configurationVersion: Int
     var configurationBundle: List<ConfigurationBundle>
@@ -45,7 +45,7 @@ class FetchedConfigurationBundle : Configuration {
 
     // Copyable
     override fun copy(): Configuration {
-        val copy = FetchedConfigurationBundle(schema)
+        val copy = RemoteConfigurationBundle(schema)
         copy.configurationVersion = configurationVersion
         
         val tempBundle = ArrayList<ConfigurationBundle>()

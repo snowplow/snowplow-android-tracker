@@ -16,10 +16,10 @@ import android.annotation.SuppressLint
 import androidx.core.util.Pair
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationCache
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationFetcher
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider
-import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationCache
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationFetcher
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvider
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
 import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
 import com.snowplowanalytics.snowplow.configuration.ConfigurationState
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
@@ -55,16 +55,16 @@ class RemoteConfigurationTest {
                     + "}"
                     + "]}")
         val json = JSONObject(config)
-        val fetchedConfigurationBundle = FetchedConfigurationBundle(context, json)
+        val remoteConfigurationBundle = RemoteConfigurationBundle(context, json)
         Assert.assertEquals(
             "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
-            fetchedConfigurationBundle.schema
+            remoteConfigurationBundle.schema
         )
-        Assert.assertEquals(12, fetchedConfigurationBundle.configurationVersion.toLong())
-        Assert.assertEquals(2, fetchedConfigurationBundle.configurationBundle.size.toLong())
+        Assert.assertEquals(12, remoteConfigurationBundle.configurationVersion.toLong())
+        Assert.assertEquals(2, remoteConfigurationBundle.configurationBundle.size.toLong())
 
         // Regular setup
-        var configurationBundle = fetchedConfigurationBundle.configurationBundle[0]
+        var configurationBundle = remoteConfigurationBundle.configurationBundle[0]
         Assert.assertEquals("default1", configurationBundle.namespace)
         Assert.assertNotNull(configurationBundle.networkConfiguration)
         Assert.assertNotNull(configurationBundle.trackerConfiguration)
@@ -78,7 +78,7 @@ class RemoteConfigurationTest {
         Assert.assertEquals(60, sessionConfiguration!!.foregroundTimeout.convert(TimeUnit.SECONDS))
 
         // Regular setup without NetworkConfiguration
-        configurationBundle = fetchedConfigurationBundle.configurationBundle[1]
+        configurationBundle = remoteConfigurationBundle.configurationBundle[1]
         Assert.assertEquals("default2", configurationBundle.namespace)
         Assert.assertNull(configurationBundle.networkConfiguration)
         Assert.assertNotNull(configurationBundle.subjectConfiguration)
@@ -96,14 +96,14 @@ class RemoteConfigurationTest {
 
             val expectation = Any() as Object
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            ConfigurationFetcher(
+            RemoteConfigurationFetcher(
                 context,
                 remoteConfig
-            ) { fetchedConfigurationBundle: FetchedConfigurationBundle ->
-                Assert.assertNotNull(fetchedConfigurationBundle)
+            ) { remoteConfigurationBundle: RemoteConfigurationBundle ->
+                Assert.assertNotNull(remoteConfigurationBundle)
                 Assert.assertEquals(
                     "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
-                    fetchedConfigurationBundle.schema
+                    remoteConfigurationBundle.schema
                 )
                 synchronized(expectation) { expectation.notify() }
             }
@@ -117,14 +117,14 @@ class RemoteConfigurationTest {
         val bundle = ConfigurationBundle("test")
         bundle.networkConfiguration = NetworkConfiguration("endpoint")
         val expected =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         expected.configurationVersion = 12
         expected.configurationBundle = listOf(bundle)
         val remoteConfiguration = RemoteConfiguration("http://example.com", HttpMethod.GET)
-        var cache = ConfigurationCache(remoteConfiguration)
+        var cache = RemoteConfigurationCache(remoteConfiguration)
         cache.clearCache(context)
         cache.writeCache(context, expected)
-        cache = ConfigurationCache(remoteConfiguration)
+        cache = RemoteConfigurationCache(remoteConfiguration)
         val config = cache.readCache(context)
         Assert.assertEquals(
             expected.configurationVersion.toLong(),
@@ -158,7 +158,7 @@ class RemoteConfigurationTest {
             val expectation = Any() as Object
             val expectationNotified = AtomicBoolean(false)
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            ConfigurationFetcher(
+            RemoteConfigurationFetcher(
                 context,
                 remoteConfig
             ) {
@@ -177,11 +177,11 @@ class RemoteConfigurationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         withMockServer(500, "{}") { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
 
             // test
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(context, false) { Assert.fail() }
             Thread.sleep(1000)
         }
@@ -197,11 +197,11 @@ class RemoteConfigurationTest {
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
         ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
 
             // test
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(context, false) { Assert.fail() }
             Thread.sleep(1000)
         }
@@ -217,23 +217,23 @@ class RemoteConfigurationTest {
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
         ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
             val bundle = ConfigurationBundle("namespace")
             bundle.networkConfiguration = NetworkConfiguration("endpoint")
             val cached =
-                FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
 
             // test
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             var numCalls = 0
             provider.retrieveConfiguration(
                 context,
                 false
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 val fetchedConfigurationBundle = pair.first
                 Assert.assertEquals(ConfigurationState.CACHED, pair.second)
                 if (numCalls == 1 || fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
@@ -258,23 +258,23 @@ class RemoteConfigurationTest {
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}"
         ) { _, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
             val bundle = ConfigurationBundle("namespace")
             bundle.networkConfiguration = NetworkConfiguration("endpoint")
             val cached =
-                FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
 
             // test
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             var numCalls = 0
             provider.retrieveConfiguration(
                 context,
                 false
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 val fetchedConfigurationBundle = pair.first
                 Assert.assertEquals(
                     if (numCalls == 0) ConfigurationState.CACHED else ConfigurationState.FETCHED,
@@ -299,21 +299,21 @@ class RemoteConfigurationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         withMockServer(404, "{}") { mockWebServer, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
             val bundle = ConfigurationBundle("namespace")
             bundle.networkConfiguration = NetworkConfiguration("endpoint")
             val cached =
-                FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
             val expectation = Any() as Object
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(
                 context,
                 false
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 Assert.assertEquals(ConfigurationState.CACHED, pair.second)
                 synchronized(expectation) { expectation.notify() }
             }
@@ -337,17 +337,17 @@ class RemoteConfigurationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         withMockServer(404, "{}") { mockWebServer, endpoint ->
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val cache = ConfigurationCache(remoteConfig)
+            val cache = RemoteConfigurationCache(remoteConfig)
             cache.clearCache(context)
             val bundle = ConfigurationBundle("namespace")
             bundle.networkConfiguration = NetworkConfiguration("endpoint")
             val cached =
-                FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
             val expectation = Any() as Object
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(
                 context,
                 false
@@ -367,7 +367,7 @@ class RemoteConfigurationTest {
             provider.retrieveConfiguration(
                 context,
                 true
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 val fetchedConfigurationBundle = pair.first
                 if (fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
                     numCallbackCalls++
@@ -386,14 +386,14 @@ class RemoteConfigurationTest {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
-        val cache = ConfigurationCache(cachedRemoteConfig)
+        val cache = RemoteConfigurationCache(cachedRemoteConfig)
         cache.clearCache(context)
 
         // write configuration (version 2) to cache
         val bundle = ConfigurationBundle("namespace")
         bundle.networkConfiguration = NetworkConfiguration("endpoint")
         val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 2
         cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
@@ -406,12 +406,12 @@ class RemoteConfigurationTest {
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val provider = ConfigurationProvider(remoteConfig)
+            val provider = RemoteConfigurationProvider(remoteConfig)
             var numCallbackCalls = 0
             provider.retrieveConfiguration(
                 context,
                 true
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 val fetchedConfigurationBundle = pair.first
                 numCallbackCalls++
                 // should be the non-cache configuration (version 1)
@@ -431,7 +431,7 @@ class RemoteConfigurationTest {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
-        ConfigurationCache(cachedRemoteConfig).clearCache(context)
+        RemoteConfigurationCache(cachedRemoteConfig).clearCache(context)
 
         // stub request for configuration (return version 1)
         withMockServer(
@@ -441,7 +441,7 @@ class RemoteConfigurationTest {
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val provider = ConfigurationProvider(
+            val provider = RemoteConfigurationProvider(
                 remoteConfiguration = remoteConfig,
                 defaultBundles = listOf(
                     ConfigurationBundle("namespace", NetworkConfiguration("http://localhost"))
@@ -452,7 +452,7 @@ class RemoteConfigurationTest {
             provider.retrieveConfiguration(
                 context,
                 false
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 numCallbackCalls++
                 Assert.assertEquals(ConfigurationState.DEFAULT, pair.second)
             }
@@ -466,7 +466,7 @@ class RemoteConfigurationTest {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
-        ConfigurationCache(cachedRemoteConfig).clearCache(context)
+        RemoteConfigurationCache(cachedRemoteConfig).clearCache(context)
 
         // stub request for configuration (return version 2)
         withMockServer(
@@ -476,7 +476,7 @@ class RemoteConfigurationTest {
 
             // retrieve remote configuration
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
-            val provider = ConfigurationProvider(
+            val provider = RemoteConfigurationProvider(
                 remoteConfiguration = remoteConfig,
                 defaultBundles = listOf(
                     ConfigurationBundle("namespace", NetworkConfiguration("http://localhost"))
@@ -488,7 +488,7 @@ class RemoteConfigurationTest {
             provider.retrieveConfiguration(
                 context,
                 false
-            ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
                 numCallbackCalls++
                 lastConfigurationState = pair.second
             }

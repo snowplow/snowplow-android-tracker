@@ -24,19 +24,19 @@ import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
  * This class fetch a configuration from a remote source otherwise it provides a cached configuration.
  * It can manage multiple sources and multiple caches.
  */
-class ConfigurationProvider @JvmOverloads constructor(
+class RemoteConfigurationProvider @JvmOverloads constructor(
     private val remoteConfiguration: RemoteConfiguration,
     defaultBundles: List<ConfigurationBundle>? = null,
     defaultBundleVersion: Int = Int.MIN_VALUE
 ) {
-    private val cache: ConfigurationCache = ConfigurationCache(remoteConfiguration)
-    private var fetcher: ConfigurationFetcher? = null
-    private var defaultBundle: FetchedConfigurationBundle? = null
-    private var cacheBundle: FetchedConfigurationBundle? = null
+    private val cache: RemoteConfigurationCache = RemoteConfigurationCache(remoteConfiguration)
+    private var fetcher: RemoteConfigurationFetcher? = null
+    private var defaultBundle: RemoteConfigurationBundle? = null
+    private var cacheBundle: RemoteConfigurationBundle? = null
 
     init {
         if (defaultBundles != null) {
-            val bundle = FetchedConfigurationBundle("1.0")
+            val bundle = RemoteConfigurationBundle("1.0")
             bundle.configurationVersion = defaultBundleVersion
             bundle.configurationBundle = defaultBundles
             defaultBundle = bundle
@@ -47,7 +47,7 @@ class ConfigurationProvider @JvmOverloads constructor(
     fun retrieveConfiguration(
         context: Context,
         onlyRemote: Boolean,
-        onFetchCallback: Consumer<Pair<FetchedConfigurationBundle, ConfigurationState>>
+        onFetchCallback: Consumer<Pair<RemoteConfigurationBundle, ConfigurationState>>
     ) {
         if (!onlyRemote) {
             if (cacheBundle == null) {
@@ -59,22 +59,22 @@ class ConfigurationProvider @JvmOverloads constructor(
                 onFetchCallback.accept(Pair(defaultBundle, ConfigurationState.DEFAULT))
             }
         }
-        fetcher = ConfigurationFetcher(
+        fetcher = RemoteConfigurationFetcher(
             context,
             remoteConfiguration,
-            object : Consumer<FetchedConfigurationBundle> {
-                override fun accept(fetchedConfigurationBundle: FetchedConfigurationBundle) {
-                    if (!schemaCompatibility(fetchedConfigurationBundle.schema)) {
+            object : Consumer<RemoteConfigurationBundle> {
+                override fun accept(remoteConfigurationBundle: RemoteConfigurationBundle) {
+                    if (!schemaCompatibility(remoteConfigurationBundle.schema)) {
                         return
                     }
                     synchronized(this) {
-                        val isNewer = (cacheBundle ?: defaultBundle)?.let { it.configurationVersion < fetchedConfigurationBundle.configurationVersion } ?: true
+                        val isNewer = (cacheBundle ?: defaultBundle)?.let { it.configurationVersion < remoteConfigurationBundle.configurationVersion } ?: true
                         if (isNewer) {
-                            cache.writeCache(context, fetchedConfigurationBundle)
-                            cacheBundle = fetchedConfigurationBundle
+                            cache.writeCache(context, remoteConfigurationBundle)
+                            cacheBundle = remoteConfigurationBundle
                             onFetchCallback.accept(
                                 Pair(
-                                    fetchedConfigurationBundle,
+                                    remoteConfigurationBundle,
                                     ConfigurationState.FETCHED
                                 )
                             )
