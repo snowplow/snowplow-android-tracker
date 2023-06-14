@@ -22,6 +22,7 @@ import com.snowplowanalytics.core.utils.Util.joinLongList
 import com.snowplowanalytics.core.utils.Util.mapHasKeys
 import com.snowplowanalytics.core.utils.Util.serialize
 import com.snowplowanalytics.core.utils.Util.timestamp
+import com.snowplowanalytics.core.utils.Util.truncateUrlScheme
 import com.snowplowanalytics.core.utils.Util.uUIDString
 import org.junit.Assert
 import org.junit.Test
@@ -119,5 +120,24 @@ class UtilTest {
         addToMap("hello", "world", map)
         Assert.assertEquals(1, map.size.toLong())
         Assert.assertEquals("world", map["hello"])
+    }
+
+    @Test
+    fun testTruncateUrlSchemeDoesntChangeValidUrl() {
+        val url = "https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/#snowplow-events"
+        Assert.assertEquals(url, truncateUrlScheme(url))
+    }
+
+    @Test
+    fun testTruncateUrlSchemeDoesntChangeInvalidUrl() {
+        val url = "this is not a valid URL"
+        Assert.assertEquals(url, truncateUrlScheme(url))
+    }
+
+    @Test
+    fun testTruncateUrlSchemeTruncatesLongUrlScheme() {
+        val url = "12345678901234567890://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/#snowplow-events"
+        val truncated = "1234567890123456://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/#snowplow-events"
+        Assert.assertEquals(truncated, truncateUrlScheme(url))
     }
 }

@@ -363,4 +363,13 @@ object Util {
         e.printStackTrace(pw)
         return sw.toString()
     }
+
+    fun truncateUrlScheme(url: String): String {
+        val parts = url.split("://")
+        if (parts.size > 1) {
+            val updatedParts = listOf(parts.first().take(16)) + parts.drop(1)
+            return updatedParts.joinToString("://")
+        }
+        return url
+    }
 }
