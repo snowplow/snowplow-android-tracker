@@ -45,7 +45,8 @@ class RemoteConfigurationTest {
                     + "{\"namespace\": \"default1\","
                     + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplow.io\",\"method\":\"get\"},"
                     + "\"trackerConfiguration\": {\"applicationContext\":false,\"screenContext\":false},"
-                    + "\"sessionConfiguration\": {\"backgroundTimeout\":60,\"foregroundTimeout\":60}"
+                    + "\"sessionConfiguration\": {\"backgroundTimeout\":60,\"foregroundTimeout\":60},"
+                    + "\"emitterConfiguration\": {\"serverAnonymisation\":true,\"customRetryForStatusCodes\":{\"500\":true}}"
                     + "},"
                     + "{\"namespace\": \"default2\","
                     + "\"subjectConfiguration\": {\"userId\":\"testUserId\"}"
@@ -73,6 +74,9 @@ class RemoteConfigurationTest {
         Assert.assertFalse(trackerConfiguration!!.applicationContext)
         val sessionConfiguration = configurationBundle.sessionConfiguration
         Assert.assertEquals(60, sessionConfiguration!!.foregroundTimeout.convert(TimeUnit.SECONDS))
+        val emitterConfiguration = configurationBundle.emitterConfiguration
+        Assert.assertTrue(emitterConfiguration!!.serverAnonymisation)
+        Assert.assertEquals(mapOf(500 to true), emitterConfiguration.customRetryForStatusCodes)
 
         // Regular setup without NetworkConfiguration
         configurationBundle = remoteConfigurationBundle.configurationBundle[1]
@@ -139,6 +143,30 @@ class RemoteConfigurationTest {
             configBundle.networkConfiguration!!.endpoint
         )
         Assert.assertNull(configBundle.trackerConfiguration)
+    }
+
+    @Test
+    fun testCacheEmitterConfiguration() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val bundle = ConfigurationBundle("test", NetworkConfiguration("endpoint"))
+        bundle.emitterConfiguration = EmitterConfiguration()
+            .serverAnonymisation(true)
+            .customRetryForStatusCodes(mapOf(500 to true))
+        val expected =
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+        expected.configurationVersion = 12
+        expected.configurationBundle = listOf(bundle)
+
+        val remoteConfiguration = RemoteConfiguration("http://example.com", HttpMethod.GET)
+        var cache = RemoteConfigurationCache(remoteConfiguration)
+        cache.clearCache(context)
+        cache.writeCache(context, expected)
+        cache = RemoteConfigurationCache(remoteConfiguration)
+        val config = cache.readCache(context)
+        val emitterConfig = config?.configurationBundle?.first()?.emitterConfiguration
+
+        Assert.assertTrue(emitterConfig?.serverAnonymisation ?: false)
+        Assert.assertEquals(mapOf(500 to true), emitterConfig?.customRetryForStatusCodes)
     }
 
     @Test
