@@ -14,7 +14,7 @@
 package com.snowplowanalytics.snowplow.media.entity
 
 /**
- * Type of ads within the break
+ * Type of ads within the break.
  */
 enum class MediaAdBreakType {
     /// Take full control of the video for a period of time

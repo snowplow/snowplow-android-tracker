@@ -18,12 +18,12 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Properties for the ad break context entity attached to media events during ad break playback.
- * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/ad_break/jsonschema/1-0-0`
+ * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/ad_break/jsonschema/1-0-0`.
  *
- * @param breakId An identifier for the ad break
- * @param name Ad break name (e.g., pre-roll, mid-roll, and post-roll)
- * @param breakType Type of ads within the break
- * @param podSize The number of ads to be played within the ad break
+ * @param breakId An identifier for the ad break.
+ * @param name Ad break name (e.g., pre-roll, mid-roll, and post-roll).
+ * @param breakType Type of ads within the break.
+ * @param podSize The number of ads to be played within the ad break.
  */
 data class MediaAdBreakEntity @JvmOverloads constructor(
     var breakId: String,

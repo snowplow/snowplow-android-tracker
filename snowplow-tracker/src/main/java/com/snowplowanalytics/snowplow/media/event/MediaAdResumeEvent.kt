@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 /**
  * Media player event fired when the user resumed playing the ad creative after it had been stopped or paused.
  *
- * @param percentProgress The percentage of the ad that was played when the user resumed it
+ * @param percentProgress The percentage of the ad that was played when the user resumed it.
  */
 class MediaAdResumeEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
     override val schema: String

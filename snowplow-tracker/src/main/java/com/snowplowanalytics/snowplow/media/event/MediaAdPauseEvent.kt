@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 /**
  * Media player event fired when the user clicked the pause control and stopped the ad creative.
  *
- * @param percentProgress The percentage of the ad that was played when the user paused it
+ * @param percentProgress The percentage of the ad that was played when the user paused it.
  */
 class MediaAdPauseEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
     override val schema: String

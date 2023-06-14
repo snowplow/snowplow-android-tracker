@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 /**
  * Media player event fired when the user activated a skip control to skip the ad creative.
  *
- * @param percentProgress The percentage of the ad that was played when the user skipped it
+ * @param percentProgress The percentage of the ad that was played when the user skipped it.
  */
 class MediaAdSkipEvent(var percentProgress: Int? = null) : AbstractSelfDescribing() {
     override val schema: String

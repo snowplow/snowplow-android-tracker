@@ -18,23 +18,23 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Properties for the media player context entity attached to media events.
- * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/player/jsonschema/1-0-0`
+ * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/player/jsonschema/1-0-0`.
  *
- * @param currentTime The current playback time position within the media in seconds
- * @param duration Duration of the media in seconds
- * @param ended If playback of the media has ended
- * @param fullscreen Whether the video element is fullscreen
- * @param livestream Whether the media is a livestream
- * @param label Human readable name given to tracked media content
- * @param loop If the video should restart after ending
- * @param mediaType Type of media content
- * @param muted If the media element is muted
- * @param paused If the media element is paused
- * @param pictureInPicture Whether the video element is showing picture-in-picture
- * @param playerType Type of the media player (e.g., com.youtube-youtube, com.vimeo-vimeo, org.whatwg-media_element)
- * @param playbackRate Playback rate (1 is normal)
- * @param quality Quality level of the playback (e.g., 1080p, 720p)
- * @param volume Volume percent (0 is muted, 100 is max)
+ * @param currentTime The current playback time position within the media in seconds.
+ * @param duration Duration of the media in seconds.
+ * @param ended If playback of the media has ended.
+ * @param fullscreen Whether the video element is fullscreen.
+ * @param livestream Whether the media is a livestream.
+ * @param label Human readable name given to tracked media content.
+ * @param loop If the video should restart after ending.
+ * @param mediaType Type of media content.
+ * @param muted If the media element is muted.
+ * @param paused If the media element is paused.
+ * @param pictureInPicture Whether the video element is showing picture-in-picture.
+ * @param playerType Type of the media player (e.g., com.youtube-youtube, com.vimeo-vimeo, org.whatwg-media_element).
+ * @param playbackRate Playback rate (1 is normal).
+ * @param quality Quality level of the playback (e.g., 1080p, 720p).
+ * @param volume Volume percent (0 is muted, 100 is max).
  */
 data class MediaPlayerEntity @JvmOverloads constructor(
     var currentTime: Double? = null,

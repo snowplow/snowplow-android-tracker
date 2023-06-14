@@ -18,14 +18,14 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Properties for the ad context entity attached to media events during ad playback.
- * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/ad/jsonschema/1-0-0`
+ * Entity schema: `iglu:com.snowplowanalytics.snowplow.media/ad/jsonschema/1-0-0`.
  *
- * @param adId Unique identifier for the ad
- * @param name Friendly name of the ad
- * @param creativeId The ID of the ad creative
+ * @param adId Unique identifier for the ad.
+ * @param name Friendly name of the ad.
+ * @param creativeId The ID of the ad creative.
  * @param podPosition The position of the ad within the ad break, starting with 1. It is automatically assigned by the tracker based on the tracked ad break start and ad start events.
- * @param duration Length of the video ad in seconds
- * @param skippable Indicating whether skip controls are made available to the end user
+ * @param duration Length of the video ad in seconds.
+ * @param skippable Indicating whether skip controls are made available to the end user.
  */
 data class MediaAdEntity @JvmOverloads constructor(
     var adId: String,

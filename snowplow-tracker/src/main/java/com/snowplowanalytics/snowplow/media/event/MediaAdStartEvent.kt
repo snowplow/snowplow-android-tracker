@@ -17,7 +17,7 @@ import com.snowplowanalytics.core.media.MediaSchemata
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
- * Media player event that signals the start of an ad
+ * Media player event that signals the start of an ad.
  */
 class MediaAdStartEvent : AbstractSelfDescribing() {
     override val schema: String
