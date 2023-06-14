@@ -17,7 +17,7 @@ import com.snowplowanalytics.core.media.MediaSchemata
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 
 /**
- * Media player event fired when a percentage boundary set in options.boundaries is reached
+ * Media player event fired when a percentage boundary set in the `boundaries` list in `MediaTrackingConfiguration` is reached.
  */
 class MediaPercentProgressEvent : AbstractSelfDescribing() {
     override val schema: String

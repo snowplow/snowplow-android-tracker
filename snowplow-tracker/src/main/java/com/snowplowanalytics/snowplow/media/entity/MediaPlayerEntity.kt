@@ -53,7 +53,7 @@ data class MediaPlayerEntity @JvmOverloads constructor(
     var quality: String? = null,
     var volume: Int? = null
 ) {
-    /** The percent of the way through the media" (0 to 100) */
+    /** The percent of the way through the media (0 to 100) */
     val percentProgress: Int?
         get() {
             return duration?.let { duration ->
