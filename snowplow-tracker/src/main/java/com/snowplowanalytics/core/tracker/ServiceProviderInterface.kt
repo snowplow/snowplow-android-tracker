@@ -19,6 +19,7 @@ import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
+import com.snowplowanalytics.snowplow.media.controller.MediaController
 
 interface ServiceProviderInterface {
     val namespace: String
@@ -38,6 +39,7 @@ interface ServiceProviderInterface {
     fun getOrMakeSubjectController(): SubjectControllerImpl
     fun getOrMakeSessionController(): SessionControllerImpl
     val pluginsController: PluginsControllerImpl
+    val mediaController: MediaController
 
     // Configuration Updates
     val trackerConfigurationUpdate: TrackerConfigurationUpdate

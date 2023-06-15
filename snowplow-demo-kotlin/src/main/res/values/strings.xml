@@ -41,8 +41,10 @@
     <string name="uri_hint">Enter collector URI or remote config URI…</string>
     <string name="start">Start!</string>
     <string name="tab">Chrome Tab</string>
+    <string name="video">Video</string>
 
     <string name="running_1">Running.  </string>
     <string name="running_2">Running . </string>
     <string name="running_3">Running  .</string>
+    <string name="title_activity_media">Media playback</string>
 </resources>

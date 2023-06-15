@@ -19,9 +19,11 @@ import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
+import com.snowplowanalytics.core.media.controller.MediaControllerImpl
 import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.*
+import com.snowplowanalytics.snowplow.media.controller.MediaController
 import java.util.concurrent.TimeUnit
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -50,6 +52,9 @@ class ServiceProvider(
     private var gdprController: GdprControllerImpl? = null
     override val pluginsController: PluginsControllerImpl by lazy {
         PluginsControllerImpl(this)
+    }
+    override val mediaController: MediaController by lazy {
+        MediaControllerImpl(this)
     }
 
     // Original configurations
