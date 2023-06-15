@@ -92,6 +92,11 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
         get() = _okHttpCookieJar ?: sourceConfig?.okHttpCookieJar
         set(value) { _okHttpCookieJar = value }
 
+    private var _requestHeaders: Map<String, String>? = null
+    override var requestHeaders: Map<String, String>?
+        get() = _requestHeaders ?: sourceConfig?.requestHeaders
+        set(value) { _requestHeaders = value }
+
     // Constructors
     
     /**
@@ -178,6 +183,14 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
      */
     fun okHttpCookieJar(okHttpCookieJar: CookieJar): NetworkConfiguration {
         this.okHttpCookieJar = okHttpCookieJar
+        return this
+    }
+
+    /**
+     * Custom headers to add to HTTP requests to the collector.
+     */
+    fun requestHeaders(requestHeaders: Map<String, String>): NetworkConfiguration {
+        this.requestHeaders = requestHeaders
         return this
     }
 
