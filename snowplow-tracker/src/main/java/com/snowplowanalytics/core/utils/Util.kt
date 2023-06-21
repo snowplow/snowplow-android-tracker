@@ -368,4 +368,16 @@ object Util {
         e.printStackTrace(pw)
         return sw.toString()
     }
+
+    /**
+     * Truncates the scheme of a URL to 16 characters to satisfy the validation for the page_url and page_refr properties.
+     */
+    fun truncateUrlScheme(url: String): String {
+        val parts = url.split("://")
+        if (parts.size > 1) {
+            val updatedParts = listOf(parts.first().take(16)) + parts.drop(1)
+            return updatedParts.joinToString("://")
+        }
+        return url
+    }
 }
