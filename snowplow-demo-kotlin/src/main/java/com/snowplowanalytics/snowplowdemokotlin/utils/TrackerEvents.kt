@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplowdemokotlin.utils
 
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
@@ -174,12 +175,12 @@ object TrackerEvents {
     }
 
     private fun trackAddToCart(tracker: TrackerController) {
-        val event = AddToCartEvent(listOf(product), currency = "GBP", totalValue = 123.45)
+        val event = AddToCartEvent(listOf(product), CartEntity(currency = "GBP", totalValue = 123.45))
         tracker.track(event)
     }
 
     private fun trackRemoveFromCart(tracker: TrackerController) {
-        val event = RemoveFromCartEvent(listOf(product), currency = "GBP", totalValue = 43.21)
+        val event = RemoveFromCartEvent(listOf(product), CartEntity(currency = "GBP", totalValue = 43.21))
         tracker.track(event)
     }
 

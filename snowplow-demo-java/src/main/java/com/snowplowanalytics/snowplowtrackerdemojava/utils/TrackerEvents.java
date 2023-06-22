@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplowtrackerdemojava.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity;
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity;
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity;
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent;
@@ -173,12 +174,12 @@ public class TrackerEvents {
     }
 
     private static void trackAddToCart(TrackerController tracker) {
-        AddToCartEvent event = new AddToCartEvent(Collections.singletonList(product), 123.45, "GBP");
+        AddToCartEvent event = new AddToCartEvent(Collections.singletonList(product), new CartEntity(123.45, "GBP"));
         tracker.track(event);
     }
 
     private static void trackRemoveFromCart(TrackerController tracker) {
-        RemoveFromCartEvent event = new RemoveFromCartEvent(Collections.singletonList(product), 43.21, "GBP");
+        RemoveFromCartEvent event = new RemoveFromCartEvent(Collections.singletonList(product), new CartEntity(43.21, "GBP"));
         tracker.track(event);
     }
 
