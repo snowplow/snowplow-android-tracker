@@ -15,6 +15,7 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -23,9 +24,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Track a product or products being removed from cart.
  *
  * @param products - List of product(s) that were removed from the cart.
- * @param totalValue - Total value of the cart after the product(s) were removed.
- * @param currency - Currency used for the cart (ISO 4217).
- * @param cartId - Cart identifier.
+ * @param cart - State of the cart after this addition.
  */
 class RemoveFromCartEvent @JvmOverloads constructor(
     /**
@@ -34,19 +33,9 @@ class RemoveFromCartEvent @JvmOverloads constructor(
     var products: List<ProductEntity>,
 
     /**
-     * The total value of the cart after this interaction.
+     * State of the cart after the removal.
      */
-    var totalValue: Number,
-
-    /**
-     * The currency used for this cart (ISO 4217).
-     */
-    var currency: String,
-
-    /**
-     * The unique ID representing this cart.
-     */
-    var cartId: String? = null
+    var cart: CartEntity
 ) : AbstractSelfDescribing() {
 
     /** The event schema */
@@ -66,17 +55,7 @@ class RemoveFromCartEvent @JvmOverloads constructor(
             for (product in products) {
                 entities.add(product.entity)
             }
-            entities.add(entity)
+            entities.add(cart.entity)
             return entities
         }
-
-    private val entity: SelfDescribingJson
-        get() = SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_CART,
-            mapOf<String, Any?>(
-                Parameters.ECOMM_CART_ID to cartId,
-                Parameters.ECOMM_CART_VALUE to totalValue,
-                Parameters.ECOMM_CART_CURRENCY to currency,
-            ).filter { it.value != null }
-        )
 }

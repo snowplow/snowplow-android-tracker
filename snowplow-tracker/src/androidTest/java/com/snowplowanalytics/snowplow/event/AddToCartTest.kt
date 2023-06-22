@@ -16,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import org.junit.Assert
@@ -49,7 +50,9 @@ class AddToCartTest {
             category = "category"
         )
         
-        var event = AddToCartEvent(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
+        val cart = CartEntity(totalValue = 123.45, currency = "GBP")
+        
+        var event = AddToCartEvent(products = listOf(product1, product2), cart = cart)
         var cartMap = hashMapOf<String, Any>(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
             "data" to hashMapOf<String, Any>(
@@ -70,7 +73,7 @@ class AddToCartTest {
         Assert.assertEquals(3, entities!!.size)
         Assert.assertEquals(cartMap, entities[2].map)
         
-        event = AddToCartEvent(listOf(product1), 0.5, "USD", "id")
+        event = AddToCartEvent(listOf(product1), CartEntity(0.5, "USD", "id"))
         cartMap = hashMapOf(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
             "data" to hashMapOf<String, Any>(

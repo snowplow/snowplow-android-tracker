@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
@@ -191,7 +192,7 @@ class EcommerceTest {
             currency = "USD",
         )
 
-        tracker.track(AddToCartEvent(listOf(product1), 100, "GBP"))
+        tracker.track(AddToCartEvent(listOf(product1), CartEntity(100, "GBP")))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -229,7 +230,7 @@ class EcommerceTest {
             category = "kitchen"
         )
 
-        tracker.track(RemoveFromCartEvent(listOf(product), 400000, "JPY", "cart567"))
+        tracker.track(RemoveFromCartEvent(listOf(product), CartEntity(400000, "JPY", "cart567")))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
