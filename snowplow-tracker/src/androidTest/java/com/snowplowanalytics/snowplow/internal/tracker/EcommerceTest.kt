@@ -21,18 +21,18 @@ import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionView
-import com.snowplowanalytics.snowplow.ecommerce.events.Refund
-import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart
-import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.network.Request
@@ -53,7 +53,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
         
-        val product = Product(
+        val product = ProductEntity(
             "id", 
             price = 12.34, 
             currency = "GBP", 
@@ -61,7 +61,7 @@ class EcommerceTest {
             position = 1,
             category = "accessories"
         )
-        tracker.track(ProductView(product))
+        tracker.track(ProductViewEvent(product))
         waitForEvents(networkConnection, 1)
         
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -91,13 +91,13 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val product = Product(
+        val product = ProductEntity(
             "id",
             price = 5.00,
             currency = "EUR",
             category = "misc"
         )
-        tracker.track(ProductListClick(product))
+        tracker.track(ProductListClickEvent(product))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -116,7 +116,7 @@ class EcommerceTest {
         Assert.assertEquals("EUR", productEntities[0].get(Parameters.ECOMM_PRODUCT_CURRENCY))
         Assert.assertFalse(productEntities[0].has(Parameters.ECOMM_PRODUCT_POSITION))
 
-        tracker.track(ProductListClick(product, "list name"))
+        tracker.track(ProductListClickEvent(product, "list name"))
         waitForEvents(networkConnection, 2)
         
         request = networkConnection.allRequests[1]
@@ -130,13 +130,13 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val product1 = Product(
+        val product1 = ProductEntity(
             "id",
             price = 0.99,
             currency = "CAD",
             category = "motors"
         )
-        val product2 = Product(
+        val product2 = ProductEntity(
             "id2",
             price = 1000,
             currency = "AUD",
@@ -149,7 +149,7 @@ class EcommerceTest {
             creativeId = "plow_promo"
         )
         
-        tracker.track(ProductListView(listOf(product1, product2), "specials"))
+        tracker.track(ProductListViewEvent(listOf(product1, product2), "specials"))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -184,14 +184,14 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val product1 = Product(
+        val product1 = ProductEntity(
             "id1",
             price = 0.99,
             category = "flour",
             currency = "USD",
         )
 
-        tracker.track(AddToCart(listOf(product1), 100, "GBP"))
+        tracker.track(AddToCartEvent(listOf(product1), 100, "GBP"))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -222,14 +222,14 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val product = Product(
+        val product = ProductEntity(
             "product123",
             price = 200000,
             currency = "JPY",
             category = "kitchen"
         )
 
-        tracker.track(RemoveFromCart(listOf(product), 400000, "JPY", "cart567"))
+        tracker.track(RemoveFromCartEvent(listOf(product), 400000, "JPY", "cart567"))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -260,7 +260,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        tracker.track(CheckoutStep(step = 1, couponCode = "WELCOME2023"))
+        tracker.track(CheckoutStepEvent(step = 1, couponCode = "WELCOME2023"))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -285,11 +285,11 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val product1 = Product("id1", currency = "CHF", price = 10.99, category = "climbing")
-        val product2 = Product("id2", currency = "CHF", price = 4, category = "boxing")
+        val product1 = ProductEntity("id1", currency = "CHF", price = 10.99, category = "climbing")
+        val product2 = ProductEntity("id2", currency = "CHF", price = 4, category = "boxing")
 
         tracker.track(
-            Transaction(
+            TransactionEvent(
                 transactionId = "id123",
                 revenue = 5,
                 currency = "CHF",
@@ -329,12 +329,12 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val promo = Promotion(
+        val promo = PromotionEntity(
             "promo1",
             productIds = listOf("product1", "product2", "product3"),
         )
 
-        tracker.track(PromotionView(promo))
+        tracker.track(PromotionViewEvent(promo))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -359,11 +359,11 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        val promo = Promotion(
+        val promo = PromotionEntity(
             "promo1",
         )
 
-        tracker.track(PromotionClick(promo))
+        tracker.track(PromotionClickEvent(promo))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -387,10 +387,10 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
         
-        val product1 = Product("productId", category = "roses", price = 24.99, currency = "CAD")
-        val product2 = Product("id2", category = "gloves", price = 3.56, currency = "CAD")
+        val product1 = ProductEntity("productId", category = "roses", price = 24.99, currency = "CAD")
+        val product2 = ProductEntity("id2", category = "gloves", price = 3.56, currency = "CAD")
         
-        tracker.track(Refund("refund_123",
+        tracker.track(RefundEvent("refund_123",
             currency = "GBP",
             refundAmount = 1.00,
             products = listOf(product1, product2))

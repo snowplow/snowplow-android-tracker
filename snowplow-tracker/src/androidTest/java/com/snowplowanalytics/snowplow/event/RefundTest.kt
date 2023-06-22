@@ -16,8 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.Refund
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +27,7 @@ import java.util.*
 class RefundTest {
     @Test
     fun testExpectedForm() {
-        val product1 = Product(
+        val product1 = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
@@ -35,7 +35,7 @@ class RefundTest {
             price = 123456789
         )
 
-        val event = Refund("id", currency = "USD", refundAmount = 123.45, products = listOf(product1))
+        val event = RefundEvent("id", currency = "USD", refundAmount = 123.45, products = listOf(product1))
 
         val map = hashMapOf<String, Any>(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_REFUND,

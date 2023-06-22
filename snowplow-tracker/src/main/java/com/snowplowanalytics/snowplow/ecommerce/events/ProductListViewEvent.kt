@@ -12,51 +12,29 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce.events
 
-import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a product or products being removed from cart.
+ * Track a product list view.
  *
- * @param products - List of product(s) that were removed from the cart.
- * @param totalValue - Total value of the cart after the product(s) were removed.
- * @param currency - Currency used for the cart (ISO 4217).
- * @param cartId - Cart identifier.
+ * @param products - List of products viewed.
+ * @param name - The list name.
  */
-class RemoveFromCart @JvmOverloads constructor(
-    /**
-     * List of product(s) that were removed from the cart.
-     */
-    var products: List<Product>,
-
-    /**
-     * The total value of the cart after this interaction.
-     */
-    var totalValue: Number,
-
-    /**
-     * The currency used for this cart (ISO 4217).
-     */
-    var currency: String,
-
-    /**
-     * The unique ID representing this cart.
-     */
-    var cartId: String? = null
-) : AbstractSelfDescribing() {
+class ProductListViewEvent @JvmOverloads constructor(var products: List<ProductEntity>, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
-    
+
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.remove_from_cart.toString()
+            payload["type"] = EcommerceAction.list_view.toString()
+            name?.let { payload["name"] = it }
             return payload
         }
 
@@ -66,17 +44,6 @@ class RemoveFromCart @JvmOverloads constructor(
             for (product in products) {
                 entities.add(product.entity)
             }
-            entities.add(entity)
             return entities
         }
-
-    private val entity: SelfDescribingJson
-        get() = SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_CART,
-            mapOf<String, Any?>(
-                Parameters.ECOMM_CART_ID to cartId,
-                Parameters.ECOMM_CART_VALUE to totalValue,
-                Parameters.ECOMM_CART_CURRENCY to currency,
-            ).filter { it.value != null }
-        )
 }

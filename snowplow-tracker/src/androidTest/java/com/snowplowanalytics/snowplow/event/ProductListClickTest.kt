@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import java.util.*
 class ProductListClickTest {
     @Test
     fun testExpectedForm() {
-        val product = Product(
+        val product = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
@@ -42,13 +42,13 @@ class ProductListClickTest {
             creativeId = "ecomm1"
         )
         
-        var productListClick = ProductListClick(product)
+        var productListClick = ProductListClickEvent(product)
         var data: Map<String, Any?> = productListClick.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.list_click.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
 
-        productListClick = ProductListClick(product, "seasonal_selection")
+        productListClick = ProductListClickEvent(product, "seasonal_selection")
         data = productListClick.dataPayload
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_NAME], "seasonal_selection")

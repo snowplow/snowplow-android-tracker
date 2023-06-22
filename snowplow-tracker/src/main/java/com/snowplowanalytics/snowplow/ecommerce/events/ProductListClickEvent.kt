@@ -14,16 +14,17 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a promotion click or selection.
+ * Track a product list click or selection event.
  *
- * @param promotion - The promotion selected.
+ * @param product - Information about the product that was selected.
+ * @param name - The list name.
  */
-class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing() {
+class ProductListClickEvent @JvmOverloads constructor(var product: ProductEntity, var name: String? = null) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -32,10 +33,11 @@ class PromotionClick(var promotion: Promotion) : AbstractSelfDescribing() {
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.promo_click.toString()
+            payload["type"] = EcommerceAction.list_click.toString()
+            name?.let { payload["name"] = it }
             return payload
         }
 
     override val entitiesForProcessing: List<SelfDescribingJson>?
-        get() = listOf(promotion.entity)
+        get() = listOf(product.entity)
 }

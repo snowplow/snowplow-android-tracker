@@ -20,7 +20,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Provided to certain Ecommerce events. The Product properties will be sent with the event as a 
  * Product entity.
  */
-data class Product @JvmOverloads constructor(
+data class ProductEntity @JvmOverloads constructor(
     /**
      * The SKU or product ID
      */

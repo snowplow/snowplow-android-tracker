@@ -14,36 +14,28 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a product list view.
+ * Track a promotion view.
  *
- * @param products - List of products viewed.
- * @param name - The list name.
+ * @param promotion - The promotion viewed.
  */
-class ProductListView @JvmOverloads constructor(var products: List<Product>, var name: String? = null) : AbstractSelfDescribing() {
+class PromotionViewEvent(var promotion: PromotionEntity) : AbstractSelfDescribing() {
 
-    /** The event schema */
+    /** The event schema. */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
-
+    
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.list_view.toString()
-            name?.let { payload["name"] = it }
+            payload["type"] = EcommerceAction.promo_view.toString()
             return payload
         }
 
     override val entitiesForProcessing: List<SelfDescribingJson>?
-        get() {
-            val entities = mutableListOf<SelfDescribingJson>()
-            for (product in products) {
-                entities.add(product.entity)
-            }
-            return entities
-        }
+        get() = listOf(promotion.entity)
 }

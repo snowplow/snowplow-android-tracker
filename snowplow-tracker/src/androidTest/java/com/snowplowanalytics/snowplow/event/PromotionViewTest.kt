@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionView
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,8 +26,8 @@ import java.util.*
 class PromotionViewTest {
     @Test
     fun testExpectedForm() {
-        val promotion = Promotion("promo_id")
-        val event = PromotionView(promotion)
+        val promotion = PromotionEntity("promo_id")
+        val event = PromotionViewEvent(promotion)
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.promo_view.toString(), data[Parameters.ECOMM_TYPE])

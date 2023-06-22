@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import java.util.*
 class RemoveFromCartTest {
     @Test
     fun testExpectedForm() {
-        val product1 = Product(
+        val product1 = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
@@ -41,14 +41,14 @@ class RemoveFromCartTest {
             currency = "GBP",
             creativeId = "ecomm1"
         )
-        val product2 = Product(
+        val product2 = ProductEntity(
             id = "ID2",
             category = "category2",
             price = 0.99,
             currency = "GBP"
         )
         
-        val event = RemoveFromCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
+        val event = RemoveFromCartEvent(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.remove_from_cart.toString(), data[Parameters.ECOMM_TYPE])

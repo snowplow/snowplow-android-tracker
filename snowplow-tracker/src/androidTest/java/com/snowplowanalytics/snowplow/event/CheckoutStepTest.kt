@@ -16,7 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import java.util.*
 class CheckoutStepTest {
     @Test
     fun testExpectedForm() {
-        val event = CheckoutStep(step = 5,
+        val event = CheckoutStepEvent(step = 5,
             "postcode",
             shippingFullAddress = "full address",
             deliveryMethod = "stork",

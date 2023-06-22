@@ -63,8 +63,8 @@ abstract class AbstractEvent : Event {
     override val entities: MutableList<SelfDescribingJson>
         get() {
             if (isProcessing) {
-                if (entitiesForProcessing != null) {
-                    return (customContexts + entitiesForProcessing!!).toMutableList()
+                entitiesForProcessing?.let {
+                    return (customContexts + it).toMutableList()
                 }
             }
             return customContexts

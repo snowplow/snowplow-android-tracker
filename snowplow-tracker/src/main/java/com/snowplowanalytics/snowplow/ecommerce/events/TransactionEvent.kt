@@ -15,7 +15,7 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
@@ -34,7 +34,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param creditOrder Whether it is a credit order or not.
  * @param products The product(s) included in the transaction.
  */
-class Transaction @JvmOverloads constructor(
+class TransactionEvent @JvmOverloads constructor(
     /**
     * The ID of the transaction.
     */
@@ -88,7 +88,7 @@ class Transaction @JvmOverloads constructor(
     /**
     * Products in the transaction.
     */
-    var products: List<Product>? = null
+    var products: List<ProductEntity>? = null
 ) : AbstractSelfDescribing() {
 
     /** The event schema */

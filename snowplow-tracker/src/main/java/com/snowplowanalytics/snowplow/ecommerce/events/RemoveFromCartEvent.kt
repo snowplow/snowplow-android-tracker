@@ -15,24 +15,23 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a product or products being added to cart.
+ * Track a product or products being removed from cart.
  *
- * @param products - List of product(s) that were added to the cart.
- * @param totalValue - Total value of the cart after the product(s) were added.
+ * @param products - List of product(s) that were removed from the cart.
+ * @param totalValue - Total value of the cart after the product(s) were removed.
  * @param currency - Currency used for the cart (ISO 4217).
  * @param cartId - Cart identifier.
  */
-class AddToCart @JvmOverloads constructor(
-
+class RemoveFromCartEvent @JvmOverloads constructor(
     /**
-     * List of product(s) that were added to the cart.
+     * List of product(s) that were removed from the cart.
      */
-    var products: List<Product>,
+    var products: List<ProductEntity>,
 
     /**
      * The total value of the cart after this interaction.
@@ -48,7 +47,7 @@ class AddToCart @JvmOverloads constructor(
      * The unique ID representing this cart.
      */
     var cartId: String? = null
-    ) : AbstractSelfDescribing() {
+) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -57,10 +56,10 @@ class AddToCart @JvmOverloads constructor(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart.toString()
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.remove_from_cart.toString()
             return payload
         }
-    
+
     override val entitiesForProcessing: List<SelfDescribingJson>?
         get() {
             val entities = mutableListOf<SelfDescribingJson>()

@@ -14,25 +14,25 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a promotion view.
+ * Track a promotion click or selection.
  *
- * @param promotion - The promotion viewed.
+ * @param promotion - The promotion selected.
  */
-class PromotionView(var promotion: Promotion) : AbstractSelfDescribing() {
+class PromotionClickEvent(var promotion: PromotionEntity) : AbstractSelfDescribing() {
 
-    /** The event schema. */
+    /** The event schema */
     override val schema: String
         get() = TrackerConstants.SCHEMA_ECOMMERCE_ACTION
     
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.promo_view.toString()
+            payload["type"] = EcommerceAction.promo_click.toString()
             return payload
         }
 

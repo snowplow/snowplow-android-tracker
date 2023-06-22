@@ -16,8 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,21 +27,21 @@ import java.util.*
 class TransactionTest {
     @Test
     fun testExpectedForm() {
-        val product1 = Product(
+        val product1 = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
             currency = "JPY",
             price = 123456789
         )
-        val product2 = Product(
+        val product2 = ProductEntity(
             id = "id",
             price = 0.99,
             category = "category2",
             currency = "GBP"
         )
 
-        val event = Transaction("transactionId",
+        val event = TransactionEvent("transactionId",
             8999, 
             "EUR", 
             "visa",

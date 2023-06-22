@@ -15,37 +15,40 @@ package com.snowplowanalytics.snowplow.ecommerce.events
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Track a refund event. Use the same transaction ID as for the original Transaction event.
- * Provide a list of products to specify certain products to be refunded, otherwise the whole transaction 
- * will be marked as refunded.
+ * Track a product or products being added to cart.
  *
- * @param transactionId The ID of the relevant transaction.
- * @param currency The currency in which the product(s) are being priced (ISO 4217).
- * @param refundAmount The monetary amount refunded.
- * @param refundReason Reason for refunding the whole or part of the transaction.
- * @param products The products to be refunded.
+ * @param products - List of product(s) that were added to the cart.
+ * @param totalValue - Total value of the cart after the product(s) were added.
+ * @param currency - Currency used for the cart (ISO 4217).
+ * @param cartId - Cart identifier.
  */
-class Refund @JvmOverloads constructor(
-    /** The ID of the relevant transaction. */
-    var transactionId: String,
-    
-    /** The monetary amount refunded. */
-    var refundAmount: Number,
+class AddToCartEvent @JvmOverloads constructor(
 
-    /** The currency in which the product is being priced (ISO 4217). */
+    /**
+     * List of product(s) that were added to the cart.
+     */
+    var products: List<ProductEntity>,
+
+    /**
+     * The total value of the cart after this interaction.
+     */
+    var totalValue: Number,
+
+    /**
+     * The currency used for this cart (ISO 4217).
+     */
     var currency: String,
-    
-    /** Reason for refunding the whole or part of the transaction. */
-    var refundReason: String? = null, 
-    
-    /** The products to be refunded. */
-    var products: List<Product>? = null
-) : AbstractSelfDescribing() {
+
+    /**
+     * The unique ID representing this cart.
+     */
+    var cartId: String? = null
+    ) : AbstractSelfDescribing() {
 
     /** The event schema */
     override val schema: String
@@ -54,17 +57,15 @@ class Refund @JvmOverloads constructor(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload["type"] = EcommerceAction.refund.toString()
+            payload[Parameters.ECOMM_TYPE] = EcommerceAction.add_to_cart.toString()
             return payload
         }
-
+    
     override val entitiesForProcessing: List<SelfDescribingJson>?
         get() {
             val entities = mutableListOf<SelfDescribingJson>()
-            products?.let {
-                for (product in it) {
-                    entities.add(product.entity)
-                }
+            for (product in products) {
+                entities.add(product.entity)
             }
             entities.add(entity)
             return entities
@@ -72,12 +73,11 @@ class Refund @JvmOverloads constructor(
 
     private val entity: SelfDescribingJson
         get() = SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_REFUND,
+            TrackerConstants.SCHEMA_ECOMMERCE_CART,
             mapOf<String, Any?>(
-                Parameters.ECOMM_REFUND_ID to transactionId,
-                Parameters.ECOMM_REFUND_CURRENCY to currency,
-                Parameters.ECOMM_REFUND_AMOUNT to refundAmount,
-                Parameters.ECOMM_REFUND_REASON to refundReason
+                Parameters.ECOMM_CART_ID to cartId,
+                Parameters.ECOMM_CART_VALUE to totalValue,
+                Parameters.ECOMM_CART_CURRENCY to currency,
             ).filter { it.value != null }
         )
 }

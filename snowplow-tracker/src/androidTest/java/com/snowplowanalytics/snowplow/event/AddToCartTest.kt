@@ -16,8 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +27,7 @@ import java.util.*
 class AddToCartTest {
     @Test
     fun testExpectedForm() {
-        val product1 = Product(
+        val product1 = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
@@ -42,14 +42,14 @@ class AddToCartTest {
             currency = "GBP",
             creativeId = "ecomm1"
         )
-        val product2 = Product(
+        val product2 = ProductEntity(
             id = "ID2",
             price = 0.99,
             currency = "GBP",
             category = "category"
         )
         
-        var event = AddToCart(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
+        var event = AddToCartEvent(totalValue = 123.45, currency = "GBP", products = listOf(product1, product2))
         var cartMap = hashMapOf<String, Any>(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
             "data" to hashMapOf<String, Any>(
@@ -70,7 +70,7 @@ class AddToCartTest {
         Assert.assertEquals(3, entities!!.size)
         Assert.assertEquals(cartMap, entities[2].map)
         
-        event = AddToCart(listOf(product1), 0.5, "USD", "id")
+        event = AddToCartEvent(listOf(product1), 0.5, "USD", "id")
         cartMap = hashMapOf(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_CART,
             "data" to hashMapOf<String, Any>(

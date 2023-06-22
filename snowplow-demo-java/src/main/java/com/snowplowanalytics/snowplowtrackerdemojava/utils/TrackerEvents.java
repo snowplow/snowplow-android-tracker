@@ -16,18 +16,18 @@ package com.snowplowanalytics.snowplowtrackerdemojava.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product;
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion;
-import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart;
-import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep;
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick;
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView;
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView;
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick;
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionView;
-import com.snowplowanalytics.snowplow.ecommerce.events.Refund;
-import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart;
-import com.snowplowanalytics.snowplow.ecommerce.events.Transaction;
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity;
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.MessageNotification;
 import com.snowplowanalytics.snowplow.event.MessageNotificationTrigger;
@@ -56,8 +56,8 @@ import java.util.UUID;
  * combinations of Tracker Events.
  */
 public class TrackerEvents {
-    private static Product product = new Product("productId", "product/category", "GBP", 99.99);
-    private static Promotion promotion = new Promotion("promoIdABCDE");
+    private static ProductEntity product = new ProductEntity("productId", "product/category", "GBP", 99.99);
+    private static PromotionEntity promotion = new PromotionEntity("promoIdABCDE");
 
     public static void trackAll(@NonNull TrackerController tracker) {
         trackDeepLink(tracker);
@@ -173,17 +173,17 @@ public class TrackerEvents {
     }
 
     private static void trackAddToCart(TrackerController tracker) {
-        AddToCart event = new AddToCart(Collections.singletonList(product), 123.45, "GBP");
+        AddToCartEvent event = new AddToCartEvent(Collections.singletonList(product), 123.45, "GBP");
         tracker.track(event);
     }
 
     private static void trackRemoveFromCart(TrackerController tracker) {
-        RemoveFromCart event = new RemoveFromCart(Collections.singletonList(product), 43.21, "GBP");
+        RemoveFromCartEvent event = new RemoveFromCartEvent(Collections.singletonList(product), 43.21, "GBP");
         tracker.track(event);
     }
 
     private static void trackCheckoutStep(TrackerController tracker) {
-        CheckoutStep event = new CheckoutStep(3,
+        CheckoutStepEvent event = new CheckoutStepEvent(3,
                 null,
                 null,
                 null,
@@ -196,32 +196,32 @@ public class TrackerEvents {
     }
 
     private static void trackProductView(TrackerController tracker) {
-        ProductView event = new ProductView(product);
+        ProductViewEvent event = new ProductViewEvent(product);
         tracker.track(event);
     }
 
     private static void trackProductListView(TrackerController tracker) {
-        ProductListView event = new ProductListView(Collections.singletonList(product), "snowplowProducts");
+        ProductListViewEvent event = new ProductListViewEvent(Collections.singletonList(product), "snowplowProducts");
         tracker.track(event);
     }
 
     private static void trackProductListClick(TrackerController tracker) {
-        ProductListClick event = new ProductListClick(product);
+        ProductListClickEvent event = new ProductListClickEvent(product);
         tracker.track(event);
     }
 
     private static void trackPromotionView(TrackerController tracker) {
-        PromotionView event = new PromotionView(promotion);
+        PromotionViewEvent event = new PromotionViewEvent(promotion);
         tracker.track(event);
     }
 
     private static void trackPromotionClick(TrackerController tracker) {
-        PromotionClick event = new PromotionClick(promotion);
+        PromotionClickEvent event = new PromotionClickEvent(promotion);
         tracker.track(event);
     }
 
     private static void trackTransaction(TrackerController tracker) {
-        Transaction event = new Transaction(
+        TransactionEvent event = new TransactionEvent(
                 "id-123",
                 231231,
                 "USD",
@@ -232,7 +232,7 @@ public class TrackerEvents {
     }
 
     private static void trackRefund(TrackerController tracker) {
-        Refund event = new Refund(
+        RefundEvent event = new RefundEvent(
                 "id-123",
                 7654321,
                 "USD",

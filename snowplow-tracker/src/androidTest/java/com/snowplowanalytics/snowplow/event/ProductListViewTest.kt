@@ -15,8 +15,8 @@ package com.snowplowanalytics.snowplow.event
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import java.util.*
 class ProductListViewTest {
     @Test
     fun testExpectedForm() {
-        val product1 = Product(
+        val product1 = ProductEntity(
             id = "product ID",
             name = "product name",
             category = "category",
@@ -41,20 +41,20 @@ class ProductListViewTest {
             currency = "GBP",
             creativeId = "ecomm1"
         )
-        val product2 = Product(
+        val product2 = ProductEntity(
             id = "ID2",
             price = 0.99,
             category = "category2",
             currency = "GBP"
         )
         
-        var event = ProductListView(listOf(product1, product2))
+        var event = ProductListViewEvent(listOf(product1, product2))
         var data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.list_view.toString(), data[Parameters.ECOMM_TYPE])
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
 
-        event = ProductListView(listOf(product1), "list name")
+        event = ProductListViewEvent(listOf(product1), "list name")
         data = event.dataPayload
         Assert.assertTrue(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertEquals(data[Parameters.ECOMM_NAME], "list name")

@@ -20,7 +20,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Provided to certain Ecommerce events. The Promotion properties will be sent with the event as a
  * Promotion entity.
  */
-data class Promotion @JvmOverloads constructor(
+data class PromotionEntity @JvmOverloads constructor(
     /**
      * The ID of the promotion.
      */

@@ -13,18 +13,18 @@
 package com.snowplowanalytics.snowplowdemokotlin.utils
 
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.events.AddToCart
-import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStep
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClick
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductListView
-import com.snowplowanalytics.snowplow.ecommerce.events.ProductView
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionView
-import com.snowplowanalytics.snowplow.ecommerce.events.Refund
-import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCart
-import com.snowplowanalytics.snowplow.ecommerce.events.Transaction
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
@@ -34,8 +34,8 @@ import java.util.*
  * combinations of Tracker Events.
  */
 object TrackerEvents {
-    private val product = Product("productId", "product/category", "GBP", 99.99)
-    private val promotion = Promotion("promoIdABCDE")
+    private val product = ProductEntity("productId", "product/category", "GBP", 99.99)
+    private val promotion = PromotionEntity("promoIdABCDE")
     
     fun trackAll(tracker: TrackerController) {
         trackDeepLink(tracker)
@@ -174,47 +174,47 @@ object TrackerEvents {
     }
 
     private fun trackAddToCart(tracker: TrackerController) {
-        val event = AddToCart(listOf(product), currency = "GBP", totalValue = 123.45)
+        val event = AddToCartEvent(listOf(product), currency = "GBP", totalValue = 123.45)
         tracker.track(event)
     }
 
     private fun trackRemoveFromCart(tracker: TrackerController) {
-        val event = RemoveFromCart(listOf(product), currency = "GBP", totalValue = 43.21)
+        val event = RemoveFromCartEvent(listOf(product), currency = "GBP", totalValue = 43.21)
         tracker.track(event)
     }
 
     private fun trackCheckoutStep(tracker: TrackerController) {
-        val event = CheckoutStep(3, accountType = "guest")
+        val event = CheckoutStepEvent(3, accountType = "guest")
         tracker.track(event)
     }
 
     private fun trackProductView(tracker: TrackerController) {
-        val event = ProductView(product)
+        val event = ProductViewEvent(product)
         tracker.track(event)
     }
 
     private fun trackProductListView(tracker: TrackerController) {
-        val event = ProductListView(listOf(product), "snowplowProducts")
+        val event = ProductListViewEvent(listOf(product), "snowplowProducts")
         tracker.track(event)
     }
 
     private fun trackProductListClick(tracker: TrackerController) {
-        val event = ProductListClick(product, "snowplowProducts")
+        val event = ProductListClickEvent(product, "snowplowProducts")
         tracker.track(event)
     }
 
     private fun trackPromotionView(tracker: TrackerController) {
-        val event = PromotionView(promotion)
+        val event = PromotionViewEvent(promotion)
         tracker.track(event)
     }
 
     private fun trackPromotionClick(tracker: TrackerController) {
-        val event = PromotionClick(promotion)
+        val event = PromotionClickEvent(promotion)
         tracker.track(event)
     }
 
     private fun trackTransaction(tracker: TrackerController) {
-        val event = Transaction(
+        val event = TransactionEvent(
             transactionId = "id-123", 
             231231,
             "USD",
@@ -226,7 +226,7 @@ object TrackerEvents {
     }
 
     private fun trackRefund(tracker: TrackerController) {
-        val event = Refund(
+        val event = RefundEvent(
             transactionId = "id-123",
             7654321,
             "USD", 

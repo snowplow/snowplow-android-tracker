@@ -16,8 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
-import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClick
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +27,7 @@ import java.util.*
 class PromotionClickTest {
     @Test
     fun testExpectedForm() {
-        val promotion = Promotion(
+        val promotion = PromotionEntity(
             "promo_id",
             "name",
             listOf("abc", "def", "xyz"),
@@ -36,7 +36,7 @@ class PromotionClickTest {
             "banner",
             "top_slot"
         )
-        val event = PromotionClick(promotion)
+        val event = PromotionClickEvent(promotion)
 
         val map = hashMapOf<String, Any>(
             "schema" to TrackerConstants.SCHEMA_ECOMMERCE_PROMOTION,

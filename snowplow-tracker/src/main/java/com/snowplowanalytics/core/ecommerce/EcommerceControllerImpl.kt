@@ -13,13 +13,10 @@
 package com.snowplowanalytics.core.ecommerce
 
 import androidx.annotation.RestrictTo
-import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
-import com.snowplowanalytics.snowplow.ecommerce.entities.Product
-import com.snowplowanalytics.snowplow.ecommerce.entities.Promotion
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
