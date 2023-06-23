@@ -55,7 +55,6 @@ class RemoveFromCartTest {
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
         Assert.assertEquals(EcommerceAction.remove_from_cart.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertFalse(data.containsKey(Parameters.ECOMM_PRODUCTS))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_NAME))
         Assert.assertFalse(data.containsKey(Parameters.ECOMM_CART_CURRENCY))
 

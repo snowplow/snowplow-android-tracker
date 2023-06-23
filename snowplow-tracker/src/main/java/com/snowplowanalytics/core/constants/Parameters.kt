@@ -81,11 +81,6 @@ object Parameters {
     // Snowplow Ecommerce
     const val ECOMM_TYPE = "type"
     const val ECOMM_NAME = "name"
-    const val ECOMM_PRODUCT = "product"
-    const val ECOMM_PRODUCTS = "products"
-    const val ECOMM_CART = "cart"
-    const val ECOMM_TRANSACTION = "transaction"
-    const val ECOMM_PROMOTION = "promotion"
     
     // Snowplow Ecommerce Product
     const val ECOMM_PRODUCT_ID = "id"
