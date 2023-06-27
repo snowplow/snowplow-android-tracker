@@ -35,12 +35,12 @@ class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : E
         serviceProvider.addPlugin(plugin)
     }
 
-    override fun setEcommerceUser(id: String, is_guest: Boolean?, email: String?) {
+    override fun setEcommerceUser(id: String, isGuest: Boolean?, email: String?) {
         val plugin = PluginConfiguration("ecommerceUserPluginInternal")
         plugin.entities {
             val map = mutableMapOf<String, Any>()
             map["id"] = id
-            is_guest?.let { map["is_guest"] = it }
+            isGuest?.let { map["is_guest"] = it }
             email?.let { map["email"] = it }
             
             listOf(SelfDescribingJson(TrackerConstants.SCHEMA_ECOMMERCE_USER, map))

@@ -17,8 +17,8 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Provided to certain Ecommerce events. The Product properties will be sent with the event as a 
- * Product entity.
+ * Provided to certain Ecommerce events. The Cart properties will be sent with the event as a 
+ * Cart entity.
  */
 data class CartEntity @JvmOverloads constructor(
     /**

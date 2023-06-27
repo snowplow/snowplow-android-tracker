@@ -19,13 +19,19 @@ interface EcommerceController {
 
     /**
      * Add an ecommerce Screen/Page entity to all subsequent events.
+     * @param type The type of screen that was visited, e.g. homepage, product details, cart, checkout, etc.
+     * @param language The language that the screen is based in.
+     * @param locale The locale version of the app that is running.
      */
     fun setEcommerceScreen(type: String, language: String? = null, locale: String? = null)
 
     /**
      * Add an ecommerce User entity to all subsequent events.
+     * @param id The user ID.
+     * @param isGuest Whether or not the user is a guest.
+     * @param email The user's email address.
      */
-    fun setEcommerceUser(id: String, is_guest: Boolean? = null, email: String? = null)
+    fun setEcommerceUser(id: String, isGuest: Boolean? = null, email: String? = null)
 
     /**
      * Stop adding a Screen/Page entity to events.

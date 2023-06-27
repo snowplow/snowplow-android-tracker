@@ -32,6 +32,7 @@ abstract class AbstractEvent : Event {
      */
     override var trueTimestamp: Long? = null
     
+    /** Used for events whose properties are added as entities, e.g. Ecommerce events */
     open val entitiesForProcessing: List<SelfDescribingJson>?
         get() = null
     

@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  */
 data class ProductEntity @JvmOverloads constructor(
     /**
-     * The SKU or product ID
+     * The SKU or product ID.
      */
     var id: String,
 
@@ -83,7 +83,7 @@ data class ProductEntity @JvmOverloads constructor(
     var position: Int? = null,
 
     /**
-     * Identifier, name, or url for the creative presented on the promotion.
+     * Identifier, name, or url for the creative presented on the associated promotion.
      */
     var creativeId: String? = null
 ) {
