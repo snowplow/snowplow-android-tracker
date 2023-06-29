@@ -17,6 +17,7 @@ import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
+import org.json.JSONObject
 
 /**
  * Configure how the tracker should send the events to the collector.     
@@ -29,7 +30,7 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
  *   - byteLimitGet: 40000 bytes
  *   - byteLimitPost: 40000 bytes
  */
-open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
+open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface {
 
     private var _isPaused: Boolean? = null
     internal var isPaused: Boolean
@@ -179,5 +180,30 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
             .requestCallback(requestCallback)
             .customRetryForStatusCodes(customRetryForStatusCodes)
             .serverAnonymisation(serverAnonymisation)
+    }
+
+    // JSON Formatter
+    /**
+     * This constructor is used in remote configuration.
+     */
+    constructor(jsonObject: JSONObject) : this() {
+        if (jsonObject.has("bufferOption")) {
+            _bufferOption = BufferOption.valueOf(jsonObject.getString("bufferOption"))
+        }
+        if (jsonObject.has("emitRange")) { _emitRange = jsonObject.getInt("emitRange") }
+        if (jsonObject.has("threadPoolSize")) { _threadPoolSize = jsonObject.getInt("threadPoolSize") }
+        if (jsonObject.has("byteLimitGet")) { _byteLimitGet = jsonObject.getLong("byteLimitGet") }
+        if (jsonObject.has("byteLimitPost")) { _byteLimitPost = jsonObject.getLong("byteLimitPost") }
+        if (jsonObject.has("serverAnonymisation")) { _serverAnonymisation = jsonObject.getBoolean("serverAnonymisation") }
+        if (jsonObject.has("customRetryForStatusCodes")) {
+            val customRetryForStatusCodes = mutableMapOf<Int, Boolean>()
+            val customRetryForStatusCodesJson = jsonObject.getJSONObject("customRetryForStatusCodes")
+            val keys = customRetryForStatusCodesJson.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                customRetryForStatusCodes[key.toInt()] = customRetryForStatusCodesJson.getBoolean(key)
+            }
+            _customRetryForStatusCodes = customRetryForStatusCodes
+        }
     }
 }
