@@ -87,10 +87,14 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
             return 70000
         }
 
-    override val language: String?
+    private var _language: String? = "sk"
+    override var language: String?
         get() {
             increaseMethodAccessCount("language")
-            return "sk"
+            return _language
+        }
+        set(value) {
+            _language = value
         }
 
     override fun getResolution(context: Context): String? {
