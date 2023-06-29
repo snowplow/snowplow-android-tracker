@@ -22,16 +22,60 @@ import org.json.JSONObject
  */
 open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface {
 
-    override var userId: String? = null
-    override var networkUserId: String? = null
-    override var domainUserId: String? = null
-    override var useragent: String? = null
-    override var ipAddress: String? = null
-    override var timezone: String? = null
-    override var language: String? = null
-    override var screenResolution: Size? = null
-    override var screenViewPort: Size? = null
-    override var colorDepth: Int? = null
+    /**
+     * Fallback configuration to read from in case requested values are not present in this configuration.
+     */
+    internal var sourceConfig: SubjectConfiguration? = null
+
+    private var _userId: String? = null
+    override var userId: String?
+        get() = _userId ?: sourceConfig?.userId
+        set(value) { _userId = value }
+
+    private var _networkUserId: String? = null
+    override var networkUserId: String?
+        get() = _networkUserId ?: sourceConfig?.networkUserId
+        set(value) { _networkUserId = value }
+
+    private var _domainUserId: String? = null
+    override var domainUserId: String?
+        get() = _domainUserId ?: sourceConfig?.domainUserId
+        set(value) { _domainUserId = value }
+
+    private var _useragent: String? = null
+    override var useragent: String?
+        get() = _useragent ?: sourceConfig?.useragent
+        set(value) { _useragent = value }
+
+    private var _ipAddress: String? = null
+    override var ipAddress: String?
+        get() = _ipAddress ?: sourceConfig?.ipAddress
+        set(value) { _ipAddress = value }
+
+    private var _timezone: String? = null
+    override var timezone: String?
+        get() = _timezone ?: sourceConfig?.timezone
+        set(value) { _timezone = value }
+
+    private var _language: String? = null
+    override var language: String?
+        get() = _language ?: sourceConfig?.language
+        set(value) { _language = value }
+
+    private var _screenResolution: Size? = null
+    override var screenResolution: Size?
+        get() = _screenResolution ?: sourceConfig?.screenResolution
+        set(value) { _screenResolution = value }
+
+    private var _screenViewPort: Size? = null
+    override var screenViewPort: Size?
+        get() = _screenViewPort ?: sourceConfig?.screenViewPort
+        set(value) { _screenViewPort = value }
+
+    private var _colorDepth: Int? = null
+    override var colorDepth: Int?
+        get() = _colorDepth ?: sourceConfig?.colorDepth
+        set(value) { _colorDepth = value }
     
     // Builder methods
     
@@ -144,14 +188,12 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
      * This constructor is used in remote configuration.
      */
     constructor(jsonObject: JSONObject) : this() {
-        userId = if (jsonObject.has("userId")) jsonObject.optString("userId") else null
-        networkUserId =
-            if (jsonObject.has("networkUserId")) jsonObject.optString("networkUserId") else null
-        domainUserId =
-            if (jsonObject.has("domainUserId")) jsonObject.optString("domainUserId") else null
-        useragent = if (jsonObject.has("useragent")) jsonObject.optString("useragent") else null
-        ipAddress = if (jsonObject.has("ipAddress")) jsonObject.optString("ipAddress") else null
-        timezone = if (jsonObject.has("timezone")) jsonObject.optString("timezone") else null
-        language = if (jsonObject.has("language")) jsonObject.optString("language") else null
+        if (jsonObject.has("userId")) { _userId = jsonObject.optString("userId") }
+        if (jsonObject.has("networkUserId")) { _networkUserId = jsonObject.optString("networkUserId") }
+        if (jsonObject.has("domainUserId")) { _domainUserId = jsonObject.optString("domainUserId") }
+        if (jsonObject.has("useragent")) { _useragent = jsonObject.optString("useragent") }
+        if (jsonObject.has("ipAddress")) { _ipAddress = jsonObject.optString("ipAddress") }
+        if (jsonObject.has("timezone")) { _timezone = jsonObject.optString("timezone") }
+        if (jsonObject.has("language")) { _language = jsonObject.optString("language") }
     }
 }

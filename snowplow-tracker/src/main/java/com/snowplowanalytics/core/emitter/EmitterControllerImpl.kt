@@ -16,6 +16,7 @@ import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
+import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration
 import com.snowplowanalytics.snowplow.controller.EmitterController
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
@@ -101,8 +102,8 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
     }
 
     // Private methods
-    private val dirtyConfig: EmitterConfigurationUpdate
-        get() = serviceProvider.emitterConfigurationUpdate
+    private val dirtyConfig: EmitterConfiguration
+        get() = serviceProvider.emitterConfiguration
 
     companion object {
         private val TAG = EmitterControllerImpl::class.java.simpleName

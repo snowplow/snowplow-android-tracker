@@ -58,6 +58,25 @@ class ConfigurationBundle @JvmOverloads constructor(
         json?.let { sessionConfiguration = SessionConfiguration(it) }
     }
 
+    fun updateSourceConfig(sourceBundle: ConfigurationBundle) {
+        sourceBundle.networkConfiguration?.let {
+            if (networkConfiguration == null) networkConfiguration = NetworkConfiguration()
+            networkConfiguration?.sourceConfig = it
+        }
+        sourceBundle.trackerConfiguration?.let {
+            if (trackerConfiguration == null) trackerConfiguration = TrackerConfiguration()
+            trackerConfiguration?.sourceConfig = it
+        }
+        sourceBundle.subjectConfiguration?.let {
+            if (subjectConfiguration == null) subjectConfiguration = SubjectConfiguration()
+            subjectConfiguration?.sourceConfig = it
+        }
+        sourceBundle.sessionConfiguration?.let {
+            if (sessionConfiguration == null) sessionConfiguration = SessionConfiguration()
+            sessionConfiguration?.sourceConfig = it
+        }
+    }
+
     // Copyable
     override fun copy(): Configuration {
         val copy = ConfigurationBundle(namespace)

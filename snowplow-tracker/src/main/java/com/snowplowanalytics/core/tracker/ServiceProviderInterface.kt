@@ -13,13 +13,12 @@
 package com.snowplowanalytics.core.tracker
 
 import com.snowplowanalytics.core.emitter.*
-import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
-import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
 import com.snowplowanalytics.snowplow.media.controller.MediaController
+import com.snowplowanalytics.snowplow.configuration.*
 
 interface ServiceProviderInterface {
     val namespace: String
@@ -42,12 +41,12 @@ interface ServiceProviderInterface {
     val mediaController: MediaController
 
     // Configuration Updates
-    val trackerConfigurationUpdate: TrackerConfigurationUpdate
-    val networkConfigurationUpdate: NetworkConfigurationUpdate
-    val subjectConfigurationUpdate: SubjectConfigurationUpdate
-    val emitterConfigurationUpdate: EmitterConfigurationUpdate
-    val sessionConfigurationUpdate: SessionConfigurationUpdate
-    val gdprConfigurationUpdate: GdprConfigurationUpdate
+    val trackerConfiguration: TrackerConfiguration
+    val networkConfiguration: NetworkConfiguration
+    val subjectConfiguration: SubjectConfiguration
+    val emitterConfiguration: EmitterConfiguration
+    val sessionConfiguration: SessionConfiguration
+    val gdprConfiguration: GdprConfiguration
 
     // Plugins
     val pluginConfigurations: List<PluginIdentifiable>

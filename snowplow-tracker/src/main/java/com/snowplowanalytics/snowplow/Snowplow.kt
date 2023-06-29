@@ -18,9 +18,9 @@ import androidx.core.util.Consumer
 import androidx.core.util.Pair
 
 import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvider
 import com.snowplowanalytics.snowplow.configuration.ConfigurationState
-import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterface
 
@@ -40,7 +40,7 @@ object Snowplow {
     // Private properties
     private var defaultServiceProvider: ServiceProvider? = null
     private val serviceProviderInstances: MutableMap<String, ServiceProvider?> = HashMap()
-    private var configurationProvider: ConfigurationProvider? = null
+    private var configurationProvider: RemoteConfigurationProvider? = null
 
     /**
      * The default tracker instance is the first created in the app, but that can be overridden programmatically
@@ -101,11 +101,11 @@ object Snowplow {
         defaultBundleVersion: Int,
         onSuccess: Consumer<Pair<List<String>, ConfigurationState?>?>
     ) {
-        configurationProvider = ConfigurationProvider(remoteConfiguration, defaultBundles, defaultBundleVersion)
+        configurationProvider = RemoteConfigurationProvider(remoteConfiguration, defaultBundles, defaultBundleVersion)
         configurationProvider?.retrieveConfiguration(
             context,
             false
-        ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+        ) { fetchedConfigurationPair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
             val fetchedConfigurationBundle = fetchedConfigurationPair.first
             val configurationState = fetchedConfigurationPair.second
             val bundles = fetchedConfigurationBundle.configurationBundle
@@ -182,7 +182,7 @@ object Snowplow {
         configurationProvider?.let { it.retrieveConfiguration(
             context,
             true
-        ) { fetchedConfigurationPair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
+        ) { fetchedConfigurationPair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
             val fetchedConfigurationBundle = fetchedConfigurationPair.first
             val configurationState = fetchedConfigurationPair.second
             val bundles = fetchedConfigurationBundle.configurationBundle

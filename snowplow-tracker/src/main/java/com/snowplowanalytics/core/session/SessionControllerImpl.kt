@@ -18,6 +18,7 @@ import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.core.tracker.Tracker
+import com.snowplowanalytics.snowplow.configuration.SessionConfiguration
 import com.snowplowanalytics.snowplow.controller.SessionController
 import com.snowplowanalytics.snowplow.tracker.SessionState
 import com.snowplowanalytics.snowplow.util.TimeMeasure
@@ -176,6 +177,6 @@ class SessionControllerImpl  // Constructors
         get() = serviceProvider.getOrMakeTracker()
     private val session: Session?
         get() = serviceProvider.getOrMakeTracker().session
-    private val dirtyConfig: SessionConfigurationUpdate
-        get() = serviceProvider.sessionConfigurationUpdate
+    private val dirtyConfig: SessionConfiguration
+        get() = serviceProvider.sessionConfiguration
 }
