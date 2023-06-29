@@ -167,7 +167,7 @@ class ServiceProvider(
         this.networkConfiguration = NetworkConfiguration()
         trackerConfiguration = TrackerConfiguration()
         emitterConfiguration = EmitterConfiguration()
-        subjectConfiguration= SubjectConfiguration()
+        subjectConfiguration = SubjectConfiguration()
         sessionConfiguration = SessionConfiguration()
         gdprConfiguration = GdprConfiguration()
     }
@@ -219,18 +219,17 @@ class ServiceProvider(
     }
 
     private fun makeEmitter(): Emitter {
-        val networkConfig = this.networkConfiguration
-        val endpoint = networkConfig.endpoint ?: ""
+        val endpoint = networkConfiguration.endpoint ?: ""
         
         val builder = { emitter: Emitter ->
-            emitter.httpMethod = networkConfig.method
-            networkConfig.protocol?.let { emitter.requestSecurity = it }
+            emitter.httpMethod = networkConfiguration.method
+            networkConfiguration.protocol?.let { emitter.requestSecurity = it }
             
-            emitter.networkConnection = networkConfig.networkConnection
-            emitter.customPostPath = networkConfig.customPostPath
-            emitter.client = networkConfig.okHttpClient
-            emitter.cookieJar = networkConfig.okHttpCookieJar
-            emitter.emitTimeout = networkConfig.timeout
+            emitter.networkConnection = networkConfiguration.networkConnection
+            emitter.customPostPath = networkConfiguration.customPostPath
+            emitter.client = networkConfiguration.okHttpClient
+            emitter.cookieJar = networkConfiguration.okHttpCookieJar
+            emitter.emitTimeout = networkConfiguration.timeout
             emitter.sendLimit = emitterConfiguration.emitRange
             emitter.bufferOption = emitterConfiguration.bufferOption
             emitter.eventStore = emitterConfiguration.eventStore
