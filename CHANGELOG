@@ -1,3 +1,13 @@
+Version 5.3.0 (2023-06-30)
+--------------------------
+Add media controller with APIs to track media events (#606)
+Add emitter configuration support to remote configuration (#607)
+Use default configuration for properties that are not configured using remote configuration (#613)
+Add custom HTTP headers configuration (#276)
+Truncate language in platform context entity to max 8 characters (#621)
+Truncate URL scheme for page_url and page_refr properties (#616)
+Remember requestCallback, customRetryForStatusCodes and onSessionUpdate set for initialized trackers after configuration updates
+
 Version 5.2.0 (2023-06-02)
 --------------------------
 Track install referrer details entity along with the application install event if available (#249)

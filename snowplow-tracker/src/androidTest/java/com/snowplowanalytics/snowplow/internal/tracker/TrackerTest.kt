@@ -25,7 +25,7 @@ import com.snowplowanalytics.core.tracker.ExceptionHandler
 import com.snowplowanalytics.core.tracker.Subject
 import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.core.tracker.TrackerEvent
-import com.snowplowanalytics.snowplow.TestUtils
+import com.snowplowanalytics.snowplow.util.TestUtils
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.event.SelfDescribing

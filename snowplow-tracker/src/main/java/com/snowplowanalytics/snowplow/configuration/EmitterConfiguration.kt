@@ -17,6 +17,7 @@ import com.snowplowanalytics.core.emitter.EmitterDefaults
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
+import org.json.JSONObject
 
 /**
  * Configure how the tracker should send the events to the collector.     
@@ -29,17 +30,62 @@ import com.snowplowanalytics.snowplow.network.RequestCallback
  *   - byteLimitGet: 40000 bytes
  *   - byteLimitPost: 40000 bytes
  */
-open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
+open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface {
 
-    override var bufferOption: BufferOption = EmitterDefaults.bufferOption
-    override var emitRange: Int = EmitterDefaults.emitRange
-    override var threadPoolSize: Int = EmitterDefaults.threadPoolSize
-    override var byteLimitGet: Long = EmitterDefaults.byteLimitGet
-    override var byteLimitPost: Long = EmitterDefaults.byteLimitPost
-    override var requestCallback: RequestCallback? = null
-    override var eventStore: EventStore? = null
-    override var customRetryForStatusCodes: Map<Int, Boolean>? = null
-    override var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
+    private var _isPaused: Boolean? = null
+    internal var isPaused: Boolean
+        get() = _isPaused ?: sourceConfig?.isPaused ?: false
+        set(value) { _isPaused = value }
+
+    /**
+     * Fallback configuration to read from in case requested values are not present in this configuration.
+     */
+    internal var sourceConfig: EmitterConfiguration? = null
+
+    private var _bufferOption: BufferOption? = null
+    override var bufferOption: BufferOption
+        get() = _bufferOption ?: sourceConfig?.bufferOption ?: BufferOption.DefaultGroup
+        set(value) { _bufferOption = value }
+
+    private var _emitRange: Int? = null
+    override var emitRange: Int
+        get() = _emitRange ?: sourceConfig?.emitRange ?: EmitterDefaults.emitRange
+        set(value) { _emitRange = value }
+
+    private var _threadPoolSize: Int? = null
+    override var threadPoolSize: Int
+        get() = _threadPoolSize ?: sourceConfig?.threadPoolSize ?: EmitterDefaults.threadPoolSize
+        set(value) { _threadPoolSize = value }
+
+    private var _byteLimitGet: Long? = null
+    override var byteLimitGet: Long
+        get() = _byteLimitGet ?: sourceConfig?.byteLimitGet ?: EmitterDefaults.byteLimitGet
+        set(value) { _byteLimitGet = value }
+
+    private var _byteLimitPost: Long? = null
+    override var byteLimitPost: Long
+        get() = _byteLimitPost ?: sourceConfig?.byteLimitPost ?: EmitterDefaults.byteLimitPost
+        set(value) { _byteLimitPost = value }
+
+    private var _requestCallback: RequestCallback? = null
+    override var requestCallback: RequestCallback?
+        get() = _requestCallback ?: sourceConfig?.requestCallback
+        set(value) { _requestCallback = value }
+
+    private var _eventStore: EventStore? = null
+    override var eventStore: EventStore?
+        get() = _eventStore ?: sourceConfig?.eventStore
+        set(value) { _eventStore = value }
+
+    private var _customRetryForStatusCodes: Map<Int, Boolean>? = null
+    override var customRetryForStatusCodes: Map<Int, Boolean>?
+        get() = _customRetryForStatusCodes ?: sourceConfig?.customRetryForStatusCodes
+        set(value) { _customRetryForStatusCodes = value }
+
+    private var _serverAnonymisation: Boolean? = null
+    override var serverAnonymisation: Boolean
+        get() = _serverAnonymisation ?: sourceConfig?.serverAnonymisation ?: EmitterDefaults.serverAnonymisation
+        set(value) { _serverAnonymisation = value }
     
     // Builders
     
@@ -134,5 +180,30 @@ open class EmitterConfiguration : Configuration, EmitterConfigurationInterface {
             .requestCallback(requestCallback)
             .customRetryForStatusCodes(customRetryForStatusCodes)
             .serverAnonymisation(serverAnonymisation)
+    }
+
+    // JSON Formatter
+    /**
+     * This constructor is used in remote configuration.
+     */
+    constructor(jsonObject: JSONObject) : this() {
+        if (jsonObject.has("bufferOption")) {
+            _bufferOption = BufferOption.valueOf(jsonObject.getString("bufferOption"))
+        }
+        if (jsonObject.has("emitRange")) { _emitRange = jsonObject.getInt("emitRange") }
+        if (jsonObject.has("threadPoolSize")) { _threadPoolSize = jsonObject.getInt("threadPoolSize") }
+        if (jsonObject.has("byteLimitGet")) { _byteLimitGet = jsonObject.getLong("byteLimitGet") }
+        if (jsonObject.has("byteLimitPost")) { _byteLimitPost = jsonObject.getLong("byteLimitPost") }
+        if (jsonObject.has("serverAnonymisation")) { _serverAnonymisation = jsonObject.getBoolean("serverAnonymisation") }
+        if (jsonObject.has("customRetryForStatusCodes")) {
+            val customRetryForStatusCodes = mutableMapOf<Int, Boolean>()
+            val customRetryForStatusCodesJson = jsonObject.getJSONObject("customRetryForStatusCodes")
+            val keys = customRetryForStatusCodesJson.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                customRetryForStatusCodes[key.toInt()] = customRetryForStatusCodesJson.getBoolean(key)
+            }
+            _customRetryForStatusCodes = customRetryForStatusCodes
+        }
     }
 }

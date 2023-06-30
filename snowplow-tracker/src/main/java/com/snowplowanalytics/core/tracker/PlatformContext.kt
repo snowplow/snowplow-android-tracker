@@ -124,7 +124,7 @@ class PlatformContext(
         }
         // Language
         if (shouldTrack(PlatformContextProperty.LANGUAGE)) {
-            addToMap(Parameters.MOBILE_LANGUAGE, deviceInfoMonitor.language, pairs)
+            addToMap(Parameters.MOBILE_LANGUAGE, deviceInfoMonitor.language?.take(8), pairs)
         }
 
         setEphemeralPlatformDict()

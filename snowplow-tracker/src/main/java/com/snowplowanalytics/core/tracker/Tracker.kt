@@ -31,6 +31,7 @@ import com.snowplowanalytics.core.utils.NotificationCenter.addObserver
 import com.snowplowanalytics.core.utils.NotificationCenter.removeObserver
 import com.snowplowanalytics.core.utils.Util.getApplicationContext
 import com.snowplowanalytics.core.utils.Util.getGeoLocationContext
+import com.snowplowanalytics.core.utils.Util.truncateUrlScheme
 import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import com.snowplowanalytics.snowplow.entity.DeepLink
 import com.snowplowanalytics.snowplow.event.*
@@ -583,10 +584,10 @@ class Tracker(
             }
         }
         if (url != null) {
-            payload.add(Parameters.PAGE_URL, url)
+            payload.add(Parameters.PAGE_URL, truncateUrlScheme(url))
         }
         if (referrer != null) {
-            payload.add(Parameters.PAGE_REFR, referrer)
+            payload.add(Parameters.PAGE_REFR, truncateUrlScheme(referrer))
         }
     }
 

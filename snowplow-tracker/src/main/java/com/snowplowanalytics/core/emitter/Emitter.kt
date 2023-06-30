@@ -158,6 +158,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                             .client(client)
                             .cookieJar(cookieJar)
                             .serverAnonymisation(serverAnonymisation)
+                            .requestHeaders(requestHeaders)
                             .build()
                     }
             }
@@ -183,6 +184,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
                         .build()
                 }
                 
@@ -208,7 +210,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The request security selected for the emitter
      */
-    var requestSecurity: Protocol = EmitterDefaults.requestSecurity
+    var requestSecurity: Protocol = EmitterDefaults.httpProtocol
         /**
          * Sets the Protocol for the Emitter
          * @param security the Protocol
@@ -225,6 +227,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
                         .build()
                 }
                 
@@ -263,6 +266,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
                         .build()
                 }
             }
@@ -284,6 +288,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
                         .build()
                 }
                 
@@ -319,6 +324,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .client(client)
                         .cookieJar(cookieJar)
                         .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
                         .build()
                 }
             }
@@ -329,6 +335,32 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         get() = _customRetryForStatusCodes.get()
         set(value) {
             _customRetryForStatusCodes.set(value ?: HashMap())
+        }
+
+    /**
+     * The request headers for the emitter
+     */
+    var requestHeaders: Map<String, String>? = null
+        /**
+         * Updates the request headers for the emitter.
+         * Ignored if using a custom network connection.
+         */
+        set(requestHeaders) {
+            field = requestHeaders
+            if (!isCustomNetworkConnection && builderFinished) {
+                networkConnection = emitTimeout?.let {
+                    OkHttpNetworkConnectionBuilder(uri, context)
+                        .method(httpMethod)
+                        .tls(tlsVersions)
+                        .emitTimeout(it)
+                        .customPostPath(customPostPath)
+                        .client(client)
+                        .cookieJar(cookieJar)
+                        .serverAnonymisation(serverAnonymisation)
+                        .requestHeaders(requestHeaders)
+                        .build()
+                }
+            }
         }
 
     /**
@@ -356,6 +388,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                     .client(client)
                     .cookieJar(cookieJar)
                     .serverAnonymisation(serverAnonymisation)
+                    .requestHeaders(requestHeaders)
                     .build()
             }
         } else {

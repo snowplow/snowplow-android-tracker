@@ -31,12 +31,12 @@ import java.io.IOException
 
 import java.util.concurrent.TimeUnit
 
-class ConfigurationFetcher(
+class RemoteConfigurationFetcher(
     context: Context,
     private val remoteConfiguration: RemoteConfiguration,
-    private val onFetchCallback: Consumer<FetchedConfigurationBundle>
+    private val onFetchCallback: Consumer<RemoteConfigurationBundle>
 ) {
-    private val TAG = ConfigurationFetcher::class.java.simpleName
+    private val TAG = RemoteConfigurationFetcher::class.java.simpleName
 
     init {
         execute(getRunnable(context)) { t: Throwable? -> exceptionHandler(t) }
@@ -78,11 +78,11 @@ class ConfigurationFetcher(
     private fun resolveRequest(
         context: Context,
         responseBody: ResponseBody,
-        onFetchCallback: Consumer<FetchedConfigurationBundle>
+        onFetchCallback: Consumer<RemoteConfigurationBundle>
     ) {
         val data = responseBody.string()
         val jsonObject = JSONObject(data)
-        val bundle = FetchedConfigurationBundle(context, jsonObject)
+        val bundle = RemoteConfigurationBundle(context, jsonObject)
         onFetchCallback.accept(bundle)
     }
 

@@ -233,6 +233,19 @@ class PlatformContextTest {
         Assert.assertFalse(sdjData.containsKey(Parameters.IS_PORTRAIT))
     }
 
+    @Test
+    fun truncatesLanguageToMax8Chars() {
+        val deviceInfoMonitor = MockDeviceInfoMonitor()
+        deviceInfoMonitor.language = "1234567890"
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertEquals("12345678", sdjData[Parameters.MOBILE_LANGUAGE])
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

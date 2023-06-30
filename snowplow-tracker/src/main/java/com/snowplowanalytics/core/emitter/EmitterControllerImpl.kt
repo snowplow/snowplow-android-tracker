@@ -16,6 +16,7 @@ import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
+import com.snowplowanalytics.snowplow.configuration.EmitterConfiguration
 import com.snowplowanalytics.snowplow.controller.EmitterController
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
@@ -64,11 +65,17 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
 
     override var requestCallback: RequestCallback?
         get() = emitter.requestCallback
-        set(requestCallback) { emitter.requestCallback = requestCallback }
+        set(requestCallback) {
+            dirtyConfig.requestCallback = requestCallback
+            emitter.requestCallback = requestCallback
+        }
     
     override var customRetryForStatusCodes: Map<Int, Boolean>?
         get() = emitter.customRetryForStatusCodes
-        set(customRetryForStatusCodes) { emitter.customRetryForStatusCodes = customRetryForStatusCodes }
+        set(customRetryForStatusCodes) {
+            dirtyConfig.customRetryForStatusCodes = customRetryForStatusCodes
+            emitter.customRetryForStatusCodes = customRetryForStatusCodes
+        }
 
     override var serverAnonymisation: Boolean
         get() = emitter.serverAnonymisation
@@ -101,8 +108,8 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
     }
 
     // Private methods
-    private val dirtyConfig: EmitterConfigurationUpdate
-        get() = serviceProvider.emitterConfigurationUpdate
+    private val dirtyConfig: EmitterConfiguration
+        get() = serviceProvider.emitterConfiguration
 
     companion object {
         private val TAG = EmitterControllerImpl::class.java.simpleName

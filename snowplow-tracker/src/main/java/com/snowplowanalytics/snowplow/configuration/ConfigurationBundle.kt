@@ -26,6 +26,7 @@ class ConfigurationBundle @JvmOverloads constructor(
     var trackerConfiguration: TrackerConfiguration? = null
     var subjectConfiguration: SubjectConfiguration? = null
     var sessionConfiguration: SessionConfiguration? = null
+    var emitterConfiguration: EmitterConfiguration? = null
     
     val configurations: List<Configuration>
         get() {
@@ -34,6 +35,7 @@ class ConfigurationBundle @JvmOverloads constructor(
             trackerConfiguration?.let { array.add(it) }
             subjectConfiguration?.let { array.add(it) }
             sessionConfiguration?.let { array.add(it) }
+            emitterConfiguration?.let { array.add(it) }
             return array
         }
 
@@ -56,6 +58,32 @@ class ConfigurationBundle @JvmOverloads constructor(
         
         json = jsonObject.optJSONObject("sessionConfiguration")
         json?.let { sessionConfiguration = SessionConfiguration(it) }
+
+        json = jsonObject.optJSONObject("emitterConfiguration")
+        json?.let { emitterConfiguration = EmitterConfiguration(it) }
+    }
+
+    fun updateSourceConfig(sourceBundle: ConfigurationBundle) {
+        sourceBundle.networkConfiguration?.let {
+            if (networkConfiguration == null) networkConfiguration = NetworkConfiguration()
+            networkConfiguration?.sourceConfig = it
+        }
+        sourceBundle.trackerConfiguration?.let {
+            if (trackerConfiguration == null) trackerConfiguration = TrackerConfiguration()
+            trackerConfiguration?.sourceConfig = it
+        }
+        sourceBundle.subjectConfiguration?.let {
+            if (subjectConfiguration == null) subjectConfiguration = SubjectConfiguration()
+            subjectConfiguration?.sourceConfig = it
+        }
+        sourceBundle.sessionConfiguration?.let {
+            if (sessionConfiguration == null) sessionConfiguration = SessionConfiguration()
+            sessionConfiguration?.sourceConfig = it
+        }
+        sourceBundle.emitterConfiguration?.let {
+            if (emitterConfiguration == null) emitterConfiguration = EmitterConfiguration()
+            emitterConfiguration?.sourceConfig = it
+        }
     }
 
     // Copyable
@@ -65,6 +93,7 @@ class ConfigurationBundle @JvmOverloads constructor(
         copy.trackerConfiguration = trackerConfiguration
         copy.subjectConfiguration = subjectConfiguration
         copy.sessionConfiguration = sessionConfiguration
+        copy.emitterConfiguration = emitterConfiguration
         return copy
     }
 }
