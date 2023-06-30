@@ -65,11 +65,17 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
 
     override var requestCallback: RequestCallback?
         get() = emitter.requestCallback
-        set(requestCallback) { emitter.requestCallback = requestCallback }
+        set(requestCallback) {
+            dirtyConfig.requestCallback = requestCallback
+            emitter.requestCallback = requestCallback
+        }
     
     override var customRetryForStatusCodes: Map<Int, Boolean>?
         get() = emitter.customRetryForStatusCodes
-        set(customRetryForStatusCodes) { emitter.customRetryForStatusCodes = customRetryForStatusCodes }
+        set(customRetryForStatusCodes) {
+            dirtyConfig.customRetryForStatusCodes = customRetryForStatusCodes
+            emitter.customRetryForStatusCodes = customRetryForStatusCodes
+        }
 
     override var serverAnonymisation: Boolean
         get() = emitter.serverAnonymisation

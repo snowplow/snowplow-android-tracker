@@ -165,6 +165,7 @@ class SessionControllerImpl  // Constructors
                 Logger.track(TAG, "Attempt to access SessionController fields when disabled")
                 return
             }
+            dirtyConfig.onSessionUpdate = onSessionUpdate
             session.onSessionUpdate = onSessionUpdate
         }
 
