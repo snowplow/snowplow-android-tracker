@@ -47,11 +47,7 @@ object TrackerEvents {
         trackConsentGranted(tracker)
         trackConsentWithdrawn(tracker)
         trackMessageNotification(tracker)
-        
-        // Deprecated events
-        trackPageView(tracker)
-        trackEcommerceEvent(tracker)
-        
+
         // Ecommerce events
         trackAddToCart(tracker)
         trackRemoveFromCart(tracker)
@@ -79,10 +75,6 @@ object TrackerEvents {
         tracker.track(event)
     }
 
-    private fun trackPageView(tracker: TrackerController) {
-        tracker.track(PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"))
-    }
-
     private fun trackStructuredEvent(tracker: TrackerController) {
         tracker.track(
             Structured("category", "action").label("label").property("property").value(0.00)
@@ -105,17 +97,6 @@ object TrackerEvents {
             attributes
         )
         tracker.track(SelfDescribing(test))
-    }
-
-    private fun trackEcommerceEvent(tracker: TrackerController) {
-        val item = EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff")
-            .currency("AUD").orderId("item-1")
-        val items: MutableList<EcommerceTransactionItem> = LinkedList()
-        items.add(item)
-        tracker.track(
-            EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50)
-                .shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD")
-        )
     }
 
     private fun trackConsentGranted(tracker: TrackerController) {

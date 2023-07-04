@@ -70,10 +70,6 @@ public class TrackerEvents {
         trackConsentWithdrawn(tracker);
         trackMessageNotification(tracker);
 
-        // Deprecated events
-        trackPageView(tracker);
-        trackEcommerceEvent(tracker);
-
         // Ecommerce events
         trackAddToCart(tracker);
         trackRemoveFromCart(tracker);
@@ -100,10 +96,6 @@ public class TrackerEvents {
         tracker.track(event);
     }
 
-    private static void trackPageView(TrackerController tracker) {
-        tracker.track(new PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"));
-    }
-
     private static void trackStructuredEvent(TrackerController tracker) {
         tracker.track(new Structured("category", "action").label("label").property("property").value(0.00));
     }
@@ -121,13 +113,6 @@ public class TrackerEvents {
         attributes.put("targetUrl", "http://a-target-url.com");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(new SelfDescribing(test));
-    }
-
-    private static void trackEcommerceEvent(TrackerController tracker) {
-        EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD").orderId("item-1");
-        List<EcommerceTransactionItem> items = new LinkedList<>();
-        items.add(item);
-        tracker.track(new EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD"));
     }
 
     private static void trackConsentGranted(TrackerController tracker) {
