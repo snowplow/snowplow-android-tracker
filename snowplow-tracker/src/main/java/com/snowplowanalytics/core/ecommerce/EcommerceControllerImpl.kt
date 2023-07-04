@@ -17,34 +17,22 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommScreenEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommUserEntity
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : EcommerceController {
 
-    override fun setEcommerceScreen(type: String, language: String?, locale: String?) {
+    override fun setEcommerceScreen(screen: EcommScreenEntity) {
         val plugin = PluginConfiguration("ecommercePageTypePluginInternal")
-        plugin.entities  {
-            val map = mutableMapOf<String, Any>()
-            map["type"] = type
-            language?.let { map["language"] = it }
-            locale?.let { map["locale"] = it }
-
-            listOf(SelfDescribingJson(TrackerConstants.SCHEMA_ECOMMERCE_PAGE, map))
-        }
+        plugin.entities { listOf(screen.entity) }
         serviceProvider.addPlugin(plugin)
     }
 
-    override fun setEcommerceUser(id: String, isGuest: Boolean?, email: String?) {
+    override fun setEcommerceUser(user: EcommUserEntity) {
         val plugin = PluginConfiguration("ecommerceUserPluginInternal")
-        plugin.entities {
-            val map = mutableMapOf<String, Any>()
-            map["id"] = id
-            isGuest?.let { map["is_guest"] = it }
-            email?.let { map["email"] = it }
-            
-            listOf(SelfDescribingJson(TrackerConstants.SCHEMA_ECOMMERCE_USER, map))
-        }
+        plugin.entities { listOf(user.entity) }
         serviceProvider.addPlugin(plugin)
     }
 

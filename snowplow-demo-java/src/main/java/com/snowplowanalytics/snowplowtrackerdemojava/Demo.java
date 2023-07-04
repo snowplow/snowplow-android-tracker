@@ -53,6 +53,8 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommScreenEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommUserEntity;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
@@ -264,9 +266,11 @@ public class Demo extends Activity implements LoggerDelegate {
             callbackTrackerReady.accept(true);
         });
         Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
-                "demo_app_screen",
-                null,
-                "England/London"
+            new EcommScreenEntity(
+                    "demo_app_screen",
+                    null,
+                    "England/London"
+            )
         );
         return true;
     }
@@ -341,7 +345,9 @@ public class Demo extends Activity implements LoggerDelegate {
                 plugin
         );
         Snowplow.subscribeToWebViewEvents(_webView);
-        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceUser("ecomm_user_id", null, null);
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceUser(
+                new EcommUserEntity("ecomm_user_id", null, null)
+        );
         return true;
     }
 

@@ -22,6 +22,8 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommScreenEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommUserEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
@@ -422,7 +424,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
         
-        tracker.ecommerce.setEcommerceScreen(type = "listing", language = "DE", locale = "DE")
+        tracker.ecommerce.setEcommerceScreen(EcommScreenEntity(type = "listing", language = "DE", locale = "DE"))
         
         tracker.track(ScreenView("screen"))
         waitForEvents(networkConnection, 1)
@@ -437,7 +439,7 @@ class EcommerceTest {
 
 
         // replacing earlier Page
-        tracker.ecommerce.setEcommerceScreen(type = "home_screen", language = "EN-GB")
+        tracker.ecommerce.setEcommerceScreen(EcommScreenEntity(type = "home_screen", language = "EN-GB"))
 
         tracker.track(Structured("category", "action"))
         waitForEvents(networkConnection, 2)
@@ -466,7 +468,7 @@ class EcommerceTest {
         val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
         val tracker = getTracker(networkConnection)
 
-        tracker.ecommerce.setEcommerceUser("user_id")
+        tracker.ecommerce.setEcommerceUser(EcommUserEntity("user_id"))
 
         tracker.track(ScreenView("screen"))
         waitForEvents(networkConnection, 1)
@@ -479,7 +481,7 @@ class EcommerceTest {
         Assert.assertFalse(userEntities[0].has("is_guest"))
 
         // replacing earlier User
-        tracker.ecommerce.setEcommerceUser("a_new_user", false, "email@email.com")
+        tracker.ecommerce.setEcommerceUser(EcommUserEntity("a_new_user", false, "email@email.com"))
 
         tracker.track(Structured("category", "action"))
         waitForEvents(networkConnection, 2)

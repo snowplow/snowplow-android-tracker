@@ -143,6 +143,15 @@ object Parameters {
     const val ECOMM_REFUND_AMOUNT = "refund_amount"
     const val ECOMM_REFUND_REASON = "refund_reason"
 
+    // Snowplow Ecommerce Screen/Page
+    const val ECOMM_SCREEN_TYPE = "type"
+    const val ECOMM_SCREEN_LANGUAGE = "language"
+    const val ECOMM_SCREEN_LOCALE = "locale"
+
+    // Snowplow Ecommerce User
+    const val ECOMM_USER_ID = "id"
+    const val ECOMM_USER_GUEST = "is_guest"
+    const val ECOMM_USER_EMAIL = "email"
 
     // Screen View
     const val SV_ID = "id"
