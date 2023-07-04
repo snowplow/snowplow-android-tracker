@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
+import com.snowplowanalytics.core.tracker.PlatformContext
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
@@ -43,31 +44,121 @@ import java.util.*
  *  - exceptionAutotracking: true
  *  - diagnosticAutotracking: false
  *  - userAnonymisation: false
- * 
- * @param appId Identifier of the app.
 */
-open class TrackerConfiguration(
+open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
+
+    /**
+     * Identifier of the app.
+     */
+    private var _appId: String? = null
     override var appId: String
-) : TrackerConfigurationInterface, Configuration {
-    
-    override var devicePlatform: DevicePlatform = TrackerDefaults.devicePlatform
-    override var base64encoding: Boolean = TrackerDefaults.base64Encoded
-    override var logLevel: LogLevel = TrackerDefaults.logLevel
-    override var loggerDelegate: LoggerDelegate? = null
-    override var sessionContext: Boolean = TrackerDefaults.sessionContext
-    override var applicationContext: Boolean = TrackerDefaults.applicationContext
-    override var platformContext: Boolean = TrackerDefaults.platformContext
-    override var geoLocationContext: Boolean = TrackerDefaults.geoLocationContext
-    override var deepLinkContext: Boolean = TrackerDefaults.deepLinkContext
-    override var screenContext: Boolean = TrackerDefaults.screenContext
-    override var screenViewAutotracking: Boolean = TrackerDefaults.screenViewAutotracking
-    override var lifecycleAutotracking: Boolean = TrackerDefaults.lifecycleAutotracking
-    override var installAutotracking: Boolean = TrackerDefaults.installAutotracking
-    override var exceptionAutotracking: Boolean = TrackerDefaults.exceptionAutotracking
-    override var diagnosticAutotracking: Boolean = TrackerDefaults.diagnosticAutotracking
-    override var userAnonymisation: Boolean = TrackerDefaults.userAnonymisation
-    override var trackerVersionSuffix: String? = null
-    
+        get() = _appId ?: sourceConfig?.appId ?: ""
+        set(value) { if (value.isNotEmpty()) { _appId = value } }
+
+    /**
+     *  Fallback configuration to read from in case requested values are not present in this configuration.
+     */
+    var sourceConfig: TrackerConfiguration? = null
+
+    private var _isPaused: Boolean? = null
+    internal var isPaused: Boolean
+        get() = _isPaused ?: sourceConfig?.isPaused ?: false
+        set(value) { _isPaused = value }
+
+    private var _devicePlatform: DevicePlatform? = null
+    override var devicePlatform: DevicePlatform
+        get() = _devicePlatform ?: sourceConfig?.devicePlatform ?: TrackerDefaults.devicePlatform
+        set(value) { _devicePlatform = value }
+
+    private var _base64encoding: Boolean? = null
+    override var base64encoding: Boolean
+        get() = _base64encoding ?: sourceConfig?.base64encoding ?: TrackerDefaults.base64Encoded
+        set(value) { _base64encoding = value }
+
+    private var _logLevel: LogLevel? = null
+    override var logLevel: LogLevel
+        get() = _logLevel ?: sourceConfig?.logLevel ?: TrackerDefaults.logLevel
+        set(value) { _logLevel = value }
+
+    private var _loggerDelegate: LoggerDelegate? = null
+    override var loggerDelegate: LoggerDelegate?
+        get() = _loggerDelegate ?: sourceConfig?.loggerDelegate
+        set(value) { _loggerDelegate = value }
+
+    private var _sessionContext: Boolean? = null
+    override var sessionContext: Boolean
+        get() = _sessionContext ?: sourceConfig?.sessionContext ?: TrackerDefaults.sessionContext
+        set(value) { _sessionContext = value }
+
+    private var _applicationContext: Boolean? = null
+    override var applicationContext: Boolean
+        get() = _applicationContext ?: sourceConfig?.applicationContext ?: TrackerDefaults.applicationContext
+        set(value) { _applicationContext = value }
+
+    private var _platformContext: Boolean? = null
+    override var platformContext: Boolean
+        get() = _platformContext ?: sourceConfig?.platformContext ?: TrackerDefaults.platformContext
+        set(value) { _platformContext = value }
+
+    private var _geoLocationContext: Boolean? = null
+    override var geoLocationContext: Boolean
+        get() = _geoLocationContext ?: sourceConfig?.geoLocationContext ?: TrackerDefaults.geoLocationContext
+        set(value) { _geoLocationContext = value }
+
+    private var _deepLinkContext: Boolean? = null
+    override var deepLinkContext: Boolean
+        get() = _deepLinkContext ?: sourceConfig?.deepLinkContext ?: TrackerDefaults.deepLinkContext
+        set(value) { _deepLinkContext = value }
+
+    private var _screenContext: Boolean? = null
+    override var screenContext: Boolean
+        get() = _screenContext ?: sourceConfig?.screenContext ?: TrackerDefaults.screenContext
+        set(value) { _screenContext = value }
+
+    private var _screenViewAutotracking: Boolean? = null
+    override var screenViewAutotracking: Boolean
+        get() = _screenViewAutotracking ?: sourceConfig?.screenViewAutotracking ?: TrackerDefaults.screenViewAutotracking
+        set(value) { _screenViewAutotracking = value }
+
+    private var _lifecycleAutotracking: Boolean? = null
+    override var lifecycleAutotracking: Boolean
+        get() = _lifecycleAutotracking ?: sourceConfig?.lifecycleAutotracking ?: TrackerDefaults.lifecycleAutotracking
+        set(value) { _lifecycleAutotracking = value }
+
+    private var _installAutotracking: Boolean? = null
+    override var installAutotracking: Boolean
+        get() = _installAutotracking ?: sourceConfig?.installAutotracking ?: TrackerDefaults.installAutotracking
+        set(value) { _installAutotracking = value }
+
+    private var _exceptionAutotracking: Boolean? = null
+    override var exceptionAutotracking: Boolean
+        get() = _exceptionAutotracking ?: sourceConfig?.exceptionAutotracking ?: TrackerDefaults.exceptionAutotracking
+        set(value) { _exceptionAutotracking = value }
+
+    private var _diagnosticAutotracking: Boolean? = null
+    override var diagnosticAutotracking: Boolean
+        get() = _diagnosticAutotracking ?: sourceConfig?.diagnosticAutotracking ?: TrackerDefaults.diagnosticAutotracking
+        set(value) { _diagnosticAutotracking = value }
+
+    private var _userAnonymisation: Boolean? = null
+    override var userAnonymisation: Boolean
+        get() = _userAnonymisation ?: sourceConfig?.userAnonymisation ?: TrackerDefaults.userAnonymisation
+        set(value) { _userAnonymisation = value }
+
+    private var _trackerVersionSuffix: String? = null
+    override var trackerVersionSuffix: String?
+        get() = _trackerVersionSuffix ?: sourceConfig?.trackerVersionSuffix
+        set(value) { _trackerVersionSuffix = value }
+
+    private var _platformContextProperties: List<PlatformContextProperty>? = null
+    /**
+     * List of properties of the platform context to track.
+     * If not passed and `platformContext` is enabled, all available properties will be tracked.
+     * The required `osType`, `osVersion`, `deviceManufacturer`, and `deviceModel` properties will be tracked in the entity regardless of this setting.
+     */
+    open var platformContextProperties: List<PlatformContextProperty>?
+        get() = _platformContextProperties ?: sourceConfig?.platformContextProperties
+        set(value) { _platformContextProperties = value }
 
     // Builder methods
     
@@ -185,6 +276,8 @@ open class TrackerConfiguration(
 
     /**
      * Whether to enable automatic tracking of install event.
+     * In case com.android.installreferrer:installreferrer library is present,
+     * an entity with the referrer details will be attached to the install event.
      */
     fun installAutotracking(installAutotracking: Boolean): TrackerConfiguration {
         this.installAutotracking = installAutotracking
@@ -227,6 +320,16 @@ open class TrackerConfiguration(
         return this
     }
 
+    /**
+     * List of properties of the platform context to track.
+     * If not passed and `platformContext` is enabled, all available properties will be tracked.
+     * The required `osType`, `osVersion`, `deviceManufacturer`, and `deviceModel` properties will be tracked in the entity regardless of this setting.
+     */
+    fun platformContextProperties(platformContextProperties: List<PlatformContextProperty>?): TrackerConfiguration {
+        this.platformContextProperties = platformContextProperties
+        return this
+    }
+
     // Copyable
     override fun copy(): Configuration {
         return TrackerConfiguration(appId)
@@ -247,7 +350,20 @@ open class TrackerConfiguration(
             .diagnosticAutotracking(diagnosticAutotracking)
             .userAnonymisation(userAnonymisation)
             .trackerVersionSuffix(trackerVersionSuffix)
+            .platformContextProperties(platformContextProperties)
     }
+
+    /**
+     * @param appId Identifier of the app.
+     */
+    constructor(appId: String) {
+        this._appId = appId
+    }
+
+    /**
+     * This constructor is only used internally in the service provider
+     */
+    internal constructor()
 
     // JSON Formatter
     /**
@@ -260,32 +376,30 @@ open class TrackerConfiguration(
         )
     ) {
         val value = jsonObject.optString("devicePlatform", DevicePlatform.Mobile.value)
-        devicePlatform = DevicePlatform.getByValue(value)
-        base64encoding = jsonObject.optBoolean("base64encoding", base64encoding)
-        
-        val log = jsonObject.optString("logLevel", LogLevel.OFF.name)
-        try {
-            logLevel = LogLevel.valueOf(log.uppercase(Locale.getDefault()))
-        } catch (e: Exception) {
-            Logger.e(TAG, "Unable to decode logLevel from remote configuration.")
+        _devicePlatform = DevicePlatform.getByValue(value)
+        if (jsonObject.has("base64encoding")) { _base64encoding = jsonObject.getBoolean("base64encoding") }
+
+        if (jsonObject.has("logLevel")) {
+            val log = jsonObject.optString("logLevel", LogLevel.OFF.name)
+            try {
+                _logLevel = LogLevel.valueOf(log.uppercase(Locale.getDefault()))
+            } catch (e: Exception) {
+                Logger.e(TAG, "Unable to decode logLevel from remote configuration.")
+            }
         }
-        
-        sessionContext = jsonObject.optBoolean("sessionContext", sessionContext)
-        applicationContext = jsonObject.optBoolean("applicationContext", applicationContext)
-        platformContext = jsonObject.optBoolean("platformContext", platformContext)
-        geoLocationContext = jsonObject.optBoolean("geoLocationContext", geoLocationContext)
-        screenContext = jsonObject.optBoolean("screenContext", screenContext)
-        deepLinkContext = jsonObject.optBoolean("deepLinkContext", deepLinkContext)
-        screenViewAutotracking =
-            jsonObject.optBoolean("screenViewAutotracking", screenViewAutotracking)
-        lifecycleAutotracking =
-            jsonObject.optBoolean("lifecycleAutotracking", lifecycleAutotracking)
-        installAutotracking = jsonObject.optBoolean("installAutotracking", installAutotracking)
-        exceptionAutotracking =
-            jsonObject.optBoolean("exceptionAutotracking", exceptionAutotracking)
-        diagnosticAutotracking =
-            jsonObject.optBoolean("diagnosticAutotracking", diagnosticAutotracking)
-        userAnonymisation = jsonObject.optBoolean("userAnonymisation", userAnonymisation)
+
+        if (jsonObject.has("sessionContext")) { _sessionContext = jsonObject.getBoolean("sessionContext") }
+        if (jsonObject.has("applicationContext")) { _applicationContext = jsonObject.getBoolean("applicationContext") }
+        if (jsonObject.has("platformContext")) { _platformContext = jsonObject.getBoolean("platformContext") }
+        if (jsonObject.has("geoLocationContext")) { _geoLocationContext = jsonObject.getBoolean("geoLocationContext") }
+        if (jsonObject.has("screenContext")) { _screenContext = jsonObject.getBoolean("screenContext") }
+        if (jsonObject.has("deepLinkContext")) { _deepLinkContext = jsonObject.getBoolean("deepLinkContext") }
+        if (jsonObject.has("screenViewAutotracking")) { _screenViewAutotracking = jsonObject.getBoolean("screenViewAutotracking") }
+        if (jsonObject.has("lifecycleAutotracking")) { _lifecycleAutotracking = jsonObject.getBoolean("lifecycleAutotracking") }
+        if (jsonObject.has("installAutotracking")) { _installAutotracking = jsonObject.getBoolean("installAutotracking") }
+        if (jsonObject.has("exceptionAutotracking")) { _exceptionAutotracking = jsonObject.getBoolean("exceptionAutotracking") }
+        if (jsonObject.has("diagnosticAutotracking")) { _diagnosticAutotracking = jsonObject.getBoolean("diagnosticAutotracking") }
+        if (jsonObject.has("userAnonymisation")) { _userAnonymisation = jsonObject.getBoolean("userAnonymisation") }
     }
 
     companion object {

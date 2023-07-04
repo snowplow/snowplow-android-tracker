@@ -14,12 +14,12 @@ package com.snowplowanalytics.core.tracker
 
 import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.emitter.*
-import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
-import com.snowplowanalytics.core.session.SessionConfigurationUpdate
 import com.snowplowanalytics.core.session.SessionControllerImpl
-import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
+import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
+import com.snowplowanalytics.snowplow.media.controller.MediaController
+import com.snowplowanalytics.snowplow.configuration.*
 
 interface ServiceProviderInterface {
     val namespace: String
@@ -39,18 +39,19 @@ interface ServiceProviderInterface {
     fun getOrMakeSubjectController(): SubjectControllerImpl
     fun getOrMakeSessionController(): SessionControllerImpl
     val pluginsController: PluginsControllerImpl
+    val mediaController: MediaController
     val ecommerceController: EcommerceControllerImpl
 
     // Configuration Updates
-    val trackerConfigurationUpdate: TrackerConfigurationUpdate
-    val networkConfigurationUpdate: NetworkConfigurationUpdate
-    val subjectConfigurationUpdate: SubjectConfigurationUpdate
-    val emitterConfigurationUpdate: EmitterConfigurationUpdate
-    val sessionConfigurationUpdate: SessionConfigurationUpdate
-    val gdprConfigurationUpdate: GdprConfigurationUpdate
+    val trackerConfiguration: TrackerConfiguration
+    val networkConfiguration: NetworkConfiguration
+    val subjectConfiguration: SubjectConfiguration
+    val emitterConfiguration: EmitterConfiguration
+    val sessionConfiguration: SessionConfiguration
+    val gdprConfiguration: GdprConfiguration
 
     // Plugins
-    val pluginConfigurations: List<PluginConfigurationInterface>
-    fun addPlugin(plugin: PluginConfigurationInterface)
+    val pluginConfigurations: List<PluginIdentifiable>
+    fun addPlugin(plugin: PluginIdentifiable)
     fun removePlugin(identifier: String)
 }

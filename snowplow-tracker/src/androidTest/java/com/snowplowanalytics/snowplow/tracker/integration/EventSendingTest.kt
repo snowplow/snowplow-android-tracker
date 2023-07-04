@@ -20,7 +20,7 @@ import com.snowplowanalytics.core.emitter.Emitter
 import com.snowplowanalytics.core.emitter.storage.SQLiteEventStore
 import com.snowplowanalytics.core.tracker.Subject
 import com.snowplowanalytics.core.tracker.Tracker
-import com.snowplowanalytics.snowplow.TestUtils.createSessionSharedPreferences
+import com.snowplowanalytics.snowplow.util.TestUtils.createSessionSharedPreferences
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.event.*
@@ -220,6 +220,7 @@ class EventSendingTest {
             emitter,
             ns,
             "myAppId",
+            null,
             InstrumentationRegistry.getInstrumentation().targetContext,
             trackerBuilder
         )

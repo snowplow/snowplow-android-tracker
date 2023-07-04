@@ -17,12 +17,12 @@ import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.emitter.*
 import com.snowplowanalytics.core.gdpr.Gdpr
-import com.snowplowanalytics.core.gdpr.GdprConfigurationUpdate
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
-import com.snowplowanalytics.core.session.SessionConfigurationUpdate
+import com.snowplowanalytics.core.media.controller.MediaControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.*
+import com.snowplowanalytics.snowplow.media.controller.MediaController
 import java.util.concurrent.TimeUnit
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -33,7 +33,6 @@ class ServiceProvider(
     configurations: List<Configuration>
 ) : ServiceProviderInterface {
     private val context: Context
-    private val appId: String
     override val isTrackerInitialized: Boolean
         get() = tracker != null
 
@@ -55,39 +54,36 @@ class ServiceProvider(
     override val pluginsController: PluginsControllerImpl by lazy {
         PluginsControllerImpl(this)
     }
+    override val mediaController: MediaController by lazy {
+        MediaControllerImpl(this)
+    }
 
-    // Original configurations
-    override var pluginConfigurations: MutableList<PluginConfigurationInterface> = ArrayList()
+    // Configurations
+    override lateinit var trackerConfiguration: TrackerConfiguration
+    override lateinit var networkConfiguration: NetworkConfiguration
+    override lateinit var subjectConfiguration: SubjectConfiguration
+    override lateinit var emitterConfiguration: EmitterConfiguration
+    override lateinit var sessionConfiguration: SessionConfiguration
+    override lateinit var gdprConfiguration: GdprConfiguration
+    override var pluginConfigurations: MutableList<PluginIdentifiable> = ArrayList()
         private set
-
-    // Configuration updates
-    override lateinit var trackerConfigurationUpdate: TrackerConfigurationUpdate
-    override lateinit var networkConfigurationUpdate: NetworkConfigurationUpdate
-    override lateinit var subjectConfigurationUpdate: SubjectConfigurationUpdate
-    override lateinit var emitterConfigurationUpdate: EmitterConfigurationUpdate
-    override lateinit var sessionConfigurationUpdate: SessionConfigurationUpdate
-    override lateinit var gdprConfigurationUpdate: GdprConfigurationUpdate
 
     init {
         // Initialization
         this.context = context
-        appId = context.packageName
-        
+
         // Reset configurationUpdates 
-        trackerConfigurationUpdate = TrackerConfigurationUpdate(appId)
-        networkConfigurationUpdate = NetworkConfigurationUpdate()
-        subjectConfigurationUpdate = SubjectConfigurationUpdate()
-        emitterConfigurationUpdate = EmitterConfigurationUpdate()
-        sessionConfigurationUpdate = SessionConfigurationUpdate()
-        gdprConfigurationUpdate = GdprConfigurationUpdate()
+        trackerConfiguration = TrackerConfiguration()
+        this.networkConfiguration = NetworkConfiguration()
+        subjectConfiguration = SubjectConfiguration()
+        emitterConfiguration = EmitterConfiguration()
+        sessionConfiguration = SessionConfiguration()
+        gdprConfiguration = GdprConfiguration()
         
         // Process configurations
-        networkConfigurationUpdate.sourceConfig = networkConfiguration
+        this.networkConfiguration.sourceConfig = networkConfiguration
         processConfigurations(configurations)
-        
-        if (trackerConfigurationUpdate.sourceConfig == null) {
-            trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
-        }
+
         getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
     }
 
@@ -110,31 +106,33 @@ class ServiceProvider(
     // Private methods
     private fun processConfigurations(configurations: List<Configuration>) {
         for (configuration in configurations) {
-            if (configuration is NetworkConfiguration) {
-                networkConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is TrackerConfiguration) {
-                trackerConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is SubjectConfiguration) {
-                subjectConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is SessionConfiguration) {
-                sessionConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is EmitterConfiguration) {
-                emitterConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is GdprConfiguration) {
-                gdprConfigurationUpdate.sourceConfig = configuration
-            }
-            else if (configuration is GlobalContextsConfiguration) {
-                for (plugin in configuration.toPluginConfigurations()) {
-                    pluginConfigurations.add(plugin)
+            when (configuration) {
+                is NetworkConfiguration -> {
+                    this.networkConfiguration.sourceConfig = configuration
                 }
-            }
-            else if (configuration is PluginConfigurationInterface) {
-                pluginConfigurations.add(configuration)
+                is TrackerConfiguration -> {
+                    trackerConfiguration.sourceConfig = configuration
+                }
+                is SubjectConfiguration -> {
+                    subjectConfiguration.sourceConfig = configuration
+                }
+                is SessionConfiguration -> {
+                    sessionConfiguration.sourceConfig = configuration
+                }
+                is EmitterConfiguration -> {
+                    emitterConfiguration.sourceConfig = configuration
+                }
+                is GdprConfiguration -> {
+                    gdprConfiguration.sourceConfig = configuration
+                }
+                is GlobalContextsConfiguration -> {
+                    for (plugin in configuration.toPluginConfigurations()) {
+                        pluginConfigurations.add(plugin)
+                    }
+                }
+                is PluginIdentifiable -> {
+                    pluginConfigurations.add(configuration)
+                }
             }
         }
     }
@@ -162,20 +160,20 @@ class ServiceProvider(
     private fun resetConfigurationUpdates() {
         // Don't reset networkConfiguration as it's needed in case it's not passed in the new configurations.
         // Set a default trackerConfiguration to reset to default if not passed.
-        trackerConfigurationUpdate.sourceConfig = TrackerConfiguration(appId)
-        subjectConfigurationUpdate.sourceConfig = null
-        emitterConfigurationUpdate.sourceConfig = null
-        sessionConfigurationUpdate.sourceConfig = null
-        gdprConfigurationUpdate.sourceConfig = null
+        trackerConfiguration.sourceConfig = null
+        subjectConfiguration.sourceConfig = null
+        emitterConfiguration.sourceConfig = null
+        sessionConfiguration.sourceConfig = null
+        gdprConfiguration.sourceConfig = null
     }
 
     private fun initializeConfigurationUpdates() {
-        networkConfigurationUpdate = NetworkConfigurationUpdate()
-        trackerConfigurationUpdate = TrackerConfigurationUpdate(appId)
-        emitterConfigurationUpdate = EmitterConfigurationUpdate()
-        subjectConfigurationUpdate = SubjectConfigurationUpdate()
-        sessionConfigurationUpdate = SessionConfigurationUpdate()
-        gdprConfigurationUpdate = GdprConfigurationUpdate()
+        this.networkConfiguration = NetworkConfiguration()
+        trackerConfiguration = TrackerConfiguration()
+        emitterConfiguration = EmitterConfiguration()
+        subjectConfiguration = SubjectConfiguration()
+        sessionConfiguration = SessionConfiguration()
+        gdprConfiguration = GdprConfiguration()
     }
 
     // Getters
@@ -221,36 +219,35 @@ class ServiceProvider(
 
     // Factories
     private fun makeSubject(): Subject {
-        return Subject(context, subjectConfigurationUpdate)
+        return Subject(context, subjectConfiguration)
     }
 
     private fun makeEmitter(): Emitter {
-        val networkConfig = networkConfigurationUpdate
-        val emitterConfig = emitterConfigurationUpdate
-        val endpoint = networkConfig.endpoint ?: ""
+        val endpoint = networkConfiguration.endpoint ?: ""
         
         val builder = { emitter: Emitter ->
-            networkConfig.method?.let { emitter.httpMethod = it }
-            networkConfig.protocol?.let { emitter.requestSecurity = it }
+            emitter.httpMethod = networkConfiguration.method
+            networkConfiguration.protocol?.let { emitter.requestSecurity = it }
             
-            emitter.networkConnection = networkConfig.networkConnection
-            emitter.customPostPath = networkConfig.customPostPath
-            emitter.client = networkConfig.okHttpClient
-            emitter.cookieJar = networkConfig.okHttpCookieJar
-            emitter.emitTimeout = networkConfig.timeout
-            emitter.sendLimit = emitterConfig.emitRange
-            emitter.bufferOption = emitterConfig.bufferOption
-            emitter.eventStore = emitterConfig.eventStore
-            emitter.byteLimitPost = emitterConfig.byteLimitPost
-            emitter.byteLimitGet = emitterConfig.byteLimitGet
-            emitter.threadPoolSize = emitterConfig.threadPoolSize
-            emitter.requestCallback = emitterConfig.requestCallback
-            emitter.customRetryForStatusCodes = emitterConfig.customRetryForStatusCodes
-            emitter.serverAnonymisation = emitterConfig.serverAnonymisation
+            emitter.networkConnection = networkConfiguration.networkConnection
+            emitter.customPostPath = networkConfiguration.customPostPath
+            emitter.client = networkConfiguration.okHttpClient
+            emitter.cookieJar = networkConfiguration.okHttpCookieJar
+            emitter.emitTimeout = networkConfiguration.timeout
+            emitter.sendLimit = emitterConfiguration.emitRange
+            emitter.bufferOption = emitterConfiguration.bufferOption
+            emitter.eventStore = emitterConfiguration.eventStore
+            emitter.byteLimitPost = emitterConfiguration.byteLimitPost
+            emitter.byteLimitGet = emitterConfiguration.byteLimitGet
+            emitter.threadPoolSize = emitterConfiguration.threadPoolSize
+            emitter.requestCallback = emitterConfiguration.requestCallback
+            emitter.customRetryForStatusCodes = emitterConfiguration.customRetryForStatusCodes
+            emitter.serverAnonymisation = emitterConfiguration.serverAnonymisation
+            emitter.requestHeaders = networkConfiguration.requestHeaders
         }
         
         val emitter = Emitter(context, endpoint, builder)
-        if (emitterConfig.isPaused) {
+        if (emitterConfiguration.isPaused) {
             emitter.pauseEmit()
         }
         return emitter
@@ -259,56 +256,60 @@ class ServiceProvider(
     private fun makeTracker(): Tracker {
         val emitter = getOrMakeEmitter()
         val subject = getOrMakeSubject()
-        val trackerConfig = trackerConfigurationUpdate
-        val sessionConfig = sessionConfigurationUpdate
-        val gdprConfig = gdprConfigurationUpdate
 
         val builder = { tracker: Tracker ->
             tracker.subject = subject
-            tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
-            tracker.base64Encoded = trackerConfig.base64encoding
-            tracker.platform = trackerConfig.devicePlatform
-            tracker.logLevel = trackerConfig.logLevel
-            tracker.loggerDelegate = trackerConfig.loggerDelegate
-            tracker.sessionContext = trackerConfig.sessionContext
-            tracker.applicationContext = trackerConfig.applicationContext
-            tracker.platformContextEnabled = trackerConfig.platformContext
-            tracker.geoLocationContext = trackerConfig.geoLocationContext
-            tracker.deepLinkContext = trackerConfig.deepLinkContext
-            tracker.screenContext = trackerConfig.screenContext
-            tracker.screenViewAutotracking = trackerConfig.screenViewAutotracking
-            tracker.lifecycleAutotracking = trackerConfig.lifecycleAutotracking
-            tracker.installAutotracking = trackerConfigurationUpdate.installAutotracking
-            tracker.exceptionAutotracking = trackerConfig.exceptionAutotracking
-            tracker.diagnosticAutotracking = trackerConfig.diagnosticAutotracking
-            tracker.userAnonymisation = trackerConfig.userAnonymisation
-            tracker.trackerVersionSuffix = trackerConfig.trackerVersionSuffix
+            tracker.trackerVersionSuffix = trackerConfiguration.trackerVersionSuffix
+            tracker.base64Encoded = trackerConfiguration.base64encoding
+            tracker.platform = trackerConfiguration.devicePlatform
+            tracker.logLevel = trackerConfiguration.logLevel
+            tracker.loggerDelegate = trackerConfiguration.loggerDelegate
+            tracker.sessionContext = trackerConfiguration.sessionContext
+            tracker.applicationContext = trackerConfiguration.applicationContext
+            tracker.platformContextEnabled = trackerConfiguration.platformContext
+            tracker.geoLocationContext = trackerConfiguration.geoLocationContext
+            tracker.deepLinkContext = trackerConfiguration.deepLinkContext
+            tracker.screenContext = trackerConfiguration.screenContext
+            tracker.screenViewAutotracking = trackerConfiguration.screenViewAutotracking
+            tracker.lifecycleAutotracking = trackerConfiguration.lifecycleAutotracking
+            tracker.installAutotracking = trackerConfiguration.installAutotracking
+            tracker.exceptionAutotracking = trackerConfiguration.exceptionAutotracking
+            tracker.diagnosticAutotracking = trackerConfiguration.diagnosticAutotracking
+            tracker.userAnonymisation = trackerConfiguration.userAnonymisation
+            tracker.trackerVersionSuffix = trackerConfiguration.trackerVersionSuffix
 
-            gdprConfig.sourceConfig?.let { tracker.gdprContext = Gdpr(
-                gdprConfig.basisForProcessing,
-                gdprConfig.documentId,
-                gdprConfig.documentVersion,
-                gdprConfig.documentDescription) }
+            gdprConfiguration.sourceConfig?.let { tracker.gdprContext = Gdpr(
+                basisForProcessing = it.basisForProcessing,
+                documentId = it.documentId,
+                documentVersion = it.documentVersion,
+                documentDescription = it.documentDescription) }
 
-            tracker.backgroundTimeout = sessionConfig.backgroundTimeout.convert(TimeUnit.SECONDS)
-            tracker.foregroundTimeout = sessionConfig.foregroundTimeout.convert(TimeUnit.SECONDS)
+            tracker.backgroundTimeout = sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS)
+            tracker.foregroundTimeout = sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS)
 
             for (plugin in pluginConfigurations) {
                 tracker.addOrReplaceStateMachine(plugin.toStateMachine())
             }
         }
         
-        val tracker = Tracker(emitter, namespace, trackerConfig.appId, context, builder)
+        val tracker = Tracker(
+            emitter,
+            namespace,
+            trackerConfiguration.appId,
+            trackerConfiguration.platformContextProperties,
+            context,
+            builder
+        )
         
-        if (trackerConfigurationUpdate.isPaused) {
+        if (trackerConfiguration.isPaused) {
             tracker.pauseEventTracking()
         }
-        if (sessionConfigurationUpdate.isPaused) {
+        if (sessionConfiguration.isPaused) {
             tracker.pauseSessionChecking()
         }
         val session = tracker.session
         if (session != null) {
-            val onSessionUpdate = sessionConfig.onSessionUpdate
+            val onSessionUpdate = sessionConfiguration.onSessionUpdate
             if (onSessionUpdate != null) {
                 session.onSessionUpdate = onSessionUpdate
             }
@@ -352,7 +353,7 @@ class ServiceProvider(
 
     // Plugins
 
-    override fun addPlugin(plugin: PluginConfigurationInterface) {
+    override fun addPlugin(plugin: PluginIdentifiable) {
         removePlugin(plugin.identifier)
         pluginConfigurations.add(plugin)
         tracker?.addOrReplaceStateMachine(plugin.toStateMachine())

@@ -37,25 +37,65 @@ import java.util.*
  * timeout: 5 seconds
  */
 class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
+
+    /**
+     * Fallback configuration to read from in case requested values are not present in this configuration.
+     */
+    internal var sourceConfig: NetworkConfiguration? = null
+
+    private var _endpoint: String? = null
     /**
      * @return URL (without schema/protocol) used to send events to the collector.
      */
-    override var endpoint: String? = null
+    override var endpoint: String?
+        get() = _endpoint ?: sourceConfig?.endpoint
+        set(value) { _endpoint = value }
 
+    private var _method: HttpMethod? = null
     /**
      * @return Method (GET or POST) used to send events to the collector.
      */
-    override var method: HttpMethod = EmitterDefaults.httpMethod
+    override var method: HttpMethod
+        get() = _method ?: sourceConfig?.method ?: EmitterDefaults.httpMethod
+        set(value) { _method = value }
 
+    private var _protocol: Protocol? = null
     /**
      * @return Protocol (HTTP or HTTPS) used to send events to the collector.
      */
-    override var protocol: Protocol? = EmitterDefaults.requestSecurity
-    override var networkConnection: NetworkConnection? = null
-    override var customPostPath: String? = null
-    override var timeout: Int? = EmitterDefaults.emitTimeout
-    override var okHttpClient: OkHttpClient? = null
-    override var okHttpCookieJar: CookieJar? = null
+    override var protocol: Protocol?
+        get() = _protocol ?: sourceConfig?.protocol ?: EmitterDefaults.httpProtocol
+        set(value) { _protocol = value }
+
+    private var _networkConnection: NetworkConnection? = null
+    override var networkConnection: NetworkConnection?
+        get() = _networkConnection ?: sourceConfig?.networkConnection
+        set(value) { _networkConnection = value }
+
+    private var _customPostPath: String? = null
+    override var customPostPath: String?
+        get() = _customPostPath ?: sourceConfig?.customPostPath
+        set(value) { _customPostPath = value }
+
+    private var _timeout: Int? = null
+    override var timeout: Int?
+        get() = _timeout ?: sourceConfig?.timeout ?: EmitterDefaults.emitTimeout
+        set(value) { _timeout = value }
+
+    private var _okHttpClient: OkHttpClient? = null
+    override var okHttpClient: OkHttpClient?
+        get() = _okHttpClient ?: sourceConfig?.okHttpClient
+        set(value) { _okHttpClient = value }
+
+    private var _okHttpCookieJar: CookieJar? = null
+    override var okHttpCookieJar: CookieJar?
+        get() = _okHttpCookieJar ?: sourceConfig?.okHttpCookieJar
+        set(value) { _okHttpCookieJar = value }
+
+    private var _requestHeaders: Map<String, String>? = null
+    override var requestHeaders: Map<String, String>?
+        get() = _requestHeaders ?: sourceConfig?.requestHeaders
+        set(value) { _requestHeaders = value }
 
     // Constructors
     
@@ -100,6 +140,7 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
         this.networkConnection = networkConnection
     }
 
+    internal constructor() {}
 
     // Builder methods
     
@@ -142,6 +183,14 @@ class NetworkConfiguration : NetworkConfigurationInterface, Configuration {
      */
     fun okHttpCookieJar(okHttpCookieJar: CookieJar): NetworkConfiguration {
         this.okHttpCookieJar = okHttpCookieJar
+        return this
+    }
+
+    /**
+     * Custom headers to add to HTTP requests to the collector.
+     */
+    fun requestHeaders(requestHeaders: Map<String, String>): NetworkConfiguration {
+        this.requestHeaders = requestHeaders
         return this
     }
 

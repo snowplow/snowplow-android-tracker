@@ -16,8 +16,10 @@ import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.*
 import com.snowplowanalytics.snowplow.event.Event
+import com.snowplowanalytics.snowplow.media.controller.MediaController
 import com.snowplowanalytics.snowplow.tracker.BuildConfig
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
@@ -50,6 +52,8 @@ class TrackerControllerImpl  // Constructors
         }
     override val plugins: PluginsController
         get() = serviceProvider.pluginsController
+    override val media: MediaController
+        get() = serviceProvider.mediaController
 
     // Control methods
     override fun pause() {
@@ -212,8 +216,8 @@ class TrackerControllerImpl  // Constructors
             }
             return serviceProvider.getOrMakeTracker()
         }
-    private val dirtyConfig: TrackerConfigurationUpdate
-        get() = serviceProvider.trackerConfigurationUpdate
+    private val dirtyConfig: TrackerConfiguration
+        get() = serviceProvider.trackerConfiguration
 
     companion object {
         private val TAG = TrackerControllerImpl::class.java.simpleName

@@ -1,3 +1,27 @@
+Version 5.3.0 (2023-06-30)
+--------------------------
+Add media controller with APIs to track media events (#606)
+Add emitter configuration support to remote configuration (#607)
+Use default configuration for properties that are not configured using remote configuration (#613)
+Add custom HTTP headers configuration (#276)
+Truncate language in platform context entity to max 8 characters (#621)
+Truncate URL scheme for page_url and page_refr properties (#616)
+Remember requestCallback, customRetryForStatusCodes and onSessionUpdate set for initialized trackers after configuration updates
+
+Version 5.2.0 (2023-06-02)
+--------------------------
+Track install referrer details entity along with the application install event if available (#249)
+Add a filter API to plugins to decide whether to track an event or not (#608)
+Add version to default remote configuration and don't update unless remote configuration is newer (#603)
+
+Version 5.1.0 (2023-05-11)
+--------------------------
+Track new properties in platform context version 1-0-3 and make it configurable which properties to track (#598)
+
+Version 5.0.1 (2023-04-24)
+--------------------------
+Fix adding user ID set in SubjectConfiguration to events (#595)
+
 Version 5.0.0 (2023-04-04)
 --------------------------
 Add plugin example to Kotlin demo (#593)

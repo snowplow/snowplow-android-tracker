@@ -49,6 +49,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
     private val emitTimeout: Int
     private val customPostPath: String?
     private val serverAnonymisation: Boolean
+    private val requestHeaders: Map<String, String>?
     private var client: OkHttpClient? = null
     private val uriBuilder: Uri.Builder
     override val uri: Uri
@@ -69,6 +70,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         var cookieJar: CookieJar? = null // Optional
         var customPostPath: String? = null //Optional
         var serverAnonymisation = EmitterDefaults.serverAnonymisation // Optional
+        var requestHeaders: Map<String, String>? = null // Optional
 
         /**
          * GET or POST.
@@ -167,6 +169,14 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         }
 
         /**
+         * A map of custom HTTP headers to add to the request.
+         */
+        fun requestHeaders(requestHeaders: Map<String, String>?): OkHttpNetworkConnectionBuilder {
+            this.requestHeaders = requestHeaders
+            return this
+        }
+
+        /**
          * Creates a new OkHttpNetworkConnection
          *
          * @return a new OkHttpNetworkConnection object
@@ -198,6 +208,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         emitTimeout = builder.emitTimeout
         customPostPath = builder.customPostPath
         serverAnonymisation = builder.serverAnonymisation
+        requestHeaders = builder.requestHeaders
         
         val tlsArguments = TLSArguments(builder.tlsVersions)
         uriBuilder = Uri.parse(networkUri).buildUpon()
@@ -298,6 +309,11 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         if (serverAnonymisation) {
             builder.header("SP-Anonymous", "*")
         }
+        requestHeaders?.let {
+            it.forEach { (key, value) ->
+                builder.header(key, value)
+            }
+        }
         return builder.build()
     }
 
@@ -318,6 +334,11 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
             .post(reqBody)
         if (serverAnonymisation) {
             builder.header("SP-Anonymous", "*")
+        }
+        requestHeaders?.let {
+            it.forEach { (key, value) ->
+                builder.header(key, value)
+            }
         }
         return builder.build()
     }

@@ -16,12 +16,12 @@ import android.content.Context
 import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
 import java.io.*
 
-class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
+class RemoteConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
     private var cacheFilePath: String? = null
-    private var configuration: FetchedConfigurationBundle? = null
+    private var configuration: RemoteConfigurationBundle? = null
     
     @Synchronized
-    fun readCache(context: Context): FetchedConfigurationBundle? {
+    fun readCache(context: Context): RemoteConfigurationBundle? {
         if (configuration != null) { return configuration }
         
         loadCache(context)
@@ -29,7 +29,7 @@ class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
     }
 
     @Synchronized
-    fun writeCache(context: Context, configuration: FetchedConfigurationBundle) {
+    fun writeCache(context: Context, configuration: RemoteConfigurationBundle) {
         this.configuration = configuration
         storeCache(context, configuration)
     }
@@ -61,7 +61,7 @@ class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
         try {
             val fileIn = FileInputStream(path)
             objectIn = ObjectInputStream(fileIn)
-            configuration = objectIn.readObject() as? FetchedConfigurationBundle
+            configuration = objectIn.readObject() as? RemoteConfigurationBundle
         } catch (e: FileNotFoundException) {
             // TODO log exception
         } catch (e: IOException) {
@@ -78,7 +78,7 @@ class ConfigurationCache(private val remoteConfiguration: RemoteConfiguration) {
         }
     }
 
-    private fun storeCache(context: Context, configuration: FetchedConfigurationBundle) {
+    private fun storeCache(context: Context, configuration: RemoteConfigurationBundle) {
         val path = getCachePath(context)
         var objectOut: ObjectOutputStream? = null
         try {

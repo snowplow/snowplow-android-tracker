@@ -87,6 +87,36 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
             return 70000
         }
 
+    private var _language: String? = "sk"
+    override var language: String?
+        get() {
+            increaseMethodAccessCount("language")
+            return _language
+        }
+        set(value) {
+            _language = value
+        }
+
+    override fun getResolution(context: Context): String? {
+        increaseMethodAccessCount("getResolution")
+        return "1024x768"
+    }
+
+    override fun getScale(context: Context): Float? {
+        increaseMethodAccessCount("getScale")
+        return 2.0f
+    }
+
+    override fun getIsPortrait(context: Context): Boolean? {
+        increaseMethodAccessCount("getIsPortrait")
+        return true
+    }
+
+    override fun getAppSetIdAndScope(context: Context): Pair<String, String>? {
+        increaseMethodAccessCount("getAppSetIdAndScope")
+        return Pair("XXX", "app")
+    }
+
     fun getMethodAccessCount(methodName: String): Int {
         return if (methodAccessCounts.containsKey(methodName)) {
             methodAccessCounts[methodName]!!

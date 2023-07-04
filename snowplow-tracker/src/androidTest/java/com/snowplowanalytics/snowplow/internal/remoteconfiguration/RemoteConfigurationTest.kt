@@ -14,17 +14,13 @@ package com.snowplowanalytics.snowplow.internal.remoteconfiguration
 
 import android.annotation.SuppressLint
 import androidx.core.util.Pair
-import androidx.test.espresso.core.internal.deps.guava.collect.Lists
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationCache
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationFetcher
-import com.snowplowanalytics.core.remoteconfiguration.ConfigurationProvider
-import com.snowplowanalytics.core.remoteconfiguration.FetchedConfigurationBundle
-import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
-import com.snowplowanalytics.snowplow.configuration.ConfigurationState
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationCache
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationFetcher
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvider
+import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
+import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -49,23 +45,24 @@ class RemoteConfigurationTest {
                     + "{\"namespace\": \"default1\","
                     + "\"networkConfiguration\": {\"endpoint\":\"https://fake.snowplow.io\",\"method\":\"get\"},"
                     + "\"trackerConfiguration\": {\"applicationContext\":false,\"screenContext\":false},"
-                    + "\"sessionConfiguration\": {\"backgroundTimeout\":60,\"foregroundTimeout\":60}"
+                    + "\"sessionConfiguration\": {\"backgroundTimeout\":60,\"foregroundTimeout\":60},"
+                    + "\"emitterConfiguration\": {\"serverAnonymisation\":true,\"customRetryForStatusCodes\":{\"500\":true}}"
                     + "},"
                     + "{\"namespace\": \"default2\","
                     + "\"subjectConfiguration\": {\"userId\":\"testUserId\"}"
                     + "}"
                     + "]}")
         val json = JSONObject(config)
-        val fetchedConfigurationBundle = FetchedConfigurationBundle(context, json)
+        val remoteConfigurationBundle = RemoteConfigurationBundle(context, json)
         Assert.assertEquals(
             "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
-            fetchedConfigurationBundle.schema
+            remoteConfigurationBundle.schema
         )
-        Assert.assertEquals(12, fetchedConfigurationBundle.configurationVersion.toLong())
-        Assert.assertEquals(2, fetchedConfigurationBundle.configurationBundle.size.toLong())
+        Assert.assertEquals(12, remoteConfigurationBundle.configurationVersion.toLong())
+        Assert.assertEquals(2, remoteConfigurationBundle.configurationBundle.size.toLong())
 
         // Regular setup
-        var configurationBundle = fetchedConfigurationBundle.configurationBundle[0]
+        var configurationBundle = remoteConfigurationBundle.configurationBundle[0]
         Assert.assertEquals("default1", configurationBundle.namespace)
         Assert.assertNotNull(configurationBundle.networkConfiguration)
         Assert.assertNotNull(configurationBundle.trackerConfiguration)
@@ -77,9 +74,12 @@ class RemoteConfigurationTest {
         Assert.assertFalse(trackerConfiguration!!.applicationContext)
         val sessionConfiguration = configurationBundle.sessionConfiguration
         Assert.assertEquals(60, sessionConfiguration!!.foregroundTimeout.convert(TimeUnit.SECONDS))
+        val emitterConfiguration = configurationBundle.emitterConfiguration
+        Assert.assertTrue(emitterConfiguration!!.serverAnonymisation)
+        Assert.assertEquals(mapOf(500 to true), emitterConfiguration.customRetryForStatusCodes)
 
         // Regular setup without NetworkConfiguration
-        configurationBundle = fetchedConfigurationBundle.configurationBundle[1]
+        configurationBundle = remoteConfigurationBundle.configurationBundle[1]
         Assert.assertEquals("default2", configurationBundle.namespace)
         Assert.assertNull(configurationBundle.networkConfiguration)
         Assert.assertNotNull(configurationBundle.subjectConfiguration)
@@ -93,24 +93,23 @@ class RemoteConfigurationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val body =
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        val mockWebServer = getMockServer(200, body)
-        val endpoint = getMockServerURI(mockWebServer)
-        
-        val expectation = Any() as Object
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        ConfigurationFetcher(
-            context,
-            remoteConfig
-        ) { fetchedConfigurationBundle: FetchedConfigurationBundle ->
-            Assert.assertNotNull(fetchedConfigurationBundle)
-            Assert.assertEquals(
-                "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
-                fetchedConfigurationBundle.schema
-            )
-            synchronized(expectation) { expectation.notify() }
+        withMockServer(200, body) { _, endpoint ->
+
+            val expectation = Any() as Object
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            RemoteConfigurationFetcher(
+                context,
+                remoteConfig
+            ) { remoteConfigurationBundle: RemoteConfigurationBundle ->
+                Assert.assertNotNull(remoteConfigurationBundle)
+                Assert.assertEquals(
+                    "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0",
+                    remoteConfigurationBundle.schema
+                )
+                synchronized(expectation) { expectation.notify() }
+            }
+            synchronized(expectation) { expectation.wait(10000) }
         }
-        synchronized(expectation) { expectation.wait(10000) }
-        mockWebServer.shutdown()
     }
 
     @Test
@@ -119,14 +118,14 @@ class RemoteConfigurationTest {
         val bundle = ConfigurationBundle("test")
         bundle.networkConfiguration = NetworkConfiguration("endpoint")
         val expected =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         expected.configurationVersion = 12
         expected.configurationBundle = listOf(bundle)
         val remoteConfiguration = RemoteConfiguration("http://example.com", HttpMethod.GET)
-        var cache = ConfigurationCache(remoteConfiguration)
+        var cache = RemoteConfigurationCache(remoteConfiguration)
         cache.clearCache(context)
         cache.writeCache(context, expected)
-        cache = ConfigurationCache(remoteConfiguration)
+        cache = RemoteConfigurationCache(remoteConfiguration)
         val config = cache.readCache(context)
         Assert.assertEquals(
             expected.configurationVersion.toLong(),
@@ -147,30 +146,53 @@ class RemoteConfigurationTest {
     }
 
     @Test
+    fun testCacheEmitterConfiguration() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val bundle = ConfigurationBundle("test", NetworkConfiguration("endpoint"))
+        bundle.emitterConfiguration = EmitterConfiguration()
+            .serverAnonymisation(true)
+            .customRetryForStatusCodes(mapOf(500 to true))
+        val expected =
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+        expected.configurationVersion = 12
+        expected.configurationBundle = listOf(bundle)
+
+        val remoteConfiguration = RemoteConfiguration("http://example.com", HttpMethod.GET)
+        var cache = RemoteConfigurationCache(remoteConfiguration)
+        cache.clearCache(context)
+        cache.writeCache(context, expected)
+        cache = RemoteConfigurationCache(remoteConfiguration)
+        val config = cache.readCache(context)
+        val emitterConfig = config?.configurationBundle?.first()?.emitterConfiguration
+
+        Assert.assertTrue(emitterConfig?.serverAnonymisation ?: false)
+        Assert.assertEquals(mapOf(500 to true), emitterConfig?.customRetryForStatusCodes)
+    }
+
+    @Test
     @Throws(IOException::class, InterruptedException::class)
     fun testConfigurationFetcher_downloads() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(
+        withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/2-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        )
-        val endpoint = getMockServerURI(mockWebServer)
+        ) { _, endpoint ->
 
-        // test
-        val expectation = Any() as Object
-        val expectationNotified = AtomicBoolean(false)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        ConfigurationFetcher(
-            context,
-            remoteConfig
-        ) {
-            expectationNotified.set(true)
-            synchronized(expectation) { expectation.notify() }
+            // test
+            val expectation = Any() as Object
+            val expectationNotified = AtomicBoolean(false)
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            RemoteConfigurationFetcher(
+                context,
+                remoteConfig
+            ) {
+                expectationNotified.set(true)
+                synchronized(expectation) { expectation.notify() }
+            }
+            synchronized(expectation) { expectation.wait(1000) }
+            Assert.assertTrue(expectationNotified.get())
         }
-        synchronized(expectation) { expectation.wait(5000) }
-        Assert.assertTrue(expectationNotified.get())
-        mockWebServer.shutdown()
     }
 
     @Test
@@ -178,21 +200,16 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_notDownloading_fails() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(500, "{}")
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
+        withMockServer(500, "{}") { _, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
 
-        // test
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) { Assert.fail() }
-        synchronized(expectation) { expectation.wait(5000) }
-        mockWebServer.shutdown()
+            // test
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            provider.retrieveConfiguration(context, false) { Assert.fail() }
+            Thread.sleep(1000)
+        }
     }
 
     @Test
@@ -200,24 +217,19 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_downloadOfWrongSchema_fails() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(
+        withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
-        )
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
+        ) { _, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
 
-        // test
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) { Assert.fail() }
-        synchronized(expectation) { expectation.wait(5000) }
-        mockWebServer.shutdown()
+            // test
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            provider.retrieveConfiguration(context, false) { Assert.fail() }
+            Thread.sleep(1000)
+        }
     }
 
     @Test
@@ -225,42 +237,40 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_downloadSameConfigVersionThanCached_dontUpdate() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(
+        withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
-        )
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
-        val bundle = ConfigurationBundle("namespace")
-        bundle.networkConfiguration = NetworkConfiguration("endpoint")
-        val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
-        cached.configurationVersion = 1
-        cached.configurationBundle = listOf(bundle)
-        cache.writeCache(context, cached)
+        ) { _, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
+            val bundle = ConfigurationBundle("namespace")
+            bundle.networkConfiguration = NetworkConfiguration("endpoint")
+            val cached =
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            cached.configurationVersion = 1
+            cached.configurationBundle = listOf(bundle)
+            cache.writeCache(context, cached)
 
-        // test
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        val i = intArrayOf(0) // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            val fetchedConfigurationBundle = pair.first
-            Assert.assertEquals(ConfigurationState.CACHED, pair.second)
-            if (i[0] == 1 || fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
-                Assert.fail()
+            // test
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            var numCalls = 0
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                val fetchedConfigurationBundle = pair.first
+                Assert.assertEquals(ConfigurationState.CACHED, pair.second)
+                if (numCalls == 1 || fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
+                    Assert.fail()
+                }
+                if (numCalls == 0 && fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0") {
+                    numCalls++
+                }
             }
-            if (i[0] == 0 && fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0") {
-                i[0]++
-            }
+            Thread.sleep(1000)
+            Assert.assertEquals(1, numCalls)
         }
-        synchronized(expectation) { expectation.wait(5000) }
-        Assert.assertEquals(1, i[0])
-        mockWebServer.shutdown()
     }
 
     @Test
@@ -268,45 +278,43 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_downloadHigherConfigVersionThanCached_doUpdate() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(
+        withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}"
-        )
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
-        val bundle = ConfigurationBundle("namespace")
-        bundle.networkConfiguration = NetworkConfiguration("endpoint")
-        val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
-        cached.configurationVersion = 1
-        cached.configurationBundle = listOf(bundle)
-        cache.writeCache(context, cached)
+        ) { _, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
+            val bundle = ConfigurationBundle("namespace")
+            bundle.networkConfiguration = NetworkConfiguration("endpoint")
+            val cached =
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            cached.configurationVersion = 1
+            cached.configurationBundle = listOf(bundle)
+            cache.writeCache(context, cached)
 
-        // test
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        val i = intArrayOf(0) // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            val fetchedConfigurationBundle = pair.first
-            Assert.assertEquals(
-                if (i[0] == 0) ConfigurationState.CACHED else ConfigurationState.FETCHED,
-                pair.second
-            )
-            if (i[0] == 1 || fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
-                i[0]++
+            // test
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            var numCalls = 0
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                val fetchedConfigurationBundle = pair.first
+                Assert.assertEquals(
+                    if (numCalls == 0) ConfigurationState.CACHED else ConfigurationState.FETCHED,
+                    pair.second
+                )
+                if (numCalls == 1 || fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
+                    numCalls++
+                }
+                if (numCalls == 0 && fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0") {
+                    numCalls++
+                }
             }
-            if (i[0] == 0 && fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0") {
-                i[0]++
-            }
+            Thread.sleep(1000)
+            Assert.assertEquals(2, numCalls)
         }
-        synchronized(expectation) { expectation.wait(10000) }
-        Assert.assertEquals(2, i[0])
-        mockWebServer.shutdown()
     }
 
     @Test
@@ -314,43 +322,37 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_justRefresh_downloadSameConfigVersionThanCached_dontUpdate() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(404, "{}")
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
-        val bundle = ConfigurationBundle("namespace")
-        bundle.networkConfiguration = NetworkConfiguration("endpoint")
-        val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
-        cached.configurationVersion = 1
-        cached.configurationBundle = listOf(bundle)
-        cache.writeCache(context, cached)
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        val i = intArrayOf(0) // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            Assert.assertEquals(ConfigurationState.CACHED, pair.second)
-            synchronized(expectation) { expectation.notify() }
-        }
-        synchronized(expectation) { expectation.wait(5000) }
-        val mockResponse = MockResponse()
-            .setResponseCode(200)
-            .setHeader("Content-Type", "application/json")
-            .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}")
-        mockWebServer.enqueue(mockResponse)
+        withMockServer(404, "{}") { mockWebServer, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
+            val bundle = ConfigurationBundle("namespace")
+            bundle.networkConfiguration = NetworkConfiguration("endpoint")
+            val cached =
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            cached.configurationVersion = 1
+            cached.configurationBundle = listOf(bundle)
+            cache.writeCache(context, cached)
+            val expectation = Any() as Object
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                Assert.assertEquals(ConfigurationState.CACHED, pair.second)
+                synchronized(expectation) { expectation.notify() }
+            }
+            synchronized(expectation) { expectation.wait(1000) }
+            val mockResponse = MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}")
+            mockWebServer.enqueue(mockResponse)
 
-        // test
-        val expectation2 = Any() as Object
-        provider.retrieveConfiguration(
-            context,
-            true
-        ) { Assert.fail() }
-        synchronized(expectation2) { expectation2.wait(5000) }
-        mockWebServer.shutdown()
+            // test
+            provider.retrieveConfiguration(context, true) { Assert.fail() }
+            Thread.sleep(1000)
+        }
     }
 
     @Test
@@ -358,51 +360,49 @@ class RemoteConfigurationTest {
     fun testConfigurationProvider_justRefresh_downloadHigherConfigVersionThanCached_doUpdate() {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockWebServer = getMockServer(404, "{}")
-        val endpoint = getMockServerURI(mockWebServer)
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val cache = ConfigurationCache(remoteConfig)
-        cache.clearCache(context)
-        val bundle = ConfigurationBundle("namespace")
-        bundle.networkConfiguration = NetworkConfiguration("endpoint")
-        val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
-        cached.configurationVersion = 1
-        cached.configurationBundle = listOf(bundle)
-        cache.writeCache(context, cached)
-        val expectation = Any() as Object
-        val provider = ConfigurationProvider(remoteConfig)
-        val i = intArrayOf(0) // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(
-            context,
-            false
-        ) {
-            synchronized(expectation) { expectation.notify() }
-        }
-        synchronized(expectation) { expectation.wait(5000) }
-        val mockResponse = MockResponse()
-            .setResponseCode(200)
-            .setHeader("Content-Type", "application/json")
-            .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}")
-        mockWebServer.enqueue(mockResponse)
-
-        // test
-        val expectation2 = Any() as Object
-        val j = intArrayOf(0) // Needed to make it accessible inside the closure.
-        provider.retrieveConfiguration(
-            context,
-            true
-        ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            val fetchedConfigurationBundle = pair.first
-            if (fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
-                j[0]++
-                Assert.assertEquals(ConfigurationState.FETCHED, pair.second)
-                synchronized(expectation2) { expectation2.notify() }
+        withMockServer(404, "{}") { mockWebServer, endpoint ->
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val cache = RemoteConfigurationCache(remoteConfig)
+            cache.clearCache(context)
+            val bundle = ConfigurationBundle("namespace")
+            bundle.networkConfiguration = NetworkConfiguration("endpoint")
+            val cached =
+                RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            cached.configurationVersion = 1
+            cached.configurationBundle = listOf(bundle)
+            cache.writeCache(context, cached)
+            val expectation = Any() as Object
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) {
+                synchronized(expectation) { expectation.notify() }
             }
+            synchronized(expectation) { expectation.wait(1000) }
+            val mockResponse = MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}")
+            mockWebServer.enqueue(mockResponse)
+
+            // test
+            val expectation2 = Any() as Object
+            var numCallbackCalls = 0
+            provider.retrieveConfiguration(
+                context,
+                true
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                val fetchedConfigurationBundle = pair.first
+                if (fetchedConfigurationBundle.schema == "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0") {
+                    numCallbackCalls++
+                    Assert.assertEquals(ConfigurationState.FETCHED, pair.second)
+                    synchronized(expectation2) { expectation2.notify() }
+                }
+            }
+            synchronized(expectation2) { expectation2.wait(1000) }
+            Assert.assertEquals(1, numCallbackCalls)
         }
-        synchronized(expectation2) { expectation2.wait(5000) }
-        Assert.assertEquals(1, j[0])
-        mockWebServer.shutdown()
     }
 
     @Test
@@ -411,51 +411,147 @@ class RemoteConfigurationTest {
         // prepare test
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
-        val cache = ConfigurationCache(cachedRemoteConfig)
+        val cache = RemoteConfigurationCache(cachedRemoteConfig)
         cache.clearCache(context)
 
         // write configuration (version 2) to cache
         val bundle = ConfigurationBundle("namespace")
         bundle.networkConfiguration = NetworkConfiguration("endpoint")
         val cached =
-            FetchedConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
+            RemoteConfigurationBundle("http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0")
         cached.configurationVersion = 2
         cached.configurationBundle = listOf(bundle)
         cache.writeCache(context, cached)
 
         // stub request for configuration (return version 1)
-        val mockWebServer = getMockServer(
+        withMockServer(
             200,
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
-        )
-        val endpoint = getMockServerURI(mockWebServer)
+        ) { _, endpoint ->
 
-        // retrieve remote configuration
-        val remoteConfig = RemoteConfiguration(endpoint!!, HttpMethod.GET)
-        val provider = ConfigurationProvider(remoteConfig)
-        val numCallbackCalls = intArrayOf(0)
-        val expectation = Any() as Object
-        provider.retrieveConfiguration(
-            context,
-            true
-        ) { pair: Pair<FetchedConfigurationBundle, ConfigurationState> ->
-            val fetchedConfigurationBundle = pair.first
-            numCallbackCalls[0]++
-            // should be the non-cache configuration (version 1)
-            Assert.assertEquals(
-                "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0",
-                fetchedConfigurationBundle.schema
-            )
-            Assert.assertEquals(1, fetchedConfigurationBundle.configurationVersion.toLong())
+            // retrieve remote configuration
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val provider = RemoteConfigurationProvider(remoteConfig)
+            var numCallbackCalls = 0
+            provider.retrieveConfiguration(
+                context,
+                true
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                val fetchedConfigurationBundle = pair.first
+                numCallbackCalls++
+                // should be the non-cache configuration (version 1)
+                Assert.assertEquals(
+                    "http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0",
+                    fetchedConfigurationBundle.schema
+                )
+                Assert.assertEquals(1, fetchedConfigurationBundle.configurationVersion.toLong())
+            }
+            Thread.sleep(1000)
+            Assert.assertEquals(1, numCallbackCalls)
         }
-        synchronized(expectation) { expectation.wait(5000) }
-        Assert.assertEquals(1, numCallbackCalls[0])
-        mockWebServer.shutdown()
+    }
+
+    @Test
+    fun testUsesDefaultConfigurationIfTheSameConfigurationVersionAsFetched() {
+        // prepare test
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
+        RemoteConfigurationCache(cachedRemoteConfig).clearCache(context)
+
+        // stub request for configuration (return version 1)
+        withMockServer(
+            200,
+            "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}"
+        ) { _, endpoint ->
+
+            // retrieve remote configuration
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val provider = RemoteConfigurationProvider(
+                remoteConfiguration = remoteConfig,
+                defaultBundles = listOf(
+                    ConfigurationBundle("namespace", NetworkConfiguration("http://localhost"))
+                ),
+                defaultBundleVersion = 1
+            )
+            var numCallbackCalls = 0
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                numCallbackCalls++
+                Assert.assertEquals(ConfigurationState.DEFAULT, pair.second)
+            }
+            Thread.sleep(1000)
+            Assert.assertEquals(1, numCallbackCalls)
+        }
+    }
+
+    @Test
+    fun testReplacesDefaultConfigurationIfFetchedHasNewerVersion() {
+        // prepare test
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val cachedRemoteConfig = RemoteConfiguration("http://cache.example.com", HttpMethod.GET)
+        RemoteConfigurationCache(cachedRemoteConfig).clearCache(context)
+
+        // stub request for configuration (return version 2)
+        withMockServer(
+            200,
+            "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}"
+        ) { _, endpoint ->
+
+            // retrieve remote configuration
+            val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
+            val provider = RemoteConfigurationProvider(
+                remoteConfiguration = remoteConfig,
+                defaultBundles = listOf(
+                    ConfigurationBundle("namespace", NetworkConfiguration("http://localhost"))
+                ),
+                defaultBundleVersion = 1
+            )
+            var numCallbackCalls = 0
+            var lastConfigurationState: ConfigurationState? = null
+            provider.retrieveConfiguration(
+                context,
+                false
+            ) { pair: Pair<RemoteConfigurationBundle, ConfigurationState> ->
+                numCallbackCalls++
+                lastConfigurationState = pair.second
+            }
+            Thread.sleep(1000)
+            Assert.assertEquals(2, numCallbackCalls)
+            Assert.assertEquals(ConfigurationState.FETCHED, lastConfigurationState)
+        }
+    }
+
+    @Test
+    fun testKeepsPropertiesOfSourceConfigurationIfNotOverridenInRemote() {
+        val bundle1 = ConfigurationBundle("ns1")
+        bundle1.trackerConfiguration = TrackerConfiguration("app-1")
+        bundle1.subjectConfiguration = SubjectConfiguration()
+            .domainUserId("duid1")
+            .userId("u1")
+
+        val bundle2 = ConfigurationBundle("ns1")
+        bundle2.subjectConfiguration = SubjectConfiguration()
+            .domainUserId("duid2")
+
+        val remoteBundle1 = RemoteConfigurationBundle("")
+        remoteBundle1.configurationBundle = listOf(bundle1)
+
+        val remoteBundle2 = RemoteConfigurationBundle("")
+        remoteBundle2.configurationBundle = listOf(bundle2)
+
+        remoteBundle2.updateSourceConfig(remoteBundle1)
+
+        val finalBundle = remoteBundle2.configurationBundle.first()
+        Assert.assertEquals("app-1", finalBundle.trackerConfiguration?.appId)
+        Assert.assertEquals("u1", finalBundle.subjectConfiguration?.userId)
+        Assert.assertEquals("duid2", finalBundle.subjectConfiguration?.domainUserId)
     }
 
     // Private methods
     @Throws(IOException::class)
-    fun getMockServer(responseCode: Int, body: String?): MockWebServer {
+    private fun withMockServer(responseCode: Int, body: String?, callback: (MockWebServer, String) -> Unit) {
         val mockServer = MockWebServer()
         mockServer.start()
         val mockResponse = MockResponse()
@@ -463,13 +559,12 @@ class RemoteConfigurationTest {
             .setHeader("Content-Type", "application/json")
             .setBody(body!!)
         mockServer.enqueue(mockResponse)
-        return mockServer
+        callback(mockServer, getMockServerURI(mockServer))
+        mockServer.shutdown()
     }
 
     @SuppressLint("DefaultLocale")
-    fun getMockServerURI(mockServer: MockWebServer?): String? {
-        return if (mockServer != null) {
-            String.format("http://%s:%d", mockServer.hostName, mockServer.port)
-        } else null
+    private fun getMockServerURI(mockServer: MockWebServer): String {
+        return String.format("http://%s:%d", mockServer.hostName, mockServer.port)
     }
 }

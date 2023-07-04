@@ -31,6 +31,8 @@ import com.snowplowanalytics.core.utils.NotificationCenter.addObserver
 import com.snowplowanalytics.core.utils.NotificationCenter.removeObserver
 import com.snowplowanalytics.core.utils.Util.getApplicationContext
 import com.snowplowanalytics.core.utils.Util.getGeoLocationContext
+import com.snowplowanalytics.core.utils.Util.truncateUrlScheme
+import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import com.snowplowanalytics.snowplow.entity.DeepLink
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.Payload
@@ -51,7 +53,13 @@ import kotlin.math.max
  * @param context The Android application context
  * @param builder A closure to set Tracker configuration
  */
-class Tracker(emitter: Emitter, val namespace: String, var appId: String, context: Context, builder: ((Tracker) -> Unit)? = null) {
+class Tracker(
+    emitter: Emitter,
+    val namespace: String,
+    var appId: String,
+    platformContextProperties: List<PlatformContextProperty>?,
+    context: Context,
+    builder: ((Tracker) -> Unit)? = null) {
     private var builderFinished = false
     private val context: Context
     private val stateManager = StateManager()
@@ -76,8 +84,8 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
     private val _dataCollection = AtomicBoolean(true)
     val dataCollection: Boolean
         get() = _dataCollection.get()
-    
-    private val platformContextManager = PlatformContext(context)
+
+    private val platformContextManager = PlatformContext(platformContextProperties, context)
 
     var emitter: Emitter = emitter
         set(emitter) {
@@ -423,7 +431,7 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
 
     private fun initializeInstallTracking() {
         if (installAutotracking) {
-            InstallTracker.getInstance(context)
+            ApplicationInstallEvent.trackIfFirstLaunch(context)
         }
     }
 
@@ -476,16 +484,20 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         }
         val reportsOnDiagnostic = event !is TrackerError
         execute(reportsOnDiagnostic, TAG) {
-            val payload = payloadWithEvent(trackerEvent)
-            v(TAG, "Adding new payload to event storage: %s", payload)
-            emitter.add(payload)
-            event.endProcessing(this)
-            stateManager.afterTrack(trackerEvent)
+            payloadWithEvent(trackerEvent)?.let { payload ->
+                v(TAG, "Adding new payload to event storage: %s", payload)
+                emitter.add(payload)
+                event.endProcessing(this)
+                stateManager.afterTrack(trackerEvent)
+            } ?: run {
+                d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
+                event.endProcessing(this)
+            }
         }
         return trackerEvent.eventId
     }
 
-    private fun payloadWithEvent(event: TrackerEvent): Payload {
+    private fun payloadWithEvent(event: TrackerEvent): Payload? {
         val payload = TrackerPayload()
 
         // Payload properties
@@ -499,6 +511,11 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
         
         event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
         event.wrapEntitiesToPayload(payload, base64Encoded=base64Encoded)
+
+        // Decide whether to track the event or not
+        if (!stateManager.filter(event)) {
+            return null
+        }
 
         // Workaround for campaign attribution
         if (!event.isPrimitive) {
@@ -568,10 +585,10 @@ class Tracker(emitter: Emitter, val namespace: String, var appId: String, contex
             }
         }
         if (url != null) {
-            payload.add(Parameters.PAGE_URL, url)
+            payload.add(Parameters.PAGE_URL, truncateUrlScheme(url))
         }
         if (referrer != null) {
-            payload.add(Parameters.PAGE_REFR, referrer)
+            payload.add(Parameters.PAGE_REFR, truncateUrlScheme(referrer))
         }
     }
 

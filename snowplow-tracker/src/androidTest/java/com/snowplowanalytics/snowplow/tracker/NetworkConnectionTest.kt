@@ -264,6 +264,38 @@ class NetworkConnectionTest {
         mockServer.shutdown()
     }
 
+    @Test
+    @Throws(IOException::class, InterruptedException::class)
+    fun testAddsCustomRequestHeadersForPostRequest() {
+        val mockServer = getMockServer(200)
+        val connection = OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer)!!, context)
+            .method(HttpMethod.POST)
+            .requestHeaders(mapOf("foo" to "bar"))
+            .build()
+        val payload: Payload = TrackerPayload()
+        payload.add("key", "value")
+        connection.sendRequests(listOf(Request(payload, 2)))
+        val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
+        Assert.assertEquals("bar", req!!.getHeader("foo"))
+        mockServer.shutdown()
+    }
+
+    @Test
+    @Throws(IOException::class, InterruptedException::class)
+    fun testAddsCustomRequestHeadersForGetRequest() {
+        val mockServer = getMockServer(200)
+        val connection = OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer)!!, context)
+            .method(HttpMethod.GET)
+            .requestHeaders(mapOf("foo" to "bar"))
+            .build()
+        val payload: Payload = TrackerPayload()
+        payload.add("key", "value")
+        connection.sendRequests(listOf(Request(payload, 2)))
+        val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
+        Assert.assertEquals("bar", req!!.getHeader("foo"))
+        mockServer.shutdown()
+    }
+
     // Service methods
     private fun assertGETRequest(req: RecordedRequest?) {
         Assert.assertNotNull(req)

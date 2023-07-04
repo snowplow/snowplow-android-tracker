@@ -16,6 +16,7 @@ import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.core.tracker.Tracker
+import com.snowplowanalytics.snowplow.configuration.GdprConfiguration
 import com.snowplowanalytics.snowplow.controller.GdprController
 import com.snowplowanalytics.snowplow.util.Basis
 
@@ -76,6 +77,6 @@ class GdprControllerImpl(serviceProvider: ServiceProviderInterface) : Controller
     // Private methods
     private val tracker: Tracker
         get() = serviceProvider.getOrMakeTracker()
-    private val dirtyConfig: GdprConfigurationUpdate
-        get() = serviceProvider.gdprConfigurationUpdate
+    private val dirtyConfig: GdprConfiguration
+        get() = serviceProvider.gdprConfiguration
 }

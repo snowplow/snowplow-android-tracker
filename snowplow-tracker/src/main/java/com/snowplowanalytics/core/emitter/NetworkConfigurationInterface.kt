@@ -20,12 +20,35 @@ import okhttp3.CookieJar
 import okhttp3.OkHttpClient
 
 interface NetworkConfigurationInterface {
+    /** URL (without schema/protocol) used to send events to the collector. */
     val endpoint: String?
+    /** Method used to send events to the collector. */
     val method: HttpMethod?
+    /** Protocol used to send events to the collector. */
     val protocol: Protocol?
+    /** Custom `NetworkConnection` instance to use for sending events. */
     val networkConnection: NetworkConnection?
+    /** A custom path which will be added to the endpoint URL to specify the complete URL of the collector when paired with the POST method. */
     val customPostPath: String?
+    /**
+     * The timeout set for the requests to the collector.
+     * The maximum timeout for emitting events. If emit time exceeds this value
+     * TimeOutException will be thrown.
+     */
     val timeout: Int?
+    /**
+     * An OkHttp client that will be used in the emitter. You can provide your
+     * own if you want to share your Singleton client's interceptors, connection pool etc.
+     * By default a new [OkHttpClient] is created when the tracker is instantiated.
+     */
     val okHttpClient: OkHttpClient?
+    /**
+     * An OkHttp cookie jar to override the default
+     * [CollectorCookieJar](com.snowplowanalytics.snowplow.network.CollectorCookieJar)
+     * that stores cookies in SharedPreferences.
+     * A cookie jar provided here will be ignored if a custom `okHttpClient` is configured.
+     */
     val okHttpCookieJar: CookieJar?
+    /** Custom headers to add to HTTP requests to the collector. */
+    val requestHeaders: Map<String, String>?
 }

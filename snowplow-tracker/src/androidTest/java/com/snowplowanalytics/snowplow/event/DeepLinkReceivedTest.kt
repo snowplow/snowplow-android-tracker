@@ -54,8 +54,8 @@ class DeepLinkReceivedTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         // Prepare DeepLinkReceived event
-        val event = DeepLinkReceived("url")
-            .referrer("referrer")
+        val event = DeepLinkReceived("someappwithaverylongscheme://url")
+            .referrer("someappwithaverylongscheme://referrer")
 
         // Setup tracker
         val trackerConfiguration = TrackerConfiguration("appId")
@@ -89,8 +89,8 @@ class DeepLinkReceivedTest {
         // Check url and referrer fields for atomic table
         val url = payload.map[Parameters.PAGE_URL] as String?
         val referrer = payload.map[Parameters.PAGE_REFR] as String?
-        Assert.assertEquals("url", url)
-        Assert.assertEquals("referrer", referrer)
+        Assert.assertEquals("someappwithavery://url", url)
+        Assert.assertEquals("someappwithavery://referrer", referrer)
     }
 
     @Test

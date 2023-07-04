@@ -12,17 +12,13 @@
  */
 package com.snowplowanalytics.core.globalcontexts
 
-import com.snowplowanalytics.snowplow.configuration.PluginAfterTrackConfiguration
-import com.snowplowanalytics.snowplow.configuration.PluginConfigurationInterface
-import com.snowplowanalytics.snowplow.configuration.PluginEntitiesConfiguration
+import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 
 class GlobalContextPluginConfiguration(
     override val identifier: String,
     val globalContext: GlobalContext
-) : PluginConfigurationInterface {
-
-    override val afterTrackConfiguration: PluginAfterTrackConfiguration? = null
+) : PluginIdentifiable, PluginEntitiesCallable {
 
     override val entitiesConfiguration: PluginEntitiesConfiguration
         get() = PluginEntitiesConfiguration(closure = globalContext::generateContexts)

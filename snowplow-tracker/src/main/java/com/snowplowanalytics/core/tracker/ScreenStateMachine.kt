@@ -47,6 +47,9 @@ class ScreenStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForFiltering: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, state: State?): State? {
         val screenView = event as? ScreenView
         val screenState: ScreenState? = if (state != null) {
@@ -99,6 +102,10 @@ class ScreenStateMachine : StateMachineInterface {
     }
 
     override fun afterTrack(event: InspectableEvent) {
+    }
+
+    override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
     }
 
     companion object {

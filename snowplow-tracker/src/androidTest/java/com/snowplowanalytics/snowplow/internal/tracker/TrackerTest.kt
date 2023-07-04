@@ -25,7 +25,7 @@ import com.snowplowanalytics.core.tracker.ExceptionHandler
 import com.snowplowanalytics.core.tracker.Subject
 import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.core.tracker.TrackerEvent
-import com.snowplowanalytics.snowplow.TestUtils
+import com.snowplowanalytics.snowplow.util.TestUtils
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.event.SelfDescribing
@@ -107,7 +107,7 @@ class TrackerTest {
             tracker.installAutotracking = installTracking
             tracker.applicationContext = true
         }
-        Companion.tracker = Tracker(emitter, "myNamespace", "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, "myNamespace", "myAppId", null, context, trackerBuilder)
         return Companion.tracker
     }
 
@@ -209,7 +209,7 @@ class TrackerTest {
             tracker.screenViewAutotracking = false
         }
         Companion.tracker =
-            Tracker(emitter!!, namespace, "testTrackWithNoContext", context, trackerBuilder)
+            Tracker(emitter!!, namespace, "testTrackWithNoContext", null, context, trackerBuilder)
         val eventStore = emitter.eventStore
         if (eventStore != null) {
             val isClean = eventStore.removeAllEvents()
@@ -273,7 +273,7 @@ class TrackerTest {
             tracker.screenViewAutotracking = false
         }
         Companion.tracker =
-            Tracker(emitter!!, namespace, "testTrackWithNoContext", context, trackerBuilder)
+            Tracker(emitter!!, namespace, "testTrackWithNoContext", null, context, trackerBuilder)
         
         Log.i("testTrackWithNoContext", "Send ScreenView event")
         Companion.tracker!!.track(ScreenView("name"))
@@ -325,7 +325,7 @@ class TrackerTest {
             tracker.exceptionAutotracking = false
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
         Companion.tracker!!.pauseEventTracking()
         val eventId = Companion.tracker!!.track(ScreenView("name"))
         Assert.assertNull(eventId)
@@ -359,7 +359,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
         Assert.assertNotNull(Companion.tracker!!.session)
         Companion.tracker!!.resumeSessionChecking()
         Thread.sleep(2000)
@@ -388,7 +388,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
         val screenState = Companion.tracker!!.getScreenState()
         Assert.assertNotNull(screenState)
         var screenStateMapWrapper: Map<String, Any?> = screenState!!.getCurrentScreen(true).map
@@ -431,7 +431,7 @@ class TrackerTest {
             tracker.exceptionAutotracking = true
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
         Assert.assertTrue(Companion.tracker!!.exceptionAutotracking)
         Assert.assertEquals(
             ExceptionHandler::class.java,
@@ -459,7 +459,7 @@ class TrackerTest {
             tracker.exceptionAutotracking = false
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
         val handler1 = ExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler(handler1)
         Assert.assertEquals(
@@ -489,7 +489,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, "ns", "myAppId", context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, "ns", "myAppId", null, context, trackerBuilder)
         
         Companion.tracker!!.track(Structured("c", "a"))
         val sessionIdStart = Companion.tracker!!.session!!.state!!.sessionId
