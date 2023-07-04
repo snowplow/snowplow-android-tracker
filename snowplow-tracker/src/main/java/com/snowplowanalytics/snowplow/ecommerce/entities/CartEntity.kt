@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Provided to certain Ecommerce events. The Cart properties will be sent with the event as a 
  * Cart entity.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/cart/jsonschema/1-0-0
  */
 data class CartEntity @JvmOverloads constructor(
     /**

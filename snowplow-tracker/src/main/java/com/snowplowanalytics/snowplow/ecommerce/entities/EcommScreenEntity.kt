@@ -22,6 +22,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 data class EcommScreenEntity @JvmOverloads constructor(
     /**
      * The type of screen that was visited, e.g. homepage, product details, cart, checkout, etc.
+     * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/page/jsonschema/1-0-0
      */
     var type: String,
 

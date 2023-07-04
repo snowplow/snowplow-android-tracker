@@ -18,6 +18,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Add ecommerce User details.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/user/jsonschema/1-0-0
  */
 data class EcommUserEntity @JvmOverloads constructor(
     /**

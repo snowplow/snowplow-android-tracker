@@ -23,6 +23,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Track a refund event. Use the same transaction ID as for the original Transaction event.
  * Provide a list of products to specify certain products to be refunded, otherwise the whole transaction 
  * will be marked as refunded.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/refund/jsonschema/1-0-0
  *
  * @param transactionId The ID of the relevant transaction.
  * @param currency The currency in which the product(s) are being priced (ISO 4217).

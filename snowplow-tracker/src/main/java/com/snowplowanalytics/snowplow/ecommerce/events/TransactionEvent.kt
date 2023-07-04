@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
  * Track a transaction event.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/transaction/jsonschema/1-0-0
  *
  * @param transactionId The ID of the transaction.
  * @param revenue The total value of the transaction.

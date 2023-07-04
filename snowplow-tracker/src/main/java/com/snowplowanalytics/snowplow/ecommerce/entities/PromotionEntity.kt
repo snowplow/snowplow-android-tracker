@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Provided to certain Ecommerce events. The Promotion properties will be sent with the event as a
  * Promotion entity.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/promotion/jsonschema/1-0-0
  */
 data class PromotionEntity @JvmOverloads constructor(
     /**

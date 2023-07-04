@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 /**
  * Provided to certain Ecommerce events. The Product properties will be sent with the event as a 
  * Product entity.
+ * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/product/jsonschema/1-0-0
  */
 data class ProductEntity @JvmOverloads constructor(
     /**
