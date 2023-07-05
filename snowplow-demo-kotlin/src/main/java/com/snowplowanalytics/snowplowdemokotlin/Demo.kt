@@ -330,7 +330,7 @@ class Demo : Activity(), LoggerDelegate {
             return
         }
         TrackerEvents.trackAll(tracker)
-        eventsCreated += 18
+        eventsCreated += 19
         val made = "Made: $eventsCreated"
         runOnUiThread { _eventsCreated!!.text = made }
     }

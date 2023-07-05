@@ -57,11 +57,12 @@ import java.util.UUID;
  * combinations of Tracker Events.
  */
 public class TrackerEvents {
-    private static ProductEntity product = new ProductEntity("productId", "product/category", "GBP", 99.99);
-    private static PromotionEntity promotion = new PromotionEntity("promoIdABCDE");
+    private static final ProductEntity product = new ProductEntity("productId", "product/category", "GBP", 99.99);
+    private static final PromotionEntity promotion = new PromotionEntity("promoIdABCDE");
 
     public static void trackAll(@NonNull TrackerController tracker) {
         trackDeepLink(tracker);
+        trackPageView(tracker);
         trackStructuredEvent(tracker);
         trackScreenView(tracker);
         trackTimings(tracker);
@@ -94,6 +95,10 @@ public class TrackerEvents {
         event.getEntities().add(entity);
 
         tracker.track(event);
+    }
+
+    private static void trackPageView(TrackerController tracker) {
+        tracker.track(new PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"));
     }
 
     private static void trackStructuredEvent(TrackerController tracker) {

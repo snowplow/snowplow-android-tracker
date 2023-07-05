@@ -40,6 +40,7 @@ object TrackerEvents {
     
     fun trackAll(tracker: TrackerController) {
         trackDeepLink(tracker)
+        trackPageView(tracker)
         trackStructuredEvent(tracker)
         trackScreenView(tracker)
         trackTimings(tracker)
@@ -73,6 +74,10 @@ object TrackerEvents {
         event.entities.add(entity)
 
         tracker.track(event)
+    }
+
+    private fun trackPageView(tracker: TrackerController) {
+        tracker.track(PageView("pageUrl").pageTitle("pageTitle").referrer("pageReferrer"))
     }
 
     private fun trackStructuredEvent(tracker: TrackerController) {

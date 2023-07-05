@@ -360,7 +360,7 @@ public class Demo extends Activity implements LoggerDelegate {
             return;
         }
         TrackerEvents.trackAll(tracker);
-        eventsCreated += 21;
+        eventsCreated += 19;
         final String made = "Made: " + eventsCreated;
         runOnUiThread(() -> _eventsCreated.setText(made));
     }
