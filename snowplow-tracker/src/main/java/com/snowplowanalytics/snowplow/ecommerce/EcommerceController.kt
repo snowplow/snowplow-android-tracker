@@ -12,8 +12,8 @@
  */
 package com.snowplowanalytics.snowplow.ecommerce
 
-import com.snowplowanalytics.snowplow.ecommerce.entities.EcommScreenEntity
-import com.snowplowanalytics.snowplow.ecommerce.entities.EcommUserEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceScreenEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity
 
 /**
  * Controller for managing Ecommerce entities.
@@ -24,13 +24,13 @@ interface EcommerceController {
      * Add an ecommerce Screen/Page entity to all subsequent events.
      * @param screen A EcommScreenEntity.
      */
-    fun setEcommerceScreen(screen: EcommScreenEntity)
+    fun setEcommerceScreen(screen: EcommerceScreenEntity)
 
     /**
      * Add an ecommerce User entity to all subsequent events.
      * @param user A EcommUserEntity.
      */
-    fun setEcommerceUser(user: EcommUserEntity)
+    fun setEcommerceUser(user: EcommerceUserEntity)
 
     /**
      * Stop adding a Screen/Page entity to events.

@@ -13,24 +13,22 @@
 package com.snowplowanalytics.core.ecommerce
 
 import androidx.annotation.RestrictTo
-import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
-import com.snowplowanalytics.snowplow.ecommerce.entities.EcommScreenEntity
-import com.snowplowanalytics.snowplow.ecommerce.entities.EcommUserEntity
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceScreenEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EcommerceControllerImpl(val serviceProvider: ServiceProviderInterface) : EcommerceController {
 
-    override fun setEcommerceScreen(screen: EcommScreenEntity) {
+    override fun setEcommerceScreen(screen: EcommerceScreenEntity) {
         val plugin = PluginConfiguration("ecommercePageTypePluginInternal")
         plugin.entities { listOf(screen.entity) }
         serviceProvider.addPlugin(plugin)
     }
 
-    override fun setEcommerceUser(user: EcommUserEntity) {
+    override fun setEcommerceUser(user: EcommerceUserEntity) {
         val plugin = PluginConfiguration("ecommerceUserPluginInternal")
         plugin.entities { listOf(user.entity) }
         serviceProvider.addPlugin(plugin)
