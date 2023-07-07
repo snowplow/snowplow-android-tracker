@@ -17,7 +17,8 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Add ecommerce Screen/Page details.
+ * Add ecommerce Screen/Page details. It is designed to help with grouping insights by 
+ * screen/page type, e.g. Product description, Product list, Home.
  */
 data class EcommerceScreenEntity @JvmOverloads constructor(
     /**

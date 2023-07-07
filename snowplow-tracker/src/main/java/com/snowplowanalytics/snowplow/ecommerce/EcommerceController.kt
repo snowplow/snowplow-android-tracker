@@ -21,14 +21,14 @@ import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity
 interface EcommerceController {
 
     /**
-     * Add an ecommerce Screen/Page entity to all subsequent events.
-     * @param screen A EcommScreenEntity.
+     * Add an ecommerce Screen/Page entity to all subsequent events (not just ecommerce events).
+     * @param screen A EcommerceScreenEntity.
      */
     fun setEcommerceScreen(screen: EcommerceScreenEntity)
 
     /**
-     * Add an ecommerce User entity to all subsequent events.
-     * @param user A EcommUserEntity.
+     * Add an ecommerce User entity to all subsequent events (not just ecommerce events).
+     * @param user A EcommerceUserEntity.
      */
     fun setEcommerceUser(user: EcommerceUserEntity)
 

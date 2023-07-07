@@ -17,7 +17,7 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * Add ecommerce User details.
+ * Add ecommerce User details. It is designed to help in modeling guest/non-guest account activity.
  * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/user/jsonschema/1-0-0
  */
 data class EcommerceUserEntity @JvmOverloads constructor(
