@@ -13,9 +13,11 @@
 package com.snowplowanalytics.snowplowdemokotlin.utils
 
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.ErrorType
 import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
@@ -25,6 +27,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -37,6 +40,13 @@ import java.util.*
 object TrackerEvents {
     private val product = ProductEntity("productId", "product/category", "GBP", 99.99)
     private val promotion = PromotionEntity("promoIdABCDE")
+    private val transaction = TransactionEntity(
+        transactionId = "id-123",
+        revenue = 231231,
+        currency = "USD",
+        paymentMethod = "debit",
+        totalQuantity = 1
+    )
     
     fun trackAll(tracker: TrackerController) {
         trackDeepLink(tracker)
@@ -59,6 +69,7 @@ object TrackerEvents {
         trackPromotionView(tracker)
         trackPromotionClick(tracker)
         trackTransaction(tracker)
+        trackTransactionError(tracker)
         trackRefund(tracker)
     }
 
@@ -201,13 +212,16 @@ object TrackerEvents {
     }
 
     private fun trackTransaction(tracker: TrackerController) {
-        val event = TransactionEvent(
-            transactionId = "id-123", 
-            231231,
-            "USD",
-            "debit",
-            1,
-            products = listOf(product)
+        val event = TransactionEvent(transaction)
+        tracker.track(event)
+    }
+
+    private fun trackTransactionError(tracker: TrackerController) {
+        val event = TransactionErrorEvent(
+            transaction,
+            errorShortcode = "processor_declined",
+            errorDescription = "user_details_invalid",
+            errorType = ErrorType.Hard
         )
         tracker.track(event)
     }

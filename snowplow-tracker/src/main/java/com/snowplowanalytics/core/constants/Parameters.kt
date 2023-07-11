@@ -114,6 +114,13 @@ object Parameters {
     const val ECOMM_TRANSACTION_DISCOUNT_AMOUNT = "discount_amount"
     const val ECOMM_TRANSACTION_CREDIT_ORDER = "credit_order"
 
+    // Snowplow Ecommerce Transaction Error
+    const val ECOMM_TRANSACTION_ERROR_CODE = "error_code"
+    const val ECOMM_TRANSACTION_ERROR_SHORTCODE = "error_shortcode"
+    const val ECOMM_TRANSACTION_ERROR_DESCRIPTION = "error_description"
+    const val ECOMM_TRANSACTION_ERROR_TYPE = "error_type"
+    const val ECOMM_TRANSACTION_ERROR_RESOLUTION = "resolution"
+
     // Snowplow Ecommerce Checkout Step
     const val ECOMM_CHECKOUT_STEP = "step"
     const val ECOMM_CHECKOUT_SHIPPING_POSTCODE = "shipping_postcode"

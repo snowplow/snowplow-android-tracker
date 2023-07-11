@@ -10,22 +10,20 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.core.ecommerce
 
-/**
- * Available types of ecommerce action. Each one is a different event type.
- */
-enum class EcommerceAction {
-    // lowercase to match the schema
-    add_to_cart,
-    remove_from_cart,
-    product_view,
-    list_click,
-    list_view,
-    promo_click,
-    promo_view,
-    checkout_step,
-    transaction,
-    trns_error,
-    refund
+package com.snowplowanalytics.snowplow.ecommerce
+
+/** Type of transaction error. */
+enum class ErrorType {
+    /// The customer must provide another form of payment e.g. the card has expired.
+    Hard,
+    /// Temporary issues where retrying might be successful e.g. processor declined the transaction.
+    Soft;
+
+    override fun toString(): String {
+        return when (this) {
+            Hard -> "hard"
+            Soft -> "soft"
+        }
+    }
 }

@@ -16,9 +16,11 @@ package com.snowplowanalytics.snowplowtrackerdemojava.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.ecommerce.ErrorType;
 import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity;
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity;
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity;
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent;
@@ -28,6 +30,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent;
 import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.MessageNotification;
@@ -60,6 +63,14 @@ public class TrackerEvents {
     private static final ProductEntity product = new ProductEntity("productId", "product/category", "GBP", 99.99);
     private static final PromotionEntity promotion = new PromotionEntity("promoIdABCDE");
 
+    private static final TransactionEntity transaction = new TransactionEntity(
+        "id-123",
+        231231,
+        "USD",
+        "debit",
+        1
+    );
+
     public static void trackAll(@NonNull TrackerController tracker) {
         trackDeepLink(tracker);
         trackPageView(tracker);
@@ -81,6 +92,7 @@ public class TrackerEvents {
         trackPromotionView(tracker);
         trackPromotionClick(tracker);
         trackTransaction(tracker);
+        trackTransactionError(tracker);
         trackRefund(tracker);
     }
     
@@ -212,12 +224,17 @@ public class TrackerEvents {
     }
 
     private static void trackTransaction(TrackerController tracker) {
-        TransactionEvent event = new TransactionEvent(
-                "id-123",
-                231231,
-                "USD",
-                "debit",
-                1
+        TransactionEvent event = new TransactionEvent(transaction);
+        tracker.track(event);
+    }
+
+    private static void trackTransactionError(TrackerController tracker) {
+        TransactionErrorEvent event = new TransactionErrorEvent(
+                transaction,
+                null,
+                "processor_declined",
+                "user_details_invalid",
+                ErrorType.Hard
         );
         tracker.track(event);
     }

@@ -27,6 +27,7 @@ import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity
 import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent
@@ -35,6 +36,7 @@ import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
@@ -290,17 +292,16 @@ class EcommerceTest {
 
         val product1 = ProductEntity("id1", currency = "CHF", price = 10.99, category = "climbing")
         val product2 = ProductEntity("id2", currency = "CHF", price = 4, category = "boxing")
-
-        tracker.track(
-            TransactionEvent(
-                transactionId = "id123",
-                revenue = 5,
-                currency = "CHF",
-                paymentMethod = "credit_card",
-                totalQuantity = 2,
-                products = listOf(product1, product2)
-            )
+        
+        val transaction = TransactionEntity(
+            transactionId = "id123",
+            revenue = 5,
+            currency = "CHF",
+            paymentMethod = "credit_card",
+            totalQuantity = 2
         )
+
+        tracker.track(TransactionEvent(transaction, products = listOf(product1, product2)))
         waitForEvents(networkConnection, 1)
 
         Assert.assertEquals(1, networkConnection.countRequests())
@@ -324,6 +325,50 @@ class EcommerceTest {
         Assert.assertEquals("CHF", entity.get(Parameters.ECOMM_TRANSACTION_CURRENCY))
         Assert.assertEquals("id123", entity.get(Parameters.ECOMM_TRANSACTION_ID))
         Assert.assertEquals("credit_card", entity.get(Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD))
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun transactionError() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val tracker = getTracker(networkConnection)
+
+        val transaction = TransactionEntity(
+            transactionId = "id123",
+            revenue = 5,
+            currency = "CHF",
+            paymentMethod = "credit_card",
+            totalQuantity = 2
+        )
+        
+        val errorEvent = TransactionErrorEvent(
+            transaction,
+            "code",
+            "processor_declined",
+            "user_details_invalid"
+        )
+
+        tracker.track(errorEvent)
+        waitForEvents(networkConnection, 1)
+
+        Assert.assertEquals(1, networkConnection.countRequests())
+
+        val request = networkConnection.allRequests[0]
+        val event = getEvent(request)
+        val errorEntities = getTransactionErrorEntities(request)
+        val transactionEntities = getTransactionEntities(request)
+
+        Assert.assertEquals(TrackerConstants.SCHEMA_ECOMMERCE_ACTION, event.getString("schema"))
+        Assert.assertEquals(EcommerceAction.trns_error.toString(), event.getJSONObject("data").getString("type"))
+        Assert.assertFalse(event.getJSONObject("data").has(Parameters.ECOMM_NAME))
+
+        Assert.assertEquals(1, errorEntities.size)
+        Assert.assertEquals(1, transactionEntities.size)
+
+        val entity = errorEntities[0]
+        Assert.assertEquals("code", entity.get(Parameters.ECOMM_TRANSACTION_ERROR_CODE))
+        Assert.assertEquals("processor_declined", entity.get(Parameters.ECOMM_TRANSACTION_ERROR_SHORTCODE))
+        Assert.assertEquals("user_details_invalid", entity.get(Parameters.ECOMM_TRANSACTION_ERROR_DESCRIPTION))
     }
 
     @Test
@@ -595,6 +640,19 @@ class EcommerceTest {
 
         for (i in 0 until allEntities.length()) {
             if (allEntities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION) {
+                relevantEntities.add(allEntities.getJSONObject(i).getJSONObject("data"))
+            }
+        }
+        return relevantEntities
+    }
+
+    private fun getTransactionErrorEntities(request: Request) : ArrayList<JSONObject> {
+        val relevantEntities = ArrayList<JSONObject>()
+        val allEntities = JSONObject(request.payload.map["co"] as String)
+            .getJSONArray("data")
+
+        for (i in 0 until allEntities.length()) {
+            if (allEntities.getJSONObject(i).getString("schema") == TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION_ERROR) {
                 relevantEntities.add(allEntities.getJSONObject(i).getJSONObject("data"))
             }
         }

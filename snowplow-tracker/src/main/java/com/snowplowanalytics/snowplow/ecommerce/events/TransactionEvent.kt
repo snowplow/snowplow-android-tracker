@@ -16,6 +16,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity
 import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
@@ -23,68 +24,14 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Track a transaction event.
  * Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/transaction/jsonschema/1-0-0
  *
- * @param transactionId The ID of the transaction.
- * @param revenue The total value of the transaction.
- * @param currency The currency used (ISO 4217).
- * @param paymentMethod The payment method used.
- * @param totalQuantity Total quantity of items in the transaction.
- * @param tax Total amount of tax on the transaction.
- * @param shipping Total cost of shipping on the transaction.
- * @param discountCode Discount code used.
- * @param discountAmount Discount amount taken off.
- * @param creditOrder Whether it is a credit order or not.
+ * @param transaction The TransactionEntity details.
  * @param products The product(s) included in the transaction.
  */
 class TransactionEvent @JvmOverloads constructor(
     /**
-    * The ID of the transaction.
+    * The transaction details.
     */
-    var transactionId: String,
-    
-    /**
-    * The total value of the transaction.
-    */
-    var revenue: Number,
-    
-    /**
-    * The currency used for the transaction (ISO 4217).
-    */
-    var currency: String,
-    
-    /**
-    * The payment method used for the transaction.
-    */
-    var paymentMethod: String,
-    
-    /**
-    * Total quantity of items in the transaction.
-    */
-    var totalQuantity: Int,
-    
-    /**
-    * Total amount of tax on the transaction.
-    */
-    var tax: Number? = null,
-    
-    /**
-    * Total cost of shipping on the transaction.
-    */
-    var shipping: Number? = null,
-    
-    /**
-    * Discount code used.
-    */
-    var discountCode: String? = null,
-    
-    /**
-    * Discount amount taken off.
-    */
-    var discountAmount: Number? = null,
-    
-    /**
-    * Whether the transaction is a credit order or not.
-    */
-    var creditOrder: Boolean? = null,
+    var transaction: TransactionEntity,
     
     /**
     * Products in the transaction.
@@ -111,24 +58,7 @@ class TransactionEvent @JvmOverloads constructor(
                     entities.add(product.entity)
                 }
             }
-            entities.add(entity)
+            entities.add(transaction.entity)
             return entities
         }
-
-    private val entity: SelfDescribingJson
-        get() = SelfDescribingJson(
-            TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION,
-            mapOf<String, Any?>(
-                Parameters.ECOMM_TRANSACTION_ID to transactionId,
-                Parameters.ECOMM_TRANSACTION_REVENUE to revenue,
-                Parameters.ECOMM_TRANSACTION_CURRENCY to currency,
-                Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to paymentMethod,
-                Parameters.ECOMM_TRANSACTION_QUANTITY to totalQuantity,
-                Parameters.ECOMM_TRANSACTION_TAX to tax,
-                Parameters.ECOMM_TRANSACTION_SHIPPING to shipping,
-                Parameters.ECOMM_TRANSACTION_DISCOUNT_CODE to discountCode,
-                Parameters.ECOMM_TRANSACTION_DISCOUNT_AMOUNT to discountAmount,
-                Parameters.ECOMM_TRANSACTION_CREDIT_ORDER to creditOrder
-            ).filter { it.value != null }
-        )
 }

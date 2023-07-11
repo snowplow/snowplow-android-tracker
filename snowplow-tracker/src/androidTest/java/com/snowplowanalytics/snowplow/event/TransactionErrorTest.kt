@@ -16,8 +16,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.ecommerce.EcommerceAction
+import com.snowplowanalytics.snowplow.ecommerce.ErrorType
 import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
 import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent
 import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import org.junit.Assert
 import org.junit.Test
@@ -25,52 +27,44 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class TransactionTest {
+class TransactionErrorTest {
     @Test
     fun testExpectedForm() {
-        val product1 = ProductEntity(
-            id = "product ID",
-            name = "product name",
-            category = "category",
-            currency = "JPY",
-            price = 123456789
-        )
-        val product2 = ProductEntity(
-            id = "id",
-            price = 0.99,
-            category = "category2",
-            currency = "GBP"
-        )
-        
         val transaction = TransactionEntity(
         "transactionId",
-        8999,
-        "EUR",
-        "visa",
-        2000
+        9876543.21,
+        "GBP",
+        "cash",
+        1
         )
 
-        val event = TransactionEvent(transaction, products = listOf(product1, product2))
+        val event = TransactionErrorEvent(
+            transaction,
+            errorCode = "E-001",
+            errorShortcode = "shortcode",
+            errorDescription = "description",
+            errorType = ErrorType.Soft,
+            resolution = "resolution"
+        )
 
         val map = hashMapOf<String, Any>(
-            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION,
+            "schema" to TrackerConstants.SCHEMA_ECOMMERCE_TRANSACTION_ERROR,
             "data" to hashMapOf(
-                Parameters.ECOMM_TRANSACTION_ID to "transactionId",
-                Parameters.ECOMM_TRANSACTION_REVENUE to 8999,
-                Parameters.ECOMM_TRANSACTION_CURRENCY to "EUR",
-                Parameters.ECOMM_TRANSACTION_PAYMENT_METHOD to "visa",
-                Parameters.ECOMM_TRANSACTION_QUANTITY to 2000,
+                Parameters.ECOMM_TRANSACTION_ERROR_CODE to "E-001",
+                Parameters.ECOMM_TRANSACTION_ERROR_SHORTCODE to "shortcode",
+                Parameters.ECOMM_TRANSACTION_ERROR_DESCRIPTION to "description",
+                Parameters.ECOMM_TRANSACTION_ERROR_TYPE to "soft",
+                Parameters.ECOMM_TRANSACTION_ERROR_RESOLUTION to "resolution"
             )
         )
         
         val data: Map<String, Any?> = event.dataPayload
         Assert.assertNotNull(data)
-        Assert.assertEquals(EcommerceAction.transaction.toString(), data[Parameters.ECOMM_TYPE])
-        Assert.assertFalse(data.containsKey(Parameters.ECOMM_TRANSACTION_REVENUE))
+        Assert.assertEquals(EcommerceAction.trns_error.toString(), data[Parameters.ECOMM_TYPE])
 
         val entities = event.entitiesForProcessing
         Assert.assertNotNull(entities)
-        Assert.assertEquals(3, entities!!.size)
-        Assert.assertEquals(map, entities[2].map)
+        Assert.assertEquals(2, entities!!.size)
+        Assert.assertEquals(map, entities[0].map)
     }
 }
