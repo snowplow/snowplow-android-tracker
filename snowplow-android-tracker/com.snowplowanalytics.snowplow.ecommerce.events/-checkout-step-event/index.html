@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CheckoutStepEvent</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>snowplow-android-tracker</span>
+            </a>
+    </div>
+    <div>
+5.4.0    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="snowplow-android-tracker::com.snowplowanalytics.snowplow.ecommerce.events/CheckoutStepEvent///PointingToDeclaration//918778150">
+  <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.snowplow.ecommerce.events</a><span class="delimiter">/</span><span class="current">CheckoutStepEvent</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Checkout</span><wbr></wbr><span>Step</span><wbr></wbr><span><span>Event</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CheckoutStepEvent</a> <span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html"><span class="token annotation builtin">JvmOverloads</span></a> </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">var </span>step<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>shippingPostcode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>billingPostcode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>shippingFullAddress<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>billingFullAddress<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>deliveryProvider<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>deliveryMethod<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>couponCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>accountType<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>paymentMethod<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>proofOfPayment<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>marketingOptIn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span> : <a href="../../com.snowplowanalytics.snowplow.event/-abstract-self-describing/index.html">AbstractSelfDescribing</a></div><p class="paragraph">Track a checkout step. Entity schema: iglu:com.snowplowanalytics.snowplow.ecommerce/checkout_step/jsonschema/1-0-0</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>step</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Checkout step index.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>shipping</span><wbr></wbr><span><span>Postcode</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Shipping address postcode.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>billing</span><wbr></wbr><span><span>Postcode</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Billing address postcode.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>shipping</span><wbr></wbr><span>Full</span><wbr></wbr><span><span>Address</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Full shipping address.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>billing</span><wbr></wbr><span>Full</span><wbr></wbr><span><span>Address</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Full billing address.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>delivery</span><wbr></wbr><span><span>Provider</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Can be used to discern delivery providers e.g. DHL, PostNL etc.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>delivery</span><wbr></wbr><span><span>Method</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Store pickup, standard delivery, express delivery, international, etc.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>coupon</span><wbr></wbr><span><span>Code</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Coupon applied at checkout.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>account</span><wbr></wbr><span><span>Type</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Type of account used on checkout, e.g. existing user, guest.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>payment</span><wbr></wbr><span><span>Method</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>proof</span><wbr></wbr><span>Of</span><wbr></wbr><span><span>Payment</span></span></u></div></span></div><div><div class="title"><p class="paragraph">E.g. invoice or receipt.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>marketing</span><wbr></wbr><span>Opt</span><wbr></wbr><span><span>In</span></span></u></div></span></div><div><div class="title"><p class="paragraph">If opted in to marketing campaigns to the email address.</p></div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="796321910%2FConstructors%2F918778150" anchor-label="CheckoutStepEvent" id="796321910%2FConstructors%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-checkout-step-event.html"><span>Checkout</span><wbr></wbr><span>Step</span><wbr></wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="796321910%2FConstructors%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html"><span class="token annotation builtin">JvmOverloads</span></a></div></div><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">step<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">shippingPostcode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">billingPostcode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">shippingFullAddress<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">billingFullAddress<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">deliveryProvider<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">deliveryMethod<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">couponCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">accountType<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">paymentMethod<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">proofOfPayment<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">marketingOptIn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1006751794%2FFunctions%2F918778150" anchor-label="contexts" id="-1006751794%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/contexts.html"><span><span>contexts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1006751794%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/contexts.html"><span class="token function"><strike>contexts</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contexts<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1839261845%2FFunctions%2F918778150" anchor-label="entities" id="-1839261845%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/entities.html"><span><span>entities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1839261845%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/entities.html"><span class="token function">entities</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="360050166%2FFunctions%2F918778150" anchor-label="trueTimestamp" id="360050166%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/true-timestamp.html"><span>true</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="360050166%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/true-timestamp.html"><span class="token function">trueTimestamp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">trueTimestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Set the custom timestamp of the event.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-811294854%2FProperties%2F918778150" anchor-label="accountType" id="-811294854%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="account-type.html"><span>account</span><wbr></wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-811294854%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="account-type.html">accountType</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Type of account used on checkout, e.g. existing user, guest.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1520012113%2FProperties%2F918778150" anchor-label="billingFullAddress" id="-1520012113%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="billing-full-address.html"><span>billing</span><wbr></wbr><span>Full</span><wbr></wbr><span><span>Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1520012113%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="billing-full-address.html">billingFullAddress</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Full billing address.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="404586873%2FProperties%2F918778150" anchor-label="billingPostcode" id="404586873%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="billing-postcode.html"><span>billing</span><wbr></wbr><span><span>Postcode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="404586873%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="billing-postcode.html">billingPostcode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Billing address postcode.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1973379490%2FProperties%2F918778150" anchor-label="contexts" id="1973379490%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/contexts.html"><span><span>contexts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1973379490%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/contexts.html"><strike>contexts</strike></a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="815327878%2FProperties%2F918778150" anchor-label="couponCode" id="815327878%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="coupon-code.html"><span>coupon</span><wbr></wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="815327878%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="coupon-code.html">couponCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Coupon applied at checkout.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1384784527%2FProperties%2F918778150" anchor-label="customContexts" id="-1384784527%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/custom-contexts.html"><span>custom</span><wbr></wbr><span><span>Contexts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1384784527%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-field/index.html"><span class="token annotation builtin">JvmField</span></a></div></div><span class="token keyword"></span><span class="token keyword">val </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/custom-contexts.html"><strike>customContexts</strike></a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">List of custom contexts associated with the event.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-363966819%2FProperties%2F918778150" anchor-label="dataPayload" id="-363966819%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="data-payload.html"><span>data</span><wbr></wbr><span><span>Payload</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-363966819%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="data-payload.html">dataPayload</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The payload for the event.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1078517764%2FProperties%2F918778150" anchor-label="deliveryMethod" id="1078517764%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delivery-method.html"><span>delivery</span><wbr></wbr><span><span>Method</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1078517764%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="delivery-method.html">deliveryMethod</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">E.g. store pickup, standard delivery, express delivery, international.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-441574668%2FProperties%2F918778150" anchor-label="deliveryProvider" id="-441574668%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delivery-provider.html"><span>delivery</span><wbr></wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-441574668%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="delivery-provider.html">deliveryProvider</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Can be used to discern delivery providers DHL, PostNL etc.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1389815077%2FProperties%2F918778150" anchor-label="entities" id="1389815077%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/entities.html"><span><span>entities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1389815077%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/entities.html">entities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="67195270%2FProperties%2F918778150" anchor-label="entitiesForProcessing" id="67195270%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="entities-for-processing.html"><span>entities</span><wbr></wbr><span>For</span><wbr></wbr><span><span>Processing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="67195270%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="entities-for-processing.html">entitiesForProcessing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Used for events whose properties are added as entities, e.g. Ecommerce events</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-367850521%2FProperties%2F918778150" anchor-label="marketingOptIn" id="-367850521%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="marketing-opt-in.html"><span>marketing</span><wbr></wbr><span>Opt</span><wbr></wbr><span><span>In</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-367850521%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="marketing-opt-in.html">marketingOptIn</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">If opted in to marketing campaigns to the email address.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-444611846%2FProperties%2F918778150" anchor-label="paymentMethod" id="-444611846%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="payment-method.html"><span>payment</span><wbr></wbr><span><span>Method</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-444611846%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="payment-method.html">paymentMethod</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Any kind of payment method the user selected to proceed. Card, PayPal, Alipay etc.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-836096146%2FProperties%2F918778150" anchor-label="proofOfPayment" id="-836096146%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="proof-of-payment.html"><span>proof</span><wbr></wbr><span>Of</span><wbr></wbr><span><span>Payment</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-836096146%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="proof-of-payment.html">proofOfPayment</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">E.g. invoice or receipt</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1373548072%2FProperties%2F918778150" anchor-label="schema" id="-1373548072%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="schema.html"><span><span>schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1373548072%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="schema.html">schema</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">The event schema</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-485670742%2FProperties%2F918778150" anchor-label="shippingFullAddress" id="-485670742%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="shipping-full-address.html"><span>shipping</span><wbr></wbr><span>Full</span><wbr></wbr><span><span>Address</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-485670742%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="shipping-full-address.html">shippingFullAddress</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Full shipping address.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1282166946%2FProperties%2F918778150" anchor-label="shippingPostcode" id="-1282166946%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="shipping-postcode.html"><span>shipping</span><wbr></wbr><span><span>Postcode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1282166946%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="shipping-postcode.html">shippingPostcode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Shipping address postcode.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="511249933%2FProperties%2F918778150" anchor-label="step" id="511249933%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="step.html"><span><span>step</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="511249933%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="step.html">step</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Checkout step index.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1537004244%2FProperties%2F918778150" anchor-label="trueTimestamp" id="-1537004244%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/true-timestamp.html"><span>true</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1537004244%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../../com.snowplowanalytics.snowplow.event/-abstract-event/true-timestamp.html">trueTimestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
