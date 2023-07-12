@@ -1,3 +1,7 @@
+Version 5.5.0-beta.1 (2023-07-12)
+--------------------------
+Add configuration to send requests with user ID to a Focal Meter endpoint (#571)
+
 Version 5.4.0 (2023-07-12)
 --------------------------
 Add Snowplow ecommerce events and entities (#611)
