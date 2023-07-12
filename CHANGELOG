@@ -1,3 +1,8 @@
+Version 5.4.0 (2023-07-12)
+--------------------------
+Add Snowplow ecommerce events and entities (#611)
+Increase interval for updating platform context properties from 0.1s to 1s (#624)
+
 Version 5.3.0 (2023-06-30)
 --------------------------
 Add media controller with APIs to track media events (#606)

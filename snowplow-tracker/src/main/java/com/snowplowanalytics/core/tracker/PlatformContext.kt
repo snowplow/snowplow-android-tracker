@@ -46,12 +46,12 @@ class PlatformContext(
     }
 
     /**
-     * Initializes PlatformContext with default update intervals – 0.1s for updating platform information and 10s for updating network information.
+     * Initializes PlatformContext with default update intervals – 1s for updating platform information and 10s for updating network information.
      *
      * @param context the Android context
      */
     constructor(platformContextProperties: List<PlatformContextProperty>?,
-                context: Context) : this(100, (10 * 1000).toLong(), DeviceInfoMonitor(), platformContextProperties, context)
+                context: Context) : this(1000, (10 * 1000).toLong(), DeviceInfoMonitor(), platformContextProperties, context)
 
     fun getMobileContext(userAnonymisation: Boolean): SelfDescribingJson? {
         updateEphemeralDictsIfNecessary()

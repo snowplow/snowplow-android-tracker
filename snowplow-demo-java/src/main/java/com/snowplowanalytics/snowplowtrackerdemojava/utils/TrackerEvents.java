@@ -16,6 +16,22 @@ package com.snowplowanalytics.snowplowtrackerdemojava.utils;
 import androidx.annotation.NonNull;
 
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.ecommerce.ErrorType;
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity;
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent;
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent;
 import com.snowplowanalytics.snowplow.event.DeepLinkReceived;
 import com.snowplowanalytics.snowplow.event.MessageNotification;
 import com.snowplowanalytics.snowplow.event.MessageNotificationTrigger;
@@ -32,6 +48,7 @@ import com.snowplowanalytics.snowplow.event.Timing;
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +60,16 @@ import java.util.UUID;
  * combinations of Tracker Events.
  */
 public class TrackerEvents {
+    private static final ProductEntity product = new ProductEntity("productId", "product/category", "GBP", 99.99);
+    private static final PromotionEntity promotion = new PromotionEntity("promoIdABCDE");
+
+    private static final TransactionEntity transaction = new TransactionEntity(
+        "id-123",
+        231231,
+        "USD",
+        "debit",
+        1
+    );
 
     public static void trackAll(@NonNull TrackerController tracker) {
         trackDeepLink(tracker);
@@ -51,10 +78,22 @@ public class TrackerEvents {
         trackScreenView(tracker);
         trackTimings(tracker);
         trackUnstructuredEvent(tracker);
-        trackEcommerceEvent(tracker);
         trackConsentGranted(tracker);
         trackConsentWithdrawn(tracker);
         trackMessageNotification(tracker);
+
+        // Ecommerce events
+        trackAddToCart(tracker);
+        trackRemoveFromCart(tracker);
+        trackCheckoutStep(tracker);
+        trackProductView(tracker);
+        trackProductListView(tracker);
+        trackProductListClick(tracker);
+        trackPromotionView(tracker);
+        trackPromotionClick(tracker);
+        trackTransaction(tracker);
+        trackTransactionError(tracker);
+        trackRefund(tracker);
     }
     
     private static void trackDeepLink(TrackerController tracker) {
@@ -91,13 +130,6 @@ public class TrackerEvents {
         attributes.put("targetUrl", "http://a-target-url.com");
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(new SelfDescribing(test));
-    }
-
-    private static void trackEcommerceEvent(TrackerController tracker) {
-        EcommerceTransactionItem item = new EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff").currency("AUD").orderId("item-1");
-        List<EcommerceTransactionItem> items = new LinkedList<>();
-        items.add(item);
-        tracker.track(new EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50).shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD"));
     }
 
     private static void trackConsentGranted(TrackerController tracker) {
@@ -140,6 +172,81 @@ public class TrackerEvents {
                 .sound("chime.mp3")
                 .notificationCount(9)
                 .category("category1");
+        tracker.track(event);
+    }
+
+    private static void trackAddToCart(TrackerController tracker) {
+        AddToCartEvent event = new AddToCartEvent(Collections.singletonList(product), new CartEntity(123.45, "GBP"));
+        tracker.track(event);
+    }
+
+    private static void trackRemoveFromCart(TrackerController tracker) {
+        RemoveFromCartEvent event = new RemoveFromCartEvent(Collections.singletonList(product), new CartEntity(43.21, "GBP"));
+        tracker.track(event);
+    }
+
+    private static void trackCheckoutStep(TrackerController tracker) {
+        CheckoutStepEvent event = new CheckoutStepEvent(3,
+                null,
+                null,
+                null,
+                null,
+                null, 
+                null, 
+                null, 
+                "guest");
+        tracker.track(event);
+    }
+
+    private static void trackProductView(TrackerController tracker) {
+        ProductViewEvent event = new ProductViewEvent(product);
+        tracker.track(event);
+    }
+
+    private static void trackProductListView(TrackerController tracker) {
+        ProductListViewEvent event = new ProductListViewEvent(Collections.singletonList(product), "snowplowProducts");
+        tracker.track(event);
+    }
+
+    private static void trackProductListClick(TrackerController tracker) {
+        ProductListClickEvent event = new ProductListClickEvent(product);
+        tracker.track(event);
+    }
+
+    private static void trackPromotionView(TrackerController tracker) {
+        PromotionViewEvent event = new PromotionViewEvent(promotion);
+        tracker.track(event);
+    }
+
+    private static void trackPromotionClick(TrackerController tracker) {
+        PromotionClickEvent event = new PromotionClickEvent(promotion);
+        tracker.track(event);
+    }
+
+    private static void trackTransaction(TrackerController tracker) {
+        TransactionEvent event = new TransactionEvent(transaction);
+        tracker.track(event);
+    }
+
+    private static void trackTransactionError(TrackerController tracker) {
+        TransactionErrorEvent event = new TransactionErrorEvent(
+                transaction,
+                null,
+                "processor_declined",
+                "user_details_invalid",
+                ErrorType.Hard
+        );
+        tracker.track(event);
+    }
+
+    private static void trackRefund(TrackerController tracker) {
+        RefundEvent event = new RefundEvent(
+                "id-123",
+                7654321,
+                "USD",
+                null,
+                Collections.singletonList(product)
+        );
         tracker.track(event);
     }
 }

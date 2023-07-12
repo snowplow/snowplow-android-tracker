@@ -14,6 +14,7 @@ package com.snowplowanalytics.core.tracker
 
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
+import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.*
@@ -41,6 +42,9 @@ class TrackerControllerImpl  // Constructors
         get() = serviceProvider.getOrMakeGlobalContextsController()
     val sessionController: SessionControllerImpl
         get() = serviceProvider.getOrMakeSessionController()
+    
+    override val ecommerce: EcommerceControllerImpl
+        get() = serviceProvider.ecommerceController
     override val session: SessionController?
         get() {
             val sessionController = sessionController

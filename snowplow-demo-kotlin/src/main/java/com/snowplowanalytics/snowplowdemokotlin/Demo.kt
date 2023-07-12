@@ -37,6 +37,8 @@ import com.snowplowanalytics.snowplow.Snowplow.defaultTracker
 import com.snowplowanalytics.snowplow.Snowplow.setup
 import com.snowplowanalytics.snowplow.Snowplow.subscribeToWebViewEvents
 import com.snowplowanalytics.snowplow.configuration.*
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceScreenEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext
 import com.snowplowanalytics.snowplow.network.HttpMethod
@@ -232,6 +234,7 @@ class Demo : Activity(), LoggerDelegate {
                 defaultTracker!!.emitter.requestCallback = requestCallback
                 callbackTrackerReady.accept(true)
             })
+        defaultTracker?.ecommerce?.setEcommerceScreen(EcommerceScreenEntity("demo_app_screen", locale = "England/London"))
         return true
     }
 
@@ -303,9 +306,9 @@ class Demo : Activity(), LoggerDelegate {
         plugin.afterTrack { event: InspectableEvent -> 
             println("Tracked event with ${event.entities.size} entities")
         }
-
-        createTracker(
-            applicationContext,
+        
+        val tracker = createTracker(
+            context = applicationContext,
             namespace,
             networkConfiguration,
             trackerConfiguration,
@@ -316,6 +319,7 @@ class Demo : Activity(), LoggerDelegate {
             plugin
         )
         subscribeToWebViewEvents(_webView!!)
+        tracker.ecommerce.setEcommerceUser(EcommerceUserEntity("ecomm_user_id"))
         return true
     }
 
@@ -326,7 +330,7 @@ class Demo : Activity(), LoggerDelegate {
             return
         }
         TrackerEvents.trackAll(tracker)
-        eventsCreated += 11
+        eventsCreated += 20
         val made = "Made: $eventsCreated"
         runOnUiThread { _eventsCreated!!.text = made }
     }

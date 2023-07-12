@@ -19,7 +19,9 @@ import com.snowplowanalytics.core.constants.TrackerConstants
  * @param sku Stock Keeping Unit of the item.
  * @param price Price of the item.
  * @param quantity Quantity of the item.
+ * @Deprecated Use the ecommerce package instead
  */
+@Deprecated("Use the ecommerce package instead")
 class EcommerceTransactionItem(sku: String, price: Double, quantity: Int) : AbstractPrimitive() {
     /** Stock Keeping Unit of the item.  */
     val sku: String

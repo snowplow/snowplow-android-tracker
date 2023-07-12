@@ -32,6 +32,10 @@ abstract class AbstractEvent : Event {
      */
     override var trueTimestamp: Long? = null
     
+    /** Used for events whose properties are added as entities, e.g. Ecommerce events */
+    open val entitiesForProcessing: List<SelfDescribingJson>?
+        get() = null
+    
     // Builder methods
 
     /** Adds a list of context entities to the existing ones. */
@@ -58,12 +62,24 @@ abstract class AbstractEvent : Event {
      * @return the event custom context entities
      */
     override val entities: MutableList<SelfDescribingJson>
-        get() = customContexts
+        get() {
+            if (isProcessing) {
+                entitiesForProcessing?.let {
+                    return (customContexts + it).toMutableList()
+                }
+            }
+            return customContexts
+        }
 
     @Deprecated("Old nomenclature", ReplaceWith("entities"))
     override val contexts: List<SelfDescribingJson>
         get() = entities
 
-    override fun beginProcessing(tracker: Tracker) {}
-    override fun endProcessing(tracker: Tracker) {}
+    private var isProcessing = false
+    override fun beginProcessing(tracker: Tracker) {
+        isProcessing = true
+    }
+    override fun endProcessing(tracker: Tracker) {
+        isProcessing = false
+    }
 }

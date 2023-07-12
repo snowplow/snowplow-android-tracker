@@ -45,6 +45,26 @@ object TrackerConstants {
     const val SCHEMA_GDPR = "iglu:com.snowplowanalytics.snowplow/gdpr/jsonschema/1-0-0"
     const val SCHEMA_DIAGNOSTIC_ERROR =
         "iglu:com.snowplowanalytics.snowplow/diagnostic_error/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_ACTION = 
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/snowplow_ecommerce_action/jsonschema/1-0-2"
+    const val SCHEMA_ECOMMERCE_PRODUCT =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/product/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_CART =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/cart/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_TRANSACTION =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/transaction/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_TRANSACTION_ERROR =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/transaction_error/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_CHECKOUT_STEP =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/checkout_step/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_PROMOTION =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/promotion/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_REFUND =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/refund/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_USER =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/user/jsonschema/1-0-0"
+    const val SCHEMA_ECOMMERCE_PAGE =
+        "iglu:com.snowplowanalytics.snowplow.ecommerce/page/jsonschema/1-0-0"
     const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
     const val EVENT_PAGE_VIEW = "pv"
     const val EVENT_STRUCTURED = "se"

@@ -12,7 +12,6 @@
  */
 package com.snowplowanalytics.snowplow.event
 
-import androidx.test.espresso.core.internal.deps.guava.collect.Lists
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snowplowanalytics.core.constants.Parameters
 import org.junit.Assert
@@ -20,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EcommerceTest {
+class EcommerceTransactionTest {
     
     @Test
     fun testExpectedForm() {
