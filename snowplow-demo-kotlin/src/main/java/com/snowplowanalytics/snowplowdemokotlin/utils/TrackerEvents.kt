@@ -13,6 +13,22 @@
 package com.snowplowanalytics.snowplowdemokotlin.utils
 
 import com.snowplowanalytics.snowplow.controller.TrackerController
+import com.snowplowanalytics.snowplow.ecommerce.ErrorType
+import com.snowplowanalytics.snowplow.ecommerce.entities.CartEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.ProductEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.PromotionEntity
+import com.snowplowanalytics.snowplow.ecommerce.entities.TransactionEntity
+import com.snowplowanalytics.snowplow.ecommerce.events.AddToCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.CheckoutStepEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductListViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.ProductViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionClickEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.PromotionViewEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RefundEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.RemoveFromCartEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionErrorEvent
+import com.snowplowanalytics.snowplow.ecommerce.events.TransactionEvent
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import java.util.*
@@ -22,17 +38,39 @@ import java.util.*
  * combinations of Tracker Events.
  */
 object TrackerEvents {
+    private val product = ProductEntity("productId", "product/category", "GBP", 99.99)
+    private val promotion = PromotionEntity("promoIdABCDE")
+    private val transaction = TransactionEntity(
+        transactionId = "id-123",
+        revenue = 231231,
+        currency = "USD",
+        paymentMethod = "debit",
+        totalQuantity = 1
+    )
+    
     fun trackAll(tracker: TrackerController) {
         trackDeepLink(tracker)
         trackPageView(tracker)
         trackStructuredEvent(tracker)
         trackScreenView(tracker)
         trackTimings(tracker)
-        trackUnstructuredEvent(tracker)
-        trackEcommerceEvent(tracker)
+        trackSelfDescribingEvent(tracker)
         trackConsentGranted(tracker)
         trackConsentWithdrawn(tracker)
         trackMessageNotification(tracker)
+
+        // Ecommerce events
+        trackAddToCart(tracker)
+        trackRemoveFromCart(tracker)
+        trackCheckoutStep(tracker)
+        trackProductView(tracker)
+        trackProductListView(tracker)
+        trackProductListClick(tracker)
+        trackPromotionView(tracker)
+        trackPromotionClick(tracker)
+        trackTransaction(tracker)
+        trackTransactionError(tracker)
+        trackRefund(tracker)
     }
 
     private fun trackDeepLink(tracker: TrackerController) {
@@ -67,7 +105,7 @@ object TrackerEvents {
         tracker.track(Timing("category", "variable", 1).label("label"))
     }
 
-    private fun trackUnstructuredEvent(tracker: TrackerController) {
+    private fun trackSelfDescribingEvent(tracker: TrackerController) {
         val attributes: MutableMap<String, String> = HashMap()
         attributes["targetUrl"] = "http://a-target-url.com"
         val test = SelfDescribingJson(
@@ -75,17 +113,6 @@ object TrackerEvents {
             attributes
         )
         tracker.track(SelfDescribing(test))
-    }
-
-    private fun trackEcommerceEvent(tracker: TrackerController) {
-        val item = EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff")
-            .currency("AUD").orderId("item-1")
-        val items: MutableList<EcommerceTransactionItem> = LinkedList()
-        items.add(item)
-        tracker.track(
-            EcommerceTransaction("order-1", 42.50, items).affiliation("affiliation").taxValue(2.50)
-                .shipping(5.00).city("Sydney").state("NSW").country("Australia").currency("AUD")
-        )
     }
 
     private fun trackConsentGranted(tracker: TrackerController) {
@@ -141,6 +168,71 @@ object TrackerEvents {
             .sound("chime.mp3")
             .notificationCount(9)
             .category("category1")
+        tracker.track(event)
+    }
+
+    private fun trackAddToCart(tracker: TrackerController) {
+        val event = AddToCartEvent(listOf(product), CartEntity(currency = "GBP", totalValue = 123.45))
+        tracker.track(event)
+    }
+
+    private fun trackRemoveFromCart(tracker: TrackerController) {
+        val event = RemoveFromCartEvent(listOf(product), CartEntity(currency = "GBP", totalValue = 43.21))
+        tracker.track(event)
+    }
+
+    private fun trackCheckoutStep(tracker: TrackerController) {
+        val event = CheckoutStepEvent(3, accountType = "guest")
+        tracker.track(event)
+    }
+
+    private fun trackProductView(tracker: TrackerController) {
+        val event = ProductViewEvent(product)
+        tracker.track(event)
+    }
+
+    private fun trackProductListView(tracker: TrackerController) {
+        val event = ProductListViewEvent(listOf(product), "snowplowProducts")
+        tracker.track(event)
+    }
+
+    private fun trackProductListClick(tracker: TrackerController) {
+        val event = ProductListClickEvent(product, "snowplowProducts")
+        tracker.track(event)
+    }
+
+    private fun trackPromotionView(tracker: TrackerController) {
+        val event = PromotionViewEvent(promotion)
+        tracker.track(event)
+    }
+
+    private fun trackPromotionClick(tracker: TrackerController) {
+        val event = PromotionClickEvent(promotion)
+        tracker.track(event)
+    }
+
+    private fun trackTransaction(tracker: TrackerController) {
+        val event = TransactionEvent(transaction)
+        tracker.track(event)
+    }
+
+    private fun trackTransactionError(tracker: TrackerController) {
+        val event = TransactionErrorEvent(
+            transaction,
+            errorShortcode = "processor_declined",
+            errorDescription = "user_details_invalid",
+            errorType = ErrorType.Hard
+        )
+        tracker.track(event)
+    }
+
+    private fun trackRefund(tracker: TrackerController) {
+        val event = RefundEvent(
+            transactionId = "id-123",
+            7654321,
+            "USD", 
+            products = listOf(product)
+        )
         tracker.track(event)
     }
 }

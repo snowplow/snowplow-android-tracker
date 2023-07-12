@@ -23,11 +23,8 @@ import com.snowplowanalytics.snowplow.configuration.ConfigurationState
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterface
+import com.snowplowanalytics.snowplow.configuration.*
 
-import com.snowplowanalytics.snowplow.configuration.Configuration
-import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.RemoteConfiguration
-import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.network.HttpMethod
 

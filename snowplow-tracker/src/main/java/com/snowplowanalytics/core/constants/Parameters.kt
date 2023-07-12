@@ -77,6 +77,88 @@ object Parameters {
     const val TI_ITEM_PRICE = "ti_pr"
     const val TI_ITEM_QUANTITY = "ti_qu"
     const val TI_ITEM_CURRENCY = "ti_cu"
+    
+    // Snowplow Ecommerce
+    const val ECOMM_TYPE = "type"
+    const val ECOMM_NAME = "name"
+    
+    // Snowplow Ecommerce Product
+    const val ECOMM_PRODUCT_ID = "id"
+    const val ECOMM_PRODUCT_NAME = "name"
+    const val ECOMM_PRODUCT_CATEGORY = "category"
+    const val ECOMM_PRODUCT_PRICE = "price"
+    const val ECOMM_PRODUCT_LIST_PRICE = "list_price"
+    const val ECOMM_PRODUCT_QUANTITY = "quantity"
+    const val ECOMM_PRODUCT_SIZE = "size"
+    const val ECOMM_PRODUCT_VARIANT = "variant"
+    const val ECOMM_PRODUCT_BRAND = "brand"
+    const val ECOMM_PRODUCT_INVENTORY_STATUS = "inventory_status"
+    const val ECOMM_PRODUCT_POSITION = "position"
+    const val ECOMM_PRODUCT_CURRENCY = "currency"
+    const val ECOMM_PRODUCT_CREATIVE_ID = "creative_id"
+    
+    // Snowplow Ecommerce Cart
+    const val ECOMM_CART_ID = "cart_id"
+    const val ECOMM_CART_VALUE = "total_value"
+    const val ECOMM_CART_CURRENCY = "currency"
+    
+    // Snowplow Ecommerce Transaction
+    const val ECOMM_TRANSACTION_ID = "transaction_id"
+    const val ECOMM_TRANSACTION_REVENUE = "revenue"
+    const val ECOMM_TRANSACTION_CURRENCY = "currency"
+    const val ECOMM_TRANSACTION_PAYMENT_METHOD = "payment_method"
+    const val ECOMM_TRANSACTION_QUANTITY = "total_quantity"
+    const val ECOMM_TRANSACTION_TAX = "tax"
+    const val ECOMM_TRANSACTION_SHIPPING = "shipping"
+    const val ECOMM_TRANSACTION_DISCOUNT_CODE = "discount_code"
+    const val ECOMM_TRANSACTION_DISCOUNT_AMOUNT = "discount_amount"
+    const val ECOMM_TRANSACTION_CREDIT_ORDER = "credit_order"
+
+    // Snowplow Ecommerce Transaction Error
+    const val ECOMM_TRANSACTION_ERROR_CODE = "error_code"
+    const val ECOMM_TRANSACTION_ERROR_SHORTCODE = "error_shortcode"
+    const val ECOMM_TRANSACTION_ERROR_DESCRIPTION = "error_description"
+    const val ECOMM_TRANSACTION_ERROR_TYPE = "error_type"
+    const val ECOMM_TRANSACTION_ERROR_RESOLUTION = "resolution"
+
+    // Snowplow Ecommerce Checkout Step
+    const val ECOMM_CHECKOUT_STEP = "step"
+    const val ECOMM_CHECKOUT_SHIPPING_POSTCODE = "shipping_postcode"
+    const val ECOMM_CHECKOUT_BILLING_POSTCODE = "billing_postcode"
+    const val ECOMM_CHECKOUT_SHIPPING_ADDRESS = "shipping_full_address"
+    const val ECOMM_CHECKOUT_BILLING_ADDRESS = "billing_full_address"
+    const val ECOMM_CHECKOUT_DELIVERY_PROVIDER = "delivery_provider"
+    const val ECOMM_CHECKOUT_DELIVERY_METHOD = "delivery_method"
+    const val ECOMM_CHECKOUT_COUPON_CODE = "coupon_code"
+    const val ECOMM_CHECKOUT_ACCOUNT_TYPE = "account_type"
+    const val ECOMM_CHECKOUT_PAYMENT_METHOD = "payment_method"
+    const val ECOMM_CHECKOUT_PROOF_OF_PAYMENT = "proof_of_payment"
+    const val ECOMM_CHECKOUT_MARKETING_OPT_IN = "marketing_opt_in"
+
+    // Snowplow Ecommerce Promo
+    const val ECOMM_PROMO_ID = "id"
+    const val ECOMM_PROMO_NAME = "name"
+    const val ECOMM_PROMO_PRODUCT_IDS = "product_ids"
+    const val ECOMM_PROMO_POSITION = "position"
+    const val ECOMM_PROMO_CREATIVE_ID = "creative_id"
+    const val ECOMM_PROMO_TYPE = "type"
+    const val ECOMM_PROMO_SLOT = "slot"
+
+    // Snowplow Ecommerce Refund
+    const val ECOMM_REFUND_ID = "transaction_id"
+    const val ECOMM_REFUND_CURRENCY = "currency"
+    const val ECOMM_REFUND_AMOUNT = "refund_amount"
+    const val ECOMM_REFUND_REASON = "refund_reason"
+
+    // Snowplow Ecommerce Screen/Page
+    const val ECOMM_SCREEN_TYPE = "type"
+    const val ECOMM_SCREEN_LANGUAGE = "language"
+    const val ECOMM_SCREEN_LOCALE = "locale"
+
+    // Snowplow Ecommerce User
+    const val ECOMM_USER_ID = "id"
+    const val ECOMM_USER_GUEST = "is_guest"
+    const val ECOMM_USER_EMAIL = "email"
 
     // Screen View
     const val SV_ID = "id"

@@ -504,11 +504,12 @@ class Tracker(
         setApplicationInstallEventTimestamp(event)
         addBasicPropertiesToPayload(payload, event)
         addStateMachinePayloadValues(event)
-        event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
 
         // Context entities
         addBasicContexts(event)
         addStateMachineEntities(event)
+        
+        event.wrapPropertiesToPayload(payload, base64Encoded=base64Encoded)
         event.wrapEntitiesToPayload(payload, base64Encoded=base64Encoded)
 
         // Decide whether to track the event or not

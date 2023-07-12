@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.emitter.*
 import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
@@ -39,6 +40,7 @@ interface ServiceProviderInterface {
     fun getOrMakeSessionController(): SessionControllerImpl
     val pluginsController: PluginsControllerImpl
     val mediaController: MediaController
+    val ecommerceController: EcommerceControllerImpl
 
     // Configuration Updates
     val trackerConfiguration: TrackerConfiguration

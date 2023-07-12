@@ -53,6 +53,8 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration;
 import com.snowplowanalytics.snowplow.controller.EmitterController;
 import com.snowplowanalytics.snowplow.controller.SessionController;
 import com.snowplowanalytics.snowplow.controller.TrackerController;
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceScreenEntity;
+import com.snowplowanalytics.snowplow.ecommerce.entities.EcommerceUserEntity;
 import com.snowplowanalytics.snowplow.emitter.BufferOption;
 import com.snowplowanalytics.snowplow.globalcontexts.GlobalContext;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
@@ -67,13 +69,12 @@ import com.snowplowanalytics.snowplow.util.TimeMeasure;
 import com.snowplowanalytics.snowplowtrackerdemojava.utils.DemoUtils;
 import com.snowplowanalytics.snowplowtrackerdemojava.utils.TrackerEvents;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static com.snowplowanalytics.core.utils.Util.addToMap;
 
@@ -266,6 +267,12 @@ public class Demo extends Activity implements LoggerDelegate {
             Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
             callbackTrackerReady.accept(true);
         });
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
+            new EcommerceScreenEntity(
+                    "demo_app_screen"
+                    
+            )
+        );
         return true;
     }
 
@@ -339,6 +346,9 @@ public class Demo extends Activity implements LoggerDelegate {
                 plugin
         );
         Snowplow.subscribeToWebViewEvents(_webView);
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceUser(
+                new EcommerceUserEntity("ecomm_user_id")
+        );
         return true;
     }
 
@@ -349,7 +359,7 @@ public class Demo extends Activity implements LoggerDelegate {
             return;
         }
         TrackerEvents.trackAll(tracker);
-        eventsCreated += 11;
+        eventsCreated += 20;
         final String made = "Made: " + eventsCreated;
         runOnUiThread(() -> _eventsCreated.setText(made));
     }
