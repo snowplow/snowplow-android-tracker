@@ -222,6 +222,16 @@ class Demo : Activity(), LoggerDelegate {
             Consumer<Pair<List<String>, ConfigurationState?>?> { configurationPair: Pair<List<String>, ConfigurationState?>? ->
                 val namespaces = configurationPair!!.first
                 updateLogger("Created namespaces: $namespaces")
+
+                defaultTracker?.ecommerce?.setEcommerceScreen(EcommerceScreenEntity("demo_app_screen", locale = "England/London"))
+
+                val exampleGlobalEntity = SelfDescribingJson(
+                    "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
+                    mapOf("key" to "staticExampleRemote")
+                )
+                val staticGlobalContext = GlobalContext(listOf(exampleGlobalEntity))
+                defaultTracker?.globalContexts?.add("global", staticGlobalContext)
+                
                 when (configurationPair.second) {
                     ConfigurationState.CACHED -> {
                         updateLogger("Configuration retrieved from cache")
@@ -234,7 +244,6 @@ class Demo : Activity(), LoggerDelegate {
                 defaultTracker!!.emitter.requestCallback = requestCallback
                 callbackTrackerReady.accept(true)
             })
-        defaultTracker?.ecommerce?.setEcommerceScreen(EcommerceScreenEntity("demo_app_screen", locale = "England/London"))
         return true
     }
 
@@ -320,6 +329,13 @@ class Demo : Activity(), LoggerDelegate {
         )
         subscribeToWebViewEvents(_webView!!)
         tracker.ecommerce.setEcommerceUser(EcommerceUserEntity("ecomm_user_id"))
+
+        val exampleGlobalEntity = SelfDescribingJson(
+            "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
+            mapOf("key" to "staticExampleLocal")
+        )
+        val staticGlobalContext = GlobalContext(listOf(exampleGlobalEntity))
+        tracker.globalContexts.add("global", staticGlobalContext)
         return true
     }
 
