@@ -257,18 +257,14 @@ public class Demo extends Activity implements LoggerDelegate {
             List<String> namespaces = configurationPair.first;
 
             Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
-                    new EcommerceScreenEntity(
-                            "demo_app_screen"
-
-                    )
+                    new EcommerceScreenEntity("demo_app_screen")
             );
 
-            SelfDescribingJson exampleGlobalEntity = new SelfDescribingJson(
-                    "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
-                    new HashMap<String, String>() {{ put("key", "staticExampleRemote"); }}
-            );
-            GlobalContext staticGlobalContext = new GlobalContext(Collections.singletonList(exampleGlobalEntity));
-            Objects.requireNonNull(Snowplow.getDefaultTracker()).getGlobalContexts().add("global", staticGlobalContext);
+            Map<String, Object> pairs = new HashMap<>();
+            addToMap("id", "snowplow", pairs);
+            addToMap("email", "info@snowplow.io", pairs);
+            GlobalContext gc = new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs)));
+            Objects.requireNonNull(Snowplow.getDefaultTracker()).getGlobalContexts().add("ruleSetExampleTag", gc);
             
             updateLogger("Created namespaces: " + namespaces);
             switch (configurationPair.second) {

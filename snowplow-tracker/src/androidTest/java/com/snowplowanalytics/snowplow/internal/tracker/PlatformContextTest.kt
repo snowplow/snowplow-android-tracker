@@ -41,6 +41,7 @@ class PlatformContextTest {
         Assert.assertTrue(sdjData.containsKey(Parameters.DEVICE_MANUFACTURER))
         Assert.assertTrue(sdjData.containsKey(Parameters.CARRIER))
         Assert.assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE))
+        Assert.assertTrue(sdjData.containsKey(Parameters.MOBILE_LANGUAGE))
     }
 
     @Test
@@ -247,19 +248,18 @@ class PlatformContextTest {
     }
 
     @Test
-    fun catchesInvalidLocaleLanguageNoMocking() {
-        var exceptionOccurred = false
+    fun invalidLocaleLanguageIsNullNoMocking() {
         val defaultLocale = Locale.getDefault()
 
         // set locale to an ISO-639 invalid 2-letter code
         Locale.setDefault(Locale("dk", "example"))
         
-        try {
-            PlatformContext(null, context)
-        } catch (e: Exception) {
-            exceptionOccurred = true
-        }
-        Assert.assertFalse(exceptionOccurred)
+        val platformContext = PlatformContext(null, context)
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertFalse(sdjData.containsKey(Parameters.MOBILE_LANGUAGE))
         
         // restore original locale
         Locale.setDefault(defaultLocale)        
