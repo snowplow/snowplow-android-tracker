@@ -202,7 +202,11 @@ open class DeviceInfoMonitor {
     /// System language currently used on the device (ISO 639)
     open val language: String?
         get() {
-            return Locale.getDefault().isO3Language
+            return try {
+                Locale.getDefault().isO3Language
+            } catch (e: MissingResourceException) {
+                null
+            }
         }
 
     /// Android vendor ID scoped to the set of apps published under the same Google Play developer account (see https://developer.android.com/training/articles/app-set-id)
