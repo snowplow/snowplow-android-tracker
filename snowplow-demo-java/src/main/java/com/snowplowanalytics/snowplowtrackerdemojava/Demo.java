@@ -255,6 +255,17 @@ public class Demo extends Activity implements LoggerDelegate {
         RemoteConfiguration remoteConfig = new RemoteConfiguration(uri, method);
         Snowplow.setup(getApplicationContext(), remoteConfig, null, configurationPair -> {
             List<String> namespaces = configurationPair.first;
+
+            Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
+                    new EcommerceScreenEntity("demo_app_screen")
+            );
+
+            Map<String, Object> pairs = new HashMap<>();
+            addToMap("id", "snowplow", pairs);
+            addToMap("email", "info@snowplow.io", pairs);
+            GlobalContext gc = new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs)));
+            Objects.requireNonNull(Snowplow.getDefaultTracker()).getGlobalContexts().add("ruleSetExampleTag", gc);
+            
             updateLogger("Created namespaces: " + namespaces);
             switch (configurationPair.second) {
                 case CACHED:
@@ -267,12 +278,6 @@ public class Demo extends Activity implements LoggerDelegate {
             Snowplow.getDefaultTracker().getEmitter().setRequestCallback(getRequestCallback());
             callbackTrackerReady.accept(true);
         });
-        Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceScreen(
-            new EcommerceScreenEntity(
-                    "demo_app_screen"
-                    
-            )
-        );
         return true;
     }
 
@@ -349,6 +354,14 @@ public class Demo extends Activity implements LoggerDelegate {
         Objects.requireNonNull(Snowplow.getDefaultTracker()).getEcommerce().setEcommerceUser(
                 new EcommerceUserEntity("ecomm_user_id")
         );
+
+        SelfDescribingJson exampleGlobalEntity = new SelfDescribingJson(
+                "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0",
+                new HashMap<String, String>() {{ put("key", "staticExampleLocal"); }}
+        );
+        GlobalContext staticGlobalContext = new GlobalContext(Collections.singletonList(exampleGlobalEntity));
+        Objects.requireNonNull(Snowplow.getDefaultTracker()).getGlobalContexts().add("global", staticGlobalContext);
+        
         return true;
     }
 

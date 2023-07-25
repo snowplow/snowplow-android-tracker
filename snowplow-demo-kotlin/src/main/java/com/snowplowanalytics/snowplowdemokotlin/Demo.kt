@@ -222,6 +222,14 @@ class Demo : Activity(), LoggerDelegate {
             Consumer<Pair<List<String>, ConfigurationState?>?> { configurationPair: Pair<List<String>, ConfigurationState?>? ->
                 val namespaces = configurationPair!!.first
                 updateLogger("Created namespaces: $namespaces")
+
+                defaultTracker?.ecommerce?.setEcommerceScreen(EcommerceScreenEntity("demo_app_screen", locale = "England/London"))
+
+                val pairs: MutableMap<String, Any> = HashMap()
+                Util.addToMap("id", "snowplow", pairs)
+                Util.addToMap("email", "info@snowplow.io", pairs)
+                defaultTracker?.globalContexts?.add("ruleSetExampleTag", GlobalContext(listOf(SelfDescribingJson(SCHEMA_IDENTIFY, pairs))))
+                
                 when (configurationPair.second) {
                     ConfigurationState.CACHED -> {
                         updateLogger("Configuration retrieved from cache")
@@ -234,7 +242,6 @@ class Demo : Activity(), LoggerDelegate {
                 defaultTracker!!.emitter.requestCallback = requestCallback
                 callbackTrackerReady.accept(true)
             })
-        defaultTracker?.ecommerce?.setEcommerceScreen(EcommerceScreenEntity("demo_app_screen", locale = "England/London"))
         return true
     }
 
@@ -320,6 +327,7 @@ class Demo : Activity(), LoggerDelegate {
         )
         subscribeToWebViewEvents(_webView!!)
         tracker.ecommerce.setEcommerceUser(EcommerceUserEntity("ecomm_user_id"))
+        
         return true
     }
 

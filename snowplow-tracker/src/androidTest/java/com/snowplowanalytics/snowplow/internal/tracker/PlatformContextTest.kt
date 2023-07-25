@@ -22,7 +22,7 @@ import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.reflect.Parameter
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 class PlatformContextTest {
@@ -41,6 +41,7 @@ class PlatformContextTest {
         Assert.assertTrue(sdjData.containsKey(Parameters.DEVICE_MANUFACTURER))
         Assert.assertTrue(sdjData.containsKey(Parameters.CARRIER))
         Assert.assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE))
+        Assert.assertTrue(sdjData.containsKey(Parameters.MOBILE_LANGUAGE))
     }
 
     @Test
@@ -244,6 +245,24 @@ class PlatformContextTest {
         val sdjData = sdj!!.map["data"] as Map<*, *>
 
         Assert.assertEquals("12345678", sdjData[Parameters.MOBILE_LANGUAGE])
+    }
+
+    @Test
+    fun invalidLocaleLanguageIsNullNoMocking() {
+        val defaultLocale = Locale.getDefault()
+
+        // set locale to an ISO-639 invalid 2-letter code
+        Locale.setDefault(Locale("dk", "example"))
+        
+        val platformContext = PlatformContext(null, context)
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertFalse(sdjData.containsKey(Parameters.MOBILE_LANGUAGE))
+        
+        // restore original locale
+        Locale.setDefault(defaultLocale)        
     }
 
     // --- PRIVATE
