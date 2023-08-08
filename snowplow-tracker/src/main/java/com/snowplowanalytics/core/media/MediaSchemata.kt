@@ -17,7 +17,8 @@ object MediaSchemata {
     private val schemaPrefix = "iglu:com.snowplowanalytics.snowplow.media/"
     private val schemaSuffix = "/jsonschema/1-0-0"
 
-    val playerSchema = "${schemaPrefix}player$schemaSuffix"
+    // NOTE: The player schema has a different vendor than the other media schemas because it builds on an older version of the same schema. Versions 5.3 to 5.4.1 of the tracker used a conflicting schema URI which has since been removed from Iglu Central.
+    val playerSchema = "iglu:com.snowplowanalytics.snowplow/media_player/jsonschema/2-0-0"
     val sessionSchema = "${schemaPrefix}session$schemaSuffix"
     val adSchema = "${schemaPrefix}ad$schemaSuffix"
     val adBreakSchema = "${schemaPrefix}ad_break$schemaSuffix"
