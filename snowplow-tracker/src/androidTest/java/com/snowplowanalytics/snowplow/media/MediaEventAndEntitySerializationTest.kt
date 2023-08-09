@@ -48,7 +48,7 @@ class MediaEventAndEntitySerializationTest {
     fun buildsEntityWithDefaultValuesForEmptyMediaPlayer() {
         val entity = MediaPlayerEntity().entity
 
-        assertEquals(mediaSchema("player"), entity.map["schema"] as? String)
+        assertEquals(mediaPlayerSchema, entity.map["schema"] as? String)
         assertEquals(0.0, (entity.map["data"] as? Map<*, *>)?.get("currentTime"))
         assertEquals(true, (entity.map["data"] as? Map<*, *>)?.get("paused"))
         assertEquals(false, (entity.map["data"] as? Map<*, *>)?.get("ended"))
@@ -74,7 +74,7 @@ class MediaEventAndEntitySerializationTest {
             volume = 80,
         )
 
-        assertEquals(mediaSchema("player"), entity.entity.map["schema"] as? String)
+        assertEquals(mediaPlayerSchema, entity.entity.map["schema"] as? String)
         val data = entity.entity.map["data"] as? Map<*, *>
         assertEquals(33.3, data?.get("currentTime"))
         assertEquals(100.0, data?.get("duration"))
@@ -168,4 +168,7 @@ class MediaEventAndEntitySerializationTest {
     private fun mediaSchema(name: String, version: String = "1-0-0"): String {
         return "iglu:com.snowplowanalytics.snowplow.media/" + name + "/jsonschema/" + version
     }
+
+    private val mediaPlayerSchema: String
+        get() = "iglu:com.snowplowanalytics.snowplow/media_player/jsonschema/2-0-0"
 }
