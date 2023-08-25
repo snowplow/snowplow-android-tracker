@@ -87,8 +87,8 @@ android {
 dependencies {
     implementation 'androidx.annotation:annotation:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     compileOnly "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     compileOnly "com.android.installreferrer:installreferrer:2.2"
 
