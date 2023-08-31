@@ -265,6 +265,19 @@ class PlatformContextTest {
         Locale.setDefault(defaultLocale)        
     }
 
+    @Test
+    fun doesntSetTheNetworkTechIfNotRequested() {
+        val platformContext = PlatformContext(listOf(
+            PlatformContextProperty.NETWORK_TYPE
+        ), context)
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE))
+        Assert.assertFalse(sdjData.containsKey(Parameters.NETWORK_TECHNOLOGY))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

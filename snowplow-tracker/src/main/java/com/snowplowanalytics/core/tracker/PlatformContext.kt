@@ -186,15 +186,15 @@ class PlatformContext(
         val networkInfo = deviceInfoMonitor.getNetworkInfo(context)
         if (trackType) {
             addToMap(
-                Parameters.NETWORK_TECHNOLOGY,
-                deviceInfoMonitor.getNetworkTechnology(networkInfo),
+                Parameters.NETWORK_TYPE,
+                deviceInfoMonitor.getNetworkType(networkInfo),
                 pairs
             )
         }
         if (trackTech) {
             addToMap(
-                Parameters.NETWORK_TYPE,
-                deviceInfoMonitor.getNetworkType(networkInfo),
+                Parameters.NETWORK_TECHNOLOGY,
+                deviceInfoMonitor.getNetworkTechnology(networkInfo),
                 pairs
             )
         }
