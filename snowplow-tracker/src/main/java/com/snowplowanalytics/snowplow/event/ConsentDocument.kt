@@ -63,8 +63,8 @@ class ConsentDocument(documentId: String, documentVersion: String) : AbstractSel
         get() {
             val payload = HashMap<String, Any?>()
             payload[Parameters.CD_ID] = documentId
-            payload[Parameters.CD_NAME] = documentName
-            payload[Parameters.CD_DESCRIPTION] = documentDescription
+            documentName?.let { payload[Parameters.CD_NAME] = it }
+            documentDescription?.let { payload[Parameters.CD_DESCRIPTION] = it }
             payload[Parameters.CD_VERSION] = documentVersion
             return payload
         }

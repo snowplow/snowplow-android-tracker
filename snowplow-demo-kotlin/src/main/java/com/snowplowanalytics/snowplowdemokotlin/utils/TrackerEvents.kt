@@ -127,6 +127,9 @@ object TrackerEvents {
                 .documentDescription("granted context desc 2")
                 .documentName("granted context name 2")
         )
+        documents.add(
+            ConsentDocument("granted context id 3", "granted context version 3")
+        )
         val event = ConsentGranted(
             "2018-05-08T18:12:02+00:00",
             "granted event doc id",
@@ -149,6 +152,9 @@ object TrackerEvents {
             ConsentDocument("withdrawn context id 2", "withdrawn context version 2")
                 .documentDescription("withdrawn context desc 2")
                 .documentName("withdrawn context name 2")
+        )
+        documents.add(
+            ConsentDocument("withdrawn context id 3", "withdrawn context version 3")
         )
         val event =
             ConsentWithdrawn(false, "withdrawn event doc  id", "withdrawn event doc version")
