@@ -12,15 +12,18 @@
  */
 package com.snowplowanalytics.core.tracker
 
+import android.net.Uri
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.ecommerce.EcommerceControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
+import com.snowplowanalytics.core.utils.Util.urlSafeBase64Encode
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.*
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.media.controller.MediaController
 import com.snowplowanalytics.snowplow.tracker.BuildConfig
+import com.snowplowanalytics.snowplow.tracker.CrossDeviceParameterConfiguration
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
@@ -68,6 +71,89 @@ class TrackerControllerImpl  // Constructors
 
     override fun track(event: Event): UUID? {
         return tracker.track(event)
+    }
+
+    private fun decorateLinkErrorTemplate(extendedParameterName: String): String {
+        return "$extendedParameterName has been requested in CrossDeviceParameterConfiguration, but it is not set."
+    }
+
+    override fun decorateLink(
+        uri: Uri,
+        extendedParameters: CrossDeviceParameterConfiguration?
+    ): Uri? {
+        // UserId is a required parameter of `_sp`
+        val userId = this.session?.userId
+        if (userId == null) {
+            Logger.track(TAG, "$uri could not be decorated as session.userId is null")
+            return null
+        }
+
+        val extendedParameters = extendedParameters ?: CrossDeviceParameterConfiguration()
+
+        val sessionId = if (extendedParameters.sessionId) {
+            this.session?.sessionId ?: ""
+        } else {
+            ""
+        }
+        if (extendedParameters.sessionId && sessionId.isEmpty()) {
+            Logger.d(
+                TAG,
+                "${decorateLinkErrorTemplate("sessionId")} Ensure an event has been tracked to generate a session before calling this method."
+            )
+        }
+
+        val sourceId = if (extendedParameters.sourceId) {
+            this.appId
+        } else {
+            ""
+        }
+        val sourcePlatform = if (extendedParameters.sourcePlatform) {
+            this.devicePlatform.value
+        } else {
+            ""
+        }
+
+        val subjectUserId = if (extendedParameters.subjectUserId) {
+            this.subject.userId ?: ""
+        } else {
+            ""
+        }
+        if (extendedParameters.subjectUserId && subjectUserId.isEmpty()) {
+            Logger.d(
+                TAG,
+                "${decorateLinkErrorTemplate("subjectUserId")} Ensure SubjectConfiguration.userId has been set on your tracker."
+            )
+        }
+
+        val reason = extendedParameters.reason ?: ""
+
+        // Create our list of values in the required order
+        val spParameters = listOf(
+            userId,
+            System.currentTimeMillis(),
+            sessionId,
+            urlSafeBase64Encode(subjectUserId),
+            urlSafeBase64Encode(sourceId),
+            sourcePlatform,
+            urlSafeBase64Encode(reason)
+        ).joinToString(".").trimEnd('.')
+
+        // Remove any existing `_sp` param if present
+        val builder = uri.buildUpon()
+        if (!uri.getQueryParameter(crossDeviceQueryParameterKey).isNullOrBlank()) {
+            builder.clearQuery()
+            uri.queryParameterNames.forEach {
+                if (it != crossDeviceQueryParameterKey) builder.appendQueryParameter(
+                    it,
+                    uri.getQueryParameter(it)
+                )
+            }
+        }
+
+        return builder.appendQueryParameter(
+            crossDeviceQueryParameterKey,
+            spParameters
+        ).build()
     }
 
     override val version: String
@@ -225,6 +311,8 @@ class TrackerControllerImpl  // Constructors
         }
     private val dirtyConfig: TrackerConfiguration
         get() = serviceProvider.trackerConfiguration
+
+    private val crossDeviceQueryParameterKey = "_sp"
 
     companion object {
         private val TAG = TrackerControllerImpl::class.java.simpleName

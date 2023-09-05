@@ -69,6 +69,17 @@ object Util {
     }
 
     /**
+     * Encodes a string into URL-safe Base64.
+     *
+     * @param string the string to encode
+     * @return a Base64 encoded string
+     */
+    @JvmStatic
+    fun urlSafeBase64Encode(string: String): String {
+        return Base64.encodeToString(string.toByteArray(), Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
+    }
+
+    /**
      * Generates a random UUID for each event.
      *
      * @return a UUID string
