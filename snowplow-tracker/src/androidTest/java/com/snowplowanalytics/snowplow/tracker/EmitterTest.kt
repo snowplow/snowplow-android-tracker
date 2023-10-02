@@ -407,6 +407,28 @@ class EmitterTest {
         emitter.flush()
     }
 
+    @Test
+    @Throws(InterruptedException::class)
+    fun testDoesNotRetryFailedRequestsIfDisabled() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 500)
+        val emitter = getEmitter(networkConnection, BufferOption.Single)
+        emitter.retryFailedRequests = false
+
+        // no events in queue since they were dropped because retrying is disabled
+        emitter.add(generatePayloads(1)[0])
+        Thread.sleep(1000)
+        Assert.assertEquals(0, emitter.eventStore!!.size())
+
+        emitter.retryFailedRequests = true
+        emitter.add(generatePayloads(1)[0])
+        Thread.sleep(1000)
+
+        // event still in queue because retrying is enabled
+        Assert.assertEquals(1, emitter.eventStore!!.size())
+        Assert.assertEquals(2, networkConnection.previousResults.size.toLong())
+        emitter.flush()
+    }
+
     // Emitter Builder
     private fun getEmitter(networkConnection: NetworkConnection?, option: BufferOption?): Emitter {
         val builder = { emitter: Emitter ->

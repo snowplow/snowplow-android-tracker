@@ -33,5 +33,6 @@ object EmitterDefaults {
     var emitTimeout = 5
     var threadPoolSize = 15
     var serverAnonymisation = false
+    var retryFailedRequests = true
     var timeUnit = TimeUnit.SECONDS
 }

@@ -64,4 +64,11 @@ interface EmitterConfigurationInterface {
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
      */
     var serverAnonymisation: Boolean
+
+    /**
+     * Whether to retry sending events that failed to be sent to the collector.
+     *
+     * If disabled, events that failed to be sent will be dropped regardless of other configuration (such as the customRetryForStatusCodes).
+     */
+    var retryFailedRequests: Boolean
 }

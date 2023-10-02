@@ -84,6 +84,13 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
             emitter.serverAnonymisation = serverAnonymisation
         }
 
+    override var retryFailedRequests: Boolean
+        get() = emitter.retryFailedRequests
+        set(value) {
+            dirtyConfig.retryFailedRequests = value
+            emitter.retryFailedRequests = value
+        }
+
     override val dbCount: Long
         get() {
             val eventStore = emitter.eventStore
