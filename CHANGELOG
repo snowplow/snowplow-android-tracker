@@ -1,3 +1,7 @@
+Version 5.5.0 (2023-10-02)
+--------------------------
+Add option to disable retrying any failed requests (#641)
+
 Version 5.4.4 (2023-09-05)
 --------------------------
 Fix invalid consent document context entity in case no name or description is given (#637)

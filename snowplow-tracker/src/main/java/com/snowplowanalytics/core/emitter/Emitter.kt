@@ -337,6 +337,14 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
             _customRetryForStatusCodes.set(value ?: HashMap())
         }
 
+    private val _retryFailedRequests = AtomicReference(EmitterDefaults.retryFailedRequests)
+    /**
+     * Whether retrying failed requests is allowed
+     */
+    var retryFailedRequests: Boolean
+        get() = _retryFailedRequests.get()
+        set(value) { _retryFailedRequests.set(value) }
+
     /**
      * The request headers for the emitter
      */
@@ -561,7 +569,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
             if (res.isSuccessful) {
                 removableEvents.addAll(res.eventIds)
                 successCount += res.eventIds.size
-            } else if (res.shouldRetry(customRetryForStatusCodes)) {
+            } else if (res.shouldRetry(customRetryForStatusCodes, retryFailedRequests)) {
                 failedWillRetryCount += res.eventIds.size
                 Logger.e(TAG, "Request sending failed but we will retry later.")
             } else {

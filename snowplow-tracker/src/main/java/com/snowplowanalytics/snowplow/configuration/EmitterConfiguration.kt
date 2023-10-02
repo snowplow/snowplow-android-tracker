@@ -29,6 +29,7 @@ import org.json.JSONObject
  *   - threadPoolSize: 15
  *   - byteLimitGet: 40000 bytes
  *   - byteLimitPost: 40000 bytes
+ *   - retryFailedRequests: true
  */
 open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface {
 
@@ -86,6 +87,11 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
     override var serverAnonymisation: Boolean
         get() = _serverAnonymisation ?: sourceConfig?.serverAnonymisation ?: EmitterDefaults.serverAnonymisation
         set(value) { _serverAnonymisation = value }
+
+    private var _retryFailedRequests: Boolean? = null
+    override var retryFailedRequests: Boolean
+        get() = _retryFailedRequests ?: sourceConfig?.retryFailedRequests ?: EmitterDefaults.retryFailedRequests
+        set(value) { _retryFailedRequests = value }
     
     // Builders
     
@@ -168,6 +174,16 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
         return this
     }
 
+    /**
+     * Whether to retry failed requests. By default, this is set to true.
+     *
+     * If disabled, events that failed to be sent will be dropped regardless of other configuration (such as the customRetryForStatusCodes).
+     */
+    fun retryFailedRequests(retryFailedRequests: Boolean): EmitterConfiguration {
+        this.retryFailedRequests = retryFailedRequests
+        return this
+    }
+
     // Copyable
     override fun copy(): EmitterConfiguration {
         return EmitterConfiguration()
@@ -180,6 +196,7 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
             .requestCallback(requestCallback)
             .customRetryForStatusCodes(customRetryForStatusCodes)
             .serverAnonymisation(serverAnonymisation)
+            .retryFailedRequests(retryFailedRequests)
     }
 
     // JSON Formatter
@@ -205,5 +222,6 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
             }
             _customRetryForStatusCodes = customRetryForStatusCodes
         }
+        if (jsonObject.has("retryFailedRequests")) { _retryFailedRequests = jsonObject.getBoolean("retryFailedRequests") }
     }
 }

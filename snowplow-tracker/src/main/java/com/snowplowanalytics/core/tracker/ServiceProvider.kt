@@ -244,6 +244,7 @@ class ServiceProvider(
             emitter.customRetryForStatusCodes = emitterConfiguration.customRetryForStatusCodes
             emitter.serverAnonymisation = emitterConfiguration.serverAnonymisation
             emitter.requestHeaders = networkConfiguration.requestHeaders
+            emitter.retryFailedRequests = emitterConfiguration.retryFailedRequests
         }
         
         val emitter = Emitter(context, endpoint, builder)

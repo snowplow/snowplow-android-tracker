@@ -26,7 +26,7 @@ class RequestResultTest {
         val result = RequestResult(200, false, listOf(100L))
         Assert.assertTrue(result.isSuccessful)
         Assert.assertFalse(result.oversize)
-        Assert.assertFalse(result.shouldRetry(HashMap()))
+        Assert.assertFalse(result.shouldRetry(HashMap(), true))
         Assert.assertEquals(result.eventIds, listOf(100L))
     }
 
@@ -34,21 +34,21 @@ class RequestResultTest {
     fun testFailedRequest() {
         val result = RequestResult(500, false, ArrayList())
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertTrue(result.shouldRetry(HashMap()))
+        Assert.assertTrue(result.shouldRetry(HashMap(), true))
     }
 
     @Test
     fun testOversizedFailedRequest() {
         val result = RequestResult(500, true, ArrayList())
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertFalse(result.shouldRetry(HashMap()))
+        Assert.assertFalse(result.shouldRetry(HashMap(), true))
     }
 
     @Test
     fun testFailedRequestWithNoRetryStatus() {
         val result = RequestResult(403, false, ArrayList())
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertFalse(result.shouldRetry(HashMap()))
+        Assert.assertFalse(result.shouldRetry(HashMap(), true))
     }
 
     @Test
@@ -58,9 +58,16 @@ class RequestResultTest {
         customRetry[500] = false
         var result = RequestResult(403, false, ArrayList())
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertTrue(result.shouldRetry(customRetry))
+        Assert.assertTrue(result.shouldRetry(customRetry, true))
         result = RequestResult(500, false, ArrayList())
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertFalse(result.shouldRetry(customRetry))
+        Assert.assertFalse(result.shouldRetry(customRetry, true))
+    }
+
+    @Test
+    fun testFailedRequestWithDisabledRetry() {
+        val result = RequestResult(500, false, ArrayList())
+        Assert.assertFalse(result.isSuccessful)
+        Assert.assertFalse(result.shouldRetry(HashMap(), false))
     }
 }

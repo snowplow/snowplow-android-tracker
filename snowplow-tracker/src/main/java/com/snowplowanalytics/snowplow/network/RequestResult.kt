@@ -41,9 +41,14 @@ class RequestResult(
      * 
      * @see com.snowplowanalytics.snowplow.configuration.EmitterConfiguration.customRetryForStatusCodes
      */
-    fun shouldRetry(customRetryForStatusCodes: Map<Int, Boolean>?): Boolean {
+    fun shouldRetry(customRetryForStatusCodes: Map<Int, Boolean>?, retryAllowed: Boolean): Boolean {
         // don't retry if successful
         if (isSuccessful) {
+            return false
+        }
+
+        // don't retry if retries are not allowed
+        if (!retryAllowed) {
             return false
         }
 
