@@ -1,3 +1,7 @@
+Version 5.6.0 (2023-10-12)
+--------------------------
+Add configuration to send requests with user ID to a Focal Meter endpoint (#571)
+
 Version 5.5.0 (2023-10-02)
 --------------------------
 Add option to disable retrying any failed requests (#641)
