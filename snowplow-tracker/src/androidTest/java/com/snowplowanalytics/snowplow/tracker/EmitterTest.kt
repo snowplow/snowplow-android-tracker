@@ -429,6 +429,29 @@ class EmitterTest {
         emitter.flush()
     }
 
+    @Test
+    fun testDoesntMakeRequestUnlessBufferSizeIsReached() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val emitter = getEmitter(networkConnection, BufferOption.SmallGroup)
+
+        for (payload in generatePayloads(9)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(1000)
+
+        // all events waiting in queue
+        Assert.assertEquals(0, networkConnection.previousResults.size)
+        Assert.assertEquals(9, emitter.eventStore!!.size())
+
+        emitter.add(generatePayloads(1)[0])
+        Thread.sleep(1000)
+
+        // all events sent
+        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(1, networkConnection.previousResults.size)
+        emitter.flush()
+    }
+
     // Emitter Builder
     private fun getEmitter(networkConnection: NetworkConnection?, option: BufferOption?): Emitter {
         val builder = { emitter: Emitter ->
