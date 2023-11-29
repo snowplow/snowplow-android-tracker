@@ -422,13 +422,15 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
      */
     fun add(payload: Payload) {
         Executor.execute(TAG) {
-            eventStore?.add(payload)
-            if (isRunning.compareAndSet(false, true)) {
-                try {
-                    attemptEmit(networkConnection)
-                } catch (t: Throwable) {
-                    isRunning.set(false)
-                    Logger.e(TAG, "Received error during emission process: %s", t)
+            eventStore?.let { eventStore ->
+                eventStore.add(payload)
+                if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
+                    try {
+                        attemptEmit(networkConnection)
+                    } catch (t: Throwable) {
+                        isRunning.set(false)
+                        Logger.e(TAG, "Received error during emission process: %s", t)
+                    }
                 }
             }
         }
