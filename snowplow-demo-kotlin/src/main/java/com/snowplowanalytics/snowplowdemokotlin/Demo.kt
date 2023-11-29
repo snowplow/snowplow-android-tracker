@@ -260,7 +260,7 @@ class Demo : Activity(), LoggerDelegate {
         val networkConfiguration = NetworkConfiguration(uri, method)
         val emitterConfiguration = EmitterConfiguration()
             .requestCallback(requestCallback)
-            .bufferOption(BufferOption.DefaultGroup)
+            .bufferOption(BufferOption.SmallGroup)
             .threadPoolSize(20)
             .emitRange(500)
             .byteLimitPost(52000)

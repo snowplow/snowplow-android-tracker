@@ -23,7 +23,7 @@ import org.json.JSONObject
  * Configure how the tracker should send the events to the collector.     
  * 
  * Default values:
- *   - bufferOption: [BufferOption.DefaultGroup]
+ *   - bufferOption: [BufferOption.Single]
  *   - serverAnonymisation: false
  *   - emitRange: 150 - maximum number of events to process at a time
  *   - threadPoolSize: 15
@@ -45,7 +45,7 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
 
     private var _bufferOption: BufferOption? = null
     override var bufferOption: BufferOption
-        get() = _bufferOption ?: sourceConfig?.bufferOption ?: BufferOption.DefaultGroup
+        get() = _bufferOption ?: sourceConfig?.bufferOption ?: EmitterDefaults.bufferOption
         set(value) { _bufferOption = value }
 
     private var _emitRange: Int? = null
@@ -96,8 +96,7 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
     // Builders
     
     /**
-     * How many events to send in each request. By default, this is set to [BufferOption.DefaultGroup], 
-     * a maximum of 10 events per request.
+     * How many events to send in each request. By default, this is set to [BufferOption.Single].
      */
     fun bufferOption(bufferOption: BufferOption): EmitterConfiguration {
         this.bufferOption = bufferOption
@@ -205,7 +204,7 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
      */
     constructor(jsonObject: JSONObject) : this() {
         if (jsonObject.has("bufferOption")) {
-            _bufferOption = BufferOption.valueOf(jsonObject.getString("bufferOption"))
+            _bufferOption = BufferOption.fromString(jsonObject.getString("bufferOption"))
         }
         if (jsonObject.has("emitRange")) { _emitRange = jsonObject.getInt("emitRange") }
         if (jsonObject.has("threadPoolSize")) { _threadPoolSize = jsonObject.getInt("threadPoolSize") }

@@ -45,12 +45,12 @@ class EmitterTest {
         var builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         var emitter = Emitter(context, "com.acme", builder)
         Assert.assertEquals(BufferOption.Single, emitter.bufferOption)
-        builder = { emitter1: Emitter -> emitter1.bufferOption = BufferOption.DefaultGroup }
+        builder = { emitter1: Emitter -> emitter1.bufferOption = BufferOption.SmallGroup }
         emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(BufferOption.DefaultGroup, emitter.bufferOption)
-        builder = { emitter2: Emitter -> emitter2.bufferOption = BufferOption.HeavyGroup }
+        Assert.assertEquals(BufferOption.SmallGroup, emitter.bufferOption)
+        builder = { emitter2: Emitter -> emitter2.bufferOption = BufferOption.LargeGroup }
         emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
     }
 
     @Test
@@ -76,7 +76,7 @@ class EmitterTest {
         var emitter = Emitter(context, uri, builder)
         Assert.assertEquals("http://$uri/i", emitter.emitterUri)
         builder = { emitter1: Emitter ->
-            emitter1.bufferOption = BufferOption.DefaultGroup
+            emitter1.bufferOption = BufferOption.SmallGroup
             emitter1.httpMethod = HttpMethod.POST
             emitter1.requestSecurity = Protocol.HTTP
         }
@@ -86,14 +86,14 @@ class EmitterTest {
             emitter.emitterUri
         )
         builder = { emitter2: Emitter ->
-            emitter2.bufferOption = BufferOption.DefaultGroup
+            emitter2.bufferOption = BufferOption.SmallGroup
             emitter2.httpMethod = HttpMethod.GET
             emitter2.requestSecurity = Protocol.HTTPS
         }
         emitter = Emitter(context, uri, builder)
         Assert.assertEquals("https://$uri/i", emitter.emitterUri)
         builder = { emitter3: Emitter ->
-            emitter3.bufferOption = BufferOption.DefaultGroup
+            emitter3.bufferOption = BufferOption.SmallGroup
             emitter3.httpMethod = HttpMethod.POST
             emitter3.requestSecurity = Protocol.HTTPS
         }
@@ -173,8 +173,8 @@ class EmitterTest {
         Assert.assertEquals("https://$uri/i", emitter.emitterUri)
         emitter.emitterUri = "com.acme"
         Assert.assertEquals("https://com.acme/i", emitter.emitterUri)
-        emitter.bufferOption = BufferOption.HeavyGroup
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        emitter.bufferOption = BufferOption.LargeGroup
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
         emitter.flush()
         emitter.flush()
         Thread.sleep(500)
@@ -189,8 +189,8 @@ class EmitterTest {
             "https://com.foo/com.snowplowanalytics.snowplow/tp2",
             emitter.emitterUri
         )
-        emitter.bufferOption = BufferOption.DefaultGroup
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        emitter.bufferOption = BufferOption.SmallGroup
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
         emitter.shutdown()
         builder = { emitter1: Emitter ->
             emitter1.bufferOption = BufferOption.Single
