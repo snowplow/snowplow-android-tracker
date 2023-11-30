@@ -296,7 +296,6 @@ public class Demo extends Activity implements LoggerDelegate {
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .requestCallback(getRequestCallback())
                 .threadPoolSize(20)
-                .emitRange(500)
                 .byteLimitPost(52000);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration(appId)
                 .logLevel(LogLevel.VERBOSE)

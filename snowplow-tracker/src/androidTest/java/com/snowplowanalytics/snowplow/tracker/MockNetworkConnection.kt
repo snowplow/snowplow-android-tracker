@@ -59,4 +59,9 @@ class MockNetworkConnection(override var httpMethod: HttpMethod, var statusCode:
     fun countRequests(): Int {
         return allRequests.size
     }
+
+    fun clear() {
+        previousRequests.clear()
+        previousResults.clear()
+    }
 }

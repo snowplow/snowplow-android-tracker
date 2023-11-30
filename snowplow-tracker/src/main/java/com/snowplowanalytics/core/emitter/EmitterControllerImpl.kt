@@ -40,10 +40,10 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         }
 
     override var emitRange: Int
-        get() = emitter.sendLimit
+        get() = emitter.emitRange
         set(emitRange) {
             dirtyConfig.emitRange = emitRange
-            emitter.sendLimit = emitRange
+            emitter.emitRange = emitRange
         }
 
     override val threadPoolSize: Int

@@ -127,9 +127,9 @@ class EmitterTest {
 
     @Test
     fun testSendLimitSet() {
-        val builder = { emitter: Emitter -> emitter.sendLimit = 200 }
+        val builder = { emitter: Emitter -> emitter.emitRange = 200 }
         val emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(200, emitter.sendLimit.toLong())
+        Assert.assertEquals(200, emitter.emitRange.toLong())
     }
 
     @Test
@@ -156,7 +156,7 @@ class EmitterTest {
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 250
             emitter.emptyLimit = 5
-            emitter.sendLimit = 200
+            emitter.emitRange = 200
             emitter.byteLimitGet = 20000
             emitter.byteLimitPost = 25000
             emitter.eventStore = MockEventStore()
@@ -198,9 +198,9 @@ class EmitterTest {
             emitter1.requestSecurity = Protocol.HTTP
             emitter1.emitterTick = 250
             emitter1.emptyLimit = 5
-            emitter1.sendLimit = 200
+            emitter1.emitRange = 200
             emitter1.byteLimitGet = 20000
-            emitter1.byteLimitPost = 25000
+            emitter1.byteLimitPost = 50000
             emitter1.eventStore = MockEventStore()
             emitter1.timeUnit = TimeUnit.MILLISECONDS
             emitter1.customPostPath = "com.acme.company/tpx"
@@ -452,14 +452,71 @@ class EmitterTest {
         emitter.flush()
     }
 
+    @Test
+    fun testNumberOfRequestsMatchesEmitRangeAndOversize() {
+        val networkConnection = MockNetworkConnection(HttpMethod.POST, 200)
+        val emitter = getEmitter(networkConnection, BufferOption.Single)
+        emitter.emitRange = 20
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(20)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(20, emitter.eventStore!!.size())
+        emitter.resumeEmit()
+        Thread.sleep(500)
+
+        // made a single request
+        Assert.assertEquals(1, networkConnection.sendingCount())
+        Assert.assertEquals(1, networkConnection.previousResults.first().size)
+
+        networkConnection.clear()
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(40)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(40, emitter.eventStore!!.size())
+        emitter.resumeEmit()
+
+        Thread.sleep(500)
+
+        // made two requests one after the other
+        Assert.assertEquals(2, networkConnection.sendingCount())
+        Assert.assertEquals(1, networkConnection.previousResults.map { it.size }.max())
+
+        networkConnection.clear()
+
+        // test with oversize requests
+        emitter.byteLimitPost = 5
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(2)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(2, emitter.eventStore!!.size())
+        emitter.resumeEmit()
+
+        Thread.sleep(500)
+
+        // made two requests at once
+        Assert.assertEquals(1, networkConnection.sendingCount())
+        Assert.assertEquals(2, networkConnection.previousResults.first().size)
+
+        emitter.flush()
+    }
+
     // Emitter Builder
-    private fun getEmitter(networkConnection: NetworkConnection?, option: BufferOption?): Emitter {
+    private fun getEmitter(networkConnection: NetworkConnection, option: BufferOption): Emitter {
         val builder = { emitter: Emitter ->
             emitter.networkConnection = networkConnection
-            emitter.bufferOption = option!!
+            emitter.bufferOption = option
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
-            emitter.sendLimit = 200
+            emitter.emitRange = 200
             emitter.byteLimitGet = 20000
             emitter.byteLimitPost = 25000
             emitter.eventStore = MockEventStore()

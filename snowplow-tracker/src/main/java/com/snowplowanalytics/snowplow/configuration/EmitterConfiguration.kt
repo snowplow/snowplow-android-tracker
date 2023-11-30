@@ -25,7 +25,7 @@ import org.json.JSONObject
  * Default values:
  *   - bufferOption: [BufferOption.Single]
  *   - serverAnonymisation: false
- *   - emitRange: 150 - maximum number of events to process at a time
+ *   - emitRange: 25 - maximum number of events to process at a time
  *   - threadPoolSize: 15
  *   - byteLimitGet: 40000 bytes
  *   - byteLimitPost: 40000 bytes
