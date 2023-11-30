@@ -202,6 +202,7 @@ class EventSendingTest {
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
+            emitter.emitRange = 1
         }
         val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
         val subject = Subject(InstrumentationRegistry.getInstrumentation().targetContext, null)

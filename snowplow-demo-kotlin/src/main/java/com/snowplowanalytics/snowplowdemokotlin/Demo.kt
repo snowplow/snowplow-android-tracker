@@ -262,7 +262,6 @@ class Demo : Activity(), LoggerDelegate {
             .requestCallback(requestCallback)
             .bufferOption(BufferOption.SmallGroup)
             .threadPoolSize(20)
-            .emitRange(500)
             .byteLimitPost(52000)
         val trackerConfiguration = TrackerConfiguration(appId)
             .logLevel(LogLevel.VERBOSE)

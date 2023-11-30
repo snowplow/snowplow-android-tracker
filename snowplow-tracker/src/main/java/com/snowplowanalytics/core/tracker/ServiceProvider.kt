@@ -234,7 +234,7 @@ class ServiceProvider(
             emitter.client = networkConfiguration.okHttpClient
             emitter.cookieJar = networkConfiguration.okHttpCookieJar
             emitter.emitTimeout = networkConfiguration.timeout
-            emitter.sendLimit = emitterConfiguration.emitRange
+            emitter.emitRange = emitterConfiguration.emitRange
             emitter.bufferOption = emitterConfiguration.bufferOption
             emitter.eventStore = emitterConfiguration.eventStore
             emitter.byteLimitPost = emitterConfiguration.byteLimitPost

@@ -117,7 +117,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The maximum amount of events to grab for an emit attempt.
      */
-    var sendLimit: Int = EmitterDefaults.sendLimit
+    var emitRange: Int = EmitterDefaults.emitRange
 
     /**
      * The GET byte limit
@@ -556,7 +556,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
         
         emptyCount = 0
-        val events = eventStore.getEmittableEvents(sendLimit)
+        val events = eventStore.getEmittableEvents(emitRange)
         val requests = buildRequests(events, networkConnection.httpMethod)
         val results = networkConnection.sendRequests(requests)
         
@@ -639,47 +639,44 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                 }
             }
         } else {
-            var i = 0
-            while (i < events.size) {
-                var reqEventIds: MutableList<Long> = ArrayList()
-                var postPayloadMaps: MutableList<Payload> = ArrayList()
-                
-                var j = i
-                while (j < i + bufferOption.code && j < events.size) {
-                    val event = events[j]
-                    val payload = event?.payload
-                    val eventId = event?.eventId
-                    if (payload != null && eventId != null) {
-                        addSendingTimeToPayload(payload, sendingTime)
-                        if (isOversize(payload, httpMethod)) {
-                            val request = Request(payload, eventId, true)
-                            requests.add(request)
-                        } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
-                            val request = Request(postPayloadMaps, reqEventIds)
-                            requests.add(request)
+            var eventIds: MutableList<Long> = ArrayList()
+            var eventPayloads: MutableList<Payload> = ArrayList()
 
-                            // Clear collections and build a new POST
-                            postPayloadMaps = ArrayList()
-                            reqEventIds = ArrayList()
+            for (event in events) {
+                if (event == null) { continue }
+                val payload = event.payload
+                val eventId = event.eventId
+                addSendingTimeToPayload(payload, sendingTime)
 
-                            // Build and store the request
-                            postPayloadMaps.add(payload)
-                            reqEventIds.add(eventId)
-                        } else {
-                            postPayloadMaps.add(payload)
-                            reqEventIds.add(eventId)
-                        }
-                        j++
-                    }
-                    
-                }
-
-                // Check if all payloads have been processed
-                if (postPayloadMaps.isNotEmpty()) {
-                    val request = Request(postPayloadMaps, reqEventIds)
+                // Oversize event -> separate requests
+                if (isOversize(payload, httpMethod)) {
+                    val request = Request(payload, eventId, true)
                     requests.add(request)
                 }
-                i += bufferOption.code
+                // Events up to this one are oversize -> create request for them
+                else if (isOversize(payload, eventPayloads, httpMethod)) {
+                    val request = Request(eventPayloads, eventIds)
+                    requests.add(request)
+
+                    // Clear collections and build a new POST
+                    eventPayloads = ArrayList()
+                    eventIds = ArrayList()
+
+                    // Build and store the request
+                    eventPayloads.add(payload)
+                    eventIds.add(eventId)
+                }
+                // Add to the list of events for the request
+                else {
+                    eventPayloads.add(payload)
+                    eventIds.add(eventId)
+                }
+            }
+
+            // Check if there are any remaining events not in a request
+            if (eventPayloads.isNotEmpty()) {
+                val request = Request(eventPayloads, eventIds)
+                requests.add(request)
             }
         }
         return requests
