@@ -51,6 +51,9 @@ class DeepLinkStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForFiltering: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, state: State?): State? {
         // - Init (DL) DeepLinkReceived
         // - ReadyForOutput (DL) DeepLinkReceived
@@ -92,6 +95,10 @@ class DeepLinkStateMachine : StateMachineInterface {
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
         return null
     }
 

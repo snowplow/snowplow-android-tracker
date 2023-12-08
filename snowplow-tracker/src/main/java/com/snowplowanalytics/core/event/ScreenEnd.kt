@@ -10,24 +10,21 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
+package com.snowplowanalytics.snowplow.event
 
-package com.snowplowanalytics.snowplow.util
-
+import com.snowplowanalytics.core.constants.TrackerConstants
 import java.util.*
-import kotlin.time.Duration
 
-class TimeTraveler {
-    private var date: Date = Date()
+class ScreenEnd : AbstractSelfDescribing() {
 
-    fun travelBy(duration: Duration) {
-        date = Date(date.time + duration.inWholeMilliseconds)
-    }
+    // Tracker methods
+    override val dataPayload: Map<String, Any?>
+        get() {
+            val payload = HashMap<String, Any?>()
+            return payload
+        }
 
-    fun generateDate(): Date {
-        return date
-    }
+    override val schema: String
+        get() = TrackerConstants.SCHEMA_SCREEN_END
 
-    fun generateTimestamp(): Long {
-        return date.time
-    }
 }

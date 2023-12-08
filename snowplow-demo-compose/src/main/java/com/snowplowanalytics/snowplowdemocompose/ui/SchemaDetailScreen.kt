@@ -36,8 +36,7 @@ fun SchemaDetailScreen(
         "iglu:com.snowplowanalytics.iglu/anything-a/jsonschema/1-0-0", 
         hashMapOf("name" to schemaParts.name, "vendor" to schemaParts.vendor)
     )
-    Tracking.ManuallyTrackScreenView("schema_detail", entities = listOf(entity))
-    
+
     Scaffold(
         topBar = {
             TopAppBar(

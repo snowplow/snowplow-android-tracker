@@ -454,6 +454,9 @@ internal open class MockStateMachine(
 ) : StateMachineInterface {
     var afterTrackEvents: MutableList<InspectableEvent> = ArrayList()
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override val subscribedEventSchemasForTransitions: List<String>
         get() = LinkedList(listOf("inc", "dec"))
 
@@ -468,6 +471,10 @@ internal open class MockStateMachine(
 
     override val subscribedEventSchemasForFiltering: List<String>
         get() = Collections.singletonList("s1")
+
+    override fun eventsBefore(event: Event): List<Event>? {
+        return null
+    }
 
     override fun transition(event: Event, state: State?): State? {
         val e = event as SelfDescribing

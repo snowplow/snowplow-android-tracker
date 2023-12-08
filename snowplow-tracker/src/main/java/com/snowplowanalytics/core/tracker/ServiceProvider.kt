@@ -272,6 +272,7 @@ class ServiceProvider(
             tracker.deepLinkContext = trackerConfiguration.deepLinkContext
             tracker.screenContext = trackerConfiguration.screenContext
             tracker.screenViewAutotracking = trackerConfiguration.screenViewAutotracking
+            tracker.screenEngagementAutotracking = trackerConfiguration.screenEngagementAutotracking
             tracker.lifecycleAutotracking = trackerConfiguration.lifecycleAutotracking
             tracker.installAutotracking = trackerConfiguration.installAutotracking
             tracker.exceptionAutotracking = trackerConfiguration.exceptionAutotracking

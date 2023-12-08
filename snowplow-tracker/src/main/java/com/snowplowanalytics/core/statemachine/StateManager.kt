@@ -29,6 +29,7 @@ class StateManager {
     private val eventSchemaToPayloadUpdater = HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToAfterTrackCallback = HashMap<String, MutableList<StateMachineInterface>>()
     private val eventSchemaToFilter = HashMap<String, MutableList<StateMachineInterface>>()
+    private val eventSchemaToEventsBefore = HashMap<String, MutableList<StateMachineInterface>>()
 
     val trackerState = TrackerState()
     
@@ -69,6 +70,11 @@ class StateManager {
             stateMachine.subscribedEventSchemasForFiltering,
             stateMachine
         )
+        addToSchemaRegistry(
+            eventSchemaToEventsBefore,
+            stateMachine.subscribedEventSchemasForEventsBefore,
+            stateMachine
+        )
     }
 
     @Synchronized
@@ -102,6 +108,11 @@ class StateManager {
             stateMachine.subscribedEventSchemasForFiltering,
             stateMachine
         )
+        removeFromSchemaRegistry(
+            eventSchemaToEventsBefore,
+            stateMachine.subscribedEventSchemasForEventsBefore,
+            stateMachine
+        )
         return true
     }
 
@@ -133,6 +144,25 @@ class StateManager {
             }
         }
         return trackerState.snapshot
+    }
+
+    @Synchronized
+    fun eventsBefore(event: Event): List<Event> {
+        val result: MutableList<Event> = LinkedList()
+        if (event is AbstractSelfDescribing) {
+            val stateMachines: MutableList<StateMachineInterface> = LinkedList()
+            eventSchemaToEventsBefore[event.schema]?.let { stateMachines.addAll(it) }
+            eventSchemaToEventsBefore["*"]?.let { stateMachines.addAll(it) }
+
+            for (stateMachine in stateMachines) {
+                stateMachineToIdentifier[stateMachine]?.let { stateIdentifier ->
+                    stateMachine.eventsBefore(event)?.let { events ->
+                        result.addAll(events)
+                    }
+                }
+            }
+        }
+        return result
     }
 
     @Synchronized

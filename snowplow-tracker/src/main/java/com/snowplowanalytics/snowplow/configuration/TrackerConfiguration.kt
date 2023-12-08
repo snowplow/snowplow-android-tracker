@@ -39,6 +39,7 @@ import java.util.*
  *  - screenContext: true
  *  - deepLinkContext: true
  *  - screenViewAutotracking: true
+ *  - screenEngagementAutotracking: true
  *  - lifecycleAutotracking: false
  *  - installAutotracking: true
  *  - exceptionAutotracking: true
@@ -119,6 +120,11 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     override var screenViewAutotracking: Boolean
         get() = _screenViewAutotracking ?: sourceConfig?.screenViewAutotracking ?: TrackerDefaults.screenViewAutotracking
         set(value) { _screenViewAutotracking = value }
+
+    private var _screenEngagementAutotracking: Boolean? = null
+    override var screenEngagementAutotracking: Boolean
+        get() = _screenEngagementAutotracking ?: sourceConfig?.screenEngagementAutotracking ?: TrackerDefaults.screenEngagementAutotracking
+        set(value) { _screenEngagementAutotracking = value }
 
     private var _lifecycleAutotracking: Boolean? = null
     override var lifecycleAutotracking: Boolean
@@ -266,6 +272,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     }
 
     /**
+     * Whether enable tracking the screen end event and the screen summary context entity.
+     * Make sure that you have lifecycle autotracking enabled for screen summary to have complete information.
+     */
+    fun screenEngagementAutotracking(screenEngagementAutotracking: Boolean): TrackerConfiguration {
+        this.screenEngagementAutotracking = screenEngagementAutotracking
+        return this
+    }
+
+    /**
      * Whether to enable automatic tracking of background and foreground transitions. 
      * The Foreground library must be installed.
      */
@@ -344,6 +359,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
             .screenContext(screenContext)
             .deepLinkContext(deepLinkContext)
             .screenViewAutotracking(screenViewAutotracking)
+            .screenEngagementAutotracking(screenEngagementAutotracking)
             .lifecycleAutotracking(lifecycleAutotracking)
             .installAutotracking(installAutotracking)
             .exceptionAutotracking(exceptionAutotracking)
@@ -395,6 +411,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         if (jsonObject.has("screenContext")) { _screenContext = jsonObject.getBoolean("screenContext") }
         if (jsonObject.has("deepLinkContext")) { _deepLinkContext = jsonObject.getBoolean("deepLinkContext") }
         if (jsonObject.has("screenViewAutotracking")) { _screenViewAutotracking = jsonObject.getBoolean("screenViewAutotracking") }
+        if (jsonObject.has("screenEngagementAutotracking")) { _screenEngagementAutotracking = jsonObject.getBoolean("screenEngagementAutotracking") }
         if (jsonObject.has("lifecycleAutotracking")) { _lifecycleAutotracking = jsonObject.getBoolean("lifecycleAutotracking") }
         if (jsonObject.has("installAutotracking")) { _installAutotracking = jsonObject.getBoolean("installAutotracking") }
         if (jsonObject.has("exceptionAutotracking")) { _exceptionAutotracking = jsonObject.getBoolean("exceptionAutotracking") }
