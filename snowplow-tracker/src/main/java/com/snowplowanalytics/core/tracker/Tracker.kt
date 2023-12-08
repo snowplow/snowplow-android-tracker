@@ -69,7 +69,7 @@ class Tracker(
     private val stateManager = StateManager()
     
     fun getScreenState(): ScreenState? {
-        val state = stateManager.trackerState.getState("ScreenContext")
+        val state = stateManager.trackerState.getState(ScreenStateMachine.ID)
             ?: // Legacy initialization
             return ScreenState()
 
@@ -338,8 +338,19 @@ class Tracker(
     private val receiveScreenViewNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
             if (screenViewAutotracking) {
-                val event = data["event"] as? Event?
-                event?.let { track(it) }
+                val event = data["event"] as? ScreenView?
+                event?.let { event ->
+                    getScreenState()?.let { state ->
+                        // don't track if screen view is for the same activity as the last one
+                        if (
+                            event.activityClassName?.isEmpty() != false ||
+                            event.activityClassName != state.activityClassName ||
+                            event.activityTag != state.activityTag
+                        ) {
+                            track(event)
+                        }
+                    } ?: track(event)
+                }
             }
         }
     }
