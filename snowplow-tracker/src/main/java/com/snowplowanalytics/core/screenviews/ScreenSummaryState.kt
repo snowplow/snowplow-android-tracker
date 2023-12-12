@@ -27,7 +27,9 @@ class ScreenSummaryState : State {
     private var lastItemIndex: Int? = null
     private var itemsCount: Int? = null
     private var maxYOffset: Int? = null
+    private var maxXOffset: Int? = null
     private var contentHeight: Int? = null
+    private var contentWidth: Int? = null
 
     val data: Map<String, Any?>
         get() {
@@ -38,7 +40,9 @@ class ScreenSummaryState : State {
             lastItemIndex?.let { data["last_item_index"] = it }
             itemsCount?.let { data["items_count"] = it }
             maxYOffset?.let { data["max_y_offset"] = it }
+            maxXOffset?.let { data["max_x_offset"] = it }
             contentHeight?.let { data["content_height"] = it }
+            contentWidth?.let { data["content_width"] = it }
 
             return data
         }
@@ -73,8 +77,10 @@ class ScreenSummaryState : State {
     }
 
     fun updateWithScrollChanged(event: ScrollChanged) {
-        maxYOffset = max(event.yOffset, maxYOffset ?: 0)
-        contentHeight = max(event.contentHeight, contentHeight ?: 0)
+        event.yOffset?.let { maxYOffset = max(it, maxYOffset ?: 0) }
+        event.xOffset?.let { maxXOffset = max(it, maxXOffset ?: 0) }
+        event.contentWidth?.let { contentWidth = max(it, contentWidth ?: 0) }
+        event.contentHeight?.let { contentHeight = max(it, contentHeight ?: 0) }
     }
 
     companion object {

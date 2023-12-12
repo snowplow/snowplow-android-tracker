@@ -130,11 +130,11 @@ class ScreenSummaryStateMachineTest {
 
         tracker.track(ScreenView(name = "Screen 1"))
         Thread.sleep(200)
-        tracker.track(ScrollChanged(yOffset= 10, contentHeight = 100))
+        tracker.track(ScrollChanged(yOffset = 10, contentHeight = 100))
         Thread.sleep(200)
-        tracker.track(ScrollChanged(yOffset= 30, contentHeight = 100))
+        tracker.track(ScrollChanged(xOffset = 15, yOffset = 30, contentWidth = 150, contentHeight = 100))
         Thread.sleep(200)
-        tracker.track(ScrollChanged(yOffset= 20, contentHeight = 100))
+        tracker.track(ScrollChanged(yOffset = 20, contentHeight = 100))
         Thread.sleep(200)
         tracker.track(ScreenView(name = "Screen 2"))
         Thread.sleep(200)
@@ -144,6 +144,8 @@ class ScreenSummaryStateMachineTest {
 
         val screenSummary = getScreenSummary(events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
         Assert.assertEquals(30, screenSummary?.get("max_y_offset"))
+        Assert.assertEquals(15, screenSummary?.get("max_x_offset"))
+        Assert.assertEquals(150, screenSummary?.get("content_width"))
         Assert.assertEquals(100, screenSummary?.get("content_height"))
     }
 

@@ -22,9 +22,13 @@ import com.snowplowanalytics.core.constants.TrackerConstants
  */
 class ScrollChanged (
     /** Vertical scroll offset in pixels. */
-    var yOffset: Int,
+    var yOffset: Int? = null,
+    /** Horizontal scroll offset in pixels. */
+    var xOffset: Int? = null,
+    /** The width of the scroll view content in pixels. */
+    var contentWidth: Int? = null,
     /** The height of the scroll view content in pixels. */
-    var contentHeight: Int
+    var contentHeight: Int? = null
 ) : AbstractSelfDescribing() {
 
     override val schema: String
@@ -32,9 +36,11 @@ class ScrollChanged (
 
     override val dataPayload: Map<String, Any?>
         get() {
-            return mapOf(
-                "y_offset" to yOffset,
-                "content_height" to contentHeight
-            )
+            val data = mutableMapOf<String, Any?>()
+            yOffset?.let { data["y_offset"] = it }
+            xOffset?.let { data["x_offset"] = it }
+            contentWidth?.let { data["content_width"] = it }
+            contentHeight?.let { data["content_height"] = it }
+            return data
         }
 }
