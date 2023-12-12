@@ -71,6 +71,8 @@ object TrackerConstants {
         "iglu:com.snowplowanalytics.mobile/screen_summary/jsonschema/1-0-0"
     const val SCHEMA_LIST_ITEM_VIEW =
         "iglu:com.snowplowanalytics.mobile/list_item_view/jsonschema/1-0-0"
+    const val SCHEMA_SCROLL_CHANGED =
+        "iglu:com.snowplowanalytics.mobile/scroll_changed/jsonschema/1-0-0"
     const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
     const val EVENT_PAGE_VIEW = "pv"
     const val EVENT_STRUCTURED = "se"

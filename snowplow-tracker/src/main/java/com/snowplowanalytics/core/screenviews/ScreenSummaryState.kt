@@ -15,6 +15,7 @@ package com.snowplowanalytics.core.screenviews
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.snowplow.event.ListItemView
+import com.snowplowanalytics.snowplow.event.ScrollChanged
 import java.lang.Integer.max
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -25,6 +26,8 @@ class ScreenSummaryState : State {
     private var backgroundDuration: Long = 0
     private var lastItemIndex: Int? = null
     private var itemsCount: Int? = null
+    private var maxYOffset: Int? = null
+    private var contentHeight: Int? = null
 
     val data: Map<String, Any?>
         get() {
@@ -34,11 +37,12 @@ class ScreenSummaryState : State {
             )
             lastItemIndex?.let { data["last_item_index"] = it }
             itemsCount?.let { data["items_count"] = it }
+            maxYOffset?.let { data["max_y_offset"] = it }
+            contentHeight?.let { data["content_height"] = it }
 
             return data
         }
 
-    @Synchronized
     fun updateTransitionToForeground() {
         val currentTimestamp = dateGenerator()
 
@@ -46,7 +50,6 @@ class ScreenSummaryState : State {
         lastUpdateTimestamp = currentTimestamp
     }
 
-    @Synchronized
     fun updateTransitionToBackground() {
         val currentTimestamp = dateGenerator()
 
@@ -54,7 +57,6 @@ class ScreenSummaryState : State {
         lastUpdateTimestamp = currentTimestamp
     }
 
-    @Synchronized
     fun updateForScreenEnd() {
         val currentTimestamp = dateGenerator()
 
@@ -62,13 +64,17 @@ class ScreenSummaryState : State {
         lastUpdateTimestamp = currentTimestamp
     }
 
-    @Synchronized
     fun updateWithListItemView(event: ListItemView) {
         lastItemIndex = max(event.index, lastItemIndex ?: 0)
         event.itemsCount?.let {
             itemsCount = max(it, itemsCount ?: 0)
         }
 
+    }
+
+    fun updateWithScrollChanged(event: ScrollChanged) {
+        maxYOffset = max(event.yOffset, maxYOffset ?: 0)
+        contentHeight = max(event.contentHeight, contentHeight ?: 0)
     }
 
     companion object {

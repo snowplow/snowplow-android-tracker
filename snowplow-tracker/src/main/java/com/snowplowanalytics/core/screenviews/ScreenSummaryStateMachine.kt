@@ -25,7 +25,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         get() = ID
 
     override val subscribedEventSchemasForTransitions: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema, TrackerConstants.SCHEMA_LIST_ITEM_VIEW)
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema, TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCROLL_CHANGED)
 
     override val subscribedEventSchemasForEntitiesGeneration: List<String>
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema)
@@ -37,7 +37,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         get() = emptyList()
 
     override val subscribedEventSchemasForFiltering: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCREEN_END)
+        get() = listOf(TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCREEN_END, TrackerConstants.SCHEMA_SCROLL_CHANGED)
 
     override val subscribedEventSchemasForEventsBefore: List<String>
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
@@ -59,6 +59,9 @@ class ScreenSummaryStateMachine : StateMachineInterface {
             }
             is ListItemView -> {
                 screenSummaryState.updateWithListItemView(event)
+            }
+            is ScrollChanged -> {
+                screenSummaryState.updateWithScrollChanged(event)
             }
         }
         return state
@@ -86,7 +89,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         if (event.schema == TrackerConstants.SCHEMA_SCREEN_END) {
             return state != null
         }
-        // do not track list item view events
+        // do not track list item view and scroll changed events
         return false
     }
 

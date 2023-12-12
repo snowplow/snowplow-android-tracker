@@ -123,6 +123,30 @@ class ScreenSummaryStateMachineTest {
         Assert.assertEquals(10, screenSummary?.get("items_count"))
     }
 
+    @Test
+    fun updatesScrollMetrics() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        Thread.sleep(200)
+        tracker.track(ScrollChanged(yOffset= 10, contentHeight = 100))
+        Thread.sleep(200)
+        tracker.track(ScrollChanged(yOffset= 30, contentHeight = 100))
+        Thread.sleep(200)
+        tracker.track(ScrollChanged(yOffset= 20, contentHeight = 100))
+        Thread.sleep(200)
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        Assert.assertEquals(3, events.size)
+
+        val screenSummary = getScreenSummary(events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+        Assert.assertEquals(30, screenSummary?.get("max_y_offset"))
+        Assert.assertEquals(100, screenSummary?.get("content_height"))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
