@@ -25,9 +25,13 @@ class ScrollChanged (
     var yOffset: Int? = null,
     /** Horizontal scroll offset in pixels. */
     var xOffset: Int? = null,
-    /** The width of the scroll view content in pixels. */
+    /** The width of the scroll view in pixels. */
+    var viewWidth: Int? = null,
+    /** The height of the scroll view in pixels. */
+    var viewHeight: Int? = null,
+    /** The width of the content of the scroll view in pixels. */
     var contentWidth: Int? = null,
-    /** The height of the scroll view content in pixels. */
+    /** The height of the content of the scroll view in pixels. */
     var contentHeight: Int? = null
 ) : AbstractSelfDescribing() {
 
@@ -39,6 +43,8 @@ class ScrollChanged (
             val data = mutableMapOf<String, Any?>()
             yOffset?.let { data["y_offset"] = it }
             xOffset?.let { data["x_offset"] = it }
+            viewWidth?.let { data["view_width"] = it }
+            viewHeight?.let { data["view_height"] = it }
             contentWidth?.let { data["content_width"] = it }
             contentHeight?.let { data["content_height"] = it }
             return data
