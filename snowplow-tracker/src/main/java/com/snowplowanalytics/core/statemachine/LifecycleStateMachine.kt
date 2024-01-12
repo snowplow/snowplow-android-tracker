@@ -48,6 +48,9 @@ class LifecycleStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForFiltering: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, currentState: State?): State? {
         if (event is Foreground) {
             return LifecycleState(true, event.foregroundIndex)
@@ -73,6 +76,10 @@ class LifecycleStateMachine : StateMachineInterface {
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
         return null
     }
 

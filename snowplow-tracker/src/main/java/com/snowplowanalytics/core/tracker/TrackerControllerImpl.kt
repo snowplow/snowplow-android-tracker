@@ -162,6 +162,13 @@ class TrackerControllerImpl  // Constructors
             dirtyConfig.screenViewAutotracking = screenViewAutotracking
             tracker.screenViewAutotracking = screenViewAutotracking
         }
+
+    override var screenEngagementAutotracking: Boolean
+        get() = tracker.screenEngagementAutotracking
+        set(screenEngagementAutotracking) {
+            dirtyConfig.screenEngagementAutotracking = screenEngagementAutotracking
+            tracker.screenEngagementAutotracking = screenEngagementAutotracking
+        }
     
     override var lifecycleAutotracking: Boolean
         get() = tracker.lifecycleAutotracking

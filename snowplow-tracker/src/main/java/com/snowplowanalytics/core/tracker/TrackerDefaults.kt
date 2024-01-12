@@ -34,6 +34,7 @@ object TrackerDefaults {
     var diagnosticAutotracking = false
     var lifecycleAutotracking = false
     var screenViewAutotracking = true
+    var screenEngagementAutotracking = true
     var installAutotracking = true
     var userAnonymisation = false
 }

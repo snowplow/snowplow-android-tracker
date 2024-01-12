@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.snowplowanalytics.snowplowdemocompose.R
 import com.snowplowanalytics.snowplowdemocompose.data.SchemaUrlParts
+import com.snowplowanalytics.snowplowdemocompose.data.Tracking
 
 @Composable
 fun SchemaListScreen(
@@ -38,7 +40,11 @@ fun SchemaListScreen(
             if (vm.errorMessage.isEmpty()) {
                 Column(modifier = Modifier.padding(contentPadding)) {
                     LazyColumn(modifier = Modifier.fillMaxHeight()) {
-                        items(vm.schemaPartsList) { schema ->
+                        itemsIndexed(vm.schemaPartsList) { index, schema ->
+                            Tracking.TrackListItemView(
+                                index = index,
+                                itemsCount = vm.schemaPartsList.size
+                            )
                             SchemaCard(schema = schema, onClick = onSchemaClicked)
                         }
                     }

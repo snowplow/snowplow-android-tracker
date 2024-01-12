@@ -51,6 +51,9 @@ class PluginStateMachine(
             return config.schemas ?: Collections.singletonList("*")
         }
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, state: State?): State? {
         return null
     }
@@ -69,5 +72,9 @@ class PluginStateMachine(
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
         return filterConfiguration?.closure?.apply(event)
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
+        return null
     }
 }

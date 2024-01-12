@@ -18,6 +18,10 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.emitter.Emitter
 import com.snowplowanalytics.core.emitter.Executor.execute
 import com.snowplowanalytics.core.gdpr.Gdpr
+import com.snowplowanalytics.core.screenviews.ScreenState
+import com.snowplowanalytics.core.screenviews.ScreenStateMachine
+import com.snowplowanalytics.core.screenviews.ScreenSummaryState
+import com.snowplowanalytics.core.screenviews.ScreenSummaryStateMachine
 import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
 import com.snowplowanalytics.core.session.Session.Companion.getInstance
@@ -180,6 +184,16 @@ class Tracker(
         set(willTrack) {
             if (!builderFinished) {
                 field = willTrack
+            }
+        }
+
+    var screenEngagementAutotracking = false
+        set(screenEngagementAutotracking) {
+            field = screenEngagementAutotracking
+            if (screenEngagementAutotracking) {
+                addOrReplaceStateMachine(ScreenSummaryStateMachine())
+            } else {
+                removeStateMachine(ScreenSummaryStateMachine.ID)
             }
         }
 
@@ -473,28 +487,39 @@ class Tracker(
         if (!dataCollection) {
             return null
         }
-        
-        event.beginProcessing(this)
-        var stateSnapshot: TrackerStateSnapshot
-        var trackerEvent: TrackerEvent
+
+        val events = withEventsBefore(event)
+        for (e in events) { e.beginProcessing(this) }
+        var trackerEvents: List<Pair<Event, TrackerEvent>>
         synchronized(this) {
-            stateSnapshot = stateManager.trackerStateForProcessedEvent(event)
-            trackerEvent = TrackerEvent(event, stateSnapshot)
-            workaroundForIncoherentSessionContext(trackerEvent)
-        }
-        val reportsOnDiagnostic = event !is TrackerError
-        execute(reportsOnDiagnostic, TAG) {
-            payloadWithEvent(trackerEvent)?.let { payload ->
-                v(TAG, "Adding new payload to event storage: %s", payload)
-                emitter.add(payload)
-                event.endProcessing(this)
-                stateManager.afterTrack(trackerEvent)
-            } ?: run {
-                d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
-                event.endProcessing(this)
+            trackerEvents = events.map { event ->
+                val stateSnapshot = stateManager.trackerStateForProcessedEvent(event)
+                val trackerEvent = TrackerEvent(event, stateSnapshot)
+                workaroundForIncoherentSessionContext(trackerEvent)
+                Pair(event, trackerEvent)
             }
         }
-        return trackerEvent.eventId
+
+        val reportsOnDiagnostic = event !is TrackerError
+        execute(reportsOnDiagnostic, TAG) {
+            trackerEvents.forEach { (event, trackerEvent) ->
+                payloadWithEvent(trackerEvent)?.let { payload ->
+                    v(TAG, "Adding new payload to event storage: %s", payload)
+                    emitter.add(payload)
+                    event.endProcessing(this)
+                    stateManager.afterTrack(trackerEvent)
+                } ?: run {
+                    d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
+                    event.endProcessing(this)
+                }
+            }
+        }
+        return trackerEvents.last().second.eventId
+    }
+
+    private fun withEventsBefore(event: Event): List<Event> {
+        val events = stateManager.eventsBefore(event)
+        return events + listOf(event)
     }
 
     private fun payloadWithEvent(event: TrackerEvent): Payload? {
