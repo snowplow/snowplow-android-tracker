@@ -34,8 +34,8 @@ class ScreenState : State {
     private var transitionType: String? = null
     private var fragmentClassName: String? = null
     private var fragmentTag: String? = null
-    private var activityClassName: String? = null
-    private var activityTag: String? = null
+    var activityClassName: String? = null
+    var activityTag: String? = null
 
     init {
         id = uUIDString()
