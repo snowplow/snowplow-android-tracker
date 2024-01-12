@@ -82,7 +82,7 @@ interface TrackerConfigurationInterface {
     var screenViewAutotracking: Boolean
 
     /**
-     * Whether enable tracking the screen end event and the screen summary context entity.
+     * Whether to enable tracking the screen end event and the screen summary context entity.
      * Make sure that you have lifecycle autotracking enabled for screen summary to have complete information.
      */
     var screenEngagementAutotracking: Boolean
