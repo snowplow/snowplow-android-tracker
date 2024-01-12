@@ -16,7 +16,7 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 
 /**
  * Event tracked when a scroll view's scroll position changes.
- * If screen engagement tracking is enabled, the scroll changed events will be aggregated into a `screen_summary` entity.
+ * If screen engagement tracking is enabled, the scroll changed events will be aggregated into a `screen_summary` entity and won't be sent as separate events to the collector.
  *
  * Schema: `iglu:com.snowplowanalytics.mobile/scroll_changed/jsonschema/1-0-0`
  */

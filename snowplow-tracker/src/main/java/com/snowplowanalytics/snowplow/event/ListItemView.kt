@@ -16,7 +16,7 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 
 /**
  * Event tracking the view of an item in a list.
- * If screen engagement tracking is enabled, the list item view events will be aggregated into a `screen_summary` entity.
+ * If screen engagement tracking is enabled, the list item view events will be aggregated into a `screen_summary` entity and won't be sent as separate events to the collector.
  *
  * Schema: `iglu:com.snowplowanalytics.mobile/list_item_view/jsonschema/1-0-0`
  */
