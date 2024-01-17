@@ -38,7 +38,7 @@ class MockEventStore : EventStore {
         }
     }
 
-    override fun removeEvents(ids: MutableList<Long?>): Boolean {
+    override fun removeEvents(ids: MutableList<Long>): Boolean {
         var result = true
         for (id in ids) {
             val removed = removeEvent(id!!)
@@ -60,11 +60,11 @@ class MockEventStore : EventStore {
         return db.size.toLong()
     }
 
-    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
+    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent> {
         synchronized(this) {
             val eventIds: MutableList<Long> = ArrayList()
             val eventPayloads: MutableList<String> = ArrayList()
-            var events: MutableList<EmitterEvent?> = ArrayList()
+            var events: MutableList<EmitterEvent> = ArrayList()
             for ((key, value) in db) {
                 val payloadCopy: Payload = TrackerPayload()
                 payloadCopy.addMap(value!!.map)
