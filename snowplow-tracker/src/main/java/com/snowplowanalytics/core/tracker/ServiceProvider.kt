@@ -244,6 +244,8 @@ class ServiceProvider(
             emitter.serverAnonymisation = emitterConfiguration.serverAnonymisation
             emitter.requestHeaders = networkConfiguration.requestHeaders
             emitter.retryFailedRequests = emitterConfiguration.retryFailedRequests
+            emitter.maxEventStoreAge = emitterConfiguration.maxEventStoreAge
+            emitter.maxEventStoreSize = emitterConfiguration.maxEventStoreSize
         }
         
         val emitter = Emitter(

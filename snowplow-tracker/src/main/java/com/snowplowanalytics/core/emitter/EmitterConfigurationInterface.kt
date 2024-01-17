@@ -15,6 +15,7 @@ package com.snowplowanalytics.core.emitter
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
+import kotlin.time.Duration
 
 interface EmitterConfigurationInterface {
     /**
@@ -71,4 +72,16 @@ interface EmitterConfigurationInterface {
      * If disabled, events that failed to be sent will be dropped regardless of other configuration (such as the customRetryForStatusCodes).
      */
     var retryFailedRequests: Boolean
+
+    /**
+     * Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent.
+     * Defaults to 30 days.
+     */
+    var maxEventStoreAge: Duration
+
+    /**
+     * Limit for the maximum number of unsent events to keep in the event store.
+     * Defaults to 1000.
+     */
+    var maxEventStoreSize: Long
 }

@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.controller.EmitterController
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
+import kotlin.time.Duration
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
@@ -89,6 +90,20 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         set(value) {
             dirtyConfig.retryFailedRequests = value
             emitter.retryFailedRequests = value
+        }
+
+    override var maxEventStoreAge: Duration
+        get() = emitter.maxEventStoreAge
+        set(value) {
+            dirtyConfig.maxEventStoreAge = value
+            emitter.maxEventStoreAge = value
+        }
+
+    override var maxEventStoreSize: Long
+        get() = emitter.maxEventStoreSize
+        set(value) {
+            dirtyConfig.maxEventStoreSize = value
+            emitter.maxEventStoreSize = value
         }
 
     override val dbCount: Long

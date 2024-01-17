@@ -18,6 +18,8 @@ import com.snowplowanalytics.snowplow.network.Protocol
 
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object EmitterDefaults {
     var httpMethod = HttpMethod.POST
@@ -34,4 +36,6 @@ object EmitterDefaults {
     var serverAnonymisation = false
     var retryFailedRequests = true
     var timeUnit = TimeUnit.SECONDS
+    var maxEventStoreAge = 30.toDuration(DurationUnit.DAYS)
+    var maxEventStoreSize: Long = 1000
 }

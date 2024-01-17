@@ -27,6 +27,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @RunWith(AndroidJUnit4::class)
 class EventStoreTest {
@@ -309,6 +311,60 @@ class EventStoreTest {
         trackerPayload.add("key2", "value2")
         eventStore2.insertEvent(trackerPayload)
         Assert.assertEquals(2, eventStore2.size())
+    }
+
+    @Test
+    fun testRemoveOldEventsByAge() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val eventStore = SQLiteEventStore(context, "namespace")
+        openedEventStores.add(eventStore)
+        waitUntilDatabaseOpen(eventStore)
+
+        for (i in 1..5) {
+            val payload = TrackerPayload()
+            payload.add("eid", i.toString())
+            eventStore.insertEvent(payload)
+        }
+
+        Thread.sleep(2000)
+
+        for (i in 6..10) {
+            val payload = TrackerPayload()
+            payload.add("eid", i.toString())
+            eventStore.insertEvent(payload)
+        }
+
+        Assert.assertEquals(10, eventStore.size())
+
+        eventStore.removeOldEvents(10, 1.toDuration(DurationUnit.SECONDS))
+
+        Assert.assertEquals(5, eventStore.size())
+        val events = eventStore.getEmittableEvents(10)
+        val eventIds = events.map { it.payload.map["eid"] as String }
+        Assert.assertEquals(listOf("10", "6", "7", "8", "9"), eventIds.sorted())
+    }
+
+    @Test
+    fun testRemoveOldestEventsByMaxSize() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val eventStore = SQLiteEventStore(context, "namespace")
+        openedEventStores.add(eventStore)
+        waitUntilDatabaseOpen(eventStore)
+
+        for (i in 1..5) {
+            val trackerPayload = TrackerPayload()
+            trackerPayload.add("eid", "$i")
+            eventStore.insertEvent(trackerPayload)
+        }
+
+        Assert.assertEquals(5, eventStore.size())
+
+        eventStore.removeOldEvents(3, 10.toDuration(DurationUnit.MINUTES))
+
+        Assert.assertEquals(3, eventStore.size())
+        val events = eventStore.getEmittableEvents(10)
+        val eventIds = events.map { it.payload.map["eid"] as String }
+        Assert.assertEquals(listOf("3", "4", "5"), eventIds.sorted())
     }
 
     // Helper Methods
