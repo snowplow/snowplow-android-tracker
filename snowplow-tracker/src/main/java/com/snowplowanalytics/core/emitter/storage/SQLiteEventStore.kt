@@ -135,7 +135,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         return retval == 1
     }
 
-    override fun removeEvents(ids: MutableList<Long?>): Boolean {
+    override fun removeEvents(ids: MutableList<Long>): Boolean {
         if (ids.isEmpty()) {
             return false
         }
@@ -215,12 +215,12 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         }
     }
 
-    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
+    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent> {
         if (!databaseOpen) {
             return emptyList<EmitterEvent>()
         }
         insertWaitingEventsIfReady()
-        val events = ArrayList<EmitterEvent?>()
+        val events = ArrayList<EmitterEvent>()
 
         // FIFO Pattern for sending events
         for (eventMetadata in getDescEventsInRange(queryLimit)) {

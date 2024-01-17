@@ -544,7 +544,7 @@ class Emitter(
         var successCount = 0
         var failedWillRetryCount = 0
         var failedWontRetryCount = 0
-        val removableEvents: MutableList<Long?> = ArrayList()
+        val removableEvents: MutableList<Long> = ArrayList()
 
         for (res in results) {
             if (res.isSuccessful) {

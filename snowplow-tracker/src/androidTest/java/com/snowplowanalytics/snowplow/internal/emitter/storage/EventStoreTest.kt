@@ -166,7 +166,7 @@ class EventStoreTest {
     @Throws(InterruptedException::class)
     fun testRemoveRangeOfEvents() {
         val eventStore = eventStore()
-        val idList: MutableList<Long?> = ArrayList()
+        val idList: MutableList<Long> = ArrayList()
         idList.add(eventStore.insertEvent(payload()))
         idList.add(eventStore.insertEvent(payload()))
         idList.add(eventStore.insertEvent(payload()))

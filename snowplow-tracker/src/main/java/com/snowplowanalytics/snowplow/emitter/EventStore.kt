@@ -36,7 +36,7 @@ interface EventStore {
      * @param ids the events' identifiers in the store.
      * @return a boolean of success to remove.
      */
-    fun removeEvents(ids: MutableList<Long?>): Boolean
+    fun removeEvents(ids: MutableList<Long>): Boolean
 
     /**
      * Empties the store of all the events.
@@ -54,5 +54,5 @@ interface EventStore {
      * Returns a list of [EmitterEvent] objects which contain events and related IDs.
      * @return EmitterEvent objects containing eventIds and event payloads.
      */
-    fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?>
+    fun getEmittableEvents(queryLimit: Int): List<EmitterEvent>
 }

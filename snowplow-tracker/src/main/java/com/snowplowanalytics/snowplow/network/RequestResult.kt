@@ -23,7 +23,7 @@ import java.util.*
 class RequestResult(
     val statusCode: Int,
     val oversize: Boolean,
-    val eventIds: List<Long?>
+    val eventIds: List<Long>
 ) {
     /**
      * @return the requests success status
