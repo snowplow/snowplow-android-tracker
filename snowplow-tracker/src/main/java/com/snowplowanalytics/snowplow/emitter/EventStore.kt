@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.emitter
 
 import com.snowplowanalytics.snowplow.payload.Payload
+import kotlin.time.Duration
 
 /**
  * The component that persists and buffers events before sending.
@@ -55,4 +56,11 @@ interface EventStore {
      * @return EmitterEvent objects containing eventIds and event payloads.
      */
     fun getEmittableEvents(queryLimit: Int): List<EmitterEvent>
+
+    /**
+     * Remove events older than `maxAge` seconds and keep only the latest `maxSize` events.
+     * @param maxSize the maximum number of events to keep.
+     * @param maxAge the maximum age of events to keep.
+     */
+    fun removeOldEvents(maxSize: Long, maxAge: Duration)
 }

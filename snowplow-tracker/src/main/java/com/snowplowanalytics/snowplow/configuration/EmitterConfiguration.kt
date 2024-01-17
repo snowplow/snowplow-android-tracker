@@ -18,6 +18,9 @@ import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
 import org.json.JSONObject
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Configure how the tracker should send the events to the collector.     
@@ -92,6 +95,16 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
     override var retryFailedRequests: Boolean
         get() = _retryFailedRequests ?: sourceConfig?.retryFailedRequests ?: EmitterDefaults.retryFailedRequests
         set(value) { _retryFailedRequests = value }
+
+    private var _maxEventStoreAge: Duration? = null
+    override var maxEventStoreAge: Duration
+        get() = _maxEventStoreAge ?: sourceConfig?.maxEventStoreAge ?: EmitterDefaults.maxEventStoreAge
+        set(value) { _maxEventStoreAge = value }
+
+    private var _maxEventStoreSize: Long? = null
+    override var maxEventStoreSize: Long
+        get() = _maxEventStoreSize ?: sourceConfig?.maxEventStoreSize ?: EmitterDefaults.maxEventStoreSize
+        set(value) { _maxEventStoreSize = value }
     
     // Builders
     
@@ -183,6 +196,24 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
         return this
     }
 
+    /**
+     * Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent.
+     * Defaults to 30 days.
+     */
+    fun maxEventStoreAge(maxEventStoreAge: Duration): EmitterConfiguration {
+        this.maxEventStoreAge = maxEventStoreAge
+        return this
+    }
+
+    /**
+     * Limit for the maximum number of unsent events to keep in the event store.
+     * Defaults to 1000.
+     */
+    fun maxEventStoreSize(maxEventStoreSize: Long): EmitterConfiguration {
+        this.maxEventStoreSize = maxEventStoreSize
+        return this
+    }
+
     // Copyable
     override fun copy(): EmitterConfiguration {
         return EmitterConfiguration()
@@ -196,6 +227,8 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
             .customRetryForStatusCodes(customRetryForStatusCodes)
             .serverAnonymisation(serverAnonymisation)
             .retryFailedRequests(retryFailedRequests)
+            .maxEventStoreSize(maxEventStoreSize)
+            .maxEventStoreAge(maxEventStoreAge)
     }
 
     // JSON Formatter
@@ -222,5 +255,7 @@ open class EmitterConfiguration() : Configuration, EmitterConfigurationInterface
             _customRetryForStatusCodes = customRetryForStatusCodes
         }
         if (jsonObject.has("retryFailedRequests")) { _retryFailedRequests = jsonObject.getBoolean("retryFailedRequests") }
+        if (jsonObject.has("maxEventStoreAge")) { _maxEventStoreAge = jsonObject.getDouble("maxEventStoreAge").toDuration(DurationUnit.SECONDS) }
+        if (jsonObject.has("maxEventStoreSize")) { _maxEventStoreSize = jsonObject.getLong("maxEventStoreSize") }
     }
 }

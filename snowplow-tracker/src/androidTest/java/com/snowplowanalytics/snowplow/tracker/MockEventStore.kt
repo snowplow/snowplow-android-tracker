@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.emitter.EmitterEvent
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import java.util.ArrayList
 import java.util.HashMap
+import kotlin.time.Duration
 
 class MockEventStore : EventStore {
     var db = HashMap<Long, Payload?>()
@@ -80,5 +81,9 @@ class MockEventStore : EventStore {
             v("MockEventStore", "getEmittableEvents payloads: %s", eventPayloads)
             return events
         }
+    }
+
+    override fun removeOldEvents(maxSize: Long, maxAge: Duration) {
+        // "Not implemented in the mock event store"
     }
 }

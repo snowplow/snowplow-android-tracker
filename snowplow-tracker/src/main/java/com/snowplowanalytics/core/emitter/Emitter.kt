@@ -33,6 +33,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.time.Duration
 
 /**
  * Build an emitter object which controls the
@@ -360,6 +361,16 @@ class Emitter(
         }
 
     /**
+     * Limit for the maximum number of unsent events to keep in the event store.
+     */
+    var maxEventStoreSize: Long = EmitterDefaults.maxEventStoreSize
+
+    /**
+     * Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent.
+     */
+    var maxEventStoreAge: Duration = EmitterDefaults.maxEventStoreAge
+
+    /**
      * Creates an emitter object
      */
     init {
@@ -413,6 +424,7 @@ class Emitter(
             eventStore.add(payload)
             if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
                 try {
+                    removeOldEvents()
                     attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
@@ -430,6 +442,7 @@ class Emitter(
         Executor.execute(TAG) {
             if (isRunning.compareAndSet(false, true)) {
                 try {
+                    removeOldEvents()
                     attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
@@ -482,6 +495,10 @@ class Emitter(
             Logger.e(TAG, "Executor termination is interrupted: " + e.message)
             false
         }
+    }
+
+    private fun removeOldEvents() {
+        eventStore.removeOldEvents(maxEventStoreSize, maxEventStoreAge)
     }
 
     /**

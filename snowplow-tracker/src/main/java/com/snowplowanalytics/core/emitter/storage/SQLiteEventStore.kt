@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.emitter.EmitterEvent
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
+import kotlin.time.Duration
 
 /**
  * Helper class for storing, getting and removing
@@ -161,6 +162,25 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         retval += payloadWaitingList.size
         payloadWaitingList.clear()
         return retval >= 0
+    }
+
+    override fun removeOldEvents(maxSize: Long, maxAge: Duration) {
+        if (databaseOpen) {
+            insertWaitingEventsIfReady()
+
+            database?.execSQL(
+                """
+                DELETE FROM ${EventStoreHelper.TABLE_EVENTS}
+                WHERE ${EventStoreHelper.COLUMN_ID} NOT IN (
+                    SELECT ${EventStoreHelper.COLUMN_ID}
+                    FROM ${EventStoreHelper.TABLE_EVENTS}
+                    WHERE ${EventStoreHelper.COLUMN_DATE_CREATED} >= datetime('now','-${maxAge.inWholeSeconds} seconds')
+                    ORDER BY ${EventStoreHelper.COLUMN_DATE_CREATED} DESC, ${EventStoreHelper.COLUMN_ID} DESC
+                    LIMIT $maxSize
+                )
+                """.trimIndent()
+            )
+        }
     }
 
     /**
