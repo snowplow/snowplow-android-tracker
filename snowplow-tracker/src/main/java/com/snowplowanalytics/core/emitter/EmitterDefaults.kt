@@ -29,7 +29,7 @@ object EmitterDefaults {
     var emptyLimit = 5
     var byteLimitGet: Long = 40000
     var byteLimitPost: Long = 40000
-    var emitTimeout = 5
+    var emitTimeout = 30
     var threadPoolSize = 15
     var serverAnonymisation = false
     var retryFailedRequests = true
