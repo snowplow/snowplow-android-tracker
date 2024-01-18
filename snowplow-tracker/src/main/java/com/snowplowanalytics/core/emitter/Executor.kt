@@ -27,7 +27,7 @@ import java.util.concurrent.Future
 object Executor {
     private var executor: ExecutorService? = null
     
-    var threadCount = 2 // Minimum amount of threads.
+    var threadCount = EmitterDefaults.threadPoolSize
         /**
          * Changes the amount of threads the scheduler will be able to use.
          *
