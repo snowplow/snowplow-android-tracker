@@ -20,7 +20,6 @@ import com.snowplowanalytics.core.emitter.Executor.execute
 import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.screenviews.ScreenState
 import com.snowplowanalytics.core.screenviews.ScreenStateMachine
-import com.snowplowanalytics.core.screenviews.ScreenSummaryState
 import com.snowplowanalytics.core.screenviews.ScreenSummaryStateMachine
 import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
@@ -127,17 +126,6 @@ class Tracker(
         set(timeout) {
             if (!builderFinished) {
                 field = timeout
-            }
-        }
-
-    /**
-     * This configuration option is not published in the TrackerConfiguration class.
-     * Create a Tracker directly, not via the Snowplow interface, to configure threadCount.
-     */
-    var threadCount: Int = TrackerDefaults.threadCount
-        set(threadCount) {
-            if (!builderFinished) {
-                field = max(threadCount, 2)
             }
         }
 

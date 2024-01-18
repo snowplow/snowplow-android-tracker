@@ -91,7 +91,6 @@ class TrackerTest {
             tracker.platform = DevicePlatform.InternetOfThings
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
-            tracker.threadCount = 1
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
             tracker.geoLocationContext = false
@@ -121,7 +120,6 @@ class TrackerTest {
         Assert.assertNotNull(tracker.emitter)
         Assert.assertNotNull(tracker.subject)
         Assert.assertEquals(LogLevel.VERBOSE, tracker.logLevel)
-        Assert.assertEquals(2, tracker.threadCount.toLong())
         Assert.assertFalse(tracker.exceptionAutotracking)
         Assert.assertTrue(tracker.lifecycleAutotracking)
         Assert.assertTrue(tracker.installAutotracking)
