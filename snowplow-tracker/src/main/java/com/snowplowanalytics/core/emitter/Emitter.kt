@@ -38,7 +38,13 @@ import java.util.concurrent.atomic.AtomicReference
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
  */
-class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Unit)? = null) {
+class Emitter(
+    val namespace: String,
+    eventStore: EventStore?,
+    context: Context,
+    collectorUri: String,
+    builder: ((Emitter) -> Unit)? = null
+) {
     private val TAG = Emitter::class.java.simpleName
 
     private var builderFinished = false
@@ -85,15 +91,8 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The emitter event store object
      */
-    var eventStore: EventStore? = null
-        // if not set during Emitter initialisation (via builder),
-        // this is set as part of Tracker initialisation, as a side-effect of setting namespace
-        set(eventStore) {
-            if (field == null) {
-                field = eventStore
-            }
-        }
-    
+    val eventStore: EventStore = eventStore ?: SQLiteEventStore(context, namespace)
+
     /**
      * This configuration option is not published in the EmitterConfiguration class.
      * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
@@ -231,17 +230,6 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .build()
                 }
                 
-            }
-        }
-
-    /**
-     * Emitter namespace. NB: setting the namespace has a side-effect of creating the SQLiteEventStore
-     */
-    var namespace: String? = null
-        set(namespace) {
-            field = namespace
-            if (eventStore == null) {
-                eventStore = field?.let { SQLiteEventStore(context, it) }
             }
         }
 
@@ -422,15 +410,13 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
      */
     fun add(payload: Payload) {
         Executor.execute(TAG) {
-            eventStore?.let { eventStore ->
-                eventStore.add(payload)
-                if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
-                    try {
-                        attemptEmit(networkConnection)
-                    } catch (t: Throwable) {
-                        isRunning.set(false)
-                        Logger.e(TAG, "Received error during emission process: %s", t)
-                    }
+            eventStore.add(payload)
+            if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
+                try {
+                    attemptEmit(networkConnection)
+                } catch (t: Throwable) {
+                    isRunning.set(false)
+                    Logger.e(TAG, "Received error during emission process: %s", t)
                 }
             }
         }
@@ -525,13 +511,6 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
             return
         }
         
-        if (eventStore == null) {
-            Logger.d(TAG, "No EventStore set.")
-            isRunning.compareAndSet(true, false)
-            return
-        }
-        val eventStore = eventStore ?: return
-
         if (networkConnection == null) {
             Logger.d(TAG, "No networkConnection set.")
             isRunning.compareAndSet(true, false)

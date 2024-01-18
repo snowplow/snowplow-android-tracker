@@ -57,13 +57,9 @@ class TrackerTest {
             
             val emitter = Companion.tracker!!.emitter
             val eventStore = emitter.eventStore
-            if (eventStore != null) {
-                val isClean = eventStore.removeAllEvents()
-                Log.i("TrackerTest", "EventStore cleaned: $isClean")
-                Log.i("TrackerTest", "Events in the store: " + eventStore.size())
-            } else {
-                Log.i("TrackerTest", "EventStore null")
-            }
+            val isClean = eventStore.removeAllEvents()
+            Log.i("TrackerTest", "EventStore cleaned: $isClean")
+            Log.i("TrackerTest", "Events in the store: " + eventStore.size())
             emitter.shutdown(30)
             Companion.tracker!!.close()
             Log.i("TrackerTest", "Tracker closed")
@@ -85,7 +81,7 @@ class TrackerTest {
             emitter.emptyLimit = 0
         }
         val emitter = Emitter(
-            context, "testUrl", builder
+            "myNamespace", null, context, "testUrl", builder
         )
         val subject = Subject(
             context, null
@@ -136,7 +132,7 @@ class TrackerTest {
     fun testEmitterUpdate() {
         val tracker = tracker
         Assert.assertNotNull(tracker!!.emitter)
-        tracker.emitter = Emitter(context, "test", null)
+        tracker.emitter = Emitter(tracker.namespace, null, context, "test", null)
         Assert.assertNotNull(tracker.emitter)
     }
 
@@ -193,7 +189,7 @@ class TrackerTest {
                 emitterArg.requestSecurity = Protocol.HTTP
             }
         try {
-            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, builder)
+            emitter = Emitter(namespace, null, context, getMockServerURI(mockWebServer)!!, builder)
         } catch (e: Exception) {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
@@ -211,10 +207,8 @@ class TrackerTest {
         Companion.tracker =
             Tracker(emitter!!, namespace, "testTrackWithNoContext", null, context, trackerBuilder)
         val eventStore = emitter.eventStore
-        if (eventStore != null) {
-            val isClean = eventStore.removeAllEvents()
-            Log.i("testTrackSelfDescribingEvent", "EventStore clean: $isClean")
-        }
+        val isClean = eventStore.removeAllEvents()
+        Log.i("testTrackSelfDescribingEvent", "EventStore clean: $isClean")
         Log.i("testTrackSelfDescribingEvent", "Send SelfDescribing event")
         val sdj = SelfDescribingJson("iglu:foo/bar/jsonschema/1-0-0")
         val sdEvent = SelfDescribing(sdj)
@@ -255,7 +249,7 @@ class TrackerTest {
                 emitterArg.requestSecurity = Protocol.HTTP
             }
         try {
-            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, emitterBuilder)
+            emitter = Emitter(namespace, null, context, getMockServerURI(mockWebServer)!!, emitterBuilder)
         } catch (e: Exception) {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
@@ -313,7 +307,7 @@ class TrackerTest {
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, getMockServerURI(mockWebServer)!!, builder
+            namespace, null, context, getMockServerURI(mockWebServer)!!, builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -330,7 +324,7 @@ class TrackerTest {
         val eventId = Companion.tracker!!.track(ScreenView("name"))
         Assert.assertNull(eventId)
         val req = mockWebServer.takeRequest(2, TimeUnit.SECONDS)
-        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore!!.size())
+        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore.size())
         Assert.assertNull(req)
         mockWebServer.shutdown()
     }
@@ -345,7 +339,7 @@ class TrackerTest {
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, getMockServerURI(mockWebServer)!!, builder
+            namespace, null, context, getMockServerURI(mockWebServer)!!, builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -373,7 +367,7 @@ class TrackerTest {
         TestUtils.createSessionSharedPreferences(context, namespace)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, "fake-uri", builder
+            namespace, null, context, "fake-uri", builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -422,7 +416,7 @@ class TrackerTest {
             Thread.getDefaultUncaughtExceptionHandler().javaClass
         )
         val emitter = Emitter(
-            context, "com.acme", null
+            namespace, null, context, "com.acme", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -450,7 +444,7 @@ class TrackerTest {
             Thread.getDefaultUncaughtExceptionHandler().javaClass
         )
         val emitter = Emitter(
-            context, "com.acme", null
+            namespace, null, context, "com.acme", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -475,7 +469,7 @@ class TrackerTest {
     @Test
     fun testStartsNewSessionWhenChangingAnonymousTracking() {
         val emitterBuilder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        val emitter = Emitter(context, "fake-uri", emitterBuilder)
+        val emitter = Emitter("ns", null, context, "fake-uri", emitterBuilder)
         emitter.pauseEmit()
         
         val trackerBuilder = { tracker: Tracker ->

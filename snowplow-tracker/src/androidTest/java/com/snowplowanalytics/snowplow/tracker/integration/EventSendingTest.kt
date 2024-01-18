@@ -53,9 +53,9 @@ class EventSendingTest {
             if (tracker == null) return
             val emitter = tracker!!.emitter
             tracker!!.close()
-            val isClean = emitter.eventStore!!.removeAllEvents()
+            val isClean = emitter.eventStore.removeAllEvents()
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: $isClean")
-            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore!!.size())
+            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore.size())
         } catch (e: IllegalStateException) {
             Log.i("TrackerTest", "Tracker already closed.")
         }
@@ -204,7 +204,7 @@ class EventSendingTest {
             emitter.emptyLimit = 0
             emitter.emitRange = 1
         }
-        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
+        val emitter = Emitter(ns, null, InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
         val subject = Subject(InstrumentationRegistry.getInstrumentation().targetContext, null)
         
         if (tracker != null) tracker!!.close()
@@ -225,7 +225,7 @@ class EventSendingTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             trackerBuilder
         )
-        emitter.eventStore!!.removeAllEvents()
+        emitter.eventStore.removeAllEvents()
         return tracker!!
     }
 
