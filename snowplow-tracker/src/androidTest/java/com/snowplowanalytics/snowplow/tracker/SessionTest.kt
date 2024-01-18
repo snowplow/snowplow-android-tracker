@@ -210,7 +210,7 @@ class SessionTest {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker")
         
         val emitter = Emitter(
-            context, "", null
+            "tracker", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
@@ -249,7 +249,7 @@ class SessionTest {
     fun testBackgroundTimeSmallerThanBackgroundTimeoutDoesntCauseNewSession() {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker")
         val emitter = Emitter(
-            context, "", null
+            "tracker", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
@@ -331,7 +331,7 @@ class SessionTest {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker1")
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker2")
         val emitter = Emitter(
-            context, "", null
+            "ns", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true

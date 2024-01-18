@@ -390,10 +390,6 @@ class Tracker(
         
         emitter.flush()
         
-        // Setting the emitter namespace has a side-effect of creating a SQLiteEventStore,
-        // unless an EventStore was already provided through EmitterConfiguration
-        emitter.namespace = namespace
-        
         trackerVersionSuffix?.let {
             val suffix = it.replace("[^A-Za-z0-9.-]".toRegex(), "")
             if (suffix.isNotEmpty()) {

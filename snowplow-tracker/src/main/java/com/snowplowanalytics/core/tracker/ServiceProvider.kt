@@ -236,7 +236,6 @@ class ServiceProvider(
             emitter.emitTimeout = networkConfiguration.timeout
             emitter.emitRange = emitterConfiguration.emitRange
             emitter.bufferOption = emitterConfiguration.bufferOption
-            emitter.eventStore = emitterConfiguration.eventStore
             emitter.byteLimitPost = emitterConfiguration.byteLimitPost
             emitter.byteLimitGet = emitterConfiguration.byteLimitGet
             emitter.threadPoolSize = emitterConfiguration.threadPoolSize
@@ -247,7 +246,13 @@ class ServiceProvider(
             emitter.retryFailedRequests = emitterConfiguration.retryFailedRequests
         }
         
-        val emitter = Emitter(context, endpoint, builder)
+        val emitter = Emitter(
+            namespace = namespace,
+            eventStore = emitterConfiguration.eventStore,
+            context = context,
+            collectorUri = endpoint,
+            builder = builder
+        )
         if (emitterConfiguration.isPaused) {
             emitter.pauseEmit()
         }

@@ -53,7 +53,7 @@ class LoggingTest {
     fun setUp() {
         mockLoggerDelegate = MockLoggerDelegate()
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        emitter = Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", builder)
+        emitter = Emitter("namespace", null, ApplicationProvider.getApplicationContext(), "http://localhost", builder)
         networkConfig = NetworkConfiguration("http://localhost", HttpMethod.POST)
     }
 

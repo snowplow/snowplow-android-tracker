@@ -120,8 +120,7 @@ class StateManagerTest {
     fun testScreenStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.screenContext = true
             tracker.sessionContext = false
@@ -216,8 +215,7 @@ class StateManagerTest {
     fun testLifecycleStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.lifecycleAutotracking = true
             tracker.base64Encoded = false
@@ -290,8 +288,7 @@ class StateManagerTest {
     fun testDeepLinkStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.deepLinkContext = true
             tracker.base64Encoded = false
