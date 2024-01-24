@@ -49,31 +49,28 @@ object TrackerEvents {
     )
     
     fun trackAll(tracker: TrackerController) {
-        
-        
         trackDeepLink(tracker)
-        tracker.track(ScreenEnd())
-//        trackPageView(tracker)
-//        trackStructuredEvent(tracker)
-//        trackScreenView(tracker)
-//        trackTimings(tracker)
-//        trackSelfDescribingEvent(tracker)
-//        trackConsentGranted(tracker)
-//        trackConsentWithdrawn(tracker)
-//        trackMessageNotification(tracker)
-//
-//        // Ecommerce events
-//        trackAddToCart(tracker)
-//        trackRemoveFromCart(tracker)
-//        trackCheckoutStep(tracker)
-//        trackProductView(tracker)
-//        trackProductListView(tracker)
-//        trackProductListClick(tracker)
-//        trackPromotionView(tracker)
-//        trackPromotionClick(tracker)
-//        trackTransaction(tracker)
-//        trackTransactionError(tracker)
-//        trackRefund(tracker)
+        trackPageView(tracker)
+        trackStructuredEvent(tracker)
+        trackScreenView(tracker)
+        trackTimings(tracker)
+        trackSelfDescribingEvent(tracker)
+        trackConsentGranted(tracker)
+        trackConsentWithdrawn(tracker)
+        trackMessageNotification(tracker)
+
+        // Ecommerce events
+        trackAddToCart(tracker)
+        trackRemoveFromCart(tracker)
+        trackCheckoutStep(tracker)
+        trackProductView(tracker)
+        trackProductListView(tracker)
+        trackProductListClick(tracker)
+        trackPromotionView(tracker)
+        trackPromotionClick(tracker)
+        trackTransaction(tracker)
+        trackTransactionError(tracker)
+        trackRefund(tracker)
     }
 
     private fun trackDeepLink(tracker: TrackerController) {
