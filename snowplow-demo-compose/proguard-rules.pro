@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Fixes R8 full mode crash
+# Also see https://github.com/square/retrofit/issues/3751
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+# Reflection for the appSetId
+-keep class com.google.android.gms.appset.AppSet { *; }
+-keep class com.google.android.gms.appset.AppSetIdInfo { *; }
+-keep class com.google.android.gms.internal.appset.zzr { *; }
+-keep class com.google.android.gms.tasks.Tasks { *; }
+
+# Reflection for the AAID (AndroidIdfa)
+-keep class com.google.android.gms.ads.identifier.** { *; }
