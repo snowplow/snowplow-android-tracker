@@ -24,14 +24,14 @@ class AbstractEventTest {
     @Test
     fun testAddsEntitiesUsingAllAPIs() {
         val event = ScreenView("screen")
+        val entity = SelfDescribingJson("schema3", "data3")
 
         event.entities.add(SelfDescribingJson("schema1", "data1"))
-        event.customContexts.add(SelfDescribingJson("schema2", "data2"))
-        event.entities(listOf(SelfDescribingJson("schema3", "data3")))
-        event.contexts(listOf(SelfDescribingJson("schema4", "data4")))
+        event.contexts(listOf(SelfDescribingJson("schema2", "data2")))
+        event.entities(listOf(entity))
 
-        Assert.assertEquals(4, event.entities.count())
-        Assert.assertEquals(4, event.contexts.count())
-        Assert.assertEquals(4, event.customContexts.count())
+        Assert.assertEquals(1, event.entities.count())
+        Assert.assertEquals(1, event.contexts.count())
+        Assert.assertTrue(event.entities.contains(entity))
     }
 }

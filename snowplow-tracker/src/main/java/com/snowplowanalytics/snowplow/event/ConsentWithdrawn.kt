@@ -104,7 +104,7 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
     override fun beginProcessing(tracker: Tracker) {
         for (document in documents) {
             val context = SelfDescribingJson(document.schema, document.dataPayload)
-            customContexts.add(context) // TODO: Only the user should modify the public customContexts property
+            entities.add(context)
         }
     }
 }
