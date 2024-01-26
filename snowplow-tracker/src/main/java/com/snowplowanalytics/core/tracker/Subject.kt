@@ -13,6 +13,10 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
+import android.content.res.Resources
+import android.os.Build
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.tracker.Logger.v
 import com.snowplowanalytics.snowplow.util.Size
@@ -223,9 +227,25 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
      * @param context the android context
      */
     private fun setDefaultScreenResolution(context: Context) {
-        val width = context.resources.displayMetrics.widthPixels
-        val height = context.resources.displayMetrics.heightPixels
-        screenResolution = (Size(width, height))
+        try {
+            screenResolution = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val metrics =
+                    context.getSystemService(WindowManager::class.java).currentWindowMetrics
+                Size(metrics.bounds.width(), metrics.bounds.height())
+            } else {
+                val windowManager =
+                    context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+                val display = windowManager?.defaultDisplay
+                val metrics = if (display != null) {
+                    DisplayMetrics().also { display.getRealMetrics(it) }
+                } else {
+                    Resources.getSystem().displayMetrics
+                }
+                Size(metrics.widthPixels, metrics.heightPixels)
+            }
+        } catch (e: Exception) {
+            Logger.e(TAG, "Failed to set default screen resolution.")
+        }
     }
 
     /**
