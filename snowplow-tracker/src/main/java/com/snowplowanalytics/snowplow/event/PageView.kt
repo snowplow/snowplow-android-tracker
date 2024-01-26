@@ -16,7 +16,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 
 /**
- * A pageView event.
+ * A PageView event. This event has been designed for web trackers, and is not suitable for mobile apps.
  * @param pageUrl The page URL.
  */
 class PageView(pageUrl: String) : AbstractPrimitive() {
