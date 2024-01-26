@@ -13,8 +13,6 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
-import android.graphics.Point
-import android.view.WindowManager
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.tracker.Logger.v
 import com.snowplowanalytics.snowplow.util.Size
@@ -225,11 +223,9 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
      * @param context the android context
      */
     private fun setDefaultScreenResolution(context: Context) {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-        val display = windowManager?.defaultDisplay
-        val size = Point()
-        display?.getSize(size)
-        screenResolution = (Size(size.x, size.y))
+        val width = context.resources.displayMetrics.widthPixels
+        val height = context.resources.displayMetrics.heightPixels
+        screenResolution = (Size(width, height))
     }
 
     /**
