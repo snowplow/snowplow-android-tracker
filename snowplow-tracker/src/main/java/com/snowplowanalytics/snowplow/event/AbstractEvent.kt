@@ -22,7 +22,7 @@ import java.util.*
  * - "True" timestamp: user-defined custom event timestamp
  */
 abstract class AbstractEvent : Event {
-    private var _entities: MutableList<SelfDescribingJson> = LinkedList()
+    private var _entities = mutableListOf<SelfDescribingJson>()
     /**
      * @return the custom context entities associated with the event.
      */
@@ -55,13 +55,13 @@ abstract class AbstractEvent : Event {
     
     // Builder methods
 
-    /** Replace the context entities attached to the event with a new list of entities. */
+    /** Adds a list of context entities to the existing ones. */
     fun entities(entities: List<SelfDescribingJson>): AbstractEvent {
-        this.entities = entities.toMutableList()
+        this.entities.addAll(entities)
         return this
     }
 
-    /** Replace the context entities attached to the event with a new list of entities. */
+    /** Adds a list of context entities to the existing ones. */
     @Deprecated("Old nomenclature.", ReplaceWith("entities()"))
     fun contexts(contexts: List<SelfDescribingJson>): AbstractEvent {
         return entities(contexts)
