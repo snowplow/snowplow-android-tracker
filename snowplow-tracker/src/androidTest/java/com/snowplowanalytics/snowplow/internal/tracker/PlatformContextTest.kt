@@ -19,6 +19,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.PlatformContext
 import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
+import com.snowplowanalytics.snowplow.tracker.PlatformContextRetriever
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +30,7 @@ class PlatformContextTest {
     // --- TESTS
     @Test
     fun addsNotMockedMobileContext() {
-        val platformContext = PlatformContext(null, context)
+        val platformContext = PlatformContext(context = context)
         val sdj = platformContext.getMobileContext(false)
         Assert.assertNotNull(sdj)
         val sdjMap = sdj!!.map
@@ -47,7 +48,7 @@ class PlatformContextTest {
     @Test
     fun addsAllMockedInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         Thread.sleep(100) // sleep in order to fetch the app set properties
         val sdj = platformContext.getMobileContext(false)
         val sdjMap = sdj!!.map
@@ -77,7 +78,7 @@ class PlatformContextTest {
     @Test
     fun updatesMobileInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         Assert.assertEquals(
             1,
             deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory").toLong()
@@ -100,7 +101,7 @@ class PlatformContextTest {
     @Test
     fun doesntUpdateMobileInfoWithinUpdateWindow() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(1000, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(1000, 0, deviceInfoMonitor, context = context)
         Assert.assertEquals(
             1,
             deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory").toLong()
@@ -123,7 +124,7 @@ class PlatformContextTest {
     @Test
     fun updatesNetworkInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType").toLong())
         Assert.assertEquals(
             1,
@@ -140,7 +141,7 @@ class PlatformContextTest {
     @Test
     fun doesntUpdateNetworkInfoWithinUpdateWindow() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 1000, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 1000, deviceInfoMonitor, context = context)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType").toLong())
         Assert.assertEquals(
             1,
@@ -157,7 +158,7 @@ class PlatformContextTest {
     @Test
     fun doesntUpdateNonEphemeralInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType").toLong())
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage").toLong())
         platformContext.getMobileContext(false)
@@ -168,7 +169,7 @@ class PlatformContextTest {
     @Test
     fun doesntUpdateIdfaIfNotNull() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 1, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 1, deviceInfoMonitor, context = context)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
         platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
@@ -178,7 +179,7 @@ class PlatformContextTest {
     fun updatesIdfaIfEmptyOrNull() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         deviceInfoMonitor.customIdfa = ""
-        val platformContext = PlatformContext(0, 1, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 1, deviceInfoMonitor, context = context)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
         deviceInfoMonitor.customIdfa = null
         platformContext.getMobileContext(false)
@@ -190,7 +191,7 @@ class PlatformContextTest {
     @Test
     fun anonymisesUserIdentifiers() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         val sdj = platformContext.getMobileContext(true)
         val sdjMap = sdj!!.map
         val sdjData = sdjMap["data"] as Map<*, *>?
@@ -201,16 +202,16 @@ class PlatformContextTest {
     @Test
     fun readsAppSetInfoSynchronouslyFromGeneralPrefsSecondTime() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
-        PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        PlatformContext(0, 0, deviceInfoMonitor, context = context)
 
         Thread.sleep(100)
 
-        val secondPlatformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val secondPlatformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
         val sdj = secondPlatformContext.getMobileContext(true)
         val sdjData = sdj!!.map["data"] as Map<*, *>?
 
         Assert.assertEquals("XXX", sdjData!![Parameters.APP_SET_ID])
-        Assert.assertEquals("app", sdjData!![Parameters.APP_SET_ID_SCOPE])
+        Assert.assertEquals("app", sdjData[Parameters.APP_SET_ID_SCOPE])
     }
 
     @Test
@@ -219,7 +220,7 @@ class PlatformContextTest {
         val platformContext = PlatformContext(
             0, 0, deviceInfoMonitor,
             listOf(PlatformContextProperty.ANDROID_IDFA, PlatformContextProperty.BATTERY_LEVEL),
-            context
+            context = context
         )
 
         val sdj = platformContext.getMobileContext(false)
@@ -238,7 +239,7 @@ class PlatformContextTest {
     fun truncatesLanguageToMax8Chars() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         deviceInfoMonitor.language = "1234567890"
-        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, null, context)
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
 
         val sdj = platformContext.getMobileContext(false)
         Assert.assertNotNull(sdj)
@@ -254,7 +255,7 @@ class PlatformContextTest {
         // set locale to an ISO-639 invalid 2-letter code
         Locale.setDefault(Locale("dk", "example"))
         
-        val platformContext = PlatformContext(null, context)
+        val platformContext = PlatformContext(context = context)
         val sdj = platformContext.getMobileContext(false)
         Assert.assertNotNull(sdj)
         val sdjData = sdj!!.map["data"] as Map<*, *>
@@ -267,15 +268,71 @@ class PlatformContextTest {
 
     @Test
     fun doesntSetTheNetworkTechIfNotRequested() {
-        val platformContext = PlatformContext(listOf(
+        val platformContext = PlatformContext(properties = listOf(
             PlatformContextProperty.NETWORK_TYPE
-        ), context)
+        ), context = context)
         val sdj = platformContext.getMobileContext(false)
         Assert.assertNotNull(sdj)
         val sdjData = sdj!!.map["data"] as Map<*, *>
 
         Assert.assertTrue(sdjData.containsKey(Parameters.NETWORK_TYPE))
         Assert.assertFalse(sdjData.containsKey(Parameters.NETWORK_TECHNOLOGY))
+    }
+
+    @Test
+    fun PlatformContextRetrieverOverridesProperties() {
+        val retriever = PlatformContextRetriever(
+            osType = { "r1" },
+            osVersion = { "r2" },
+            deviceVendor = { "r3" },
+            deviceModel = { "r4" },
+            carrier = { "r5" },
+            networkType = { "r6" },
+            networkTechnology = { "r7" },
+            androidIdfa = { "r8" },
+            availableStorage = { 100 },
+            totalStorage = { 101 },
+            physicalMemory = { 102 },
+            systemAvailableMemory = { 103 },
+            batteryLevel = { 104 },
+            batteryState = { "r9" },
+            isPortrait = { false },
+            resolution = { "r10" },
+            scale = { 105f },
+            language = { "r11" },
+            appSetId = { "r12" },
+            appSetIdScope = { "r13" },
+        )
+        val platformContext = PlatformContext(
+            retriever = retriever,
+            context = context
+        )
+        Thread.sleep(100)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertEquals("r1", sdjData[Parameters.OS_TYPE])
+        Assert.assertEquals("r2", sdjData[Parameters.OS_VERSION])
+        Assert.assertEquals("r3", sdjData[Parameters.DEVICE_MANUFACTURER])
+        Assert.assertEquals("r4", sdjData[Parameters.DEVICE_MODEL])
+        Assert.assertEquals("r5", sdjData[Parameters.CARRIER])
+        Assert.assertEquals("r6", sdjData[Parameters.NETWORK_TYPE])
+        Assert.assertEquals("r7", sdjData[Parameters.NETWORK_TECHNOLOGY])
+        Assert.assertEquals("r8", sdjData[Parameters.ANDROID_IDFA])
+        Assert.assertEquals(100L, sdjData[Parameters.AVAILABLE_STORAGE])
+        Assert.assertEquals(101L, sdjData[Parameters.TOTAL_STORAGE])
+        Assert.assertEquals(102L, sdjData[Parameters.PHYSICAL_MEMORY])
+        Assert.assertEquals(103L, sdjData[Parameters.SYSTEM_AVAILABLE_MEMORY])
+        Assert.assertEquals(104, sdjData[Parameters.BATTERY_LEVEL])
+        Assert.assertEquals("r9", sdjData[Parameters.BATTERY_STATE])
+        Assert.assertEquals(false, sdjData[Parameters.IS_PORTRAIT])
+        Assert.assertEquals("r10", sdjData[Parameters.MOBILE_RESOLUTION])
+        Assert.assertEquals(105f, sdjData[Parameters.MOBILE_SCALE])
+        Assert.assertEquals("r11", sdjData[Parameters.MOBILE_LANGUAGE])
+        Assert.assertEquals("r12", sdjData[Parameters.APP_SET_ID])
+        Assert.assertEquals("r13", sdjData[Parameters.APP_SET_ID_SCOPE])
     }
 
     // --- PRIVATE

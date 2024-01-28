@@ -45,7 +45,6 @@ import com.snowplowanalytics.snowplow.util.Basis
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.max
 
 /**
  * Builds a Tracker object which is used to send events to a Snowplow Collector.
@@ -60,7 +59,8 @@ class Tracker(
     emitter: Emitter,
     val namespace: String,
     var appId: String,
-    platformContextProperties: List<PlatformContextProperty>?,
+    platformContextProperties: List<PlatformContextProperty>? = null,
+    platformContextRetriever: PlatformContextRetriever? = null,
     context: Context,
     builder: ((Tracker) -> Unit)? = null) {
     private var builderFinished = false
@@ -88,7 +88,11 @@ class Tracker(
     val dataCollection: Boolean
         get() = _dataCollection.get()
 
-    private val platformContextManager = PlatformContext(platformContextProperties, context)
+    private val platformContextManager = PlatformContext(
+        properties = platformContextProperties,
+        retriever = platformContextRetriever ?: PlatformContextRetriever(),
+        context = context
+    )
 
     var emitter: Emitter = emitter
         set(emitter) {

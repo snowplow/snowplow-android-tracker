@@ -13,12 +13,12 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
-import com.snowplowanalytics.core.tracker.PlatformContext
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
+import com.snowplowanalytics.snowplow.tracker.PlatformContextRetriever
 import org.json.JSONObject
 import java.util.*
 
@@ -165,6 +165,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     open var platformContextProperties: List<PlatformContextProperty>?
         get() = _platformContextProperties ?: sourceConfig?.platformContextProperties
         set(value) { _platformContextProperties = value }
+
+    private var _platformContextRetriever: PlatformContextRetriever? = null
+    /**
+     * Set of callbacks to be used to retrieve properties of the platform context.
+     * Overrides the tracker implementation for setting the properties.
+     */
+    open var platformContextRetriever: PlatformContextRetriever?
+        get() = _platformContextRetriever ?: sourceConfig?.platformContextRetriever
+        set(value) { _platformContextRetriever = value }
 
     // Builder methods
     
@@ -345,6 +354,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         return this
     }
 
+    /**
+     * Set of callbacks to be used to retrieve properties of the platform context.
+     * Overrides the tracker implementation for setting the properties.
+     */
+    fun platformContextRetriever(platformContextRetriever: PlatformContextRetriever?): TrackerConfiguration {
+        this.platformContextRetriever = platformContextRetriever
+        return this
+    }
+
     // Copyable
     override fun copy(): Configuration {
         return TrackerConfiguration(appId)
@@ -367,6 +385,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
             .userAnonymisation(userAnonymisation)
             .trackerVersionSuffix(trackerVersionSuffix)
             .platformContextProperties(platformContextProperties)
+            .platformContextRetriever(platformContextRetriever)
     }
 
     /**
