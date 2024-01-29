@@ -22,10 +22,27 @@ import java.util.*
  * - "True" timestamp: user-defined custom event timestamp
  */
 abstract class AbstractEvent : Event {
-    /** List of custom contexts associated with the event.  */
-    @Deprecated("Old nomenclature.", ReplaceWith("entities"))
-    @JvmField
-    val customContexts: MutableList<SelfDescribingJson> = LinkedList()
+    private var _entities = mutableListOf<SelfDescribingJson>()
+    /**
+     * @return the custom context entities associated with the event.
+     */
+    override var entities: MutableList<SelfDescribingJson>
+        get() {
+            if (isProcessing) {
+                entitiesForProcessing?.let {
+                    return (_entities + it).toMutableList()
+                }
+            }
+            return _entities
+        }
+        set(value) {
+            _entities = value
+        }
+
+    @Deprecated("Old nomenclature", ReplaceWith("entities"))
+    override var contexts: List<SelfDescribingJson>
+        get() = entities
+        set(value) { entities = value.toMutableList()}
     
     /**
      * @return the optional "true" (custom) event timestamp
@@ -39,14 +56,14 @@ abstract class AbstractEvent : Event {
     // Builder methods
 
     /** Adds a list of context entities to the existing ones. */
-    fun entities(entities: List<SelfDescribingJson>?): AbstractEvent {
-        entities?.let { customContexts.addAll(entities) }
+    fun entities(entities: List<SelfDescribingJson>): AbstractEvent {
+        this.entities.addAll(entities)
         return this
     }
 
     /** Adds a list of context entities to the existing ones. */
     @Deprecated("Old nomenclature.", ReplaceWith("entities()"))
-    fun contexts(contexts: List<SelfDescribingJson>?): AbstractEvent {
+    fun contexts(contexts: List<SelfDescribingJson>): AbstractEvent {
         return entities(contexts)
     }
 
@@ -56,24 +73,6 @@ abstract class AbstractEvent : Event {
         return this
     }
     
-    // Public methods
-    
-    /**
-     * @return the event custom context entities
-     */
-    override val entities: MutableList<SelfDescribingJson>
-        get() {
-            if (isProcessing) {
-                entitiesForProcessing?.let {
-                    return (customContexts + it).toMutableList()
-                }
-            }
-            return customContexts
-        }
-
-    @Deprecated("Old nomenclature", ReplaceWith("entities"))
-    override val contexts: List<SelfDescribingJson>
-        get() = entities
 
     private var isProcessing = false
     override fun beginProcessing(tracker: Tracker) {
