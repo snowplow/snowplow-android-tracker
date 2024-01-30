@@ -72,8 +72,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))
@@ -107,8 +107,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))
@@ -141,8 +141,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))

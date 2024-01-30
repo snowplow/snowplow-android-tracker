@@ -222,8 +222,8 @@ class EventSendingTest {
             ns,
             "myAppId",
             null,
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            trackerBuilder
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            builder = trackerBuilder
         )
         emitter.eventStore.removeAllEvents()
         return tracker!!

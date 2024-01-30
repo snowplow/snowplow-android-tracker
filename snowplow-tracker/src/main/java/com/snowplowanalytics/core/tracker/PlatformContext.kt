@@ -21,6 +21,7 @@ import com.snowplowanalytics.core.utils.Util.addToMap
 import com.snowplowanalytics.core.utils.Util.mapHasKeys
 import com.snowplowanalytics.snowplow.configuration.PlatformContextProperty
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
+import com.snowplowanalytics.snowplow.tracker.PlatformContextRetriever
 
 /**
  * PlatformContext manages device information that is sent as context along with events.
@@ -29,13 +30,17 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * @param platformDictUpdateFrequency Minimal gap between subsequent updates of mobile platform information in milliseconds
  * @param networkDictUpdateFrequency Minimal gap between subsequent updates of network platform information in milliseconds
  * @param deviceInfoMonitor Device monitor for fetching platform information
+ * @param properties List of properties of the platform context to track
+ * @param retriever Overrides for retrieving property values
+ * @param context Android context
  */
 class PlatformContext(
-    private val platformDictUpdateFrequency: Long,
-    private val networkDictUpdateFrequency: Long,
-    private val deviceInfoMonitor: DeviceInfoMonitor,
-    private val platformContextProperties: List<PlatformContextProperty>?,
-    private val context: Context
+    private val platformDictUpdateFrequency: Long = 1000,
+    private val networkDictUpdateFrequency: Long = (10 * 1000).toLong(),
+    private val deviceInfoMonitor: DeviceInfoMonitor = DeviceInfoMonitor(),
+    private val properties: List<PlatformContextProperty>? = null,
+    private val retriever: PlatformContextRetriever = PlatformContextRetriever(),
+    private val context: Context,
 ) {
     private val pairs: MutableMap<String, Any> = HashMap()
     private var lastUpdatedEphemeralPlatformDict: Long = 0
@@ -44,14 +49,6 @@ class PlatformContext(
     init {
         setPlatformDict()
     }
-
-    /**
-     * Initializes PlatformContext with default update intervals – 1s for updating platform information and 10s for updating network information.
-     *
-     * @param context the Android context
-     */
-    constructor(platformContextProperties: List<PlatformContextProperty>?,
-                context: Context) : this(1000, (10 * 1000).toLong(), DeviceInfoMonitor(), platformContextProperties, context)
 
     fun getMobileContext(userAnonymisation: Boolean): SelfDescribingJson? {
         updateEphemeralDictsIfNecessary()
@@ -90,41 +87,40 @@ class PlatformContext(
     }
 
     private fun setPlatformDict() {
-        addToMap(Parameters.OS_TYPE, deviceInfoMonitor.osType, pairs)
-        addToMap(Parameters.OS_VERSION, deviceInfoMonitor.osVersion, pairs)
-        addToMap(Parameters.DEVICE_MODEL, deviceInfoMonitor.deviceModel, pairs)
-        addToMap(Parameters.DEVICE_MANUFACTURER, deviceInfoMonitor.deviceVendor, pairs)
+        addToMap(Parameters.OS_TYPE, fromRetrieverOr(retriever.osType) { deviceInfoMonitor.osType }, pairs)
+        addToMap(Parameters.OS_VERSION, fromRetrieverOr(retriever.osVersion) { deviceInfoMonitor.osVersion }, pairs)
+        addToMap(Parameters.DEVICE_MODEL, fromRetrieverOr(retriever.deviceModel) { deviceInfoMonitor.deviceModel }, pairs)
+        addToMap(Parameters.DEVICE_MANUFACTURER, fromRetrieverOr(retriever.deviceVendor) { deviceInfoMonitor.deviceVendor }, pairs)
         // Carrier
         if (shouldTrack(PlatformContextProperty.CARRIER)) {
             addToMap(
-                Parameters.CARRIER, deviceInfoMonitor.getCarrier(
-                    context
-                ), pairs
+                Parameters.CARRIER, fromRetrieverOr(retriever.carrier) { deviceInfoMonitor.getCarrier(context) },
+                pairs
             )
         }
         // Physical memory
         if (shouldTrack(PlatformContextProperty.PHYSICAL_MEMORY)) {
             addToMap(
-                Parameters.PHYSICAL_MEMORY, deviceInfoMonitor.getPhysicalMemory(
-                    context
-                ), pairs
+                Parameters.PHYSICAL_MEMORY,
+                fromRetrieverOr(retriever.physicalMemory) { deviceInfoMonitor.getPhysicalMemory(context) },
+                pairs
             )
         }
         // Total storage
         if (shouldTrack(PlatformContextProperty.TOTAL_STORAGE)) {
-            addToMap(Parameters.TOTAL_STORAGE, deviceInfoMonitor.totalStorage, pairs)
+            addToMap(Parameters.TOTAL_STORAGE, fromRetrieverOr(retriever.totalStorage) { deviceInfoMonitor.totalStorage }, pairs)
         }
         // Resolution
         if (shouldTrack(PlatformContextProperty.RESOLUTION)) {
-            addToMap(Parameters.MOBILE_RESOLUTION, deviceInfoMonitor.getResolution(context), pairs)
+            addToMap(Parameters.MOBILE_RESOLUTION, fromRetrieverOr(retriever.resolution) { deviceInfoMonitor.getResolution(context) }, pairs)
         }
         // Scale
         if (shouldTrack(PlatformContextProperty.SCALE)) {
-            addToMap(Parameters.MOBILE_SCALE, deviceInfoMonitor.getScale(context), pairs)
+            addToMap(Parameters.MOBILE_SCALE, fromRetrieverOr(retriever.scale) { deviceInfoMonitor.getScale(context) }, pairs)
         }
         // Language
         if (shouldTrack(PlatformContextProperty.LANGUAGE)) {
-            addToMap(Parameters.MOBILE_LANGUAGE, deviceInfoMonitor.language?.take(8), pairs)
+            addToMap(Parameters.MOBILE_LANGUAGE, (fromRetrieverOr(retriever.language) { deviceInfoMonitor.language })?.take(8), pairs)
         }
 
         setEphemeralPlatformDict()
@@ -140,9 +136,9 @@ class PlatformContext(
             val currentIdfa = pairs[Parameters.ANDROID_IDFA]
             if (currentIdfa == null || currentIdfa.toString().isEmpty()) {
                 addToMap(
-                    Parameters.ANDROID_IDFA, deviceInfoMonitor.getAndroidIdfa(
-                        context
-                    ), pairs
+                    Parameters.ANDROID_IDFA,
+                    fromRetrieverOr(retriever.androidIdfa) { deviceInfoMonitor.getAndroidIdfa(context) },
+                    pairs
                 )
             }
         }
@@ -150,29 +146,25 @@ class PlatformContext(
         val trackBatState = shouldTrack(PlatformContextProperty.BATTERY_STATE)
         val trackBatLevel = shouldTrack(PlatformContextProperty.BATTERY_LEVEL)
         if (trackBatState || trackBatLevel) {
-            val batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(
-                context
-            )
-            if (batteryInfo != null) {
-                if (trackBatState) { addToMap(Parameters.BATTERY_STATE, batteryInfo.first, pairs) }
-                if (trackBatLevel) { addToMap(Parameters.BATTERY_LEVEL, batteryInfo.second, pairs) }
-            }
+            val batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(context)
+            if (trackBatState) { addToMap(Parameters.BATTERY_STATE, fromRetrieverOr(retriever.batteryState) { batteryInfo?.first }, pairs) }
+            if (trackBatLevel) { addToMap(Parameters.BATTERY_LEVEL, fromRetrieverOr(retriever.batteryLevel) { batteryInfo?.second }, pairs) }
         }
         // Memory
         if (shouldTrack(PlatformContextProperty.SYSTEM_AVAILABLE_MEMORY)) {
             addToMap(
-                Parameters.SYSTEM_AVAILABLE_MEMORY, deviceInfoMonitor.getSystemAvailableMemory(
-                    context
-                ), pairs
+                Parameters.SYSTEM_AVAILABLE_MEMORY,
+                fromRetrieverOr(retriever.systemAvailableMemory) { deviceInfoMonitor.getSystemAvailableMemory(context) },
+                pairs
             )
         }
         // Storage
         if (shouldTrack(PlatformContextProperty.AVAILABLE_STORAGE)) {
-            addToMap(Parameters.AVAILABLE_STORAGE, deviceInfoMonitor.availableStorage, pairs)
+            addToMap(Parameters.AVAILABLE_STORAGE, fromRetrieverOr(retriever.availableStorage) { deviceInfoMonitor.availableStorage }, pairs)
         }
         // Is portrait
         if (shouldTrack(PlatformContextProperty.IS_PORTRAIT)) {
-            addToMap(Parameters.IS_PORTRAIT, deviceInfoMonitor.getIsPortrait(context), pairs)
+            addToMap(Parameters.IS_PORTRAIT, fromRetrieverOr(retriever.isPortrait) { deviceInfoMonitor.getIsPortrait(context) }, pairs)
         }
     }
 
@@ -187,14 +179,14 @@ class PlatformContext(
         if (trackType) {
             addToMap(
                 Parameters.NETWORK_TYPE,
-                deviceInfoMonitor.getNetworkType(networkInfo),
+                fromRetrieverOr(retriever.networkType) { deviceInfoMonitor.getNetworkType(networkInfo) },
                 pairs
             )
         }
         if (trackTech) {
             addToMap(
                 Parameters.NETWORK_TECHNOLOGY,
-                deviceInfoMonitor.getNetworkTechnology(networkInfo),
+                fromRetrieverOr(retriever.networkTechnology) { deviceInfoMonitor.getNetworkTechnology(networkInfo) },
                 pairs
             )
         }
@@ -215,29 +207,45 @@ class PlatformContext(
             TrackerConstants.SNOWPLOW_GENERAL_VARS,
             Context.MODE_PRIVATE
         )
-        val appSetId = generalPref.getString(Parameters.APP_SET_ID, null)
-        val appSetIdScope = generalPref.getString(Parameters.APP_SET_ID_SCOPE, null)
+        val appSetId = fromRetrieverOr(retriever.appSetId) { generalPref.getString(Parameters.APP_SET_ID, null) }
+        val appSetIdScope = fromRetrieverOr(retriever.appSetIdScope) { generalPref.getString(Parameters.APP_SET_ID_SCOPE, null) }
 
         if (appSetId != null && appSetIdScope != null) {
             if (trackId) { addToMap(Parameters.APP_SET_ID, appSetId, pairs) }
             if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, appSetIdScope, pairs) }
         } else {
             Executor.execute(TAG) {
-                deviceInfoMonitor.getAppSetIdAndScope(context)?.let {
-                    if (trackId) { addToMap(Parameters.APP_SET_ID, it.first, pairs) }
-                    if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, it.second, pairs) }
+                val preferences = generalPref.edit()
+                var edited = false
 
-                    generalPref.edit()
-                        .putString(Parameters.APP_SET_ID, it.first)
-                        .putString(Parameters.APP_SET_ID_SCOPE, it.second)
-                        .apply()
+                val appSetIdAndScope = deviceInfoMonitor.getAppSetIdAndScope(context)
+                val id = fromRetrieverOr(retriever.appSetId) {
+                    val id = appSetIdAndScope?.first
+                    preferences.putString(Parameters.APP_SET_ID, id)
+                    edited = true
+                    id
                 }
+                val scope = fromRetrieverOr(retriever.appSetIdScope) {
+                    val scope = appSetIdAndScope?.second
+                    preferences.putString(Parameters.APP_SET_ID_SCOPE, scope)
+                    edited = true
+                    scope
+                }
+
+                if (trackId) { addToMap(Parameters.APP_SET_ID, id, pairs) }
+                if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, scope, pairs) }
+
+                if (edited) { preferences.apply() }
             }
         }
     }
 
     private fun shouldTrack(property: PlatformContextProperty): Boolean {
-        return platformContextProperties?.contains(property) ?: true
+        return properties?.contains(property) ?: true
+    }
+
+    private fun <T> fromRetrieverOr(f1: (() -> T)?, f2: () -> T): T {
+        return if (f1 == null) { f2() } else { f1.invoke() }
     }
 
     companion object {

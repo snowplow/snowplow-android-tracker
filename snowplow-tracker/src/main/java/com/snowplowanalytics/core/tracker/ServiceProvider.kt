@@ -302,12 +302,13 @@ class ServiceProvider(
         }
         
         val tracker = Tracker(
-            emitter,
-            namespace,
-            trackerConfiguration.appId,
-            trackerConfiguration.platformContextProperties,
-            context,
-            builder
+            emitter = emitter,
+            namespace = namespace,
+            appId = trackerConfiguration.appId,
+            platformContextProperties = trackerConfiguration.platformContextProperties,
+            platformContextRetriever = trackerConfiguration.platformContextRetriever,
+            context = context,
+            builder = builder
         )
         
         if (trackerConfiguration.isPaused) {

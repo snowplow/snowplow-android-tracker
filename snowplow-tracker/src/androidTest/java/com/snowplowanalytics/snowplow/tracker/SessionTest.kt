@@ -218,7 +218,7 @@ class SessionTest {
             tracker.foregroundTimeout = 100
             tracker.backgroundTimeout = 2
         }
-        val tracker = Tracker(emitter, "tracker", "app", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "tracker", "app", context = context, builder = trackerBuilder)
         val session = tracker.session
         
         getSessionContext(session, "event_1", timestamp, false)
@@ -257,7 +257,7 @@ class SessionTest {
             tracker.foregroundTimeout = 100
             tracker.backgroundTimeout = 2
         }
-        val tracker = Tracker(emitter, "tracker", "app", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "tracker", "app", context = context, builder = trackerBuilder)
         val session = tracker.session
         getSessionContext(session, "event_1", timestamp, false)
         var sessionState = session!!.state
@@ -338,8 +338,8 @@ class SessionTest {
             tracker.foregroundTimeout = 20
             tracker.backgroundTimeout = 20
         }
-        val tracker1 = Tracker(emitter, "tracker1", "app", null, context, trackerBuilder)
-        val tracker2 = Tracker(emitter, "tracker2", "app", null, context, trackerBuilder)
+        val tracker1 = Tracker(emitter, "tracker1", "app", context = context, builder = trackerBuilder)
+        val tracker2 = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
         val session1 = tracker1.session
         val session2 = tracker2.session
         session1!!.getSessionContext("session1-fake-id1", timestamp, false)
@@ -364,7 +364,7 @@ class SessionTest {
         val id2 = session2.state!!.sessionId
 
         // Recreate tracker2
-        val tracker2b = Tracker(emitter, "tracker2", "app", null, context, trackerBuilder)
+        val tracker2b = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
         tracker2b.session!!.getSessionContext("session2b-fake-id3", timestamp, false)
         val initialValue2b = tracker2b.session!!.sessionIndex?.toLong()
         val previousId2b = tracker2b.session!!.state!!.previousSessionId
