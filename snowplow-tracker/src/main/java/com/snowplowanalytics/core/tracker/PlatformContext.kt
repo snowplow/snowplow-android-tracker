@@ -32,6 +32,7 @@ import com.snowplowanalytics.snowplow.tracker.PlatformContextRetriever
  * @param deviceInfoMonitor Device monitor for fetching platform information
  * @param properties List of properties of the platform context to track
  * @param retriever Overrides for retrieving property values
+ * @param context Android context
  */
 class PlatformContext(
     private val platformDictUpdateFrequency: Long = 1000,

@@ -52,6 +52,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @param emitter Emitter to which events will be sent
  * @param namespace Identifier for the Tracker instance
  * @param appId Application ID
+ * @param platformContextProperties List of properties of the platform context to track
+ * @param platformContextRetriever Overrides for retrieving property values
  * @param context The Android application context
  * @param builder A closure to set Tracker configuration
  */
