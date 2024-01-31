@@ -125,6 +125,7 @@ class StateManagerTest {
             tracker.screenContext = true
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
+            tracker.lifecycleAutotracking = false
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
@@ -294,6 +295,7 @@ class StateManagerTest {
             tracker.base64Encoded = false
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
+            tracker.lifecycleAutotracking = false
         }
         val tracker = Tracker(emitter, "namespace", "appId", context = context, builder = trackerBuilder)
 
