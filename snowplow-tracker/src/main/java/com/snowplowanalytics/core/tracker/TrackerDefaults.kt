@@ -22,7 +22,6 @@ object TrackerDefaults {
     var logLevel = LogLevel.OFF
     var foregroundTimeout: Long = 1800 // 30 minutes
     var backgroundTimeout: Long = 1800 // 30 minutes
-    var threadCount = 10
     var timeUnit = TimeUnit.SECONDS
     var sessionContext = true
     var geoLocationContext = false
