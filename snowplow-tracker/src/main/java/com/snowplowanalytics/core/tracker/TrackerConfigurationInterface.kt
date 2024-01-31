@@ -89,7 +89,8 @@ interface TrackerConfigurationInterface {
 
     /**
      * Whether enable automatic tracking of background and foreground transitions.
-     * @apiNote It needs the Foreground library installed.
+     * Enabled by default.
+     * @apiNote It needs the androidx.lifecycle-extensions library installed.
      */
     var lifecycleAutotracking: Boolean
 

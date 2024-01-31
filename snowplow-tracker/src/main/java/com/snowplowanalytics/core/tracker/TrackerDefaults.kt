@@ -32,7 +32,7 @@ object TrackerDefaults {
     var applicationContext = true
     var exceptionAutotracking = true
     var diagnosticAutotracking = false
-    var lifecycleAutotracking = false
+    var lifecycleAutotracking = true
     var screenViewAutotracking = true
     var screenEngagementAutotracking = true
     var installAutotracking = true
