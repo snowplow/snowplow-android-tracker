@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -33,24 +33,24 @@ class EmitterTest {
     @Test
     fun testHttpMethodSet() {
         var builder = { emitter: Emitter -> emitter.httpMethod = HttpMethod.GET }
-        var emitter = Emitter(context, "com.acme", builder)
+        var emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(HttpMethod.GET, emitter.httpMethod)
         builder = { emitter1: Emitter -> emitter1.httpMethod = HttpMethod.POST }
-        emitter = Emitter(context, "com.acme", builder)
+        emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(HttpMethod.POST, emitter.httpMethod)
     }
 
     @Test
     fun testBufferOptionSet() {
         var builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        var emitter = Emitter(context, "com.acme", builder)
+        var emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(BufferOption.Single, emitter.bufferOption)
-        builder = { emitter1: Emitter -> emitter1.bufferOption = BufferOption.DefaultGroup }
-        emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(BufferOption.DefaultGroup, emitter.bufferOption)
-        builder = { emitter2: Emitter -> emitter2.bufferOption = BufferOption.HeavyGroup }
-        emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        builder = { emitter1: Emitter -> emitter1.bufferOption = BufferOption.SmallGroup }
+        emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
+        Assert.assertEquals(BufferOption.SmallGroup, emitter.bufferOption)
+        builder = { emitter2: Emitter -> emitter2.bufferOption = BufferOption.LargeGroup }
+        emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
     }
 
     @Test
@@ -61,7 +61,7 @@ class EmitterTest {
                 override fun onFailure(successCount: Int, failureCount: Int) {}
             }
         }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertNotNull(emitter.requestCallback)
     }
 
@@ -73,76 +73,76 @@ class EmitterTest {
             emitter.httpMethod = HttpMethod.GET
             emitter.requestSecurity = Protocol.HTTP
         }
-        var emitter = Emitter(context, uri, builder)
+        var emitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertEquals("http://$uri/i", emitter.emitterUri)
         builder = { emitter1: Emitter ->
-            emitter1.bufferOption = BufferOption.DefaultGroup
+            emitter1.bufferOption = BufferOption.SmallGroup
             emitter1.httpMethod = HttpMethod.POST
             emitter1.requestSecurity = Protocol.HTTP
         }
-        emitter = Emitter(context, uri, builder)
+        emitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertEquals(
             "http://$uri/com.snowplowanalytics.snowplow/tp2",
             emitter.emitterUri
         )
         builder = { emitter2: Emitter ->
-            emitter2.bufferOption = BufferOption.DefaultGroup
+            emitter2.bufferOption = BufferOption.SmallGroup
             emitter2.httpMethod = HttpMethod.GET
             emitter2.requestSecurity = Protocol.HTTPS
         }
-        emitter = Emitter(context, uri, builder)
+        emitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertEquals("https://$uri/i", emitter.emitterUri)
         builder = { emitter3: Emitter ->
-            emitter3.bufferOption = BufferOption.DefaultGroup
+            emitter3.bufferOption = BufferOption.SmallGroup
             emitter3.httpMethod = HttpMethod.POST
             emitter3.requestSecurity = Protocol.HTTPS
         }
-        emitter = Emitter(context, uri, builder)
+        emitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertEquals("https://$uri/com.snowplowanalytics.snowplow/tp2", emitter.emitterUri)
     }
 
     @Test
     fun testSecuritySet() {
         var builder = { emitter: Emitter -> emitter.requestSecurity = Protocol.HTTP }
-        var emitter = Emitter(context, "com.acme", builder)
+        var emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(Protocol.HTTP, emitter.requestSecurity)
         builder = { emitter1: Emitter -> emitter1.requestSecurity = Protocol.HTTPS }
-        emitter = Emitter(context, "com.acme", builder)
+        emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(Protocol.HTTPS, emitter.requestSecurity)
     }
 
     @Test
     fun testTickSet() {
         val builder = { emitter: Emitter -> emitter.emitterTick = 0 }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(0, emitter.emitterTick.toLong())
     }
 
     @Test
     fun testEmptyLimitSet() {
         val builder = { emitter: Emitter -> emitter.emptyLimit = 0 }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(0, emitter.emptyLimit.toLong())
     }
 
     @Test
     fun testSendLimitSet() {
-        val builder = { emitter: Emitter -> emitter.sendLimit = 200 }
-        val emitter = Emitter(context, "com.acme", builder)
-        Assert.assertEquals(200, emitter.sendLimit.toLong())
+        val builder = { emitter: Emitter -> emitter.emitRange = 200 }
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
+        Assert.assertEquals(200, emitter.emitRange.toLong())
     }
 
     @Test
     fun testByteLimitGetSet() {
         val builder = { emitter: Emitter -> emitter.byteLimitGet = 20000 }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(20000, emitter.byteLimitGet)
     }
 
     @Test
     fun testByteLimitPostSet() {
         val builder = { emitter: Emitter -> emitter.byteLimitPost = 25000 }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         Assert.assertEquals(25000, emitter.byteLimitPost)
     }
 
@@ -156,13 +156,12 @@ class EmitterTest {
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 250
             emitter.emptyLimit = 5
-            emitter.sendLimit = 200
+            emitter.emitRange = 200
             emitter.byteLimitGet = 20000
             emitter.byteLimitPost = 25000
-            emitter.eventStore = MockEventStore()
             emitter.timeUnit = TimeUnit.MILLISECONDS
         }
-        val emitter = Emitter(context, uri, builder)
+        val emitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertFalse(emitter.emitterStatus)
         Assert.assertEquals(BufferOption.Single, emitter.bufferOption)
         Assert.assertEquals("http://$uri/com.snowplowanalytics.snowplow/tp2", emitter.emitterUri)
@@ -173,8 +172,8 @@ class EmitterTest {
         Assert.assertEquals("https://$uri/i", emitter.emitterUri)
         emitter.emitterUri = "com.acme"
         Assert.assertEquals("https://com.acme/i", emitter.emitterUri)
-        emitter.bufferOption = BufferOption.HeavyGroup
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        emitter.bufferOption = BufferOption.LargeGroup
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
         emitter.flush()
         emitter.flush()
         Thread.sleep(500)
@@ -189,8 +188,8 @@ class EmitterTest {
             "https://com.foo/com.snowplowanalytics.snowplow/tp2",
             emitter.emitterUri
         )
-        emitter.bufferOption = BufferOption.DefaultGroup
-        Assert.assertEquals(BufferOption.HeavyGroup, emitter.bufferOption)
+        emitter.bufferOption = BufferOption.SmallGroup
+        Assert.assertEquals(BufferOption.LargeGroup, emitter.bufferOption)
         emitter.shutdown()
         builder = { emitter1: Emitter ->
             emitter1.bufferOption = BufferOption.Single
@@ -198,14 +197,13 @@ class EmitterTest {
             emitter1.requestSecurity = Protocol.HTTP
             emitter1.emitterTick = 250
             emitter1.emptyLimit = 5
-            emitter1.sendLimit = 200
+            emitter1.emitRange = 200
             emitter1.byteLimitGet = 20000
-            emitter1.byteLimitPost = 25000
-            emitter1.eventStore = MockEventStore()
+            emitter1.byteLimitPost = 50000
             emitter1.timeUnit = TimeUnit.MILLISECONDS
             emitter1.customPostPath = "com.acme.company/tpx"
         }
-        val customPathEmitter = Emitter(context, uri, builder)
+        val customPathEmitter = Emitter("ns", MockEventStore(), context, uri, builder)
         Assert.assertEquals("com.acme.company/tpx", customPathEmitter.customPostPath)
         Assert.assertEquals("http://$uri/com.acme.company/tpx", customPathEmitter.emitterUri)
         customPathEmitter.shutdown()
@@ -237,7 +235,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         emitter.flush()
     }
 
@@ -255,7 +253,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertFalse(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(1, emitter.eventStore!!.size())
+        Assert.assertEquals(1, emitter.eventStore.size())
         emitter.flush()
     }
 
@@ -272,7 +270,7 @@ class EmitterTest {
             Thread.sleep(600)
             i++
         }
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         var totEvents = 0
         for (results in networkConnection.previousResults) {
             for (result in results) {
@@ -297,7 +295,7 @@ class EmitterTest {
             Thread.sleep(600)
             i++
         }
-        Assert.assertEquals(2, emitter.eventStore!!.size())
+        Assert.assertEquals(2, emitter.eventStore.size())
         for (results in networkConnection.previousResults) {
             for (result in results) {
                 Assert.assertFalse(result.isSuccessful)
@@ -321,7 +319,7 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         emitter.flush()
     }
 
@@ -337,7 +335,7 @@ class EmitterTest {
         Assert.assertEquals(false, emitter.emitterStatus)
         Assert.assertEquals(0, networkConnection.sendingCount().toLong())
         Assert.assertEquals(0, networkConnection.previousResults.size.toLong())
-        Assert.assertEquals(1, emitter.eventStore!!.size())
+        Assert.assertEquals(1, emitter.eventStore.size())
         
         emitter.resumeEmit()
         var i = 0
@@ -348,15 +346,14 @@ class EmitterTest {
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertEquals(1, networkConnection.previousResults[0].size.toLong())
         Assert.assertTrue(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         emitter.flush()
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun testUpdatesNetworkConnectionWhileRunning() {
-        val builder = { emitter: Emitter -> emitter.eventStore = MockEventStore() }
-        val emitter = Emitter(context, "com.acme", builder)
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme")
         emitter.flush()
         Thread.sleep(100)
         Assert.assertTrue(emitter.emitterStatus) // is running
@@ -378,7 +375,7 @@ class EmitterTest {
         }
         Assert.assertEquals(1, networkConnection.previousResults.size.toLong())
         Assert.assertFalse(networkConnection.previousResults[0][0].isSuccessful)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         emitter.flush()
     }
 
@@ -395,14 +392,14 @@ class EmitterTest {
         // no events in queue since they were dropped because retrying is disabled for 500
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
         
         networkConnection.statusCode = 403
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
 
         // event still in queue because retrying is enabled for 403
-        Assert.assertEquals(1, emitter.eventStore!!.size())
+        Assert.assertEquals(1, emitter.eventStore.size())
         Assert.assertEquals(2, networkConnection.previousResults.size.toLong())
         emitter.flush()
     }
@@ -417,33 +414,112 @@ class EmitterTest {
         // no events in queue since they were dropped because retrying is disabled
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
-        Assert.assertEquals(0, emitter.eventStore!!.size())
+        Assert.assertEquals(0, emitter.eventStore.size())
 
         emitter.retryFailedRequests = true
         emitter.add(generatePayloads(1)[0])
         Thread.sleep(1000)
 
         // event still in queue because retrying is enabled
-        Assert.assertEquals(1, emitter.eventStore!!.size())
+        Assert.assertEquals(1, emitter.eventStore.size())
         Assert.assertEquals(2, networkConnection.previousResults.size.toLong())
         emitter.flush()
     }
 
+    @Test
+    fun testDoesntMakeRequestUnlessBufferSizeIsReached() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        val emitter = getEmitter(networkConnection, BufferOption.SmallGroup)
+
+        for (payload in generatePayloads(9)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(1000)
+
+        // all events waiting in queue
+        Assert.assertEquals(0, networkConnection.previousResults.size)
+        Assert.assertEquals(9, emitter.eventStore.size())
+
+        emitter.add(generatePayloads(1)[0])
+        Thread.sleep(1000)
+
+        // all events sent
+        Assert.assertEquals(0, emitter.eventStore.size())
+        Assert.assertEquals(1, networkConnection.previousResults.size)
+        emitter.flush()
+    }
+
+    @Test
+    fun testNumberOfRequestsMatchesEmitRangeAndOversize() {
+        val networkConnection = MockNetworkConnection(HttpMethod.POST, 200)
+        val emitter = getEmitter(networkConnection, BufferOption.Single)
+        emitter.emitRange = 20
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(20)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(20, emitter.eventStore.size())
+        emitter.resumeEmit()
+        Thread.sleep(500)
+
+        // made a single request
+        Assert.assertEquals(1, networkConnection.sendingCount())
+        Assert.assertEquals(1, networkConnection.previousResults.first().size)
+
+        networkConnection.clear()
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(40)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(40, emitter.eventStore.size())
+        emitter.resumeEmit()
+
+        Thread.sleep(500)
+
+        // made two requests one after the other
+        Assert.assertEquals(2, networkConnection.sendingCount())
+        Assert.assertEquals(1, networkConnection.previousResults.map { it.size }.max())
+
+        networkConnection.clear()
+
+        // test with oversize requests
+        emitter.byteLimitPost = 5
+
+        emitter.pauseEmit()
+        for (payload in generatePayloads(2)) {
+            emitter.add(payload)
+        }
+        Thread.sleep(500)
+        Assert.assertEquals(2, emitter.eventStore.size())
+        emitter.resumeEmit()
+
+        Thread.sleep(500)
+
+        // made two requests at once
+        Assert.assertEquals(1, networkConnection.sendingCount())
+        Assert.assertEquals(2, networkConnection.previousResults.first().size)
+
+        emitter.flush()
+    }
+
     // Emitter Builder
-    private fun getEmitter(networkConnection: NetworkConnection?, option: BufferOption?): Emitter {
+    private fun getEmitter(networkConnection: NetworkConnection, option: BufferOption): Emitter {
         val builder = { emitter: Emitter ->
             emitter.networkConnection = networkConnection
-            emitter.bufferOption = option!!
+            emitter.bufferOption = option
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
-            emitter.sendLimit = 200
+            emitter.emitRange = 200
             emitter.byteLimitGet = 20000
             emitter.byteLimitPost = 25000
-            emitter.eventStore = MockEventStore()
             emitter.timeUnit = TimeUnit.SECONDS
             emitter.tlsVersions = EnumSet.of(TLSVersion.TLSv1_2)
         }
-        return Emitter(context, "com.acme", builder)
+        return Emitter("ns", MockEventStore(), context, "com.acme", builder)
     }
 
     // Service methods

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -19,6 +19,7 @@ import com.snowplowanalytics.snowplow.emitter.EmitterEvent
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import java.util.ArrayList
 import java.util.HashMap
+import kotlin.time.Duration
 
 class MockEventStore : EventStore {
     var db = HashMap<Long, Payload?>()
@@ -38,7 +39,7 @@ class MockEventStore : EventStore {
         }
     }
 
-    override fun removeEvents(ids: MutableList<Long?>): Boolean {
+    override fun removeEvents(ids: MutableList<Long>): Boolean {
         var result = true
         for (id in ids) {
             val removed = removeEvent(id!!)
@@ -60,11 +61,11 @@ class MockEventStore : EventStore {
         return db.size.toLong()
     }
 
-    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
+    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent> {
         synchronized(this) {
             val eventIds: MutableList<Long> = ArrayList()
             val eventPayloads: MutableList<String> = ArrayList()
-            var events: MutableList<EmitterEvent?> = ArrayList()
+            var events: MutableList<EmitterEvent> = ArrayList()
             for ((key, value) in db) {
                 val payloadCopy: Payload = TrackerPayload()
                 payloadCopy.addMap(value!!.map)
@@ -80,5 +81,9 @@ class MockEventStore : EventStore {
             v("MockEventStore", "getEmittableEvents payloads: %s", eventPayloads)
             return events
         }
+    }
+
+    override fun removeOldEvents(maxSize: Long, maxAge: Duration) {
+        // "Not implemented in the mock event store"
     }
 }

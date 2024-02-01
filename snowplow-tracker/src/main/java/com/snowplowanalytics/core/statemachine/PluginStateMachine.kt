@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -51,6 +51,9 @@ class PluginStateMachine(
             return config.schemas ?: Collections.singletonList("*")
         }
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, state: State?): State? {
         return null
     }
@@ -69,5 +72,9 @@ class PluginStateMachine(
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
         return filterConfiguration?.closure?.apply(event)
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
+        return null
     }
 }

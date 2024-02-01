@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,7 +18,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.tracker.Logger.updateLogLevel
 import com.snowplowanalytics.core.tracker.Subject
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
-import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.util.Size
 import org.junit.Assert
 import org.junit.Test
@@ -129,6 +128,14 @@ class SubjectTest {
         Assert.assertNull(subject.getSubject(true)["duid"])
         Assert.assertNull(subject.getSubject(true)["tnuid"])
         Assert.assertNull(subject.getSubject(true)["ip"])
+    }
+
+    @Test
+    fun testSetsScreenResolutionAutomaticaly() {
+        val subject = createSubject()
+        Assert.assertNotNull(subject.screenResolution)
+        Assert.assertTrue((subject.screenResolution?.width ?: 0) > 0)
+        Assert.assertTrue((subject.screenResolution?.height ?: 0) > 0)
     }
 
     // Helper Methods

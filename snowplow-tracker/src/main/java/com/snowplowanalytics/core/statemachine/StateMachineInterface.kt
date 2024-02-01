@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,12 +18,14 @@ import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
 interface StateMachineInterface {
     val identifier: String
+    val subscribedEventSchemasForEventsBefore: List<String>
     val subscribedEventSchemasForTransitions: List<String>
     val subscribedEventSchemasForEntitiesGeneration: List<String>
     val subscribedEventSchemasForPayloadUpdating: List<String>
     val subscribedEventSchemasForAfterTrackCallback: List<String>
     val subscribedEventSchemasForFiltering: List<String>
 
+    fun eventsBefore(event: Event): List<Event>?
     fun transition(event: Event, state: State?): State?
     fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>?
     fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>?

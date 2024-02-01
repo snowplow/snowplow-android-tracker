@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -295,9 +295,7 @@ public class Demo extends Activity implements LoggerDelegate {
         NetworkConfiguration networkConfiguration = new NetworkConfiguration(uri, method);
         EmitterConfiguration emitterConfiguration = new EmitterConfiguration()
                 .requestCallback(getRequestCallback())
-                .bufferOption(BufferOption.DefaultGroup)
                 .threadPoolSize(20)
-                .emitRange(500)
                 .byteLimitPost(52000);
         TrackerConfiguration trackerConfiguration = new TrackerConfiguration(appId)
                 .logLevel(LogLevel.VERBOSE)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -22,7 +22,6 @@ object TrackerDefaults {
     var logLevel = LogLevel.OFF
     var foregroundTimeout: Long = 1800 // 30 minutes
     var backgroundTimeout: Long = 1800 // 30 minutes
-    var threadCount = 10
     var timeUnit = TimeUnit.SECONDS
     var sessionContext = true
     var geoLocationContext = false
@@ -32,8 +31,9 @@ object TrackerDefaults {
     var applicationContext = true
     var exceptionAutotracking = true
     var diagnosticAutotracking = false
-    var lifecycleAutotracking = false
+    var lifecycleAutotracking = true
     var screenViewAutotracking = true
+    var screenEngagementAutotracking = true
     var installAutotracking = true
     var userAnonymisation = false
 }

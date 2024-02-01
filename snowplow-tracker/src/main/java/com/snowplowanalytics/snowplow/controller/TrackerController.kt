@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -12,6 +12,8 @@
  */
 package com.snowplowanalytics.snowplow.controller
 
+import android.net.Uri
+import com.snowplowanalytics.snowplow.tracker.CrossDeviceParameterConfiguration
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.snowplow.ecommerce.EcommerceController
 import com.snowplowanalytics.snowplow.event.Event
@@ -116,4 +118,23 @@ interface TrackerController : TrackerConfigurationInterface {
      * The tracker will start tracking again.
      */
     fun resume()
+
+    /**
+     * Adds user and session information to a URI.
+     *
+     * For example, calling decorateLink on `appSchema://path/to/page` with all extended parameters enabled will return:
+     *
+     *  `appSchema://path/to/page?_sp=domainUserId.timestamp.sessionId.subjectUserId.sourceId.platform.reason`
+     *
+     *  @param uri The URI to add the query string to
+     *  @param extendedParameters Any optional parameters to include in the query string.
+     *
+     *  @return Optional URL
+     *      - null if [SessionController.userId] is null from `sessionContext(false)` being passed in [TrackerConfiguration]
+     *      - otherwise, decorated URL
+     */
+    fun decorateLink(
+        uri: Uri,
+        extendedParameters: CrossDeviceParameterConfiguration? = null
+    ): Uri?
 }

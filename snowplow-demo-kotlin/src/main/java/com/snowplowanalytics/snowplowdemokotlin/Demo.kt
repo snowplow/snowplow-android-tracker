@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -260,9 +260,8 @@ class Demo : Activity(), LoggerDelegate {
         val networkConfiguration = NetworkConfiguration(uri, method)
         val emitterConfiguration = EmitterConfiguration()
             .requestCallback(requestCallback)
-            .bufferOption(BufferOption.DefaultGroup)
+            .bufferOption(BufferOption.SmallGroup)
             .threadPoolSize(20)
-            .emitRange(500)
             .byteLimitPost(52000)
         val trackerConfiguration = TrackerConfiguration(appId)
             .logLevel(LogLevel.VERBOSE)

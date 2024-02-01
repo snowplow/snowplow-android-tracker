@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.screenviews
 
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.constants.Parameters
@@ -34,8 +34,8 @@ class ScreenState : State {
     private var transitionType: String? = null
     private var fragmentClassName: String? = null
     private var fragmentTag: String? = null
-    private var activityClassName: String? = null
-    private var activityTag: String? = null
+    var activityClassName: String? = null
+    var activityTag: String? = null
 
     init {
         id = uUIDString()

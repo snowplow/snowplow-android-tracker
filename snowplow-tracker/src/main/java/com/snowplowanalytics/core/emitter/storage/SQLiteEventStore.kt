@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -25,6 +25,7 @@ import com.snowplowanalytics.snowplow.emitter.EmitterEvent
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
+import kotlin.time.Duration
 
 /**
  * Helper class for storing, getting and removing
@@ -135,7 +136,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         return retval == 1
     }
 
-    override fun removeEvents(ids: MutableList<Long?>): Boolean {
+    override fun removeEvents(ids: MutableList<Long>): Boolean {
         if (ids.isEmpty()) {
             return false
         }
@@ -161,6 +162,25 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         retval += payloadWaitingList.size
         payloadWaitingList.clear()
         return retval >= 0
+    }
+
+    override fun removeOldEvents(maxSize: Long, maxAge: Duration) {
+        if (databaseOpen) {
+            insertWaitingEventsIfReady()
+
+            database?.execSQL(
+                """
+                DELETE FROM ${EventStoreHelper.TABLE_EVENTS}
+                WHERE ${EventStoreHelper.COLUMN_ID} NOT IN (
+                    SELECT ${EventStoreHelper.COLUMN_ID}
+                    FROM ${EventStoreHelper.TABLE_EVENTS}
+                    WHERE ${EventStoreHelper.COLUMN_DATE_CREATED} >= datetime('now','-${maxAge.inWholeSeconds} seconds')
+                    ORDER BY ${EventStoreHelper.COLUMN_DATE_CREATED} DESC, ${EventStoreHelper.COLUMN_ID} DESC
+                    LIMIT $maxSize
+                )
+                """.trimIndent()
+            )
+        }
     }
 
     /**
@@ -215,12 +235,12 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         }
     }
 
-    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?> {
+    override fun getEmittableEvents(queryLimit: Int): List<EmitterEvent> {
         if (!databaseOpen) {
             return emptyList<EmitterEvent>()
         }
         insertWaitingEventsIfReady()
-        val events = ArrayList<EmitterEvent?>()
+        val events = ArrayList<EmitterEvent>()
 
         // FIFO Pattern for sending events
         for (eventMetadata in getDescEventsInRange(queryLimit)) {

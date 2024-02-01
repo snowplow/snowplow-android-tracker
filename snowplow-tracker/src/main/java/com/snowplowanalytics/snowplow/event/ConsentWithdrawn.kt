@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -104,7 +104,7 @@ class ConsentWithdrawn(all: Boolean, documentId: String, documentVersion: String
     override fun beginProcessing(tracker: Tracker) {
         for (document in documents) {
             val context = SelfDescribingJson(document.schema, document.dataPayload)
-            customContexts.add(context) // TODO: Only the user should modify the public customContexts property
+            entities.add(context)
         }
     }
 }

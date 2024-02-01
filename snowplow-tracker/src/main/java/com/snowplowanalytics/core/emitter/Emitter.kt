@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -33,12 +33,19 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.time.Duration
 
 /**
  * Build an emitter object which controls the
  * sending of events to the Snowplow Collector.
  */
-class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Unit)? = null) {
+class Emitter(
+    val namespace: String,
+    eventStore: EventStore?,
+    context: Context,
+    collectorUri: String,
+    builder: ((Emitter) -> Unit)? = null
+) {
     private val TAG = Emitter::class.java.simpleName
 
     private var builderFinished = false
@@ -85,15 +92,8 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The emitter event store object
      */
-    var eventStore: EventStore? = null
-        // if not set during Emitter initialisation (via builder),
-        // this is set as part of Tracker initialisation, as a side-effect of setting namespace
-        set(eventStore) {
-            if (field == null) {
-                field = eventStore
-            }
-        }
-    
+    val eventStore: EventStore = eventStore ?: SQLiteEventStore(context, namespace)
+
     /**
      * This configuration option is not published in the EmitterConfiguration class.
      * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure tlsVersions.
@@ -117,7 +117,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
     /**
      * The maximum amount of events to grab for an emit attempt.
      */
-    var sendLimit: Int = EmitterDefaults.sendLimit
+    var emitRange: Int = EmitterDefaults.emitRange
 
     /**
      * The GET byte limit
@@ -231,17 +231,6 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                         .build()
                 }
                 
-            }
-        }
-
-    /**
-     * Emitter namespace. NB: setting the namespace has a side-effect of creating the SQLiteEventStore
-     */
-    var namespace: String? = null
-        set(namespace) {
-            field = namespace
-            if (eventStore == null) {
-                eventStore = field?.let { SQLiteEventStore(context, it) }
             }
         }
 
@@ -372,6 +361,16 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
 
     /**
+     * Limit for the maximum number of unsent events to keep in the event store.
+     */
+    var maxEventStoreSize: Long = EmitterDefaults.maxEventStoreSize
+
+    /**
+     * Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent.
+     */
+    var maxEventStoreAge: Duration = EmitterDefaults.maxEventStoreAge
+
+    /**
      * Creates an emitter object
      */
     init {
@@ -422,9 +421,10 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
      */
     fun add(payload: Payload) {
         Executor.execute(TAG) {
-            eventStore?.add(payload)
-            if (isRunning.compareAndSet(false, true)) {
+            eventStore.add(payload)
+            if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
                 try {
+                    removeOldEvents()
                     attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
@@ -442,6 +442,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         Executor.execute(TAG) {
             if (isRunning.compareAndSet(false, true)) {
                 try {
+                    removeOldEvents()
                     attemptEmit(networkConnection)
                 } catch (t: Throwable) {
                     isRunning.set(false)
@@ -496,6 +497,10 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
     }
 
+    private fun removeOldEvents() {
+        eventStore.removeOldEvents(maxEventStoreSize, maxEventStoreAge)
+    }
+
     /**
      * Attempts to send events in the database to a collector.
      *
@@ -523,13 +528,6 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
             return
         }
         
-        if (eventStore == null) {
-            Logger.d(TAG, "No EventStore set.")
-            isRunning.compareAndSet(true, false)
-            return
-        }
-        val eventStore = eventStore ?: return
-
         if (networkConnection == null) {
             Logger.d(TAG, "No networkConnection set.")
             isRunning.compareAndSet(true, false)
@@ -554,7 +552,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         }
         
         emptyCount = 0
-        val events = eventStore.getEmittableEvents(sendLimit)
+        val events = eventStore.getEmittableEvents(emitRange)
         val requests = buildRequests(events, networkConnection.httpMethod)
         val results = networkConnection.sendRequests(requests)
         
@@ -563,7 +561,7 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
         var successCount = 0
         var failedWillRetryCount = 0
         var failedWontRetryCount = 0
-        val removableEvents: MutableList<Long?> = ArrayList()
+        val removableEvents: MutableList<Long> = ArrayList()
 
         for (res in results) {
             if (res.isSuccessful) {
@@ -637,47 +635,44 @@ class Emitter(context: Context, collectorUri: String, builder: ((Emitter) -> Uni
                 }
             }
         } else {
-            var i = 0
-            while (i < events.size) {
-                var reqEventIds: MutableList<Long> = ArrayList()
-                var postPayloadMaps: MutableList<Payload> = ArrayList()
-                
-                var j = i
-                while (j < i + bufferOption.code && j < events.size) {
-                    val event = events[j]
-                    val payload = event?.payload
-                    val eventId = event?.eventId
-                    if (payload != null && eventId != null) {
-                        addSendingTimeToPayload(payload, sendingTime)
-                        if (isOversize(payload, httpMethod)) {
-                            val request = Request(payload, eventId, true)
-                            requests.add(request)
-                        } else if (isOversize(payload, postPayloadMaps, httpMethod)) {
-                            val request = Request(postPayloadMaps, reqEventIds)
-                            requests.add(request)
+            var eventIds: MutableList<Long> = ArrayList()
+            var eventPayloads: MutableList<Payload> = ArrayList()
 
-                            // Clear collections and build a new POST
-                            postPayloadMaps = ArrayList()
-                            reqEventIds = ArrayList()
+            for (event in events) {
+                if (event == null) { continue }
+                val payload = event.payload
+                val eventId = event.eventId
+                addSendingTimeToPayload(payload, sendingTime)
 
-                            // Build and store the request
-                            postPayloadMaps.add(payload)
-                            reqEventIds.add(eventId)
-                        } else {
-                            postPayloadMaps.add(payload)
-                            reqEventIds.add(eventId)
-                        }
-                        j++
-                    }
-                    
-                }
-
-                // Check if all payloads have been processed
-                if (postPayloadMaps.isNotEmpty()) {
-                    val request = Request(postPayloadMaps, reqEventIds)
+                // Oversize event -> separate requests
+                if (isOversize(payload, httpMethod)) {
+                    val request = Request(payload, eventId, true)
                     requests.add(request)
                 }
-                i += bufferOption.code
+                // Events up to this one are oversize -> create request for them
+                else if (isOversize(payload, eventPayloads, httpMethod)) {
+                    val request = Request(eventPayloads, eventIds)
+                    requests.add(request)
+
+                    // Clear collections and build a new POST
+                    eventPayloads = ArrayList()
+                    eventIds = ArrayList()
+
+                    // Build and store the request
+                    eventPayloads.add(payload)
+                    eventIds.add(eventId)
+                }
+                // Add to the list of events for the request
+                else {
+                    eventPayloads.add(payload)
+                    eventIds.add(eventId)
+                }
+            }
+
+            // Check if there are any remaining events not in a request
+            if (eventPayloads.isNotEmpty()) {
+                val request = Request(eventPayloads, eventIds)
+                requests.add(request)
             }
         }
         return requests

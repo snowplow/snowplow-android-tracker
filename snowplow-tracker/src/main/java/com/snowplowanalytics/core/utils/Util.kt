@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -66,6 +66,17 @@ object Util {
     @JvmStatic
     fun base64Encode(string: String): String {
         return Base64.encodeToString(string.toByteArray(), Base64.NO_WRAP)
+    }
+
+    /**
+     * Encodes a string into URL-safe Base64.
+     *
+     * @param string the string to encode
+     * @return a Base64 encoded string
+     */
+    @JvmStatic
+    fun urlSafeBase64Encode(string: String): String {
+        return Base64.encodeToString(string.toByteArray(), Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
     }
 
     /**

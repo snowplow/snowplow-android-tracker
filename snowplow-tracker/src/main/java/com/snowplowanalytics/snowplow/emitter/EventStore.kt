@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,6 +13,7 @@
 package com.snowplowanalytics.snowplow.emitter
 
 import com.snowplowanalytics.snowplow.payload.Payload
+import kotlin.time.Duration
 
 /**
  * The component that persists and buffers events before sending.
@@ -36,7 +37,7 @@ interface EventStore {
      * @param ids the events' identifiers in the store.
      * @return a boolean of success to remove.
      */
-    fun removeEvents(ids: MutableList<Long?>): Boolean
+    fun removeEvents(ids: MutableList<Long>): Boolean
 
     /**
      * Empties the store of all the events.
@@ -54,5 +55,12 @@ interface EventStore {
      * Returns a list of [EmitterEvent] objects which contain events and related IDs.
      * @return EmitterEvent objects containing eventIds and event payloads.
      */
-    fun getEmittableEvents(queryLimit: Int): List<EmitterEvent?>
+    fun getEmittableEvents(queryLimit: Int): List<EmitterEvent>
+
+    /**
+     * Remove events older than `maxAge` seconds and keep only the latest `maxSize` events.
+     * @param maxSize the maximum number of events to keep.
+     * @param maxAge the maximum age of events to keep.
+     */
+    fun removeOldEvents(maxSize: Long, maxAge: Duration)
 }

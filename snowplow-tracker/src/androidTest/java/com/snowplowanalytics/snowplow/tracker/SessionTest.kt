@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -210,7 +210,7 @@ class SessionTest {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker")
         
         val emitter = Emitter(
-            context, "", null
+            "tracker", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
@@ -218,7 +218,7 @@ class SessionTest {
             tracker.foregroundTimeout = 100
             tracker.backgroundTimeout = 2
         }
-        val tracker = Tracker(emitter, "tracker", "app", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "tracker", "app", context = context, builder = trackerBuilder)
         val session = tracker.session
         
         getSessionContext(session, "event_1", timestamp, false)
@@ -249,7 +249,7 @@ class SessionTest {
     fun testBackgroundTimeSmallerThanBackgroundTimeoutDoesntCauseNewSession() {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker")
         val emitter = Emitter(
-            context, "", null
+            "tracker", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
@@ -257,7 +257,7 @@ class SessionTest {
             tracker.foregroundTimeout = 100
             tracker.backgroundTimeout = 2
         }
-        val tracker = Tracker(emitter, "tracker", "app", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "tracker", "app", context = context, builder = trackerBuilder)
         val session = tracker.session
         getSessionContext(session, "event_1", timestamp, false)
         var sessionState = session!!.state
@@ -331,15 +331,15 @@ class SessionTest {
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker1")
         cleanSharedPreferences(context, TrackerConstants.SNOWPLOW_SESSION_VARS + "_tracker2")
         val emitter = Emitter(
-            context, "", null
+            "ns", null, context, "", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.sessionContext = true
             tracker.foregroundTimeout = 20
             tracker.backgroundTimeout = 20
         }
-        val tracker1 = Tracker(emitter, "tracker1", "app", null, context, trackerBuilder)
-        val tracker2 = Tracker(emitter, "tracker2", "app", null, context, trackerBuilder)
+        val tracker1 = Tracker(emitter, "tracker1", "app", context = context, builder = trackerBuilder)
+        val tracker2 = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
         val session1 = tracker1.session
         val session2 = tracker2.session
         session1!!.getSessionContext("session1-fake-id1", timestamp, false)
@@ -364,7 +364,7 @@ class SessionTest {
         val id2 = session2.state!!.sessionId
 
         // Recreate tracker2
-        val tracker2b = Tracker(emitter, "tracker2", "app", null, context, trackerBuilder)
+        val tracker2b = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
         tracker2b.session!!.getSessionContext("session2b-fake-id3", timestamp, false)
         val initialValue2b = tracker2b.session!!.sessionIndex?.toLong()
         val previousId2b = tracker2b.session!!.state!!.previousSessionId

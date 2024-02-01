@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -17,20 +17,35 @@ package com.snowplowanalytics.snowplow.emitter
  */
 enum class BufferOption(val code: Int) {
     /**
-     * Sends both GET and POST requests with only a single event. Can cause a spike in
-     * network traffic if used in correlation with a large amount of events.
+     * Sends both GET and POST requests with only a single event.
+     * This is the default setting.
+     * Can cause a spike in network traffic if used in correlation with a large amount of events.
      */
     Single(1),
 
     /**
-     * Sends POST requests in groups of 10 events. This is the default amount of events to
-     * package into a POST. All GET requests will still emit one at a time.
+     * Sends POST requests in groups of 10 events.
+     * All GET requests will still emit one at a time.
      */
-    DefaultGroup(10),
+    SmallGroup(10),
 
     /**
-     * Sends POST requests in groups of 25 events. Useful for situations where many events
-     * need to be sent. All GET requests will still emit one at a time.
+     * Sends POST requests in groups of 25 events.
+     * Useful for situations where many events need to be sent.
+     * All GET requests will still emit one at a time.
      */
-    HeavyGroup(25);
+    LargeGroup(25);
+
+    companion object {
+        fun fromString(string: String): BufferOption? {
+            return when (string) {
+                "Single" -> Single
+                "SmallGroup" -> SmallGroup
+                "DefaultGroup" -> SmallGroup
+                "LargeGroup" -> LargeGroup
+                "HeavyGroup" -> LargeGroup
+                else -> null
+            }
+        }
+    }
 }

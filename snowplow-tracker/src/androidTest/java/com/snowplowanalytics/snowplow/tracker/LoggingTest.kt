@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -53,7 +53,7 @@ class LoggingTest {
     fun setUp() {
         mockLoggerDelegate = MockLoggerDelegate()
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        emitter = Emitter(ApplicationProvider.getApplicationContext(), "http://localhost", builder)
+        emitter = Emitter("namespace", null, ApplicationProvider.getApplicationContext(), "http://localhost", builder)
         networkConfig = NetworkConfiguration("http://localhost", HttpMethod.POST)
     }
 
@@ -72,8 +72,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))
@@ -107,8 +107,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertTrue(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))
@@ -141,8 +141,8 @@ class LoggingTest {
             "namespace",
             "myAppId",
             null,
-            ApplicationProvider.getApplicationContext(),
-            trackerBuilder
+            context = ApplicationProvider.getApplicationContext(),
+            builder = trackerBuilder
         )
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Session checking has been resumed. (debug)"))
         Assert.assertFalse(mockLoggerDelegate!!.capturedLogs.contains("Tracker created successfully. (verbose)"))

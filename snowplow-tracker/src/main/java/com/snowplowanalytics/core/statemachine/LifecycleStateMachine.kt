@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -48,6 +48,9 @@ class LifecycleStateMachine : StateMachineInterface {
     override val subscribedEventSchemasForFiltering: List<String>
         get() = emptyList()
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override fun transition(event: Event, currentState: State?): State? {
         if (event is Foreground) {
             return LifecycleState(true, event.foregroundIndex)
@@ -73,6 +76,10 @@ class LifecycleStateMachine : StateMachineInterface {
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
         return null
     }
 

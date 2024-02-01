@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -10,7 +10,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.core.tracker
+package com.snowplowanalytics.core.screenviews
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
@@ -48,6 +48,9 @@ class ScreenStateMachine : StateMachineInterface {
         get() = emptyList()
 
     override val subscribedEventSchemasForFiltering: List<String>
+        get() = emptyList()
+
+    override val subscribedEventSchemasForEventsBefore: List<String>
         get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
@@ -105,6 +108,10 @@ class ScreenStateMachine : StateMachineInterface {
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        return null
+    }
+
+    override fun eventsBefore(event: Event): List<Event>? {
         return null
     }
 

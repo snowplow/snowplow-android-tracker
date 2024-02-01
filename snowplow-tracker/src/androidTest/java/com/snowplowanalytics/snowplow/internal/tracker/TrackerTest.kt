@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -57,13 +57,9 @@ class TrackerTest {
             
             val emitter = Companion.tracker!!.emitter
             val eventStore = emitter.eventStore
-            if (eventStore != null) {
-                val isClean = eventStore.removeAllEvents()
-                Log.i("TrackerTest", "EventStore cleaned: $isClean")
-                Log.i("TrackerTest", "Events in the store: " + eventStore.size())
-            } else {
-                Log.i("TrackerTest", "EventStore null")
-            }
+            val isClean = eventStore.removeAllEvents()
+            Log.i("TrackerTest", "EventStore cleaned: $isClean")
+            Log.i("TrackerTest", "Events in the store: " + eventStore.size())
             emitter.shutdown(30)
             Companion.tracker!!.close()
             Log.i("TrackerTest", "Tracker closed")
@@ -85,7 +81,7 @@ class TrackerTest {
             emitter.emptyLimit = 0
         }
         val emitter = Emitter(
-            context, "testUrl", builder
+            "myNamespace", null, context, "testUrl", builder
         )
         val subject = Subject(
             context, null
@@ -95,7 +91,6 @@ class TrackerTest {
             tracker.platform = DevicePlatform.InternetOfThings
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
-            tracker.threadCount = 1
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
             tracker.geoLocationContext = false
@@ -107,7 +102,7 @@ class TrackerTest {
             tracker.installAutotracking = installTracking
             tracker.applicationContext = true
         }
-        Companion.tracker = Tracker(emitter, "myNamespace", "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, "myNamespace", "myAppId", context = context, builder = trackerBuilder)
         return Companion.tracker
     }
 
@@ -125,7 +120,6 @@ class TrackerTest {
         Assert.assertNotNull(tracker.emitter)
         Assert.assertNotNull(tracker.subject)
         Assert.assertEquals(LogLevel.VERBOSE, tracker.logLevel)
-        Assert.assertEquals(2, tracker.threadCount.toLong())
         Assert.assertFalse(tracker.exceptionAutotracking)
         Assert.assertTrue(tracker.lifecycleAutotracking)
         Assert.assertTrue(tracker.installAutotracking)
@@ -136,7 +130,7 @@ class TrackerTest {
     fun testEmitterUpdate() {
         val tracker = tracker
         Assert.assertNotNull(tracker!!.emitter)
-        tracker.emitter = Emitter(context, "test", null)
+        tracker.emitter = Emitter(tracker.namespace, null, context, "test", null)
         Assert.assertNotNull(tracker.emitter)
     }
 
@@ -193,7 +187,7 @@ class TrackerTest {
                 emitterArg.requestSecurity = Protocol.HTTP
             }
         try {
-            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, builder)
+            emitter = Emitter(namespace, null, context, getMockServerURI(mockWebServer)!!, builder)
         } catch (e: Exception) {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
@@ -209,12 +203,10 @@ class TrackerTest {
             tracker.screenViewAutotracking = false
         }
         Companion.tracker =
-            Tracker(emitter!!, namespace, "testTrackWithNoContext", null, context, trackerBuilder)
+            Tracker(emitter!!, namespace, "testTrackWithNoContext", context = context, builder = trackerBuilder)
         val eventStore = emitter.eventStore
-        if (eventStore != null) {
-            val isClean = eventStore.removeAllEvents()
-            Log.i("testTrackSelfDescribingEvent", "EventStore clean: $isClean")
-        }
+        val isClean = eventStore.removeAllEvents()
+        Log.i("testTrackSelfDescribingEvent", "EventStore clean: $isClean")
         Log.i("testTrackSelfDescribingEvent", "Send SelfDescribing event")
         val sdj = SelfDescribingJson("iglu:foo/bar/jsonschema/1-0-0")
         val sdEvent = SelfDescribing(sdj)
@@ -255,7 +247,7 @@ class TrackerTest {
                 emitterArg.requestSecurity = Protocol.HTTP
             }
         try {
-            emitter = Emitter(context, getMockServerURI(mockWebServer)!!, emitterBuilder)
+            emitter = Emitter(namespace, null, context, getMockServerURI(mockWebServer)!!, emitterBuilder)
         } catch (e: Exception) {
             e.printStackTrace()
             Assert.fail("Exception on Emitter creation")
@@ -271,9 +263,10 @@ class TrackerTest {
             tracker.geoLocationContext = false
             tracker.installAutotracking = false
             tracker.screenViewAutotracking = false
+            tracker.lifecycleAutotracking = false
         }
         Companion.tracker =
-            Tracker(emitter!!, namespace, "testTrackWithNoContext", null, context, trackerBuilder)
+            Tracker(emitter!!, namespace, "testTrackWithNoContext", context = context, builder = trackerBuilder)
         
         Log.i("testTrackWithNoContext", "Send ScreenView event")
         Companion.tracker!!.track(ScreenView("name"))
@@ -313,7 +306,7 @@ class TrackerTest {
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, getMockServerURI(mockWebServer)!!, builder
+            namespace, null, context, getMockServerURI(mockWebServer)!!, builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -325,12 +318,12 @@ class TrackerTest {
             tracker.exceptionAutotracking = false
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         Companion.tracker!!.pauseEventTracking()
         val eventId = Companion.tracker!!.track(ScreenView("name"))
         Assert.assertNull(eventId)
         val req = mockWebServer.takeRequest(2, TimeUnit.SECONDS)
-        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore!!.size())
+        Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore.size())
         Assert.assertNull(req)
         mockWebServer.shutdown()
     }
@@ -345,7 +338,7 @@ class TrackerTest {
         val mockWebServer = getMockServer(1)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, getMockServerURI(mockWebServer)!!, builder
+            namespace, null, context, getMockServerURI(mockWebServer)!!, builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -359,7 +352,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         Assert.assertNotNull(Companion.tracker!!.session)
         Companion.tracker!!.resumeSessionChecking()
         Thread.sleep(2000)
@@ -373,7 +366,7 @@ class TrackerTest {
         TestUtils.createSessionSharedPreferences(context, namespace)
         val builder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
         val emitter = Emitter(
-            context, "fake-uri", builder
+            namespace, null, context, "fake-uri", builder
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -388,7 +381,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         val screenState = Companion.tracker!!.getScreenState()
         Assert.assertNotNull(screenState)
         var screenStateMapWrapper: Map<String, Any?> = screenState!!.getCurrentScreen(true).map
@@ -422,7 +415,7 @@ class TrackerTest {
             Thread.getDefaultUncaughtExceptionHandler().javaClass
         )
         val emitter = Emitter(
-            context, "com.acme", null
+            namespace, null, context, "com.acme", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -431,7 +424,7 @@ class TrackerTest {
             tracker.exceptionAutotracking = true
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         Assert.assertTrue(Companion.tracker!!.exceptionAutotracking)
         Assert.assertEquals(
             ExceptionHandler::class.java,
@@ -450,7 +443,7 @@ class TrackerTest {
             Thread.getDefaultUncaughtExceptionHandler().javaClass
         )
         val emitter = Emitter(
-            context, "com.acme", null
+            namespace, null, context, "com.acme", null
         )
         val trackerBuilder = { tracker: Tracker ->
             tracker.base64Encoded = false
@@ -459,7 +452,7 @@ class TrackerTest {
             tracker.exceptionAutotracking = false
             tracker.screenViewAutotracking = false
         }
-        Companion.tracker = Tracker(emitter, namespace, "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         val handler1 = ExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler(handler1)
         Assert.assertEquals(
@@ -475,7 +468,7 @@ class TrackerTest {
     @Test
     fun testStartsNewSessionWhenChangingAnonymousTracking() {
         val emitterBuilder = { emitter: Emitter -> emitter.bufferOption = BufferOption.Single }
-        val emitter = Emitter(context, "fake-uri", emitterBuilder)
+        val emitter = Emitter("ns", null, context, "fake-uri", emitterBuilder)
         emitter.pauseEmit()
         
         val trackerBuilder = { tracker: Tracker ->
@@ -489,7 +482,7 @@ class TrackerTest {
             tracker.foregroundTimeout = 5
             tracker.backgroundTimeout = 5
         }
-        Companion.tracker = Tracker(emitter, "ns", "myAppId", null, context, trackerBuilder)
+        Companion.tracker = Tracker(emitter, "ns", "myAppId", context = context, builder = trackerBuilder)
         
         Companion.tracker!!.track(Structured("c", "a"))
         val sessionIdStart = Companion.tracker!!.session!!.state!!.sessionId

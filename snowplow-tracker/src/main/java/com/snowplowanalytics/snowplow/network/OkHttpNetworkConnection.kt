@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -361,7 +361,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
      * @return a RequestResult
      */
     private fun requestSender(request: okhttp3.Request): Int {
-        return try {
+        try {
             Logger.v(TAG, "Sending request: %s", request)
             TrafficStats.setThreadStatsTag(TRAFFIC_STATS_TAG)
             val resp = client?.newCall(request)?.execute()
@@ -369,10 +369,10 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
                 resp.body?.close()
                 return resp.code
             }
-            -1
+            return -1
         } catch (e: IOException) {
             Logger.e(TAG, "Request sending failed: %s", e.toString())
-            -1
+            return -1
         }
     }
 

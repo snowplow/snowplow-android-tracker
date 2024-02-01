@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.controller.EmitterController
 import com.snowplowanalytics.snowplow.emitter.BufferOption
 import com.snowplowanalytics.snowplow.emitter.EventStore
 import com.snowplowanalytics.snowplow.network.RequestCallback
+import kotlin.time.Duration
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
@@ -40,10 +41,10 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         }
 
     override var emitRange: Int
-        get() = emitter.sendLimit
+        get() = emitter.emitRange
         set(emitRange) {
             dirtyConfig.emitRange = emitRange
-            emitter.sendLimit = emitRange
+            emitter.emitRange = emitRange
         }
 
     override val threadPoolSize: Int
@@ -89,6 +90,20 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         set(value) {
             dirtyConfig.retryFailedRequests = value
             emitter.retryFailedRequests = value
+        }
+
+    override var maxEventStoreAge: Duration
+        get() = emitter.maxEventStoreAge
+        set(value) {
+            dirtyConfig.maxEventStoreAge = value
+            emitter.maxEventStoreAge = value
+        }
+
+    override var maxEventStoreSize: Long
+        get() = emitter.maxEventStoreSize
+        set(value) {
+            dirtyConfig.maxEventStoreSize = value
+            emitter.maxEventStoreSize = value
         }
 
     override val dbCount: Long

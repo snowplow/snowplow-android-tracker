@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,21 +18,24 @@ import com.snowplowanalytics.snowplow.network.Protocol
 
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object EmitterDefaults {
     var httpMethod = HttpMethod.POST
-    var bufferOption = BufferOption.DefaultGroup
+    var bufferOption = BufferOption.Single
     var httpProtocol = Protocol.HTTPS
     var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
-    var emitRange: Int = 150
+    var emitRange: Int = BufferOption.LargeGroup.code
     var emitterTick = 5
-    var sendLimit = 250
     var emptyLimit = 5
     var byteLimitGet: Long = 40000
     var byteLimitPost: Long = 40000
-    var emitTimeout = 5
+    var emitTimeout = 30
     var threadPoolSize = 15
     var serverAnonymisation = false
     var retryFailedRequests = true
     var timeUnit = TimeUnit.SECONDS
+    var maxEventStoreAge = 30.toDuration(DurationUnit.DAYS)
+    var maxEventStoreSize: Long = 1000
 }

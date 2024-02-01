@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -24,14 +24,21 @@ class AbstractEventTest {
     @Test
     fun testAddsEntitiesUsingAllAPIs() {
         val event = ScreenView("screen")
+        val entity1 = SelfDescribingJson("schema1", "data1")
+        val entity2 = SelfDescribingJson("schema2", "data2")
+        val entity3 = SelfDescribingJson("schema3", "data3")
 
-        event.entities.add(SelfDescribingJson("schema1", "data1"))
-        event.customContexts.add(SelfDescribingJson("schema2", "data2"))
-        event.entities(listOf(SelfDescribingJson("schema3", "data3")))
-        event.contexts(listOf(SelfDescribingJson("schema4", "data4")))
-
-        Assert.assertEquals(4, event.entities.count())
-        Assert.assertEquals(4, event.contexts.count())
-        Assert.assertEquals(4, event.customContexts.count())
+        event.entities.add(entity1)
+        Assert.assertEquals(1, event.entities.count())
+        
+        event.entities(listOf(entity2))
+        Assert.assertEquals(2, event.entities.count())
+        
+        event.contexts(listOf(entity3))
+        Assert.assertEquals(3, event.entities.count())
+        Assert.assertEquals(3, event.contexts.count())
+        Assert.assertTrue(event.entities.contains(entity1))
+        Assert.assertTrue(event.entities.contains(entity2))
+        Assert.assertTrue(event.entities.contains(entity3))
     }
 }

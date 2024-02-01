@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -18,6 +18,9 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.emitter.Emitter
 import com.snowplowanalytics.core.emitter.Executor.execute
 import com.snowplowanalytics.core.gdpr.Gdpr
+import com.snowplowanalytics.core.screenviews.ScreenState
+import com.snowplowanalytics.core.screenviews.ScreenStateMachine
+import com.snowplowanalytics.core.screenviews.ScreenSummaryStateMachine
 import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
 import com.snowplowanalytics.core.session.Session.Companion.getInstance
@@ -42,7 +45,6 @@ import com.snowplowanalytics.snowplow.util.Basis
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.max
 
 /**
  * Builds a Tracker object which is used to send events to a Snowplow Collector.
@@ -50,6 +52,8 @@ import kotlin.math.max
  * @param emitter Emitter to which events will be sent
  * @param namespace Identifier for the Tracker instance
  * @param appId Application ID
+ * @param platformContextProperties List of properties of the platform context to track
+ * @param platformContextRetriever Overrides for retrieving property values
  * @param context The Android application context
  * @param builder A closure to set Tracker configuration
  */
@@ -57,7 +61,8 @@ class Tracker(
     emitter: Emitter,
     val namespace: String,
     var appId: String,
-    platformContextProperties: List<PlatformContextProperty>?,
+    platformContextProperties: List<PlatformContextProperty>? = null,
+    platformContextRetriever: PlatformContextRetriever? = null,
     context: Context,
     builder: ((Tracker) -> Unit)? = null) {
     private var builderFinished = false
@@ -65,7 +70,7 @@ class Tracker(
     private val stateManager = StateManager()
     
     fun getScreenState(): ScreenState? {
-        val state = stateManager.trackerState.getState("ScreenContext")
+        val state = stateManager.trackerState.getState(ScreenStateMachine.ID)
             ?: // Legacy initialization
             return ScreenState()
 
@@ -85,7 +90,11 @@ class Tracker(
     val dataCollection: Boolean
         get() = _dataCollection.get()
 
-    private val platformContextManager = PlatformContext(platformContextProperties, context)
+    private val platformContextManager = PlatformContext(
+        properties = platformContextProperties,
+        retriever = platformContextRetriever ?: PlatformContextRetriever(),
+        context = context
+    )
 
     var emitter: Emitter = emitter
         set(emitter) {
@@ -123,17 +132,6 @@ class Tracker(
         set(timeout) {
             if (!builderFinished) {
                 field = timeout
-            }
-        }
-
-    /**
-     * This configuration option is not published in the TrackerConfiguration class.
-     * Create a Tracker directly, not via the Snowplow interface, to configure threadCount.
-     */
-    var threadCount: Int = TrackerDefaults.threadCount
-        set(threadCount) {
-            if (!builderFinished) {
-                field = max(threadCount, 2)
             }
         }
 
@@ -180,6 +178,16 @@ class Tracker(
         set(willTrack) {
             if (!builderFinished) {
                 field = willTrack
+            }
+        }
+
+    var screenEngagementAutotracking = false
+        set(screenEngagementAutotracking) {
+            field = screenEngagementAutotracking
+            if (screenEngagementAutotracking) {
+                addOrReplaceStateMachine(ScreenSummaryStateMachine())
+            } else {
+                removeStateMachine(ScreenSummaryStateMachine.ID)
             }
         }
 
@@ -324,8 +332,19 @@ class Tracker(
     private val receiveScreenViewNotification: FunctionalObserver = object : FunctionalObserver() {
         override fun apply(data: Map<String, Any>) {
             if (screenViewAutotracking) {
-                val event = data["event"] as? Event?
-                event?.let { track(it) }
+                val event = data["event"] as? ScreenView?
+                event?.let { event ->
+                    getScreenState()?.let { state ->
+                        // don't track if screen view is for the same activity as the last one
+                        if (
+                            event.activityClassName?.isEmpty() != false ||
+                            event.activityClassName != state.activityClassName ||
+                            event.activityTag != state.activityTag
+                        ) {
+                            track(event)
+                        }
+                    } ?: track(event)
+                }
             }
         }
     }
@@ -364,10 +383,6 @@ class Tracker(
         builder?.let { it(this) }
         
         emitter.flush()
-        
-        // Setting the emitter namespace has a side-effect of creating a SQLiteEventStore,
-        // unless an EventStore was already provided through EmitterConfiguration
-        emitter.namespace = namespace
         
         trackerVersionSuffix?.let {
             val suffix = it.replace("[^A-Za-z0-9.-]".toRegex(), "")
@@ -473,28 +488,39 @@ class Tracker(
         if (!dataCollection) {
             return null
         }
-        
-        event.beginProcessing(this)
-        var stateSnapshot: TrackerStateSnapshot
-        var trackerEvent: TrackerEvent
+
+        val events = withEventsBefore(event)
+        for (e in events) { e.beginProcessing(this) }
+        var trackerEvents: List<Pair<Event, TrackerEvent>>
         synchronized(this) {
-            stateSnapshot = stateManager.trackerStateForProcessedEvent(event)
-            trackerEvent = TrackerEvent(event, stateSnapshot)
-            workaroundForIncoherentSessionContext(trackerEvent)
-        }
-        val reportsOnDiagnostic = event !is TrackerError
-        execute(reportsOnDiagnostic, TAG) {
-            payloadWithEvent(trackerEvent)?.let { payload ->
-                v(TAG, "Adding new payload to event storage: %s", payload)
-                emitter.add(payload)
-                event.endProcessing(this)
-                stateManager.afterTrack(trackerEvent)
-            } ?: run {
-                d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
-                event.endProcessing(this)
+            trackerEvents = events.map { event ->
+                val stateSnapshot = stateManager.trackerStateForProcessedEvent(event)
+                val trackerEvent = TrackerEvent(event, stateSnapshot)
+                workaroundForIncoherentSessionContext(trackerEvent)
+                Pair(event, trackerEvent)
             }
         }
-        return trackerEvent.eventId
+
+        val reportsOnDiagnostic = event !is TrackerError
+        execute(reportsOnDiagnostic, TAG) {
+            trackerEvents.forEach { (event, trackerEvent) ->
+                payloadWithEvent(trackerEvent)?.let { payload ->
+                    v(TAG, "Adding new payload to event storage: %s", payload)
+                    emitter.add(payload)
+                    event.endProcessing(this)
+                    stateManager.afterTrack(trackerEvent)
+                } ?: run {
+                    d(TAG, "Event not tracked due to filtering: %s", trackerEvent.eventId)
+                    event.endProcessing(this)
+                }
+            }
+        }
+        return trackerEvents.last().second.eventId
+    }
+
+    private fun withEventsBefore(event: Event): List<Event> {
+        val events = stateManager.eventsBefore(event)
+        return events + listOf(event)
     }
 
     private fun payloadWithEvent(event: TrackerEvent): Payload? {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -234,9 +234,8 @@ class ServiceProvider(
             emitter.client = networkConfiguration.okHttpClient
             emitter.cookieJar = networkConfiguration.okHttpCookieJar
             emitter.emitTimeout = networkConfiguration.timeout
-            emitter.sendLimit = emitterConfiguration.emitRange
+            emitter.emitRange = emitterConfiguration.emitRange
             emitter.bufferOption = emitterConfiguration.bufferOption
-            emitter.eventStore = emitterConfiguration.eventStore
             emitter.byteLimitPost = emitterConfiguration.byteLimitPost
             emitter.byteLimitGet = emitterConfiguration.byteLimitGet
             emitter.threadPoolSize = emitterConfiguration.threadPoolSize
@@ -245,9 +244,17 @@ class ServiceProvider(
             emitter.serverAnonymisation = emitterConfiguration.serverAnonymisation
             emitter.requestHeaders = networkConfiguration.requestHeaders
             emitter.retryFailedRequests = emitterConfiguration.retryFailedRequests
+            emitter.maxEventStoreAge = emitterConfiguration.maxEventStoreAge
+            emitter.maxEventStoreSize = emitterConfiguration.maxEventStoreSize
         }
         
-        val emitter = Emitter(context, endpoint, builder)
+        val emitter = Emitter(
+            namespace = namespace,
+            eventStore = emitterConfiguration.eventStore,
+            context = context,
+            collectorUri = endpoint,
+            builder = builder
+        )
         if (emitterConfiguration.isPaused) {
             emitter.pauseEmit()
         }
@@ -272,6 +279,7 @@ class ServiceProvider(
             tracker.deepLinkContext = trackerConfiguration.deepLinkContext
             tracker.screenContext = trackerConfiguration.screenContext
             tracker.screenViewAutotracking = trackerConfiguration.screenViewAutotracking
+            tracker.screenEngagementAutotracking = trackerConfiguration.screenEngagementAutotracking
             tracker.lifecycleAutotracking = trackerConfiguration.lifecycleAutotracking
             tracker.installAutotracking = trackerConfiguration.installAutotracking
             tracker.exceptionAutotracking = trackerConfiguration.exceptionAutotracking
@@ -294,12 +302,13 @@ class ServiceProvider(
         }
         
         val tracker = Tracker(
-            emitter,
-            namespace,
-            trackerConfiguration.appId,
-            trackerConfiguration.platformContextProperties,
-            context,
-            builder
+            emitter = emitter,
+            namespace = namespace,
+            appId = trackerConfiguration.appId,
+            platformContextProperties = trackerConfiguration.platformContextProperties,
+            platformContextRetriever = trackerConfiguration.platformContextRetriever,
+            context = context,
+            builder = builder
         )
         
         if (trackerConfiguration.isPaused) {

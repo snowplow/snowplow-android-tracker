@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -82,8 +82,15 @@ interface TrackerConfigurationInterface {
     var screenViewAutotracking: Boolean
 
     /**
+     * Whether to enable tracking the screen end event and the screen summary context entity.
+     * Make sure that you have lifecycle autotracking enabled for screen summary to have complete information.
+     */
+    var screenEngagementAutotracking: Boolean
+
+    /**
      * Whether enable automatic tracking of background and foreground transitions.
-     * @apiNote It needs the Foreground library installed.
+     * Enabled by default.
+     * @apiNote It needs the androidx.lifecycle-extensions library installed.
      */
     var lifecycleAutotracking: Boolean
 

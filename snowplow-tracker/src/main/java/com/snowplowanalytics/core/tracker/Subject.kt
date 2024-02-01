@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,7 +13,9 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
-import android.graphics.Point
+import android.content.res.Resources
+import android.os.Build
+import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.tracker.Logger.v
@@ -225,11 +227,25 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
      * @param context the android context
      */
     private fun setDefaultScreenResolution(context: Context) {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-        val display = windowManager?.defaultDisplay
-        val size = Point()
-        display?.getSize(size)
-        screenResolution = (Size(size.x, size.y))
+        try {
+            screenResolution = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val metrics =
+                    context.getSystemService(WindowManager::class.java).currentWindowMetrics
+                Size(metrics.bounds.width(), metrics.bounds.height())
+            } else {
+                val windowManager =
+                    context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+                val display = windowManager?.defaultDisplay
+                val metrics = if (display != null) {
+                    DisplayMetrics().also { display.getRealMetrics(it) }
+                } else {
+                    Resources.getSystem().displayMetrics
+                }
+                Size(metrics.widthPixels, metrics.heightPixels)
+            }
+        } catch (e: Exception) {
+            Logger.e(TAG, "Failed to set default screen resolution.")
+        }
     }
 
     /**

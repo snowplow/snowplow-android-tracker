@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -13,12 +13,12 @@
 package com.snowplowanalytics.snowplow.configuration
 
 import com.snowplowanalytics.core.tracker.Logger
-import com.snowplowanalytics.core.tracker.PlatformContext
 import com.snowplowanalytics.core.tracker.TrackerConfigurationInterface
 import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.LoggerDelegate
+import com.snowplowanalytics.snowplow.tracker.PlatformContextRetriever
 import org.json.JSONObject
 import java.util.*
 
@@ -39,7 +39,8 @@ import java.util.*
  *  - screenContext: true
  *  - deepLinkContext: true
  *  - screenViewAutotracking: true
- *  - lifecycleAutotracking: false
+ *  - screenEngagementAutotracking: true
+ *  - lifecycleAutotracking: true
  *  - installAutotracking: true
  *  - exceptionAutotracking: true
  *  - diagnosticAutotracking: false
@@ -120,6 +121,11 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         get() = _screenViewAutotracking ?: sourceConfig?.screenViewAutotracking ?: TrackerDefaults.screenViewAutotracking
         set(value) { _screenViewAutotracking = value }
 
+    private var _screenEngagementAutotracking: Boolean? = null
+    override var screenEngagementAutotracking: Boolean
+        get() = _screenEngagementAutotracking ?: sourceConfig?.screenEngagementAutotracking ?: TrackerDefaults.screenEngagementAutotracking
+        set(value) { _screenEngagementAutotracking = value }
+
     private var _lifecycleAutotracking: Boolean? = null
     override var lifecycleAutotracking: Boolean
         get() = _lifecycleAutotracking ?: sourceConfig?.lifecycleAutotracking ?: TrackerDefaults.lifecycleAutotracking
@@ -159,6 +165,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     open var platformContextProperties: List<PlatformContextProperty>?
         get() = _platformContextProperties ?: sourceConfig?.platformContextProperties
         set(value) { _platformContextProperties = value }
+
+    private var _platformContextRetriever: PlatformContextRetriever? = null
+    /**
+     * Set of callbacks to be used to retrieve properties of the platform context.
+     * Overrides the tracker implementation for setting the properties.
+     */
+    open var platformContextRetriever: PlatformContextRetriever?
+        get() = _platformContextRetriever ?: sourceConfig?.platformContextRetriever
+        set(value) { _platformContextRetriever = value }
 
     // Builder methods
     
@@ -266,8 +281,18 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     }
 
     /**
-     * Whether to enable automatic tracking of background and foreground transitions. 
-     * The Foreground library must be installed.
+     * Whether to enable tracking the screen end event and the screen summary context entity.
+     * Make sure that you have lifecycle autotracking enabled for screen summary to have complete information.
+     */
+    fun screenEngagementAutotracking(screenEngagementAutotracking: Boolean): TrackerConfiguration {
+        this.screenEngagementAutotracking = screenEngagementAutotracking
+        return this
+    }
+
+    /**
+     * Whether to enable automatic tracking of background and foreground transitions.
+     * Enabled by default.
+     * The androidx.lifecycle-extensions library must be installed.
      */
     fun lifecycleAutotracking(lifecycleAutotracking: Boolean): TrackerConfiguration {
         this.lifecycleAutotracking = lifecycleAutotracking
@@ -330,6 +355,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         return this
     }
 
+    /**
+     * Set of callbacks to be used to retrieve properties of the platform context.
+     * Overrides the tracker implementation for setting the properties.
+     */
+    fun platformContextRetriever(platformContextRetriever: PlatformContextRetriever?): TrackerConfiguration {
+        this.platformContextRetriever = platformContextRetriever
+        return this
+    }
+
     // Copyable
     override fun copy(): Configuration {
         return TrackerConfiguration(appId)
@@ -344,6 +378,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
             .screenContext(screenContext)
             .deepLinkContext(deepLinkContext)
             .screenViewAutotracking(screenViewAutotracking)
+            .screenEngagementAutotracking(screenEngagementAutotracking)
             .lifecycleAutotracking(lifecycleAutotracking)
             .installAutotracking(installAutotracking)
             .exceptionAutotracking(exceptionAutotracking)
@@ -351,6 +386,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
             .userAnonymisation(userAnonymisation)
             .trackerVersionSuffix(trackerVersionSuffix)
             .platformContextProperties(platformContextProperties)
+            .platformContextRetriever(platformContextRetriever)
     }
 
     /**
@@ -395,6 +431,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         if (jsonObject.has("screenContext")) { _screenContext = jsonObject.getBoolean("screenContext") }
         if (jsonObject.has("deepLinkContext")) { _deepLinkContext = jsonObject.getBoolean("deepLinkContext") }
         if (jsonObject.has("screenViewAutotracking")) { _screenViewAutotracking = jsonObject.getBoolean("screenViewAutotracking") }
+        if (jsonObject.has("screenEngagementAutotracking")) { _screenEngagementAutotracking = jsonObject.getBoolean("screenEngagementAutotracking") }
         if (jsonObject.has("lifecycleAutotracking")) { _lifecycleAutotracking = jsonObject.getBoolean("lifecycleAutotracking") }
         if (jsonObject.has("installAutotracking")) { _installAutotracking = jsonObject.getBoolean("installAutotracking") }
         if (jsonObject.has("exceptionAutotracking")) { _exceptionAutotracking = jsonObject.getBoolean("exceptionAutotracking") }

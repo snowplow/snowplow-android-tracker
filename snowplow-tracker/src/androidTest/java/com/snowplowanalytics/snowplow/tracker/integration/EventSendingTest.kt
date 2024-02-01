@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -53,9 +53,9 @@ class EventSendingTest {
             if (tracker == null) return
             val emitter = tracker!!.emitter
             tracker!!.close()
-            val isClean = emitter.eventStore!!.removeAllEvents()
+            val isClean = emitter.eventStore.removeAllEvents()
             Log.i("TrackerTest", "Tracker closed - EventStore cleaned: $isClean")
-            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore!!.size())
+            Log.i("TrackerTest", "Events in the store: " + emitter.eventStore.size())
         } catch (e: IllegalStateException) {
             Log.i("TrackerTest", "Tracker already closed.")
         }
@@ -202,8 +202,9 @@ class EventSendingTest {
             emitter.requestSecurity = Protocol.HTTP
             emitter.emitterTick = 0
             emitter.emptyLimit = 0
+            emitter.emitRange = 1
         }
-        val emitter = Emitter(InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
+        val emitter = Emitter(ns, null, InstrumentationRegistry.getInstrumentation().targetContext, uri, builder)
         val subject = Subject(InstrumentationRegistry.getInstrumentation().targetContext, null)
         
         if (tracker != null) tracker!!.close()
@@ -221,10 +222,10 @@ class EventSendingTest {
             ns,
             "myAppId",
             null,
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            trackerBuilder
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            builder = trackerBuilder
         )
-        emitter.eventStore!!.removeAllEvents()
+        emitter.eventStore.removeAllEvents()
         return tracker!!
     }
 

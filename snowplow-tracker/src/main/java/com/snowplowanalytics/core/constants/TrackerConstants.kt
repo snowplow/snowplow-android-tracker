@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -65,6 +65,14 @@ object TrackerConstants {
         "iglu:com.snowplowanalytics.snowplow.ecommerce/user/jsonschema/1-0-0"
     const val SCHEMA_ECOMMERCE_PAGE =
         "iglu:com.snowplowanalytics.snowplow.ecommerce/page/jsonschema/1-0-0"
+    const val SCHEMA_SCREEN_END =
+        "iglu:com.snowplowanalytics.mobile/screen_end/jsonschema/1-0-0"
+    const val SCHEMA_SCREEN_SUMMARY =
+        "iglu:com.snowplowanalytics.mobile/screen_summary/jsonschema/1-0-0"
+    const val SCHEMA_LIST_ITEM_VIEW =
+        "iglu:com.snowplowanalytics.mobile/list_item_view/jsonschema/1-0-0"
+    const val SCHEMA_SCROLL_CHANGED =
+        "iglu:com.snowplowanalytics.mobile/scroll_changed/jsonschema/1-0-0"
     const val POST_CONTENT_TYPE = "application/json; charset=utf-8"
     const val EVENT_PAGE_VIEW = "pv"
     const val EVENT_STRUCTURED = "se"

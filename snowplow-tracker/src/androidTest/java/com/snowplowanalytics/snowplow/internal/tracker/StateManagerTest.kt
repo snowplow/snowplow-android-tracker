@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023 Snowplow Analytics Ltd. All rights reserved.
+ * Copyright (c) 2015-present Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -120,16 +120,16 @@ class StateManagerTest {
     fun testScreenStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.screenContext = true
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
+            tracker.lifecycleAutotracking = false
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
-        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", context = context, builder = trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))
@@ -216,14 +216,13 @@ class StateManagerTest {
     fun testLifecycleStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.lifecycleAutotracking = true
             tracker.base64Encoded = false
             tracker.logLevel = LogLevel.VERBOSE
         }
-        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", context = context, builder = trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))
@@ -290,15 +289,15 @@ class StateManagerTest {
     fun testDeepLinkStateMachine() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
-        val builder = { emitter: Emitter -> emitter.eventStore = eventStore }
-        val emitter = Emitter(context, "http://snowplow-fake-url.com", builder)
+        val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
         val trackerBuilder = { tracker: Tracker ->
             tracker.deepLinkContext = true
             tracker.base64Encoded = false
             tracker.sessionContext = false
             tracker.platformContextEnabled = false
+            tracker.lifecycleAutotracking = false
         }
-        val tracker = Tracker(emitter, "namespace", "appId", null, context, trackerBuilder)
+        val tracker = Tracker(emitter, "namespace", "appId", context = context, builder = trackerBuilder)
 
         // Send events
         tracker.track(Timing("category", "variable", 123))
@@ -454,6 +453,9 @@ internal open class MockStateMachine(
 ) : StateMachineInterface {
     var afterTrackEvents: MutableList<InspectableEvent> = ArrayList()
 
+    override val subscribedEventSchemasForEventsBefore: List<String>
+        get() = emptyList()
+
     override val subscribedEventSchemasForTransitions: List<String>
         get() = LinkedList(listOf("inc", "dec"))
 
@@ -468,6 +470,10 @@ internal open class MockStateMachine(
 
     override val subscribedEventSchemasForFiltering: List<String>
         get() = Collections.singletonList("s1")
+
+    override fun eventsBefore(event: Event): List<Event>? {
+        return null
+    }
 
     override fun transition(event: Event, state: State?): State? {
         val e = event as SelfDescribing
