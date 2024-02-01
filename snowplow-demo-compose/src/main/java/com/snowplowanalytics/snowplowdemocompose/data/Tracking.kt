@@ -24,7 +24,6 @@ object Tracking {
         val trackerConfig = TrackerConfiguration("appID")
             .logLevel(LogLevel.DEBUG)
             .screenViewAutotracking(false)
-            .lifecycleAutotracking(true)
         val emitterConfig = EmitterConfiguration().bufferOption(BufferOption.Single)
 
         return Snowplow.createTracker(
@@ -48,7 +47,8 @@ object Tracking {
                                 entities: List<SelfDescribingJson>? = null,
     ) {
         LaunchedEffect(Unit, block = {
-            val event = ScreenView(screenName).entities(entities)
+            val event = ScreenView(screenName)
+            entities?.let { event.entities(it) }
             Snowplow.defaultTracker?.track(event)
         })
     }

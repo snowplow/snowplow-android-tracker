@@ -263,6 +263,7 @@ class TrackerTest {
             tracker.geoLocationContext = false
             tracker.installAutotracking = false
             tracker.screenViewAutotracking = false
+            tracker.lifecycleAutotracking = false
         }
         Companion.tracker =
             Tracker(emitter!!, namespace, "testTrackWithNoContext", context = context, builder = trackerBuilder)

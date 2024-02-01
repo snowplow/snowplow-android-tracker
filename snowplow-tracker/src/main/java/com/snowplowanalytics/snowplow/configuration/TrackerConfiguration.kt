@@ -40,7 +40,7 @@ import java.util.*
  *  - deepLinkContext: true
  *  - screenViewAutotracking: true
  *  - screenEngagementAutotracking: true
- *  - lifecycleAutotracking: false
+ *  - lifecycleAutotracking: true
  *  - installAutotracking: true
  *  - exceptionAutotracking: true
  *  - diagnosticAutotracking: false
@@ -290,8 +290,9 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     }
 
     /**
-     * Whether to enable automatic tracking of background and foreground transitions. 
-     * The Foreground library must be installed.
+     * Whether to enable automatic tracking of background and foreground transitions.
+     * Enabled by default.
+     * The androidx.lifecycle-extensions library must be installed.
      */
     fun lifecycleAutotracking(lifecycleAutotracking: Boolean): TrackerConfiguration {
         this.lifecycleAutotracking = lifecycleAutotracking
