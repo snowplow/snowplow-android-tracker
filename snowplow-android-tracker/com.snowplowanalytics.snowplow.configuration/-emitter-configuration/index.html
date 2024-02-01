@@ -40,7 +40,7 @@
             </a>
     </div>
     <div>
-5.6.0    </div>
+6.0.0    </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
@@ -58,7 +58,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.snowplow.configuration</a><span class="delimiter">/</span><span class="current">EmitterConfiguration</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Emitter</span><wbr></wbr><span><span>Configuration</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">EmitterConfiguration</a> : <a href="../-configuration/index.html">Configuration</a>, <span data-unresolved-link="com.snowplowanalytics.core.emitter/EmitterConfigurationInterface///PointingToDeclaration/">EmitterConfigurationInterface</span></div><p class="paragraph">Configure how the tracker should send the events to the collector.</p><p class="paragraph">Default values:</p><ul><li><p class="paragraph">bufferOption: <a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/-default-group/index.html">BufferOption.DefaultGroup</a></p></li><li><p class="paragraph">serverAnonymisation: false</p></li><li><p class="paragraph">emitRange: 150 - maximum number of events to process at a time</p></li><li><p class="paragraph">threadPoolSize: 15</p></li><li><p class="paragraph">byteLimitGet: 40000 bytes</p></li><li><p class="paragraph">byteLimitPost: 40000 bytes</p></li><li><p class="paragraph">retryFailedRequests: true</p></li></ul></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">EmitterConfiguration</a> : <a href="../-configuration/index.html">Configuration</a>, <span data-unresolved-link="com.snowplowanalytics.core.emitter/EmitterConfigurationInterface///PointingToDeclaration/">EmitterConfigurationInterface</span></div><p class="paragraph">Configure how the tracker should send the events to the collector.</p><p class="paragraph">Default values:</p><ul><li><p class="paragraph">bufferOption: <a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/-single/index.html">BufferOption.Single</a></p></li><li><p class="paragraph">serverAnonymisation: false</p></li><li><p class="paragraph">emitRange: 25 - maximum number of events to process at a time</p></li><li><p class="paragraph">threadPoolSize: 15</p></li><li><p class="paragraph">byteLimitGet: 40000 bytes</p></li><li><p class="paragraph">byteLimitPost: 40000 bytes</p></li><li><p class="paragraph">retryFailedRequests: true</p></li></ul></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
@@ -94,7 +94,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="buffer-option.html"><span class="token function">bufferOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bufferOption<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/index.html">BufferOption</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">EmitterConfiguration</a></div><div class="brief "><p class="paragraph">How many events to send in each request. By default, this is set to <a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/-default-group/index.html">BufferOption.DefaultGroup</a>, a maximum of 10 events per request.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="buffer-option.html"><span class="token function">bufferOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bufferOption<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/index.html">BufferOption</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">EmitterConfiguration</a></div><div class="brief "><p class="paragraph">How many events to send in each request. By default, this is set to <a href="../../com.snowplowanalytics.snowplow.emitter/-buffer-option/-single/index.html">BufferOption.Single</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -185,6 +185,36 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="event-store.html"><span class="token function">eventStore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eventStore<span class="token operator">: </span><a href="../../com.snowplowanalytics.snowplow.emitter/-event-store/index.html">EventStore</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">EmitterConfiguration</a></div><div class="brief "><p class="paragraph">Custom component with full ownership for persisting events before to be sent to the collector. If it's not set the tracker will use a SQLite database as <span data-unresolved-link="com.snowplowanalytics.core.emitter.storage/SQLiteEventStore///PointingToDeclaration/">default EventStore</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1431317598%2FFunctions%2F918778150" anchor-label="maxEventStoreAge" id="1431317598%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-event-store-age.html"><span>max</span><wbr></wbr><span>Event</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>Age</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1431317598%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="max-event-store-age.html"><span class="token function">maxEventStoreAge</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">maxEventStoreAge<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">EmitterConfiguration</a></div><div class="brief "><p class="paragraph">Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent. Defaults to 30 days.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1663744347%2FFunctions%2F918778150" anchor-label="maxEventStoreSize" id="-1663744347%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-event-store-size.html"><span>max</span><wbr></wbr><span>Event</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1663744347%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="max-event-store-size.html"><span class="token function">maxEventStoreSize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">maxEventStoreSize<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">EmitterConfiguration</a></div><div class="brief "><p class="paragraph">Limit for the maximum number of unsent events to keep in the event store. Defaults to 1000.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -343,6 +373,36 @@
               </div>
             </div>
           </div>
+<a data-name="1288243046%2FProperties%2F918778150" anchor-label="maxEventStoreAge" id="1288243046%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-event-store-age.html"><span>max</span><wbr></wbr><span>Event</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>Age</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1288243046%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="max-event-store-age.html">maxEventStoreAge</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></div><div class="brief "><p class="paragraph">Limit for the maximum duration of how long events should be kept in the event store if they fail to be sent. Defaults to 30 days.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="213319700%2FProperties%2F918778150" anchor-label="maxEventStoreSize" id="213319700%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-event-store-size.html"><span>max</span><wbr></wbr><span>Event</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="213319700%2FProperties%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="max-event-store-size.html">maxEventStoreSize</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Limit for the maximum number of unsent events to keep in the event store. Defaults to 1000.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="-522130580%2FProperties%2F918778150" anchor-label="requestCallback" id="-522130580%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
           <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
             <div class="main-subrow keyValue ">
@@ -409,7 +469,7 @@
   </div>
 </div>
       <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
