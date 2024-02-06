@@ -524,6 +524,29 @@ class TestMediaController {
     }
 
     @Test
+    fun progressEventShouldHavePercentValue() {
+        val configuration = MediaTrackingConfiguration(
+            id = "media1",
+            player = MediaPlayerEntity(duration = 100.0),
+            boundaries = listOf(50),
+        )
+        val media = tracker?.media?.startMediaTracking(configuration = configuration)
+
+        media?.track(MediaPlayEvent())
+        for (i in 1 until 60) {
+            media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
+        }
+
+        Thread.sleep(100)
+
+        assertEquals(2, trackedEvents.size)
+        
+        val progressEvents = trackedEvents.filter { it.schema == eventSchema("percent_progress") }
+        assertEquals(1, progressEvents.size)
+        assertEquals(50, progressEvents[0].payload["percentProgress"])
+    }
+
+    @Test
     fun doesntSendProgressEventsIfPaused() {
         val configuration = MediaTrackingConfiguration(
             id = "media1",
