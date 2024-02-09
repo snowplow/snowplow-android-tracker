@@ -19,10 +19,12 @@ import com.snowplowanalytics.snowplow.event.AbstractSelfDescribing
 /**
  * Media player event fired when a percentage boundary set in the `boundaries` list in `MediaTrackingConfiguration` is reached.
  */
-class MediaPercentProgressEvent : AbstractSelfDescribing() {
+class MediaPercentProgressEvent(val percentProgress: Int?) : AbstractSelfDescribing() {
     override val schema: String
         get() = MediaSchemata.eventSchema("percent_progress")
 
     override val dataPayload: Map<String, Any?>
-        get() = emptyMap()
+        get() = mapOf(
+            "percentProgress" to percentProgress,
+        )
 }
