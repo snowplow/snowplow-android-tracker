@@ -383,17 +383,14 @@ class TrackerTest {
         }
         Companion.tracker = Tracker(emitter, namespace, "myAppId", context = context, builder = trackerBuilder)
         val screenState = Companion.tracker!!.getScreenState()
-        Assert.assertNotNull(screenState)
-        var screenStateMapWrapper: Map<String, Any?> = screenState!!.getCurrentScreen(true).map
-        var screenStateMap = screenStateMapWrapper[Parameters.DATA] as Map<String?, Any?>?
-        Assert.assertEquals("Unknown", screenStateMap!![Parameters.SCREEN_NAME])
+        Assert.assertNull(screenState)
 
         // Send screenView
         var screenView = ScreenView("screen1")
         val screenId = screenView.dataPayload["id"] as String?
         val eventId1 = Companion.tracker!!.track(screenView)
-        screenStateMapWrapper = Companion.tracker!!.getScreenState()!!.getCurrentScreen(true).map
-        screenStateMap = screenStateMapWrapper[Parameters.DATA] as Map<String?, Any?>?
+        val screenStateMapWrapper = Companion.tracker!!.getScreenState()!!.getCurrentScreen(true).map
+        val screenStateMap = screenStateMapWrapper[Parameters.DATA] as Map<*, *>?
         Assert.assertEquals("screen1", screenStateMap!![Parameters.SCREEN_NAME])
         Assert.assertEquals(screenId, screenStateMap[Parameters.SCREEN_ID])
 

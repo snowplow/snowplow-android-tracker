@@ -16,13 +16,12 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.utils.NotificationCenter
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
 import com.snowplowanalytics.snowplow.configuration.Configuration
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.event.ScreenView
+import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.util.EventSink
 import org.junit.After
@@ -33,7 +32,11 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class ScreenViewAutotrackingTest {
+class ScreenStateMachineTest {
+
+    @Before
+    fun setUp() {
+    }
 
     @After
     fun tearDown() {
@@ -41,40 +44,55 @@ class ScreenViewAutotrackingTest {
     }
 
     // --- TESTS
+
     @Test
-    fun doesntTrackTheSameScreenViewMultipleTimes() {
+    fun tracksEventsWithTheCorrectScreenEntityInfo() {
         val eventSink = EventSink()
-        createTracker(listOf(eventSink))
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(Timing(category = "c1", variable = "v1", timing = 1))
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(Timing(category = "c2", variable = "v2", timing = 2))
+        tracker.track(ScreenView(name = "Screen 2"))
+        tracker.track(Timing(category = "c3", variable = "v3", timing = 3))
+        tracker.track(ScreenView(name = "Screen 3"))
+        tracker.track(Timing(category = "c4", variable = "v4", timing = 4))
+
         Thread.sleep(200)
 
-        NotificationCenter.postNotification("SnowplowScreenView", mapOf(
-            "event" to ScreenView(name = "Screen1").activityClassName("Screen1")
-        ))
-        Thread.sleep(200)
+        val events = eventSink.trackedEvents
 
-        NotificationCenter.postNotification("SnowplowScreenView", mapOf(
-            "event" to ScreenView(name = "Screen1").activityClassName("Screen1")
-        ))
-        Thread.sleep(200)
+        val timingEvents = events.filter { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+            .sortedBy { it.payload["timing"] as Int }
+        Assert.assertEquals(4, timingEvents.size)
 
-        NotificationCenter.postNotification("SnowplowScreenView", mapOf(
-            "event" to ScreenView(name = "Screen2").activityClassName("Screen2")
-        ))
-        Thread.sleep(2000)
+        val screen0 = getScreenEntityData(timingEvents[0])
+        Assert.assertNull(screen0)
 
-        val numberOfScreenViews = eventSink.trackedEvents.filter { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW }
-        Assert.assertEquals(2, numberOfScreenViews.size)
+        val screen1 = getScreenEntityData(timingEvents[1])
+        Assert.assertEquals("Screen 1", screen1?.get("name"))
+
+        val screen2 = getScreenEntityData(timingEvents[2])
+        Assert.assertEquals("Screen 2", screen2?.get("name"))
+
+        val screen3 = getScreenEntityData(timingEvents[3])
+        Assert.assertEquals("Screen 3", screen3?.get("name"))
     }
 
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
 
+    private fun getScreenEntityData(event: InspectableEvent): Map<*, *>? {
+        val entity = event.entities.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
+        return entity?.map?.get("data") as? Map<*, *>
+    }
+
     private fun createTracker(configurations: List<Configuration>): TrackerController {
         val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
         return Snowplow.createTracker(
             context,
-            namespace = "testScreenView" + Math.random().toString(),
+            namespace = "ns" + Math.random().toString(),
             network = networkConfig,
             configurations = configurations.toTypedArray()
         )

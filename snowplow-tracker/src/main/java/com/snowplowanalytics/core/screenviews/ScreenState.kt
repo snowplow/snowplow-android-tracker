@@ -21,63 +21,25 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class ScreenState : State {
-    private var name: String
-    private var type: String? = null
-    private var id: String
-    var previousName: String? = null
-        private set
-    var previousId: String? = null
-        private set
-    var previousType: String? = null
-        private set
-    private var transitionType: String? = null
-    private var fragmentClassName: String? = null
-    private var fragmentTag: String? = null
-    var activityClassName: String? = null
-    var activityTag: String? = null
+class ScreenState(
+    val name: String = "Unknown",
+    val type: String? = null,
+    val id: String = uUIDString(),
+    val transitionType: String? = null,
+    val fragmentClassName: String? = null,
+    val fragmentTag: String? = null,
+    val activityClassName: String? = null,
+    val activityTag: String? = null,
+    val previousScreenState: ScreenState? = null
+) : State {
 
-    init {
-        id = uUIDString()
-        name = "Unknown"
-    }
+    val previousName: String?
+        get() { return previousScreenState?.name }
+    val previousId: String?
+        get() { return previousScreenState?.id }
+    val previousType: String?
+        get() { return previousScreenState?.type }
 
-    @Synchronized
-    fun updateScreenState(id: String?, name: String, type: String?, transitionType: String?) {
-        populatePreviousFields()
-        this.name = name
-        this.type = type
-        this.transitionType = transitionType
-        if (id != null) {
-            this.id = id
-        } else {
-            this.id = uUIDString()
-        }
-    }
-
-    @Synchronized
-    fun updateScreenState(
-        id: String,
-        name: String,
-        type: String?,
-        transitionType: String?,
-        fragmentClassName: String?,
-        fragmentTag: String?,
-        activityClassName: String?,
-        activityTag: String?
-    ) {
-        this.updateScreenState(id, name, type, transitionType)
-        this.fragmentClassName = fragmentClassName
-        this.fragmentTag = fragmentTag
-        this.activityClassName = activityClassName
-        this.activityTag = activityTag
-    }
-
-    private fun populatePreviousFields() {
-        previousName = name
-        previousType = type
-        previousId = id
-    }
 
     fun getCurrentScreen(debug: Boolean): SelfDescribingJson {
         // this creates a screen context from screen state
