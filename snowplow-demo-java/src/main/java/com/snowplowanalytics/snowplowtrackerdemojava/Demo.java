@@ -336,7 +336,10 @@ public class Demo extends Activity implements LoggerDelegate {
         gcConfiguration.add("ruleSetExampleTag", new GlobalContext(Collections.singletonList(new SelfDescribingJson(SCHEMA_IDENTIFY, pairs))));
 
         PluginConfiguration plugin = new PluginConfiguration("myPlugin");
-        plugin.afterTrack(null, event -> System.out.printf("Tracked event with %d entities%n", event.getEntities().size()));
+        plugin.afterTrack(null, (event) -> {
+            System.out.printf("Tracked event with %d entities%n", event.getEntities().size());
+            return null;
+        });
 
         Snowplow.createTracker(getApplicationContext(),
                 namespace,
