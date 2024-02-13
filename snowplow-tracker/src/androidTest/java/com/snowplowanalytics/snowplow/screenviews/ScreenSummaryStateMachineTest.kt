@@ -16,6 +16,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.screenviews.ScreenSummaryState
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
@@ -48,6 +49,7 @@ class ScreenSummaryStateMachineTest {
     @After
     fun tearDown() {
         removeAllTrackers()
+        Executor.shutdown()
     }
 
     // --- TESTS
