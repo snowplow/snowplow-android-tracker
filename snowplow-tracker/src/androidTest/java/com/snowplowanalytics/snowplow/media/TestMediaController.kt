@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.media
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.media.MediaSchemata.eventSchema
 import com.snowplowanalytics.core.media.MediaSchemata.playerSchema
 import com.snowplowanalytics.core.media.MediaSchemata.sessionSchema
@@ -73,6 +74,7 @@ class TestMediaController {
         tracker = null
         removeAllTrackers()
         trackedEvents.clear()
+        Executor.shutdown()
     }
 
     // --- MEDIA PLAYER EVENT TESTS
