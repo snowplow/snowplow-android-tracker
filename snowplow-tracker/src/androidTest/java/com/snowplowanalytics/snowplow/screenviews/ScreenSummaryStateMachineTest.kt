@@ -16,16 +16,15 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.screenviews.ScreenSummaryState
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
 import com.snowplowanalytics.snowplow.configuration.Configuration
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.util.EventSink
 import com.snowplowanalytics.snowplow.util.TimeTraveler
 import org.junit.After
@@ -50,6 +49,7 @@ class ScreenSummaryStateMachineTest {
     @After
     fun tearDown() {
         removeAllTrackers()
+        Executor.shutdown()
     }
 
     // --- TESTS
@@ -94,9 +94,14 @@ class ScreenSummaryStateMachineTest {
         val events = eventSink.trackedEvents
         Assert.assertEquals(3, events.size)
 
-        val screenSummary = getScreenSummary(events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+        val screenEnd = events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END }
+        val screenSummary = getScreenSummary(screenEnd)
         Assert.assertEquals(10.0, screenSummary?.get("foreground_sec"))
         Assert.assertEquals(0.0, screenSummary?.get("background_sec"))
+
+        // should have the screen name of the first screen view
+        val screenEndScreen = screenEnd?.entities?.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
+        Assert.assertEquals("Screen 1", (screenEndScreen?.map?.get("data") as? Map<*, *>)?.get("name"))
     }
 
     @Test

@@ -1,3 +1,8 @@
+Version 6.0.1 (2024-02-14)
+--------------------------
+Fix wrong screen entity info assigned for screen end event and in case events are tracked right before screen view (#673)
+Add percent progress to event (#662)
+
 Version 6.0.0 (2024-02-01)
 --------------------------
 Enable lifecycle autotracking by default (#651)

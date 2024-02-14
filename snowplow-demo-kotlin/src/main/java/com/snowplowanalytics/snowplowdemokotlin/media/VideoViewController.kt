@@ -26,6 +26,7 @@ import android.view.View
 import android.widget.MediaController
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.event.Event
+import com.snowplowanalytics.snowplow.media.configuration.MediaTrackingConfiguration
 import com.snowplowanalytics.snowplow.media.controller.MediaTracking
 import com.snowplowanalytics.snowplow.media.entity.MediaPlayerEntity
 import com.snowplowanalytics.snowplow.media.event.*
@@ -130,9 +131,14 @@ class VideoViewController(activity: Activity, uri: Uri) {
             reset()
             loaded = true
 
-            mediaTracking = Snowplow.defaultTracker?.media?.startMediaTracking(
+            val configuration = MediaTrackingConfiguration(
                 id = UUID.randomUUID().toString(),
-                player = player
+                player = player,
+                boundaries = listOf(10, 25, 50, 75),
+            )
+
+            mediaTracking = Snowplow.defaultTracker?.media?.startMediaTracking(
+                configuration
             )
 
             updateThread = UpdateThread()

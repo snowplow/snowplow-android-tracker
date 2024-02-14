@@ -16,6 +16,7 @@ package com.snowplowanalytics.snowplow.media
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.media.MediaSchemata.eventSchema
 import com.snowplowanalytics.core.media.MediaSchemata.playerSchema
 import com.snowplowanalytics.core.media.MediaSchemata.sessionSchema
@@ -73,6 +74,7 @@ class TestMediaController {
         tracker = null
         removeAllTrackers()
         trackedEvents.clear()
+        Executor.shutdown()
     }
 
     // --- MEDIA PLAYER EVENT TESTS
@@ -521,6 +523,29 @@ class TestMediaController {
 
         assertEquals(4, trackedEvents.size)
         assertEquals(3, trackedEvents.filter { it.schema == eventSchema("percent_progress") }.size)
+    }
+
+    @Test
+    fun progressEventShouldHavePercentValue() {
+        val configuration = MediaTrackingConfiguration(
+            id = "media1",
+            player = MediaPlayerEntity(duration = 100.0),
+            boundaries = listOf(50),
+        )
+        val media = tracker?.media?.startMediaTracking(configuration = configuration)
+
+        media?.track(MediaPlayEvent())
+        for (i in 1 until 60) {
+            media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
+        }
+
+        Thread.sleep(100)
+
+        assertEquals(2, trackedEvents.size)
+        
+        val progressEvents = trackedEvents.filter { it.schema == eventSchema("percent_progress") }
+        assertEquals(1, progressEvents.size)
+        assertEquals(50, progressEvents[0].payload["percentProgress"])
     }
 
     @Test

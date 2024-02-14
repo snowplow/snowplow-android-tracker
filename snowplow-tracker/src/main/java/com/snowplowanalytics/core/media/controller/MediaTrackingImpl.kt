@@ -101,7 +101,7 @@ class MediaTrackingImpl (
             // track events
             event?.let { addEntitiesAndTrack(it) }
             if (shouldSendPercentProgressEvent()) {
-                addEntitiesAndTrack(MediaPercentProgressEvent())
+                addEntitiesAndTrack(MediaPercentProgressEvent(this.player.percentProgress))
             }
 
             // update state for events after this one
