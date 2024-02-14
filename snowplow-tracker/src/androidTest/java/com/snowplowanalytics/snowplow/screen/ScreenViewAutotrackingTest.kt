@@ -61,10 +61,10 @@ class ScreenViewAutotrackingTest {
         NotificationCenter.postNotification("SnowplowScreenView", mapOf(
             "event" to ScreenView(name = "Screen2").activityClassName("Screen2")
         ))
-        Thread.sleep(2000)
+        Thread.sleep(500)
 
-        val numberOfScreenViews = eventSink.trackedEvents.filter { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW }
-        Assert.assertEquals(2, numberOfScreenViews.size)
+        val numberOfScreenViews = eventSink.trackedEvents.filter { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW }.size
+        Assert.assertEquals(2, numberOfScreenViews)
     }
 
     // --- PRIVATE
