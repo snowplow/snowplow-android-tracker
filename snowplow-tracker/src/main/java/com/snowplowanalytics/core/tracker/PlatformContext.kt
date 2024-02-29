@@ -15,7 +15,6 @@ package com.snowplowanalytics.core.tracker
 import android.content.Context
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
-import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.core.utils.DeviceInfoMonitor
 import com.snowplowanalytics.core.utils.Util.addToMap
 import com.snowplowanalytics.core.utils.Util.mapHasKeys
@@ -43,15 +42,12 @@ class PlatformContext(
     private val context: Context,
 ) {
     private val pairs: MutableMap<String, Any> = HashMap()
+    private var initializedPlatformDict = false
     private var lastUpdatedEphemeralPlatformDict: Long = 0
     private var lastUpdatedEphemeralNetworkDict: Long = 0
-    
-    init {
-        setPlatformDict()
-    }
 
     fun getMobileContext(userAnonymisation: Boolean): SelfDescribingJson? {
-        updateEphemeralDictsIfNecessary()
+        update()
 
         // If does not contain the required properties, return null
         if (!mapHasKeys(
@@ -76,7 +72,11 @@ class PlatformContext(
 
     // --- PRIVATE
     @Synchronized
-    private fun updateEphemeralDictsIfNecessary() {
+    private fun update() {
+        if (!initializedPlatformDict) {
+            setPlatformDict()
+        }
+
         val now = System.currentTimeMillis()
         if (now - lastUpdatedEphemeralPlatformDict >= platformDictUpdateFrequency) {
             setEphemeralPlatformDict()
@@ -122,26 +122,25 @@ class PlatformContext(
         if (shouldTrack(PlatformContextProperty.LANGUAGE)) {
             addToMap(Parameters.MOBILE_LANGUAGE, (fromRetrieverOr(retriever.language) { deviceInfoMonitor.language })?.take(8), pairs)
         }
+        // IDFA
+        if (shouldTrack(PlatformContextProperty.ANDROID_IDFA)) {
+            addToMap(
+                Parameters.ANDROID_IDFA,
+                fromRetrieverOr(retriever.androidIdfa) {
+                    deviceInfoMonitor.getAndroidIdfa(context)
+                },
+                pairs
+            )
+        }
 
-        setEphemeralPlatformDict()
-        setEphemeralNetworkDict()
         setAppSetId()
+
+        initializedPlatformDict = true
     }
 
     private fun setEphemeralPlatformDict() {
         lastUpdatedEphemeralPlatformDict = System.currentTimeMillis()
 
-        // IDFA
-        if (shouldTrack(PlatformContextProperty.ANDROID_IDFA)) {
-            val currentIdfa = pairs[Parameters.ANDROID_IDFA]
-            if (currentIdfa == null || currentIdfa.toString().isEmpty()) {
-                addToMap(
-                    Parameters.ANDROID_IDFA,
-                    fromRetrieverOr(retriever.androidIdfa) { deviceInfoMonitor.getAndroidIdfa(context) },
-                    pairs
-                )
-            }
-        }
         // Battery
         val trackBatState = shouldTrack(PlatformContextProperty.BATTERY_STATE)
         val trackBatLevel = shouldTrack(PlatformContextProperty.BATTERY_LEVEL)
@@ -194,48 +193,25 @@ class PlatformContext(
 
     /**
      * Sets the app set information.
-     * The info has to be read on a background thread which often means that the first few
-     * tracked events will miss the info. To prevent that happening on the second start-up
-     * of the app, the info is saved in general prefs and read from there.
      */
     private fun setAppSetId() {
         val trackId = shouldTrack(PlatformContextProperty.APP_SET_ID)
         val trackScope = shouldTrack(PlatformContextProperty.APP_SET_ID_SCOPE)
         if (!trackId && !trackScope) { return }
 
-        val generalPref = context.getSharedPreferences(
-            TrackerConstants.SNOWPLOW_GENERAL_VARS,
-            Context.MODE_PRIVATE
-        )
-        val appSetId = fromRetrieverOr(retriever.appSetId) { generalPref.getString(Parameters.APP_SET_ID, null) }
-        val appSetIdScope = fromRetrieverOr(retriever.appSetIdScope) { generalPref.getString(Parameters.APP_SET_ID_SCOPE, null) }
-
-        if (appSetId != null && appSetIdScope != null) {
-            if (trackId) { addToMap(Parameters.APP_SET_ID, appSetId, pairs) }
-            if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, appSetIdScope, pairs) }
+        if (retriever.appSetId != null && retriever.appSetIdScope != null) {
+            if (trackId) { addToMap(Parameters.APP_SET_ID, retriever.appSetId?.invoke(), pairs) }
+            if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, retriever.appSetIdScope?.invoke(), pairs) }
         } else {
-            Executor.execute(TAG) {
-                val preferences = generalPref.edit()
-                var edited = false
+            val appSetIdAndScope = deviceInfoMonitor.getAppSetIdAndScope(context)
 
-                val appSetIdAndScope = deviceInfoMonitor.getAppSetIdAndScope(context)
-                val id = fromRetrieverOr(retriever.appSetId) {
-                    val id = appSetIdAndScope?.first
-                    preferences.putString(Parameters.APP_SET_ID, id)
-                    edited = true
-                    id
-                }
-                val scope = fromRetrieverOr(retriever.appSetIdScope) {
-                    val scope = appSetIdAndScope?.second
-                    preferences.putString(Parameters.APP_SET_ID_SCOPE, scope)
-                    edited = true
-                    scope
-                }
-
-                if (trackId) { addToMap(Parameters.APP_SET_ID, id, pairs) }
-                if (trackScope) { addToMap(Parameters.APP_SET_ID_SCOPE, scope, pairs) }
-
-                if (edited) { preferences.apply() }
+            if (trackId) {
+                val id = fromRetrieverOr(retriever.appSetId) { appSetIdAndScope?.first }
+                addToMap(Parameters.APP_SET_ID, id, pairs)
+            }
+            if (trackScope) {
+                val scope = fromRetrieverOr(retriever.appSetIdScope) { appSetIdAndScope?.second }
+                addToMap(Parameters.APP_SET_ID_SCOPE, scope, pairs)
             }
         }
     }

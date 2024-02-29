@@ -49,12 +49,14 @@ open class DeviceInfoMonitor {
 
     /**
      * The function that actually fetches the Advertising ID.
-     * - If called from the UI Thread will throw an Exception
+     * Can't be called on the main UI thread.
      *
      * @param context the android context
      * @return an empty string if limited tracking is on otherwise the advertising id or null
      */
     open fun getAndroidIdfa(context: Context): String? {
+        if (Looper.myLooper() == Looper.getMainLooper()) { return null }
+
         return try {
             val advertisingInfoObject = invokeStaticMethod(
                 "com.google.android.gms.ads.identifier.AdvertisingIdClient",

@@ -16,6 +16,7 @@ import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.controller.TrackerController
@@ -32,6 +33,7 @@ class ApplicationInstallEventTest {
     @Before
     fun setUp() {
         cleanSharedPreferences()
+        Executor.shutdown()
     }
 
     // Tests

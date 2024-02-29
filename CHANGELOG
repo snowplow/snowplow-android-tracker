@@ -1,3 +1,7 @@
+Version 6.0.2 (2024-02-28)
+--------------------------
+Fix createTracker call hanging for 10 seconds if run on a background thread (#620)
+
 Version 6.0.1 (2024-02-14)
 --------------------------
 Fix wrong screen entity info assigned for screen end event and in case events are tracked right before screen view (#673)

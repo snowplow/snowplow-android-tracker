@@ -49,7 +49,6 @@ class PlatformContextTest {
     fun addsAllMockedInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
-        Thread.sleep(100) // sleep in order to fetch the app set properties
         val sdj = platformContext.getMobileContext(false)
         val sdjMap = sdj!!.map
         val sdjData = sdjMap["data"] as Map<*, *>?
@@ -79,6 +78,7 @@ class PlatformContextTest {
     fun updatesMobileInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(
             1,
             deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory").toLong()
@@ -99,9 +99,24 @@ class PlatformContextTest {
     }
 
     @Test
+    fun doesntFetchPropertiesIfNotRequested() {
+        val deviceInfoMonitor = MockDeviceInfoMonitor()
+        PlatformContext(1000, 0, deviceInfoMonitor, context = context)
+        Assert.assertEquals(
+            0,
+            deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory").toLong()
+        )
+        Assert.assertEquals(
+            0,
+            deviceInfoMonitor.getMethodAccessCount("getBatteryStateAndLevel").toLong()
+        )
+    }
+
+    @Test
     fun doesntUpdateMobileInfoWithinUpdateWindow() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(1000, 0, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(
             1,
             deviceInfoMonitor.getMethodAccessCount("getSystemAvailableMemory").toLong()
@@ -125,6 +140,7 @@ class PlatformContextTest {
     fun updatesNetworkInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType").toLong())
         Assert.assertEquals(
             1,
@@ -142,6 +158,7 @@ class PlatformContextTest {
     fun doesntUpdateNetworkInfoWithinUpdateWindow() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 1000, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getNetworkType").toLong())
         Assert.assertEquals(
             1,
@@ -159,6 +176,7 @@ class PlatformContextTest {
     fun doesntUpdateNonEphemeralInfo() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getOsType").toLong())
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getTotalStorage").toLong())
         platformContext.getMobileContext(false)
@@ -170,22 +188,10 @@ class PlatformContextTest {
     fun doesntUpdateIdfaIfNotNull() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         val platformContext = PlatformContext(0, 1, deviceInfoMonitor, context = context)
+        platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
         platformContext.getMobileContext(false)
         Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
-    }
-
-    @Test
-    fun updatesIdfaIfEmptyOrNull() {
-        val deviceInfoMonitor = MockDeviceInfoMonitor()
-        deviceInfoMonitor.customIdfa = ""
-        val platformContext = PlatformContext(0, 1, deviceInfoMonitor, context = context)
-        Assert.assertEquals(1, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
-        deviceInfoMonitor.customIdfa = null
-        platformContext.getMobileContext(false)
-        Assert.assertEquals(2, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
-        platformContext.getMobileContext(false)
-        Assert.assertEquals(3, deviceInfoMonitor.getMethodAccessCount("getAndroidIdfa").toLong())
     }
 
     @Test
