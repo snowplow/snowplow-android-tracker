@@ -14,6 +14,7 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
+import android.os.RemoteException
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse
@@ -71,8 +72,11 @@ class InstallReferrerDetails(
                                     googlePlayInstantParam = response.googlePlayInstantParam
                                 )
                                 callback(referrer)
-                            } catch (_: Throwable) {
+                            } catch (_: RemoteException) {
                                 Logger.d(TAG, "Install referrer API remote exception.")
+                                callback(null)
+                            } catch (_: NoSuchMethodError) {
+                                Logger.d(TAG, "Upgrade InstallReferrer package to v1.1 or higher to add the install referrer details entity.")
                                 callback(null)
                             }
                         }
