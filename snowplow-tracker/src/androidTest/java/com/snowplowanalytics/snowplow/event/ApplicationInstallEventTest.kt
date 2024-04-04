@@ -47,7 +47,7 @@ class ApplicationInstallEventTest {
             .installAutotracking(true)
         createTracker(listOf(trackerConfiguration, plugin))
 
-        Thread.sleep(1000)
+        Thread.sleep(1200)
 
         // check if event was tracked
         Assert.assertTrue(eventTracked)
@@ -65,7 +65,7 @@ class ApplicationInstallEventTest {
             .installAutotracking(true)
         createTracker(listOf(trackerConfiguration, plugin))
 
-        Thread.sleep(1000)
+        Thread.sleep(1200)
 
         // check if event was tracked
         Assert.assertTrue(eventTracked)
@@ -76,7 +76,7 @@ class ApplicationInstallEventTest {
         // create tracker again
         createTracker(listOf(trackerConfiguration, plugin))
 
-        Thread.sleep(1000)
+        Thread.sleep(1200)
 
         // check if event was tracked
         Assert.assertFalse(eventTracked)

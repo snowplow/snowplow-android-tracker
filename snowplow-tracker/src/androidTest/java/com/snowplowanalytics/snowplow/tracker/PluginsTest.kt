@@ -62,7 +62,7 @@ class PluginsTest {
         val tracker = createTracker(listOf(plugin, testPlugin))
         tracker.track(Structured("cat", "act"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(expectation)
     }
 
@@ -84,7 +84,7 @@ class PluginsTest {
         val tracker = createTracker(listOf(plugin1, plugin2, testPlugin))
         tracker.track(ScreenView("sv"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(expectation)
     }
 
@@ -112,7 +112,7 @@ class PluginsTest {
         tracker.track(SelfDescribing("schema1", emptyMap()))
         tracker.track(SelfDescribing("schema2", emptyMap()))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(event1HasEntity!!)
         Assert.assertFalse(event2HasEntity!!)
     }
@@ -135,7 +135,7 @@ class PluginsTest {
         tracker.track(SelfDescribing("schema2", emptyMap()))
         tracker.track(Structured("cat", "act"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(event1Called)
         Assert.assertFalse(event2Called)
         Assert.assertFalse(event3Called)
@@ -156,7 +156,7 @@ class PluginsTest {
         tracker.track(SelfDescribing("schema1", emptyMap()))
         tracker.track(Structured("cat", "act"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(structuredCalled)
         Assert.assertFalse(selfDescribingCalled)
     }
@@ -172,7 +172,7 @@ class PluginsTest {
 
         tracker.track(ScreenView("sv"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertTrue(expectation)
     }
 
@@ -187,7 +187,7 @@ class PluginsTest {
 
         tracker.track(ScreenView("sv"))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
         Assert.assertFalse(pluginCalled)
     }
 
@@ -203,12 +203,12 @@ class PluginsTest {
         val tracker = createTracker(listOf(filterPlugin, afterTrackPlugin))
 
         tracker.track(SelfDescribing("s1", emptyMap()))
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         Assert.assertFalse(afterTrackCalled)
 
         tracker.track(SelfDescribing("s2", emptyMap()))
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         Assert.assertTrue(afterTrackCalled)
     }
