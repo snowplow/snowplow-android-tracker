@@ -87,7 +87,7 @@ class TestMediaController {
         )
         media?.track(MediaPlayEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertEquals(eventSchema("play"), firstEvent.schema)
@@ -102,7 +102,7 @@ class TestMediaController {
         )
         media?.track(MediaEndEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertEquals(eventSchema("end"), firstEvent.schema)
@@ -119,7 +119,7 @@ class TestMediaController {
         media?.track(event = MediaSeekEndEvent(), player = MediaPlayerEntity(currentTime = 2.0))
         media?.track(event = MediaSeekStartEvent(), player = MediaPlayerEntity(currentTime = 3.0))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(3, trackedEvents.size)
         assertEquals(2, trackedEvents.filter { it.schema == eventSchema("seek_start") }.size)
@@ -136,7 +136,7 @@ class TestMediaController {
         media?.track(MediaPlayEvent())
         media?.track(MediaPauseEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertEquals(eventSchema("play"), firstEvent.schema)
@@ -154,7 +154,7 @@ class TestMediaController {
 
         media?.track(MediaPlayEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertNotNull(
@@ -178,7 +178,7 @@ class TestMediaController {
                 )
         )
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertNotNull(
@@ -199,7 +199,7 @@ class TestMediaController {
         media?.track(MediaPlaybackRateChangeEvent(newRate = 1.5))
         media?.track(MediaPauseEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(2, trackedEvents.size)
         val rateEvent = trackedEvents.find { it.schema == eventSchema("playback_rate_change") }
@@ -238,7 +238,7 @@ class TestMediaController {
 
         media?.track(MediaFullscreenChangeEvent(fullscreen = true))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(true, firstEvent.payload.get("fullscreen"))
         assertEquals(true, firstPlayer?.get("fullscreen"))
@@ -253,7 +253,7 @@ class TestMediaController {
 
         media?.track(MediaPictureInPictureChangeEvent(pictureInPicture = true))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(true, firstEvent.payload.get("pictureInPicture"))
         assertEquals(true, firstPlayer?.get("pictureInPicture"))
@@ -265,7 +265,7 @@ class TestMediaController {
 
         media?.track(MediaAdFirstQuartileEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(25, firstEvent.payload.get("percentProgress"))
     }
@@ -276,7 +276,7 @@ class TestMediaController {
 
         media?.track(MediaAdMidpointEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(50, firstEvent.payload.get("percentProgress"))
     }
@@ -287,7 +287,7 @@ class TestMediaController {
 
         media?.track(MediaAdThirdQuartileEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(75, firstEvent.payload.get("percentProgress"))
     }
@@ -301,7 +301,7 @@ class TestMediaController {
         media?.track(MediaAdResumeEvent(percentProgress = 40))
         media?.track(MediaAdPauseEvent(percentProgress = 50))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         val adClickEvent = trackedEvents.find { it.schema == eventSchema("ad_click") }
         assertEquals(15, adClickEvent?.payload?.get("percentProgress"))
@@ -326,7 +326,7 @@ class TestMediaController {
             framesPerSecond = 60
         ))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals("720p", firstEvent.payload.get("previousQuality"))
         assertEquals("1080p", firstEvent.payload.get("newQuality"))
@@ -344,7 +344,7 @@ class TestMediaController {
             errorDescription = "Failed to load media"
         ))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals("501", firstEvent.payload.get("errorCode"))
         assertEquals("forbidden", firstEvent.payload.get("errorName"))
@@ -363,7 +363,7 @@ class TestMediaController {
             mapOf("url" to "https://www.youtube.com/watch?v=12345")
         ))
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals("iglu:com.acme/video_played/jsonschema/1-0-0", firstEvent.schema)
         assertEquals("Video", firstPlayer?.get("label"))
@@ -377,7 +377,7 @@ class TestMediaController {
 
         media?.track(MediaPlayEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals("media1", firstSession?.get("mediaSessionId"))
     }
@@ -401,7 +401,7 @@ class TestMediaController {
         media.update(player = MediaPlayerEntity(currentTime = 10.0))
         media.track(MediaEndEvent())
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         val endEvent = trackedEvents.find { it.schema == eventSchema("end") }
         val lastSession = endEvent?.entities?.find { it.map.get("schema") == sessionSchema }?.map?.get("data") as? Map<*, *>
@@ -427,7 +427,7 @@ class TestMediaController {
 
         timer.fire()
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
         assertEquals(10000L, timer.delay)
@@ -452,7 +452,7 @@ class TestMediaController {
         media.track(MediaPauseEvent())
         timer.fire()
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(4, trackedEvents.size)
     }
@@ -475,7 +475,7 @@ class TestMediaController {
             timer.fire()
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(2, trackedEvents.size)
     }
@@ -498,7 +498,7 @@ class TestMediaController {
             timer.fire()
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(5, trackedEvents.size)
     }
@@ -519,7 +519,7 @@ class TestMediaController {
             media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(4, trackedEvents.size)
         assertEquals(3, trackedEvents.filter { it.schema == eventSchema("percent_progress") }.size)
@@ -539,7 +539,7 @@ class TestMediaController {
             media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(2, trackedEvents.size)
         
@@ -562,7 +562,7 @@ class TestMediaController {
             media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(1, trackedEvents.size)
     }
@@ -586,7 +586,7 @@ class TestMediaController {
             media?.update(player = MediaPlayerEntity(currentTime = i.toDouble()))
         }
 
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertEquals(5, trackedEvents.size)
         assertEquals(3, trackedEvents.filter { it.schema == eventSchema("percent_progress") }.size)
