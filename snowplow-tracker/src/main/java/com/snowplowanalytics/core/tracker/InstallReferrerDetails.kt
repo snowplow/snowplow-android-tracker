@@ -75,6 +75,9 @@ class InstallReferrerDetails(
                             } catch (_: RemoteException) {
                                 Logger.d(TAG, "Install referrer API remote exception.")
                                 callback(null)
+                            } catch (_: NoSuchMethodError) {
+                                Logger.d(TAG, "Upgrade InstallReferrer package to v1.1 or higher to add the install referrer details entity.")
+                                callback(null)
                             }
                         }
                         InstallReferrerResponse.FEATURE_NOT_SUPPORTED -> {
@@ -99,7 +102,7 @@ class InstallReferrerDetails(
             })
         }
 
-        fun isInstallReferrerPackageAvailable(): Boolean {
+        private fun isInstallReferrerPackageAvailable(): Boolean {
             try {
                 Class.forName("com.android.installreferrer.api.InstallReferrerStateListener")
                 return true
