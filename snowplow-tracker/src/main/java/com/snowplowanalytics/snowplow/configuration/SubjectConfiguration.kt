@@ -76,6 +76,11 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
     override var colorDepth: Int?
         get() = _colorDepth ?: sourceConfig?.colorDepth
         set(value) { _colorDepth = value }
+
+    private var _useContextResourcesScreenResolution: Boolean? = null
+    override var useContextResourcesScreenResolution: Boolean?
+        get() = _useContextResourcesScreenResolution ?: sourceConfig?.useContextResourcesScreenResolution
+        set(value) { _useContextResourcesScreenResolution = value }
     
     // Builder methods
     
@@ -168,6 +173,17 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
         return this
     }
 
+    /**
+     * Set this flag to true to define the default screen resolution (at tracker initialization)
+     * based on the context's Resources display metrics, rather than the deprecated WindowManager. 
+     * NB: the height value will be smaller using Resources as it doesn't include the menu bar.
+     * Defaults to false.
+     */
+    fun useContextResourcesScreenResolution(useContextResourcesScreenResolution: Boolean?): SubjectConfiguration {
+        this.useContextResourcesScreenResolution = useContextResourcesScreenResolution
+        return this
+    }
+
     // Copyable
     override fun copy(): SubjectConfiguration {
         return SubjectConfiguration()
@@ -181,6 +197,7 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
             .screenResolution(screenResolution)
             .screenViewPort(screenViewPort)
             .colorDepth(colorDepth)
+            .useContextResourcesScreenResolution(useContextResourcesScreenResolution)
     }
 
     // JSON Formatter

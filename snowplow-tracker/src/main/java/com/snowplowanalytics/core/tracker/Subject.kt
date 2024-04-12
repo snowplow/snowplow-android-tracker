@@ -179,13 +179,28 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
             field = depth
             standardPairs[Parameters.COLOR_DEPTH] = depth.toString()
         }
+
+    var useContextResourcesScreenResolution: Boolean? = false
+        /**
+         * Whether to get the size from the context resources or not.
+         * By default this is false, the size is obtained from WindowManager.
+         *
+         * @param useContextResourcesScreenResolution
+         */
+        set(useContextResourcesScreenResolution) {
+            if (useContextResourcesScreenResolution == null) {
+                return
+            }
+
+            field = useContextResourcesScreenResolution
+        }
     
 
     init {
         setDefaultTimezone()
         setDefaultLanguage()
-        setDefaultScreenResolution(context)
-        
+        setDefaultScreenResolution(context, config?.useContextResourcesScreenResolution)
+
         if (config != null) {
             config.userId?.let { userId = it }
             config.networkUserId?.let { networkUserId = it }
@@ -197,6 +212,7 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
             config.screenResolution?.let { screenResolution = it }
             config.screenViewPort?.let { screenViewPort = it }
             config.colorDepth?.let { colorDepth = it }
+            config.useContextResourcesScreenResolution?.let { useContextResourcesScreenResolution = it }
         }
         v(TAG, "Subject created successfully.")
     }
@@ -220,31 +236,35 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
     }
 
     /**
-     * Sets the default screen resolution
-     * of the device the Tracker is running
-     * on.
-     *
-     * @param context the android context
+     * Sets the default screen resolution of the device the tracker is running on.
+     * @param context the Android context
+     * @param useContextResourcesScreenResolution whether to get the size from the context resources or not
      */
-    private fun setDefaultScreenResolution(context: Context) {
-        try {
-            screenResolution = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val metrics =
-                    context.getSystemService(WindowManager::class.java).currentWindowMetrics
-                Size(metrics.bounds.width(), metrics.bounds.height())
-            } else {
-                val windowManager =
-                    context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-                val display = windowManager?.defaultDisplay
-                val metrics = if (display != null) {
-                    DisplayMetrics().also { display.getRealMetrics(it) }
+    private fun setDefaultScreenResolution(context: Context, useContextResourcesScreenResolution: Boolean?) {
+        if (useContextResourcesScreenResolution == true) {
+            val width = context.resources.displayMetrics.widthPixels
+            val height = context.resources.displayMetrics.heightPixels
+            screenResolution = Size(width, height)
+        } else {
+            try {
+                screenResolution = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    val metrics =
+                        context.getSystemService(WindowManager::class.java).currentWindowMetrics
+                    Size(metrics.bounds.width(), metrics.bounds.height())
                 } else {
-                    Resources.getSystem().displayMetrics
+                    val windowManager =
+                        context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+                    val display = windowManager?.defaultDisplay
+                    val metrics = if (display != null) {
+                        DisplayMetrics().also { display.getRealMetrics(it) }
+                    } else {
+                        Resources.getSystem().displayMetrics
+                    }
+                    Size(metrics.widthPixels, metrics.heightPixels)
                 }
-                Size(metrics.widthPixels, metrics.heightPixels)
+            } catch (e: Throwable) {
+                Logger.e(TAG, "Failed to set default screen resolution.")
             }
-        } catch (e: Exception) {
-            Logger.e(TAG, "Failed to set default screen resolution.")
         }
     }
 

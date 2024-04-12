@@ -92,6 +92,13 @@ class SubjectControllerImpl  // Constructors
             subject.colorDepth = colorDepth
         }
 
+    override var useContextResourcesScreenResolution: Boolean?
+        get() = subject.useContextResourcesScreenResolution
+        set(useContextResourcesScreenResolution) {
+            dirtyConfig.useContextResourcesScreenResolution = useContextResourcesScreenResolution
+            subject.useContextResourcesScreenResolution = useContextResourcesScreenResolution
+        }
+
     // Private methods
     private val subject: Subject
         get() = serviceProvider.getOrMakeSubject()
