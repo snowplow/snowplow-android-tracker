@@ -25,5 +25,5 @@ interface SubjectConfigurationInterface {
     var screenResolution: Size?
     var screenViewPort: Size?
     var colorDepth: Int?
-    var useContextResourcesScreenResolution: Boolean?
+    var useContextResourcesScreenResolution: Boolean
 }

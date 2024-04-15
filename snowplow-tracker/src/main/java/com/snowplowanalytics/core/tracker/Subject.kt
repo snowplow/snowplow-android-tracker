@@ -180,22 +180,12 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
             standardPairs[Parameters.COLOR_DEPTH] = depth.toString()
         }
 
-    var useContextResourcesScreenResolution: Boolean? = false
-        /**
-         * Whether to get the size from the context resources or not.
-         * By default this is false, the size is obtained from WindowManager.
-         *
-         * @param useContextResourcesScreenResolution
-         */
-        set(useContextResourcesScreenResolution) {
-            if (useContextResourcesScreenResolution == null) {
-                return
-            }
-
-            field = useContextResourcesScreenResolution
-        }
+    /**
+     * Whether to get the size from the context resources or not.
+     * By default this is false, the size is obtained from WindowManager.
+     */
+    var useContextResourcesScreenResolution: Boolean = false
     
-
     init {
         setDefaultTimezone()
         setDefaultLanguage()
@@ -212,7 +202,6 @@ class Subject(context: Context, config: SubjectConfigurationInterface?) {
             config.screenResolution?.let { screenResolution = it }
             config.screenViewPort?.let { screenViewPort = it }
             config.colorDepth?.let { colorDepth = it }
-            config.useContextResourcesScreenResolution?.let { useContextResourcesScreenResolution = it }
         }
         v(TAG, "Subject created successfully.")
     }

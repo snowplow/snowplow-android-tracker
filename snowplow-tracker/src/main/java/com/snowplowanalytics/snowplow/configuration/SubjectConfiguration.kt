@@ -78,8 +78,8 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
         set(value) { _colorDepth = value }
 
     private var _useContextResourcesScreenResolution: Boolean? = null
-    override var useContextResourcesScreenResolution: Boolean?
-        get() = _useContextResourcesScreenResolution ?: sourceConfig?.useContextResourcesScreenResolution
+    override var useContextResourcesScreenResolution: Boolean
+        get() = _useContextResourcesScreenResolution ?: sourceConfig?.useContextResourcesScreenResolution ?: false
         set(value) { _useContextResourcesScreenResolution = value }
     
     // Builder methods
@@ -179,7 +179,7 @@ open class SubjectConfiguration() : Configuration, SubjectConfigurationInterface
      * NB: the height value will be smaller using Resources as it doesn't include the menu bar.
      * Defaults to false.
      */
-    fun useContextResourcesScreenResolution(useContextResourcesScreenResolution: Boolean?): SubjectConfiguration {
+    fun useContextResourcesScreenResolution(useContextResourcesScreenResolution: Boolean): SubjectConfiguration {
         this.useContextResourcesScreenResolution = useContextResourcesScreenResolution
         return this
     }
