@@ -77,7 +77,7 @@ class MultipleInstancesTest {
     fun testDefaultTracker() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val t1 = createTracker(context, "t1", NetworkConfiguration("snowplowanalytics.fake"))
-        val t2 = createTracker(context, "t2", NetworkConfiguration("snowplowanalytics.fake2"))
+        createTracker(context, "t2", NetworkConfiguration("snowplowanalytics.fake2"))
         val td = defaultTracker
         Assert.assertEquals(t1, td)
     }
@@ -85,7 +85,7 @@ class MultipleInstancesTest {
     @Test
     fun testUpdateDefaultTracker() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val t1 = createTracker(context, "t1", NetworkConfiguration("snowplowanalytics.fake"))
+        createTracker(context, "t1", NetworkConfiguration("snowplowanalytics.fake"))
         val t2 = createTracker(context, "t2", NetworkConfiguration("snowplowanalytics.fake2"))
         setTrackerAsDefault(t2)
         val td = defaultTracker

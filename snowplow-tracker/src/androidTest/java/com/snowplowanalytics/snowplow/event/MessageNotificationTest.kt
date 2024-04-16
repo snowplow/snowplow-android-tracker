@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MessageNotificationTest {
     @Test
+    @Suppress("unchecked_cast")
     fun testExpectedForm() {
         val event = MessageNotification("title", "body", MessageNotificationTrigger.push)
             .notificationTimestamp("2020-12-31T15:59:60-08:00")

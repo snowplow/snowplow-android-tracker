@@ -56,7 +56,7 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
         return "wifi"
     }
 
-    override fun getNetworkTechnology(networkInfo: NetworkInfo?): String? {
+    override fun getNetworkTechnology(networkInfo: NetworkInfo?): String {
         increaseMethodAccessCount("getNetworkTechnology")
         return "3g"
     }
@@ -71,7 +71,7 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
         return 10
     }
 
-    override fun getBatteryStateAndLevel(context: Context): Pair<String?, Int>? {
+    override fun getBatteryStateAndLevel(context: Context): Pair<String?, Int> {
         increaseMethodAccessCount("getBatteryStateAndLevel")
         return Pair("charging", 20)
     }
@@ -97,22 +97,22 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
             _language = value
         }
 
-    override fun getResolution(context: Context): String? {
+    override fun getResolution(context: Context): String {
         increaseMethodAccessCount("getResolution")
         return "1024x768"
     }
 
-    override fun getScale(context: Context): Float? {
+    override fun getScale(context: Context): Float {
         increaseMethodAccessCount("getScale")
         return 2.0f
     }
 
-    override fun getIsPortrait(context: Context): Boolean? {
+    override fun getIsPortrait(context: Context): Boolean {
         increaseMethodAccessCount("getIsPortrait")
         return true
     }
 
-    override fun getAppSetIdAndScope(context: Context): Pair<String, String>? {
+    override fun getAppSetIdAndScope(context: Context): Pair<String, String> {
         increaseMethodAccessCount("getAppSetIdAndScope")
         return Pair("XXX", "app")
     }

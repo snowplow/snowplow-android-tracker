@@ -50,6 +50,7 @@ class NoiseTest {
     }
 
     companion object {
+        @Suppress("unchecked_cast")
         private fun superficialEnumCodeCoverage(enumClass: Class<out Enum<*>?>) {
             try {
                 for (o in enumClass.getMethod("values").invoke(null) as Array<Any>) {

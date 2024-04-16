@@ -59,7 +59,7 @@ class NetworkConnectionTest {
         // Check successful result
         val result = results[0]
         Assert.assertTrue(result.isSuccessful)
-        Assert.assertEquals(1, result.eventIds[0]!!.toLong())
+        Assert.assertEquals(1, result.eventIds[0])
         mockServer.shutdown()
     }
 
@@ -82,7 +82,7 @@ class NetworkConnectionTest {
         // Check unsuccessful result
         val result = results[0]
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertEquals(1, result.eventIds[0]!!.toLong())
+        Assert.assertEquals(1, result.eventIds[0])
         mockServer.shutdown()
     }
 
@@ -111,7 +111,7 @@ class NetworkConnectionTest {
         // Check successful result
         val result = results[0]
         Assert.assertTrue(result.isSuccessful)
-        Assert.assertEquals(1, result.eventIds[0]!!.toLong())
+        Assert.assertEquals(1, result.eventIds[0])
         mockServer.shutdown()
     }
 
@@ -135,7 +135,7 @@ class NetworkConnectionTest {
         // Check unsuccessful result
         val result = results[0]
         Assert.assertFalse(result.isSuccessful)
-        Assert.assertEquals(1, result.eventIds[0]!!.toLong())
+        Assert.assertEquals(1, result.eventIds[0])
         mockServer.shutdown()
     }
 

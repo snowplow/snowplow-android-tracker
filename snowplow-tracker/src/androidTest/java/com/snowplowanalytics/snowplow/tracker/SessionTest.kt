@@ -397,6 +397,7 @@ class SessionTest {
         return Session(foregroundTimeout, backgroundTimeout, TimeUnit.SECONDS, null, context)
     }
 
+    @Suppress("unchecked_cast")
     private fun getSessionContext(
         session: Session?,
         eventId: String,

@@ -22,6 +22,7 @@ import org.junit.runner.RunWith
 class AbstractEventTest {
     
     @Test
+    @Suppress("deprecation")
     fun testAddsEntitiesUsingAllAPIs() {
         val event = ScreenView("screen")
         val entity1 = SelfDescribingJson("schema1", "data1")

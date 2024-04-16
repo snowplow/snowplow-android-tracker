@@ -43,7 +43,7 @@ class FocalMeterConfigurationTest {
     // --- TESTS
     @Test
     fun logsSuccessfulRequest() {
-        withMockServer(200) { mockServer, endpoint ->
+        withMockServer(200) { _, endpoint ->
             val focalMeter = FocalMeterConfiguration(endpoint)
             val debugs = mutableListOf<String>()
             val loggerDelegate = createLoggerDelegate(debugs = debugs)
@@ -68,10 +68,10 @@ class FocalMeterConfigurationTest {
 
     @Test
     fun logsSuccessfulRequestWithProcessedUserId() {
-        withMockServer(200) { mockServer, endpoint ->
+        withMockServer(200) { _, endpoint ->
             val focalMeter = FocalMeterConfiguration(
                 kantarEndpoint = endpoint,
-                processUserId = { userId -> "processed-" + userId }
+                processUserId = { userId -> "processed-$userId" }
             )
             val debugs = mutableListOf<String>()
             val loggerDelegate = createLoggerDelegate(debugs = debugs)
@@ -94,7 +94,7 @@ class FocalMeterConfigurationTest {
 
     @Test
     fun makesAnotherRequestWhenUserIdChanges() {
-        withMockServer(200) { mockServer, endpoint ->
+        withMockServer(200) { _, endpoint ->
             val focalMeter = FocalMeterConfiguration(endpoint)
             val debugs = mutableListOf<String>()
             val loggerDelegate = createLoggerDelegate(debugs = debugs)
@@ -113,13 +113,13 @@ class FocalMeterConfigurationTest {
             Assert.assertEquals(
                 1,
                 debugs.filter {
-                    it.contains("Request to Kantar endpoint sent with user ID: ${firstUserId}")
+                    it.contains("Request to Kantar endpoint sent with user ID: $firstUserId")
                 }.size
             )
             Assert.assertEquals(
                 1,
                 debugs.filter {
-                    it.contains("Request to Kantar endpoint sent with user ID: ${secondUserId}")
+                    it.contains("Request to Kantar endpoint sent with user ID: $secondUserId")
                 }.size
             )
         }
@@ -127,7 +127,7 @@ class FocalMeterConfigurationTest {
 
     @Test
     fun logsFailedRequest() {
-        withMockServer(500) { mockServer, endpoint ->
+        withMockServer(500) { _, endpoint ->
             val focalMeter = FocalMeterConfiguration(endpoint)
             val errors = mutableListOf<String>()
             val loggerDelegate = createLoggerDelegate(errors = errors)

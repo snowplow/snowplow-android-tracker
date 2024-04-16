@@ -34,6 +34,7 @@ import kotlin.collections.ArrayList
 @RunWith(AndroidJUnit4::class)
 class StateManagerTest {
     @Test
+    @Suppress("unchecked_cast")
     fun testStateManager() {
         val stateManager = StateManager()
         stateManager.addOrReplaceStateMachine(MockStateMachine())

@@ -95,7 +95,7 @@ class RemoteConfigurationTest {
             "{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-0-0\",\"configurationVersion\":12,\"configurationBundle\":[]}"
         withMockServer(200, body) { _, endpoint ->
 
-            val expectation = Any() as Object
+            val expectation = Object()
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             RemoteConfigurationFetcher(
                 context,
@@ -180,7 +180,7 @@ class RemoteConfigurationTest {
         ) { _, endpoint ->
 
             // test
-            val expectation = Any() as Object
+            val expectation = Object()
             val expectationNotified = AtomicBoolean(false)
             val remoteConfig = RemoteConfiguration(endpoint, HttpMethod.GET)
             RemoteConfigurationFetcher(
@@ -333,7 +333,7 @@ class RemoteConfigurationTest {
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
-            val expectation = Any() as Object
+            val expectation = Object()
             val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(
                 context,
@@ -371,7 +371,7 @@ class RemoteConfigurationTest {
             cached.configurationVersion = 1
             cached.configurationBundle = listOf(bundle)
             cache.writeCache(context, cached)
-            val expectation = Any() as Object
+            val expectation = Object()
             val provider = RemoteConfigurationProvider(remoteConfig)
             provider.retrieveConfiguration(
                 context,
@@ -387,7 +387,7 @@ class RemoteConfigurationTest {
             mockWebServer.enqueue(mockResponse)
 
             // test
-            val expectation2 = Any() as Object
+            val expectation2 = Object()
             var numCallbackCalls = 0
             provider.retrieveConfiguration(
                 context,

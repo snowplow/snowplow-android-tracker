@@ -508,6 +508,7 @@ class EventSendingTest {
         )
     }
 
+    @Suppress("deprecation")
     private fun trackEcommerceEvent(tracker: Tracker) {
         val item = EcommerceTransactionItem("sku-1", 35.00, 1).name("Acme 1").category("Stuff")
             .currency("AUD")

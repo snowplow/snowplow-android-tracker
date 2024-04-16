@@ -19,7 +19,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("deprecation")
 class EcommerceTransactionTest {
+    // NB this event type has been deprecated
     
     @Test
     fun testExpectedForm() {

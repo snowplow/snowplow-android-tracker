@@ -84,7 +84,7 @@ class DeepLinkReceivedTest {
         val events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        val payload = events[0]!!.payload
+        val payload = events[0].payload
 
         // Check url and referrer fields for atomic table
         val url = payload.map[Parameters.PAGE_URL] as String?
@@ -135,7 +135,7 @@ class DeepLinkReceivedTest {
         Assert.assertEquals(2, events.size.toLong())
         var screenViewPayload: Map<*, *>? = null
         for (emitterEvent in events) {
-            if (emitterEvent!!.payload.map["eid"] == screenViewEventId.toString()) {
+            if (emitterEvent.payload.map["eid"] == screenViewEventId.toString()) {
                 screenViewPayload = emitterEvent.payload.map
                 break
             }

@@ -37,7 +37,7 @@ class ExecutorTest {
     @Test
     @Throws(InterruptedException::class)
     fun testExecutorRaisingException() {
-        val expectation = Any() as Object
+        val expectation = Object()
         val exceptionRaised = AtomicBoolean(false)
         execute({ throw NullPointerException() }) { t: Throwable? ->
             exceptionRaised.set(t is NullPointerException)

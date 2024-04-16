@@ -108,7 +108,7 @@ class ConfigurationTest {
     @Test
     @Throws(InterruptedException::class)
     fun sessionConfigurationCallback() {
-        val expectation = Any() as Object
+        val expectation = Object()
         val callbackExecuted = AtomicBoolean(false)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -148,8 +148,8 @@ class ConfigurationTest {
     @Test
     @Throws(InterruptedException::class)
     fun sessionConfigurationCallbackAfterNewSession() {
-        val expectation1 = Any() as Object
-        val expectation2 = Any() as Object
+        val expectation1 = Object()
+        val expectation2 = Object()
         val callbackExecuted = AtomicBoolean(false)
         val sessionId = AtomicReference<String?>(null)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -264,7 +264,7 @@ class ConfigurationTest {
         val events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        val payload = events[0]!!.payload
+        val payload = events[0].payload
 
         // Check v_tracker field
         val versionTracker = payload.map["tv"] as String?
@@ -316,7 +316,7 @@ class ConfigurationTest {
         var events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        var payload = events[0]!!.payload
+        var payload = events[0].payload
         var contexts = payload.map["co"] as String?
         Assert.assertTrue(contexts!!.contains("\"basisForProcessing\":\"contract\""))
         Assert.assertTrue(contexts.contains("\"documentId\":\"id1\""))
@@ -337,7 +337,7 @@ class ConfigurationTest {
         events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        payload = events[0]!!.payload
+        payload = events[0].payload
         contexts = payload.map["co"] as String?
         Assert.assertFalse(contexts!!.contains("\"basisForProcessing\":\"contract\""))
         Assert.assertFalse(contexts.contains("\"documentId\":\"id1\""))
@@ -382,7 +382,7 @@ class ConfigurationTest {
         var events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        var payload = events[0]!!.payload
+        var payload = events[0].payload
         var contexts = payload.map["co"] as String?
         Assert.assertFalse(contexts!!.contains("\"basisForProcessing\""))
 
@@ -403,7 +403,7 @@ class ConfigurationTest {
         events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        payload = events[0]!!.payload
+        payload = events[0].payload
         contexts = payload.map["co"] as String?
         Assert.assertTrue(contexts!!.contains("\"basisForProcessing\":\"contract\""))
         Assert.assertTrue(contexts.contains("\"documentId\":\"id2\""))
@@ -462,7 +462,7 @@ class ConfigurationTest {
         val events = eventStore.getEmittableEvents(10)
         eventStore.removeAllEvents()
         Assert.assertEquals(1, events.size.toLong())
-        val payload = events[0]!!.payload
+        val payload = events[0].payload
         val contexts = payload.map["co"] as String?
         Assert.assertTrue(contexts!!.contains("value1"))
         Assert.assertTrue(contexts.contains("value2"))
