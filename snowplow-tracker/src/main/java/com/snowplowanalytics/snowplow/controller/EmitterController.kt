@@ -40,4 +40,9 @@ interface EmitterController : EmitterConfigurationInterface {
      * The emitter will resume emitting events again.
      */
     fun resume()
+
+    /**
+     * Flush all stored events.
+     */
+    fun flush()
 }
