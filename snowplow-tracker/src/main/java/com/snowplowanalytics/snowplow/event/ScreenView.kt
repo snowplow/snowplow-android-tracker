@@ -30,7 +30,7 @@ class ScreenView @JvmOverloads constructor(name: String, screenId: UUID? = null)
     /** Name of the screen.  */
     val name: String
 
-    /** Identifier of the screen.  */
+    /** Identifier of the screen view (unique for each screen view event).  */
     val id: String
 
     /** Type of screen.  */
