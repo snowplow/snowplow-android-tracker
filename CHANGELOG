@@ -1,3 +1,8 @@
+Version 6.0.3 (2024-04-18)
+--------------------------
+Add Subject config flag to avoid WindowManager bug (#657)
+Catch more generic exceptions for InstallReferrer (#647)
+
 Version 6.0.2 (2024-02-28)
 --------------------------
 Fix createTracker call hanging for 10 seconds if run on a background thread (#620)
