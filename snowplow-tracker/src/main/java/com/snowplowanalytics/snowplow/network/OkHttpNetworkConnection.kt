@@ -48,7 +48,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
     override val httpMethod: HttpMethod
     private val emitTimeout: Int
     private val customPostPath: String?
-    private val serverAnonymisation: Boolean
+    var serverAnonymisation: Boolean
     private val requestHeaders: Map<String, String>?
     private var client: OkHttpClient? = null
     private val uriBuilder: Uri.Builder

@@ -303,19 +303,8 @@ class Emitter(
          */
         set(serverAnonymisation) {
             field = serverAnonymisation
-            if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = emitTimeout?.let {
-                    OkHttpNetworkConnectionBuilder(uri, context)
-                        .method(httpMethod)
-                        .tls(tlsVersions)
-                        .emitTimeout(it)
-                        .customPostPath(customPostPath)
-                        .client(client)
-                        .cookieJar(cookieJar)
-                        .serverAnonymisation(serverAnonymisation)
-                        .requestHeaders(requestHeaders)
-                        .build()
-                }
+            if (!isCustomNetworkConnection && builderFinished && networkConnection is OkHttpNetworkConnection) {
+                (networkConnection as OkHttpNetworkConnection).serverAnonymisation = true
             }
         }
 

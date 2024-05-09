@@ -20,7 +20,7 @@ object Tracking {
     @Composable
     fun setup(namespace: String) : TrackerController {
         // Replace this collector endpoint with your own
-        val networkConfig = NetworkConfiguration("https://23a6-82-26-43-253.ngrok.io", HttpMethod.POST)
+        val networkConfig = NetworkConfiguration("http://192.168.0.20:9090", HttpMethod.POST)
         val trackerConfig = TrackerConfiguration("appID")
             .logLevel(LogLevel.DEBUG)
             .screenViewAutotracking(false)
