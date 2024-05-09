@@ -197,9 +197,7 @@ class Emitter(
     var bufferOption: BufferOption = EmitterDefaults.bufferOption
         /**
          * Whether the buffer should send events instantly or after the buffer has reached
-         * its limit. By default, this is set to BufferOption Default.
-         *
-         * @param option Set the BufferOption enum to Instant to send events upon creation.
+         * its limit.
          */
         set(option) {
             if (!isRunning.get()) {
