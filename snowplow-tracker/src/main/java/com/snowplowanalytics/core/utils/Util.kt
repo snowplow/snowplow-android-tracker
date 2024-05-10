@@ -44,6 +44,9 @@ object Util {
         return System.currentTimeMillis().toString()
     }
 
+    /**
+     * Converts a timestamp in milliseconds to a DateTime.
+     */
     @JvmStatic
     fun getDateTimeFromTimestamp(timestamp: Long): String {
         val date = Date(timestamp)
