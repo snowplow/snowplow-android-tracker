@@ -302,7 +302,7 @@ class Emitter(
         set(serverAnonymisation) {
             field = serverAnonymisation
             if (!isCustomNetworkConnection && builderFinished && networkConnection is OkHttpNetworkConnection) {
-                (networkConnection as OkHttpNetworkConnection).serverAnonymisation = true
+                (networkConnection as OkHttpNetworkConnection).serverAnonymisation = serverAnonymisation
             }
         }
 
