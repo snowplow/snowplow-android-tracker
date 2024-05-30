@@ -197,9 +197,7 @@ class Emitter(
     var bufferOption: BufferOption = EmitterDefaults.bufferOption
         /**
          * Whether the buffer should send events instantly or after the buffer has reached
-         * its limit. By default, this is set to BufferOption Default.
-         *
-         * @param option Set the BufferOption enum to Instant to send events upon creation.
+         * its limit.
          */
         set(option) {
             if (!isRunning.get()) {
@@ -303,19 +301,8 @@ class Emitter(
          */
         set(serverAnonymisation) {
             field = serverAnonymisation
-            if (!isCustomNetworkConnection && builderFinished) {
-                networkConnection = emitTimeout?.let {
-                    OkHttpNetworkConnectionBuilder(uri, context)
-                        .method(httpMethod)
-                        .tls(tlsVersions)
-                        .emitTimeout(it)
-                        .customPostPath(customPostPath)
-                        .client(client)
-                        .cookieJar(cookieJar)
-                        .serverAnonymisation(serverAnonymisation)
-                        .requestHeaders(requestHeaders)
-                        .build()
-                }
+            if (!isCustomNetworkConnection && builderFinished && networkConnection is OkHttpNetworkConnection) {
+                (networkConnection as OkHttpNetworkConnection).serverAnonymisation = serverAnonymisation
             }
         }
 
