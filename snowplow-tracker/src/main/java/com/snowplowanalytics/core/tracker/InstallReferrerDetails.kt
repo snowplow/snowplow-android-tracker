@@ -42,8 +42,8 @@ class InstallReferrerDetails(
     "iglu:com.android.installreferrer.api/referrer_details/jsonschema/1-0-0",
     mapOf(
         "installReferrer" to installReferrer,
-        "referrerClickTimestamp" to if (referrerClickTimestamp > 0) { Util.getDateTimeFromTimestamp(referrerClickTimestamp) } else { null },
-        "installBeginTimestamp" to if (installBeginTimestamp > 0) { Util.getDateTimeFromTimestamp(installBeginTimestamp) } else { null },
+        "referrerClickTimestamp" to if (referrerClickTimestamp > 0) { Util.getDateTimeFromTimestamp(referrerClickTimestamp * 1000) } else { null },
+        "installBeginTimestamp" to if (installBeginTimestamp > 0) { Util.getDateTimeFromTimestamp(installBeginTimestamp * 1000) } else { null },
         "googlePlayInstantParam" to googlePlayInstantParam,
     )
 ) {
