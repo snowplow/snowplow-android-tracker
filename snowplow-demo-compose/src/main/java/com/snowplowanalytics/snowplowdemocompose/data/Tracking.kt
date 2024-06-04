@@ -17,10 +17,15 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 
 object Tracking {
+    /**
+     * Replace this with the URI of your Snowplow collector
+     * (e.g., Micro, Mini, or BDP).
+     */
+    private const val collectorEndpoint = "placeholder"
+    
     @Composable
     fun setup(namespace: String) : TrackerController {
-        // Replace this collector endpoint with your own
-        val networkConfig = NetworkConfiguration("http://192.168.0.20:9090", HttpMethod.POST)
+        val networkConfig = NetworkConfiguration(collectorEndpoint, HttpMethod.POST)
         val trackerConfig = TrackerConfiguration("appID")
             .logLevel(LogLevel.DEBUG)
             .screenViewAutotracking(false)
