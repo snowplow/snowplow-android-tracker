@@ -1,3 +1,8 @@
+Version 6.0.4 (2024-06-05)
+--------------------------
+Send correct install referrer timestamps (#687)
+Set serverAnonymisation more quickly (#689)
+
 Version 6.0.3 (2024-04-18)
 --------------------------
 Add Subject config flag to avoid WindowManager bug (#657)
