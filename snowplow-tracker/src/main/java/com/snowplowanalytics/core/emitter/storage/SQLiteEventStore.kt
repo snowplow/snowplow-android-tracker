@@ -41,7 +41,7 @@ import kotlin.time.Duration
 class SQLiteEventStore(context: Context, private val namespace: String) : EventStore {
     private val payloadWaitingList: MutableList<Payload> = ArrayList()
     private var database: SQLiteDatabase? = null
-    private lateinit var dbHelper: EventStoreHelper
+    private var dbHelper: EventStoreHelper? = null
     private val allColumns = arrayOf(
         EventStoreHelper.COLUMN_ID,
         EventStoreHelper.COLUMN_EVENT_DATA,
@@ -62,7 +62,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      * @return a boolean for database status
      */
     val databaseOpen: Boolean
-        get() = database != null && database!!.isOpen
+        get() = database != null && database?.isOpen ?: false
 
     /**
      * Creates a new Event Store
@@ -91,7 +91,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      */
     fun open() {
         if (!databaseOpen) {
-            database = dbHelper.writableDatabase
+            database = dbHelper?.writableDatabase
             database?.enableWriteAheadLogging()
         }
     }
@@ -100,7 +100,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      * Closes the database
      */
     fun close() {
-        dbHelper.close()
+        dbHelper?.close()
         EventStoreHelper.removeInstance(namespace)
     }
 
@@ -112,25 +112,27 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
      * @return a boolean stating if the insert
      * was a success or not
      */
-    fun insertEvent(payload: Payload): Long {
+    fun insertEvent(payload: Payload): Long? {
         if (databaseOpen) {
+            val database = database ?: return null
             val bytes = Util.serialize(Util.objectMapToString(payload.map))
             val values = ContentValues(2)
             values.put(EventStoreHelper.COLUMN_EVENT_DATA, bytes)
             lastInsertedRowId =
-                database!!.insert(EventStoreHelper.TABLE_EVENTS, null, values)
+                database.insert(EventStoreHelper.TABLE_EVENTS, null, values)
+            Logger.d(TAG, "Added event to database: %s", lastInsertedRowId)
+            return lastInsertedRowId
         }
-        Logger.d(TAG, "Added event to database: %s", lastInsertedRowId)
-        return lastInsertedRowId
+        return null
     }
 
     override fun removeEvent(id: Long): Boolean {
         var retval = -1
         if (databaseOpen) {
-            retval = database!!.delete(
+            retval = database?.delete(
                 EventStoreHelper.TABLE_EVENTS,
                 EventStoreHelper.COLUMN_ID + "=" + id, null
-            )
+            ) ?: retval
         }
         Logger.d(TAG, "Removed event from database: %s", "" + id)
         return retval == 1
@@ -142,10 +144,10 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         }
         var retval = -1
         if (databaseOpen) {
-            retval = database!!.delete(
+            retval = database?.delete(
                 EventStoreHelper.TABLE_EVENTS,
                 EventStoreHelper.COLUMN_ID + " in (" + Util.joinLongList(ids) + ")", null
-            )
+            ) ?: retval
         }
         Logger.d(TAG, "Removed events from database: %s", retval)
         return retval == ids.size
@@ -155,7 +157,7 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
         var retval = 0
         Logger.d(TAG, "Removing all events from database.")
         if (databaseOpen) {
-            retval = database!!.delete(EventStoreHelper.TABLE_EVENTS, null, null)
+            retval = database?.delete(EventStoreHelper.TABLE_EVENTS, null, null) ?: retval
         } else {
             Logger.e(TAG, "Database is not open.")
         }
@@ -196,9 +198,10 @@ class SQLiteEventStore(context: Context, private val namespace: String) : EventS
     private fun queryDatabase(query: String?, orderBy: String?): List<Map<String, Any?>> {
         val res: MutableList<Map<String, Any?>> = ArrayList()
         if (databaseOpen) {
+            val database = database ?: return res
             var cursor: Cursor? = null
             try {
-                cursor = database!!.query(
+                cursor = database.query(
                     EventStoreHelper.TABLE_EVENTS,
                     allColumns,
                     query,

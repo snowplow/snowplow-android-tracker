@@ -248,7 +248,7 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
                 request,
                 userAgent
             ) else buildPostRequest(request, userAgent)
-            futures.add(Executor.futureCallable(getRequestCallable(okHttpRequest)))
+            Executor.futureCallable(getRequestCallable(okHttpRequest))?.let { futures.add(it) }
         }
         Logger.d(TAG, "Request Futures: %s", futures.size)
 
