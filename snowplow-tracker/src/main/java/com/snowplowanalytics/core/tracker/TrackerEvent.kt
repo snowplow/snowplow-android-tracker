@@ -43,8 +43,12 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
     init {
         entities = event.entities.toMutableList()
         trueTimestamp = event.trueTimestamp
-        payload = HashMap(event.dataPayload)
-        
+        // NOTE: this code is a workaround since the types of the `Event.dataPayload` and `TrackerEvent.payload` don't match
+        // `Event` allows the values to be optional, while `TrackerEvent` does not.
+        // We should fix this in the next major version to unify the types.
+        // The `toMap()` is called in order to make a copy before calling HashMap as that can lead to concurrency issues, see #692
+        payload = HashMap(event.dataPayload.toMap())
+
         if (state != null) {
             this.state = state
         } else {
