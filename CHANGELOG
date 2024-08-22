@@ -1,3 +1,8 @@
+Version 6.0.5 (2024-06-22)
+--------------------------
+Handle exceptions raised by the Executor during initialization of the thread pool for emitter (#694)
+Fix concurrent modification when creating TrackerEvent by copying the payload (#692)
+
 Version 6.0.4 (2024-06-05)
 --------------------------
 Send correct install referrer timestamps (#687)
