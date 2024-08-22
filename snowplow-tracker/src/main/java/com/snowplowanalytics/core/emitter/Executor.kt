@@ -14,10 +14,7 @@ package com.snowplowanalytics.core.emitter
 
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.tracker.Logger
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
+import java.util.concurrent.*
 
 /**
  * Static Class which holds the logic for controlling
@@ -51,11 +48,15 @@ object Executor {
      */
     @Synchronized
     @JvmStatic
-    private fun getExecutor(): ExecutorService {
+    private fun getExecutor(): ExecutorService? {
         if (executor == null) {
-            executor = Executors.newScheduledThreadPool(threadCount)
+            try {
+                executor = Executors.newScheduledThreadPool(threadCount)
+            } catch (e: Exception) {
+                Logger.e("Executor", e.message ?: "Failed to create thread pool")
+            }
         }
-        return executor!!
+        return executor
     }
 
     /**
@@ -105,7 +106,7 @@ object Executor {
     fun execute(runnable: Runnable?, exceptionHandler: ExceptionHandler?) {
         val executor = getExecutor()
         try {
-            executor.execute {
+            executor?.execute {
                 try {
                     runnable?.run()
                 } catch (t: Throwable) {
@@ -125,8 +126,13 @@ object Executor {
      * @return the future object to be queried
      */
     @JvmStatic
-    fun futureCallable(callable: Callable<*>): Future<*> {
-        return getExecutor().submit(callable)
+    fun futureCallable(callable: Callable<*>): Future<*>? {
+        return try {
+            getExecutor()?.submit(callable)
+        } catch (e: Exception) {
+            Logger.e("Executor", e.message ?: "Failed to submit task")
+            null
+        }
     }
 
     /**
@@ -136,7 +142,11 @@ object Executor {
     @JvmStatic
     fun shutdown(): ExecutorService? {
         if (executor != null) {
-            executor!!.shutdown()
+            try {
+                executor?.shutdown()
+            } catch (e: Exception) {
+                Logger.e("Executor", e.message ?: "Failed to shutdown")
+            }
             val es = executor
             executor = null
             return es

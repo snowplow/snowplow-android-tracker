@@ -122,7 +122,7 @@ class EventStoreTest {
     @Throws(InterruptedException::class)
     fun testInsertPayload() {
         val eventStore = eventStore()
-        val id = eventStore.insertEvent(payload())
+        val id = eventStore.insertEvent(payload())!!
         val lastRowId = eventStore.lastInsertedRowId
         val event = eventStore.getEvent(id)
         Assert.assertEquals(id, lastRowId)
@@ -153,7 +153,7 @@ class EventStoreTest {
     @Throws(InterruptedException::class)
     fun testRemoveIndividualEvent() {
         val eventStore = eventStore()
-        val id = eventStore.insertEvent(payload())
+        val id = eventStore.insertEvent(payload())!!
         var res = eventStore.removeEvent(id)
         Assert.assertEquals(0, eventStore.size())
         Assert.assertTrue(res)
@@ -169,9 +169,9 @@ class EventStoreTest {
     fun testRemoveRangeOfEvents() {
         val eventStore = eventStore()
         val idList: MutableList<Long> = ArrayList()
-        idList.add(eventStore.insertEvent(payload()))
-        idList.add(eventStore.insertEvent(payload()))
-        idList.add(eventStore.insertEvent(payload()))
+        idList.add(eventStore.insertEvent(payload())!!)
+        idList.add(eventStore.insertEvent(payload())!!)
+        idList.add(eventStore.insertEvent(payload())!!)
         Assert.assertEquals(3, idList.size.toLong())
         Assert.assertEquals(3, eventStore.size())
         var res = eventStore.removeEvents(idList)
