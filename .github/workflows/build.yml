@@ -47,7 +47,7 @@ jobs:
 
       - name: Load logs if failed
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with: 
           name: logcat-${{ matrix.api-level }}
           path: logcat.log
