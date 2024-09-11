@@ -341,6 +341,20 @@ class PlatformContextTest {
         Assert.assertEquals("r13", sdjData[Parameters.APP_SET_ID_SCOPE])
     }
 
+    @Test
+    fun batteryLevelNotTrackedIfNegative() {
+        val deviceInfoMonitor = MockDeviceInfoMonitor()
+        deviceInfoMonitor.batteryLevel = -1
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertEquals("charging", sdjData[Parameters.BATTERY_STATE])
+        Assert.assertFalse(sdjData.containsKey(Parameters.BATTERY_LEVEL))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

@@ -13,6 +13,7 @@
 package com.snowplowanalytics.core.tracker
 
 import android.content.Context
+import android.util.Pair
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.utils.DeviceInfoMonitor
@@ -147,7 +148,11 @@ class PlatformContext(
         if (trackBatState || trackBatLevel) {
             val batteryInfo = deviceInfoMonitor.getBatteryStateAndLevel(context)
             if (trackBatState) { addToMap(Parameters.BATTERY_STATE, fromRetrieverOr(retriever.batteryState) { batteryInfo?.first }, pairs) }
-            if (trackBatLevel) { addToMap(Parameters.BATTERY_LEVEL, fromRetrieverOr(retriever.batteryLevel) { batteryInfo?.second }, pairs) }
+            if (trackBatLevel) {
+                val batteryLevel = fromRetrieverOr(retriever.batteryLevel) { batteryInfo?.second }
+                val validBatteryLevel = if (batteryLevel != null && batteryLevel >= 0) batteryLevel else null
+                addToMap(Parameters.BATTERY_LEVEL, validBatteryLevel, pairs)
+            }
         }
         // Memory
         if (shouldTrack(PlatformContextProperty.SYSTEM_AVAILABLE_MEMORY)) {
