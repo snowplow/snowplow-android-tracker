@@ -1,3 +1,7 @@
+Version 6.0.6 (2024-09-12)
+--------------------------
+Set negative battery levels to null in mobile context (#698)
+
 Version 6.0.5 (2024-06-22)
 --------------------------
 Handle exceptions raised by the Executor during initialization of the thread pool for emitter (#694)

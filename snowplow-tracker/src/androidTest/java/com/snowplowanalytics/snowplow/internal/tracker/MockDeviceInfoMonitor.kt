@@ -20,6 +20,8 @@ import com.snowplowanalytics.core.utils.DeviceInfoMonitor
 class MockDeviceInfoMonitor : DeviceInfoMonitor() {
     private val methodAccessCounts: MutableMap<String, Int> = HashMap()
     var customIdfa: String? = "XJKLJSALFKJ"
+    var batteryLevel: Int = 20
+    
     override val osType: String
         get() {
             increaseMethodAccessCount("getOsType")
@@ -73,7 +75,7 @@ class MockDeviceInfoMonitor : DeviceInfoMonitor() {
 
     override fun getBatteryStateAndLevel(context: Context): Pair<String?, Int>? {
         increaseMethodAccessCount("getBatteryStateAndLevel")
-        return Pair("charging", 20)
+        return Pair("charging", batteryLevel)
     }
 
     override val availableStorage: Long
