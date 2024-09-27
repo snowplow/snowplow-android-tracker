@@ -59,7 +59,7 @@ class PluginStateMachine(
     }
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson> {
-        return entitiesConfiguration?.closure?.apply(event) ?: emptyList()
+        return entitiesConfiguration?.closure?.invoke(event) ?: emptyList()
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
@@ -67,11 +67,11 @@ class PluginStateMachine(
     }
 
     override fun afterTrack(event: InspectableEvent) {
-        afterTrackConfiguration?.closure?.accept(event)
+        afterTrackConfiguration?.closure?.invoke(event)
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
-        return filterConfiguration?.closure?.apply(event)
+        return filterConfiguration?.closure?.invoke(event)
     }
 
     override fun eventsBefore(event: Event): List<Event>? {

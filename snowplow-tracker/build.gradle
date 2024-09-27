@@ -67,8 +67,6 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled true
-
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -91,8 +89,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     compileOnly "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     compileOnly "com.android.installreferrer:installreferrer:2.2"
-
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.9'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
