@@ -259,4 +259,10 @@ object Parameters {
     const val DIAGNOSTIC_ERROR_STACK = "stackTrace"
     const val DIAGNOSTIC_ERROR_CLASS_NAME = "className"
     const val DIAGNOSTIC_ERROR_EXCEPTION_NAME = "exceptionName"
+    
+    // Page Pings (for WebView tracking)
+    const val PING_XOFFSET_MIN = "pp_mix"
+    const val PING_XOFFSET_MAX = "pp_max"
+    const val PING_YOFFSET_MIN = "pp_miy"
+    const val PING_YOFFSET_MAX = "pp_may"
 }
