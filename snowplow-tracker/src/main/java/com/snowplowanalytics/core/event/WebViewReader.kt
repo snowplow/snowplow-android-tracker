@@ -23,6 +23,7 @@ class WebViewReader(
     val eventName: String,
     val trackerVersion: String,
     val useragent: String,
+    val selfDescribingEventData: String? = null,
     val pageUrl: String? = null,
     val pageTitle: String? = null,
     val referrer: String? = null,
@@ -45,6 +46,7 @@ class WebViewReader(
             payload[Parameters.EVENT] = eventName
             payload[Parameters.TRACKER_VERSION] = trackerVersion
             payload[Parameters.USERAGENT] = useragent
+            if (selfDescribingEventData != null) payload["changeThis"] = selfDescribingEventData
             if (pageUrl != null) payload[Parameters.PAGE_URL] = pageUrl
             if (pageTitle != null) payload[Parameters.PAGE_TITLE] = pageTitle
             if (referrer != null) payload[Parameters.PAGE_REFR] = referrer
@@ -61,5 +63,5 @@ class WebViewReader(
         }
     
     override val name: String
-        get() = "internal_use_only"
+        get() = "webViewEvent"
 }
