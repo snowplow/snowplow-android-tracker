@@ -43,10 +43,10 @@ class TrackerWebViewInterfaceV2 {
         label: String? = null,
         property: String? = null,
         value: Double? = null,
-        ping_xoffset_min: Int? = null,
-        ping_xoffset_max: Int? = null,
-        ping_yoffset_min: Int? = null,
-        ping_yoffset_max: Int? = null,
+        pingXOffsetMin: Int? = null,
+        pingXOffsetMax: Int? = null,
+        pingYOffsetMin: Int? = null,
+        pingYOffsetMax: Int? = null,
         entities: String? = null,
         trackers: Array<String>? = null
     ) {
@@ -62,75 +62,14 @@ class TrackerWebViewInterfaceV2 {
             label,
             property,
             value,
-            ping_xoffset_min,
-            ping_xoffset_max,
-            ping_yoffset_min,
-            ping_yoffset_max
+            pingXOffsetMin,
+            pingXOffsetMax,
+            pingYOffsetMin,
+            pingYOffsetMax
         )
         trackEvent(event, entities, trackers)
     }
     
-
-
-    /**
-     * Track a screen view event from the Web view
-     * @param name The name of the screen viewed
-     * @param id The id (UUID v4) of screen that was viewed
-     * @param type The type of screen that was viewed
-     * @param previousName The name of the previous screen that was viewed
-     * @param previousId The id (UUID v4) of the previous screen that was viewed
-     * @param previousType The type of screen that was viewed
-     * @param transitionType The type of transition that led to the screen being viewed
-     * @param context Optional JSON string with a list of context entities
-     * @param trackers Optional list of tracker namespaces to track with
-     * @throws JSONException In case of JSON parsing failures
-     */
-    @JavascriptInterface
-    @Throws(JSONException::class)
-    fun trackScreenView(
-        name: String,
-        id: String,
-        type: String?,
-        previousName: String?,
-        previousId: String?,
-        previousType: String?,
-        transitionType: String?,
-        context: String?,
-        trackers: Array<String>?
-    ) {
-        val event = ScreenView(name, UUID.fromString(id))
-            .type(type)
-            .previousId(previousId)
-            .previousName(previousName)
-            .previousType(previousType)
-            .transitionType(transitionType)
-        trackEvent(event, context, trackers)
-    }
-
-    /**
-     * Track a page view event from the Web view
-     * @param pageUrl Page URL
-     * @param pageTitle Page title
-     * @param referrer Referrer URL
-     * @param context Optional JSON string with a list of context entities
-     * @param trackers Optional list of tracker namespaces to track with
-     * @throws JSONException In case of JSON parsing failures
-     */
-    @JavascriptInterface
-    @Throws(JSONException::class)
-    fun trackPageView(
-        pageUrl: String,
-        pageTitle: String?,
-        referrer: String?,
-        context: String?,
-        trackers: Array<String>?
-    ) {
-        val event = PageView(pageUrl)
-            .pageTitle(pageTitle)
-            .referrer(referrer)
-        trackEvent(event, context, trackers)
-    }
-
     @Throws(JSONException::class)
     private fun trackEvent(event: AbstractEvent, context: String?, trackers: Array<String>?) {
         if (context != null) {
@@ -139,7 +78,7 @@ class TrackerWebViewInterfaceV2 {
                 event.entities(contextEntities)
             }
         }
-        if (trackers == null || trackers.isEmpty()) {
+        if (trackers.isNullOrEmpty()) {
             val tracker = defaultTracker
             if (tracker != null) {
                 tracker.track(event)

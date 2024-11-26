@@ -13,7 +13,6 @@
 package com.snowplowanalytics.core.event
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.snowplow.event.AbstractPrimitive
 
 /**
@@ -32,10 +31,10 @@ class WebViewReader(
     val label: String? = null,
     val property: String? = null,
     val value: Double? = null,
-    val ping_xoffset_min: Int? = null,
-    val ping_xoffset_max: Int? = null,
-    val ping_yoffset_min: Int? = null,
-    val ping_yoffset_max: Int? = null
+    val pingXOffsetMin: Int? = null,
+    val pingXOffsetMax: Int? = null,
+    val pingYOffsetMin: Int? = null,
+    val pingYOffsetMax: Int? = null
 ) : AbstractPrimitive() {
     
 
@@ -54,10 +53,10 @@ class WebViewReader(
             if (label != null) payload[Parameters.SE_LABEL] = label
             if (property != null) payload[Parameters.SE_PROPERTY] = property
             if (value != null) payload[Parameters.SE_VALUE] = value
-            if (ping_xoffset_min != null) payload[Parameters.PING_XOFFSET_MIN] = ping_xoffset_min
-            if (ping_xoffset_max != null) payload[Parameters.PING_XOFFSET_MAX] = ping_xoffset_max
-            if (ping_yoffset_min != null) payload[Parameters.PING_YOFFSET_MIN] = ping_yoffset_min
-            if (ping_yoffset_max != null) payload[Parameters.PING_YOFFSET_MAX] = ping_yoffset_max
+            if (pingXOffsetMin != null) payload[Parameters.PING_XOFFSET_MIN] = pingXOffsetMin
+            if (pingXOffsetMax != null) payload[Parameters.PING_XOFFSET_MAX] = pingXOffsetMax
+            if (pingYOffsetMin != null) payload[Parameters.PING_YOFFSET_MIN] = pingYOffsetMin
+            if (pingYOffsetMax != null) payload[Parameters.PING_YOFFSET_MAX] = pingYOffsetMax
             return payload
         }
     

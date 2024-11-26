@@ -87,10 +87,10 @@ class TrackerWebViewInterfaceV2Test {
             pageUrl = "http://snowplow.com",
             pageTitle = "Snowplow",
             referrer = "http://google.com",
-            ping_xoffset_min = 10,
-            ping_xoffset_max = 20,
-            ping_yoffset_min = 30,
-            ping_yoffset_max = 40
+            pingXOffsetMin = 10,
+            pingXOffsetMax = 20,
+            pingYOffsetMin = 30,
+            pingYOffsetMax = 40
         )
 
         Thread.sleep(200)
@@ -135,6 +135,50 @@ class TrackerWebViewInterfaceV2Test {
         assertEquals("prop", payload[Parameters.SE_PROPERTY])
         assertEquals("lbl", payload[Parameters.SE_LABEL])
         assertEquals(10.0, payload[Parameters.SE_VALUE])
+    }
+
+    @Test
+    @Throws(JSONException::class, InterruptedException::class)
+    fun tracksEventWithCorrectTracker() {
+        // create the second tracker
+        val trackedEvents2: MutableList<InspectableEvent> = mutableListOf()
+        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
+        val plugin2 = PluginConfiguration("plugin2")
+        plugin2.afterTrack {
+                trackedEvents2.add(it)
+        }
+        createTracker(
+            context,
+            namespace = "ns2",
+            network = networkConfig,
+            TrackerConfiguration("appId"),
+            plugin2
+        )
+
+        // track an event using the second tracker
+        webInterface!!.trackWebViewEvent(
+            eventName = "pv",
+            trackerVersion = "webview",
+            useragent = "Chrome",
+            pageUrl = "http://snowplow.com",
+            trackers = arrayOf("ns2")
+        )
+        Thread.sleep(200)
+
+        assertEquals(0, trackedEvents.size)
+        assertEquals(1, trackedEvents2.size)
+
+        // track an event using default tracker if not specified
+        webInterface!!.trackWebViewEvent(
+            eventName = "pp",
+            trackerVersion = "webview",
+            useragent = "Chrome",
+            pageUrl = "http://snowplow.com",
+        )
+        Thread.sleep(200)
+
+        assertEquals(1, trackedEvents.size)
+        assertEquals(1, trackedEvents2.size)
     }
 
 
