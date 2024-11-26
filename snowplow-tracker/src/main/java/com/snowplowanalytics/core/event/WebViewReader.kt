@@ -13,7 +13,7 @@
 package com.snowplowanalytics.core.event
 
 import com.snowplowanalytics.core.constants.Parameters
-import com.snowplowanalytics.snowplow.event.AbstractPrimitive
+import com.snowplowanalytics.snowplow.event.AbstractEvent
 
 /**
  * A PageView event. This event has been designed for web trackers, and is not suitable for mobile apps.
@@ -36,7 +36,7 @@ class WebViewReader(
     val pingXOffsetMax: Int? = null,
     val pingYOffsetMin: Int? = null,
     val pingYOffsetMax: Int? = null
-) : AbstractPrimitive() {
+) : AbstractEvent() {
     
 
     // Public methods
@@ -46,7 +46,9 @@ class WebViewReader(
             payload[Parameters.EVENT] = eventName
             payload[Parameters.TRACKER_VERSION] = trackerVersion
             payload[Parameters.USERAGENT] = useragent
-            if (selfDescribingEventData != null) payload["changeThis"] = selfDescribingEventData
+            
+            if (selfDescribingEventData != null) payload["selfDescribingEventData"] = selfDescribingEventData
+            
             if (pageUrl != null) payload[Parameters.PAGE_URL] = pageUrl
             if (pageTitle != null) payload[Parameters.PAGE_TITLE] = pageTitle
             if (referrer != null) payload[Parameters.PAGE_REFR] = referrer
@@ -62,6 +64,4 @@ class WebViewReader(
             return payload
         }
     
-    override val name: String
-        get() = "webViewEvent"
 }

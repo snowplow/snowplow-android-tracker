@@ -14,6 +14,7 @@ package com.snowplowanalytics.core.tracker
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
+import com.snowplowanalytics.core.event.WebViewReader
 import com.snowplowanalytics.core.statemachine.StateMachineEvent
 import com.snowplowanalytics.core.statemachine.TrackerState
 import com.snowplowanalytics.core.statemachine.TrackerStateSnapshot
@@ -39,6 +40,7 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
     var trueTimestamp: Long?
     var isPrimitive = false
     var isService: Boolean
+    var isWebView = false
 
     init {
         entities = event.entities.toMutableList()
@@ -56,7 +58,11 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
         }
         
         isService = event is TrackerError
-        if (event is AbstractPrimitive) {
+        if (event is WebViewReader) {
+            name = payload[Parameters.EVENT]?.toString()
+            isPrimitive = true
+            isWebView = true
+        } else if (event is AbstractPrimitive) {
             name = event.name
             isPrimitive = true
         } else {
