@@ -22,7 +22,6 @@ import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
 import java.util.*
 
 /**
@@ -71,11 +70,11 @@ class TrackerWebViewInterfaceV2 {
     }
     
     @Throws(JSONException::class)
-    private fun trackEvent(event: AbstractEvent, context: String?, trackers: Array<String>?) {
-        if (context != null) {
-            val contextEntities = parseContext(context)
-            if (contextEntities.isNotEmpty()) {
-                event.entities(contextEntities)
+    private fun trackEvent(event: AbstractEvent, contextEntities: String?, trackers: Array<String>?) {
+        if (contextEntities != null) {
+            val entities = parseEntities(contextEntities)
+            if (entities.isNotEmpty()) {
+                event.entities(entities)
             }
         }
         if (trackers.isNullOrEmpty()) {
@@ -98,9 +97,9 @@ class TrackerWebViewInterfaceV2 {
     }
 
     @Throws(JSONException::class)
-    private fun parseContext(context: String): List<SelfDescribingJson> {
+    private fun parseEntities(serialisedEntities: String): List<SelfDescribingJson> {
         val entities: MutableList<SelfDescribingJson> = ArrayList()
-        val contextJson = JSONArray(context)
+        val contextJson = JSONArray(serialisedEntities)
         for (i in 0 until contextJson.length()) {
             val itemJson = contextJson.getJSONObject(i)
             val item = jsonToMap(itemJson)
@@ -114,6 +113,6 @@ class TrackerWebViewInterfaceV2 {
     }
 
     companion object {
-        const val TAG = "SnowplowWebInterface"
+        const val TAG = "SnowplowWebInterfaceV2"
     }
 }

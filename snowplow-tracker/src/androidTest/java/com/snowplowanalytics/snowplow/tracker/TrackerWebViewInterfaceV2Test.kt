@@ -45,6 +45,7 @@ import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import com.snowplowanalytics.snowplow.util.TimeTraveler
 import junit.framework.TestCase
 import org.json.JSONException
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -181,6 +182,29 @@ class TrackerWebViewInterfaceV2Test {
         assertEquals(1, trackedEvents2.size)
     }
 
+    @Test
+    @Throws(JSONException::class, InterruptedException::class)
+    fun tracksEventWithEntity() {
+        val entities = "[{\"schema\":\"http://schema.com\",\"data\":{\"key\":\"val\"}},{\"schema\":\"http://example.com\",\"data\":{\"anotherKey\":\"anotherValue\"}}]"
+        webInterface!!.trackWebViewEvent(
+            eventName = "pp",
+            trackerVersion = "webview",
+            useragent = "Chrome",
+            pageUrl = "http://snowplow.com",
+            entities = entities
+        )
+        Thread.sleep(200)
+
+        assertEquals(1, trackedEvents.size)
+        val entity1 = firstEvent.entities[0]
+        val entity2 = firstEvent.entities[1]
+        
+        assertEquals("http://schema.com", entity1.map["schema"] as? String)
+        assertEquals("val", (entity1.map["data"] as? Map<*, *>)?.get("key"))
+        assertEquals("http://example.com", entity2.map["schema"] as? String)
+        assertEquals("anotherValue", (entity2.map["data"] as? Map<*, *>)?.get("anotherKey"))
+    }
+
 
     // --- PRIVATE
     private val context: Context
@@ -192,6 +216,8 @@ class TrackerWebViewInterfaceV2Test {
         val trackerConfig = TrackerConfiguration("appId")
             .installAutotracking(false)
             .lifecycleAutotracking(false)
+            .platformContext(false)
+            .base64encoding(false)
 
         val plugin = PluginConfiguration("plugin")
         plugin.afterTrack {
