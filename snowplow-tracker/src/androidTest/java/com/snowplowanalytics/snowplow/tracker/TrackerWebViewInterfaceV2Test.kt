@@ -186,8 +186,35 @@ class TrackerWebViewInterfaceV2Test {
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun addsEventNameAndSchemaForInspection() {
+        val trackedEvents: MutableList<InspectableEvent> = mutableListOf()
         
-        // TODO
+        val namespace = "ns" + Math.random().toString()
+        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
+
+        val plugin = PluginConfiguration("plugin")
+        plugin.afterTrack { trackedEvents.add(it) }
+
+        createTracker(
+            context,
+            namespace,
+            networkConfig,
+            TrackerConfiguration("appId"),
+            plugin
+        )
+
+        val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
+        webInterface!!.trackWebViewEvent(
+            eventName = "se",
+            trackerVersion = "webview",
+            useragent = "Chrome",
+            selfDescribingEventData = data,
+            trackers = arrayOf(namespace)
+        )
+
+        Thread.sleep(200)
+        assertEquals(1, trackedEvents.size)
+        assertEquals("se", trackedEvents[0].name)
+        assertEquals("iglu:etc", trackedEvents[0].schema)
     }
 
     // --- PRIVATE
