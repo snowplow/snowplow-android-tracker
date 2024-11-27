@@ -22,6 +22,7 @@ import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 
 /**
@@ -54,7 +55,7 @@ class TrackerWebViewInterfaceV2 {
             eventName,
             trackerVersion,
             useragent,
-            selfDescribingEventData,
+            parseSelfDescribingEventData(selfDescribingEventData),
             pageUrl,
             pageTitle,
             referrer,
@@ -99,19 +100,38 @@ class TrackerWebViewInterfaceV2 {
     }
 
     @Throws(JSONException::class)
+    private fun createSelfDescribingJson(map: Map<String, Any?>): SelfDescribingJson? {
+        val schema = map["schema"] as? String?
+        val data = map["data"]
+        return if (schema != null && data != null) {
+            SelfDescribingJson(schema, data)
+        } else {
+            null
+        }
+    }
+
+    @Throws(JSONException::class)
     private fun parseEntities(serialisedEntities: String): List<SelfDescribingJson> {
         val entities: MutableList<SelfDescribingJson> = ArrayList()
-        val contextJson = JSONArray(serialisedEntities)
-        for (i in 0 until contextJson.length()) {
-            val itemJson = contextJson.getJSONObject(i)
+        val entitiesJson = JSONArray(serialisedEntities)
+        for (i in 0 until entitiesJson.length()) {
+            val itemJson = entitiesJson.getJSONObject(i)
             val item = jsonToMap(itemJson)
-            val schema = item["schema"] as? String?
-            val data = item["data"]
-            if (schema != null && data != null) {
-                entities.add(SelfDescribingJson(schema, data))
+            val selfDescribingJson = createSelfDescribingJson(item)
+            
+            if (selfDescribingJson != null) {
+                entities.add(selfDescribingJson)
             }
         }
         return entities
+    }
+
+    @Throws(JSONException::class)
+    private fun parseSelfDescribingEventData(serialisedEvent: String?): SelfDescribingJson? {
+        return serialisedEvent?.let {
+            val eventJson = JSONObject(it)
+            createSelfDescribingJson(jsonToMap(eventJson))
+        }
     }
 
     companion object {

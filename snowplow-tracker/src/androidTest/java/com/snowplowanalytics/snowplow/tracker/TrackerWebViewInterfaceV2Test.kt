@@ -16,9 +16,11 @@ package com.snowplowanalytics.snowplow.tracker
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.emitter.Executor
+import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterfaceV2
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
@@ -59,47 +61,21 @@ class TrackerWebViewInterfaceV2Test {
 
     @Test
     @Throws(JSONException::class, InterruptedException::class)
-    fun tracksPagePingEvent() {
+    fun tracksEventWithAllOptions() {
+        val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
+        
         webInterface!!.trackWebViewEvent(
-            eventName = "pp",
+            eventName = "ue",
             trackerVersion = "webview",
-            useragent = "Firefox",
+            useragent = "Chrome",
+            selfDescribingEventData = data,
             pageUrl = "http://snowplow.com",
             pageTitle = "Snowplow",
             referrer = "http://google.com",
             pingXOffsetMin = 10,
             pingXOffsetMax = 20,
             pingYOffsetMin = 30,
-            pingYOffsetMax = 40
-        )
-
-        Thread.sleep(200)
-        waitForEvents(networkConnection, 1)
-
-        assertEquals(1, networkConnection.countRequests())
-
-        val request = networkConnection.allRequests[0]
-        val payload = request.payload.map
-        
-        assertEquals("pp", payload[Parameters.EVENT])
-        assertEquals("webview", payload[Parameters.TRACKER_VERSION])
-        assertEquals("Firefox", payload[Parameters.USERAGENT])
-        assertEquals("http://snowplow.com", payload[Parameters.PAGE_URL])
-        assertEquals("Snowplow", payload[Parameters.PAGE_TITLE])
-        assertEquals("http://google.com", payload[Parameters.PAGE_REFR])
-        assertEquals("10", payload[Parameters.PING_XOFFSET_MIN])
-        assertEquals("20", payload[Parameters.PING_XOFFSET_MAX])
-        assertEquals("30", payload[Parameters.PING_YOFFSET_MIN])
-        assertEquals("40", payload[Parameters.PING_YOFFSET_MAX])
-    }
-
-    @Test
-    @Throws(JSONException::class, InterruptedException::class)
-    fun tracksStructuredEvent() {
-        webInterface!!.trackWebViewEvent(
-            eventName = "se",
-            trackerVersion = "webview2",
-            useragent = "Firefox",
+            pingYOffsetMax = 40,
             category = "cat",
             action = "act",
             property = "prop",
@@ -114,35 +90,27 @@ class TrackerWebViewInterfaceV2Test {
 
         val request = networkConnection.allRequests[0]
         val payload = request.payload.map
-        
-        assertEquals("se", payload[Parameters.EVENT])
-        assertEquals("webview2", payload[Parameters.TRACKER_VERSION])
-        assertEquals("Firefox", payload[Parameters.USERAGENT])
+
+        assertEquals("ue", payload[Parameters.EVENT])
+        assertEquals("webview", payload[Parameters.TRACKER_VERSION])
+        assertEquals("Chrome", payload[Parameters.USERAGENT])
+        assertEquals("http://snowplow.com", payload[Parameters.PAGE_URL])
+        assertEquals("Snowplow", payload[Parameters.PAGE_TITLE])
+        assertEquals("http://google.com", payload[Parameters.PAGE_REFR])
+        assertEquals("10", payload[Parameters.PING_XOFFSET_MIN])
+        assertEquals("20", payload[Parameters.PING_XOFFSET_MAX])
+        assertEquals("30", payload[Parameters.PING_YOFFSET_MIN])
+        assertEquals("40", payload[Parameters.PING_YOFFSET_MAX])
         assertEquals("cat", payload[Parameters.SE_CATEGORY])
         assertEquals("act", payload[Parameters.SE_ACTION])
         assertEquals("prop", payload[Parameters.SE_PROPERTY])
         assertEquals("lbl", payload[Parameters.SE_LABEL])
         assertEquals("10.0", payload[Parameters.SE_VALUE])
-    }
-
-    @Test
-    @Throws(JSONException::class, InterruptedException::class)
-    fun tracksSelfDescribingEvent() {
-//        val data = "[{\"schema\":\"http://schema.com\",\"data\":{\"key\":\"val\"}}]"
-//        webInterface!!.trackWebViewEvent(
-//            eventName = "ue",
-//            trackerVersion = "webview2",
-//            useragent = "Firefox",
-//            selfDescribingEventData = data
-//        )
-//
-//        Thread.sleep(200)
-//
-//        assertEquals(1, trackedEvents.size)
-//        assertEquals("webViewEvent", trackedEvents.first().name)
-//
-//        val payload = trackedEvents.first().payload
-//        assertEquals(data, payload["changeThis"])
+        
+        assertTrue(payload.containsKey(Parameters.UNSTRUCTURED))
+        val selfDescJson = JSONObject(payload[Parameters.UNSTRUCTURED] as String)
+        assertEquals(TrackerConstants.SCHEMA_UNSTRUCT_EVENT, selfDescJson.getString("schema"))
+        assertEquals(data, selfDescJson.getString("data"))
     }
 
     @Test
@@ -170,6 +138,8 @@ class TrackerWebViewInterfaceV2Test {
 
         assertEquals(0, networkConnection.countRequests())
         assertEquals(1, networkConnection2.countRequests())
+
+        assertEquals("pv", networkConnection2.allRequests[0].payload.map[Parameters.EVENT])
 
         // tracks using default tracker if not specified
         webInterface!!.trackWebViewEvent(
@@ -202,7 +172,7 @@ class TrackerWebViewInterfaceV2Test {
         assertEquals(1, networkConnection.countRequests())
         
         val relevantEntities = ArrayList<JSONObject>()
-        val allEntities = JSONObject(networkConnection.allRequests[0].payload.map["co"] as String)
+        val allEntities = JSONObject(networkConnection.allRequests[0].payload.map[Parameters.CONTEXT] as String)
             .getJSONArray("data")
         for (i in 0 until allEntities.length()) {
             if (allEntities.getJSONObject(i).getString("schema") == "iglu:com.example/etc") {
@@ -211,6 +181,13 @@ class TrackerWebViewInterfaceV2Test {
         }
         assertEquals(1, relevantEntities.size)
         assertEquals("val", relevantEntities[0].get("key") as? String)
+    }
+    
+    @Test
+    @Throws(JSONException::class, InterruptedException::class)
+    fun addsEventNameAndSchemaForInspection() {
+        
+        // TODO
     }
 
     // --- PRIVATE

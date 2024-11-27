@@ -14,16 +14,16 @@ package com.snowplowanalytics.core.event
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.snowplow.event.AbstractEvent
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 
 /**
- * A PageView event. This event has been designed for web trackers, and is not suitable for mobile apps.
- * @param pageUrl The page URL.
+ * Allows the tracking of JavaScript events from WebViews.
  */
 class WebViewReader(
     val eventName: String,
     val trackerVersion: String,
     val useragent: String,
-    val selfDescribingEventData: String? = null,
+    val selfDescribingEventData: SelfDescribingJson? = null,
     val pageUrl: String? = null,
     val pageTitle: String? = null,
     val referrer: String? = null,
@@ -47,7 +47,7 @@ class WebViewReader(
             payload[Parameters.TRACKER_VERSION] = trackerVersion
             payload[Parameters.USERAGENT] = useragent
             
-            if (selfDescribingEventData != null) payload["selfDescribingEventData"] = selfDescribingEventData
+            if (selfDescribingEventData != null) payload[Parameters.WEBVIEW_EVENT_DATA] = selfDescribingEventData
             
             if (pageUrl != null) payload[Parameters.PAGE_URL] = pageUrl
             if (pageTitle != null) payload[Parameters.PAGE_TITLE] = pageTitle

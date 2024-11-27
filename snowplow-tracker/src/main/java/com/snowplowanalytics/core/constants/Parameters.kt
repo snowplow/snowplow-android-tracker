@@ -265,4 +265,5 @@ object Parameters {
     const val PING_XOFFSET_MAX = "pp_max"
     const val PING_YOFFSET_MIN = "pp_miy"
     const val PING_YOFFSET_MAX = "pp_may"
+    const val WEBVIEW_EVENT_DATA = "selfDescribingEventData"
 }

@@ -58,16 +58,20 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
         }
         
         isService = event is TrackerError
-        if (event is WebViewReader) {
-            name = payload[Parameters.EVENT]?.toString()
-            isPrimitive = true
-            isWebView = true
-        } else if (event is AbstractPrimitive) {
-            name = event.name
-            isPrimitive = true
-        } else {
-            schema = (event as? AbstractSelfDescribing)?.schema
-            isPrimitive = false
+        when (event) {
+            is WebViewReader -> {
+                name = payload[Parameters.EVENT]?.toString()
+                schema = getWebViewSchema()
+                isWebView = true
+            }
+            is AbstractPrimitive -> {
+                name = event.name
+                isPrimitive = true
+            }
+            else -> {
+                schema = (event as? AbstractSelfDescribing)?.schema
+                isPrimitive = false
+            }
         }
     }
 
@@ -106,16 +110,19 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
     }
 
     fun wrapPropertiesToPayload(toPayload: Payload, base64Encoded: Boolean) {
-        if (isPrimitive) {
-            toPayload.addMap(payload)
-        } else {
-            wrapSelfDescribingToPayload(toPayload, base64Encoded)
+        when {
+            isWebView -> wrapWebViewToPayload(toPayload, base64Encoded)
+            isPrimitive -> toPayload.addMap(payload)
+            else -> wrapSelfDescribingEventToPayload(toPayload, base64Encoded)
         }
     }
+    
+    private fun getWebViewSchema(): String? {
+        val selfDescribingData = payload[Parameters.WEBVIEW_EVENT_DATA] as SelfDescribingJson?
+        return selfDescribingData?.map?.get(Parameters.SCHEMA)?.toString()
+    }
 
-    private fun wrapSelfDescribingToPayload(toPayload: Payload, base64Encoded: Boolean) {
-        val schema = schema ?: return
-        val data = SelfDescribingJson(schema, payload)
+    private fun addSelfDescribingDataToPayload(toPayload: Payload, base64Encoded: Boolean, data: SelfDescribingJson) {
         val unstructuredEventPayload = HashMap<String?, Any?>()
         unstructuredEventPayload[Parameters.SCHEMA] = TrackerConstants.SCHEMA_UNSTRUCT_EVENT
         unstructuredEventPayload[Parameters.DATA] = data.map
@@ -125,5 +132,19 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
             Parameters.UNSTRUCTURED_ENCODED,
             Parameters.UNSTRUCTURED
         )
+    }
+    
+    private fun wrapWebViewToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        val selfDescribingData = payload[Parameters.WEBVIEW_EVENT_DATA] as SelfDescribingJson?
+        if (selfDescribingData != null) {
+            addSelfDescribingDataToPayload(toPayload, base64Encoded, selfDescribingData)
+        }
+        payload.remove(Parameters.WEBVIEW_EVENT_DATA)
+        toPayload.addMap(payload)
+    }
+
+    private fun wrapSelfDescribingEventToPayload(toPayload: Payload, base64Encoded: Boolean) {
+        val schema = schema ?: return
+        addSelfDescribingDataToPayload(toPayload, base64Encoded, SelfDescribingJson(schema, payload))
     }
 }
