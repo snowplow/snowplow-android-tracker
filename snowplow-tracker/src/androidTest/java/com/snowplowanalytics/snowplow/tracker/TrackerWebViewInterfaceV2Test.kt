@@ -120,6 +120,7 @@ class TrackerWebViewInterfaceV2Test {
             NetworkConfiguration(networkConnection2),
             TrackerConfiguration("appId")
         )
+        Thread.sleep(200)
 
         // track an event using the second tracker
         webInterface!!.trackWebViewEvent(
