@@ -38,7 +38,6 @@ class WebViewReader(
     val pingYOffsetMax: Int? = null
 ) : AbstractEvent() {
     
-
     // Public methods
     override val dataPayload: Map<String, Any?>
         get() {
@@ -48,7 +47,6 @@ class WebViewReader(
             payload[Parameters.USERAGENT] = useragent
             
             if (selfDescribingEventData != null) payload[Parameters.WEBVIEW_EVENT_DATA] = selfDescribingEventData
-            
             if (pageUrl != null) payload[Parameters.PAGE_URL] = pageUrl
             if (pageTitle != null) payload[Parameters.PAGE_TITLE] = pageTitle
             if (referrer != null) payload[Parameters.PAGE_REFR] = referrer
@@ -63,5 +61,4 @@ class WebViewReader(
             if (pingYOffsetMax != null) payload[Parameters.PING_YOFFSET_MAX] = pingYOffsetMax
             return payload
         }
-    
 }
