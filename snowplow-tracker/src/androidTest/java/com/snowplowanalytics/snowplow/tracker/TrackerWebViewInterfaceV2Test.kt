@@ -16,11 +16,9 @@ package com.snowplowanalytics.snowplow.tracker
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.emitter.Executor
-import com.snowplowanalytics.core.tracker.Tracker
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterfaceV2
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
@@ -29,11 +27,9 @@ import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.network.HttpMethod
-import com.snowplowanalytics.snowplow.network.Request
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
