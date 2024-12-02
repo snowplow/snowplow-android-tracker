@@ -99,7 +99,6 @@ class TrackerWebViewInterfaceV2 {
         }
     }
 
-    @Throws(JSONException::class)
     private fun createSelfDescribingJson(map: Map<String, Any?>): SelfDescribingJson? {
         val schema = map["schema"] as? String?
         val data = map["data"]

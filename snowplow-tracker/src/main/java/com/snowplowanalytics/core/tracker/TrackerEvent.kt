@@ -139,8 +139,7 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
         if (selfDescribingData != null) {
             addSelfDescribingDataToPayload(toPayload, base64Encoded, selfDescribingData)
         }
-        payload.remove(Parameters.WEBVIEW_EVENT_DATA)
-        toPayload.addMap(payload)
+        toPayload.addMap(payload.filterNot { it.key == Parameters.WEBVIEW_EVENT_DATA })
     }
 
     private fun wrapSelfDescribingEventToPayload(toPayload: Payload, base64Encoded: Boolean) {
