@@ -23,10 +23,10 @@ import com.snowplowanalytics.core.tracker.TrackerWebViewInterfaceV2
 import com.snowplowanalytics.snowplow.Snowplow.createTracker
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
-import com.snowplowanalytics.snowplow.configuration.PluginConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.util.EventSink
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.After
@@ -38,19 +38,14 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TrackerWebViewInterfaceV2Test {
     private var webInterface: TrackerWebViewInterfaceV2? = null
-    private var networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
-    private var tracker: TrackerController? = null
 
     @Before
     fun setUp() {
         webInterface = TrackerWebViewInterfaceV2()
-        tracker = createTracker()
     }
 
     @After
     fun tearDown() {
-        tracker?.pause()
-        tracker = null
         removeAllTrackers()
         Executor.shutdown()
     }
@@ -58,6 +53,14 @@ class TrackerWebViewInterfaceV2Test {
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun tracksEventWithAllOptions() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        createTracker(
+            context,
+            "ns${Math.random()}",
+            NetworkConfiguration(networkConnection),
+            TrackerConfiguration("appId").base64encoding(false)
+        )
+        
         val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
         val atomic = "{\"eventName\":\"ue\",\"trackerVersion\":\"webview\"," +
                 "\"useragent\":\"Chrome\",\"pageUrl\":\"http://snowplow.com\"," +
@@ -71,8 +74,11 @@ class TrackerWebViewInterfaceV2Test {
             atomicProperties = atomic
         )
 
-        Thread.sleep(200)
-        waitForEvents(networkConnection, 1)
+        var i = 0
+        while (i < 10 && networkConnection.countRequests() == 0) {
+            Thread.sleep(1000)
+            i++
+        }
 
         assertEquals(1, networkConnection.countRequests())
 
@@ -104,118 +110,86 @@ class TrackerWebViewInterfaceV2Test {
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun tracksEventWithCorrectTracker() {
-        // create the second tracker
-        val networkConnection2 = MockNetworkConnection(HttpMethod.GET, 200)
-        createTracker(
-            context,
-            namespace = "ns2",
-            NetworkConfiguration(networkConnection2),
-            TrackerConfiguration("appId")
-        )
+        val eventSink1 = EventSink()
+        val eventSink2 = EventSink()
+
+        createTracker("ns1", eventSink1)
+        createTracker("ns2", eventSink2)
         Thread.sleep(200)
 
         // track an event using the second tracker
         webInterface!!.trackWebViewEvent(
-            atomicProperties = "{\"eventName\":\"pv\",\"trackerVersion\":\"webview\"}",
+            atomicProperties = "{}",
             trackers = arrayOf("ns2")
         )
         Thread.sleep(200)
-        waitForEvents(networkConnection2, 1)
-
-        assertEquals(0, networkConnection.countRequests())
-        assertEquals(1, networkConnection2.countRequests())
-
-        assertEquals("pv", networkConnection2.allRequests[0].payload.map[Parameters.EVENT])
+        
+        assertEquals(0, eventSink1.trackedEvents.size)
+        assertEquals(1, eventSink2.trackedEvents.size)
 
         // tracks using default tracker if not specified
         webInterface!!.trackWebViewEvent(atomicProperties = "{}")
         Thread.sleep(200)
-        waitForEvents(networkConnection, 1)
 
-        assertEquals(1, networkConnection.countRequests())
-        assertEquals(1, networkConnection2.countRequests())
+        assertEquals(1, eventSink1.trackedEvents.size)
+        assertEquals(1, eventSink2.trackedEvents.size)
     }
 
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun tracksEventWithEntity() {
+        val namespace = "ns" + Math.random().toString()
+        val eventSink = EventSink()
+        createTracker(namespace, eventSink)
+        
         webInterface!!.trackWebViewEvent(
             atomicProperties = "{}",
-            entities = "[{\"schema\":\"iglu:com.example/etc\",\"data\":{\"key\":\"val\"}}]"
+            entities = "[{\"schema\":\"iglu:com.example/etc\",\"data\":{\"key\":\"val\"}}]",
+            trackers = arrayOf(namespace)
         )
         Thread.sleep(200)
-        waitForEvents(networkConnection, 1)
-
-        assertEquals(1, networkConnection.countRequests())
+        val events = eventSink.trackedEvents
+        assertEquals(1, events.size)
         
-        val relevantEntities = ArrayList<JSONObject>()
-        val allEntities = JSONObject(networkConnection.allRequests[0].payload.map[Parameters.CONTEXT] as String)
-            .getJSONArray("data")
-        for (i in 0 until allEntities.length()) {
-            if (allEntities.getJSONObject(i).getString("schema") == "iglu:com.example/etc") {
-                relevantEntities.add(allEntities.getJSONObject(i).getJSONObject("data"))
-            }
-        }
+        val relevantEntities = events[0].entities.filter { it.map["schema"] == "iglu:com.example/etc" }
         assertEquals(1, relevantEntities.size)
-        assertEquals("val", relevantEntities[0].get("key") as? String)
+        
+        val entityData = relevantEntities[0].map["data"] as HashMap<*, *>?
+        assertEquals("val", entityData?.get("key"))
     }
     
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun addsEventNameAndSchemaForInspection() {
-        val trackedEvents: MutableList<InspectableEvent> = mutableListOf()
-        
         val namespace = "ns" + Math.random().toString()
-        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
-
-        val plugin = PluginConfiguration("plugin")
-        plugin.afterTrack { trackedEvents.add(it) }
-
-        createTracker(
-            context,
-            namespace,
-            networkConfig,
-            TrackerConfiguration("appId"),
-            plugin
-        )
+        val eventSink = EventSink()
+        createTracker(namespace, eventSink)
 
         webInterface!!.trackWebViewEvent(
-            atomicProperties = "{\"eventName\":\"se\",\"trackerVersion\":\"webview\"}",
+            atomicProperties = "{\"eventName\":\"se\"}",
             selfDescribingEventData = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}",
             trackers = arrayOf(namespace)
         )
 
         Thread.sleep(200)
-        assertEquals(1, trackedEvents.size)
-        assertEquals("se", trackedEvents[0].name)
-        assertEquals("iglu:etc", trackedEvents[0].schema)
+        val events = eventSink.trackedEvents
+        
+        assertEquals(1, events.size)
+        assertEquals("se", events[0].name)
+        assertEquals("iglu:etc", events[0].schema)
     }
 
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private fun createTracker(): TrackerController {
-        val trackerConfig = TrackerConfiguration("appId")
-            .installAutotracking(false)
-            .lifecycleAutotracking(false)
-            .platformContext(false)
-            .base64encoding(false)
-
+    private fun createTracker(namespace: String, eventSink: EventSink): TrackerController {
+        val networkConfig = NetworkConfiguration(MockNetworkConnection(HttpMethod.POST, 200))
         return createTracker(
             context,
-            "ns${Math.random()}",
-            NetworkConfiguration(networkConnection),
-            trackerConfig
+            namespace = namespace,
+            network = networkConfig,
+            configurations = arrayOf(eventSink)
         )
-    }
-
-    @Throws(Exception::class)
-    fun waitForEvents(networkConnection: MockNetworkConnection, eventsExpected: Int) {
-        var i = 0
-        while (i < 10 && networkConnection.countRequests() == eventsExpected - 1) {
-            Thread.sleep(1000)
-            i++
-        }
     }
 }
