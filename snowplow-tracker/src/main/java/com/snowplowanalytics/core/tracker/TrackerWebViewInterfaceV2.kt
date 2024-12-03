@@ -27,51 +27,50 @@ import java.util.*
 
 /**
  * JavaScript interface used to provide an API for tracking events from WebViews.
+ * This V2 interface works with the WebView tracker v0.3.0+.
  */
 class TrackerWebViewInterfaceV2 {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun trackWebViewEvent(
-        eventName: String,
-        trackerVersion: String,
-        useragent: String,
+        atomicProperties: String,
         selfDescribingEventData: String? = null,
-        pageUrl: String? = null,
-        pageTitle: String? = null,
-        referrer: String? = null,
-        category: String? = null,
-        action: String? = null,
-        label: String? = null,
-        property: String? = null,
-        value: Double? = null,
-        pingXOffsetMin: Int? = null,
-        pingXOffsetMax: Int? = null,
-        pingYOffsetMin: Int? = null,
-        pingYOffsetMax: Int? = null,
         entities: String? = null,
         trackers: Array<String>? = null
     ) {
+        val atomic = JSONObject(atomicProperties)
+
         val event = WebViewReader(
-            eventName,
-            trackerVersion,
-            useragent,
-            parseSelfDescribingEventData(selfDescribingEventData),
-            pageUrl,
-            pageTitle,
-            referrer,
-            category,
-            action,
-            label,
-            property,
-            value,
-            pingXOffsetMin,
-            pingXOffsetMax,
-            pingYOffsetMin,
-            pingYOffsetMax
+            selfDescribingEventData = parseSelfDescribingEventData(selfDescribingEventData),
+            eventName = getProperty(atomic, "eventName")?.toString(),
+            trackerVersion = getProperty(atomic, "trackerVersion")?.toString(),
+            useragent = getProperty(atomic, "useragent")?.toString(),
+            pageUrl = getProperty(atomic, "pageUrl")?.toString(),
+            pageTitle = getProperty(atomic, "pageTitle")?.toString(),
+            referrer = getProperty(atomic, "referrer")?.toString(),
+            category = getProperty(atomic, "category")?.toString(),
+            action = getProperty(atomic, "action")?.toString(),
+            label = getProperty(atomic, "label")?.toString(),
+            property = getProperty(atomic, "property")?.toString(),
+            value = getProperty(atomic, "value")?.toString()?.toDoubleOrNull(),
+            pingXOffsetMin = getProperty(atomic, "pingXOffsetMin")?.toString()?.toIntOrNull(),
+            pingXOffsetMax = getProperty(atomic, "pingXOffsetMax")?.toString()?.toIntOrNull(),
+            pingYOffsetMin = getProperty(atomic, "pingYOffsetMin")?.toString()?.toIntOrNull(),
+            pingYOffsetMax = getProperty(atomic, "pingYOffsetMax")?.toString()?.toIntOrNull(),
         )
         trackEvent(event, entities, trackers)
     }
-    
+
+    private fun getProperty(atomicProperties: JSONObject, property: String) = try {
+        if (atomicProperties.has(property)) {
+            atomicProperties.get(property)
+        } else {
+            null
+        }
+    } catch (e: JSONException) {
+        null
+    }
+
     @Throws(JSONException::class)
     private fun trackEvent(event: AbstractEvent, contextEntities: String?, trackers: Array<String>?) {
         if (contextEntities != null) {
@@ -117,7 +116,6 @@ class TrackerWebViewInterfaceV2 {
             val itemJson = entitiesJson.getJSONObject(i)
             val item = jsonToMap(itemJson)
             val selfDescribingJson = createSelfDescribingJson(item)
-            
             if (selfDescribingJson != null) {
                 entities.add(selfDescribingJson)
             }

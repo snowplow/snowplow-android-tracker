@@ -20,10 +20,10 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
  * Allows the tracking of JavaScript events from WebViews.
  */
 class WebViewReader(
-    val eventName: String,
-    val trackerVersion: String,
-    val useragent: String,
     val selfDescribingEventData: SelfDescribingJson? = null,
+    val eventName: String? = null,
+    val trackerVersion: String? = null,
+    val useragent: String? = null,
     val pageUrl: String? = null,
     val pageTitle: String? = null,
     val referrer: String? = null,
@@ -42,11 +42,10 @@ class WebViewReader(
     override val dataPayload: Map<String, Any?>
         get() {
             val payload = HashMap<String, Any?>()
-            payload[Parameters.EVENT] = eventName
-            payload[Parameters.TRACKER_VERSION] = trackerVersion
-            payload[Parameters.USERAGENT] = useragent
-            
             if (selfDescribingEventData != null) payload[Parameters.WEBVIEW_EVENT_DATA] = selfDescribingEventData
+            if (eventName != null) payload[Parameters.EVENT] = eventName
+            if (trackerVersion != null) payload[Parameters.TRACKER_VERSION] = trackerVersion
+            if (useragent != null) payload[Parameters.USERAGENT] = useragent
             if (pageUrl != null) payload[Parameters.PAGE_URL] = pageUrl
             if (pageTitle != null) payload[Parameters.PAGE_TITLE] = pageTitle
             if (referrer != null) payload[Parameters.PAGE_REFR] = referrer

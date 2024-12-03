@@ -59,24 +59,16 @@ class TrackerWebViewInterfaceV2Test {
     @Throws(JSONException::class, InterruptedException::class)
     fun tracksEventWithAllOptions() {
         val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
+        val atomic = "{\"eventName\":\"ue\",\"trackerVersion\":\"webview\"," +
+                "\"useragent\":\"Chrome\",\"pageUrl\":\"http://snowplow.com\"," +
+                "\"pageTitle\":\"Snowplow\",\"referrer\":\"http://google.com\"," +
+                "\"pingXOffsetMin\":10,\"pingXOffsetMax\":20,\"pingYOffsetMin\":30," +
+                "\"pingYOffsetMax\":40,\"category\":\"cat\",\"action\":\"act\"," +
+                "\"property\":\"prop\",\"label\":\"lbl\",\"value\":10.0}"
         
         webInterface!!.trackWebViewEvent(
-            eventName = "ue",
-            trackerVersion = "webview",
-            useragent = "Chrome",
             selfDescribingEventData = data,
-            pageUrl = "http://snowplow.com",
-            pageTitle = "Snowplow",
-            referrer = "http://google.com",
-            pingXOffsetMin = 10,
-            pingXOffsetMax = 20,
-            pingYOffsetMin = 30,
-            pingYOffsetMax = 40,
-            category = "cat",
-            action = "act",
-            property = "prop",
-            label = "lbl",
-            value = 10.0
+            atomicProperties = atomic
         )
 
         Thread.sleep(200)
@@ -124,10 +116,7 @@ class TrackerWebViewInterfaceV2Test {
 
         // track an event using the second tracker
         webInterface!!.trackWebViewEvent(
-            eventName = "pv",
-            trackerVersion = "webview",
-            useragent = "Chrome",
-            pageUrl = "http://snowplow.com",
+            atomicProperties = "{\"eventName\":\"pv\",\"trackerVersion\":\"webview\"}",
             trackers = arrayOf("ns2")
         )
         Thread.sleep(200)
@@ -139,12 +128,7 @@ class TrackerWebViewInterfaceV2Test {
         assertEquals("pv", networkConnection2.allRequests[0].payload.map[Parameters.EVENT])
 
         // tracks using default tracker if not specified
-        webInterface!!.trackWebViewEvent(
-            eventName = "pp",
-            trackerVersion = "webview",
-            useragent = "Chrome",
-            pageUrl = "http://snowplow.com",
-        )
+        webInterface!!.trackWebViewEvent(atomicProperties = "{}")
         Thread.sleep(200)
         waitForEvents(networkConnection, 1)
 
@@ -155,13 +139,9 @@ class TrackerWebViewInterfaceV2Test {
     @Test
     @Throws(JSONException::class, InterruptedException::class)
     fun tracksEventWithEntity() {
-        val entities = "[{\"schema\":\"iglu:com.example/etc\",\"data\":{\"key\":\"val\"}}]"
         webInterface!!.trackWebViewEvent(
-            eventName = "pp",
-            trackerVersion = "webview",
-            useragent = "Chrome",
-            pageUrl = "http://snowplow.com",
-            entities = entities
+            atomicProperties = "{}",
+            entities = "[{\"schema\":\"iglu:com.example/etc\",\"data\":{\"key\":\"val\"}}]"
         )
         Thread.sleep(200)
         waitForEvents(networkConnection, 1)
@@ -199,12 +179,9 @@ class TrackerWebViewInterfaceV2Test {
             plugin
         )
 
-        val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
         webInterface!!.trackWebViewEvent(
-            eventName = "se",
-            trackerVersion = "webview",
-            useragent = "Chrome",
-            selfDescribingEventData = data,
+            atomicProperties = "{\"eventName\":\"se\",\"trackerVersion\":\"webview\"}",
+            selfDescribingEventData = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}",
             trackers = arrayOf(namespace)
         )
 
