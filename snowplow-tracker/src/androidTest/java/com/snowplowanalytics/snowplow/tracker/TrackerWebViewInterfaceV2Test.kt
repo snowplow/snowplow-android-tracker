@@ -62,7 +62,7 @@ class TrackerWebViewInterfaceV2Test {
         )
         
         val data = "{\"schema\":\"iglu:etc\",\"data\":{\"key\":\"val\"}}"
-        val atomic = "{\"eventName\":\"ue\",\"trackerVersion\":\"webview\"," +
+        val atomic = "{\"eventName\":\"pv\",\"trackerVersion\":\"webview\"," +
                 "\"useragent\":\"Chrome\",\"pageUrl\":\"http://snowplow.com\"," +
                 "\"pageTitle\":\"Snowplow\",\"referrer\":\"http://google.com\"," +
                 "\"pingXOffsetMin\":10,\"pingXOffsetMax\":20,\"pingYOffsetMin\":30," +
@@ -85,7 +85,7 @@ class TrackerWebViewInterfaceV2Test {
         val request = networkConnection.allRequests[0]
         val payload = request.payload.map
 
-        assertEquals("ue", payload[Parameters.EVENT])
+        assertEquals("pv", payload[Parameters.EVENT])
         assertEquals("webview", payload[Parameters.TRACKER_VERSION])
         assertEquals("Chrome", payload[Parameters.USERAGENT])
         assertEquals("http://snowplow.com", payload[Parameters.PAGE_URL])
