@@ -74,12 +74,7 @@ class TrackerWebViewInterfaceV2Test {
             atomicProperties = atomic
         )
 
-        var i = 0
-        while (i < 10 && networkConnection.countRequests() == 0) {
-            Thread.sleep(1000)
-            i++
-        }
-
+        waitForEvents(networkConnection)
         assertEquals(1, networkConnection.countRequests())
 
         val request = networkConnection.allRequests[0]
@@ -105,6 +100,31 @@ class TrackerWebViewInterfaceV2Test {
         val selfDescJson = JSONObject(payload[Parameters.UNSTRUCTURED] as String)
         assertEquals(TrackerConstants.SCHEMA_UNSTRUCT_EVENT, selfDescJson.getString("schema"))
         assertEquals(data, selfDescJson.getString("data"))
+    }
+
+    @Test
+    @Throws(JSONException::class, InterruptedException::class)
+    fun addsDefaultPropertiesIfNotProvided() {
+        val networkConnection = MockNetworkConnection(HttpMethod.GET, 200)
+        createTracker(
+            context,
+            "ns${Math.random()}",
+            NetworkConfiguration(networkConnection),
+            TrackerConfiguration("appId").base64encoding(false)
+        )
+        
+        webInterface!!.trackWebViewEvent(atomicProperties = "{}")
+        
+        waitForEvents(networkConnection)
+        assertEquals(1, networkConnection.countRequests())
+
+        val request = networkConnection.allRequests[0]
+        val payload = request.payload.map
+
+        assertEquals("ue", payload[Parameters.EVENT])
+        
+        val trackerVersion = payload[Parameters.TRACKER_VERSION] as String?
+        assertTrue(trackerVersion?.startsWith("andr") ?: false)
     }
 
     @Test
@@ -191,5 +211,13 @@ class TrackerWebViewInterfaceV2Test {
             network = networkConfig,
             configurations = arrayOf(eventSink)
         )
+    }
+    
+    private fun waitForEvents(networkConnection: MockNetworkConnection) {
+        var i = 0
+        while (i < 10 && networkConnection.countRequests() == 0) {
+            Thread.sleep(1000)
+            i++
+        }
     }
 }
