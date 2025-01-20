@@ -1,3 +1,7 @@
+Version 6.1.0 (2025-01-16)
+--------------------------
+Add new WebView interface (#700)
+
 Version 6.0.6 (2024-09-12)
 --------------------------
 Set negative battery levels to null in mobile context (#698)

@@ -23,6 +23,7 @@ import com.snowplowanalytics.snowplow.configuration.ConfigurationState
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterface
+import com.snowplowanalytics.core.tracker.TrackerWebViewInterfaceV2
 import com.snowplowanalytics.snowplow.configuration.*
 
 import com.snowplowanalytics.snowplow.controller.TrackerController
@@ -356,6 +357,7 @@ object Snowplow {
     @JvmStatic
     fun subscribeToWebViewEvents(webView: WebView) {
         webView.addJavascriptInterface(TrackerWebViewInterface(), TrackerWebViewInterface.TAG)
+        webView.addJavascriptInterface(TrackerWebViewInterfaceV2(), TrackerWebViewInterfaceV2.TAG)
     }
 
     // Private methods
