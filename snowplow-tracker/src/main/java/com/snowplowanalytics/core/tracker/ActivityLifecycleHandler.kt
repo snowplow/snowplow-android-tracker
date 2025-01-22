@@ -24,6 +24,7 @@ import com.snowplowanalytics.snowplow.event.ScreenView.Companion.buildWithActivi
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ActivityLifecycleHandler private constructor(context: Context) :
     Application.ActivityLifecycleCallbacks {
+    private var lastActivityHashCode: Int? = null
 
     init {
         val application = context.applicationContext as? Application
@@ -31,6 +32,10 @@ class ActivityLifecycleHandler private constructor(context: Context) :
     }
 
     override fun onActivityResumed(activity: Activity) {
+        val sameActivity = lastActivityHashCode?.let { it == activity.hashCode() } ?: false
+        if (sameActivity) { return }
+        lastActivityHashCode = activity.hashCode()
+
         Logger.d(TAG, "Auto screenview occurred - activity has resumed")
         try {
             val event = buildWithActivity(activity)
