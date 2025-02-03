@@ -15,8 +15,6 @@ package com.snowplowanalytics.snowplow.configuration
 import com.snowplowanalytics.core.statemachine.PluginStateMachine
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
-import java.util.function.Consumer
-import java.util.function.Function
 
 /**
  * Provides a block closure to be called after events are tracked.
@@ -27,7 +25,7 @@ import java.util.function.Function
  */
 class PluginAfterTrackConfiguration(
     val schemas: List<String>? = null,
-    val closure: Consumer<InspectableEvent>
+    val closure: (InspectableEvent) -> Unit?
 )
 
 /**
@@ -38,7 +36,7 @@ class PluginAfterTrackConfiguration(
  */
 class PluginFilterConfiguration(
     val schemas: List<String>? = null,
-    val closure: Function<InspectableEvent, Boolean>
+    val closure: (InspectableEvent) -> Boolean
 )
 
 /**
@@ -50,7 +48,7 @@ class PluginFilterConfiguration(
  */
 class PluginEntitiesConfiguration(
     val schemas: List<String>? = null,
-    val closure: Function<InspectableEvent, List<SelfDescribingJson>>
+    val closure: (InspectableEvent) -> List<SelfDescribingJson>
 )
 
 /**
@@ -121,7 +119,7 @@ interface PluginConfigurationInterface : PluginIdentifiable, PluginEntitiesCalla
 /**
  * Configuration for a custom tracker plugin.
  * Enables you to add closures to be called when and after events are tracked in the tracker.
- * 
+ *
  * @property identifier Unique identifier of the plugin within the tracker.
  */
 class PluginConfiguration(
@@ -139,7 +137,7 @@ class PluginConfiguration(
      */
     fun entities(
         schemas: List<String>? = null,
-        closure: Function<InspectableEvent, List<SelfDescribingJson>>
+        closure: (InspectableEvent) -> List<SelfDescribingJson>
     ) {
         entitiesConfiguration = PluginEntitiesConfiguration(
             schemas = schemas,
@@ -156,7 +154,7 @@ class PluginConfiguration(
      */
     fun afterTrack(
         schemas: List<String>? = null,
-        closure: Consumer<InspectableEvent>
+        closure: (InspectableEvent) -> Unit?
     ): PluginConfiguration {
         afterTrackConfiguration = PluginAfterTrackConfiguration(
             schemas = schemas,
@@ -173,7 +171,7 @@ class PluginConfiguration(
      */
     fun filter(
         schemas: List<String>? = null,
-        closure: Function<InspectableEvent, Boolean>
+        closure: (InspectableEvent) -> Boolean
     ): PluginConfiguration {
         filterConfiguration = PluginFilterConfiguration(
             schemas = schemas,
