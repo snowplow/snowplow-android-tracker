@@ -130,6 +130,14 @@ class Tracker(
             }
         }
 
+    var continueSessionOnRestart: Boolean = TrackerDefaults.continueSessionOnRestart
+        set(continueSession) {
+            if (!builderFinished) {
+                field = continueSession
+                session?.continueSessionOnRestart = continueSession
+            }
+        }
+
     /**
     * This configuration option is not published in the TrackerConfiguration class.
     * Create a Tracker directly, not via the Snowplow interface, to configure timeUnit.
@@ -242,12 +250,13 @@ class Tracker(
                     callbacks = sessionCallbacks
                 }
                 session = getInstance(
-                    context,
-                    foregroundTimeout,
-                    backgroundTimeout,
-                    timeUnit,
-                    namespace,
-                    callbacks
+                    context = context,
+                    foregroundTimeout = foregroundTimeout,
+                    backgroundTimeout = backgroundTimeout,
+                    timeUnit = timeUnit,
+                    namespace = namespace,
+                    sessionCallbacks = callbacks,
+                    continueSessionOnRestart = continueSessionOnRestart,
                 )
             }
         }
@@ -401,12 +410,13 @@ class Tracker(
                 callbacks = sessionCallbacks
             }
             session = getInstance(
-                context,
-                foregroundTimeout,
-                backgroundTimeout,
-                timeUnit,
-                namespace,
-                callbacks
+                context = context,
+                foregroundTimeout = foregroundTimeout,
+                backgroundTimeout = backgroundTimeout,
+                timeUnit = timeUnit,
+                namespace = namespace,
+                sessionCallbacks = callbacks,
+                continueSessionOnRestart = continueSessionOnRestart
             )
         }
 
@@ -641,7 +651,7 @@ class Tracker(
                 return
             }
             val sessionContextJson =
-                sessionManager.getSessionContext(eventId, eventTimestamp, userAnonymisation)
+                sessionManager.getAndUpdateSessionForEvent(eventId, eventTimestamp, userAnonymisation)
             sessionContextJson?.let { event.entities.add(it) }
         }
     }

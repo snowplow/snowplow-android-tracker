@@ -64,6 +64,11 @@ open class SessionConfiguration : SessionConfigurationInterface, Configuration {
         get() = _onSessionUpdate ?: sourceConfig?.onSessionUpdate
         set(value) { _onSessionUpdate = value }
 
+    private var _continueSessionOnRestart: Boolean? = null
+    override var continueSessionOnRestart: Boolean
+        get() = _continueSessionOnRestart ?: sourceConfig?.continueSessionOnRestart ?: TrackerDefaults.continueSessionOnRestart
+        set(value) { _continueSessionOnRestart = value }
+
     /**
      * This will set up the session behaviour of the tracker.
      * @param foregroundTimeout The timeout set for the inactivity of app when in foreground.
@@ -78,6 +83,11 @@ open class SessionConfiguration : SessionConfigurationInterface, Configuration {
     
     fun onSessionUpdate(onSessionUpdate: Consumer<SessionState>?): SessionConfiguration {
         this.onSessionUpdate = onSessionUpdate
+        return this
+    }
+
+    fun continueSessionOnRestart(continueSession: Boolean): SessionConfiguration {
+        this.continueSessionOnRestart = continueSession
         return this
     }
 

@@ -25,4 +25,13 @@ class ClientSessionEntity(private val values: Map<String, Any?>) :
 
     val userId: String?
         get() = values[Parameters.SESSION_USER_ID] as String?
+
+    val sessionId: String?
+        get() = values[Parameters.SESSION_ID] as String?
+
+    val previousSessionId: String?
+        get() = values[Parameters.SESSION_PREVIOUS_ID] as String?
+
+    val eventIndex: Int?
+        get() = values[Parameters.SESSION_EVENT_INDEX] as Int?
 }

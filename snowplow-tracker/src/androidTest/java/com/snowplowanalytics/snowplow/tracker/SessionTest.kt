@@ -52,14 +52,14 @@ class SessionTest {
         Assert.assertEquals(300000, session.backgroundTimeout)
         Assert.assertNull(sessionState)
         Assert.assertNotNull(session.userId)
-        val sdj = session.getSessionContext("first-id-1", timestamp, false)
+        val sdj = session.getAndUpdateSessionForEvent("first-id-1", timestamp, false)
         sessionState = session.state
 
         Assert.assertNotNull(sdj)
         Assert.assertNotNull(sessionState)
         Assert.assertEquals("first-id-1", sessionState!!.firstEventId)
         Assert.assertEquals(timestampDateTime, sessionState.firstEventTimestamp)
-        session.getSessionContext("second-id-2", timestamp + 10000, false)
+        session.getAndUpdateSessionForEvent("second-id-2", timestamp + 10000, false)
         Assert.assertEquals("first-id-1", sessionState.firstEventId)
         Assert.assertEquals(timestampDateTime, sessionState.firstEventTimestamp)
         Assert.assertEquals(TrackerConstants.SESSION_SCHEMA, sdj!!.map["schema"])
@@ -342,8 +342,8 @@ class SessionTest {
         val tracker2 = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
         val session1 = tracker1.session
         val session2 = tracker2.session
-        session1!!.getSessionContext("session1-fake-id1", timestamp, false)
-        session2!!.getSessionContext("session2-fake-id1", timestamp, false)
+        session1!!.getAndUpdateSessionForEvent("session1-fake-id1", timestamp, false)
+        session2!!.getAndUpdateSessionForEvent("session2-fake-id1", timestamp, false)
         val initialValue1 = session1.sessionIndex?.toLong()
         val id1 = session1.state!!.sessionId
         val initialValue2 = session2.sessionIndex?.toLong()
@@ -351,12 +351,12 @@ class SessionTest {
         // Retrigger session in tracker1
         // The timeout is 20s, this sleep is only 2s - it's still the same session
         Thread.sleep(2000)
-        session1.getSessionContext("session1-fake-id2", timestamp, false)
+        session1.getAndUpdateSessionForEvent("session1-fake-id2", timestamp, false)
 
         // Retrigger timedout session in tracker2
         // 20s has then passed. Session must be updated, increasing the sessionIndex by 1
         Thread.sleep(18000)
-        session2.getSessionContext("session2-fake-id2", timestamp, false)
+        session2.getAndUpdateSessionForEvent("session2-fake-id2", timestamp, false)
 
         // Check sessions have the correct state
         Assert.assertEquals(0, session1.sessionIndex!! - initialValue1!!)
@@ -365,7 +365,7 @@ class SessionTest {
 
         // Recreate tracker2
         val tracker2b = Tracker(emitter, "tracker2", "app", context = context, builder = trackerBuilder)
-        tracker2b.session!!.getSessionContext("session2b-fake-id3", timestamp, false)
+        tracker2b.session!!.getAndUpdateSessionForEvent("session2b-fake-id3", timestamp, false)
         val initialValue2b = tracker2b.session!!.sessionIndex?.toLong()
         val previousId2b = tracker2b.session!!.state!!.previousSessionId
 
@@ -388,6 +388,47 @@ class SessionTest {
         Assert.assertNull(context[Parameters.SESSION_PREVIOUS_ID])
     }
 
+    @Test
+    fun testStartsNewSessionOnRestartByDefault() {
+        val session1 = Session(foregroundTimeout = 3, backgroundTimeout = 3, namespace = "t1", timeUnit = TimeUnit.SECONDS, context = context)
+        val firstSession = session1.getAndUpdateSessionForEvent("event_1", eventTimestamp = 1654496481345, userAnonymisation = false)
+
+        val session2 = Session(foregroundTimeout = 3, backgroundTimeout = 3, namespace = "t1", timeUnit = TimeUnit.SECONDS, context = context)
+        val secondSession = session2.getAndUpdateSessionForEvent("event_2", eventTimestamp = 1654496481345, userAnonymisation = false)
+
+        Assert.assertNotNull(firstSession?.sessionId)
+        Assert.assertNotEquals(firstSession?.sessionId, secondSession?.sessionId)
+        Assert.assertEquals(firstSession?.sessionId, secondSession?.previousSessionId)
+    }
+
+    @Test
+    fun testResumesPreviouslyPersistedSessionIfEnabled() {
+        val session1 = Session(foregroundTimeout = 3, backgroundTimeout = 3, namespace = "t1", continueSessionOnRestart = true, timeUnit = TimeUnit.SECONDS, context = context)
+        session1.getAndUpdateSessionForEvent("event_1", eventTimestamp = 1654496481345, userAnonymisation = false)
+        val firstSession = session1.getAndUpdateSessionForEvent("event_2", eventTimestamp = 1654496481346, userAnonymisation = false)
+
+        val session2 = Session(foregroundTimeout = 3, backgroundTimeout = 3, namespace = "t1", continueSessionOnRestart = true, timeUnit = TimeUnit.SECONDS, context = context)
+        val secondSession = session2.getAndUpdateSessionForEvent("event_3", eventTimestamp = 1654496481347, userAnonymisation = false)
+
+        Assert.assertNotNull(firstSession?.sessionId)
+        Assert.assertEquals(firstSession?.sessionId, secondSession?.sessionId)
+        Assert.assertEquals(secondSession?.eventIndex, 3)
+    }
+
+    @Test
+    fun testStartsNewSessionOnRestartOnTimeout() {
+        val session1 = Session(foregroundTimeout = 100, backgroundTimeout = 100, namespace = "t1", continueSessionOnRestart = true, timeUnit = TimeUnit.MILLISECONDS, context = context)
+        val firstSession = session1.getAndUpdateSessionForEvent("event_1", eventTimestamp = 1654496481345, userAnonymisation = false)
+
+        Thread.sleep(500)
+
+        val session2 = Session(foregroundTimeout = 100, backgroundTimeout = 100, namespace = "t1", continueSessionOnRestart = true, timeUnit = TimeUnit.MILLISECONDS, context = context)
+        val secondSession = session2.getAndUpdateSessionForEvent("event_2", eventTimestamp = 1654496481345, userAnonymisation = false)
+
+        Assert.assertNotEquals(firstSession?.sessionId, secondSession?.sessionId)
+        Assert.assertEquals(firstSession?.sessionId, secondSession?.previousSessionId)
+    }
+
     // Private methods
     private fun getSession(foregroundTimeout: Long, backgroundTimeout: Long): Session {
         context.getSharedPreferences(TrackerConstants.SNOWPLOW_SESSION_VARS, Context.MODE_PRIVATE)
@@ -403,7 +444,7 @@ class SessionTest {
         eventTimestamp: Long,
         userAnonymisation: Boolean
     ): Map<String, Any>? {
-        return session!!.getSessionContext(
+        return session!!.getAndUpdateSessionForEvent(
             eventId,
             eventTimestamp,
             userAnonymisation

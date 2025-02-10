@@ -18,6 +18,7 @@ import com.snowplowanalytics.core.Controller
 import com.snowplowanalytics.core.tracker.Logger
 import com.snowplowanalytics.core.tracker.ServiceProviderInterface
 import com.snowplowanalytics.core.tracker.Tracker
+import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.snowplow.configuration.SessionConfiguration
 import com.snowplowanalytics.snowplow.controller.SessionController
 import com.snowplowanalytics.snowplow.tracker.SessionState
@@ -167,6 +168,25 @@ class SessionControllerImpl  // Constructors
             }
             dirtyConfig.onSessionUpdate = onSessionUpdate
             session.onSessionUpdate = onSessionUpdate
+        }
+
+    override var continueSessionOnRestart: Boolean
+        get() {
+            val session = session
+            if (session == null) {
+                Logger.track(TAG, "Attempt to access SessionController fields when disabled")
+                return TrackerDefaults.continueSessionOnRestart
+            }
+            return session.continueSessionOnRestart
+        }
+        set(value) {
+            val session = session
+            if (session == null) {
+                Logger.track(TAG, "Attempt to access SessionController fields when disabled")
+                return
+            }
+            dirtyConfig.continueSessionOnRestart = value
+            session.continueSessionOnRestart = value
         }
 
     // Service method
