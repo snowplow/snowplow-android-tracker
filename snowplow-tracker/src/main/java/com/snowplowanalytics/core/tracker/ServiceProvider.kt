@@ -295,6 +295,7 @@ class ServiceProvider(
 
             tracker.backgroundTimeout = sessionConfiguration.backgroundTimeout.convert(TimeUnit.SECONDS)
             tracker.foregroundTimeout = sessionConfiguration.foregroundTimeout.convert(TimeUnit.SECONDS)
+            tracker.continueSessionOnRestart = sessionConfiguration.continueSessionOnRestart
 
             for (plugin in pluginConfigurations) {
                 tracker.addOrReplaceStateMachine(plugin.toStateMachine())

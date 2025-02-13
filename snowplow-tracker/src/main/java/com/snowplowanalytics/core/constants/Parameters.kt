@@ -227,6 +227,7 @@ object Parameters {
     const val SESSION_STORAGE = "storageMechanism"
     const val SESSION_FIRST_ID = "firstEventId"
     const val SESSION_FIRST_TIMESTAMP = "firstEventTimestamp"
+    const val SESSION_LAST_UPDATE = "lastUpdate"
 
     // Screen Context
     const val SCREEN_NAME = "name"

@@ -14,6 +14,7 @@ package com.snowplowanalytics.snowplow.tracker
 
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.statemachine.State
+import com.snowplowanalytics.core.utils.Util
 
 /**
  * Stores the current Session information. Used in creating the client_session entity when
@@ -22,30 +23,47 @@ import com.snowplowanalytics.core.statemachine.State
  * @see com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
  */
 class SessionState(
-    val firstEventId: String,
-    val firstEventTimestamp: String,
-    val sessionId: String,
-    val previousSessionId: String?,  //$ On iOS it has to be set nullable on constructor
-    val sessionIndex: Int,
-    val userId: String,
-    val storage: String
+    var firstEventId: String,
+    var firstEventTimestamp: String,
+    var sessionId: String,
+    var previousSessionId: String?,  //$ On iOS it has to be set nullable on constructor
+    var sessionIndex: Int,
+    var userId: String,
+    var storage: String = "LOCAL_STORAGE",
+    var eventIndex: Int? = null,
+    var lastUpdate: Long? = null
 ) : State {
-    private val sessionContext = HashMap<String, Any?>()
-
-    init {
-        sessionContext[Parameters.SESSION_FIRST_ID] = firstEventId
-        sessionContext[Parameters.SESSION_FIRST_TIMESTAMP] =
-            firstEventTimestamp
-        sessionContext[Parameters.SESSION_ID] = sessionId
-        sessionContext[Parameters.SESSION_PREVIOUS_ID] =
-            previousSessionId
-        sessionContext[Parameters.SESSION_INDEX] = sessionIndex
-        sessionContext[Parameters.SESSION_USER_ID] = userId
-        sessionContext[Parameters.SESSION_STORAGE] = storage
-    }
 
     val sessionValues: Map<String, Any?>
-        get() = sessionContext
+        get() {
+            val sessionContext = HashMap<String, Any?>()
+            sessionContext[Parameters.SESSION_FIRST_ID] = firstEventId
+            sessionContext[Parameters.SESSION_FIRST_TIMESTAMP] =
+                firstEventTimestamp
+            sessionContext[Parameters.SESSION_ID] = sessionId
+            sessionContext[Parameters.SESSION_PREVIOUS_ID] =
+                previousSessionId
+            sessionContext[Parameters.SESSION_INDEX] = sessionIndex
+            sessionContext[Parameters.SESSION_USER_ID] = userId
+            sessionContext[Parameters.SESSION_STORAGE] = storage
+
+            eventIndex?.let {
+                sessionContext[Parameters.SESSION_EVENT_INDEX] = it
+            }
+            return sessionContext
+        }
+
+
+    val dataToPersist: Map<String, Any?>
+        get() {
+            val dictionary = sessionValues.toMutableMap()
+
+            lastUpdate?.let {
+                dictionary[Parameters.SESSION_LAST_UPDATE] = it
+            }
+
+            return dictionary
+        }
 
     companion object {
         @JvmStatic
@@ -79,8 +97,39 @@ class SessionState(
             value = storedState[Parameters.SESSION_STORAGE]
             if (value !is String) return null
             val storage = value
-            
-            return SessionState(firstEventId, firstEventTimestamp, sessionId, previousSessionId, sessionIndex, userId, storage)
+
+            val eventIndex = storedState[Parameters.SESSION_EVENT_INDEX] as? Int
+            val lastUpdate = storedState[Parameters.SESSION_LAST_UPDATE] as? Long
+
+            return SessionState(
+                firstEventId=firstEventId,
+                firstEventTimestamp=firstEventTimestamp,
+                sessionId=sessionId,
+                previousSessionId=previousSessionId,
+                sessionIndex=sessionIndex,
+                userId=userId,
+                storage=storage,
+                eventIndex=eventIndex,
+                lastUpdate=lastUpdate
+            )
+        }
+    }
+
+    fun startNewSession(eventId: String, eventTimestamp: Long) {
+        this.previousSessionId = this.sessionId
+        this.sessionId = Util.uUIDString()
+        this.sessionIndex = this.sessionIndex + 1
+        this.eventIndex = 0
+        this.firstEventId = eventId
+        this.firstEventTimestamp = Util.getDateTimeFromTimestamp(eventTimestamp)
+
+        this.lastUpdate = System.currentTimeMillis()
+    }
+
+    fun updateForNextEvent(isSessionCheckerEnabled: Boolean) {
+        this.eventIndex = (this.eventIndex ?: 0) + 1
+        if (isSessionCheckerEnabled) {
+            this.lastUpdate = System.currentTimeMillis()
         }
     }
 }

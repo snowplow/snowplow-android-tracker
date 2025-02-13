@@ -34,4 +34,12 @@ interface SessionConfigurationInterface {
      * The callback called every time the session is updated.
      */
     var onSessionUpdate: Consumer<SessionState>?
+
+
+    /**
+     * If enabled, will be able to continue the previous session when the app is closed and reopened (if it doesn't timeout).
+     * Disabled by default, which means that every restart of the app starts a new session.
+     * When enabled, every event will result in the session being updated in the UserDefaults.
+     */
+    var continueSessionOnRestart: Boolean
 }

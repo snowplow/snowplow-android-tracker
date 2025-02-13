@@ -20,11 +20,10 @@ import androidx.core.util.Consumer
 import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.tracker.Logger
+import com.snowplowanalytics.core.tracker.TrackerDefaults
 import com.snowplowanalytics.core.utils.Util
 import com.snowplowanalytics.snowplow.entity.ClientSessionEntity
-import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.SessionState
-import com.snowplowanalytics.snowplow.tracker.SessionState.Companion.build
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
@@ -48,12 +47,14 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     backgroundTimeout: Long,
     timeUnit: TimeUnit,
     namespace: String?,
-    context: Context
+    context: Context,
+
+    /// If enabled, will persist all session updates (also changes to eventIndex) and will be able to continue the previous session when the app is closed and reopened.
+    var continueSessionOnRestart: Boolean = TrackerDefaults.continueSessionOnRestart,
 ) {
     // Session Variables
     var userId: String
         private set
-    private var eventIndex = 0
 
     @Volatile
     var backgroundIndex = 0
@@ -69,7 +70,6 @@ class Session @SuppressLint("ApplySharedPref") constructor(
     val isBackground: Boolean
         get() = _isBackground.get()
 
-    private var lastSessionCheck: Long = 0
     private val isNewSession = AtomicBoolean(true)
 
     @Volatile
@@ -92,6 +92,8 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         this.foregroundTimeout = timeUnit.toMillis(foregroundTimeout)
         this.backgroundTimeout = timeUnit.toMillis(backgroundTimeout)
         isSessionCheckerEnabled = true
+
+        isNewSession.set(!continueSessionOnRestart)
         
         var sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS
         if (namespace != null && namespace.isNotEmpty()) {
@@ -105,11 +107,10 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             if (sessionInfo == null) {
                 Logger.track(TAG, "No previous session info available")
             } else {
-                state = build(sessionInfo)
+                state = SessionState.build(sessionInfo)
             }
             userId = retrieveUserId(context, state)
             sharedPreferences = context.getSharedPreferences(sessionVarsName, Context.MODE_PRIVATE)
-            lastSessionCheck = System.currentTimeMillis()
         } finally {
             StrictMode.setThreadPolicy(oldPolicy)
         }
@@ -122,34 +123,40 @@ class Session @SuppressLint("ApplySharedPref") constructor(
      * @return a SelfDescribingJson containing the session context
      */
     @Synchronized
-    fun getSessionContext(
+    fun getAndUpdateSessionForEvent(
         eventId: String,
         eventTimestamp: Long,
         userAnonymisation: Boolean
-    ): SelfDescribingJson? {
+    ): ClientSessionEntity? {
         Logger.v(TAG, "Getting session context...")
-        if (isSessionCheckerEnabled) {
-            if (shouldUpdateSession()) {
-                Logger.d(TAG, "Update session information.")
-                updateSession(eventId, eventTimestamp)
-                if (isBackground) { // timed out in background
-                    executeEventCallback(backgroundTimeoutCallback)
-                } else { // timed out in foreground
-                    executeEventCallback(foregroundTimeoutCallback)
-                }
+        if (isSessionCheckerEnabled && shouldStartNewSession()) {
+            Logger.d(TAG, "Update session information.")
+            startNewSession(eventId, eventTimestamp)
+
+            state?.let {
+                callOnSessionUpdateCallback(it)
             }
-            lastSessionCheck = System.currentTimeMillis()
+
+            if (isBackground) { // timed out in background
+                executeEventCallback(backgroundTimeoutCallback)
+            } else { // timed out in foreground
+                executeEventCallback(foregroundTimeoutCallback)
+            }
+
+            if (!continueSessionOnRestart) { persist() }
         }
-        eventIndex += 1
-        
+
         val state = state ?: run {
             Logger.v(TAG, "Session state not present")
             return null 
         }
+
+        state.updateForNextEvent(isSessionCheckerEnabled)
+        // persist every session update
+        if (continueSessionOnRestart) { persist() }
         
         val sessionValues = state.sessionValues
         val sessionCopy: MutableMap<String, Any?> = HashMap(sessionValues)
-        sessionCopy[Parameters.SESSION_EVENT_INDEX] = eventIndex
         if (userAnonymisation) {
             sessionCopy[Parameters.SESSION_USER_ID] =
                 "00000000-0000-0000-0000-000000000000"
@@ -158,51 +165,48 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         return ClientSessionEntity(sessionCopy)
     }
 
-    private fun shouldUpdateSession(): Boolean {
+    private fun shouldStartNewSession(): Boolean {
         if (isNewSession.get()) {
             return true
         }
-        val now = System.currentTimeMillis()
-        val timeout = if (isBackground) backgroundTimeout else foregroundTimeout
-        return now < lastSessionCheck || now - lastSessionCheck > timeout
+        val lastSessionCheck = state?.lastUpdate
+        if (lastSessionCheck !== null) {
+            val now = System.currentTimeMillis()
+            val timeout = if (isBackground) backgroundTimeout else foregroundTimeout
+            return now < lastSessionCheck || now - lastSessionCheck > timeout
+        }
+        return true
     }
 
     @Synchronized
-    private fun updateSession(eventId: String, eventTimestamp: Long) {
+    private fun startNewSession(eventId: String, eventTimestamp: Long) {
         isNewSession.set(false)
-        val currentSessionId = Util.uUIDString()
-        val eventTimestampDateTime = Util.getDateTimeFromTimestamp(eventTimestamp)
-        
-        var sessionIndex = 1
-        eventIndex = 0
-        var previousSessionId: String? = null
-        var storage = "LOCAL_STORAGE"
-        state?.let {
-            sessionIndex = it.sessionIndex + 1
-            previousSessionId = it.sessionId
-            storage = it.storage
-        }
-        state = SessionState(
-            eventId,
-            eventTimestampDateTime,
-            currentSessionId,
-            previousSessionId,
-            sessionIndex,
-            userId,
-            storage
-        )
-        state?.let {
-            storeSessionState(it)
-            callOnSessionUpdateCallback(it)
+
+        if (state == null) {
+            state = SessionState(
+                firstEventId = eventId,
+                firstEventTimestamp = Util.getDateTimeFromTimestamp(eventTimestamp),
+                sessionId = Util.uUIDString(),
+                previousSessionId = null,
+                sessionIndex = 1,
+                userId = userId,
+            )
+        } else {
+            state?.startNewSession(
+                eventId = eventId,
+                eventTimestamp = eventTimestamp
+            )
         }
     }
 
-    private fun storeSessionState(state: SessionState) {
-        val jsonObject = JSONObject(state.sessionValues)
-        val jsonString = jsonObject.toString()
-        val editor = sharedPreferences.edit()
-        editor.putString(TrackerConstants.SESSION_STATE, jsonString)
-        editor.apply()
+    private fun persist() {
+        state?.let { state ->
+            val jsonObject = JSONObject(state.dataToPersist)
+            val jsonString = jsonObject.toString()
+            val editor = sharedPreferences.edit()
+            editor.putString(TrackerConstants.SESSION_STATE, jsonString)
+            editor.apply()
+        }
     }
 
     private fun callOnSessionUpdateCallback(state: SessionState) {
@@ -324,10 +328,18 @@ class Session @SuppressLint("ApplySharedPref") constructor(
             backgroundTimeout: Long,
             timeUnit: TimeUnit,
             namespace: String?,
-            sessionCallbacks: Array<Runnable?>?
+            sessionCallbacks: Array<Runnable?>?,
+            continueSessionOnRestart: Boolean
         ): Session {
             val session =
-                Session(foregroundTimeout, backgroundTimeout, timeUnit, namespace, context)
+                Session(
+                    foregroundTimeout = foregroundTimeout,
+                    backgroundTimeout = backgroundTimeout,
+                    timeUnit = timeUnit,
+                    namespace = namespace,
+                    context = context,
+                    continueSessionOnRestart = continueSessionOnRestart
+                )
             var callbacks: Array<Runnable?>? = arrayOf(null, null, null, null)
             if (sessionCallbacks != null && sessionCallbacks.size == 4) {
                 callbacks = sessionCallbacks

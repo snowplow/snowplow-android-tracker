@@ -36,4 +36,5 @@ object TrackerDefaults {
     var screenEngagementAutotracking = true
     var installAutotracking = true
     var userAnonymisation = false
+    var continueSessionOnRestart = false
 }

@@ -73,6 +73,7 @@ class ConfigurationTest {
         Assert.assertEquals(protocol, scheme)
         Assert.assertEquals(trackerConfiguration.appId, tracker.appId)
         Assert.assertEquals("namespace", tracker.namespace)
+        Assert.assertEquals(tracker.session!!.continueSessionOnRestart, false)
     }
 
     @Test
@@ -83,12 +84,14 @@ class ConfigurationTest {
         val networkConfig = NetworkConfiguration("fake-url", HttpMethod.POST)
         val trackerConfig = TrackerConfiguration("appId")
         val sessionConfig = SessionConfiguration(expectedForeground, expectedBackground)
+        sessionConfig.continueSessionOnRestart = true
         val tracker =
             createTracker(context, "namespace", networkConfig, trackerConfig, sessionConfig)
         val foreground = tracker.session!!.foregroundTimeout
         val background = tracker.session!!.backgroundTimeout
         Assert.assertEquals(expectedForeground, foreground)
         Assert.assertEquals(expectedBackground, background)
+        Assert.assertEquals(tracker.session!!.continueSessionOnRestart, true)
     }
 
     @Test

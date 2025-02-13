@@ -279,9 +279,10 @@ class Demo : Activity(), LoggerDelegate {
             .installAutotracking(true)
             .diagnosticAutotracking(true)
         val sessionConfiguration = SessionConfiguration(
-            TimeMeasure(6, TimeUnit.SECONDS),
-            TimeMeasure(30, TimeUnit.SECONDS)
+            TimeMeasure(30, TimeUnit.MINUTES),
+            TimeMeasure(30, TimeUnit.MINUTES)
         )
+            .continueSessionOnRestart(true)
             .onSessionUpdate { state: SessionState ->
                 updateLogger(
                     """
