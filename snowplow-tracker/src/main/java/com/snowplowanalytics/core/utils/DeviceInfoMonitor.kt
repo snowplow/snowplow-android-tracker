@@ -240,6 +240,9 @@ open class DeviceInfoMonitor {
             // equivalent of: val id = appSetInfo.getId()
             val id = invokeInstanceMethod(appSetInfo, "getId", null) ?: return null
 
+            // Check if id is blank/empty and return null to avoid validation errors
+            if ((id as? String)?.isBlank() == true) { return null }
+
             // equivalent of: val id = appSetInfo.getScope()
             val scope = invokeInstanceMethod(appSetInfo, "getScope", null) ?: return null
 
