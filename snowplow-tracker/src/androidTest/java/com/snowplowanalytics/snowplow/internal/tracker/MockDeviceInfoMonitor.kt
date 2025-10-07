@@ -17,7 +17,7 @@ import android.net.NetworkInfo
 import android.util.Pair
 import com.snowplowanalytics.core.utils.DeviceInfoMonitor
 
-class MockDeviceInfoMonitor : DeviceInfoMonitor() {
+open class MockDeviceInfoMonitor : DeviceInfoMonitor() {
     private val methodAccessCounts: MutableMap<String, Int> = HashMap()
     var customIdfa: String? = "XJKLJSALFKJ"
     var batteryLevel: Int = 20
