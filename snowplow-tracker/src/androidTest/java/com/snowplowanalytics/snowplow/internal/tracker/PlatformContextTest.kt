@@ -342,6 +342,25 @@ class PlatformContextTest {
     }
 
     @Test
+    fun appSetIdNotAddedIfEmpty() {
+        val deviceInfoMonitor = object : MockDeviceInfoMonitor() {
+            override fun getAppSetIdAndScope(context: Context): android.util.Pair<String, String>? {
+                // Simulate what happens when AppSetIdInfo returns empty string
+                return android.util.Pair("", "app")
+            }
+        }
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertFalse(sdjData.containsKey(Parameters.APP_SET_ID))
+        Assert.assertTrue(sdjData.containsKey(Parameters.APP_SET_ID_SCOPE))
+        Assert.assertEquals("app", sdjData[Parameters.APP_SET_ID_SCOPE])
+    }
+
+    @Test
     fun batteryLevelNotTrackedIfNegative() {
         val deviceInfoMonitor = MockDeviceInfoMonitor()
         deviceInfoMonitor.batteryLevel = -1

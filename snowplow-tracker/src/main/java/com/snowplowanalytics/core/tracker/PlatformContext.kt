@@ -212,7 +212,10 @@ class PlatformContext(
 
             if (trackId) {
                 val id = fromRetrieverOr(retriever.appSetId) { appSetIdAndScope?.first }
-                addToMap(Parameters.APP_SET_ID, id, pairs)
+                // Don't add empty/blank appSetId to avoid validation errors
+                if (id != null && (id as? String)?.isNotBlank() == true) {
+                    addToMap(Parameters.APP_SET_ID, id, pairs)
+                }
             }
             if (trackScope) {
                 val scope = fromRetrieverOr(retriever.appSetIdScope) { appSetIdAndScope?.second }
