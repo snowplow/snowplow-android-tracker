@@ -344,9 +344,9 @@ class PlatformContextTest {
     @Test
     fun appSetIdNotAddedIfEmpty() {
         val deviceInfoMonitor = object : MockDeviceInfoMonitor() {
-            override fun getAppSetIdAndScope(context: Context): Pair<String, String>? {
+            override fun getAppSetIdAndScope(context: Context): android.util.Pair<String, String>? {
                 // Simulate what happens when AppSetIdInfo returns empty string
-                return Pair("", "app")
+                return android.util.Pair("", "app")
             }
         }
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
