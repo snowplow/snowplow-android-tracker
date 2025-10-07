@@ -34,7 +34,7 @@ enum class DevicePlatform(val value: String) {
         @JvmStatic
         fun getByValue(value: String): DevicePlatform {
             for (element in EnumSet.allOf(DevicePlatform::class.java)) {
-                if (element.toString() == value) {
+                if (element.value == value) {
                     return element
                 }
             }

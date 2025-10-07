@@ -30,4 +30,23 @@ class DevicePlatformTest {
         Assert.assertEquals("cnsl", DevicePlatform.GameConsole.value)
         Assert.assertEquals("iot", DevicePlatform.InternetOfThings.value)
     }
+
+    @Test
+    fun testGetByValue() {
+        Assert.assertEquals(DevicePlatform.Web, DevicePlatform.getByValue("web"))
+        Assert.assertEquals(DevicePlatform.Mobile, DevicePlatform.getByValue("mob"))
+        Assert.assertEquals(DevicePlatform.Desktop, DevicePlatform.getByValue("pc"))
+        Assert.assertEquals(DevicePlatform.ServerSideApp, DevicePlatform.getByValue("srv"))
+        Assert.assertEquals(DevicePlatform.General, DevicePlatform.getByValue("app"))
+        Assert.assertEquals(DevicePlatform.ConnectedTV, DevicePlatform.getByValue("tv"))
+        Assert.assertEquals(DevicePlatform.GameConsole, DevicePlatform.getByValue("cnsl"))
+        Assert.assertEquals(DevicePlatform.InternetOfThings, DevicePlatform.getByValue("iot"))
+    }
+
+    @Test
+    fun testGetByValueWithInvalidValue() {
+        Assert.assertEquals(DevicePlatform.Mobile, DevicePlatform.getByValue("invalid"))
+        Assert.assertEquals(DevicePlatform.Mobile, DevicePlatform.getByValue(""))
+        Assert.assertEquals(DevicePlatform.Mobile, DevicePlatform.getByValue("ConnectedTV"))
+    }
 }
