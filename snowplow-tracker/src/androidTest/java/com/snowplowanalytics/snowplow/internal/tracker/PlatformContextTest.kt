@@ -342,12 +342,11 @@ class PlatformContextTest {
     }
 
     @Test
-    fun appSetIdNotAddedIfNotAvailable() {
+    fun appSetIdNotAddedIfEmpty() {
         val deviceInfoMonitor = object : MockDeviceInfoMonitor() {
             override fun getAppSetIdAndScope(context: Context): Pair<String, String>? {
-                // Simulate what happens when AppSetIdInfo returns empty/blank string
-                // (the real implementation returns null in this case to avoid validation errors)
-                return null
+                // Simulate what happens when AppSetIdInfo returns empty string
+                return Pair("", "app")
             }
         }
         val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
@@ -357,7 +356,8 @@ class PlatformContextTest {
         val sdjData = sdj!!.map["data"] as Map<*, *>
 
         Assert.assertFalse(sdjData.containsKey(Parameters.APP_SET_ID))
-        Assert.assertFalse(sdjData.containsKey(Parameters.APP_SET_ID_SCOPE))
+        Assert.assertTrue(sdjData.containsKey(Parameters.APP_SET_ID_SCOPE))
+        Assert.assertEquals("app", sdjData[Parameters.APP_SET_ID_SCOPE])
     }
 
     @Test
