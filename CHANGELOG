@@ -1,3 +1,8 @@
+Version 6.2.1 (2025-10-07)
+--------------------------
+Fix: Handle empty/blank appSetId to prevent validation errors (#710)
+Fix DevicePlatform.getByValue to compare value property instead of enum name (#714)
+
 Version 6.2.0 (2025-02-10)
 --------------------------
 Add an option to continue previously persisted session when the app restarts rather than starting a new one (#340)
