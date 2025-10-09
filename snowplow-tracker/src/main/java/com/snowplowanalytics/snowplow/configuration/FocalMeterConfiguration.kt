@@ -20,6 +20,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import java.util.function.Function
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This configuration tells the tracker to send requests with the user ID in session context entity
@@ -68,8 +69,8 @@ class FocalMeterConfiguration(
         uriBuilder.appendQueryParameter("c12", "not_set")
 
         val client = OkHttpClient.Builder()
-            .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .connectTimeout(15.seconds)
+            .readTimeout(15.seconds)
             .build()
 
         val request = Request.Builder()

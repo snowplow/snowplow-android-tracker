@@ -23,8 +23,8 @@ import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.event.Structured
 import com.snowplowanalytics.snowplow.network.HttpMethod
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
 import org.junit.After
 import org.junit.Assert
 import org.junit.Test
@@ -165,14 +165,15 @@ class FocalMeterConfigurationTest {
     private fun withMockServer(responseCode: Int, callback: (MockWebServer, String) -> Unit) {
         val mockServer = MockWebServer()
         mockServer.start()
-        val mockResponse = MockResponse()
-            .setResponseCode(responseCode)
-            .setHeader("Content-Type", "application/json")
-            .setBody("")
+        val mockResponse = MockResponse.Builder()
+            .code(responseCode)
+            .addHeader("Content-Type", "application/json")
+            .body("")
+            .build()
         mockServer.enqueue(mockResponse)
         val endpoint = String.format("http://%s:%d", mockServer.hostName, mockServer.port)
         callback(mockServer, endpoint)
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     private fun createLoggerDelegate(

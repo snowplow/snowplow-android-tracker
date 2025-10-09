@@ -27,6 +27,7 @@ import okhttp3.ResponseBody
 
 import org.json.JSONException
 import org.json.JSONObject
+import kotlin.time.Duration.Companion.seconds
 import java.io.IOException
 
 import java.util.concurrent.TimeUnit
@@ -59,8 +60,8 @@ class RemoteConfigurationFetcher(
         val uriBuilder = Uri.parse(endpoint).buildUpon()
         val uri = uriBuilder.build().toString()
         val client: OkHttpClient = OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(15.seconds)
+            .readTimeout(15.seconds)
             .build()
         val request: Request = Request.Builder()
             .url(uri)

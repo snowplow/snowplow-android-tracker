@@ -17,17 +17,15 @@ project.ext {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.3"
     namespace "com.snowplowanalytics.snowplow.tracker"
+    compileSdkVersion 35
 
-    useLibrary 'android.test.base'
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1
-        versionName "$project.version"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,8 +34,9 @@ android {
         debug {
             buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
             buildConfigField "String", "TRACKER_VERSION", "\"$project.version\""
+            enableUnitTestCoverage true
+            enableAndroidTestCoverage true
 
-            testCoverageEnabled = true
         }
         release {
             buildConfigField "String", "TRACKER_LABEL", "\"andr-$project.version\""
@@ -48,16 +47,13 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude 'LICENSE.txt'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/DEPENDENCIES'
+    packaging {
+        resources {
+            excludes += ['LICENSE.txt', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE.txt', 'META-INF/DEPENDENCIES']
+        }
     }
 
-    lintOptions {
+    lint {
         disable 'InvalidPackage'
         abortOnError false
     }
@@ -67,8 +63,6 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled true
-
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -76,12 +70,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    installation {
+        installOptions '-d', '-t'
+    }
 
     // This enables long timeouts required on slow environments
-    adbOptions {
-        timeOutInMs 10 * 60 * 1000  // Set the timeout to 10 minutes
-        installOptions "-d","-t"
-    }
 }
 
 dependencies {
@@ -92,10 +85,8 @@ dependencies {
     compileOnly "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     compileOnly "com.android.installreferrer:installreferrer:2.2"
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.9'
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.2.0'
     // test
     testImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     testImplementation "com.android.installreferrer:installreferrer:2.2"
@@ -103,7 +94,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'com.google.android.gms:play-services-analytics:18.0.3'
-    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver3:5.2.0'
 }
 
 task sourcesJar(type: Jar) {

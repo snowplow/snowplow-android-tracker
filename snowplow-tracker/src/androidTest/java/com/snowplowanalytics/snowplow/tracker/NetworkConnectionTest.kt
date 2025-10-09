@@ -23,9 +23,9 @@ import com.snowplowanalytics.snowplow.payload.Payload
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
+import mockwebserver3.RecordedRequest
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Assert
@@ -60,7 +60,7 @@ class NetworkConnectionTest {
         val result = results[0]
         Assert.assertTrue(result.isSuccessful)
         Assert.assertEquals(1, result.eventIds[0]!!.toLong())
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @Test
@@ -83,7 +83,7 @@ class NetworkConnectionTest {
         val result = results[0]
         Assert.assertFalse(result.isSuccessful)
         Assert.assertEquals(1, result.eventIds[0]!!.toLong())
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @Test
@@ -112,7 +112,7 @@ class NetworkConnectionTest {
         val result = results[0]
         Assert.assertTrue(result.isSuccessful)
         Assert.assertEquals(1, result.eventIds[0]!!.toLong())
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @Test
@@ -136,7 +136,7 @@ class NetworkConnectionTest {
         val result = results[0]
         Assert.assertFalse(result.isSuccessful)
         Assert.assertEquals(1, result.eventIds[0]!!.toLong())
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @Test
@@ -165,7 +165,7 @@ class NetworkConnectionTest {
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
         Assert.assertNotNull(req)
         Assert.assertTrue(hasClientBeenUsed.get())
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @Test
@@ -198,7 +198,7 @@ class NetworkConnectionTest {
         val mockServer = MockWebServer()
         mockServer.start()
         mockServer.enqueue(
-            MockResponse().addHeader("Set-Cookie", "sp=test")
+            MockResponse.Builder().addHeader("Set-Cookie", "sp=test").build()
         )
         val connection = OkHttpNetworkConnectionBuilder(getMockServerURI(mockServer)!!, context)
             .method(HttpMethod.POST)
@@ -211,8 +211,8 @@ class NetworkConnectionTest {
         mockServer.takeRequest(60, TimeUnit.SECONDS)
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertEquals("sp=test", req!!.getHeader("Cookie"))
-        mockServer.shutdown()
+        Assert.assertEquals("sp=test", req!!.headers["Cookie"])
+        mockServer.close()
         CollectorCookieJar(context).clear()
     }
 
@@ -228,8 +228,8 @@ class NetworkConnectionTest {
         payload.add("key", "value")
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertNull(req!!.getHeader("SP-Anonymous"))
-        mockServer.shutdown()
+        Assert.assertNull(req!!.headers["SP-Anonymous"])
+        mockServer.close()
     }
 
     @Test
@@ -244,8 +244,8 @@ class NetworkConnectionTest {
         payload.add("key", "value")
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertEquals("*", req!!.getHeader("SP-Anonymous"))
-        mockServer.shutdown()
+        Assert.assertEquals("*", req!!.headers["SP-Anonymous"])
+        mockServer.close()
     }
 
     @Test
@@ -260,8 +260,8 @@ class NetworkConnectionTest {
         payload.add("key", "value")
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertEquals("*", req!!.getHeader("SP-Anonymous"))
-        mockServer.shutdown()
+        Assert.assertEquals("*", req!!.headers["SP-Anonymous"])
+        mockServer.close()
     }
 
     @Test
@@ -276,8 +276,8 @@ class NetworkConnectionTest {
         payload.add("key", "value")
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertEquals("bar", req!!.getHeader("foo"))
-        mockServer.shutdown()
+        Assert.assertEquals("bar", req!!.headers["foo"])
+        mockServer.close()
     }
 
     @Test
@@ -292,26 +292,27 @@ class NetworkConnectionTest {
         payload.add("key", "value")
         connection.sendRequests(listOf(Request(payload, 2)))
         val req = mockServer.takeRequest(60, TimeUnit.SECONDS)
-        Assert.assertEquals("bar", req!!.getHeader("foo"))
-        mockServer.shutdown()
+        Assert.assertEquals("bar", req!!.headers["foo"])
+        mockServer.close()
     }
 
     // Service methods
     private fun assertGETRequest(req: RecordedRequest?) {
         Assert.assertNotNull(req)
         Assert.assertEquals("GET", req!!.method)
-        Assert.assertEquals("Keep-Alive", req.getHeader("Connection"))
-        Assert.assertEquals("/i?", req.path!!.substring(0, 3))
+        Assert.assertEquals("Keep-Alive", req.headers["Connection"])
+        val path = req.url!!.encodedPath + "?" + (req.url!!.encodedQuery ?: "")
+        Assert.assertEquals("/i?", path.substring(0, 3))
     }
 
     @Throws(JSONException::class)
     private fun assertPOSTRequest(req: RecordedRequest?): JSONObject {
         Assert.assertNotNull(req)
         Assert.assertEquals("POST", req!!.method)
-        Assert.assertEquals("application/json; charset=utf-8", req.getHeader("Content-Type"))
-        Assert.assertEquals("Keep-Alive", req.getHeader("Connection"))
-        Assert.assertEquals("/com.snowplowanalytics.snowplow/tp2", req.path)
-        val payload = JSONObject(req.body.readUtf8())
+        Assert.assertEquals("application/json; charset=utf-8", req.headers["Content-Type"])
+        Assert.assertEquals("Keep-Alive", req.headers["Connection"])
+        Assert.assertEquals("/com.snowplowanalytics.snowplow/tp2", req.url!!.encodedPath)
+        val payload = JSONObject(req.body!!.utf8())
         Assert.assertEquals(1, payload.length().toLong())
         Assert.assertEquals(
             "value",
@@ -325,9 +326,10 @@ class NetworkConnectionTest {
     fun getMockServer(responseCode: Int): MockWebServer {
         val mockServer = MockWebServer()
         mockServer.start()
-        val mockedResponse = MockResponse()
-        mockedResponse.setResponseCode(responseCode)
-        mockedResponse.setBody("{}")
+        val mockedResponse = MockResponse.Builder()
+            .code(responseCode)
+            .body("{}")
+            .build()
         mockServer.enqueue(mockedResponse)
         return mockServer
     }

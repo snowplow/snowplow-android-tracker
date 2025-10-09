@@ -22,8 +22,8 @@ import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvide
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
 import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Assert
@@ -343,10 +343,11 @@ class RemoteConfigurationTest {
                 synchronized(expectation) { expectation.notify() }
             }
             synchronized(expectation) { expectation.wait(1000) }
-            val mockResponse = MockResponse()
-                .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}")
+            val mockResponse = MockResponse.Builder()
+                .code(200)
+                .addHeader("Content-Type", "application/json")
+                .body("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":1,\"configurationBundle\":[]}")
+                .build()
             mockWebServer.enqueue(mockResponse)
 
             // test
@@ -380,10 +381,11 @@ class RemoteConfigurationTest {
                 synchronized(expectation) { expectation.notify() }
             }
             synchronized(expectation) { expectation.wait(1000) }
-            val mockResponse = MockResponse()
-                .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}")
+            val mockResponse = MockResponse.Builder()
+                .code(200)
+                .addHeader("Content-Type", "application/json")
+                .body("{\"\$schema\":\"http://iglucentral.com/schemas/com.snowplowanalytics.mobile/remote_config/jsonschema/1-1-0\",\"configurationVersion\":2,\"configurationBundle\":[]}")
+                .build()
             mockWebServer.enqueue(mockResponse)
 
             // test
@@ -554,13 +556,14 @@ class RemoteConfigurationTest {
     private fun withMockServer(responseCode: Int, body: String?, callback: (MockWebServer, String) -> Unit) {
         val mockServer = MockWebServer()
         mockServer.start()
-        val mockResponse = MockResponse()
-            .setResponseCode(responseCode)
-            .setHeader("Content-Type", "application/json")
-            .setBody(body!!)
+        val mockResponse = MockResponse.Builder()
+            .code(responseCode)
+            .addHeader("Content-Type", "application/json")
+            .body(body!!)
+            .build()
         mockServer.enqueue(mockResponse)
         callback(mockServer, getMockServerURI(mockServer))
-        mockServer.shutdown()
+        mockServer.close()
     }
 
     @SuppressLint("DefaultLocale")

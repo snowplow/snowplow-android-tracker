@@ -1,16 +1,17 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
     namespace 'com.snowplowanalytics.snowplowdemocompose'
-    compileSdkVersion 33
+    compileSdk 35
 
     defaultConfig {
         applicationId 'com.snowplowanalytics.snowplowdemocompose'
         minSdkVersion 26
-        targetSdkVersion 33
+        targetSdkVersion 35
         versionCode 1
         versionName '1.0'
 
@@ -37,10 +38,6 @@ android {
         compose true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.1"
-    }
-
 }
 
 dependencies {
@@ -58,7 +55,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.browser:browser:1.5.0'
-    
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':snowplow-android-tracker')
 
@@ -66,7 +63,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:22.6.0'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
-    
+
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.0.0"
 }
