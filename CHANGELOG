@@ -1,3 +1,9 @@
+Version 7.0.0 (2025-10-10)
+--------------------------
+Upgrade gradle to 8.13, target SDKs to 35 and okhttp to 5.2
+Remove usage of java.util.function.* in order to remove the need for library desugaring
+Change an Emitter log from error to debug (#275)
+
 Version 6.2.1 (2025-10-07)
 --------------------------
 Fix: Handle empty/blank appSetId to prevent validation errors (#710)

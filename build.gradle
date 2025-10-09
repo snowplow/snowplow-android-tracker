@@ -24,7 +24,7 @@ plugins {
 
 subprojects {
     group = 'com.snowplowanalytics'
-    version = '6.2.1'
+    version = '7.0.0'
     repositories {
         google()
         maven {
