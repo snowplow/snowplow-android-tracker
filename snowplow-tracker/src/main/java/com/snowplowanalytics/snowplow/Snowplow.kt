@@ -37,7 +37,7 @@ import java.util.*
 object Snowplow {
     // Private properties
     private var defaultServiceProvider: ServiceProvider? = null
-    private val serviceProviderInstances: MutableMap<String, ServiceProvider?> = HashMap()
+    private val serviceProviderInstances: MutableMap<String, ServiceProvider> = HashMap()
     private var configurationProvider: RemoteConfigurationProvider? = null
 
     /**

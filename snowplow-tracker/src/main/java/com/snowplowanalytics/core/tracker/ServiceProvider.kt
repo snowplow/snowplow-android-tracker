@@ -27,12 +27,12 @@ import java.util.concurrent.TimeUnit
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ServiceProvider(
-    context: Context,
+    private val context: Context,
     override val namespace: String,
     networkConfiguration: NetworkConfiguration,
     configurations: List<Configuration>
 ) : ServiceProviderInterface {
-    private val context: Context
+    // Initialization
     override val isTrackerInitialized: Boolean
         get() = tracker != null
 
@@ -59,18 +59,16 @@ class ServiceProvider(
     }
 
     // Configurations
-    override lateinit var trackerConfiguration: TrackerConfiguration
-    override lateinit var networkConfiguration: NetworkConfiguration
-    override lateinit var subjectConfiguration: SubjectConfiguration
-    override lateinit var emitterConfiguration: EmitterConfiguration
-    override lateinit var sessionConfiguration: SessionConfiguration
-    override lateinit var gdprConfiguration: GdprConfiguration
+    override var trackerConfiguration: TrackerConfiguration
+    override var networkConfiguration: NetworkConfiguration
+    override var subjectConfiguration: SubjectConfiguration
+    override var emitterConfiguration: EmitterConfiguration
+    override var sessionConfiguration: SessionConfiguration
+    override var gdprConfiguration: GdprConfiguration
     override var pluginConfigurations: MutableList<PluginIdentifiable> = ArrayList()
         private set
 
     init {
-        // Initialization
-        this.context = context
 
         // Reset configurationUpdates 
         trackerConfiguration = TrackerConfiguration()
