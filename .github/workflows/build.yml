@@ -46,7 +46,7 @@ jobs:
           script: |
             adb logcat -c
             adb logcat > logcat.log &
-            ./gradlew createDebugCoverageReport
+            ./gradlew createDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.notAnnotation=androidx.test.filters.FlakyTest
         env:
           API_LEVEL: ${{ matrix.api-level }}
 

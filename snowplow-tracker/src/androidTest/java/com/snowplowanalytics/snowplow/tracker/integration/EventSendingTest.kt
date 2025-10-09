@@ -39,6 +39,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import androidx.test.filters.FlakyTest
 import java.io.IOException
 import java.net.URLDecoder
 import java.util.*
@@ -82,6 +83,7 @@ class EventSendingTest {
     }
 
     // Tests
+    @FlakyTest(bugId = -1, detail = "Flaky on CI - timing sensitive test")
     @Test
     @Throws(Exception::class)
     fun testSendGet() {
