@@ -528,7 +528,7 @@ class Emitter(
                 return
             }
             emptyCount++
-            Logger.e(TAG, "Emitter database empty: $emptyCount")
+            Logger.d(TAG, "Emitter database empty: $emptyCount")
             try {
                 timeUnit.sleep(emitterTick.toLong())
             } catch (e: InterruptedException) {
