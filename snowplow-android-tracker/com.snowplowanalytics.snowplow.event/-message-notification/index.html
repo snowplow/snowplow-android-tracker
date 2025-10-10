@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>MessageNotification</title>
     <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,50 +19,99 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
-<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../index.html">
-                    <span>snowplow-android-tracker</span>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../../index.html">
+                    snowplow-android-tracker
             </a>
-    </div>
-    <div>
-6.2.1    </div>
-    <div class="pull-right d-flex">
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+6.3.0        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":snowplow-android-tracker:dokkaHtml/release">androidJvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":snowplow-android-tracker:dokkaHtml/release"
+                                       data-filter=":snowplow-android-tracker:dokkaHtml/release"/>
+                                <span class="checkbox--icon"></span>
+                                androidJvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
-    </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
-    </div>
-    <div id="main">
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    snowplow-android-tracker
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageIds="snowplow-android-tracker::com.snowplowanalytics.snowplow.event/MessageNotification///PointingToDeclaration//918778150">
   <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.snowplow.event</a><span class="delimiter">/</span><span class="current">MessageNotification</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Message</span><wbr></wbr><span><span>Notification</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">MessageNotification</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>body<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>trigger<span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></span></span><span class="token punctuation">)</span> : <a href="../-abstract-self-describing/index.html">AbstractSelfDescribing</a></div><p class="paragraph">Event that represents the reception of a push notification (or a locally generated one).</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>title</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Title of message notification.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>body</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Body content of the message notification.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>trigger</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The trigger that raised this notification: remote notification (push), position related (location), date-time related (calendar, timeInterval) or app generated (other).</p></div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">MessageNotification</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>body<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>trigger<span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></span></span><span class="token punctuation">)</span> : <a href="../-abstract-self-describing/index.html">AbstractSelfDescribing</a></div><p class="paragraph">Event that represents the reception of a push notification (or a locally generated one).</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>title</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Title of message notification.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>body</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Body content of the message notification.</p></div></div></div></div><div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>trigger</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The trigger that raised this notification: remote notification (push), position related (location), date-time related (calendar, timeInterval) or app generated (other).</p></div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
@@ -75,7 +125,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">title<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">body<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">trigger<span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">title<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">body<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">trigger<span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -101,295 +151,6 @@
           </div>
         </div>
       </div>
-      <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1082081897%2FFunctions%2F918778150" anchor-label="action" id="1082081897%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="action.html"><span><span>action</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1082081897%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="action.html"><span class="token function">action</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The action associated with the notification.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="109135675%2FFunctions%2F918778150" anchor-label="attachments" id="109135675%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="attachments.html"><span><span>attachments</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="109135675%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="attachments.html"><span class="token function">attachments</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">attachments<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-message-notification-attachment/index.html">MessageNotificationAttachment</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Attachments added to the notification (they can be part of the data object).</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-754235142%2FFunctions%2F918778150" anchor-label="bodyLocArgs" id="-754235142%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="body-loc-args.html"><span>body</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Args</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-754235142%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="body-loc-args.html"><span class="token function">bodyLocArgs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bodyLocArgs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in bodyLocArgs to use to localize the body text to the user's current localization.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1859690878%2FFunctions%2F918778150" anchor-label="bodyLocKey" id="1859690878%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="body-loc-key.html"><span>body</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Key</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1859690878%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="body-loc-key.html"><span class="token function">bodyLocKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bodyLocKey<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The key to the body string in the app's string resources to use to localize the body text to the user's current localization.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1387331041%2FFunctions%2F918778150" anchor-label="category" id="1387331041%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="category.html"><span><span>category</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1387331041%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="category.html"><span class="token function">category</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">category<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The category associated to the notification.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="17840974%2FFunctions%2F918778150" anchor-label="contentAvailable" id="17840974%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="content-available.html"><span>content</span><wbr></wbr><span><span>Available</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="17840974%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="content-available.html"><span class="token function">contentAvailable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contentAvailable<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The application is notified of the delivery of the notification if it's in the foreground or background, the app will be woken up (iOS only).</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="626957749%2FFunctions%2F918778150" anchor-label="contexts" id="626957749%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="../-abstract-event/contexts.html"><span><span>contexts</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="626957749%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-abstract-event/contexts.html"><span class="token function"><strike>contexts</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contexts<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1616654728%2FFunctions%2F918778150" anchor-label="entities" id="-1616654728%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="../-abstract-event/entities.html"><span><span>entities</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1616654728%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-abstract-event/entities.html"><span class="token function">entities</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="662094234%2FFunctions%2F918778150" anchor-label="group" id="662094234%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="group.html"><span><span>group</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="662094234%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="group.html"><span class="token function">group</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">group<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The group which this notification is part of.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-861572218%2FFunctions%2F918778150" anchor-label="icon" id="-861572218%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="icon.html"><span><span>icon</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-861572218%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="icon.html"><span class="token function">icon</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">icon<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The icon associated to the notification (Android only).</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="2019752207%2FFunctions%2F918778150" anchor-label="notificationCount" id="2019752207%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="notification-count.html"><span>notification</span><wbr></wbr><span><span>Count</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2019752207%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="notification-count.html"><span class="token function">notificationCount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notificationCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The number of items this notification represents.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="10302510%2FFunctions%2F918778150" anchor-label="notificationTimestamp" id="10302510%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="notification-timestamp.html"><span>notification</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="10302510%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="notification-timestamp.html"><span class="token function">notificationTimestamp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notificationTimestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The time when the event of the notification occurred.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-648139510%2FFunctions%2F918778150" anchor-label="sound" id="-648139510%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="sound.html"><span><span>sound</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-648139510%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="sound.html"><span class="token function">sound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The sound played when the device receives the notification.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1986263673%2FFunctions%2F918778150" anchor-label="subtitle" id="-1986263673%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="subtitle.html"><span><span>subtitle</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1986263673%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="subtitle.html"><span class="token function">subtitle</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">subtitle<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The notification's subtitle. (iOS only)</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1903492257%2FFunctions%2F918778150" anchor-label="tag" id="-1903492257%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="tag.html"><span><span>tag</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1903492257%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="tag.html"><span class="token function">tag</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tag<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (Android only).</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1799753708%2FFunctions%2F918778150" anchor-label="threadIdentifier" id="1799753708%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="thread-identifier.html"><span>thread</span><wbr></wbr><span><span>Identifier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1799753708%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="thread-identifier.html"><span class="token function">threadIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">threadIdentifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (iOS only).</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-798641570%2FFunctions%2F918778150" anchor-label="titleLocArgs" id="-798641570%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="title-loc-args.html"><span>title</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Args</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-798641570%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="title-loc-args.html"><span class="token function">titleLocArgs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">titleLocArgs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in titleLocArgs to use to localize the title text to the user's current localization.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1650327582%2FFunctions%2F918778150" anchor-label="titleLocKey" id="-1650327582%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="title-loc-key.html"><span>title</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Key</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1650327582%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="title-loc-key.html"><span class="token function">titleLocKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">titleLocKey<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The key to the title string in the app's string resources to use to localize the title text to the user's current localization.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="360050166%2FFunctions%2F918778150" anchor-label="trueTimestamp" id="360050166%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
-          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="../-abstract-event/true-timestamp.html"><span>true</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="360050166%2FFunctions%2F918778150"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-abstract-event/true-timestamp.html"><span class="token function">trueTimestamp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">trueTimestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Set the custom timestamp of the event.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
         <div class="table"><a data-name="2066847114%2FProperties%2F918778150" anchor-label="action" id="2066847114%2FProperties%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
@@ -402,7 +163,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="action.html">action</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The action associated with the notification.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="action.html">action</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The action associated with the notification.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -417,7 +178,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="attachments.html">attachments</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-message-notification-attachment/index.html">MessageNotificationAttachment</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Attachments added to the notification (they can be part of the data object).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="attachments.html">attachments</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-message-notification-attachment/index.html">MessageNotificationAttachment</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Attachments added to the notification (they can be part of the data object).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -432,7 +193,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="body.html">body</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="body.html">body</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -447,7 +208,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="body-loc-args.html">bodyLocArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in bodyLocArgs to use to localize the body text to the user's current localization.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="body-loc-args.html">bodyLocArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in bodyLocArgs to use to localize the body text to the user's current localization.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -462,7 +223,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="body-loc-key.html">bodyLocKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key to the body string in the app's string resources to use to localize the body text to the user's current localization.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="body-loc-key.html">bodyLocKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key to the body string in the app's string resources to use to localize the body text to the user's current localization.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -477,7 +238,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="category.html">category</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The category associated to the notification.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="category.html">category</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The category associated to the notification.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -492,7 +253,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="content-available.html">contentAvailable</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The application is notified of the delivery of the notification if it's in the foreground or background, the app will be woken up (iOS only).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="content-available.html">contentAvailable</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The application is notified of the delivery of the notification if it's in the foreground or background, the app will be woken up (iOS only).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -507,7 +268,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/contexts.html"><strike>contexts</strike></a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/contexts.html"><strike>contexts</strike></a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -522,7 +283,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="data-payload.html">dataPayload</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The payload for the event.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="data-payload.html">dataPayload</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The payload for the event.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -537,7 +298,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/entities.html">entities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/entities.html">entities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -552,7 +313,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-abstract-event/entities-for-processing.html">entitiesForProcessing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Used for events whose properties are added as entities, e.g. Ecommerce events</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../-abstract-event/entities-for-processing.html">entitiesForProcessing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Used for events whose properties are added as entities, e.g. Ecommerce events</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -567,7 +328,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="group.html">group</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The group which this notification is part of.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="group.html">group</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The group which this notification is part of.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -582,7 +343,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="icon.html">icon</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The icon associated to the notification (Android only).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="icon.html">icon</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The icon associated to the notification (Android only).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -597,7 +358,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="notification-count.html">notificationCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The number of items this notification represents.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="notification-count.html">notificationCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The number of items this notification represents.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -612,7 +373,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="notification-timestamp.html">notificationTimestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The time when the event of the notification occurred.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="notification-timestamp.html">notificationTimestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The time when the event of the notification occurred.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -627,7 +388,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="schema.html">schema</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="schema.html">schema</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -642,7 +403,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="sound.html">sound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The sound played when the device receives the notification.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="sound.html">sound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The sound played when the device receives the notification.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -657,7 +418,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="subtitle.html">subtitle</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The notification's subtitle. (iOS only)</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="subtitle.html">subtitle</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The notification's subtitle. (iOS only)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -672,7 +433,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="tag.html">tag</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (Android only).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="tag.html">tag</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (Android only).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -687,7 +448,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="thread-identifier.html">threadIdentifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (iOS only).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="thread-identifier.html">threadIdentifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (iOS only).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -702,7 +463,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -717,7 +478,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="title-loc-args.html">titleLocArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in titleLocArgs to use to localize the title text to the user's current localization.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="title-loc-args.html">titleLocArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in titleLocArgs to use to localize the title text to the user's current localization.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -732,7 +493,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="title-loc-key.html">titleLocKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key to the title string in the app's string resources to use to localize the title text to the user's current localization.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">var </span><a href="title-loc-key.html">titleLocKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key to the title string in the app's string resources to use to localize the title text to the user's current localization.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -747,7 +508,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="trigger.html">trigger</a><span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">val </span><a href="trigger.html">trigger</a><span class="token operator">: </span><a href="../-message-notification-trigger/index.html">MessageNotificationTrigger</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -762,7 +523,296 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/true-timestamp.html">trueTimestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="../-abstract-event/true-timestamp.html">trueTimestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1082081897%2FFunctions%2F918778150" anchor-label="action" id="1082081897%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="action.html"><span><span>action</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1082081897%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="action.html"><span class="token function">action</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The action associated with the notification.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="109135675%2FFunctions%2F918778150" anchor-label="attachments" id="109135675%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="attachments.html"><span><span>attachments</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="109135675%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="attachments.html"><span class="token function">attachments</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">attachments<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-message-notification-attachment/index.html">MessageNotificationAttachment</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Attachments added to the notification (they can be part of the data object).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-754235142%2FFunctions%2F918778150" anchor-label="bodyLocArgs" id="-754235142%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="body-loc-args.html"><span>body</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Args</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-754235142%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="body-loc-args.html"><span class="token function">bodyLocArgs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bodyLocArgs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in bodyLocArgs to use to localize the body text to the user's current localization.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1859690878%2FFunctions%2F918778150" anchor-label="bodyLocKey" id="1859690878%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="body-loc-key.html"><span>body</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1859690878%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="body-loc-key.html"><span class="token function">bodyLocKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bodyLocKey<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The key to the body string in the app's string resources to use to localize the body text to the user's current localization.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1387331041%2FFunctions%2F918778150" anchor-label="category" id="1387331041%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="category.html"><span><span>category</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1387331041%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="category.html"><span class="token function">category</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">category<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The category associated to the notification.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="17840974%2FFunctions%2F918778150" anchor-label="contentAvailable" id="17840974%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="content-available.html"><span>content</span><wbr></wbr><span><span>Available</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="17840974%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="content-available.html"><span class="token function">contentAvailable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contentAvailable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The application is notified of the delivery of the notification if it's in the foreground or background, the app will be woken up (iOS only).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="626957749%2FFunctions%2F918778150" anchor-label="contexts" id="626957749%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-abstract-event/contexts.html"><span><span>contexts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="626957749%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-abstract-event/contexts.html"><span class="token function"><strike>contexts</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">contexts<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1616654728%2FFunctions%2F918778150" anchor-label="entities" id="-1616654728%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-abstract-event/entities.html"><span><span>entities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1616654728%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-abstract-event/entities.html"><span class="token function">entities</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.snowplowanalytics.snowplow.payload/-self-describing-json/index.html">SelfDescribingJson</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Adds a list of context entities to the existing ones.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="662094234%2FFunctions%2F918778150" anchor-label="group" id="662094234%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="group.html"><span><span>group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="662094234%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="group.html"><span class="token function">group</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">group<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The group which this notification is part of.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-861572218%2FFunctions%2F918778150" anchor-label="icon" id="-861572218%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="icon.html"><span><span>icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-861572218%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="icon.html"><span class="token function">icon</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">icon<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The icon associated to the notification (Android only).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2019752207%2FFunctions%2F918778150" anchor-label="notificationCount" id="2019752207%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notification-count.html"><span>notification</span><wbr></wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2019752207%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="notification-count.html"><span class="token function">notificationCount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notificationCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The number of items this notification represents.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="10302510%2FFunctions%2F918778150" anchor-label="notificationTimestamp" id="10302510%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notification-timestamp.html"><span>notification</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="10302510%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="notification-timestamp.html"><span class="token function">notificationTimestamp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notificationTimestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The time when the event of the notification occurred.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-648139510%2FFunctions%2F918778150" anchor-label="sound" id="-648139510%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sound.html"><span><span>sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-648139510%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="sound.html"><span class="token function">sound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The sound played when the device receives the notification.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1986263673%2FFunctions%2F918778150" anchor-label="subtitle" id="-1986263673%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="subtitle.html"><span><span>subtitle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1986263673%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="subtitle.html"><span class="token function">subtitle</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">subtitle<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The notification's subtitle. (iOS only)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1903492257%2FFunctions%2F918778150" anchor-label="tag" id="-1903492257%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tag.html"><span><span>tag</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1903492257%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="tag.html"><span class="token function">tag</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tag<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (Android only).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1799753708%2FFunctions%2F918778150" anchor-label="threadIdentifier" id="1799753708%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="thread-identifier.html"><span>thread</span><wbr></wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1799753708%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="thread-identifier.html"><span class="token function">threadIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">threadIdentifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">An identifier similar to 'group' but usable for different purposes (iOS only).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-798641570%2FFunctions%2F918778150" anchor-label="titleLocArgs" id="-798641570%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title-loc-args.html"><span>title</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Args</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-798641570%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="title-loc-args.html"><span class="token function">titleLocArgs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">titleLocArgs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">Variable string values to be used in place of the format specifiers in titleLocArgs to use to localize the title text to the user's current localization.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1650327582%2FFunctions%2F918778150" anchor-label="titleLocKey" id="-1650327582%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title-loc-key.html"><span>title</span><wbr></wbr><span>Loc</span><wbr></wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1650327582%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="title-loc-key.html"><span class="token function">titleLocKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">titleLocKey<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">MessageNotification</a></div><div class="brief "><p class="paragraph">The key to the title string in the app's string resources to use to localize the title text to the user's current localization.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="360050166%2FFunctions%2F918778150" anchor-label="trueTimestamp" id="360050166%2FFunctions%2F918778150" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":snowplow-android-tracker:dokkaHtml/release" data-filterable-set=":snowplow-android-tracker:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-abstract-event/true-timestamp.html"><span>true</span><wbr></wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="360050166%2FFunctions%2F918778150"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-abstract-event/true-timestamp.html"><span class="token function">trueTimestamp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">trueTimestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-abstract-event/index.html">AbstractEvent</a></div><div class="brief "><p class="paragraph">Set the custom timestamp of the event.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -772,12 +822,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span
-                class="pull-right"><span>Generated by </span><a
-                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
     </div>
-</div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
