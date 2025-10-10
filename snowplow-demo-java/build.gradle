@@ -5,13 +5,14 @@ project.ext {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '30.0.3'
+    namespace 'com.snowplowanalytics.snowplowtrackerdemojava'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
 
     defaultConfig {
         applicationId "com.snowplowanalytics.snowplowtrackerdemojava"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 35
         versionCode 3
         versionName "0.3.0"
         signingConfig signingConfigs.debug
@@ -23,7 +24,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            testCoverageEnabled = true
+            enableUnitTestCoverage true
+            enableAndroidTestCoverage true
         }
     }
 
@@ -34,12 +36,11 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
 }
@@ -50,8 +51,6 @@ dependencies {
     implementation project(':snowplow-android-tracker')
     implementation 'androidx.browser:browser:1.5.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.2.0'
     implementation 'com.google.code.gson:gson:2.9.0'
-
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.9'
 }

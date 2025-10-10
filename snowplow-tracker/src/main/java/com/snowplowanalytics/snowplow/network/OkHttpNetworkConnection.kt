@@ -33,6 +33,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.*
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Components in charge to send events to the collector.
@@ -228,8 +229,8 @@ class OkHttpNetworkConnection private constructor(builder: OkHttpNetworkConnecti
         client = if (builder.client == null) {
             OkHttpClient.Builder()
                 .sslSocketFactory(tlsArguments.sslSocketFactory, tlsArguments.trustManager)
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(15.seconds)
+                .readTimeout(15.seconds)
                 .cookieJar(builder.cookieJar ?: CollectorCookieJar(builder.context))
                 .build()
         } else {

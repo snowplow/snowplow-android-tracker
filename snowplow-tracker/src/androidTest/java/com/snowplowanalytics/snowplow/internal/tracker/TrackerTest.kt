@@ -35,8 +35,8 @@ import com.snowplowanalytics.snowplow.network.Protocol
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
 import com.snowplowanalytics.snowplow.tracker.LogLevel
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Assert
@@ -215,7 +215,7 @@ class TrackerTest {
         Assert.assertNotNull(req)
         val reqCount = mockWebServer.requestCount
         Assert.assertEquals(1, reqCount.toLong())
-        val payload = JSONObject(req!!.body.readUtf8())
+        val payload = JSONObject(req!!.body!!.utf8())
         Assert.assertEquals(2, payload.length().toLong())
         Assert.assertEquals(
             "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
@@ -227,7 +227,7 @@ class TrackerTest {
         Assert.assertEquals("ue", event.getString(Parameters.EVENT))
         Assert.assertFalse(event.has(Parameters.UNSTRUCTURED_ENCODED))
         Assert.assertEquals(eventId.toString(), event.getString(Parameters.EID))
-        mockWebServer.shutdown()
+        mockWebServer.close()
     }
 
     @Test
@@ -275,7 +275,7 @@ class TrackerTest {
         
         val reqCount = mockWebServer.requestCount
         Assert.assertEquals(1, reqCount.toLong())
-        val payload = JSONObject(req!!.body.readUtf8())
+        val payload = JSONObject(req!!.body!!.utf8())
         Assert.assertEquals(2, payload.length().toLong())
         Assert.assertEquals(
             "iglu:com.snowplowanalytics.snowplow/payload_data/jsonschema/1-0-4",
@@ -293,7 +293,7 @@ class TrackerTest {
             found = false
         }
         Assert.assertFalse(found)
-        mockWebServer.shutdown()
+        mockWebServer.close()
     }
 
     @Test
@@ -325,7 +325,7 @@ class TrackerTest {
         val req = mockWebServer.takeRequest(2, TimeUnit.SECONDS)
         Assert.assertEquals(0, Companion.tracker!!.emitter.eventStore.size())
         Assert.assertNull(req)
-        mockWebServer.shutdown()
+        mockWebServer.close()
     }
 
     @Test
@@ -357,7 +357,7 @@ class TrackerTest {
         Companion.tracker!!.resumeSessionChecking()
         Thread.sleep(2000)
         Companion.tracker!!.pauseSessionChecking()
-        mockWebServer.shutdown()
+        mockWebServer.close()
     }
 
     @Test
@@ -506,7 +506,7 @@ class TrackerTest {
     fun getMockServer(count: Int): MockWebServer {
         val mockServer = MockWebServer()
         mockServer.start()
-        val mockResponse = MockResponse().setResponseCode(200)
+        val mockResponse = MockResponse.Builder().code(200).build()
         for (i in 0 until count) {
             mockServer.enqueue(mockResponse)
         }

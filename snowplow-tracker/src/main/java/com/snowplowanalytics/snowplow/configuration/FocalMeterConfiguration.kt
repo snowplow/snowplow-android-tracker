@@ -19,7 +19,7 @@ import com.snowplowanalytics.snowplow.entity.ClientSessionEntity
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
-import java.util.function.Function
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This configuration tells the tracker to send requests with the user ID in session context entity
@@ -31,7 +31,7 @@ import java.util.function.Function
  */
 class FocalMeterConfiguration(
     val kantarEndpoint: String,
-    val processUserId: Function<String, String>? = null,
+    val processUserId: ((String) -> String)? = null,
 ) : Configuration, PluginAfterTrackCallable, PluginIdentifiable {
     private val TAG = FocalMeterConfiguration::class.java.simpleName
 
@@ -45,7 +45,7 @@ class FocalMeterConfiguration(
             val session = event.entities.find { it is ClientSessionEntity } as? ClientSessionEntity
             session?.userId?.let { newUserId ->
                 if (shouldUpdate(newUserId)) {
-                    val processedUserId = processUserId?.apply(newUserId) ?: newUserId
+                    val processedUserId = processUserId?.invoke(newUserId) ?: newUserId
                     makeRequest(processedUserId)
                 }
             }
@@ -68,8 +68,8 @@ class FocalMeterConfiguration(
         uriBuilder.appendQueryParameter("c12", "not_set")
 
         val client = OkHttpClient.Builder()
-            .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .connectTimeout(15.seconds)
+            .readTimeout(15.seconds)
             .build()
 
         val request = Request.Builder()

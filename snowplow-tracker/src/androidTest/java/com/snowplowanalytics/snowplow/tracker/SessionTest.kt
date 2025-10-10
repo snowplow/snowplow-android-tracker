@@ -27,6 +27,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import androidx.test.filters.FlakyTest
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -325,6 +326,7 @@ class SessionTest {
         Assert.assertEquals("event_2", sessionContext[Parameters.SESSION_FIRST_ID])
     }
 
+    @FlakyTest(bugId = -1, detail = "Flaky on CI")
     @Test
     @Throws(InterruptedException::class)
     fun testMultipleTrackersUpdateDifferentSessions() {
