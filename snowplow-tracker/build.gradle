@@ -49,7 +49,14 @@ android {
 
     packaging {
         resources {
-            excludes += ['LICENSE.txt', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE.txt', 'META-INF/DEPENDENCIES']
+            excludes += [
+                'LICENSE.txt',
+                'META-INF/LICENSE',
+                'META-INF/NOTICE',
+                'META-INF/LICENSE.txt',
+                'META-INF/NOTICE.txt',
+                'META-INF/DEPENDENCIES'
+            ]
         }
     }
 
@@ -70,11 +77,16 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     installation {
         installOptions '-d', '-t'
     }
 
-    // This enables long timeouts required on slow environments
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -87,6 +99,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:5.2.0'
+
     // test
     testImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     testImplementation "com.android.installreferrer:installreferrer:2.2"
@@ -97,105 +110,12 @@ dependencies {
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver3:5.2.0'
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from android.sourceSets.main.java.srcDirs
-}
-
-task javadoc(type: Javadoc) {
-    configurations.implementation.setCanBeResolved(true)
-
-    failOnError false
-    source = android.sourceSets.main.java.sourceFiles
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.implementation
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set('javadoc')
-    from javadoc.destinationDir
-}
-
-android.libraryVariants.all { variant ->
-    task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
-        title = "Documentation for snowplow-android-core $version API"
-        description "Generates Javadoc for $variant.name."
-        source = variant.getJavaCompileProvider().get().source
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        doFirst { classpath = files(variant.javaCompiler.classpath.files) + files(ext.androidJar) }
-        options.links("http://docs.oracle.com/javase/7/docs/api/");
-        exclude '**/R.java'
-    }
-}
-
-coveralls {
-    jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
-}
-
 repositories {
     mavenCentral()
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                println 'Publishing release:'
-                println GROUP
-                println POM_ARTIFACT_ID
-                println VERSION_NAME
-
-                groupId GROUP
-                artifactId POM_ARTIFACT_ID
-                version VERSION_NAME
-
-                from components.release
-                artifact sourcesJar
-                artifact javadocJar
-
-                pom {
-                    name = POM_NAME
-                    packaging = POM_PACKAGING
-                    description = POM_DESCRIPTION
-                    url = POM_URL
-
-                    licenses {
-                        license {
-                            name = POM_LICENCE_NAME
-                            url = POM_LICENCE_URL
-                            distribution = POM_LICENCE_DIST
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = POM_DEVELOPER_ID
-                            name = POM_DEVELOPER_NAME
-                        }
-                    }
-
-                    scm {
-                        url = POM_SCM_URL
-                        connection = POM_SCM_CONNECTION
-                        developerConnection = POM_SCM_DEV_CONNECTION
-                    }
-                }
-            }
-        }
-    }
-
-    signing {
-        if (System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword')) {
-            println 'Found signing credentials. Signing...'
-            def signingKey = findProperty("signingKey")
-            def signingPassword = findProperty("signingPassword")
-            useInMemoryPgpKeys(signingKey, signingPassword)
-            sign publishing.publications.release
-            println 'Used useInMemoryPgpKeys()'
-        } else {
-            println 'Signing credentials not found, skipping.'
-        }
-    }
+coveralls {
+    jacocoReportPath "$buildDir/reports/coverage/debug/report.xml"
 }
 
 tasks.withType(DokkaTask.class) {
@@ -208,5 +128,84 @@ tasks.withType(DokkaTask.class) {
                 suppress.set(true)
             }
         }
+    }
+}
+
+def dokkaJar = tasks.register("dokkaJar", Jar) {
+    dependsOn(tasks.named("dokkaHtml"))
+    archiveClassifier.set("javadoc")
+    from(tasks.named("dokkaHtml").flatMap { it.outputDirectory })
+}
+
+publishing {
+    publications {
+        register("release", MavenPublication) {
+            println 'Publishing release:'
+            println GROUP
+            println POM_ARTIFACT_ID
+            println VERSION_NAME
+
+            groupId GROUP
+            artifactId POM_ARTIFACT_ID
+            version VERSION_NAME
+
+            // Includes the AAR and the sources jar generated by withSourcesJar()
+
+            // Attach the Dokka "javadoc" jar
+            artifact(dokkaJar)
+
+            pom {
+                name = POM_NAME
+                packaging = POM_PACKAGING
+                description = POM_DESCRIPTION
+                url = POM_URL
+
+                licenses {
+                    license {
+                        name = POM_LICENCE_NAME
+                        url = POM_LICENCE_URL
+                        distribution = POM_LICENCE_DIST
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                    }
+                }
+
+                scm {
+                    url = POM_SCM_URL
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_DEV_CONNECTION
+                }
+            }
+        }
+    }
+}
+
+// Defer wiring the Android 'release' component until it's created by AGP
+afterEvaluate {
+    def releaseComponent = components.findByName("release")
+    if (releaseComponent == null) {
+        println "No 'release' component found. Available components: ${components*.name}"
+    } else {
+        publishing.publications.named("release", MavenPublication) {
+            from(releaseComponent)
+        }
+    }
+}
+
+signing {
+    if (System.getenv('ORG_GRADLE_PROJECT_signingKey') && System.getenv('ORG_GRADLE_PROJECT_signingPassword')) {
+        println 'Found signing credentials. Signing...'
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["release"])
+        println 'Used useInMemoryPgpKeys()'
+    } else {
+        println 'Signing credentials not found, skipping.'
     }
 }
