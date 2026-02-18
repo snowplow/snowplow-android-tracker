@@ -269,11 +269,6 @@ class Tracker(
         }
     
     var platformContextEnabled: Boolean = TrackerDefaults.platformContext
-        set(mobile) {
-            if (!builderFinished) {
-                field = mobile
-            }
-        }
     
     var applicationContext: Boolean = TrackerDefaults.applicationContext
         set(application) {

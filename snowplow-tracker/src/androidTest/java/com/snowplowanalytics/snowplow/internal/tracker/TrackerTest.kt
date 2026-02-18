@@ -494,6 +494,77 @@ class TrackerTest {
         Assert.assertNotEquals(sessionIdAnonymous, sessionIdNotAnonymous)
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun testPlatformContextCanBeToggledAtRuntime() {
+        shutdown()
+
+        val namespace = "platformContextToggle"
+        TestUtils.createSessionSharedPreferences(context, namespace)
+
+        val mockWebServer = getMockServer(3)
+
+        val emitterBuilder = { emitterArg: Emitter ->
+            emitterArg.bufferOption = BufferOption.Single
+            emitterArg.requestSecurity = Protocol.HTTP
+        }
+        val emitter = Emitter(namespace, null, context, getMockServerURI(mockWebServer)!!, emitterBuilder)
+
+        val trackerBuilder = { tracker: Tracker ->
+            tracker.base64Encoded = false
+            tracker.logLevel = LogLevel.VERBOSE
+            tracker.sessionContext = false
+            tracker.applicationContext = false
+            tracker.platformContextEnabled = true  // Start with platformContext enabled
+            tracker.geoLocationContext = false
+            tracker.installAutotracking = false
+            tracker.screenViewAutotracking = false
+            tracker.lifecycleAutotracking = false
+        }
+        Companion.tracker = Tracker(emitter, namespace, "testPlatformContextToggle", context = context, builder = trackerBuilder)
+
+        // Track event with platformContext enabled - should include mobile_context
+        Companion.tracker!!.track(Structured("cat1", "act1"))
+        val req1 = mockWebServer.takeRequest(60, TimeUnit.SECONDS)
+        Assert.assertNotNull(req1)
+        val payload1 = JSONObject(req1!!.body!!.utf8())
+        val data1 = payload1.getJSONArray("data")
+        val event1 = data1.getJSONObject(0)
+        val contexts1 = event1.optString(Parameters.CONTEXT)
+        Assert.assertNotNull(contexts1)
+        Assert.assertTrue(contexts1.contains("mobile_context"))
+
+        // Disable platformContext at runtime
+        Companion.tracker!!.platformContextEnabled = false
+
+        // Track event with platformContext disabled - should NOT include mobile_context
+        Companion.tracker!!.track(Structured("cat2", "act2"))
+        val req2 = mockWebServer.takeRequest(60, TimeUnit.SECONDS)
+        Assert.assertNotNull(req2)
+        val payload2 = JSONObject(req2!!.body!!.utf8())
+        val data2 = payload2.getJSONArray("data")
+        val event2 = data2.getJSONObject(0)
+        val contexts2 = event2.optString(Parameters.CONTEXT)
+        // Context should be empty or not contain mobile_context
+        Assert.assertFalse(contexts2.contains("mobile_context"))
+
+        // Re-enable platformContext at runtime
+        Companion.tracker!!.platformContextEnabled = true
+
+        // Track event with platformContext re-enabled - should include mobile_context again
+        Companion.tracker!!.track(Structured("cat3", "act3"))
+        val req3 = mockWebServer.takeRequest(60, TimeUnit.SECONDS)
+        Assert.assertNotNull(req3)
+        val payload3 = JSONObject(req3!!.body!!.utf8())
+        val data3 = payload3.getJSONArray("data")
+        val event3 = data3.getJSONObject(0)
+        val contexts3 = event3.optString(Parameters.CONTEXT)
+        Assert.assertNotNull(contexts3)
+        Assert.assertTrue(contexts3.contains("mobile_context"))
+
+        mockWebServer.close()
+    }
+
     class TestExceptionHandler(private val expectedMessage: String) :
         Thread.UncaughtExceptionHandler {
         override fun uncaughtException(t: Thread, e: Throwable) {
