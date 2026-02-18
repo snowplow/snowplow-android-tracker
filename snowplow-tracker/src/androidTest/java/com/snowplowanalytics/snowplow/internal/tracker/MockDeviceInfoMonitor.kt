@@ -21,6 +21,8 @@ open class MockDeviceInfoMonitor : DeviceInfoMonitor() {
     private val methodAccessCounts: MutableMap<String, Int> = HashMap()
     var customIdfa: String? = "XJKLJSALFKJ"
     var batteryLevel: Int = 20
+    var mockAvailableStorage: Long = 20000
+    var mockTotalStorage: Long = 70000
     
     override val osType: String
         get() {
@@ -81,12 +83,12 @@ open class MockDeviceInfoMonitor : DeviceInfoMonitor() {
     override val availableStorage: Long
         get() {
             increaseMethodAccessCount("getAvailableStorage")
-            return 20000
+            return mockAvailableStorage
         }
     override val totalStorage: Long
         get() {
             increaseMethodAccessCount("getTotalStorage")
-            return 70000
+            return mockTotalStorage
         }
 
     private var _language: String? = "sk"

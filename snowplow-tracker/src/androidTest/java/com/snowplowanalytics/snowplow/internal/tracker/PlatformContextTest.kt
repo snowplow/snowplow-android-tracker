@@ -374,6 +374,34 @@ class PlatformContextTest {
         Assert.assertFalse(sdjData.containsKey(Parameters.BATTERY_LEVEL))
     }
 
+    @Test
+    fun availableStorageNotTrackedIfNegative() {
+        val deviceInfoMonitor = MockDeviceInfoMonitor()
+        deviceInfoMonitor.mockAvailableStorage = -2107899904
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertTrue(sdjData.containsKey(Parameters.TOTAL_STORAGE))
+        Assert.assertFalse(sdjData.containsKey(Parameters.AVAILABLE_STORAGE))
+    }
+
+    @Test
+    fun totalStorageNotTrackedIfNegative() {
+        val deviceInfoMonitor = MockDeviceInfoMonitor()
+        deviceInfoMonitor.mockTotalStorage = -2107899904
+        val platformContext = PlatformContext(0, 0, deviceInfoMonitor, context = context)
+
+        val sdj = platformContext.getMobileContext(false)
+        Assert.assertNotNull(sdj)
+        val sdjData = sdj!!.map["data"] as Map<*, *>
+
+        Assert.assertTrue(sdjData.containsKey(Parameters.AVAILABLE_STORAGE))
+        Assert.assertFalse(sdjData.containsKey(Parameters.TOTAL_STORAGE))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

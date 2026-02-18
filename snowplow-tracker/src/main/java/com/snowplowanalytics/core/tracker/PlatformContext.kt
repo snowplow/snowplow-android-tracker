@@ -109,7 +109,9 @@ class PlatformContext(
         }
         // Total storage
         if (shouldTrack(PlatformContextProperty.TOTAL_STORAGE)) {
-            addToMap(Parameters.TOTAL_STORAGE, fromRetrieverOr(retriever.totalStorage) { deviceInfoMonitor.totalStorage }, pairs)
+            val totalStorage = fromRetrieverOr(retriever.totalStorage) { deviceInfoMonitor.totalStorage }
+            val validTotalStorage = if (totalStorage != null && totalStorage >= 0) totalStorage else null
+            addToMap(Parameters.TOTAL_STORAGE, validTotalStorage, pairs)
         }
         // Resolution
         if (shouldTrack(PlatformContextProperty.RESOLUTION)) {
@@ -164,7 +166,9 @@ class PlatformContext(
         }
         // Storage
         if (shouldTrack(PlatformContextProperty.AVAILABLE_STORAGE)) {
-            addToMap(Parameters.AVAILABLE_STORAGE, fromRetrieverOr(retriever.availableStorage) { deviceInfoMonitor.availableStorage }, pairs)
+            val availableStorage = fromRetrieverOr(retriever.availableStorage) { deviceInfoMonitor.availableStorage }
+            val validAvailableStorage = if (availableStorage != null && availableStorage >= 0) availableStorage else null
+            addToMap(Parameters.AVAILABLE_STORAGE, validAvailableStorage, pairs)
         }
         // Is portrait
         if (shouldTrack(PlatformContextProperty.IS_PORTRAIT)) {
