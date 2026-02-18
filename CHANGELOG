@@ -1,3 +1,8 @@
+Version 6.3.1 (2026-02-18)
+--------------------------
+Allow platformContext to be toggled at runtime (close #720)
+Filter negative storage values from platform context
+
 Version 6.3.0 (2025-10-10)
 --------------------------
 Upgrade gradle to 8.13, target SDKs to 35 and okhttp to 5.2
