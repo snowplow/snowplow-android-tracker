@@ -293,6 +293,7 @@ class Emitter(
     /**
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
      */
+    @Volatile
     var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
         /**
          * Updates the server anonymisation setting for the Emitter.
@@ -503,6 +504,11 @@ class Emitter(
      * + Otherwise will attempt to emit again
      */
     private fun attemptEmit(networkConnection: NetworkConnection?) {
+        if (!isRunning.get()) {
+            Logger.d(TAG, "Emitter loop stopping: emitter has been shut down.")
+            return
+        }
+        
         if (isEmittingPaused.get()) {
             Logger.d(TAG, "Emitter paused.")
             isRunning.compareAndSet(true, false)
