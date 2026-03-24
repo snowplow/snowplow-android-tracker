@@ -37,9 +37,9 @@ class ServiceProvider(
         get() = tracker != null
 
     // Internal services
-    private var tracker: Tracker? = null
-    private var emitter: Emitter? = null
-    private var subject: Subject? = null
+    @Volatile private var tracker: Tracker? = null
+    @Volatile private var emitter: Emitter? = null
+    @Volatile private var subject: Subject? = null
 
     // Controllers
     private var trackerController: TrackerControllerImpl? = null
@@ -85,6 +85,7 @@ class ServiceProvider(
         getOrMakeTracker() // Build tracker to initialize NotificationCenter receivers
     }
 
+    @Synchronized
     fun reset(configurations: List<Configuration>) {
         stopServices()
         resetConfigurationUpdates()
@@ -93,6 +94,7 @@ class ServiceProvider(
         getOrMakeTracker()
     }
 
+    @Synchronized
     fun shutdown() {
         tracker?.pauseEventTracking()
         stopServices()
@@ -175,14 +177,17 @@ class ServiceProvider(
     }
 
     // Getters
+    @Synchronized
     override fun getOrMakeSubject(): Subject {
         return subject ?: makeSubject().also { subject = it }
     }
 
+    @Synchronized
     override fun getOrMakeEmitter(): Emitter {
         return emitter ?: makeEmitter().also { emitter = it }
     }
-    
+
+    @Synchronized
     override fun getOrMakeTracker(): Tracker {
         return tracker ?: makeTracker().also { tracker = it }
     }
