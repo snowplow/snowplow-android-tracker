@@ -293,6 +293,7 @@ class Emitter(
     /**
      * Whether to anonymise server-side user identifiers including the `network_userid` and `user_ipaddress`
      */
+    @Volatile
     var serverAnonymisation: Boolean = EmitterDefaults.serverAnonymisation
         /**
          * Updates the server anonymisation setting for the Emitter.

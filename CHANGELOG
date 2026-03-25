@@ -1,3 +1,7 @@
+Version 6.3.2 (2026-03-24)
+--------------------------
+Fix race condition in ServiceProvider causing duplicate emitters on concurrent reset (close #723)
+
 Version 6.3.1 (2026-02-18)
 --------------------------
 Allow platformContext to be toggled at runtime (close #720)
