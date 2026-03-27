@@ -504,6 +504,11 @@ class Emitter(
      * + Otherwise will attempt to emit again
      */
     private fun attemptEmit(networkConnection: NetworkConnection?) {
+        if (!isRunning.get()) {
+            Logger.d(TAG, "Emitter loop stopping: emitter has been shut down.")
+            return
+        }
+        
         if (isEmittingPaused.get()) {
             Logger.d(TAG, "Emitter paused.")
             isRunning.compareAndSet(true, false)
