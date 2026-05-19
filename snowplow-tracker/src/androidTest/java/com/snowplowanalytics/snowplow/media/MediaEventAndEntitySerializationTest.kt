@@ -94,6 +94,20 @@ class MediaEventAndEntitySerializationTest {
     }
 
     @Test
+    fun stripsEmptyStringValuesFromMediaPlayer() {
+        val entity = MediaPlayerEntity(
+            label = "",
+            playerType = "",
+            quality = "",
+        )
+
+        val data = entity.entity.map["data"] as? Map<*, *>
+        assertFalse(data?.containsKey("label") ?: true)
+        assertFalse(data?.containsKey("playerType") ?: true)
+        assertFalse(data?.containsKey("quality") ?: true)
+    }
+
+    @Test
     fun buildsMediaSessionEntity() {
         val date = Date()
         val timeTraveler = TimeTraveler()
