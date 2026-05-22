@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
 
     permissions:
-      contents: read
+      contents: write
 
     env:
       SONA_USER: ${{ secrets.SONA_USER }}
@@ -49,3 +49,40 @@ jobs:
 
       - name: Publish
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+      - name: Extract CHANGELOG entry for this version
+        id: changelog
+        env:
+          VERSION: ${{ steps.version.outputs.TAG_VERSION }}
+        run: |
+          set -euo pipefail
+          # Pull the section for this version: from `Version X.Y.Z (...)` up to
+          # (but not including) the next `Version ` header. Drop the
+          # `--------` underline row.
+          awk -v ver="$VERSION" '
+            $0 ~ "^Version " ver " " { found=1; next }
+            found && /^Version / { exit }
+            found && /^-+$/ { next }
+            found { print }
+          ' CHANGELOG > release-notes.md
+          if [[ ! -s release-notes.md ]]; then
+            echo "::warning::No CHANGELOG entry found for $VERSION; release notes will be empty"
+          fi
+          echo "=== Release notes ==="
+          cat release-notes.md
+          echo "====================="
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.TAG_VERSION }}
+        run: |
+          set -euo pipefail
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists; updating notes."
+            gh release edit "$VERSION" --notes-file release-notes.md
+          else
+            gh release create "$VERSION" \
+              --title "$VERSION" \
+              --notes-file release-notes.md
+          fi
