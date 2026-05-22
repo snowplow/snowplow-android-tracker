@@ -80,7 +80,7 @@ data class MediaPlayerEntity @JvmOverloads constructor(
                 "playbackRate" to playbackRate,
                 "quality" to quality,
                 "volume" to volume
-            ).filter { it.value != null }
+            ).filter { it.value != null && it.value != "" }
         )
 
     internal fun update(player: MediaPlayerEntity) {
