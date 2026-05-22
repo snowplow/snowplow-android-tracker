@@ -1,3 +1,7 @@
+Version 6.3.3 (2026-05-22)
+--------------------------
+Strip empty strings from optional media player entity fields
+
 Version 6.3.2 (2026-03-24)
 --------------------------
 Fix race condition in ServiceProvider causing duplicate emitters on concurrent reset (close #723)
