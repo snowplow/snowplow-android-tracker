@@ -76,15 +76,10 @@ class TrackerEvent @JvmOverloads constructor(event: Event, state: TrackerStateSn
     }
 
     override fun addPayloadValues(payload: Map<String, Any>): Boolean {
-        var result = true
         for ((key, value) in payload) {
-            if (this.payload[key] == null) {
-                this.payload[key] = value
-            } else {
-                result = false
-            }
+            this.payload[key] = value
         }
-        return result
+        return true
     }
 
     fun addContextEntity(entity: SelfDescribingJson) {

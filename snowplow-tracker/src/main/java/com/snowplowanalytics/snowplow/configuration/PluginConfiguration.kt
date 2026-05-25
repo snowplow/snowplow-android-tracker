@@ -52,6 +52,24 @@ class PluginEntitiesConfiguration(
 )
 
 /**
+ * Provides a block closure that is called before an event is sent to the emitter, returning a map of
+ * payload values to overwrite or add to the event payload. Useful for mutating the payload, e.g. to
+ * strip sensitive fields based on consent.
+ *
+ * The closure receives an [InspectableEvent] snapshot and must return either a `Map<String, Any>` whose
+ * entries will be merged into the event payload (overwriting existing keys, adding missing ones), or
+ * `null` to leave the payload unchanged. Keys must use the raw tracker key names (e.g. `url`, `se_ca`),
+ * not the final collector field names. Key removal is not supported in v1.
+ *
+ * @property schemas Optional list of event schemas to call the block for. If null, the block is called for all events.
+ * @property closure Block that returns payload values to merge into the event before it is tracked.
+ */
+class PluginBeforeTrackConfiguration(
+    val schemas: List<String>? = null,
+    val closure: (InspectableEvent) -> Map<String, Any>?
+)
+
+/**
  * Identifies a tracker plugin with a unique identifier. Required for all plugins.
  *
  * @property identifier Unique identifier of the plugin within the tracker.
@@ -70,11 +88,15 @@ internal fun PluginIdentifiable.toStateMachine(): PluginStateMachine {
     var filterConfiguration: PluginFilterConfiguration? = null
     (this as? PluginFilterCallable)?.let { filterConfiguration = it.filterConfiguration }
 
+    var beforeTrackConfiguration: PluginBeforeTrackConfiguration? = null
+    (this as? PluginBeforeTrackCallable)?.let { beforeTrackConfiguration = it.beforeTrackConfiguration }
+
     return PluginStateMachine(
         identifier = identifier,
         entitiesConfiguration = entitiesConfiguration,
         afterTrackConfiguration = afterTrackConfiguration,
-        filterConfiguration = filterConfiguration
+        filterConfiguration = filterConfiguration,
+        beforeTrackConfiguration = beforeTrackConfiguration
     )
 }
 /**
@@ -105,6 +127,15 @@ interface PluginFilterCallable {
 }
 
 /**
+ * Protocol for a plugin that provides a closure to mutate the event payload before it is sent to the emitter.
+ *
+ * @property beforeTrackConfiguration Closure configuration that is called before events are tracked to overwrite or add payload values.
+ */
+interface PluginBeforeTrackCallable {
+    val beforeTrackConfiguration: PluginBeforeTrackConfiguration?
+}
+
+/**
  * Interface for tracker plugin definition.
  * Specifies configurations for the closures called when and after events are tracked.
  *
@@ -124,10 +155,11 @@ interface PluginConfigurationInterface : PluginIdentifiable, PluginEntitiesCalla
  */
 class PluginConfiguration(
     override val identifier: String
-) : Configuration, PluginIdentifiable, PluginEntitiesCallable, PluginAfterTrackCallable, PluginFilterCallable {
+) : Configuration, PluginIdentifiable, PluginEntitiesCallable, PluginAfterTrackCallable, PluginFilterCallable, PluginBeforeTrackCallable {
     override var entitiesConfiguration: PluginEntitiesConfiguration? = null
     override var afterTrackConfiguration: PluginAfterTrackConfiguration? = null
     override var filterConfiguration: PluginFilterConfiguration? = null
+    override var beforeTrackConfiguration: PluginBeforeTrackConfiguration? = null
 
     /**
      * Add a closure that generates entities for a given tracked event.
@@ -180,6 +212,29 @@ class PluginConfiguration(
         return this
     }
 
+    /**
+     * Add a closure that is called before the event is sent to the emitter, returning a map of
+     * payload values to overwrite or add to the event payload.
+     *
+     * The returned map's keys must be raw tracker key names (e.g. `url`, `se_ca`), not collector
+     * field names. Entries overwrite any existing keys on the payload; missing keys are added.
+     * Returning `null` (or an empty map) leaves the payload unchanged. Key removal is not
+     * supported in v1.
+     *
+     * @param schemas Optional list of event schemas to call the closure for. If null, the closure is called for all events.
+     * @param closure Closure block that returns payload values to merge into the event before it is tracked.
+     */
+    fun beforeTrack(
+        schemas: List<String>? = null,
+        closure: (InspectableEvent) -> Map<String, Any>?
+    ): PluginConfiguration {
+        beforeTrackConfiguration = PluginBeforeTrackConfiguration(
+            schemas = schemas,
+            closure = closure
+        )
+        return this
+    }
+
     override fun copy(): Configuration {
         val copy = PluginConfiguration(
             identifier=identifier,
@@ -187,6 +242,7 @@ class PluginConfiguration(
         entitiesConfiguration?.let { copy.entities(schemas = it.schemas, closure = it.closure) }
         afterTrackConfiguration?.let { copy.afterTrack(schemas = it.schemas, closure = it.closure) }
         filterConfiguration?.let { copy.filter(schemas = it.schemas, closure = it.closure) }
+        beforeTrackConfiguration?.let { copy.beforeTrack(schemas = it.schemas, closure = it.closure) }
         return copy
     }
 }

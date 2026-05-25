@@ -192,6 +192,95 @@ class PluginsTest {
     }
 
     @Test
+    fun beforeTrackAddsPayloadValuesToEvent() {
+        val plugin = PluginConfiguration("plugin")
+            .beforeTrack { mapOf("added_key" to "added_value") }
+
+        var capturedPayload: Map<String, Any>? = null
+        val testPlugin = PluginConfiguration("test")
+            .afterTrack { capturedPayload = HashMap(it.payload) }
+
+        val tracker = createTracker(listOf(plugin, testPlugin))
+        tracker.track(Structured("cat", "act"))
+
+        Thread.sleep(200)
+        Assert.assertEquals("added_value", capturedPayload!!["added_key"])
+    }
+
+    @Test
+    fun beforeTrackOverwritesExistingPayloadValues() {
+        val plugin = PluginConfiguration("plugin")
+            .beforeTrack { mapOf("se_ca" to "anonymized") }
+
+        var capturedPayload: Map<String, Any>? = null
+        val testPlugin = PluginConfiguration("test")
+            .afterTrack { capturedPayload = HashMap(it.payload) }
+
+        val tracker = createTracker(listOf(plugin, testPlugin))
+        tracker.track(Structured("sensitive_category", "act"))
+
+        Thread.sleep(200)
+        Assert.assertEquals("anonymized", capturedPayload!!["se_ca"])
+    }
+
+    @Test
+    fun beforeTrackReturningNullIsNoOp() {
+        val plugin = PluginConfiguration("plugin")
+            .beforeTrack { null }
+
+        var capturedPayload: Map<String, Any>? = null
+        val testPlugin = PluginConfiguration("test")
+            .afterTrack { capturedPayload = HashMap(it.payload) }
+
+        val tracker = createTracker(listOf(plugin, testPlugin))
+        tracker.track(Structured("cat", "act"))
+
+        Thread.sleep(200)
+        Assert.assertEquals("cat", capturedPayload!!["se_ca"])
+        Assert.assertEquals("act", capturedPayload!!["se_ac"])
+    }
+
+    @Test
+    fun beforeTrackOnlyAppliesForMatchingSchemas() {
+        val plugin = PluginConfiguration("plugin")
+            .beforeTrack(listOf("schema1")) { mapOf("added_key" to "added_value") }
+
+        val schemaToPayload = HashMap<String, Map<String, Any>>()
+        val testPlugin = PluginConfiguration("test")
+            .afterTrack {
+                it.schema?.let { schema -> schemaToPayload[schema] = HashMap(it.payload) }
+            }
+
+        val tracker = createTracker(listOf(plugin, testPlugin))
+        tracker.track(SelfDescribing("schema1", emptyMap()))
+        tracker.track(SelfDescribing("schema2", emptyMap()))
+
+        Thread.sleep(200)
+        Assert.assertEquals("added_value", schemaToPayload["schema1"]?.get("added_key"))
+        Assert.assertNull(schemaToPayload["schema2"]?.get("added_key"))
+    }
+
+    @Test
+    fun beforeTrackChainsWithOtherBuilders() {
+        var afterTrackCalled = false
+        val plugin = PluginConfiguration("plugin")
+            .beforeTrack { mapOf("added_key" to "added_value") }
+            .afterTrack { afterTrackCalled = true }
+            .filter { true }
+
+        var capturedPayload: Map<String, Any>? = null
+        val testPlugin = PluginConfiguration("test")
+            .afterTrack { capturedPayload = HashMap(it.payload) }
+
+        val tracker = createTracker(listOf(plugin, testPlugin))
+        tracker.track(Structured("cat", "act"))
+
+        Thread.sleep(200)
+        Assert.assertTrue(afterTrackCalled)
+        Assert.assertEquals("added_value", capturedPayload!!["added_key"])
+    }
+
+    @Test
     fun filtersEvents() {
         val filterPlugin = PluginConfiguration("filter")
             .filter(listOf("s1")) { false }
