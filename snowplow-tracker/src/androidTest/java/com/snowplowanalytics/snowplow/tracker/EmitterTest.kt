@@ -353,7 +353,13 @@ class EmitterTest {
     @Test
     @Throws(InterruptedException::class)
     fun testUpdatesNetworkConnectionWhileRunning() {
-        val emitter = Emitter("ns", MockEventStore(), context, "com.acme")
+        // Keep the loop alive across empty checks so we can update the URI while it is running.
+        val builder = { emitter: Emitter ->
+            emitter.emitterTick = 1
+            emitter.emptyLimit = 10
+            emitter.timeUnit = TimeUnit.SECONDS
+        }
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
         emitter.flush()
         Thread.sleep(100)
         Assert.assertTrue(emitter.emitterStatus) // is running
@@ -504,6 +510,72 @@ class EmitterTest {
         Assert.assertEquals(2, networkConnection.previousResults.first().size)
 
         emitter.flush()
+    }
+
+    @Test
+    @Throws(InterruptedException::class)
+    fun testFlushWakesWaitingLoopAndSendsEvents() {
+        val networkConnection = MockNetworkConnection(HttpMethod.POST, 200)
+        // Long tick + high empty limit: without waking, an empty loop would wait many seconds.
+        val builder = { emitter: Emitter ->
+            emitter.networkConnection = networkConnection
+            emitter.bufferOption = BufferOption.SmallGroup // won't auto-send on a single add
+            emitter.emitterTick = 30
+            emitter.emptyLimit = 10
+            emitter.emitRange = 200
+            emitter.timeUnit = TimeUnit.SECONDS
+        }
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
+
+        // Start the loop while the store is empty so it parks in the wait.
+        emitter.flush()
+        Thread.sleep(500)
+        Assert.assertTrue(emitter.emitterStatus)
+        Assert.assertEquals(0, networkConnection.sendingCount().toLong())
+
+        // Add an event (below buffer threshold, so add() alone won't send) then flush to wake.
+        emitter.add(generatePayloads(1)[0])
+        emitter.flush()
+
+        // Should be sent well within one tick (30s) if the loop was actually woken.
+        var i = 0
+        while (i < 10 && networkConnection.sendingCount() < 1) {
+            Thread.sleep(200)
+            i++
+        }
+        Assert.assertEquals(1, networkConnection.sendingCount().toLong())
+        Assert.assertEquals(0, emitter.eventStore.size())
+        emitter.shutdown()
+    }
+
+    @Test
+    @Throws(InterruptedException::class)
+    fun testAddWakesWaitingLoopWithoutWaitingFullTick() {
+        val networkConnection = MockNetworkConnection(HttpMethod.POST, 200)
+        val builder = { emitter: Emitter ->
+            emitter.networkConnection = networkConnection
+            emitter.bufferOption = BufferOption.Single // auto-send once an event is present
+            emitter.emitterTick = 30
+            emitter.emptyLimit = 10
+            emitter.emitRange = 200
+            emitter.timeUnit = TimeUnit.SECONDS
+        }
+        val emitter = Emitter("ns", MockEventStore(), context, "com.acme", builder)
+
+        // Park the loop on an empty store.
+        emitter.flush()
+        Thread.sleep(500)
+        Assert.assertTrue(emitter.emitterStatus)
+
+        // Adding an event should wake the waiting loop and send within well under one tick.
+        emitter.add(generatePayloads(1)[0])
+        var i = 0
+        while (i < 10 && networkConnection.sendingCount() < 1) {
+            Thread.sleep(200)
+            i++
+        }
+        Assert.assertEquals(1, networkConnection.sendingCount().toLong())
+        emitter.shutdown()
     }
 
     // Emitter Builder
