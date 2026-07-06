@@ -28,7 +28,7 @@ object EmitterDefaults {
     var tlsVersions: EnumSet<TLSVersion> = EnumSet.of(TLSVersion.TLSv1_2)
     var emitRange: Int = BufferOption.LargeGroup.code
     var emitterTick = 5
-    var emptyLimit = 5
+    var emptyLimit = 0
     var byteLimitGet: Long = 40000
     var byteLimitPost: Long = 40000
     var emitTimeout = 30

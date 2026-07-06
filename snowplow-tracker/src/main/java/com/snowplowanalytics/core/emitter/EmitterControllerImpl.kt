@@ -129,6 +129,10 @@ class EmitterControllerImpl(serviceProvider: ServiceProviderInterface) :
         emitter.resumeEmit()
     }
 
+    override fun flush() {
+        emitter.flush()
+    }
+
     // Private methods
     private val dirtyConfig: EmitterConfiguration
         get() = serviceProvider.emitterConfiguration

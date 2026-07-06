@@ -40,4 +40,10 @@ interface EmitterController : EmitterConfigurationInterface {
      * The emitter will resume emitting events again.
      */
     fun resume()
+
+    /**
+     * Attempt to send all events currently queued in the event store.
+     * Sending happens asynchronously, so events may not be sent by the time this method returns.
+     */
+    fun flush()
 }

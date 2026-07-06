@@ -30,6 +30,7 @@ import okhttp3.CookieJar
 import okhttp3.OkHttpClient
 
 import java.util.*
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -56,6 +57,14 @@ class Emitter(
     private val context: Context
     private lateinit var uri: String
     private var emptyCount = 0
+
+    /**
+     * Used to wake the emit loop when it is waiting on an empty event store.
+     * An explicit [flush], or an [add] that reaches the buffer threshold, offers to this queue
+     * (via [startOrWakeEmitter]) so that a running loop stops waiting and immediately re-checks
+     * the event store, instead of sleeping for the full [emitterTick] duration.
+     */
+    private val wakeSignal = LinkedBlockingQueue<Unit>(1)
 
     /**
      * This configuration option is not published in the EmitterConfiguration class.
@@ -102,13 +111,18 @@ class Emitter(
     var tlsVersions: EnumSet<TLSVersion> = EmitterDefaults.tlsVersions
 
     /**
-     * The emitter tick. This configuration option is not published in the EmitterConfiguration class.
+     * The maximum duration (in [timeUnit]) that the emit loop waits on an empty event store
+     * before re-checking it. The loop is woken early whenever a new event is added or [flush]
+     * is called, so this is only an upper bound on idle latency, not a fixed sleep.
+     * This configuration option is not published in the EmitterConfiguration class.
      * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure emitterTick.
      */
     var emitterTick: Int = EmitterDefaults.emitterTick
 
     /**
-     * The amount of times the event store can be empty before it is shut down.
+     * The amount of times the event store can be empty before the emit loop is shut down.
+     * With the default of 0 the loop stops as soon as the store is empty and is restarted on
+     * the next event or flush; a higher value keeps the loop alive across a few empty checks.
      * This configuration option is not published in the EmitterConfiguration class.
      * Create an Emitter and Tracker directly, not via the Snowplow interface, to configure emptyLimit.
      */
@@ -410,33 +424,41 @@ class Emitter(
     fun add(payload: Payload) {
         Executor.execute(TAG) {
             eventStore.add(payload)
-            if (eventStore.size() >= bufferOption.code && isRunning.compareAndSet(false, true)) {
-                try {
-                    removeOldEvents()
-                    attemptEmit(networkConnection)
-                } catch (t: Throwable) {
-                    isRunning.set(false)
-                    Logger.e(TAG, "Received error during emission process: %s", t)
-                }
+            if (eventStore.size() >= bufferOption.code) {
+                startOrWakeEmitter()
             }
         }
     }
 
     /**
-     * Attempts to start the emitter if it
-     * is not currently running.
+     * Attempts to send all events currently in the event store.
+     *
+     * If the emit loop is not running it is started; if it is already running (for example
+     * waiting on a previously empty store) it is woken so it immediately re-checks the store.
+     * Either way the events that are in the store when flush is called will be sent.
      */
     fun flush() {
         Executor.execute(TAG) {
-            if (isRunning.compareAndSet(false, true)) {
-                try {
-                    removeOldEvents()
-                    attemptEmit(networkConnection)
-                } catch (t: Throwable) {
-                    isRunning.set(false)
-                    Logger.e(TAG, "Received error during emission process: %s", t)
-                }
+            startOrWakeEmitter()
+        }
+    }
+
+    /**
+     * Starts the emit loop if it is not already running, otherwise wakes it so that a loop
+     * currently waiting on an empty event store re-checks it without waiting for the full tick.
+     */
+    private fun startOrWakeEmitter() {
+        if (isRunning.compareAndSet(false, true)) {
+            try {
+                removeOldEvents()
+                attemptEmit(networkConnection)
+            } catch (t: Throwable) {
+                isRunning.set(false)
+                Logger.e(TAG, "Received error during emission process: %s", t)
             }
+        } else {
+            // Loop already running; wake it in case it is waiting on an empty store.
+            wakeSignal.offer(Unit)
         }
     }
 
@@ -525,17 +547,32 @@ class Emitter(
         if (eventStore.size() <= 0) {
             if (emptyCount >= emptyLimit) {
                 Logger.d(TAG, "Emitter loop stopping: empty limit reached.")
+                emptyCount = 0
                 isRunning.compareAndSet(true, false)
+                // Guard against a race where an event was added (and only offered a wake
+                // signal because isRunning was still true) between the size check above and
+                // clearing isRunning. Reclaim the loop so those events aren't stranded.
+                if (eventStore.size() > 0 && isRunning.compareAndSet(false, true)) {
+                    try {
+                        attemptEmit(networkConnection)
+                    } catch (t: Throwable) {
+                        isRunning.set(false)
+                        Logger.e(TAG, "Received error during emission process: %s", t)
+                    }
+                }
                 return
             }
             emptyCount++
             Logger.d(TAG, "Emitter database empty: $emptyCount")
+            // Wait up to emitterTick before re-checking, but return early if woken by a new
+            // event or an explicit flush so that events are sent without waiting the full tick.
             try {
-                timeUnit.sleep(emitterTick.toLong())
+                wakeSignal.poll(emitterTick.toLong(), timeUnit)
             } catch (e: InterruptedException) {
-                Logger.e(TAG, "Emitter thread sleep interrupted: $e")
+                Logger.e(TAG, "Emitter thread wait interrupted: $e")
+                Thread.currentThread().interrupt()
             }
-            attemptEmit(networkConnection) // at this point we update network connection since it might be outdated after sleep
+            attemptEmit(networkConnection) // at this point we update network connection since it might be outdated after waiting
             return
         }
         
