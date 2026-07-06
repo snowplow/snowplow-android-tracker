@@ -234,6 +234,7 @@ $dokka.location:com.snowplowanalytics.snowplow.configuration/TrackerConfiguratio
 $dokka.location:com.snowplowanalytics.snowplow.controller////PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/index.html
 $dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController///PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/index.html
 $dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController/dbCount/#/PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/db-count.html
+$dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController/flush/#/PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/flush.html
 $dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController/isSending/#/PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/is-sending.html
 $dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController/pause/#/PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/pause.html
 $dokka.location:com.snowplowanalytics.snowplow.controller/EmitterController/resume/#/PointingToDeclaration/snowplow-android-tracker/com.snowplowanalytics.snowplow.controller/-emitter-controller/resume.html
