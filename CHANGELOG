@@ -1,3 +1,7 @@
+Version 6.4.0 (2026-07-06)
+--------------------------
+Wake emitter on signal instead of polling and expose flush() (close #679)
+
 Version 6.3.3 (2026-05-22)
 --------------------------
 Strip empty strings from optional media player entity fields
