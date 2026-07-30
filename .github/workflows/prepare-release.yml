@@ -21,17 +21,21 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     env:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BASE_BRANCH: master
+      # Workflow inputs are exposed as environment variables and referenced as
+      # "$RELEASE_BRANCH" in run: blocks, never interpolated as ${{ }} into an
+      # inline script. Direct interpolation splices the raw value into the shell
+      # before it runs, which is a script-injection sink (see ST-482).
+      RELEASE_BRANCH: ${{ inputs.release_branch }}
+      DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Validate inputs
         id: validate
         run: |
           set -euo pipefail
-          branch="${{ inputs.release_branch }}"
-          if [[ ! "$branch" =~ ^release/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            echo "::error::release_branch must match 'release/X.Y.Z' (got: $branch)"
+          if [[ ! "$RELEASE_BRANCH" =~ ^release/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "::error::release_branch must match 'release/X.Y.Z' (got: $RELEASE_BRANCH)"
             exit 1
           fi
           version="${BASH_REMATCH[1]}"
@@ -52,14 +56,16 @@ jobs:
 
       - name: Verify branch state
         id: state
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
-          version='${{ steps.validate.outputs.version }}'
-
           git fetch origin "$BASE_BRANCH"
 
+          # Detect idempotent re-run: if HEAD is already "Prepare for X.Y.Z release",
+          # skip the bump+commit and only refresh the PR.
           head_subject="$(git log -1 --pretty=%s)"
-          if [[ "$head_subject" == "Prepare for $version release" ]]; then
+          if [[ "$head_subject" == "Prepare for $VERSION release" ]]; then
             echo "Branch HEAD is already the prepare-release commit; will skip bump+commit and only refresh the PR."
             echo "already_prepared=true" >> "$GITHUB_OUTPUT"
           else
@@ -70,6 +76,7 @@ jobs:
         id: commits
         run: |
           set -euo pipefail
+          # Previous tag = highest semver tag reachable from BASE_BRANCH.
           prev_tag="$(git tag --merged "origin/$BASE_BRANCH" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
           if [[ -z "$prev_tag" ]]; then
             echo "::error::Could not determine previous release tag"
@@ -77,16 +84,20 @@ jobs:
           fi
           echo "prev_tag=$prev_tag" >> "$GITHUB_OUTPUT"
 
-          git log --no-merges "$prev_tag..HEAD" --pretty='%h %s' \
-            | grep -v -E '^[0-9a-f]+ Prepare for ' \
-            > commits-raw.txt || true
+          # Commits on the release branch since prev_tag. Both squash/rebase
+          # commits and merge commits are listed; classify-commits.sh filters
+          # out release-automation and chore subjects.
+          git log --no-merges "$prev_tag..HEAD" --pretty='%h %s' > commits-raw.txt || true
           git log --merges "$prev_tag..HEAD" --pretty='%h %s' >> commits-raw.txt || true
 
+          # De-dup by short sha, preserve order
           awk '!seen[$1]++' commits-raw.txt > commits.txt
           echo "Commits since $prev_tag:"
           cat commits.txt
 
       - name: Annotate commits with author + external flag
+        env:
+          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           : > commits-annotated.txt
@@ -94,11 +105,13 @@ jobs:
             [[ -z "$line" ]] && continue
             sha="$(echo "$line" | awk '{print $1}')"
             subject="$(echo "$line" | cut -d' ' -f2-)"
+            # Try to resolve the GitHub login via the PR number in the subject.
             pr_num="$(echo "$subject" | grep -oE '#[0-9]+' | head -1 | tr -d '#' || true)"
             login=""
             external="false"
             if [[ -n "$pr_num" ]]; then
-              if json="$(gh api "repos/${{ github.repository }}/pulls/$pr_num" 2>/dev/null)"; then
+              # gh api: pull request author + author_association ("MEMBER"/"OWNER"/"COLLABORATOR" => internal)
+              if json="$(gh api "repos/$REPOSITORY/pulls/$pr_num" 2>/dev/null)"; then
                 login="$(echo "$json" | jq -r '.user.login // ""')"
                 assoc="$(echo "$json" | jq -r '.author_association // ""')"
                 case "$assoc" in
@@ -112,43 +125,28 @@ jobs:
           echo "Annotated commits:"
           cat commits-annotated.txt
 
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
-
       - name: Bump version files
         if: steps.state.outputs.already_prepared == 'false'
-        run: ./.github/scripts/bump-version.sh '${{ steps.validate.outputs.version }}'
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+        run: ./.github/scripts/bump-version.sh "$VERSION"
 
-      - name: Generate CHANGELOG entry with Claude
+      - name: Generate CHANGELOG entry
         if: steps.state.outputs.already_prepared == 'false'
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+          RELEASE_DATE: ${{ steps.validate.outputs.release_date }}
         run: |
           set -euo pipefail
-          awk '
-            /^Version / { count++ }
-            count == 1 { print }
-            count == 2 { exit }
-          ' CHANGELOG > previous-entry.txt
+          ./.github/scripts/classify-commits.sh < commits-annotated.txt > classified.tsv
+          ./.github/scripts/format-changelog.sh underline "$VERSION" "$RELEASE_DATE" \
+            < classified.tsv > new-entry.txt
 
-          {
-            echo "VERSION: ${{ steps.validate.outputs.version }}"
-            echo "RELEASE_DATE: ${{ steps.validate.outputs.release_date }}"
-            echo ""
-            echo "COMMITS:"
-            cat commits.txt
-            echo ""
-            echo "PREVIOUS_ENTRY:"
-            cat previous-entry.txt
-            echo ""
-            echo "---"
-            echo "Instructions:"
-            cat .github/scripts/prompts/changelog-entry.md
-          } > changelog-prompt.txt
-
-          claude -p --output-format text < changelog-prompt.txt > new-entry.txt
           echo "=== Generated CHANGELOG entry ==="
           cat new-entry.txt
           echo "================================="
 
+          # Prepend (with a blank line between new entry and existing content).
           {
             cat new-entry.txt
             echo ""
@@ -158,11 +156,13 @@ jobs:
 
       - name: Commit "Prepare for release"
         if: steps.state.outputs.already_prepared == 'false' && inputs.dry_run == false
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
           git add VERSION gradle.properties build.gradle CHANGELOG
-          git commit -m 'Prepare for ${{ steps.validate.outputs.version }} release'
-          git push origin '${{ inputs.release_branch }}'
+          git commit -m "Prepare for $VERSION release"
+          git push origin "$RELEASE_BRANCH"
 
       - name: Show planned changes (dry run)
         if: inputs.dry_run == true
@@ -171,48 +171,30 @@ jobs:
           git --no-pager diff
           echo "===================================="
 
-      - name: Generate PR body with Claude
+      - name: Generate PR body
         run: |
           set -euo pipefail
-          prev_pr_num="$(gh pr list --state merged --search 'Release in:title' --base "$BASE_BRANCH" --limit 1 --json number --jq '.[0].number' || true)"
-          if [[ -n "$prev_pr_num" ]]; then
-            gh pr view "$prev_pr_num" --json body --jq .body > previous-pr-body.txt
-          else
-            echo '(no previous release PR found)' > previous-pr-body.txt
-          fi
+          ./.github/scripts/classify-commits.sh < commits-annotated.txt > classified.tsv
+          ./.github/scripts/format-pr-body.sh < classified.tsv > pr-body.md
 
-          {
-            echo "VERSION: ${{ steps.validate.outputs.version }}"
-            echo ""
-            echo "COMMITS:"
-            cat commits-annotated.txt
-            echo ""
-            echo "PREVIOUS_PR_BODY:"
-            cat previous-pr-body.txt
-            echo ""
-            echo "---"
-            echo "Instructions:"
-            cat .github/scripts/prompts/pr-body.md
-          } > pr-body-prompt.txt
-
-          claude -p --output-format text < pr-body-prompt.txt > pr-body.md
           echo "=== Generated PR body ==="
           cat pr-body.md
           echo "========================="
 
       - name: Open or update release PR
         if: inputs.dry_run == false
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
-          version='${{ steps.validate.outputs.version }}'
-          existing="$(gh pr list --head '${{ inputs.release_branch }}' --base "$BASE_BRANCH" --state open --json number --jq '.[0].number' || true)"
+          existing="$(gh pr list --head "$RELEASE_BRANCH" --base "$BASE_BRANCH" --state open --json number --jq '.[0].number' || true)"
           if [[ -n "$existing" ]]; then
-            gh pr edit "$existing" --title "Release/$version" --body-file pr-body.md
+            gh pr edit "$existing" --title "Release/$VERSION" --body-file pr-body.md
             echo "Updated existing PR #$existing"
           else
             gh pr create \
               --base "$BASE_BRANCH" \
-              --head '${{ inputs.release_branch }}' \
-              --title "Release/$version" \
+              --head "$RELEASE_BRANCH" \
+              --title "Release/$VERSION" \
               --body-file pr-body.md
           fi
