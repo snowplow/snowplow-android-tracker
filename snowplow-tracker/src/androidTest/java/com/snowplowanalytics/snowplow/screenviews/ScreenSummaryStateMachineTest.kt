@@ -231,6 +231,35 @@ class ScreenSummaryStateMachineTest {
         Assert.assertEquals(15.0, screenSummary?.get("foreground_sec"))
     }
 
+    @Test
+    fun lifecycleEventAfterEndScreenViewDoesNotResumeEngagementTracking() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        val screen1Id = UUID.randomUUID()
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = screen1Id))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(EndScreenView(screenId = screen1Id))
+        Thread.sleep(200)
+        timeTraveler.travelBy(5.toDuration(DurationUnit.SECONDS))
+        tracker.track(Background())
+        Thread.sleep(200)
+        timeTraveler.travelBy(5.toDuration(DurationUnit.SECONDS))
+        tracker.track(Foreground())
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val backgroundSummary = getScreenSummary(events.find { it.schema == Background.schema })
+        val foregroundSummary = getScreenSummary(events.find { it.schema == Foreground.schema })
+        // engagement duration stays at the value finalized by EndScreenView; the later
+        // Background/Foreground lifecycle events must not mutate or re-emit it
+        Assert.assertEquals(10.0, backgroundSummary?.get("foreground_sec"))
+        Assert.assertEquals(0.0, backgroundSummary?.get("background_sec"))
+        Assert.assertEquals(10.0, foregroundSummary?.get("foreground_sec"))
+        Assert.assertEquals(0.0, foregroundSummary?.get("background_sec"))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

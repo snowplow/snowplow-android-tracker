@@ -49,10 +49,14 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         val screenSummaryState = state as ScreenSummaryState? ?: return null
         when (event) {
             is Foreground -> {
-                screenSummaryState.updateTransitionToForeground()
+                if (!screenSummaryState.ended) {
+                    screenSummaryState.updateTransitionToForeground()
+                }
             }
             is Background -> {
-                screenSummaryState.updateTransitionToBackground()
+                if (!screenSummaryState.ended) {
+                    screenSummaryState.updateTransitionToBackground()
+                }
             }
             is ScreenEnd -> {
                 if (!screenSummaryState.ended) {
