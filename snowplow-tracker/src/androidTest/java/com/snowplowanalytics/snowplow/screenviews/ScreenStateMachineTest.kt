@@ -108,6 +108,25 @@ class ScreenStateMachineTest {
     }
 
     @Test
+    fun endScreenViewCarriesTheEndedScreensOwnContext() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        val screen1Id = UUID.randomUUID()
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = screen1Id))
+        tracker.track(EndScreenView(screenId = screen1Id))
+
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        // the end_screen_view event itself still carries the (about-to-be-ended) screen's context,
+        // even though later events have it cleared
+        val endScreenView = events.find { it.schema == TrackerConstants.SCHEMA_END_SCREEN_VIEW }
+        Assert.assertEquals("Screen 1", getScreenEntityData(endScreenView!!)?.get("name"))
+        Assert.assertEquals(screen1Id.toString(), getScreenEntityData(endScreenView)?.get("id"))
+    }
+
+    @Test
     fun endScreenViewWithNonMatchingScreenIdIsNoOp() {
         val eventSink = EventSink()
         val tracker = createTracker(listOf(eventSink))

@@ -28,7 +28,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END, TrackerConstants.SCHEMA_END_SCREEN_VIEW, Foreground.schema, Background.schema, TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCROLL_CHANGED)
 
     override val subscribedEventSchemasForEntitiesGeneration: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema)
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_END, TrackerConstants.SCHEMA_END_SCREEN_VIEW, Foreground.schema, Background.schema)
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
         get() = emptyList()
@@ -55,11 +55,16 @@ class ScreenSummaryStateMachine : StateMachineInterface {
                 screenSummaryState.updateTransitionToBackground()
             }
             is ScreenEnd -> {
-                screenSummaryState.updateForScreenEnd()
+                if (!screenSummaryState.ended) {
+                    screenSummaryState.updateForScreenEnd()
+                }
             }
             is EndScreenView -> {
-                if (event.screenId == null || event.screenId.toString() == screenSummaryState.screenId) {
-                    return null
+                if (!screenSummaryState.ended &&
+                    (event.screenId == null || event.screenId.toString() == screenSummaryState.screenId)
+                ) {
+                    screenSummaryState.updateForScreenEnd()
+                    screenSummaryState.ended = true
                 }
             }
             is ListItemView -> {
@@ -92,7 +97,9 @@ class ScreenSummaryStateMachine : StateMachineInterface {
 
     override fun filter(event: InspectableEvent, state: State?): Boolean {
         if (event.schema == TrackerConstants.SCHEMA_SCREEN_END) {
-            return state != null
+            val screenSummaryState = state as? ScreenSummaryState
+            // suppress the automatic pre-ScreenView flush if the screen was already ended manually
+            return screenSummaryState != null && !screenSummaryState.ended
         }
         // do not track list item view and scroll changed events
         return false

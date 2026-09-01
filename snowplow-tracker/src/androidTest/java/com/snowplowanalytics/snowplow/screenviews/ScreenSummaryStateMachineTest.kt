@@ -192,6 +192,26 @@ class ScreenSummaryStateMachineTest {
     }
 
     @Test
+    fun endScreenViewCarriesFinalizedScreenSummary() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        val screen1Id = UUID.randomUUID()
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = screen1Id))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(EndScreenView(screenId = screen1Id))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val endScreenView = events.find { it.schema == TrackerConstants.SCHEMA_END_SCREEN_VIEW }
+        // the manual end event itself carries the finalized engagement metrics for the ended screen
+        val screenSummary = getScreenSummary(endScreenView)
+        Assert.assertEquals(10.0, screenSummary?.get("foreground_sec"))
+        Assert.assertEquals(0.0, screenSummary?.get("background_sec"))
+    }
+
+    @Test
     fun endScreenViewWithNonMatchingScreenIdIsNoOp() {
         val eventSink = EventSink()
         val tracker = createTracker(listOf(eventSink))

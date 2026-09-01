@@ -21,6 +21,11 @@ import java.lang.Integer.min
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ScreenSummaryState(val screenId: String? = null) : State {
+    /** Whether this screen's engagement tracking has been finalized via
+     * [com.snowplowanalytics.snowplow.event.EndScreenView]. Once ended, further Foreground/Background/
+     * ScreenEnd updates are ignored so the finalized duration isn't double-counted. */
+    var ended: Boolean = false
+
     private var lastUpdateTimestamp = dateGenerator()
 
     private var foregroundDuration: Long = 0

@@ -81,7 +81,9 @@ class ScreenStateMachine : StateMachineInterface {
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         val screenState = state as? ScreenState ?: return ArrayList()
-        if (screenState.ended) return ArrayList()
+        // the EndScreenView event itself still reports the context of the screen it just ended;
+        // only events strictly after it see the context cleared
+        if (screenState.ended && event.schema != TrackerConstants.SCHEMA_END_SCREEN_VIEW) return ArrayList()
         return listOf(screenState.getCurrentScreen(true))
     }
 
