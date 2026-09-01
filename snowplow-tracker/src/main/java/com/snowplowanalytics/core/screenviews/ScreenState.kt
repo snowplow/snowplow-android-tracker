@@ -33,6 +33,11 @@ class ScreenState(
     val previousScreenState: ScreenState? = null
 ) : State {
 
+    /** Whether this screen has been manually ended via [com.snowplowanalytics.snowplow.event.EndScreenView].
+     * An ended screen is no longer the current screen (no screen context is attached to further events),
+     * but it's still referenced as the previous screen by the next screen_view. */
+    var ended: Boolean = false
+
     val previousName: String?
         get() { return previousScreenState?.name }
     val previousId: String?

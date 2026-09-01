@@ -25,7 +25,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         get() = ID
 
     override val subscribedEventSchemasForTransitions: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema, TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCROLL_CHANGED)
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END, TrackerConstants.SCHEMA_END_SCREEN_VIEW, Foreground.schema, Background.schema, TrackerConstants.SCHEMA_LIST_ITEM_VIEW, TrackerConstants.SCHEMA_SCROLL_CHANGED)
 
     override val subscribedEventSchemasForEntitiesGeneration: List<String>
         get() = listOf(TrackerConstants.SCHEMA_SCREEN_END, Foreground.schema, Background.schema)
@@ -44,7 +44,7 @@ class ScreenSummaryStateMachine : StateMachineInterface {
 
     override fun transition(event: Event, state: State?): State? {
         if (event is ScreenView) {
-            return ScreenSummaryState()
+            return ScreenSummaryState(event.id)
         }
         val screenSummaryState = state as ScreenSummaryState? ?: return null
         when (event) {
@@ -56,6 +56,11 @@ class ScreenSummaryStateMachine : StateMachineInterface {
             }
             is ScreenEnd -> {
                 screenSummaryState.updateForScreenEnd()
+            }
+            is EndScreenView -> {
+                if (event.screenId == null || event.screenId.toString() == screenSummaryState.screenId) {
+                    return null
+                }
             }
             is ListItemView -> {
                 screenSummaryState.updateWithListItemView(event)

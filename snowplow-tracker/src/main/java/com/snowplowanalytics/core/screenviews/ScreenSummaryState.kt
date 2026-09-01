@@ -20,7 +20,7 @@ import java.lang.Integer.max
 import java.lang.Integer.min
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class ScreenSummaryState : State {
+class ScreenSummaryState(val screenId: String? = null) : State {
     private var lastUpdateTimestamp = dateGenerator()
 
     private var foregroundDuration: Long = 0

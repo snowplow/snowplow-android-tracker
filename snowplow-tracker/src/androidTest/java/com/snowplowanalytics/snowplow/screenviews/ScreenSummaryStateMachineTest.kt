@@ -156,6 +156,61 @@ class ScreenSummaryStateMachineTest {
         Assert.assertEquals(100, screenSummary?.get("content_height"))
     }
 
+    @Test
+    fun endScreenViewDoesNotFireAsSideEffectOfAutomaticFlush() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        Thread.sleep(200)
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        Assert.assertTrue(events.none { it.schema == TrackerConstants.SCHEMA_END_SCREEN_VIEW })
+    }
+
+    @Test
+    fun endScreenViewWithMatchingScreenIdStopsEngagementAndPreventsDuplicateScreenEnd() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        val screen1Id = UUID.randomUUID()
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = screen1Id))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(EndScreenView(screenId = screen1Id))
+        Thread.sleep(200)
+        timeTraveler.travelBy(5.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        Assert.assertEquals(3, events.size)
+        // the automatic pre-ScreenView screen_end is suppressed since the summary was already closed manually
+        Assert.assertNull(events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+    }
+
+    @Test
+    fun endScreenViewWithNonMatchingScreenIdIsNoOp() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(EndScreenView(screenId = UUID.randomUUID()))
+        Thread.sleep(200)
+        timeTraveler.travelBy(5.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val screenSummary = getScreenSummary(events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+        // engagement kept accumulating across the whole 15s since the mismatched screenId made the end a no-op
+        Assert.assertEquals(15.0, screenSummary?.get("foreground_sec"))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext

@@ -16,6 +16,7 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.statemachine.StateMachineInterface
+import com.snowplowanalytics.snowplow.event.EndScreenView
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
@@ -24,19 +25,20 @@ import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 class ScreenStateMachine : StateMachineInterface {
     /*
      States: Init, Screen
-     Events: SV (ScreenView)
+     Events: SV (ScreenView), ESV (EndScreenView)
      Transitions:
       - Init (SV) Screen
       - Screen (SV) Screen
+      - Screen (ESV) Screen, marked as ended
      Entity Generation:
-      - Screen
+      - Screen, unless ended
      */
 
     override val identifier: String
         get() = ID
-    
+
     override val subscribedEventSchemasForTransitions: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_END_SCREEN_VIEW)
 
     override val subscribedEventSchemasForEntitiesGeneration: List<String>
         get() = listOf("*")
@@ -54,26 +56,33 @@ class ScreenStateMachine : StateMachineInterface {
         get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
-        return (event as? ScreenView)?.let { screenView ->
-            ScreenState(
-                id = screenView.id,
-                name = screenView.name,
-                type = screenView.type,
-                transitionType = screenView.transitionType,
-                fragmentClassName = screenView.fragmentClassName,
-                fragmentTag = screenView.fragmentTag,
-                activityClassName = screenView.activityClassName,
-                activityTag = screenView.activityTag,
+        return when (event) {
+            is ScreenView -> ScreenState(
+                id = event.id,
+                name = event.name,
+                type = event.type,
+                transitionType = event.transitionType,
+                fragmentClassName = event.fragmentClassName,
+                fragmentTag = event.fragmentTag,
+                activityClassName = event.activityClassName,
+                activityTag = event.activityTag,
                 previousScreenState = state as? ScreenState
             )
+            is EndScreenView -> {
+                val screenState = state as? ScreenState
+                if (screenState != null && (event.screenId == null || event.screenId.toString() == screenState.id)) {
+                    screenState.ended = true
+                }
+                state
+            }
+            else -> state
         }
     }
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
-        if (state == null) return ArrayList()
-        val screenState = state as? ScreenState
-        val entity = screenState?.getCurrentScreen(true)
-        return entity?.let { listOf(it) }
+        val screenState = state as? ScreenState ?: return ArrayList()
+        if (screenState.ended) return ArrayList()
+        return listOf(screenState.getCurrentScreen(true))
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {

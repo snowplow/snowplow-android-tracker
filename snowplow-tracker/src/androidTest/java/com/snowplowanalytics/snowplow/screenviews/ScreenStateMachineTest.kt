@@ -81,6 +81,49 @@ class ScreenStateMachineTest {
         Assert.assertEquals("Screen 3", screen3?.get("name"))
     }
 
+    @Test
+    fun endScreenViewClearsScreenContextButKeepsPreviousChain() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        val screen1Id = UUID.randomUUID()
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = screen1Id))
+        tracker.track(EndScreenView())
+        tracker.track(Timing(category = "c1", variable = "v1", timing = 1))
+        tracker.track(ScreenView(name = "Screen 2"))
+
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        Assert.assertEquals(4, events.size)
+
+        // context is cleared for events tracked after the manual end
+        val timingEvent = events.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNull(getScreenEntityData(timingEvent!!))
+
+        // but the previous_* chain on the next real screen_view still references the ended screen
+        val screenView2 = events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && it.payload["name"] == "Screen 2" }
+        Assert.assertEquals("Screen 1", screenView2?.payload?.get("previousName"))
+        Assert.assertEquals(screen1Id.toString(), screenView2?.payload?.get("previousId"))
+    }
+
+    @Test
+    fun endScreenViewWithNonMatchingScreenIdIsNoOp() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1", screenId = UUID.randomUUID()))
+        tracker.track(EndScreenView(screenId = UUID.randomUUID()))
+        tracker.track(Timing(category = "c1", variable = "v1", timing = 1))
+
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val timingEvent = events.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        // screen context is untouched since the supplied screenId didn't match the active screen
+        Assert.assertEquals("Screen 1", getScreenEntityData(timingEvent!!)?.get("name"))
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
