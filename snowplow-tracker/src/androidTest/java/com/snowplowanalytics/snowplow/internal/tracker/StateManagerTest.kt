@@ -12,9 +12,11 @@
  */
 package com.snowplowanalytics.snowplow.internal.tracker
 
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.emitter.Emitter
+import com.snowplowanalytics.core.session.AppStateProvider
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.statemachine.StateMachineInterface
 import com.snowplowanalytics.core.statemachine.StateManager
@@ -25,6 +27,7 @@ import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.tracker.MockEventStore
+import org.junit.After
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +36,12 @@ import kotlin.collections.ArrayList
 
 @RunWith(AndroidJUnit4::class)
 class StateManagerTest {
+    @After
+    fun tearDown() {
+        // Restore the default (foreground) app state so other tests aren't affected by this one.
+        AppStateProvider.onStart(ProcessLifecycleOwner.get())
+    }
+
     @Test
     fun testStateManager() {
         val stateManager = StateManager()
@@ -214,6 +223,12 @@ class StateManagerTest {
     @Test
     @Throws(InterruptedException::class)
     fun testLifecycleStateMachine() {
+        // This test exercises the Lifecycle state machine's Foreground/Background transitions
+        // directly, not the real process state, so force the app-state cache to foreground
+        // (the instrumentation process never starts an Activity, so without this
+        // AppStateProvider would otherwise correctly report the process as not-visible).
+        AppStateProvider.onStart(ProcessLifecycleOwner.get())
+
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()
         val emitter = Emitter("namespace", eventStore, context, "http://snowplow-fake-url.com")
