@@ -94,6 +94,12 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         isSessionCheckerEnabled = true
 
         isNewSession.set(!continueSessionOnRestart)
+
+        // Seed from the actual app state rather than defaulting to foreground, so that a
+        // background-only process launch (e.g. WorkManager, FCM) doesn't report isBackground=false
+        // until a real Foreground/Background event happens to come along.
+        AppStateProvider.initialize(context)
+        _isBackground.set(!AppStateProvider.isForeground)
         
         var sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS
         if (namespace != null && namespace.isNotEmpty()) {

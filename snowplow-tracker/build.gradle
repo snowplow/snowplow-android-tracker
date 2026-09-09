@@ -108,6 +108,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'com.google.android.gms:play-services-analytics:18.0.3'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver3:5.2.0'
+    androidTestImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
 }
 
 repositories {

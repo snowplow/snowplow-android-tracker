@@ -21,6 +21,7 @@ import com.snowplowanalytics.core.gdpr.Gdpr
 import com.snowplowanalytics.core.screenviews.ScreenState
 import com.snowplowanalytics.core.screenviews.ScreenStateMachine
 import com.snowplowanalytics.core.screenviews.ScreenSummaryStateMachine
+import com.snowplowanalytics.core.session.AppStateProvider
 import com.snowplowanalytics.core.session.ProcessObserver.Companion.initialize
 import com.snowplowanalytics.core.session.Session
 import com.snowplowanalytics.core.session.Session.Companion.getInstance
@@ -462,6 +463,7 @@ class Tracker(
     private fun initializeLifecycleTracking() {
         if (lifecycleAutotracking) {
             initialize(context)
+            AppStateProvider.initialize(context)
             // Initialize LifecycleStateMachine for lifecycle entities
             addOrReplaceStateMachine(LifecycleStateMachine())
         }
