@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.snowplowanalytics.core.tracker.Logger
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 /**
  * Caches whether the app process is currently foregrounded, backed by [ProcessLifecycleOwner].
@@ -76,15 +75,19 @@ object AppStateProvider : DefaultLifecycleObserver {
         if (Looper.myLooper() == context.mainLooper) {
             seedAndRegister()
         } else {
-            // Block (with a timeout guard) until the initial state is seeded on the main thread,
-            // so that a background-only process launch (e.g. WorkManager, FCM) doesn't read a
-            // stale default before the very first event is tracked.
+            // Block until the initial state is seeded on the main thread, so that a
+            // background-only process launch (e.g. WorkManager, FCM) doesn't read a stale
+            // default before the very first event is tracked. This must NOT be a bounded wait:
+            // if the caller gave up after a timeout while the posted seed was still queued,
+            // that seed would later run and silently overwrite `_isForeground` at an
+            // arbitrary point in the future (e.g. mid-way through unrelated code that had
+            // already read/relied on the stale value, or explicitly set it itself).
             val latch = CountDownLatch(1)
             Handler(context.mainLooper).post {
                 seedAndRegister()
                 latch.countDown()
             }
-            latch.await(1, TimeUnit.SECONDS)
+            latch.await()
         }
     }
 }
