@@ -22,6 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.snowplowanalytics.core.session.AppStateProvider
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assume
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -61,8 +62,12 @@ class AppStateProviderTest {
             done.await(5, TimeUnit.SECONDS)
         )
 
-        val expected = ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-        Assert.assertEquals(expected, AppStateProvider.isForeground)
+        // The instrumentation process is started for a foreground component, so the seed must
+        // report it as foregrounded. Note this is deliberately NOT derived from
+        // `isAtLeast(STARTED)`: that is ambiguous before the first Activity starts (see
+        // seedsForegroundWhileStillAtCreatedOnAnInstrumentationProcess), and asserting against
+        // it would just restate the implementation rather than pin the intended behaviour.
+        Assert.assertTrue(AppStateProvider.isForeground)
     }
 
     @Test
@@ -102,5 +107,33 @@ class AppStateProviderTest {
         )
         backgroundThread.join(3000)
         Assert.assertFalse("The background seeding thread must complete, not hang", backgroundThread.isAlive)
+    }
+
+    @Test
+    fun seedsForegroundWhileStillAtCreatedOnAnInstrumentationProcess() {
+        // Regression for AISP-1708 review point (3). ProcessLifecycleOwner reports CREATED both
+        // for a normal launch whose Activity has not started yet (the state during
+        // Application.onCreate, where most apps create the tracker) and for a background-only
+        // launch, so seeding purely from `isAtLeast(STARTED)` marked every normal cold start as
+        // backgrounded and produced a spurious application_foreground once ON_START arrived.
+        //
+        // The seed now falls back to the process's own importance for that ambiguous window.
+        // The instrumentation process is started for a foreground component, so it must seed as
+        // foregrounded even when the lifecycle has not reached STARTED.
+        AppStateProvider.onStop(ProcessLifecycleOwner.get())
+        AppStateProvider.resetForTests()
+
+        val state = ProcessLifecycleOwner.get().lifecycle.currentState
+        Assume.assumeFalse(
+            "Only meaningful while the process has not reached STARTED",
+            state.isAtLeast(Lifecycle.State.STARTED)
+        )
+
+        AppStateProvider.initialize(context)
+
+        Assert.assertTrue(
+            "A process started for a foreground component must seed as foregrounded even at CREATED",
+            AppStateProvider.isForeground
+        )
     }
 }

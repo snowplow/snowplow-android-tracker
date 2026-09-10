@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.core.session
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -95,26 +96,36 @@ object AppStateProvider {
         val seedAndRegister = {
             try {
                 val lifecycle = ProcessLifecycleOwner.get().lifecycle
-                // STARTED is the only threshold that actually distinguishes a background-only
-                // launch (WorkManager, FCM - no Activity ever starts, so the process never goes
-                // past CREATED) from one heading to the foreground. CREATED itself can't be used
-                // for that: ProcessLifecycleOwner dispatches ON_CREATE unconditionally for every
-                // process start (it's wired up via a ContentProvider that attaches before
-                // Application.onCreate, regardless of which component started the process), so
-                // by the time any app code runs, the process is already at least CREATED whether
-                // or not an Activity is coming. iOS sidesteps the equivalent problem because
-                // .inactive - its transitional launching state - is synchronously distinguishable
-                // from .background at seed time; Android has no such signal, so a tracker created
-                // in Application.onCreate() during a normal launch (the common integration
-                // pattern) will still read CREATED here, seed as backgrounded, and get corrected
-                // moments later by the ON_START observer below once the first Activity starts.
-                // That correction is indistinguishable, from this object alone, from a genuine
-                // background-to-foreground transition, so it can surface as a one-off spurious
-                // application_foreground event / foregroundIndex bump on a normal cold start.
-                // Flagged in review as needing verification on a real device; no code change
-                // made here without that confirmation, since a timing-based heuristic guess is
-                // riskier than the known, documented edge case.
-                _isForeground = lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                // ProcessLifecycleOwner alone cannot answer this question at seed time.
+                // It dispatches ON_CREATE unconditionally for every process start (it is wired
+                // up via a ContentProvider that attaches before Application.onCreate, regardless
+                // of which component started the process), and only reaches STARTED once an
+                // Activity actually starts - which, on a normal launch, happens *after* the
+                // Application.onCreate() in which most apps create the tracker. So at seed time
+                // CREATED means "foreground launch, Activity not started yet" and "background-only
+                // launch" alike, and neither `isAtLeast(STARTED)` nor `isAtLeast(CREATED)` can
+                // separate them: the former marks every normal cold start as backgrounded, the
+                // latter marks every background launch as foregrounded.
+                //
+                // The process's own importance does separate them, synchronously, at that exact
+                // moment: Android has already decided why it started this process. A process
+                // started for an Activity is IMPORTANCE_FOREGROUND (100) while still at CREATED;
+                // one started for a broadcast/service (WorkManager, FCM) is IMPORTANCE_CACHED
+                // (400) or IMPORTANCE_SERVICE (300). This is the Android analogue of the
+                // .inactive-vs-.background distinction iOS relies on.
+                //
+                // Verified on API 36 with the tracker created in Application.onCreate():
+                //   foreground launch (am start)     -> state=CREATED, importance=100
+                //   background launch (am broadcast) -> state=CREATED, importance=400
+                //
+                // ProcessLifecycleOwner is still authoritative once it has actually observed an
+                // Activity, so prefer it whenever it has already reached STARTED, and fall back
+                // to importance only for the ambiguous pre-STARTED window.
+                _isForeground = if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    true
+                } else {
+                    isProcessImportanceForeground()
+                }
                 lifecycle.addObserver(Observer())
                 initializationState = InitializationState.COMPLETE
             } catch (e: NoClassDefFoundError) {
@@ -141,6 +152,31 @@ object AppStateProvider {
                 latch.countDown()
             }
             latch.await()
+        }
+    }
+
+    /**
+     * Whether this process was started for a foreground component, read from the process's own
+     * importance. Used only to disambiguate the pre-STARTED window in [initialize], where
+     * [ProcessLifecycleOwner] reports CREATED for both a normal launch and a background-only one.
+     *
+     * IMPORTANCE_VISIBLE (200) is included so that a process kept alive by a visible-but-not-
+     * focused component is not misreported as backgrounded. Anything at or above
+     * IMPORTANCE_FOREGROUND_SERVICE (125) that is not visible - a foreground service doing
+     * background work, a cached or service process - is treated as not foregrounded, matching
+     * the "no user-visible UI" meaning of `isVisible`.
+     *
+     * Defaults to `true` if the state can't be read, preserving the tracker's behaviour from
+     * before the state was read at all.
+     */
+    private fun isProcessImportanceForeground(): Boolean {
+        return try {
+            val info = ActivityManager.RunningAppProcessInfo()
+            ActivityManager.getMyMemoryState(info)
+            info.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
+        } catch (e: Exception) {
+            Logger.e(TAG, "Could not read process importance: %s", e)
+            true
         }
     }
 
