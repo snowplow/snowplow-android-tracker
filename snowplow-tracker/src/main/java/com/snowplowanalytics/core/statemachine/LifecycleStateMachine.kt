@@ -12,6 +12,7 @@
  */
 package com.snowplowanalytics.core.statemachine
 
+import com.snowplowanalytics.core.session.AppStateProvider
 import com.snowplowanalytics.snowplow.entity.LifecycleEntity
 import com.snowplowanalytics.snowplow.event.Background
 import com.snowplowanalytics.snowplow.event.Event
@@ -62,7 +63,7 @@ class LifecycleStateMachine : StateMachineInterface {
     }
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
-        if (state == null) return listOf<SelfDescribingJson>(LifecycleEntity(true))
+        if (state == null) return listOf<SelfDescribingJson>(LifecycleEntity(AppStateProvider.isForeground))
         
         val s = state as? LifecycleState
         return s?.let { listOf<SelfDescribingJson>(LifecycleEntity(it.isForeground).index(it.index)) }

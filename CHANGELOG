@@ -1,3 +1,7 @@
+Version 6.4.1 (2026-09-11)
+--------------------------
+Seed isVisible and background state from real process lifecycle [AISP-1708] (#740)
+
 Version 6.4.0 (2026-07-06)
 --------------------------
 Wake emitter on signal instead of polling and expose flush() (close #679)
