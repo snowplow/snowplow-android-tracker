@@ -40,6 +40,7 @@ class StateManagerTest {
     fun tearDown() {
         // Restore the default (foreground) app state so other tests aren't affected by this one.
         AppStateProvider.onStart(ProcessLifecycleOwner.get())
+        AppStateProvider.markSeededForTests()
     }
 
     @Test
@@ -228,6 +229,8 @@ class StateManagerTest {
         // (the instrumentation process never starts an Activity, so without this
         // AppStateProvider would otherwise correctly report the process as not-visible).
         AppStateProvider.onStart(ProcessLifecycleOwner.get())
+        // Pin it, so the tracker created below can't re-seed over the forced value.
+        AppStateProvider.markSeededForTests()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val eventStore = MockEventStore()

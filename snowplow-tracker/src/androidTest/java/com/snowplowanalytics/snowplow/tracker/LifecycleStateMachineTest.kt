@@ -147,6 +147,11 @@ class LifecycleStateMachineTest {
         } else {
             AppStateProvider.onStop(owner)
         }
+        // Pin the state as already seeded. createTracker() below calls
+        // AppStateProvider.initialize(), and on a process where nothing has seeded yet that would
+        // overwrite the value just forced with the instrumentation process's real (foreground)
+        // state - making these tests pass or fail depending on suite ordering.
+        AppStateProvider.markSeededForTests()
     }
 
     private fun getLifecycleEntityData(event: InspectableEvent?): Map<*, *>? {

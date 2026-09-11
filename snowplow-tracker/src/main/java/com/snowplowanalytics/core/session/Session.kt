@@ -98,7 +98,11 @@ class Session @SuppressLint("ApplySharedPref") constructor(
         // Seed from the actual app state rather than defaulting to foreground, so that a
         // background-only process launch (e.g. WorkManager, FCM) doesn't report isBackground=false
         // until a real Foreground/Background event happens to come along.
-        AppStateProvider.initialize(context)
+        //
+        // Only reads the cached value - AppStateProvider.initialize() is called from
+        // Snowplow.createTracker, outside the @Synchronized getInstance that wraps this
+        // constructor. Seeding here instead would block on a main-looper hop while holding the
+        // Session class monitor, deadlocking against a main thread that wants that same monitor.
         _isBackground.set(!AppStateProvider.isForeground)
         
         var sessionVarsName = TrackerConstants.SNOWPLOW_SESSION_VARS

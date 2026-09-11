@@ -49,6 +49,10 @@ object AppStateProvider {
     private val TAG = AppStateProvider::class.java.simpleName
     private val lock = Any()
 
+    /** Released once the seed has run, so callers that arrive mid-seed can wait for it. */
+    @Volatile
+    private var seedLatch = CountDownLatch(1)
+
     @Volatile
     private var initializationState = InitializationState.NONE
 
@@ -67,22 +71,41 @@ object AppStateProvider {
         _isForeground = false
     }
 
+    /**
+     * Seeds the cached state and subscribes to lifecycle callbacks. Safe to call repeatedly; only
+     * the first call does the work.
+     *
+     * MUST be called from outside any lock the main thread could also be waiting on - in practice
+     * only from [com.snowplowanalytics.snowplow.Snowplow.createTracker], before any tracker,
+     * session or service provider is constructed. Off the main thread it blocks on a main-looper
+     * hop, so calling it from inside a monitor the main thread might acquire (as `Session.init`
+     * once did, under the `@Synchronized Session.getInstance`) deadlocks: the background thread
+     * holds the monitor while waiting for the looper, and the main thread blocks on that monitor
+     * instead of pumping the queue that would release it.
+     */
     @JvmStatic
     fun initialize(context: Context) {
         // Claim the seeding job under the lock and release it immediately - never hold it across
-        // the main-thread hop below. Holding it (e.g. a plain @Synchronized fun) deadlocks: a
-        // background thread that wins the race would block on the main looper while holding the
-        // monitor, and the main thread - still unwinding through Snowplow.createTracker, so not
-        // yet pumping its message queue - would block acquiring it. ANR.
-        val shouldSeed = synchronized(lock) {
-            if (initializationState != InitializationState.NONE) {
-                false
-            } else {
+        // either wait below, for the same deadlock reason as above.
+        val state = synchronized(lock) {
+            val current = initializationState
+            if (current == InitializationState.NONE) {
                 initializationState = InitializationState.IN_PROGRESS
-                true
             }
+            current
         }
-        if (!shouldSeed) return
+
+        if (state == InitializationState.COMPLETE) return
+        if (state == InitializationState.IN_PROGRESS) {
+            // Another thread is mid-seed. Returning straight away would let this caller read the
+            // stale default, so wait for that seed to land. Never blocks the main thread: the
+            // seeding thread either IS the main thread (its seed is synchronous, so this state is
+            // not observable from it) or has posted to the looper, which this thread does not block.
+            if (Looper.myLooper() != context.mainLooper) {
+                seedLatch.await()
+            }
+            return
+        }
 
         val seedAndRegister = {
             try {
@@ -107,8 +130,15 @@ object AppStateProvider {
                 lifecycle.addObserver(Observer())
                 initializationState = InitializationState.COMPLETE
             } catch (e: NoClassDefFoundError) {
-                initializationState = InitializationState.NONE
+                // Leave the state at IN_PROGRESS rather than resetting to NONE: the class is not
+                // going to appear later in the process, so re-running the seed on every
+                // subsequent call would just repeat the failed lookup. `_isForeground` keeps its
+                // `true` default, which is the documented fallback.
                 Logger.e(TAG, "Class 'ProcessLifecycleOwner' not found. The tracker can't track app state.")
+            } finally {
+                // Release waiters on every path, including the failure above, so a caller
+                // blocked in the IN_PROGRESS branch can never be stranded.
+                seedLatch.countDown()
             }
         }
 
@@ -119,29 +149,29 @@ object AppStateProvider {
             // before the first event is tracked. Deliberately unbounded: a timed-out caller
             // would leave the queued seed to overwrite `_isForeground` at an arbitrary later
             // point, after other code had already read or set it.
-            val latch = CountDownLatch(1)
-            Handler(context.mainLooper).post {
-                seedAndRegister()
-                latch.countDown()
-            }
-            latch.await()
+            Handler(context.mainLooper).post { seedAndRegister() }
+            seedLatch.await()
         }
     }
 
     /**
-     * Whether this process was started for a foreground component. Used only to disambiguate the
-     * pre-STARTED window in [initialize].
+     * Whether this process was started for a component the user can see. Used only to
+     * disambiguate the pre-STARTED window in [initialize].
      *
-     * The cutoff includes IMPORTANCE_VISIBLE so a visible-but-unfocused process isn't reported as
-     * backgrounded; a foreground *service* doing background work falls outside it, matching the
-     * "no user-visible UI" meaning of `isVisible`. Defaults to `true` if unreadable, preserving
-     * the behaviour from before the state was read at all.
+     * Only IMPORTANCE_FOREGROUND (100) and IMPORTANCE_VISIBLE (200) count. Note the constants are
+     * NOT ordered by visibility: IMPORTANCE_FOREGROUND_SERVICE (125) sits *between* them, so a
+     * plain `<= IMPORTANCE_VISIBLE` bound would also accept a process started only for a
+     * foreground service - an FCM push doing background upload work, say - and report it as
+     * visible, which is the very misclassification this seed exists to avoid.
+     *
+     * Defaults to `true` if unreadable, preserving the behaviour from before the state was read.
      */
     private fun isProcessImportanceForeground(): Boolean {
         return try {
             val info = ActivityManager.RunningAppProcessInfo()
             ActivityManager.getMyMemoryState(info)
-            info.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
+            info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND ||
+                info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
         } catch (e: Exception) {
             Logger.e(TAG, "Could not read process importance: %s", e)
             true
@@ -158,6 +188,22 @@ object AppStateProvider {
     fun resetForTests() {
         synchronized(lock) {
             initializationState = InitializationState.NONE
+            seedLatch = CountDownLatch(1)
+        }
+    }
+
+    /**
+     * Marks the state as already seeded, so a later [initialize] (from `Snowplow.createTracker`,
+     * say) cannot overwrite a value a test has set via [onStart]/[onStop]. Without this, a test
+     * that forces the state and then creates a tracker races the real seed, and passes or fails
+     * depending on whether anything else in the suite had already seeded the process.
+     */
+    @VisibleForTesting
+    @JvmStatic
+    fun markSeededForTests() {
+        synchronized(lock) {
+            initializationState = InitializationState.COMPLETE
+            seedLatch.countDown()
         }
     }
 }

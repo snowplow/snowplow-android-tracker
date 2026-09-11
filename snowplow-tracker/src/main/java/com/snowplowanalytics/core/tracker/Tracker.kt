@@ -463,8 +463,8 @@ class Tracker(
     private fun initializeLifecycleTracking() {
         if (lifecycleAutotracking) {
             initialize(context)
-            AppStateProvider.initialize(context)
-            // Initialize LifecycleStateMachine for lifecycle entities
+            // AppStateProvider is seeded in Snowplow.createTracker, before this constructor runs
+            // and outside the locks it holds - see AppStateProvider.initialize.
             addOrReplaceStateMachine(LifecycleStateMachine())
         }
     }
