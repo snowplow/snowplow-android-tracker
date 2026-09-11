@@ -21,6 +21,7 @@ import com.snowplowanalytics.snowplow.configuration.ConfigurationBundle
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationProvider
 import com.snowplowanalytics.snowplow.configuration.ConfigurationState
 import com.snowplowanalytics.core.remoteconfiguration.RemoteConfigurationBundle
+import com.snowplowanalytics.core.session.AppStateProvider
 import com.snowplowanalytics.core.tracker.ServiceProvider
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterface
 import com.snowplowanalytics.core.tracker.TrackerWebViewInterfaceV2
@@ -266,6 +267,13 @@ object Snowplow {
         network: NetworkConfiguration,
         vararg configurations: Configuration
     ): TrackerController {
+        // Every way of creating a tracker funnels through here, and this is the last point that
+        // holds no lock. Seeding the app state can block on a main-looper hop, so it has to
+        // happen before ServiceProvider/Tracker/Session are constructed - Session.init reads the
+        // cached value under the @Synchronized Session.getInstance, and seeding from there would
+        // deadlock against a main thread waiting on that same monitor.
+        AppStateProvider.initialize(context)
+
         var serviceProvider = serviceProviderInstances[namespace]
         if (serviceProvider != null) {
             val configList: MutableList<Configuration> = ArrayList(listOf(*configurations))
