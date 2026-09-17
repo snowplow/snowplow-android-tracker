@@ -100,6 +100,24 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:5.2.0'
 
+    // ======================= DO NOT MERGE =============================
+    // Wiz SCA smoke test (AISP-1527). Deliberately vulnerable pins, added
+    // only to check whether Wiz reports findings on this repo. Drop this
+    // commit once the scan result has been read.
+    //
+    // (1) Direct dependency, known critical CVE:
+    //       commons-text 1.9 -> CVE-2022-42889 "Text4Shell", CVSS 9.8
+    //     Fires if Wiz parses build.gradle at all.
+    implementation 'org.apache.commons:commons-text:1.9'
+    //
+    // (2) Vulnerable only TRANSITIVELY:
+    //       log4j-slf4j-impl 2.14.1 -> pulls log4j-core 2.14.1
+    //       -> CVE-2021-44228 "Log4Shell", CVSS 10.0
+    //     log4j-core is never named here, so this only fires if Wiz
+    //     resolves the graph instead of reading declared coordinates.
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
+    // ==================================================================
+
     // test
     testImplementation "androidx.lifecycle:lifecycle-extensions:$project.archLifecycleVersion"
     testImplementation "com.android.installreferrer:installreferrer:2.2"
