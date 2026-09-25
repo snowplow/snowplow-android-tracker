@@ -105,6 +105,71 @@ class ScreenSummaryStateMachineTest {
     }
 
     @Test
+    fun manuallyTrackedScreenEndClosesOutTheScreenSummary() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenEnd())
+        Thread.sleep(200)
+
+        // filtered to screen events: an application_install event may also be present on first run
+        val events = eventSink.trackedEvents
+        Assert.assertEquals(1, events.count { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW })
+        Assert.assertEquals(1, events.count { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+
+        val screenEnd = events.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END }
+        val screenSummary = getScreenSummary(screenEnd)
+        Assert.assertEquals(10.0, screenSummary?.get("foreground_sec"))
+        Assert.assertEquals(0.0, screenSummary?.get("background_sec"))
+
+        // the screen context entity still refers to the ended screen
+        val screenEndScreen = screenEnd?.entities?.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
+        Assert.assertEquals("Screen 1", (screenEndScreen?.map?.get("data") as? Map<*, *>)?.get("name"))
+    }
+
+    /// A manual screen end must not be double-counted: the automatic flush before the next
+    /// ScreenView should only report the time elapsed since the manual end.
+    @Test
+    fun manualScreenEndFollowedByScreenViewDoesNotDoubleCountEngagement() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        Thread.sleep(200)
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenEnd())
+        Thread.sleep(200)
+        timeTraveler.travelBy(5.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val screenEnds = events.filter { it.schema == TrackerConstants.SCHEMA_SCREEN_END }
+        Assert.assertEquals(2, screenEnds.size)
+
+        Assert.assertEquals(10.0, getScreenSummary(screenEnds[0])?.get("foreground_sec"))
+        Assert.assertEquals(15.0, getScreenSummary(screenEnds[1])?.get("foreground_sec"))
+    }
+
+    /// The state machine filters out screen_end when there is no screen to end,
+    /// so a manual call before any screen view must not emit an event.
+    @Test
+    fun manualScreenEndWithoutAScreenViewIsNotTracked() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenEnd())
+        Thread.sleep(500)
+
+        Assert.assertEquals(
+            0,
+            eventSink.trackedEvents.count { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+    }
+
+    @Test
     fun updatesListMetrics() {
         val eventSink = EventSink()
         val tracker = createTracker(listOf(eventSink))
