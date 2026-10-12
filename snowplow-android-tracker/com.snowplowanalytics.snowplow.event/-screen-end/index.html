@@ -46,7 +46,7 @@
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
         <div class="library-version" id="library-version">
-6.4.1        </div>
+6.4.2        </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active=""
@@ -108,7 +108,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">snowplow-android-tracker</a><span class="delimiter">/</span><a href="../index.html">com.snowplowanalytics.snowplow.event</a><span class="delimiter">/</span><span class="current">ScreenEnd</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Screen</span><wbr></wbr><span><span>End</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">ScreenEnd</a> : <a href="../-abstract-self-describing/index.html">AbstractSelfDescribing</a></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":snowplow-android-tracker:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">ScreenEnd</a> : <a href="../-abstract-self-describing/index.html">AbstractSelfDescribing</a></div><p class="paragraph">Event tracked when a screen is no longer visible to the user.</p><p class="paragraph">It is tracked automatically before each <a href="../-screen-view/index.html">ScreenView</a> event when screen engagement tracking is enabled, closing out the engagement summary for the previous screen. It can also be tracked manually to end the current screen without starting a new one.</p><p class="paragraph">After the screen ends, the screen and screen summary entities are no longer attached to subsequent events until the next <a href="../-screen-view/index.html">ScreenView</a>. The next <a href="../-screen-view/index.html">ScreenView</a> still references the ended screen in its previous screen fields and no further <a href="index.html">ScreenEnd</a> is tracked for it.</p><p class="paragraph">The event is not tracked if there is no current screen to end.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
