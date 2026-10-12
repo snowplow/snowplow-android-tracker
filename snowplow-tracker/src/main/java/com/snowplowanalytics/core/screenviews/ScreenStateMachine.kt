@@ -17,26 +17,30 @@ import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.statemachine.StateMachineInterface
 import com.snowplowanalytics.snowplow.event.Event
+import com.snowplowanalytics.snowplow.event.ScreenEnd
 import com.snowplowanalytics.snowplow.event.ScreenView
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.tracker.InspectableEvent
 
 class ScreenStateMachine : StateMachineInterface {
     /*
-     States: Init, Screen
-     Events: SV (ScreenView)
+     States: Init, Screen, EndedScreen
+     Events: SV (ScreenView), SE (ScreenEnd)
      Transitions:
       - Init (SV) Screen
       - Screen (SV) Screen
+      - Screen (SE) EndedScreen
+      - EndedScreen (SV) Screen
      Entity Generation:
       - Screen
+      - EndedScreen (only for the SE that ended the screen)
      */
 
     override val identifier: String
         get() = ID
     
     override val subscribedEventSchemasForTransitions: List<String>
-        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW)
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_VIEW, TrackerConstants.SCHEMA_SCREEN_END)
 
     override val subscribedEventSchemasForEntitiesGeneration: List<String>
         get() = listOf("*")
@@ -48,12 +52,16 @@ class ScreenStateMachine : StateMachineInterface {
         get() = emptyList()
 
     override val subscribedEventSchemasForFiltering: List<String>
-        get() = emptyList()
+        get() = listOf(TrackerConstants.SCHEMA_SCREEN_END)
 
     override val subscribedEventSchemasForEventsBefore: List<String>
         get() = emptyList()
 
     override fun transition(event: Event, state: State?): State? {
+        if (event is ScreenEnd) {
+            // keep the ended screen so that the next screen view can reference it as previous
+            return (state as? ScreenState)?.ended()
+        }
         return (event as? ScreenView)?.let { screenView ->
             ScreenState(
                 id = screenView.id,
@@ -72,6 +80,12 @@ class ScreenStateMachine : StateMachineInterface {
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) return ArrayList()
         val screenState = state as? ScreenState
+        when (screenState?.lifecycle) {
+            // only the screen end event is attributed to the ended screen
+            ScreenLifecycle.ENDING -> if (event.schema != TrackerConstants.SCHEMA_SCREEN_END) return null
+            ScreenLifecycle.ENDED -> return null
+            else -> {}
+        }
         val entity = screenState?.getCurrentScreen(true)
         return entity?.let { listOf(it) }
     }
@@ -100,6 +114,10 @@ class ScreenStateMachine : StateMachineInterface {
     }
 
     override fun filter(event: InspectableEvent, state: State?): Boolean? {
+        // only track the screen end event if it ended an active screen
+        if (event.schema == TrackerConstants.SCHEMA_SCREEN_END) {
+            return (state as? ScreenState)?.lifecycle == ScreenLifecycle.ENDING
+        }
         return null
     }
 

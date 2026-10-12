@@ -105,6 +105,107 @@ class ScreenSummaryStateMachineTest {
     }
 
     @Test
+    fun manualScreenEndKeepsTheScreenEntitiesOnTheScreenEndEvent() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(ScreenEnd())
+        Thread.sleep(200)
+
+        val screenEnd = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_SCREEN_END }
+        Assert.assertEquals(10.0, getScreenSummary(screenEnd)?.get("foreground_sec"))
+        Assert.assertEquals("Screen 1", getScreen(screenEnd)?.get("name"))
+    }
+
+    @Test
+    fun eventsAfterManualScreenEndHaveNoScreenEntities() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(ScreenEnd())
+        tracker.track(Structured("category", "action"))
+        tracker.track(Background())
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        val structured = events.find { it.name == TrackerConstants.EVENT_STRUCTURED }
+        Assert.assertNotNull(structured)
+        Assert.assertNull(getScreen(structured))
+
+        val background = events.find { it.schema == Background.schema }
+        Assert.assertNotNull(background)
+        Assert.assertNull(getScreen(background))
+        Assert.assertNull(getScreenSummary(background))
+    }
+
+    @Test
+    fun eventsTrackedBeforeManualScreenEndKeepTheScreenSummary() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        timeTraveler.travelBy(10.toDuration(DurationUnit.SECONDS))
+        tracker.track(Background())
+        tracker.track(ScreenEnd())
+        Thread.sleep(200)
+
+        val background = eventSink.trackedEvents.find { it.schema == Background.schema }
+        Assert.assertEquals(10.0, getScreenSummary(background)?.get("foreground_sec"))
+        Assert.assertEquals("Screen 1", getScreen(background)?.get("name"))
+    }
+
+    @Test
+    fun manualScreenEndFollowedByScreenViewDoesNotTrackAnotherScreenEnd() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(ScreenEnd())
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val events = eventSink.trackedEvents
+        Assert.assertEquals(1, events.count { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+        Assert.assertEquals(2, events.count { it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW })
+    }
+
+    @Test
+    fun repeatedManualScreenEndIsNotTracked() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(ScreenEnd())
+        tracker.track(ScreenEnd())
+        Thread.sleep(200)
+
+        Assert.assertEquals(1, eventSink.trackedEvents.count { it.schema == TrackerConstants.SCHEMA_SCREEN_END })
+    }
+
+    @Test
+    fun screenViewAfterManualScreenEndReferencesTheEndedScreenAsPrevious() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        val firstScreen = ScreenView(name = "Screen 1")
+        tracker.track(firstScreen)
+        tracker.track(ScreenEnd())
+        tracker.track(Structured("category", "action"))
+        tracker.track(ScreenView(name = "Screen 2"))
+        Thread.sleep(200)
+
+        val screenView = eventSink.trackedEvents.find {
+            it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && it.payload["name"] == "Screen 2"
+        }
+        Assert.assertEquals("Screen 1", screenView?.payload?.get("previousName"))
+        Assert.assertEquals(firstScreen.id, screenView?.payload?.get("previousId"))
+        Assert.assertEquals("Screen 2", getScreen(screenView)?.get("name"))
+    }
+
+    @Test
     fun updatesListMetrics() {
         val eventSink = EventSink()
         val tracker = createTracker(listOf(eventSink))
@@ -163,6 +264,11 @@ class ScreenSummaryStateMachineTest {
     private fun getScreenSummary(event: InspectableEvent?): Map<String, Any?>? {
         val entity = event?.entities?.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN_SUMMARY }
         return entity?.map?.get("data") as? Map<String, Any?>
+    }
+
+    private fun getScreen(event: InspectableEvent?): Map<*, *>? {
+        val entity = event?.entities?.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
+        return entity?.map?.get("data") as? Map<*, *>
     }
 
     private fun createTracker(configurations: List<Configuration>): TrackerController {

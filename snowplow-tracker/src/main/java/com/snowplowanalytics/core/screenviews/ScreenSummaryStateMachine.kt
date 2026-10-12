@@ -46,6 +46,10 @@ class ScreenSummaryStateMachine : StateMachineInterface {
         if (event is ScreenView) {
             return ScreenSummaryState()
         }
+        if (state is EndedScreenSummaryState) {
+            // the summary was already sent with a screen end event, a repeated screen end is not tracked
+            return if (event is ScreenEnd) null else state
+        }
         val screenSummaryState = state as ScreenSummaryState? ?: return null
         when (event) {
             is Foreground -> {
@@ -56,6 +60,8 @@ class ScreenSummaryStateMachine : StateMachineInterface {
             }
             is ScreenEnd -> {
                 screenSummaryState.updateForScreenEnd()
+                // a new state so that entities of events tracked before the screen end are not affected
+                return EndedScreenSummaryState(screenSummaryState.data)
             }
             is ListItemView -> {
                 screenSummaryState.updateWithListItemView(event)
@@ -68,12 +74,17 @@ class ScreenSummaryStateMachine : StateMachineInterface {
     }
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
-        val screenSummaryState = state as ScreenSummaryState? ?: return null
+        val data = when (state) {
+            is ScreenSummaryState -> state.data
+            // after the screen ended, the summary is no longer attached to foreground and background events
+            is EndedScreenSummaryState -> if (event.schema == TrackerConstants.SCHEMA_SCREEN_END) state.data else return null
+            else -> return null
+        }
 
         return listOf(
             SelfDescribingJson(
                 TrackerConstants.SCHEMA_SCREEN_SUMMARY,
-                screenSummaryState.data
+                data
             )
         )
     }
