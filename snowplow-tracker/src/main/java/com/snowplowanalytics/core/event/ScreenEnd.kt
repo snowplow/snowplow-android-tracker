@@ -15,6 +15,19 @@ package com.snowplowanalytics.snowplow.event
 import com.snowplowanalytics.core.constants.TrackerConstants
 import java.util.*
 
+/**
+ * Event tracked when a screen is no longer visible to the user.
+ *
+ * It is tracked automatically before each [ScreenView] event when screen engagement tracking is
+ * enabled, closing out the engagement summary for the previous screen. It can also be tracked
+ * manually to end the current screen without starting a new one.
+ *
+ * After the screen ends, the screen and screen summary entities are no longer attached to
+ * subsequent events until the next [ScreenView]. The next [ScreenView] still references the ended
+ * screen in its previous screen fields and no further [ScreenEnd] is tracked for it.
+ *
+ * The event is not tracked if there is no current screen to end.
+ */
 class ScreenEnd : AbstractSelfDescribing() {
 
     // Tracker methods
