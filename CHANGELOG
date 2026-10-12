@@ -1,6 +1,10 @@
+Version 6.4.2 (2026-10-12)
+--------------------------
+Stop attaching the ended screen's entities after a manual ScreenEnd (#743)
+
 Version 6.4.1 (2026-09-11)
 --------------------------
-Seed isVisible and background state from real process lifecycle [AISP-1708] (#740)
+Seed isVisible and background state from real process lifecycle (#740)
 
 Version 6.4.0 (2026-07-06)
 --------------------------
