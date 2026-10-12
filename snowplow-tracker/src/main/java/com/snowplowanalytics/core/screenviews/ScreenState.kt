@@ -17,8 +17,20 @@ import com.snowplowanalytics.core.constants.Parameters
 import com.snowplowanalytics.core.constants.TrackerConstants
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.core.utils.Util.uUIDString
+import com.snowplowanalytics.snowplow.event.ScreenEnd
 import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.payload.TrackerPayload
+
+/** Lifecycle of the current screen. */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+enum class ScreenLifecycle {
+    /** The screen is visible, its entity is attached to all events. */
+    ACTIVE,
+    /** The screen was just ended, its entity is attached only to the [ScreenEnd] event that ended it. */
+    ENDING,
+    /** The screen was ended earlier, its entity is no longer attached to events. */
+    ENDED
+}
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ScreenState(
@@ -30,7 +42,9 @@ class ScreenState(
     val fragmentTag: String? = null,
     val activityClassName: String? = null,
     val activityTag: String? = null,
-    val previousScreenState: ScreenState? = null
+    val previousScreenState: ScreenState? = null,
+    /** Whether the screen is still visible or was ended using a [ScreenEnd] event. */
+    val lifecycle: ScreenLifecycle = ScreenLifecycle.ACTIVE
 ) : State {
 
     val previousName: String?
@@ -40,6 +54,23 @@ class ScreenState(
     val previousType: String?
         get() { return previousScreenState?.type }
 
+    /**
+     * Returns a copy of the state for a screen that was ended by a [ScreenEnd] event.
+     * The first [ScreenEnd] moves the screen to [ScreenLifecycle.ENDING], any later one to [ScreenLifecycle.ENDED].
+     */
+    fun ended(): ScreenState {
+        return ScreenState(
+            name = name,
+            type = type,
+            id = id,
+            transitionType = transitionType,
+            fragmentClassName = fragmentClassName,
+            fragmentTag = fragmentTag,
+            activityClassName = activityClassName,
+            activityTag = activityTag,
+            lifecycle = if (lifecycle == ScreenLifecycle.ACTIVE) ScreenLifecycle.ENDING else ScreenLifecycle.ENDED
+        )
+    }
 
     fun getCurrentScreen(debug: Boolean): SelfDescribingJson {
         // this creates a screen context from screen state

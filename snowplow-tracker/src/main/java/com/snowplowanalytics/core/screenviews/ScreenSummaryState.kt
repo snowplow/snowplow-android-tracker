@@ -15,6 +15,7 @@ package com.snowplowanalytics.core.screenviews
 import androidx.annotation.RestrictTo
 import com.snowplowanalytics.core.statemachine.State
 import com.snowplowanalytics.snowplow.event.ListItemView
+import com.snowplowanalytics.snowplow.event.ScreenEnd
 import com.snowplowanalytics.snowplow.event.ScrollChanged
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -104,3 +105,7 @@ class ScreenSummaryState : State {
         var dateGenerator: () -> Long = { System.currentTimeMillis() }
     }
 }
+
+/** Final screen summary of a screen that was ended using a [ScreenEnd] event. */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+class EndedScreenSummaryState(val data: Map<String, Any?>) : State
