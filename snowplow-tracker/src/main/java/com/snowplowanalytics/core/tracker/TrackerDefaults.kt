@@ -28,6 +28,7 @@ object TrackerDefaults {
     var platformContext = true
     var deepLinkContext = true
     var screenContext = true
+    var screenContextFromEvent = false
     var applicationContext = true
     var exceptionAutotracking = true
     var diagnosticAutotracking = false

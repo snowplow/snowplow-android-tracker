@@ -36,6 +36,10 @@ class ScreenStateMachine : StateMachineInterface {
       - EndedScreen (only for the SE that ended the screen)
      */
 
+    /** Whether events that already carry a screen entity keep it instead of getting the current screen entity. */
+    @Volatile
+    var screenContextFromEvent = false
+
     override val identifier: String
         get() = ID
     
@@ -79,6 +83,8 @@ class ScreenStateMachine : StateMachineInterface {
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) return ArrayList()
+        // keep the screen entity attached by the caller rather than adding the current screen
+        if (screenContextFromEvent && event.entities.any { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }) return null
         val screenState = state as? ScreenState
         when (screenState?.lifecycle) {
             // only the screen end event is attributed to the ended screen
