@@ -77,6 +77,12 @@ interface TrackerConfigurationInterface {
     var screenContext: Boolean
 
     /**
+     * Whether events that already carry a screen entity keep it instead of getting the current screen entity.
+     * Only applies when screen context is enabled.
+     */
+    var screenContextFromEvent: Boolean
+
+    /**
      * Whether enable automatic tracking of ScreenView events.
      */
     var screenViewAutotracking: Boolean

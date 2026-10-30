@@ -116,6 +116,11 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         get() = _screenContext ?: sourceConfig?.screenContext ?: TrackerDefaults.screenContext
         set(value) { _screenContext = value }
 
+    private var _screenContextFromEvent: Boolean? = null
+    override var screenContextFromEvent: Boolean
+        get() = _screenContextFromEvent ?: sourceConfig?.screenContextFromEvent ?: TrackerDefaults.screenContextFromEvent
+        set(value) { _screenContextFromEvent = value }
+
     private var _screenViewAutotracking: Boolean? = null
     override var screenViewAutotracking: Boolean
         get() = _screenViewAutotracking ?: sourceConfig?.screenViewAutotracking ?: TrackerDefaults.screenViewAutotracking
@@ -270,6 +275,15 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     }
 
     /**
+     * Whether events that already carry a screen entity keep it instead of getting the current screen entity.
+     * Only applies when screen context is enabled.
+     */
+    fun screenContextFromEvent(screenContextFromEvent: Boolean): TrackerConfiguration {
+        this.screenContextFromEvent = screenContextFromEvent
+        return this
+    }
+
+    /**
      * Whether to enable automatic tracking of ScreenView events. 
      * Note that this automatic tracking relies on the Android 
      * `Application.ActivityLifecycleCallbacks` interface, and therefore only works with Activity-based
@@ -376,6 +390,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
             .platformContext(platformContext)
             .geoLocationContext(geoLocationContext)
             .screenContext(screenContext)
+            .screenContextFromEvent(screenContextFromEvent)
             .deepLinkContext(deepLinkContext)
             .screenViewAutotracking(screenViewAutotracking)
             .screenEngagementAutotracking(screenEngagementAutotracking)
@@ -429,6 +444,7 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
         if (jsonObject.has("platformContext")) { _platformContext = jsonObject.getBoolean("platformContext") }
         if (jsonObject.has("geoLocationContext")) { _geoLocationContext = jsonObject.getBoolean("geoLocationContext") }
         if (jsonObject.has("screenContext")) { _screenContext = jsonObject.getBoolean("screenContext") }
+        if (jsonObject.has("screenContextFromEvent")) { _screenContextFromEvent = jsonObject.getBoolean("screenContextFromEvent") }
         if (jsonObject.has("deepLinkContext")) { _deepLinkContext = jsonObject.getBoolean("deepLinkContext") }
         if (jsonObject.has("screenViewAutotracking")) { _screenViewAutotracking = jsonObject.getBoolean("screenViewAutotracking") }
         if (jsonObject.has("screenEngagementAutotracking")) { _screenEngagementAutotracking = jsonObject.getBoolean("screenEngagementAutotracking") }

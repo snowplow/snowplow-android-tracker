@@ -241,6 +241,13 @@ class TrackerControllerImpl  // Constructors
             dirtyConfig.screenContext = screenContext
             tracker.screenContext = screenContext
         }
+
+    override var screenContextFromEvent: Boolean
+        get() = tracker.screenContextFromEvent
+        set(screenContextFromEvent) {
+            dirtyConfig.screenContextFromEvent = screenContextFromEvent
+            tracker.screenContextFromEvent = screenContextFromEvent
+        }
     
     override var screenViewAutotracking: Boolean
         get() = tracker.screenViewAutotracking
