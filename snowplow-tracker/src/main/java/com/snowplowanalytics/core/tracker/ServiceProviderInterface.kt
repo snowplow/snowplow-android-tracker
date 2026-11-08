@@ -19,6 +19,7 @@ import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
 import com.snowplowanalytics.snowplow.configuration.PluginIdentifiable
 import com.snowplowanalytics.snowplow.media.controller.MediaController
+import com.snowplowanalytics.core.signals.SignalsControllerImpl
 import com.snowplowanalytics.snowplow.configuration.*
 
 interface ServiceProviderInterface {
@@ -41,6 +42,7 @@ interface ServiceProviderInterface {
     val pluginsController: PluginsControllerImpl
     val mediaController: MediaController
     val ecommerceController: EcommerceControllerImpl
+    val signalsController: SignalsControllerImpl
 
     // Configuration Updates
     val trackerConfiguration: TrackerConfiguration
@@ -49,6 +51,7 @@ interface ServiceProviderInterface {
     val emitterConfiguration: EmitterConfiguration
     val sessionConfiguration: SessionConfiguration
     val gdprConfiguration: GdprConfiguration
+    val signalsConfiguration: SignalsConfiguration?
 
     // Plugins
     val pluginConfigurations: List<PluginIdentifiable>

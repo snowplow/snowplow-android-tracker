@@ -21,6 +21,7 @@ import com.snowplowanalytics.core.gdpr.GdprControllerImpl
 import com.snowplowanalytics.core.globalcontexts.GlobalContextsControllerImpl
 import com.snowplowanalytics.core.media.controller.MediaControllerImpl
 import com.snowplowanalytics.core.session.SessionControllerImpl
+import com.snowplowanalytics.core.signals.SignalsControllerImpl
 import com.snowplowanalytics.snowplow.configuration.*
 import com.snowplowanalytics.snowplow.media.controller.MediaController
 import java.util.concurrent.TimeUnit
@@ -57,6 +58,9 @@ class ServiceProvider(
     override val mediaController: MediaController by lazy {
         MediaControllerImpl(this)
     }
+    override val signalsController: SignalsControllerImpl by lazy {
+        SignalsControllerImpl(this)
+    }
 
     // Configurations
     override var trackerConfiguration: TrackerConfiguration
@@ -65,6 +69,7 @@ class ServiceProvider(
     override var emitterConfiguration: EmitterConfiguration
     override var sessionConfiguration: SessionConfiguration
     override var gdprConfiguration: GdprConfiguration
+    override var signalsConfiguration: SignalsConfiguration? = null
     override var pluginConfigurations: MutableList<PluginIdentifiable> = ArrayList()
         private set
 
@@ -125,6 +130,9 @@ class ServiceProvider(
                 is GdprConfiguration -> {
                     gdprConfiguration.sourceConfig = configuration
                 }
+                is SignalsConfiguration -> {
+                    signalsConfiguration = configuration
+                }
                 is GlobalContextsConfiguration -> {
                     for (plugin in configuration.toPluginConfigurations()) {
                         pluginConfigurations.add(plugin)
@@ -165,6 +173,7 @@ class ServiceProvider(
         emitterConfiguration.sourceConfig = null
         sessionConfiguration.sourceConfig = null
         gdprConfiguration.sourceConfig = null
+        signalsConfiguration = null
     }
 
     private fun initializeConfigurationUpdates() {
@@ -174,6 +183,7 @@ class ServiceProvider(
         subjectConfiguration = SubjectConfiguration()
         sessionConfiguration = SessionConfiguration()
         gdprConfiguration = GdprConfiguration()
+        signalsConfiguration = null
     }
 
     // Getters
