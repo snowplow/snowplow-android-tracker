@@ -20,6 +20,7 @@ import com.snowplowanalytics.core.emitter.Executor
 import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
 import com.snowplowanalytics.snowplow.configuration.Configuration
+import com.snowplowanalytics.snowplow.tracker.LogLevel
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.SignalsConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
@@ -137,6 +138,23 @@ class ServiceAttributesTest {
         assertFalse(result.isSuccess)
         assertNull(result.attributes)
         assertEquals(SignalsError(404, "service not found"), result.error)
+    }
+
+    @Test
+    fun surfacesErrorMessageContainingPercentSignWithLoggingOn() {
+        // Arrange
+        enqueue(400, """{"error": "100% invalid identifier"}""")
+        val tracker = createTracker(
+            SignalsConfiguration(endpoint),
+            TrackerConfiguration("app-id").logLevel(LogLevel.DEBUG)
+        )
+        tracker.track(Structured("cat", "act"))
+
+        // Act
+        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+
+        // Assert
+        assertEquals(SignalsError(400, "100% invalid identifier"), result.error)
     }
 
     @Test

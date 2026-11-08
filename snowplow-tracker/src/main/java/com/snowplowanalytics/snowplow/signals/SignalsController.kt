@@ -61,4 +61,26 @@ interface SignalsController {
         identifier: String?,
         callback: Consumer<ServiceAttributesResult>
     )
+
+    /**
+     * Starts calling the handler with interventions Signals sends for the current user and session.
+     * Adding a handler with an existing ID replaces it.
+     *
+     * The tracker subscribes to interventions while at least one handler is registered and the app is
+     * in the foreground, using `client_session_user_id` and `client_session_session_id` from the session.
+     * It subscribes after the first event is tracked, and resubscribes when the session changes.
+     * Each intervention is tracked as an `intervention_receive` event, and each handler's outcome as
+     * `intervention_handle` or `intervention_handle_error`.
+     *
+     * @param id Identifies the handler, e.g. to remove it later.
+     * @param handler Called on the main thread with each intervention.
+     */
+    fun addInterventionHandler(id: String, handler: InterventionHandler)
+
+    /**
+     * Stops calling the handler with the given ID. Unsubscribes when no handlers are left.
+     *
+     * @param id ID the handler was added with.
+     */
+    fun removeInterventionHandler(id: String)
 }

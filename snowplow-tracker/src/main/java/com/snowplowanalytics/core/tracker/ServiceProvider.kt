@@ -58,9 +58,8 @@ class ServiceProvider(
     override val mediaController: MediaController by lazy {
         MediaControllerImpl(this)
     }
-    override val signalsController: SignalsControllerImpl by lazy {
-        SignalsControllerImpl(this)
-    }
+    private val signalsControllerLazy = lazy { SignalsControllerImpl(this, context) }
+    override val signalsController: SignalsControllerImpl by signalsControllerLazy
 
     // Configurations
     override var trackerConfiguration: TrackerConfiguration
@@ -97,11 +96,13 @@ class ServiceProvider(
         processConfigurations(configurations)
         resetServices()
         getOrMakeTracker()
+        if (signalsControllerLazy.isInitialized()) signalsController.restart()
     }
 
     @Synchronized
     fun shutdown() {
         tracker?.pauseEventTracking()
+        if (signalsControllerLazy.isInitialized()) signalsController.close()
         stopServices()
         resetServices()
         resetControllers()
@@ -132,6 +133,11 @@ class ServiceProvider(
                 }
                 is SignalsConfiguration -> {
                     signalsConfiguration = configuration
+                    pluginConfigurations.removeAll { it.identifier == SignalsControllerImpl.PLUGIN_IDENTIFIER }
+                    pluginConfigurations.add(
+                        PluginConfiguration(SignalsControllerImpl.PLUGIN_IDENTIFIER)
+                            .afterTrack { signalsController.onEventTracked(it) }
+                    )
                 }
                 is GlobalContextsConfiguration -> {
                     for (plugin in configuration.toPluginConfigurations()) {
