@@ -275,8 +275,12 @@ open class TrackerConfiguration : TrackerConfigurationInterface, Configuration {
     }
 
     /**
-     * Whether events that already carry a screen entity keep it instead of getting the current screen entity.
+     * Whether events tracked with their own screen entity keep it instead of getting the current screen entity.
      * Only applies when screen context is enabled.
+     *
+     * Only entities attached to the event are checked, not those added by global contexts or plugins.
+     * Screen view and screen end events always get the screen they describe.
+     * Web view events that carry the web tracker's screen entity don't get the native screen entity.
      */
     fun screenContextFromEvent(screenContextFromEvent: Boolean): TrackerConfiguration {
         this.screenContextFromEvent = screenContextFromEvent
