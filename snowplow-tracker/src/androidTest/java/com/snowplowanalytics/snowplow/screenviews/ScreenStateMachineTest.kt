@@ -21,9 +21,11 @@ import com.snowplowanalytics.snowplow.Snowplow
 import com.snowplowanalytics.snowplow.Snowplow.removeAllTrackers
 import com.snowplowanalytics.snowplow.configuration.Configuration
 import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
+import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
 import com.snowplowanalytics.snowplow.event.*
 import com.snowplowanalytics.snowplow.network.HttpMethod
+import com.snowplowanalytics.snowplow.payload.SelfDescribingJson
 import com.snowplowanalytics.snowplow.util.EventSink
 import org.junit.After
 import org.junit.Assert
@@ -81,6 +83,184 @@ class ScreenStateMachineTest {
         Assert.assertEquals("Screen 3", screen3?.get("name"))
     }
 
+    @Test
+    fun keepsTheScreenEntityAttachedByTheCaller() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+
+        val callerScreenId = UUID.randomUUID().toString()
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(ScreenView(name = "Screen 2"))
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(callerScreenEntity("Screen 1", callerScreenId)))
+        )
+
+        Thread.sleep(200)
+
+        val timing = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNotNull(timing)
+        val screens = getAllScreenEntityData(timing)
+        Assert.assertEquals(1, screens.size)
+        Assert.assertEquals("Screen 1", screens[0]["name"])
+        Assert.assertEquals(callerScreenId, screens[0]["id"])
+    }
+
+    @Test
+    fun doesNotDuplicateTheScreenEntityAttachedByTheCaller() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+
+        tracker.track(
+            Structured(category = "before", action = "a")
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            Structured(category = "during", action = "a")
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+
+        Thread.sleep(200)
+
+        val eventsWithCallerScreen = eventSink.trackedEvents.filter {
+            it.schema == TrackerConstants.SCHEMA_USER_TIMINGS || it.name == TrackerConstants.EVENT_STRUCTURED
+        }
+        Assert.assertEquals(3, eventsWithCallerScreen.size)
+        for (event in eventsWithCallerScreen) {
+            val screens = getAllScreenEntityData(event)
+            Assert.assertEquals(1, screens.size)
+            Assert.assertEquals("Screen A", screens[0]["name"])
+        }
+    }
+
+    @Test
+    fun attachesTheCurrentScreenWhenTheCallerDoesNotAttachOne() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(ScreenView(name = "Screen 2"))
+        tracker.track(Timing(category = "c1", variable = "v1", timing = 1))
+
+        Thread.sleep(200)
+
+        val timing = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNotNull(timing)
+        val screens = getAllScreenEntityData(timing)
+        Assert.assertEquals(1, screens.size)
+        Assert.assertEquals("Screen 2", screens[0]["name"])
+    }
+
+    @Test
+    fun screenEndKeepsTheEndingScreenAfterEventsWithCallerScreenEntities() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+        tracker.track(ScreenView(name = "Screen 2"))
+        tracker.track(ScreenEnd())
+
+        Thread.sleep(200)
+
+        val screenEnds = eventSink.trackedEvents.filter { it.schema == TrackerConstants.SCHEMA_SCREEN_END }
+            .map { getAllScreenEntityData(it) }
+        Assert.assertEquals(2, screenEnds.size)
+        for (screens in screenEnds) {
+            Assert.assertEquals(1, screens.size)
+        }
+        Assert.assertEquals(setOf("Screen 1", "Screen 2"), screenEnds.map { it[0]["name"] }.toSet())
+    }
+
+    @Test
+    fun addsTheCurrentScreenToEventsWithACallerScreenEntityByDefault() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+
+        Thread.sleep(200)
+
+        val timing = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNotNull(timing)
+        val screens = getAllScreenEntityData(timing)
+        Assert.assertEquals(setOf("Screen A", "Screen 1"), screens.map { it["name"] }.toSet())
+    }
+
+    @Test
+    fun keepsTheCallerScreenEntityAfterEnablingScreenContextFromEventAtRuntime() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink))
+        tracker.screenContextFromEvent = true
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+
+        Thread.sleep(200)
+
+        Assert.assertTrue(tracker.screenContextFromEvent)
+        val timing = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNotNull(timing)
+        val screens = getAllScreenEntityData(timing)
+        Assert.assertEquals(1, screens.size)
+        Assert.assertEquals("Screen A", screens[0]["name"])
+    }
+
+    @Test
+    fun keepsTheCallerScreenEntityOfAnotherVersion() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+        val otherVersion = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-0-1"
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            Timing(category = "c1", variable = "v1", timing = 1)
+                .entities(listOf(SelfDescribingJson(otherVersion, mapOf("name" to "Screen A", "id" to UUID.randomUUID().toString()))))
+        )
+
+        Thread.sleep(200)
+
+        val timing = eventSink.trackedEvents.find { it.schema == TrackerConstants.SCHEMA_USER_TIMINGS }
+        Assert.assertNotNull(timing)
+        Assert.assertEquals(0, getAllScreenEntityData(timing).size)
+        Assert.assertEquals(1, timing!!.entities.count { it.map["schema"] == otherVersion })
+    }
+
+    @Test
+    fun screenViewKeepsItsOwnScreenEntityWithACallerScreenEntity() {
+        val eventSink = EventSink()
+        val tracker = createTracker(listOf(eventSink, TrackerConfiguration("appId").screenContextFromEvent(true)))
+
+        tracker.track(ScreenView(name = "Screen 1"))
+        tracker.track(
+            ScreenView(name = "Screen 2")
+                .entities(listOf(callerScreenEntity("Screen A", UUID.randomUUID().toString())))
+        )
+
+        Thread.sleep(200)
+
+        val screenView = eventSink.trackedEvents.find {
+            it.schema == TrackerConstants.SCHEMA_SCREEN_VIEW && it.payload["name"] == "Screen 2"
+        }
+        Assert.assertNotNull(screenView)
+        Assert.assertEquals(setOf("Screen A", "Screen 2"), getAllScreenEntityData(screenView).map { it["name"] }.toSet())
+    }
+
     // --- PRIVATE
     private val context: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
@@ -88,6 +268,15 @@ class ScreenStateMachineTest {
     private fun getScreenEntityData(event: InspectableEvent): Map<*, *>? {
         val entity = event.entities.find { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
         return entity?.map?.get("data") as? Map<*, *>
+    }
+
+    private fun getAllScreenEntityData(event: InspectableEvent?): List<Map<*, *>> {
+        return event?.entities.orEmpty().filter { it.map["schema"] == TrackerConstants.SCHEMA_SCREEN }
+            .mapNotNull { it.map["data"] as? Map<*, *> }
+    }
+
+    private fun callerScreenEntity(name: String, id: String): SelfDescribingJson {
+        return SelfDescribingJson(TrackerConstants.SCHEMA_SCREEN, mapOf("name" to name, "id" to id))
     }
 
     private fun createTracker(configurations: List<Configuration>): TrackerController {

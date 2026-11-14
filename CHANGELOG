@@ -1,3 +1,7 @@
+Version 6.5.0 (2026-11-14)
+--------------------------
+Add screenContextFromEvent option to keep a caller-supplied screen entity (close #745)
+
 Version 6.4.2 (2026-10-12)
 --------------------------
 Stop attaching the ended screen's entities after a manual ScreenEnd (#743)
