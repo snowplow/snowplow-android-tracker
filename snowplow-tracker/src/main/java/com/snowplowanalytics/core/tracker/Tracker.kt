@@ -289,16 +289,24 @@ class Tracker(
             }
         }
 
+    // one instance so that runtime changes to screenContextFromEvent reach the registered state machine
+    private val screenStateMachine = ScreenStateMachine()
+
     /** Internal use only  */
     var screenContext = false
         set(screenContext) {
             field = screenContext
             if (screenContext) {
-                addOrReplaceStateMachine(ScreenStateMachine())
+                addOrReplaceStateMachine(screenStateMachine)
             } else {
                 removeStateMachine(ScreenStateMachine.ID)
             }
         }
+
+    /** Internal use only  */
+    var screenContextFromEvent: Boolean
+        get() = screenStateMachine.screenContextFromEvent
+        set(value) { screenStateMachine.screenContextFromEvent = value }
     
     var gdprContext: Gdpr? = null
     

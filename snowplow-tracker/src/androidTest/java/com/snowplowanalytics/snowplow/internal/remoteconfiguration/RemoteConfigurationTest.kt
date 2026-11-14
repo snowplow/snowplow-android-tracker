@@ -37,6 +37,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 class RemoteConfigurationTest {
     @Test
     @Throws(JSONException::class)
+    fun testScreenContextFromEventFromJSONAndCopy() {
+        val fromJson = TrackerConfiguration("appId", JSONObject("{\"screenContextFromEvent\":true}"))
+        Assert.assertTrue(fromJson.screenContextFromEvent)
+        Assert.assertTrue((fromJson.copy() as TrackerConfiguration).screenContextFromEvent)
+        Assert.assertFalse(TrackerConfiguration("appId", JSONObject("{}")).screenContextFromEvent)
+    }
+
+    @Test
+    @Throws(JSONException::class)
     fun testJSONToConfigurations() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val config =

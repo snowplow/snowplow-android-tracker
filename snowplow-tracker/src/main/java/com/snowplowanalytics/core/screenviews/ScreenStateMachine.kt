@@ -36,6 +36,10 @@ class ScreenStateMachine : StateMachineInterface {
       - EndedScreen (only for the SE that ended the screen)
      */
 
+    /** Whether events tracked with their own screen entity keep it instead of getting the current screen entity. */
+    @Volatile
+    var screenContextFromEvent = false
+
     override val identifier: String
         get() = ID
     
@@ -79,6 +83,8 @@ class ScreenStateMachine : StateMachineInterface {
 
     override fun entities(event: InspectableEvent, state: State?): List<SelfDescribingJson>? {
         if (state == null) return ArrayList()
+        // keep the screen entity attached by the caller rather than adding the current screen
+        if (screenContextFromEvent && hasScreenEntity(event)) return null
         val screenState = state as? ScreenState
         when (screenState?.lifecycle) {
             // only the screen end event is attributed to the ended screen
@@ -125,8 +131,21 @@ class ScreenStateMachine : StateMachineInterface {
         return null
     }
 
+    /**
+     * Whether the event was tracked with its own screen entity, of any 1-x-x version.
+     * Screen view and screen end events always keep the screen they describe.
+     */
+    private fun hasScreenEntity(event: InspectableEvent): Boolean {
+        if (event.schema == TrackerConstants.SCHEMA_SCREEN_VIEW || event.schema == TrackerConstants.SCHEMA_SCREEN_END) {
+            return false
+        }
+        return event.entities.any { (it.map["schema"] as? String)?.startsWith(SCREEN_SCHEMA_PREFIX) == true }
+    }
+
     companion object {
         val ID: String
             get() = "ScreenContext"
+
+        private const val SCREEN_SCHEMA_PREFIX = "iglu:com.snowplowanalytics.mobile/screen/jsonschema/1-"
     }
 }
