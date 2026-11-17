@@ -31,6 +31,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".SignalsActivity"
+            android:exported="true"
+            android:label="Signals Demo" />
+        <activity
             android:name=".Demo"
             android:label="@string/title_activity_demo"
             android:screenOrientation="fullSensor"></activity>

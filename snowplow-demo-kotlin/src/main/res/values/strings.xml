@@ -13,6 +13,7 @@
     <string name="link_repo">- Github Repository</string>
 
     <string name="main_demo_button">Tracker Demo</string>
+    <string name="main_signals_button">Signals Demo</string>
 
     <string name="title_activity_demo">Tracker Demo</string>
     <string name="demo_header">Tracker Demo (Kotlin) </string>
