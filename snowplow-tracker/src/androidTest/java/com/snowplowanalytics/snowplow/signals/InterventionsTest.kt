@@ -37,7 +37,6 @@ import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -178,24 +177,23 @@ class InterventionsTest {
     @Test
     fun resubscribesWhenSessionChanges() {
         // Arrange
-        enqueueOpenStream()
-        enqueueOpenStream()
+        repeat(4) { enqueueOpenStream() }
         val tracker = createTracker(SignalsConfiguration(endpoint))
         tracker.track(Structured("cat", "act"))
         tracker.signals.addInterventionHandler("handler") {}
-        val first = takeRequest()!!
+        val firstSessionId = takeRequest()!!.url.queryParameter("client_session_session_id")
 
         // Act
         tracker.session!!.startNewSession()
         tracker.track(Structured("cat", "act"))
 
         // Assert
-        val second = takeRequest()!!
-        assertNotEquals(
-            first.url.queryParameter("client_session_session_id"),
-            second.url.queryParameter("client_session_session_id")
-        )
-        assertEquals(tracker.session?.sessionId, second.url.queryParameter("client_session_session_id"))
+        // A reconnect with the first session's identifiers may arrive before the resubscription.
+        val resubscription = generateSequence { takeRequest() }
+            .take(3)
+            .firstOrNull { it.url.queryParameter("client_session_session_id") != firstSessionId }
+        assertNotNull(resubscription)
+        assertEquals(tracker.session?.sessionId, resubscription!!.url.queryParameter("client_session_session_id"))
     }
 
     @Test
