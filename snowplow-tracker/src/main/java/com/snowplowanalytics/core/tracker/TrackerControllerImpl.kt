@@ -22,6 +22,7 @@ import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.*
 import com.snowplowanalytics.snowplow.event.Event
 import com.snowplowanalytics.snowplow.media.controller.MediaController
+import com.snowplowanalytics.snowplow.signals.SignalsController
 import com.snowplowanalytics.snowplow.tracker.BuildConfig
 import com.snowplowanalytics.snowplow.tracker.CrossDeviceParameterConfiguration
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform
@@ -57,6 +58,9 @@ class TrackerControllerImpl  // Constructors
         get() = serviceProvider.pluginsController
     override val media: MediaController
         get() = serviceProvider.mediaController
+
+    override val signals: SignalsController
+        get() = serviceProvider.signalsController
 
     // Control methods
     override fun pause() {

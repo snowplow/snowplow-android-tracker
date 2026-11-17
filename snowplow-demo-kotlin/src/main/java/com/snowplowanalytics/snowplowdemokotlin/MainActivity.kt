@@ -43,6 +43,10 @@ class MainActivity : Activity() {
             startActivity(intent)
         }
 
+        findViewById<Button>(R.id.btn_signals).setOnClickListener {
+            startActivity(Intent(this@MainActivity, SignalsActivity::class.java))
+        }
+
         // Setup Hyperlinks
 
         val link1 = findViewById<View>(R.id.link_tech_docs) as TextView
