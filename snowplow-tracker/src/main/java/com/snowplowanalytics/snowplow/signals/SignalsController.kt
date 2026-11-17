@@ -16,49 +16,29 @@ package com.snowplowanalytics.snowplow.signals
 import androidx.core.util.Consumer
 
 /**
- * Reads attributes from Snowplow Signals for the current user or session.
+ * Reads attributes from, and receives interventions from, Snowplow Signals.
  * Available as `tracker.signals`; requires a [com.snowplowanalytics.snowplow.configuration.SignalsConfiguration].
  */
 interface SignalsController {
 
     /**
-     * Reads the attributes of a public Signals service for the current user,
-     * keyed on [SignalsAttributeKeys.CLIENT_SESSION_USER_ID] (`tracker.session.userId`).
-     *
-     * @param service Name of the service, which must be public in Signals.
-     * @param callback Called on a background thread with the result.
-     */
-    fun getServiceAttributes(service: String, callback: Consumer<ServiceAttributesResult>)
-
-    /**
-     * Reads the attributes of a public Signals service for the given attribute key.
-     * The identifier is filled in for [SignalsAttributeKeys.CLIENT_SESSION_USER_ID] (`tracker.session.userId`)
-     * and [SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID] (`tracker.session.sessionId`).
-     * Other attribute keys need an explicit identifier.
-     *
-     * @param service Name of the service, which must be public in Signals.
-     * @param attributeKey Name of the attribute key to read the attributes for.
-     * @param callback Called on a background thread with the result.
-     */
-    fun getServiceAttributes(
-        service: String,
-        attributeKey: String,
-        callback: Consumer<ServiceAttributesResult>
-    )
-
-    /**
      * Reads the attributes of a public Signals service for the given attribute key and identifier.
+     * Makes `GET {endpoint}/api/v1/services/{service}?{attributeKey}={identifier}` without credentials.
+     *
+     * To read by the identifiers of the session context entity, pass
+     * [SignalsAttributeKeys.CLIENT_SESSION_USER_ID] with `tracker.session?.userId`, or
+     * [SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID] with `tracker.session?.sessionId`
+     * (created on the first tracked event).
      *
      * @param service Name of the service, which must be public in Signals.
-     * @param attributeKey Name of the attribute key to read the attributes for.
-     * @param identifier Value of the attribute key, a UUID. If null, it is filled in for the
-     * [SignalsAttributeKeys] built-in keys from the current session.
+     * @param attributeKey Name of the attribute key the service's attributes are calculated for.
+     * @param identifier Value of the attribute key to read the attributes for.
      * @param callback Called on a background thread with the result.
      */
     fun getServiceAttributes(
         service: String,
         attributeKey: String,
-        identifier: String?,
+        identifier: String,
         callback: Consumer<ServiceAttributesResult>
     )
 

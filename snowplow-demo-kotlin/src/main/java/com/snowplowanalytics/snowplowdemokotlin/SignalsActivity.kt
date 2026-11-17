@@ -64,8 +64,12 @@ class SignalsActivity : Activity() {
         button(layout, "Create tracker") { createTracker() }
         button(layout, "Track screen view") { track { ScreenView("signals_demo") } }
         button(layout, "Track structured event") { track { Structured("signals_demo", "tap") } }
-        button(layout, "Read attributes (user)") { read(SignalsAttributeKeys.CLIENT_SESSION_USER_ID) }
-        button(layout, "Read attributes (session)") { read(SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID) }
+        button(layout, "Read attributes (user)") {
+            read(SignalsAttributeKeys.CLIENT_SESSION_USER_ID) { it.session?.userId }
+        }
+        button(layout, "Read attributes (session)") {
+            read(SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID) { it.session?.sessionId }
+        }
         val handlerButton = button(layout, "Add intervention handler") {}
         handlerButton.setOnClickListener {
             toggleHandler()
@@ -98,10 +102,11 @@ class SignalsActivity : Activity() {
         append("Tracked event. sessionId=${tracker.session?.sessionId}")
     }
 
-    private fun read(attributeKey: String) {
+    private fun read(attributeKey: String, identifier: (TrackerController) -> String?) {
         val tracker = tracker ?: return
         val service = serviceField.text.toString()
-        tracker.signals.getServiceAttributes(service, attributeKey) { result: ServiceAttributesResult ->
+        val id = identifier(tracker) ?: return append("No $attributeKey yet. Track an event first.")
+        tracker.signals.getServiceAttributes(service, attributeKey, id) { result: ServiceAttributesResult ->
             runOnUiThread {
                 if (result.isSuccess) {
                     append("Attributes of $service by $attributeKey: ${result.attributes}")

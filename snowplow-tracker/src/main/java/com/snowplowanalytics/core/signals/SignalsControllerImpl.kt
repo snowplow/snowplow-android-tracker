@@ -76,22 +76,10 @@ class SignalsControllerImpl(
 
     // Service attributes
 
-    override fun getServiceAttributes(service: String, callback: Consumer<ServiceAttributesResult>) {
-        getServiceAttributes(service, SignalsAttributeKeys.CLIENT_SESSION_USER_ID, null, callback)
-    }
-
     override fun getServiceAttributes(
         service: String,
         attributeKey: String,
-        callback: Consumer<ServiceAttributesResult>
-    ) {
-        getServiceAttributes(service, attributeKey, null, callback)
-    }
-
-    override fun getServiceAttributes(
-        service: String,
-        attributeKey: String,
-        identifier: String?,
+        identifier: String,
         callback: Consumer<ServiceAttributesResult>
     ) {
         Executor.execute(TAG) {
@@ -102,19 +90,15 @@ class SignalsControllerImpl(
     private fun fetchServiceAttributes(
         service: String,
         attributeKey: String,
-        identifier: String?
+        identifier: String
     ): ServiceAttributesResult {
         val configuration = configuration ?: return failure(0, NOT_CONFIGURED)
-
-        val resolvedIdentifier = identifier ?: identifierFromSession(attributeKey).getOrElse {
-            return failure(0, it.message ?: "No identifier for attribute key '$attributeKey'.")
-        }
 
         val url = buildUrl(configuration.endpoint)
             ?.newBuilder()
             ?.addPathSegments(SERVICES_PATH)
             ?.addPathSegment(service)
-            ?.addQueryParameter(attributeKey, resolvedIdentifier)
+            ?.addQueryParameter(attributeKey, identifier)
             ?.build()
             ?: return failure(0, "Invalid Signals endpoint: ${configuration.endpoint}")
 
@@ -297,20 +281,10 @@ class SignalsControllerImpl(
     // Identifiers
 
     /**
-     * Reads the value of a built-in attribute key from the current session.
+     * Reads the value of a built-in attribute key from the current session, to subscribe to interventions.
      * Fails if the session is disabled, user anonymisation is on, or no session has started yet.
      */
     internal fun identifierFromSession(attributeKey: String): Result<String> {
-        if (attributeKey != SignalsAttributeKeys.CLIENT_SESSION_USER_ID &&
-            attributeKey != SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID
-        ) {
-            return Result.failure(IllegalArgumentException(
-                "No identifier given for attribute key '$attributeKey'. Only " +
-                    "'${SignalsAttributeKeys.CLIENT_SESSION_USER_ID}' and " +
-                    "'${SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID}' are filled in from the session."
-            ))
-        }
-
         val trackerController = serviceProvider.getOrMakeTrackerController()
         if (trackerController.userAnonymisation) {
             return Result.failure(IllegalStateException(
@@ -328,7 +302,7 @@ class SignalsControllerImpl(
         }
         if (value.isNullOrEmpty()) {
             return Result.failure(IllegalStateException(
-                "No session has started yet. Track an event before reading from Signals."
+                "No session has started yet. Track an event before subscribing to Signals."
             ))
         }
         return Result.success(value)
