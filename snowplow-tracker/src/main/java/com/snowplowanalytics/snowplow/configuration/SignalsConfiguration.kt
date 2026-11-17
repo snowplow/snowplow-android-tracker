@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  * Configures the tracker to read attributes from, and receive interventions from, Snowplow Signals.
  * Pass it to [com.snowplowanalytics.snowplow.Snowplow.createTracker] to enable `tracker.signals`.
  *
- * Signals is read with the user and session identifiers from the `client_session` entity,
+ * Interventions are received for the user and session identifiers from the `client_session` entity,
  * so session tracking must be enabled (default) and user anonymisation turned off.
  *
  * @param endpoint The Signals API endpoint, e.g. `https://signals.example.com`. `https://` is assumed if the scheme is omitted.
