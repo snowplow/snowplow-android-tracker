@@ -14,7 +14,7 @@
 package com.snowplowanalytics.snowplow.signals
 
 /**
- * Names of the attribute keys built into Signals that the tracker can fill in from the `client_session` entity.
+ * Names of the attribute keys built into Signals that are calculated from the `client_session` entity.
  */
 object SignalsAttributeKeys {
     /** The `userId` in the `client_session` entity, i.e. `tracker.session.userId`. */

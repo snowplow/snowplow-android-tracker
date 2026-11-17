@@ -25,7 +25,6 @@ import com.snowplowanalytics.snowplow.configuration.NetworkConfiguration
 import com.snowplowanalytics.snowplow.configuration.SignalsConfiguration
 import com.snowplowanalytics.snowplow.configuration.TrackerConfiguration
 import com.snowplowanalytics.snowplow.controller.TrackerController
-import com.snowplowanalytics.snowplow.event.Structured
 import com.snowplowanalytics.snowplow.network.HttpMethod
 import com.snowplowanalytics.snowplow.tracker.MockNetworkConnection
 import mockwebserver3.MockResponse
@@ -63,14 +62,16 @@ class ServiceAttributesTest {
     }
 
     @Test
-    fun readsAttributesForCurrentUser() {
+    fun readsAttributesForSessionUserId() {
         // Arrange
         enqueue(200, """{"attributes": {"page_views": 3, "last_page": null, "pages": ["a", "b"]}}""")
         val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
+        val userId = tracker.session!!.userId
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+        val result = await {
+            tracker.signals.getServiceAttributes("my_service", SignalsAttributeKeys.CLIENT_SESSION_USER_ID, userId, it)
+        }
 
         // Assert
         assertTrue(result.isSuccess)
@@ -81,27 +82,8 @@ class ServiceAttributesTest {
         val request = server.takeRequest()
         assertEquals("GET", request.method)
         assertEquals("/api/v1/services/my_service", request.url.encodedPath)
-        assertEquals(tracker.session?.userId, request.url.queryParameter("client_session_user_id"))
+        assertEquals(userId, request.url.queryParameter("client_session_user_id"))
         assertEquals(1, request.url.querySize)
-    }
-
-    @Test
-    fun readsAttributesForCurrentSession() {
-        // Arrange
-        enqueue(200, """{"attributes": {"page_views": 1}}""")
-        val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
-
-        // Act
-        val result = await {
-            tracker.signals.getServiceAttributes("my_service", SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID, it)
-        }
-
-        // Assert
-        assertTrue(result.isSuccess)
-        val request = server.takeRequest()
-        assertNotNull(tracker.session?.sessionId)
-        assertEquals(tracker.session?.sessionId, request.url.queryParameter("client_session_session_id"))
     }
 
     @Test
@@ -129,10 +111,9 @@ class ServiceAttributesTest {
         // Arrange
         enqueue(404, """{"error": "service not found"}""")
         val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("private_service", it) }
+        val result = await { tracker.signals.getServiceAttributes("private_service", "user_id", "u1", it) }
 
         // Assert
         assertFalse(result.isSuccess)
@@ -148,10 +129,9 @@ class ServiceAttributesTest {
             SignalsConfiguration(endpoint),
             TrackerConfiguration("app-id").logLevel(LogLevel.DEBUG)
         )
-        tracker.track(Structured("cat", "act"))
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+        val result = await { tracker.signals.getServiceAttributes("my_service", "user_id", "u1", it) }
 
         // Assert
         assertEquals(SignalsError(400, "100% invalid identifier"), result.error)
@@ -162,10 +142,9 @@ class ServiceAttributesTest {
         // Arrange
         enqueue(502, "Bad gateway")
         val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+        val result = await { tracker.signals.getServiceAttributes("my_service", "user_id", "u1", it) }
 
         // Assert
         assertEquals(502, result.error?.status)
@@ -175,11 +154,10 @@ class ServiceAttributesTest {
     fun failsWithoutResponse() {
         // Arrange
         val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
         server.close()
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+        val result = await { tracker.signals.getServiceAttributes("my_service", "user_id", "u1", it) }
 
         // Assert
         assertEquals(0, result.error?.status)
@@ -189,79 +167,13 @@ class ServiceAttributesTest {
     fun failsWithoutSignalsConfiguration() {
         // Arrange
         val tracker = createTracker()
-        tracker.track(Structured("cat", "act"))
 
         // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
+        val result = await { tracker.signals.getServiceAttributes("my_service", "user_id", "u1", it) }
 
         // Assert
         assertEquals(0, result.error?.status)
         assertTrue(result.error!!.message.contains("SignalsConfiguration"))
-        assertEquals(0, server.requestCount)
-    }
-
-    @Test
-    fun failsForSessionIdBeforeFirstEvent() {
-        // Arrange
-        val tracker = createTracker(SignalsConfiguration(endpoint))
-
-        // Act
-        val result = await {
-            tracker.signals.getServiceAttributes("my_service", SignalsAttributeKeys.CLIENT_SESSION_SESSION_ID, it)
-        }
-
-        // Assert
-        assertEquals(0, result.error?.status)
-        assertEquals(0, server.requestCount)
-    }
-
-    @Test
-    fun failsWhenUserAnonymisationIsOn() {
-        // Arrange
-        val tracker = createTracker(
-            SignalsConfiguration(endpoint),
-            TrackerConfiguration("app-id").userAnonymisation(true)
-        )
-        tracker.track(Structured("cat", "act"))
-
-        // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
-
-        // Assert
-        assertEquals(0, result.error?.status)
-        assertTrue(result.error!!.message.contains("anonymisation"))
-        assertEquals(0, server.requestCount)
-    }
-
-    @Test
-    fun failsWhenSessionIsDisabled() {
-        // Arrange
-        val tracker = createTracker(
-            SignalsConfiguration(endpoint),
-            TrackerConfiguration("app-id").sessionContext(false)
-        )
-        tracker.track(Structured("cat", "act"))
-
-        // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", it) }
-
-        // Assert
-        assertEquals(0, result.error?.status)
-        assertTrue(result.error!!.message.contains("Session tracking is disabled"))
-        assertEquals(0, server.requestCount)
-    }
-
-    @Test
-    fun failsForCustomKeyWithoutIdentifier() {
-        // Arrange
-        val tracker = createTracker(SignalsConfiguration(endpoint))
-        tracker.track(Structured("cat", "act"))
-
-        // Act
-        val result = await { tracker.signals.getServiceAttributes("my_service", "custom_key", it) }
-
-        // Assert
-        assertEquals(0, result.error?.status)
         assertEquals(0, server.requestCount)
     }
 
