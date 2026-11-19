@@ -13,6 +13,7 @@
 package com.snowplowanalytics.core.statemachine
 
 import com.snowplowanalytics.snowplow.configuration.PluginAfterTrackConfiguration
+import com.snowplowanalytics.snowplow.configuration.PluginBeforeTrackConfiguration
 import com.snowplowanalytics.snowplow.configuration.PluginEntitiesConfiguration
 import com.snowplowanalytics.snowplow.configuration.PluginFilterConfiguration
 import com.snowplowanalytics.snowplow.event.Event
@@ -24,7 +25,8 @@ class PluginStateMachine(
     override val identifier: String,
     val entitiesConfiguration: PluginEntitiesConfiguration?,
     val afterTrackConfiguration: PluginAfterTrackConfiguration?,
-    val filterConfiguration: PluginFilterConfiguration?
+    val filterConfiguration: PluginFilterConfiguration?,
+    val beforeTrackConfiguration: PluginBeforeTrackConfiguration? = null
 ) : StateMachineInterface {
 
     override val subscribedEventSchemasForTransitions: List<String>
@@ -37,7 +39,10 @@ class PluginStateMachine(
         }
 
     override val subscribedEventSchemasForPayloadUpdating: List<String>
-        get() = emptyList()
+        get() {
+            val config = beforeTrackConfiguration ?: return emptyList()
+            return config.schemas ?: Collections.singletonList("*")
+        }
 
     override val subscribedEventSchemasForAfterTrackCallback: List<String>
         get() {
@@ -63,7 +68,7 @@ class PluginStateMachine(
     }
 
     override fun payloadValues(event: InspectableEvent, state: State?): Map<String, Any>? {
-        return null
+        return beforeTrackConfiguration?.closure?.invoke(event)
     }
 
     override fun afterTrack(event: InspectableEvent) {
